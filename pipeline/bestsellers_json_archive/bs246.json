@@ -1,0 +1,61 @@
+{
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "Direct HTTP fetch worked throughout (no block encountered; robots.txt has no Claude-specific disallow). Method: checked main nav/mega-menu (homepage href scrape), collections.json (750 collections across 3 pages), sitemap_collections_1.xml, then opened every candidate and confirmed exact qty via exhaustive products.json enumeration (paginated limit=250, deduped by product id) -- this matched the site's own rendered 'You've viewed X of Y products' text on every page where that text was present, confirming collections.json's own products_count field is inflated/unreliable (consistent with prior project finding) and was NOT used for qty. Two collections are in main navigation: /collections/best-selling-product (title 'Bestsellers | Top Kitchen Essentials Shop') and /collections/loved-by-customers (title 'Loved by Customers', matches the 'Customer Favorites' target term) -- these are the confident, canonical rows. Four additional bestseller-named collections exist on the site (found via sitemap, not nav) with genuinely distinct product sets (low overlap vs the canonical listing, so not aliases) but unclear whether the site actively surfaces them anywhere in the UI -- flagged for human review rather than silently excluded or silently included. EXCLUDED (not emitted as a row): /collections/wc-bestsellers, title 'WC Bestsellers', rendered 'of 1101 products' -- verified via /collections/all/products.json enumeration that 1101 is the site's ENTIRE product catalogue count; this is a mislabeled catch-all collection, not a genuine bestseller curation, so it fails the 'genuinely represents a bestseller/popularity merchandising concept' test in section 3 of the brief.",
+  "rows": [
+    {
+      "category": "Bestsellers",
+      "sub_category": "Bestsellers",
+      "qty": 80,
+      "link": "https://www.wonderchef.com/collections/best-selling-product",
+      "is_group": false,
+      "evidence": "Exhaustive products.json enumeration (paginated limit=250): 80 unique product ids. Page <title>: 'Bestsellers | Top Kitchen Essentials Shop | Wonderchef'. Linked from main site navigation.",
+      "flag": null
+    },
+    {
+      "category": "Bestsellers",
+      "sub_category": "Loved by Customers",
+      "qty": 185,
+      "link": "https://www.wonderchef.com/collections/loved-by-customers",
+      "is_group": false,
+      "evidence": "Exhaustive products.json enumeration: 185 unique product ids. Page <title>: 'Loved by Customers'. Linked from main site navigation. Only 3 of 185 products overlap with the canonical /best-selling-product listing, confirming this is a genuinely distinct listing, not an alias.",
+      "flag": null
+    },
+    {
+      "category": "Bestsellers",
+      "sub_category": "Bestseller",
+      "qty": 263,
+      "link": "https://www.wonderchef.com/collections/bestseller",
+      "is_group": false,
+      "evidence": "Exhaustive products.json enumeration: 263 unique product ids.",
+      "flag": "MANUAL REVIEW: collection titled 'Bestseller' is NOT linked from main site navigation or any discoverable internal link -- found only via sitemap_collections_1.xml. Product set is genuinely distinct from the canonical /best-selling-product listing (only 35 of 263 products overlap), so it is not a pure alias, but it is unclear whether the site actively surfaces this URL to customers anywhere. Human to confirm whether this is a live secondary Bestsellers listing or an orphaned/legacy auto-tag collection."
+    },
+    {
+      "category": "Bestsellers",
+      "sub_category": "Best Selling",
+      "qty": 35,
+      "link": "https://www.wonderchef.com/collections/best-selings",
+      "is_group": false,
+      "evidence": "Exhaustive products.json enumeration: 35 unique product ids, matches rendered page text 'of 35 products'.",
+      "flag": "MANUAL REVIEW: not linked from main navigation (sitemap-only discovery); collection created 2021-05-31 per collections.json published_at, likely a legacy typo-handle duplicate ('best-selings'). 18 of 35 products overlap with the canonical /best-selling-product listing. Human to confirm whether this should be counted separately or treated as superseded by the canonical listing."
+    },
+    {
+      "category": "Bestsellers",
+      "sub_category": "Best Selling Products",
+      "qty": 23,
+      "link": "https://www.wonderchef.com/collections/best-selling-products",
+      "is_group": false,
+      "evidence": "Exhaustive products.json enumeration: 23 unique product ids.",
+      "flag": "MANUAL REVIEW: not linked from main navigation (sitemap-only discovery); collection created 2019-03-01 per collections.json published_at, appears to be a legacy collection predating the current /best-selling-product nav item. 14 of 23 products overlap with the canonical listing. Human to confirm whether this is still a live, distinct merchandising page."
+    },
+    {
+      "category": "Bestsellers",
+      "sub_category": "Home & Living Best Seller",
+      "qty": 106,
+      "link": "https://www.wonderchef.com/collections/home-living-best-seller",
+      "is_group": false,
+      "evidence": "Exhaustive products.json enumeration: 106 unique product ids, matches rendered page text 'of 106 products'.",
+      "flag": "MANUAL REVIEW: not linked from main navigation; appears to be a department-specific ('Home & Living' product-tag) auto-collection rather than a page the site's UI surfaces directly. Only 1 of 106 products overlaps with the canonical /best-selling-product listing (genuinely distinct product set). Human to confirm whether this counts as a genuine site-exposed Bestsellers sub-listing."
+    }
+  ]
+}

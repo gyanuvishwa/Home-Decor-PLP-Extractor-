@@ -1,0 +1,43 @@
+{
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "Access: robots.txt (fetched via curl_cffi impersonate=chrome120, HTTP 200) explicitly groups ClaudeBot/Claude-Web/anthropic-ai with GPTBot etc under 'Allow: /' -- confirmed for www2.hm.com specifically (not assumed from another H&M market). Tier 1 (direct HTTP fetch of category HTML pages) was blocked by an Akamai Bot Manager 'Access Denied' wall (errors.edgesuite.net) on every impersonation profile tried (chrome99/110/116/119/123/124, safari15_3/17_0, edge99/101), even though robots.txt and the sitemap XML endpoints returned 200 for the same client -- sitemap-only fetch was used first to build the candidate tree, then escalated to tier 3 (Claude-in-Chrome) per the hard-block rule since no Playwright/CDP tool is available in this environment. Tree source: en_in.sitemap.xml -> 31 en_in.pages.subdepartment.N.xml files (2969 URLs unioned) filtered for 'bath', cross-checked against the live mega-menu (Home > Shop by Room > Bathroom) and each category page's own tab strip -- both agree on the same 7-node Bathroom-room tree (Bathroom/Soap Dispensers/Towels/Shower Curtains/Bathroom Storage/Accessories/Laundry Bags), so no under-reported nodes. Qty verified from the rendered '<N> Products' header on each leaf page (JS-hydrated storefront, tier-1 HTML was empty pre-hydration). Exclusions: Towels, Shower Curtains, Bath Mats (confirmed via screenshot to be textile rugs/patterned mats, not rubber/anti-slip) -> Textile.xlsx territory per rule 20/16, not re-extracted here. Laundry Bags and Laundry & Cleaning Products (brooms/sprays) -> out of Bathroom scope per rule 3 (general laundry/cleaning, not a bathroom fixture/accessory/hardware type), excluded, not sent to review (not ambiguous). Parent https://www2.hm.com/en_in/home/shop-by-room/bathroom.html (265 products, aggregate of all 7 tabs incl. seasonal Christmas towels) excluded per rule 24 -- valid subcategories exist. Duplicate-taxonomy finding: https://www2.hm.com/en_in/home/shop-by-product/bath-shower/bathroom-accessories.html (30 products) was compared product-ID-by-product-ID (via page JS, article a[href*=productpage]) against https://www2.hm.com/en_in/home/shop-by-room/bathroom/accessories.html (31 products) -- 30 of 31 product IDs are identical, confirming these are the same underlying catalog node exposed via two different nav taxonomies (Shop by Room vs Shop by Product) with a live 1-item stock/timing drift, not two genuine categories. Recorded once under the Shop-by-Room path (the canonical Bathroom-room hub used for rule 23 navbar extraction); the alternate URL logged to review as a duplicate, not double-counted. Cross-category dedup: all 4 candidate leaf URLs checked against pipeline/bathroom_json_archive/cross_category_url_index.json -- no hits in Furniture/Storage/Wall_Decor/Textile. No bathroom mirror, vanity, fixture, tap, or ceramic-sanitaryware category exists on this storefront (H&M Home India sells only soft-goods-adjacent bathroom accessories, soap dispensers and small storage/shelving -- confirmed absent via full sitemap+menu tree, not a search-only null result).",
+  "rows": [
+    {
+      "category": "Bathroom",
+      "sub_category": "Soap Dispensers",
+      "qty": 3,
+      "link": "https://www2.hm.com/en_in/home/shop-by-room/bathroom/soap-dispensers.html",
+      "is_group": false,
+      "evidence": "Rendered listing header '3 Products' on the live (JS-hydrated) category page, confirmed via screenshot; H1 'Soap Dispensers', tab strip active state matches URL slug.",
+      "flag": null
+    },
+    {
+      "category": "Bathroom",
+      "sub_category": "Bathroom Storage | Shelving, Hooks & Baskets",
+      "qty": 9,
+      "link": "https://www2.hm.com/en_in/home/shop-by-room/bathroom/storage.html",
+      "is_group": false,
+      "evidence": "Rendered listing header '9 Products' on the live category page, confirmed via screenshot; H1 'Bathroom Storage', tab strip active state matches URL slug.",
+      "flag": null
+    },
+    {
+      "category": "Bathroom",
+      "sub_category": "Accessories",
+      "qty": 31,
+      "link": "https://www2.hm.com/en_in/home/shop-by-room/bathroom/accessories.html",
+      "is_group": false,
+      "evidence": "Rendered listing header '31 Products' on the live category page, confirmed via screenshot; H1 'Bathroom Accessories', tab strip active state matches URL slug. Unique product-ID count via page JS also returned 31.",
+      "flag": null
+    }
+  ],
+  "review": [
+    {
+      "category": "Bathroom",
+      "sub_category": "Bathroom Accessories (alternate Shop-by-Product path)",
+      "qty": 30,
+      "issue": "DUPLICATE OF https://www2.hm.com/en_in/home/shop-by-room/bathroom/accessories.html -- product-ID comparison (30 vs 31 items) shows 30 of 31 IDs identical between the two URLs; same underlying catalog node exposed via H&M's Shop-by-Room and Shop-by-Product taxonomies. Recorded once (under the Shop-by-Room URL) in rows[]; this alternate-path URL intentionally excluded to avoid near-total double counting.",
+      "link": "https://www2.hm.com/en_in/home/shop-by-product/bath-shower/bathroom-accessories.html"
+    }
+  ]
+}

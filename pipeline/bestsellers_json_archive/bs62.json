@@ -1,0 +1,16 @@
+{
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "Rejuvenation (WSI/Williams-Sonoma family, same platform as Pottery Barn/West Elm). Direct HTTP works via curl_cffi impersonate=chrome124 (plain requests/curl hang/timeout on this host - TLS-fingerprint sensitive). Homepage nav JSON (primaryNavBar.mobileNavItems) has no dedicated 'Bestsellers' top-level nav item; the string 'Best Sellers' only appears as a Recently-Viewed-flyout tab label and a recommendation-widget config key ('showBestSellers','isAutomatedBestsellersEnabled') - not a navigable PLP link, so main nav alone would falsely suggest absence. Found the genuine Bestsellers PLP by walking the site's own Constructor.io group/category taxonomy (ac.cnstrc.com, key=key_9BhS51IOFNhJejk4 - this is the sole product-data source; the SPA's SSR HTML always ships totalProductsCount:0 and the real grid is Constructor-hydrated client-side, matching this company's prior Home-Decor pass notes): root 'all' -> 17 top-level departments; one department is 'New and Featured' (group_id=new-and-featured, count=4826), a mixed merchandising hub (Bestsellers, Contract Grade, Fair Trade, room-based New-arrivals collections, designer project collaborations, sustainability tags, etc. all as flat sibling groups - not itself a Bestsellers page). One of its ~90 sibling groups is explicitly named 'Bestsellers' (group_id=bestsellers-shop-all, count=439). Resolved and opened its live URL: HTTP 200, <title>Bestsellers | Rejuvenation</title>, <h1>Bestsellers</h1> - confirmed a genuine bestseller-merchandising PLP, not a badge or editorial page. Checked the full group tree (all 17 departments + all children of 'new-and-featured' and 'sale') for any other bestseller-named node (e.g. room-qualified 'Furniture Bestsellers') - none exists; this is a single undifferentiated listing, so sub_category = category per brief §6. Also checked robots.txt: no Claude-specific disallow, standard sitemap set only.",
+  "rows": [
+    {
+      "category": "Bestsellers",
+      "sub_category": "Bestsellers",
+      "qty": 439,
+      "link": "https://www.rejuvenation.com/shop/new-and-featured/bestsellers-shop-all/",
+      "is_group": false,
+      "evidence": "Constructor.io browse API https://ac.cnstrc.com/browse/group_id/bestsellers-shop-all?key=key_9BhS51IOFNhJejk4 : response.total_num_results=439. Cross-checked by exhaustion: paged browse (num_results_per_page=120) counting unique product IDs until an empty page returned exactly 439 unique IDs, matching total_num_results exactly. Page itself verified reachable at HTTP 200 with <title>Bestsellers | Rejuvenation</title> and <h1>Bestsellers</h1>.",
+      "flag": null
+    }
+  ]
+}

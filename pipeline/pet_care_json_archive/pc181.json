@@ -1,0 +1,52 @@
+{
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "Site is Freedom (Greenlit Brands), SAP Commerce Cloud (Hybris)/Spartacus Angular SPA - confirmed by prior Home-Decor pass (archive c210, notes/181.md): server HTML is an SSR SEO shell only, no product-count data embedded anywhere (checked JSON-LD, no ItemList/numberOfItems; only a MiniCart 'shownProductCount' field, unrelated). categorysitemap.xml (234 curated category URLs, re-verified this pass) contains NO pet-related URLs at all despite being current (lastmod today) - Pet Care is absent from that sitemap even though the tree is live and linked from primary nav, so sitemap alone is not proof of absence for this site. Found the Pets tree instead via the homepage mega-menu's embedded nav JSON (grep for 'pet' in homepage HTML), which listed categoryCode/url pairs for 'pets', 'pet-beds', 'pet-sofas', 'pet-blankets-and-covers', 'pet-bowls-and-feeders'. Direct curl fetches of the 4 child URLs initially returned only the generic CSR app shell (title 'Freedom Store', ~6.4KB, no product grid) - this proved to be a transient SSR-render-pool miss, not a dead route: retrying each URL 1-3x consistently produced the full SSR page with a distinct product-specific <title> (confirmed for all 4 children + the 'Pets' parent). Because this SPA's product-count widget (Coveo) does not render its 'N PRODUCTS' / 'Showing X of Y results' text into the server-rendered HTML (only the product grid itself is SSR'd, per the prior pass's platform analysis), used Playwright (Chromium headless) to load each page and read the rendered DOM text for the exact count - this is the first Rule-2 (Playwright) escalation needed for this company since Tier-1 direct fetch could reach the pages but not the qty text. All 5 counts read from two independent rendered strings that agree exactly on every page: the filter-panel header ('N PRODUCTS') and the pagination footer ('Showing 1-N of N results'). Cross-check: Pets (parent) rendered '95 PRODUCTS'; its three genuinely distinct child buckets sum to exactly 65 (Pet Beds) + 9 (Pet Blankets & Covers) + 21 (Pet Accessories) = 95, an exact match, so Pets is recorded as a pure rollup grouping (is_group true, qty null) with no products of its own beyond its children. Pet Sofas (8 products, breadcrumb Pets > Pet Beds > Pet Sofas, URL /pets/pet-beds/c/pet-sofas) is a genuine second-level child of Pet Beds specifically - its 8 products are individually visible and identically named inside Pet Beds' own 65-product listing (e.g. QUEVEN Pet Sofa Bed, TOFOL Pet Sofa, VERTOU Pet Sofa etc. appear in both listings), i.e. Pet Beds' 65 already includes Pet Sofas' 8 as a cross-listed subset. Kept both as separate rows (each has its own distinct URL, on-page title, and exact count, satisfying the 'genuinely different PLPs -> keep both' rule) rather than collapsing them, but flagging this overlap explicitly so the merge step does not sum Pet Beds(65)+Pet Sofas(8) as if they were disjoint - Pet Beds' 65 is the correct total for that node and already contains the 8. sub_category naming: used the site's own on-page breadcrumb/H1 name in each case; for the 4th child this is literally 'Pet Accesories' (site's own spelling) even though its URL slug is pet-bowls-and-feeders and its <title> tag says 'Pet Bowls & Pet Feeders in Australia' - recorded as 'Pet Accessories' (correcting the obvious typo) since its contents are broader than bowls/feeders (also pet gates, play pens, placemats, lick mats, pet toys, and two wild-bird-feeder items which were left in since the products are still pet/animal-feeding items and the row is a Tier-2 generic-branch-under-pet-specific-parent case, not something requiring exclusion). No pet-food/consumable or medical/veterinary categories were found on this site. No Furniture/Storage/Bathroom/Kitchen/Lighting/Wall-Decor/Textile categories were mis-attributed here - all 5 rows are exclusively pet items (pet beds, pet sofas/pet-sofa-beds, pet blankets & furniture-protector covers, pet bowls/feeders/gates/pens/toys).",
+  "rows": [
+    {
+      "category": "Pet Care",
+      "sub_category": "Pets",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Pet Beds",
+      "qty": 65,
+      "link": "https://www.freedom.com.au/pets/c/pet-beds",
+      "is_group": false,
+      "evidence": "Playwright-rendered DOM: filter header '65 PRODUCTS' and pagination footer 'Showing 1-65 of 65 results'",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Pet Sofas",
+      "qty": 8,
+      "link": "https://www.freedom.com.au/pets/pet-beds/c/pet-sofas",
+      "is_group": false,
+      "evidence": "Playwright-rendered DOM: filter header '8 PRODUCTS' and pagination footer 'Showing 1-8 of 8 results'",
+      "flag": "NOTE: these 8 products are a cross-listed subset also present in the Pet Beds (65) listing - see notes; not additive to Pet Beds' total"
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Pet Blankets & Covers",
+      "qty": 9,
+      "link": "https://www.freedom.com.au/pets/c/pet-blankets-and-covers",
+      "is_group": false,
+      "evidence": "Playwright-rendered DOM: filter header '9 PRODUCTS' and pagination footer 'Showing 1-9 of 9 results'",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Pet Accessories",
+      "qty": 21,
+      "link": "https://www.freedom.com.au/pets/c/pet-bowls-and-feeders",
+      "is_group": false,
+      "evidence": "Playwright-rendered DOM: filter header '21 PRODUCTS' and pagination footer 'Showing 1-21 of 21 results'; site breadcrumb/H1 reads 'Pet Accesories' (site's own spelling), URL slug is pet-bowls-and-feeders, meta <title> is 'Pet Bowls & Pet Feeders in Australia'",
+      "flag": null
+    }
+  ]
+}

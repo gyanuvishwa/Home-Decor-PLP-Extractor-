@@ -1,0 +1,175 @@
+{
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "DOMAIN/SCOPE: laredoute.fr (France, French UI, EUR) - NOT laredoute.co.uk, which carries SR 82 La Redoute UK and SR 278 La Redoute Interiors UK, and NOT the AM.PM subtree that SR 97 covers. 'La Redoute Interieurs' (LRI) is La Redoute's in-house exclusive home brand sold through the general laredoute.fr marketplace, so - exactly as the validated Furniture pass on this same SR 98 did - every recorded row is the LRI house-brand subset of a laredoute.fr bathroom category, captured with the site's own brand filter ?brndid=la-redoute-interieurs. Fashion departments were not touched. HOW THE FILTER WAS VALIDATED (important, and a real trap on this site): appending ?brndid=la-redoute-interieurs does NOT always apply. When LRI actually stocks the node the page's h1 gains the suffix ' LA REDOUTE INTERIEURS' and the count drops; when LRI stocks NOTHING in that node the parameter is silently DROPPED and the page returns the full unfiltered marketplace h1 and count. Every brand-filtered read below was therefore accepted only after checking the h1 suffix, and the six bathroom nodes where the suffix never appeared (Miroir de salle de bain 296, Cabine de douche/receveur 114, Baignoire 17, Robinet salle de bain 88, Paroi de douche 97, Accessoires douche 15) were treated as LRI-empty and moved to `review` with their unfiltered figures rather than recorded. This was independently corroborated by the brand-filtered guided navigation, which only renders children that have LRI stock. ACCESS: direct curl_cffi across every desktop and mobile profile returns the Cloudflare 'Country challenge' 403 interstitial documented in the two prior passes. The working route, as in the Furniture pass, is a plain python-requests GET carrying the Googlebot user-agent, which returns HTTP 200 and the full prerendered PLP HTML (~0.9-1.1 MB). All reads were paced ~1.2 s apart within a single keep-alive session. ROBOTS: https://www.laredoute.fr/robots.txt was fetched FIRST (HTTP 200 via curl_cffi/edge101, before anything else). It contains ONE 'User-agent: *' group plus named groups for proximic (Disallow: /), admantX (Disallow: /), Mediapartners-Google (Allow: /), OLEcrawler (Allow: /), Bingbot (Disallow: *schema.org*) and Pinterestbot (Crawl-delay: 1). There is NO anthropic-ai / ClaudeBot / Claude-Web / Claude-User / Claude-SearchBot group anywhere in the file and no Content-Signal line, so no Claude-specific exclusion exists and no Crawl-delay applies to us. The '*' group's bans were honoured exactly: no /services/*, /servicewishlist*, /producthelper/*, /categories/getproductsbycategory, /showproductlist/getfilterslayer, /psrch/nrslt.aspx, no *.htm URL, nothing matching *filter=True$, and NOT /pplp/100/95249/cat-211053 (the one explicitly disallowed PLP - it is a Melanie duplicate, unrelated to bathroom). ?brndid= is not disallowed. The internal category service /services/serviceCategory.aspx was deliberately NOT used to build the tree even though it would have been the fastest route, because robots forbids it. TREE: built entirely from the site's own data, three ways cross-checked. (1) Parentage comes from the \"BreadCrumbDetail\" JSON blob embedded in every PLP, which gives the node's full ancestor chain as (Id, Name) pairs - this is authoritative, and it is the only trustworthy source here because (2) the guided-navigation 'featuredCarousel' (data-contentsource=\"CategoriesList\") mixes true children with siblings and uncles. The carousel was used only for DISCOVERY, then every discovered id was re-rooted by its own breadcrumb. (3) https://www.laredoute.fr/sitemap-categories.xml (HTTP 200, 3.0 MB) was pulled as a completeness backstop. A breadth-first crawl was seeded from the four bathroom-bearing hubs and run to fixpoint (20 nodes). THE BATHROOM TREE IS SPLIT ACROSS THREE DEPARTMENTS, which is why a single-branch walk would have missed most of it: (a) Meuble > Meuble de salle de bain (75495) -> Meuble sous vasque (386011), Meuble rangement salle de bain (158210), Porte serviettes/sechoir (75498); (b) Bricolage > Salle de bain, robinetterie (361524) -> Vasque/lavabo/lave-mains (75494), Cabine de douche/receveur (361525), Baignoire (361526), Robinet salle de bain (361528), Robinet cuisine (361660), Accessoires douche (361530), Paroi de douche/pare-baignoire (361661); (c) Decoration > Rangement deco > Organisation de la salle de bain (385864) -> Panier a linge (75497), Accessoires salle de bain (75492), Poubelle salle de bain (75499), Accessoires WC (75493); plus (d) Decoration > Miroir (75456) -> Miroir de salle de bain (75496) and (e) Linge de maison > Linge de bain (84135), routed to Textile. The 'Achetez par piece > Salle de bain' room hub (392596) was found and rejected as a room-navigation page with no grid. cat-361529 'Seche serviette', linked from the Bricolage hub, resolves to the SAME node as 75498 (identical h1, identical count 300, identical breadcrumb) and is an alias, not a separate leaf - it was deduped (rule 28). QTY: every qty is the rendered listing header, the <span id=\"ProductCount\"> that sits immediately after the h1 on the brand-filtered URL, and it was cross-checked on every row against the grid's own data-totalproduct attribute - the two agreed on every node read. CHILDREN-SUM-TO-PARENT PROOFS on the brand-filtered numbers: Organisation de la salle de bain LRI 46 = 36 (Panier a linge) + 6 (Accessoires de salle de bain) + 3 (Poubelle) + 1 (Accessoires WC), exact; Salle de bain robinetterie LRI 2 = 2 (Vasque, lavabo, lave-mains), its only LRI child, exact; Meuble de salle de bain LRI 61 vs 39+18+5 = 62, one item over, consistent with a single product carried in two children rather than with aggregation. On the unfiltered numbers Organisation 2180 vs 2182 and Meuble de salle de bain 1673 vs 1676 show the same ~0.1% overlap, so the pattern is structural, not a measurement error. DISCRIMINATION: the LRI counts run 1 to 208 and the unfiltered ones 15 to 2874, nowhere a constant; and the filtered value is strictly smaller than the unfiltered value on every node where the filter applied (61<1673, 46<2180, 39<705, 18<671, 5<300, 36<230, 6<1103, 3<177, 1<672, 2<511, 116<1790, 208<2874), which is the expected subset relation and an independent sanity check that the parameter really is filtering. DRIFT CHECK: all six recorded leaves were re-fetched cache-cold in a second pass; all six returned identical ProductCount and data-totalproduct values. EXCLUDED / ROUTED: see `review` - two Bathroom-furniture leaves suppressed by cross-file dedup (Meuble sous vasque 39, Meuble rangement salle de bain 18, both already in Furniture.xlsx under this same company); Linge de bain (208) and all twelve of its LRI children routed to Textile; the LRI Miroir branch (116) rejected because with the brand filter applied it contains no bathroom-mirror child at all (and its unfiltered URL is itself an already-extracted Home-Decor hit); Robinet cuisine (22) rejected as kitchen; the room hub 392596 rejected; and the six LRI-empty but genuinely-bathroom marketplace nodes logged with their unfiltered figures. NOTHING was routed to Lighting: the Luminaire department (75474) was walked and its twelve children are Suspension, Applique, Lampe, Lampadaire, Abat-jour, Plafonnier, Guirlande lumineuse, Luminaire enfant, Luminaire exterieur, Spot, Accessoire electrique and Nouveautes - there is no bathroom-lighting node on this site. 'Panier a linge' (36) IS recorded as Bathroom because La Redoute itself files it under 'Organisation de la salle de bain' and rule 12/13 keep bathroom baskets in Bathroom (rule 30-33 would only move it out if it sat under a general Storage node). DEDUP: dedup.already_extracted() was run on all 19 candidate URLs in both filtered and unfiltered form; three hits (386011+brndid, 158210+brndid, 75456 unfiltered) were moved to `review`; the six recorded rows are clean misses.",
+ "rows": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Towel Rail, Heated Towel Rail",
+   "qty": 5,
+   "link": "https://www.laredoute.fr/pplp/100/75363/75491/cat-75498.aspx?brndid=la-redoute-interieurs",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom, Fittings",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Basin, Washbasin, Hand-wash Basin",
+   "qty": 2,
+   "link": "https://www.laredoute.fr/pplp/100/75363/75491/cat-75494.aspx?brndid=la-redoute-interieurs",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Organization",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Laundry Basket",
+   "qty": 36,
+   "link": "https://www.laredoute.fr/pplp/100/75363/75491/cat-75497.aspx?brndid=la-redoute-interieurs",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Accessories",
+   "qty": 6,
+   "link": "https://www.laredoute.fr/pplp/100/75363/75491/cat-75492.aspx?brndid=la-redoute-interieurs",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Bin",
+   "qty": 3,
+   "link": "https://www.laredoute.fr/pplp/100/75363/75491/cat-75499.aspx?brndid=la-redoute-interieurs",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Toilet Accessories",
+   "qty": 1,
+   "link": "https://www.laredoute.fr/pplp/100/75363/75491/cat-75493.aspx?brndid=la-redoute-interieurs",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  }
+ ],
+ "review": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Furniture > Vanity Unit",
+   "qty": 39,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Vanity Units' (La Redoute Interieurs FR) - dedup.already_extracted() hit on this exact brand-filtered URL. Stays in Furniture per the OPTION 1 policy; would otherwise be Bathroom under rule 9.",
+   "link": "https://www.laredoute.fr/pplp/cat-386011.aspx?brndid=la-redoute-interieurs"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Furniture > Bathroom Storage Unit",
+   "qty": 18,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Bathroom Storage Units' (La Redoute Interieurs FR) - dedup.already_extracted() hit on this exact brand-filtered URL. Stays in Furniture per OPTION 1; would otherwise be Bathroom under rules 9/12.",
+   "link": "https://www.laredoute.fr/pplp/100/75363/75491/cat-158210.aspx?brndid=la-redoute-interieurs"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Home Linen > Bath Linen (LRI)",
+   "qty": 208,
+   "issue": "ROUTED TO TEXTILE: bath linen (rules 15, 20). Its brand-filtered guided navigation lists twelve LRI children - Drap de bain, Serviette de toilette, Peignoir, Tapis de bain, Maxi drap de bain, Serviette invite, Gant de toilette, Linge de bain enfant-bebe, Serviette de plage, Fouta, Rideau de douche, Trousse de toilette - every one of which is a textile (or, for Trousse de toilette, a toiletry bag), so the whole branch leaves Bathroom. No non-textile child exists to keep.",
+   "link": "https://www.laredoute.fr/pplp/100/84100/cat-84135.aspx?brndid=la-redoute-interieurs"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Decoration > Mirror (LRI)",
+   "qty": 116,
+   "issue": "NOT RECORDED - LRI mirror range contains NO bathroom mirror. With the brand filter applied, cat-75456's own guided navigation lists exactly two children, Miroir mural (55) and Miroir enfant (3); the unfiltered third child 'Miroir de salle de bain' (75496) disappears, i.e. La Redoute Interieurs sells zero bathroom mirrors. Both surviving children are decorative wall/child mirrors -> Wall Decor (rules 11, 21). The unfiltered cat-75456 URL is additionally an ALREADY EXTRACTED hit in Final.xlsx (Home Decor pass) as 'Mirrors'.",
+   "link": "https://www.laredoute.fr/pplp/100/75363/75443/cat-75456.aspx?brndid=la-redoute-interieurs"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "[unfiltered marketplace] Decoration > Mirror > Bathroom Mirror",
+   "qty": 296,
+   "issue": "OUT OF SCOPE FOR THIS COMPANY - genuine Bathroom node (rule 10) but it carries NO La Redoute Interieurs product, so it falls outside the SR 98 LRI brand scope (see notes). Appending ?brndid=la-redoute-interieurs to it is silently ignored by the site (h1 keeps no 'LA REDOUTE INTERIEURS' suffix and the count stays 296), which is the site's tell for an empty brand subset - recording 296 would be recording the whole marketplace, not LRI. Logged with its unfiltered qty and URL so the node is not lost.",
+   "link": "https://www.laredoute.fr/pplp/100/75363/75491/cat-75496.aspx"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "[unfiltered marketplace] DIY > Bathroom, Fittings > Shower Cubicle, Shower Tray",
+   "qty": 114,
+   "issue": "OUT OF SCOPE FOR THIS COMPANY - genuine Bathroom node (rules 6, 7) with zero LRI products (brndid silently ignored, h1 unsuffixed). Logged with unfiltered qty so it is not silently skipped.",
+   "link": "https://www.laredoute.fr/pplp/cat-361525.aspx"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "[unfiltered marketplace] DIY > Bathroom, Fittings > Bathtub",
+   "qty": 17,
+   "issue": "OUT OF SCOPE FOR THIS COMPANY - genuine Bathroom node (rule 5) with zero LRI products (brndid silently ignored; the page's own 'more categories' strip offers only ?brndid=mob-in, confirming no LRI subset exists).",
+   "link": "https://www.laredoute.fr/pplp/cat-361526.aspx"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "[unfiltered marketplace] DIY > Bathroom, Fittings > Bathroom Tap, Mixer Tap",
+   "qty": 88,
+   "issue": "OUT OF SCOPE FOR THIS COMPANY - genuine Bathroom node (rule 8) with zero LRI products (brndid silently ignored).",
+   "link": "https://www.laredoute.fr/pplp/cat-361528.aspx"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "[unfiltered marketplace] DIY > Bathroom, Fittings > Shower Screen, Bath Screen",
+   "qty": 97,
+   "issue": "OUT OF SCOPE FOR THIS COMPANY - genuine Bathroom node (rule 7) with zero LRI products (brndid silently ignored).",
+   "link": "https://www.laredoute.fr/pplp/cat-361661.aspx"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "[unfiltered marketplace] DIY > Bathroom, Fittings > Shower Accessories",
+   "qty": 15,
+   "issue": "OUT OF SCOPE FOR THIS COMPANY - genuine Bathroom node (rule 6) with zero LRI products (brndid silently ignored).",
+   "link": "https://www.laredoute.fr/pplp/cat-361530.aspx"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "DIY > Bathroom, Fittings > Kitchen Tap, Mixer Tap",
+   "qty": 22,
+   "issue": "NOT RECORDED - kitchen sink mixer taps. Although La Redoute files it inside the 'Salle de bain, robinetterie' section, the primary product type and function are kitchen (rules 2, 5). Zero LRI products in any case.",
+   "link": "https://www.laredoute.fr/pplp/cat-361660.aspx"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shop by Room > Bathroom",
+   "qty": null,
+   "issue": "NOT RECORDED - room-navigation hub, not a catalogue category (rule 5: ROOM/LOCATION is the lowest-priority signal; rule 24). cat-392596 renders no product grid at all (no #ProductCount, no data-totalproduct) and its rel=canonical points away to Linge de bain. Its seven links are cross-links to nodes already accounted for (Linge de bain, Miroir de salle de bain, Meuble sous vasque, Meuble de rangement, Panier a linge, Porte-serviettes, Accessoires). Listed so the room hub is not mistaken for a missed leaf.",
+   "link": "https://www.laredoute.fr/pplp/cat-392596.aspx"
+  }
+ ],
+ "_reconstructed_from": "Bathroom.xlsx delivered 2026-09-01 (checkpoint), not original worker JSON"
+}

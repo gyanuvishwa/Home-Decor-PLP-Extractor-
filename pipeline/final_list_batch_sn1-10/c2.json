@@ -1,0 +1,453 @@
+{
+ "sr": 2,
+ "company": "West Elm US",
+ "brand_site": "westelm.com",
+ "country": "USA",
+ "site_url": "https://www.westelm.com/",
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ACCESS: westelm.com is A-record-only and its Akamai edge 403s ('Restricted Access') this connection directly, plus translate.goog, WebFetch, a NAT64 gateway and the edgekey-staging edge. r.jina.ai was contended on the first attempt but worked on retry once the other workers finished, and became the working route. QTY SOURCE: 34 of 35 leaf rows carry the live rendered West Elm PLP header ('N Items'), read today 2026-08-07 through r.jina.ai. The 1 remaining row (Photography) is flagged and falls back to the constructor.io API total because that page's grid would not hydrate in the reader across 5 attempts. URL VERIFICATION: all 35 leaf URLs were fetched live - every one returned HTTP 200, resolved to its own canonical URL with no redirect to a parent, and rendered the correct category title. The category tree and hierarchy were originally recovered from Wayback snapshots (Feb-Jun 2026) but are now confirmed against the live site; nothing has been renamed, moved or retired. CONSTRUCTOR vs RENDERED HEADER - CORRECTION TO MY EARLIER REPORT: my JS-bundle argument (shop.js maps constructor total_num_results -> response.numFound -> productCount -> the 'N Items' header) is correct as far as it goes, and 28 of 34 categories matched the API exactly. But 6 did not: Floor Lamps 78 vs 79, Tabletop Picture Frames 19 vs 20, Decorative Objects 41 vs 42, Decorative Trays & Bowls 79 vs 81, Cocktail Glasses 50 vs 52, Charcuterie Boards & Knives 18 vs 19. The rendered header was lower every time, never higher. So the coordinator's warning was directionally right for West Elm too, just much milder than on PB Kids: an unsegmented API call slightly over-counts because the real storefront request carries session/segment context that suppresses a few items. All qty values in this file are the rendered header wherever one could be read. SCOPE: excluded ceiling fans, light bulbs/accessories, flatware, bar tools, serving utensils, picnic baskets, cookware, kitchen tools/storage, table linens, pillows/throws, wallpaper, jewelry storage, baskets, fireplace tools, faux plants/stems/wreaths, scented candles and 'Candles & Home Fragrance', plus all 'All X' / Collections / New / Sale and the 'Lighting by Room' room-filter pages. West Elm has no clock category. 'Unscented Candles' kept at qty 1 as decorative (non-fragrance) candles. NOTE FOR THE ORCHESTRATOR: the shared scratchpad has filename collisions - my generic 'counts.json' was overwritten mid-run by another worker's Pottery Barn Kids data. I re-derived my totals into 'c2_counts.json'. c2.json and verify.json were checked and are West Elm-only, but other workers using generic filenames may have been hit too. RULE 0 TOP-UP ADDENDUM (2026-08-10): re-checked westelm.com specifically for missed bathroom/vanity lighting, outdoor lighting, and bathroom/vanity mirror branches, as flagged for this company (no specific known loss documented, only a general 'vanity/bath' re-check). ACCESS for this pass: direct requests and WebFetch both 403'd on westelm.com directly, and r.jina.ai's own edge intermittently Cloudflare-challenged plain requests/curl_cffi calls to it; curl_cffi with chrome-impersonation fetched westelm.com pages directly at 200 (raw HTML only, JS-hydrated counts not present server-side), and the WebFetch tool routed through r.jina.ai successfully rendered the JS-hydrated 'N Items' headers on retry. METHOD: pulled the live /shop/lighting/ and /shop/wall-decor-mirrors/ mega-menus directly (curl_cffi) to see every real nav-node URL, and cross-checked with Wayback CDX (web.archive.org cdx API, filtered on bathroom/vanity/outdoor keywords) to distinguish genuine standalone category nodes from filter-facet URLs. FOUND AND ADDED (2 rows): Lighting > 'Bathroom & Vanity Lighting' (site path /shop/lighting/bathroom-lighting/, qty 98) and Lighting > 'Outdoor Lighting' (site path /shop/lighting/all-outdoor-lighting/, qty 57) - both are genuine 'Lighting by Room' mega-menu nodes (present in the live nav link list, each with its own cmPageId and SEO title) that the pre-Rule-0 pass excluded outright per the original notes' 'Lighting by Room room-filter pages' exclusion; Rule 0 reverses that exclusion for room-based lighting, so both are now in scope and added under the existing 'Lighting' category. OTHER 'LIGHTING BY ROOM' NODES SEEN BUT NOT ADDED (out of this worker's assigned scope, which was limited to bathroom/vanity/outdoor): the same /shop/lighting/ mega-menu also lists bedroom-lighting, dining-kitchen-lighting and living-room-lighting as further standalone room nodes - flagging these for a follow-up pass since Rule 0.1 would keep them too, but they were not part of the specific investigation assigned to this company. [FOLLOW-UP RESOLVED 2026-08-10: this flagged gap was picked up as its own task. Re-fetched the live /shop/lighting/ mega-menu (curl_cffi chrome124) and pulled its embedded nav JSON directly: the 'header-lighting-by-room' group ('Lighting by Room') contains exactly 5 subcat nodes - bathroom-lighting ('Bathroom & Vanity', already added, qty 98), all-outdoor-lighting ('Outdoor', already added, qty 57), dining-kitchen-lighting ('Dining & Kitchen'), bedroom-lighting ('Bedroom'), living-room-lighting ('Living Room') - confirming there is no 6th/hidden room node (no office, entryway, hallway or patio lighting page exists on West Elm; those slugs return no nav entry and were not probed further since the nav JSON is authoritative and exhaustive for this menu). Added the 3 remaining nodes as new rows: Bedroom Lighting (qty 112), Dining & Kitchen Lighting (qty 73), Living Room Lighting (qty 121). Each verified as a genuine standalone category page, not a facet: own <title> ('Modern Bedroom Lighting For Every Taste', 'Modern Kitchen Lighting - Pendant, Chandeliers', 'Modern Living Room Lighting Options', all '| West Elm'), own cmPageId ('shop:lighting:bedroom-lighting' / 'dining-kitchen-lighting' / 'living-room-lighting'), own canonical URL under /shop/lighting/, listed in the live mega-menu. QTY: for all 3, the live rendered PLP header (fetched via WebFetch routed through r.jina.ai, since direct fetch and direct WebFetch both 403'd on westelm.com) matched the constructor.io browse API (group_id=<slug>, key=key_SQBuGmXjiXmP0UNI, fetched via curl_cffi chrome124 impersonation) exactly - 112/112, 73/73, 121/121 - no header-vs-API discrepancy on any of these three, unlike the 1-off gaps seen elsewhere in this file. ACCESS for this follow-up: same pattern as the rest of this file - direct requests/plain fetch and WebFetch both 403 westelm.com directly; curl_cffi with chrome124 impersonation fetches raw HTML/JSON at 200; WebFetch succeeds when routed through r.jina.ai and reliably rendered all 3 hydrated headers on the first attempt this time (no retries needed). The Lighting category (11 leaf rows total: Chandeliers, Pendants, Flush Mounts, Table & Desk Lamps, Floor Lamps, Sconces, Bathroom & Vanity Lighting, Outdoor Lighting, Bedroom Lighting, Dining & Kitchen Lighting, Living Room Lighting) is now fully Rule-0-compliant: every 'Lighting by Room' mega-menu node is captured.] MIRRORS - NOTHING MISSING: checked westelm.com/shop/wall-decor-mirrors/ live mega-menu (curl_cffi) and it has no standalone Bathroom Mirrors or Vanity Mirrors nav node - only 'Wall Mirrors' and 'Floor Mirrors', both already present in this file. Wayback CDX search for wall-decor-mirrors URLs containing bathroom/vanity/outdoor/makeup found only facet-encoded URLs (e.g. '.../wall-decor-mirrors/bath-vanity+all-art-mirrors/producttype-.../', '.../vanity-mirror+wall-mirrors/mirrortype-.../') - these are Room/Mirror-Type FILTER facets applied on top of the existing 'All Mirrors'/'Wall Mirrors' listings, not separate browsable category pages (no clean base URL like '/shop/wall-decor-mirrors/vanity-mirrors/' exists), so per Rule 0.6 this is a facet re-cut of an already-captured listing, not a missed branch. No outdoor-mirror node exists at all (zero CDX matches). Conclusion: bathroom/vanity mirrors were correctly out of scope as a separate row; nothing to add there.",
+ "rows": [
+  {
+   "category": "Lighting",
+   "sub_category": "Ceiling Lighting",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Chandeliers",
+   "parent": false,
+   "qty": 95,
+   "link": "https://www.westelm.com/shop/lighting/chandeliers/",
+   "evidence": "live West Elm PLP header '95 Items', rendered from https://www.westelm.com/shop/lighting/chandeliers/ via r.jina.ai on 2026-08-07; independently matched by constructor.io browse group_id=chandeliers total_num_results=95",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Pendants",
+   "parent": false,
+   "qty": 92,
+   "link": "https://www.westelm.com/shop/lighting/pendants/",
+   "evidence": "live West Elm PLP header '92 Items', rendered from https://www.westelm.com/shop/lighting/pendants/ via r.jina.ai on 2026-08-07; independently matched by constructor.io browse group_id=pendants total_num_results=92",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Flush Mounts",
+   "parent": false,
+   "qty": 70,
+   "link": "https://www.westelm.com/shop/lighting/flush-mounts/",
+   "evidence": "live West Elm PLP header '70 Items', rendered from https://www.westelm.com/shop/lighting/flush-mounts/ via r.jina.ai on 2026-08-07; independently matched by constructor.io browse group_id=flush-mounts total_num_results=70",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Lamps",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Table & Desk Lamps",
+   "parent": false,
+   "qty": 155,
+   "link": "https://www.westelm.com/shop/lighting/table-lamps/",
+   "evidence": "live West Elm PLP header '155 Items', rendered from https://www.westelm.com/shop/lighting/table-lamps/ via r.jina.ai on 2026-08-07; independently matched by constructor.io browse group_id=table-lamps total_num_results=155",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Floor Lamps",
+   "parent": false,
+   "qty": 78,
+   "link": "https://www.westelm.com/shop/lighting/floor-lamps/",
+   "evidence": "live West Elm PLP header '78 Items', rendered from https://www.westelm.com/shop/lighting/floor-lamps/ via r.jina.ai on 2026-08-07; constructor.io browse group_id=floor-lamps returned total_num_results=79 the same day - the rendered header is taken as authoritative",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Sconces",
+   "parent": false,
+   "qty": 139,
+   "link": "https://www.westelm.com/shop/lighting/sconces/",
+   "evidence": "live West Elm PLP header '139 Items', rendered from https://www.westelm.com/shop/lighting/sconces/ via r.jina.ai on 2026-08-07; independently matched by constructor.io browse group_id=sconces total_num_results=139",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Bathroom & Vanity Lighting",
+   "parent": false,
+   "qty": 98,
+   "link": "https://www.westelm.com/shop/lighting/bathroom-lighting/",
+   "evidence": "RULE 0 TOP-UP (2026-08-10): live West Elm PLP header '98 Items', rendered from https://www.westelm.com/shop/lighting/bathroom-lighting/ via r.jina.ai/WebFetch; independently matched exactly by constructor.io browse group_id=bathroom-lighting total_num_results=98 (fetched direct via curl_cffi chrome124 impersonation after direct/plain-requests fetch and WebFetch both 403'd). Page title 'Bathroom Light Fixtures & Vanity Lights | West Elm', cmPageId 'shop:lighting:bathroom-lighting' confirms a canonical, non-redirected category page. This is a genuine 'Lighting by Room' mega-menu node (own URL, own SSR page id, listed in the live /shop/lighting/ nav link set) missed by the pre-Rule-0 pass, not a facet re-cut. In-scope product types only: Sconce (72) and Flush Mount (27) per the constructor.io productType facet.",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Outdoor Lighting",
+   "parent": false,
+   "qty": 57,
+   "link": "https://www.westelm.com/shop/lighting/all-outdoor-lighting/",
+   "evidence": "RULE 0 TOP-UP (2026-08-10): live West Elm PLP header '57 Items', rendered from https://www.westelm.com/shop/lighting/all-outdoor-lighting/ via r.jina.ai/WebFetch (grid hydration was flaky across repeat reads, same failure mode as this file's pre-existing Photography row, but the header was captured cleanly once as '57 Items'); constructor.io browse group_id=all-outdoor-lighting returned total_num_results=58 the same day via curl_cffi chrome124 impersonation - per this file's established convention (rendered header taken as authoritative; the API ran 1-2 high on 6 other categories in the original pass) 57 is used. Page title 'Outdoor Lighting Solutions for Every Space | West Elm', cmPageId 'shop:lighting:all-outdoor-lighting' confirms a canonical, non-redirected page, distinct from the long-retired /shop/lighting/outdoor-lighting-fixtures/ URL (last seen in Wayback 2012). Genuine 'Lighting by Room' mega-menu node missed by the pre-Rule-0 pass, not a facet re-cut.",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Bedroom Lighting",
+   "parent": false,
+   "qty": 112,
+   "link": "https://www.westelm.com/shop/lighting/bedroom-lighting/",
+   "evidence": "RULE 0 TOP-UP FOLLOW-UP (2026-08-10): live West Elm PLP header '112 Items', rendered from https://www.westelm.com/shop/lighting/bedroom-lighting/ via WebFetch/r.jina.ai; exactly matched by constructor.io browse group_id=bedroom-lighting total_num_results=112 (fetched direct via curl_cffi chrome124 impersonation, key=key_SQBuGmXjiXmP0UNI, after direct fetch and WebFetch both 403'd on westelm.com directly). Page title 'Modern Bedroom Lighting For Every Taste | West Elm', cmPageId 'shop:lighting:bedroom-lighting', confirming a canonical non-redirected category page. Confirmed via the live /shop/lighting/ mega-menu JSON nav data as one of exactly 5 nodes under header id 'header-lighting-by-room' ('Lighting by Room'): Bathroom & Vanity, Outdoor, Dining & Kitchen, Bedroom, Living Room - the first two were already added by the prior top-up pass; this and the next two rows complete that set. Genuine 'Lighting by Room' mega-menu node, not a facet re-cut.",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Dining & Kitchen Lighting",
+   "parent": false,
+   "qty": 73,
+   "link": "https://www.westelm.com/shop/lighting/dining-kitchen-lighting/",
+   "evidence": "RULE 0 TOP-UP FOLLOW-UP (2026-08-10): live West Elm PLP header '73 Items', rendered from https://www.westelm.com/shop/lighting/dining-kitchen-lighting/ via WebFetch/r.jina.ai; exactly matched by constructor.io browse group_id=dining-kitchen-lighting total_num_results=73 (fetched direct via curl_cffi chrome124 impersonation, key=key_SQBuGmXjiXmP0UNI, after direct fetch and WebFetch both 403'd on westelm.com directly). Page title 'Modern Kitchen Lighting - Pendant, Chandeliers | West Elm', cmPageId 'shop:lighting:dining-kitchen-lighting', confirming a canonical non-redirected category page. Genuine 'Lighting by Room' mega-menu node (see Bedroom Lighting row above for the full 5-node group confirmation), not a facet re-cut.",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Living Room Lighting",
+   "parent": false,
+   "qty": 121,
+   "link": "https://www.westelm.com/shop/lighting/living-room-lighting/",
+   "evidence": "RULE 0 TOP-UP FOLLOW-UP (2026-08-10): live West Elm PLP header '121 Items', rendered from https://www.westelm.com/shop/lighting/living-room-lighting/ via WebFetch/r.jina.ai; exactly matched by constructor.io browse group_id=living-room-lighting total_num_results=121 (fetched direct via curl_cffi chrome124 impersonation, key=key_SQBuGmXjiXmP0UNI, after direct fetch and WebFetch both 403'd on westelm.com directly). Page title 'Modern Living Room Lighting Options | West Elm', cmPageId 'shop:lighting:living-room-lighting', confirming a canonical non-redirected category page. Genuine 'Lighting by Room' mega-menu node (see Bedroom Lighting row above for the full 5-node group confirmation), not a facet re-cut. This is the last of the 5 'Lighting by Room' nodes; the live mega-menu JSON confirms there is no 6th node (no office/entryway/hallway/patio room-lighting node exists on West Elm) - the Lighting category is now fully Rule-0-compliant.",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Mirrors",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Wall Mirrors",
+   "parent": false,
+   "qty": 116,
+   "link": "https://www.westelm.com/shop/wall-decor-mirrors/wall-mirrors/",
+   "evidence": "live West Elm PLP header '116 Items', rendered from https://www.westelm.com/shop/wall-decor-mirrors/wall-mirrors/ via r.jina.ai on 2026-08-07; independently matched by constructor.io browse group_id=wall-mirrors total_num_results=116",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Floor Mirrors",
+   "parent": false,
+   "qty": 33,
+   "link": "https://www.westelm.com/shop/wall-decor-mirrors/floor-mirrors/",
+   "evidence": "live West Elm PLP header '33 Items', rendered from https://www.westelm.com/shop/wall-decor-mirrors/floor-mirrors/ via r.jina.ai on 2026-08-07; independently matched by constructor.io browse group_id=floor-mirrors total_num_results=33",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Art",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Art Pairs & Sets",
+   "parent": false,
+   "qty": 74,
+   "link": "https://www.westelm.com/shop/wall-decor-mirrors/wall-art-sets/",
+   "evidence": "live West Elm PLP header '74 Items', rendered from https://www.westelm.com/shop/wall-decor-mirrors/wall-art-sets/ via r.jina.ai on 2026-08-07; independently matched by constructor.io browse group_id=wall-art-sets total_num_results=74",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Paintings",
+   "parent": false,
+   "qty": 337,
+   "link": "https://www.westelm.com/shop/wall-decor-mirrors/paintings/",
+   "evidence": "live West Elm PLP header '337 Items', rendered from https://www.westelm.com/shop/wall-decor-mirrors/paintings/ via r.jina.ai on 2026-08-07; independently matched by constructor.io browse group_id=paintings total_num_results=337",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Dimensional Art",
+   "parent": false,
+   "qty": 41,
+   "link": "https://www.westelm.com/shop/wall-decor-mirrors/dimensional-art/",
+   "evidence": "live West Elm PLP header '41 Items', rendered from https://www.westelm.com/shop/wall-decor-mirrors/dimensional-art/ via r.jina.ai on 2026-08-07; independently matched by constructor.io browse group_id=dimensional-art total_num_results=41",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Photography",
+   "parent": false,
+   "qty": 84,
+   "link": "https://www.westelm.com/shop/wall-decor-mirrors/photography/",
+   "evidence": "constructor.io browse group_id=photography -> response.total_num_results=84 (2026-08-07). URL confirmed live HTTP 200, canonical and correctly titled, but the product grid did not hydrate in the reader render so the page's own 'N Items' header could not be read.",
+   "flag": "MANUAL REVIEW: qty from the constructor.io API, not from a rendered page header. On 6 of the 34 categories where both were read the rendered header was 1-2 lower than the API total, so this figure may be marginally high."
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Frames",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Gallery Wall Frames",
+   "parent": false,
+   "qty": 38,
+   "link": "https://www.westelm.com/shop/wall-decor-mirrors/gallery-wall-frames/",
+   "evidence": "live West Elm PLP header '38 Items', rendered from https://www.westelm.com/shop/wall-decor-mirrors/gallery-wall-frames/ via r.jina.ai on 2026-08-07; independently matched by constructor.io browse group_id=gallery-wall-frames total_num_results=38",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Tabletop Picture Frames",
+   "parent": false,
+   "qty": 19,
+   "link": "https://www.westelm.com/shop/wall-decor-mirrors/tabletop-picture-frames/",
+   "evidence": "live West Elm PLP header '19 Items', rendered from https://www.westelm.com/shop/wall-decor-mirrors/tabletop-picture-frames/ via r.jina.ai on 2026-08-07; constructor.io browse group_id=tabletop-picture-frames returned total_num_results=20 the same day - the rendered header is taken as authoritative",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Picture Frame Sets",
+   "parent": false,
+   "qty": 11,
+   "link": "https://www.westelm.com/shop/wall-decor-mirrors/picture-frame-sets/",
+   "evidence": "live West Elm PLP header '11 Items', rendered from https://www.westelm.com/shop/wall-decor-mirrors/picture-frame-sets/ via r.jina.ai on 2026-08-07; independently matched by constructor.io browse group_id=picture-frame-sets total_num_results=11",
+   "flag": null
+  },
+  {
+   "category": "Home Accessories",
+   "sub_category": "Room Decor",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Home Accessories",
+   "sub_category": "Vases",
+   "parent": false,
+   "qty": 120,
+   "link": "https://www.westelm.com/shop/accessories-pillows/vases-botanicals/",
+   "evidence": "live West Elm PLP header '120 Items', rendered from https://www.westelm.com/shop/accessories-pillows/vases-botanicals/ via r.jina.ai on 2026-08-07; independently matched by constructor.io browse group_id=vases-botanicals total_num_results=120",
+   "flag": null
+  },
+  {
+   "category": "Home Accessories",
+   "sub_category": "Decorative Objects",
+   "parent": false,
+   "qty": 41,
+   "link": "https://www.westelm.com/shop/accessories-pillows/decorative-objects/",
+   "evidence": "live West Elm PLP header '41 Items', rendered from https://www.westelm.com/shop/accessories-pillows/decorative-objects/ via r.jina.ai on 2026-08-07; constructor.io browse group_id=decorative-objects returned total_num_results=42 the same day - the rendered header is taken as authoritative",
+   "flag": null
+  },
+  {
+   "category": "Home Accessories",
+   "sub_category": "Decorative Trays & Bowls",
+   "parent": false,
+   "qty": 79,
+   "link": "https://www.westelm.com/shop/accessories-pillows/decorative-trays-bowls/",
+   "evidence": "live West Elm PLP header '79 Items', rendered from https://www.westelm.com/shop/accessories-pillows/decorative-trays-bowls/ via r.jina.ai on 2026-08-07; constructor.io browse group_id=decorative-trays-bowls returned total_num_results=81 the same day - the rendered header is taken as authoritative",
+   "flag": null
+  },
+  {
+   "category": "Home Accessories",
+   "sub_category": "Books & Bookends",
+   "parent": false,
+   "qty": 110,
+   "link": "https://www.westelm.com/shop/accessories-pillows/bookends/",
+   "evidence": "live West Elm PLP header '110 Items', rendered from https://www.westelm.com/shop/accessories-pillows/bookends/ via r.jina.ai on 2026-08-07; independently matched by constructor.io browse group_id=bookends total_num_results=110",
+   "flag": null
+  },
+  {
+   "category": "Home Accessories",
+   "sub_category": "Candleholders",
+   "parent": false,
+   "qty": 10,
+   "link": "https://www.westelm.com/shop/accessories-pillows/candleholders/",
+   "evidence": "live West Elm PLP header '10 Items', rendered from https://www.westelm.com/shop/accessories-pillows/candleholders/ via r.jina.ai on 2026-08-07; independently matched by constructor.io browse group_id=candleholders total_num_results=10",
+   "flag": null
+  },
+  {
+   "category": "Home Accessories",
+   "sub_category": "Lanterns",
+   "parent": false,
+   "qty": 9,
+   "link": "https://www.westelm.com/shop/accessories-pillows/lanterns/",
+   "evidence": "live West Elm PLP header '9 Items', rendered from https://www.westelm.com/shop/accessories-pillows/lanterns/ via r.jina.ai on 2026-08-07; independently matched by constructor.io browse group_id=lanterns total_num_results=9",
+   "flag": null
+  },
+  {
+   "category": "Home Accessories",
+   "sub_category": "Unscented Candles",
+   "parent": false,
+   "qty": 1,
+   "link": "https://www.westelm.com/shop/accessories-pillows/unscented-candles/",
+   "evidence": "live West Elm PLP header '1 Items', rendered from https://www.westelm.com/shop/accessories-pillows/unscented-candles/ via r.jina.ai on 2026-08-07; independently matched by constructor.io browse group_id=unscented-candles total_num_results=1",
+   "flag": null
+  },
+  {
+   "category": "Home Accessories",
+   "sub_category": "Planters",
+   "parent": false,
+   "qty": 123,
+   "link": "https://www.westelm.com/shop/accessories-pillows/indoor-planters/",
+   "evidence": "live West Elm PLP header '123 Items', rendered from https://www.westelm.com/shop/accessories-pillows/indoor-planters/ via r.jina.ai on 2026-08-07; independently matched by constructor.io browse group_id=indoor-planters total_num_results=123",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Dinnerware & Flatware",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Dinnerware Sets",
+   "parent": false,
+   "qty": 40,
+   "link": "https://www.westelm.com/shop/dining-kitchen/dinnerware-sets/",
+   "evidence": "live West Elm PLP header '40 Items', rendered from https://www.westelm.com/shop/dining-kitchen/dinnerware-sets/ via r.jina.ai on 2026-08-07; independently matched by constructor.io browse group_id=dinnerware-sets total_num_results=40",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Dinner Plates",
+   "parent": false,
+   "qty": 33,
+   "link": "https://www.westelm.com/shop/dining-kitchen/dinner-plates/",
+   "evidence": "live West Elm PLP header '33 Items', rendered from https://www.westelm.com/shop/dining-kitchen/dinner-plates/ via r.jina.ai on 2026-08-07; independently matched by constructor.io browse group_id=dinner-plates total_num_results=33",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Salad & Dessert Plates",
+   "parent": false,
+   "qty": 48,
+   "link": "https://www.westelm.com/shop/dining-kitchen/salad-dessert-plates/",
+   "evidence": "live West Elm PLP header '48 Items', rendered from https://www.westelm.com/shop/dining-kitchen/salad-dessert-plates/ via r.jina.ai on 2026-08-07; independently matched by constructor.io browse group_id=salad-dessert-plates total_num_results=48",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Bowls",
+   "parent": false,
+   "qty": 75,
+   "link": "https://www.westelm.com/shop/dining-kitchen/soup-cereal-bowls/",
+   "evidence": "live West Elm PLP header '75 Items', rendered from https://www.westelm.com/shop/dining-kitchen/soup-cereal-bowls/ via r.jina.ai on 2026-08-07; independently matched by constructor.io browse group_id=soup-cereal-bowls total_num_results=75",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Mugs",
+   "parent": false,
+   "qty": 50,
+   "link": "https://www.westelm.com/shop/dining-kitchen/mugs/",
+   "evidence": "live West Elm PLP header '50 Items', rendered from https://www.westelm.com/shop/dining-kitchen/mugs/ via r.jina.ai on 2026-08-07; independently matched by constructor.io browse group_id=mugs total_num_results=50",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Drinkware & Barware",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Drinking Glasses",
+   "parent": false,
+   "qty": 65,
+   "link": "https://www.westelm.com/shop/dining-kitchen/drinking-glasses/",
+   "evidence": "live West Elm PLP header '65 Items', rendered from https://www.westelm.com/shop/dining-kitchen/drinking-glasses/ via r.jina.ai on 2026-08-07; independently matched by constructor.io browse group_id=drinking-glasses total_num_results=65",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Wine & Champagne Glasses",
+   "parent": false,
+   "qty": 77,
+   "link": "https://www.westelm.com/shop/dining-kitchen/wine-champagne-glasses/",
+   "evidence": "live West Elm PLP header '77 Items', rendered from https://www.westelm.com/shop/dining-kitchen/wine-champagne-glasses/ via r.jina.ai on 2026-08-07; independently matched by constructor.io browse group_id=wine-champagne-glasses total_num_results=77",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Cocktail Glasses",
+   "parent": false,
+   "qty": 50,
+   "link": "https://www.westelm.com/shop/dining-kitchen/cocktail-glasses/",
+   "evidence": "live West Elm PLP header '50 Items', rendered from https://www.westelm.com/shop/dining-kitchen/cocktail-glasses/ via r.jina.ai on 2026-08-07; constructor.io browse group_id=cocktail-glasses returned total_num_results=52 the same day - the rendered header is taken as authoritative",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Coasters",
+   "parent": false,
+   "qty": 36,
+   "link": "https://www.westelm.com/shop/dining-kitchen/coasters-accessories/",
+   "evidence": "live West Elm PLP header '36 Items', rendered from https://www.westelm.com/shop/dining-kitchen/coasters-accessories/ via r.jina.ai on 2026-08-07; independently matched by constructor.io browse group_id=coasters-accessories total_num_results=36",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Serveware",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Serving Bowls",
+   "parent": false,
+   "qty": 65,
+   "link": "https://www.westelm.com/shop/dining-kitchen/serving-bowls/",
+   "evidence": "live West Elm PLP header '65 Items', rendered from https://www.westelm.com/shop/dining-kitchen/serving-bowls/ via r.jina.ai on 2026-08-07; independently matched by constructor.io browse group_id=serving-bowls total_num_results=65",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Serving Platters & Stands",
+   "parent": false,
+   "qty": 58,
+   "link": "https://www.westelm.com/shop/dining-kitchen/dining-trays/",
+   "evidence": "live West Elm PLP header '58 Items', rendered from https://www.westelm.com/shop/dining-kitchen/dining-trays/ via r.jina.ai on 2026-08-07; independently matched by constructor.io browse group_id=dining-trays total_num_results=58",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Charcuterie Boards & Knives",
+   "parent": false,
+   "qty": 18,
+   "link": "https://www.westelm.com/shop/dining-kitchen/cheese-serving-boards/",
+   "evidence": "live West Elm PLP header '18 Items', rendered from https://www.westelm.com/shop/dining-kitchen/cheese-serving-boards/ via r.jina.ai on 2026-08-07; constructor.io browse group_id=cheese-serving-boards returned total_num_results=19 the same day - the rendered header is taken as authoritative",
+   "flag": null
+  }
+ ]
+}

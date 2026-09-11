@@ -1,0 +1,75 @@
+{
+  "sr": 261,
+  "company": "Objectry",
+  "brand_site": "objectry.com",
+  "country": "India",
+  "site_url": "https://www.objectry.com/",
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "Reached via Chrome (Shopify store, no WAF/challenge). robots.txt has no Claude-specific Disallow: it names UCP/MCP for agent commerce and 'checkouts are for humans' but Allow: / for crawling. Tree came from the site's own header 'FURNITURE' mega-menu (extracted from the live DOM), whose children are Coffee Table, Console, Dining Table, End Table, Mirror, Seating, Shelf, Storage. Mirror was excluded (belongs to the Wall Decor/Mirrors task, not Furniture, per project scope). Every remaining node was verified by same-origin fetch of /collections/<handle>/products.json?limit=250 from the loaded page (all returned well under the 250 cap, i.e. complete single-page enumerations). The site publishes NO rendered product-count header anywhere on its collection pages (checked live on /collections/seating: only a '0 ITEMS' cart badge, no listing count) so full-catalog enumeration is the qty source for every row, per Rule 4 priority 3. Two site-only 'all furniture' aggregator views (collections/furniture=135, collections/furniture-no-sale=120) and one redundant table-aggregator tag (collections/tables=12, not present in the mega-menu and fully overlapping with Coffee Table/Dining Table) were excluded as non-leaf/duplicate per the URL hierarchy rule. A separate 'desk' collection (34 items) sits in a different, non-Furniture menu block (grouped with Mug/Organiser/Stationery) and is overwhelmingly desk ACCESSORIES, not desk furniture (only 1 SKU in the entire 240-product catalog carries product_type 'Desk') - excluded. Two mislabeling traps matched the prior Home-Decor pass's findings for this same store: 'Step Bar (Wall Mounted)' is product_type-tagged 'Mirror' but is actually a wall-mounted bar/console unit and was kept as furniture inside Console; 'Parallel Lines Boxes #3' is titled 'Boxes' but its body_html ('solid wood and roomy cabinets... a storage piece') confirms it is a real cabinet, kept inside Shelf. Storage (16 items) is a sibling nav node that heavily cross-lists items already counted in Shelf/Console (by design, tag-based) plus one exclusive new SKU ('Yin Yang Cabinet') and one non-furniture item ('Basic Key Hook & Organiser', a wall/door key hook) - the literal site count of 16 is kept as qty with a flag on the one non-furniture item, since it is what the URL actually displays and 15/16 are genuine furniture. No parent/child duplication: only the deepest sibling leaf nodes are recorded, all as direct children of the Furniture department (no intermediate grouping level exists on this site, so no is_group rows are needed).",
+  "rows": [
+    {
+      "category": "Furniture",
+      "sub_category": "Coffee Table",
+      "qty": 24,
+      "link": "https://www.objectry.com/collections/coffee-table",
+      "is_group": false,
+      "evidence": "same-origin fetch /collections/coffee-table/products.json?limit=250 returned 24 products (single page, no header count published by site); all product_type values Table/tables/Console, none out of scope",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Console",
+      "qty": 14,
+      "link": "https://www.objectry.com/collections/console",
+      "is_group": false,
+      "evidence": "same-origin fetch /collections/console/products.json?limit=250 returned 14 products (single page); includes 'Step Bar (Wall Mounted)', tagged product_type 'Mirror' but confirmed a wall-mounted bar/console furniture unit, not a mirror",
+      "flag": "MANUAL REVIEW: includes 'Step Bar (Wall Mounted)', mislabeled product_type='Mirror' on the site but is a functional wall-mounted bar/console unit - kept as furniture"
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Dining Table",
+      "qty": 11,
+      "link": "https://www.objectry.com/collections/dining-table-1",
+      "is_group": false,
+      "evidence": "same-origin fetch /collections/dining-table-1/products.json?limit=250 returned 11 products (single page); all dining tables",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "End Table",
+      "qty": 37,
+      "link": "https://www.objectry.com/collections/end-table",
+      "is_group": false,
+      "evidence": "same-origin fetch /collections/end-table/products.json?limit=250 returned 37 products (single page); all side/end tables, product_type Table",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Seating",
+      "qty": 37,
+      "link": "https://www.objectry.com/collections/seating",
+      "is_group": false,
+      "evidence": "same-origin fetch /collections/seating/products.json?limit=250 returned 37 products (single page); chairs, sofas, benches and stools - site does not split this node further",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Shelf",
+      "qty": 8,
+      "link": "https://www.objectry.com/collections/shelf",
+      "is_group": false,
+      "evidence": "same-origin fetch /collections/shelf/products.json?limit=250 returned 8 products (single page); bookcases/book racks/shelves plus one cabinet ('Parallel Lines Boxes #3', confirmed by body_html to be a solid-wood cabinet piece, not standalone storage boxes)",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Storage",
+      "qty": 16,
+      "link": "https://www.objectry.com/collections/storage",
+      "is_group": false,
+      "evidence": "same-origin fetch /collections/storage/products.json?limit=250 returned 16 products (single page); mostly cross-listed shelf/console/cabinet furniture already counted under Shelf/Console plus one exclusive SKU 'Yin Yang Cabinet'",
+      "flag": "MANUAL REVIEW: 1 of the 16 listed items ('Basic Key Hook & Organiser', product_type Organiser) is a standalone wall/door key hook, not furniture - qty kept at the literal site count of 16 since the other 15 are genuine furniture and this is what the URL displays"
+    }
+  ]
+}

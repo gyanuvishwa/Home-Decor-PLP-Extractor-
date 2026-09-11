@@ -1,0 +1,399 @@
+{
+ "sr": 35,
+ "company": "Frontgate",
+ "brand_site": "frontgate.com",
+ "country": "USA",
+ "site_url": "https://www.frontgate.com/",
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "Access: direct curl_cffi with the chrome124 desktop profile returned 200 on every request (plain requests gets an Akamai 403); no proxy was needed. Platform: IBM WebSphere Commerce / Cornerstone Brands PWA with an Unbxd search layer, same mechanics as Ballard Designs. TREE: taken from the site's own nav API https://www.frontgate.com/JSONAPIs?module=categories (413 nodes, each with a categoryId); every leaf URL was then re-fetched with ?templateInfo=true to confirm it resolves 200 to itself without redirecting and that its categoryId is present in the served page. COUNTS: https://www.frontgate.com/UnbxdAPI?categoryId=<id>&returnRespAsJSON=true&isAPI=true&requesttype=ajax with header 'CBI-AJAX: 1' -> numberOfProducts (returned as a STRING in the JSON, coerced to int). Per the batch rule this structured number was not trusted on code-reading alone: EVERY leaf was verified by full enumeration, paging &unbxdStart until the API returned an empty product array, and in every single case the number of tiles returned equalled numberOfProducts exactly and then stopped. All counts were read twice in separate passes with identical results, so no drift. Note that unique partNumbers are sometimes fewer than tiles (e.g. Storage & Display 62 tiles / 51 unique partNumbers) because Frontgate renders one tile per colourway; the site's own reported count is the tile count, which is exactly what numberOfProducts gives, so that is what is recorded. Sanity checks: the number changes per category (Daybeds 12 up to the whole Outdoor department 2246), nothing is a round display cap, and no value is a site-wide constant. HIERARCHY: parents that have extractable children are emitted as grouping rows with null qty because their own totals are roll-ups whose children overlap (for the record their API totals are Dining Room 109, Living Room 172, Bedroom 127, Bathroom 61, Game Room 20, Outdoor Seating 476, Outdoor Dining 348, Coffee/Side/Accent Tables 96). REDIRECT TRAPS FOUND (each would otherwise have produced a duplicate row): Bedroom > Vanity Stools (/indoor-furniture/bedroom-furnishings-storage/vanity-stools/, API says 17) 301s to the Bathroom Vanity Stools page, and Bedroom > Ottomans & Benches (API says 22) 301s to the Living Room benches-ottomans page - both bedroom nodes were dropped and only the surviving canonical pages kept. Likewise Bed & Bath > Bedroom Furniture, Bed & Bath > Bathroom Vanities, Bed & Bath > Bathroom Furniture & Storage, Bed & Bath > Vanity Stools, Tabletop & Entertaining > Bar Cabinets & Carts, and Furniture > Outdoor Furniture all return numberOfProducts=0 and 301 to nodes already captured under Furniture/Outdoor - all dropped as aliases. EXCLUDED and why: 'Furniture Collections' (21 named collection pages - Milano, Etienne, Tivoli and so on) and 'Outdoor Collections' (47 named collection pages) as per-collection roll-ups on the never-extract list; all Discover / New Arrivals / Fabric Swatches / buying guides / Design Studio / Handcrafted in the USA / Shop by Material / Clearance and special-savings nodes as navigation and filter pages; Game Room > Games (4 board games); Outdoor > Replacement Cushions and Outdoor Covers & Storage > Furniture Covers (furniture parts and covers); Outdoor > Pool & Patio Storage (36 - I read all 36 titles: hose reels, storage chests, towel stands, float caddies and waste bins, i.e. standalone storage goods and garden hardware, not furniture); Outdoor > Fire & Heaters (29 fire pits and heaters); the Umbrellas parent and Replacement Canopies; Outdoor Decor, Planters & Garden, Pool Floats, Towels & Stands; and the whole of the Bed & Bath (bedding and towels), Lighting & Decor, Rugs & Pillows and Tabletop & Entertaining departments, which contain no furniture beyond the alias nodes listed above. CONTENT CHECKS: I read every product title for Storage & Display (62, entirely sideboards/chests/bar and storage cabinets/modular units), Bathroom Furniture & Storage (41, vanities plus storage cabinets), Vanity Desks & Storage (26), Office (20), Bar Cabinets & Carts (13), Furniture Sets (45, real multi-piece bedroom/dining/dressing-room/vanity sets rather than marketing collections), Outdoor Kitchen & Bar Carts (54, teak and aluminium cabinets, sideboards, consoles, buffets, etageres and bar carts), Pool Furniture & Decor (31) and Umbrella Tables & Bases (24) before deciding to include them. DUPLICATE-NAME NOTE: 'Dining Tables', 'Dining Chairs' and the sofa nodes appear in both the Furniture and the Outdoor Furniture bucket - these are genuinely different indoor and outdoor listings with different URLs, categoryIds and counts.",
+ "rows": [
+  {
+   "category": "Furniture",
+   "sub_category": "Furniture Sets",
+   "qty": 45,
+   "link": "https://www.frontgate.com/indoor-furniture/furniture-sets/",
+   "is_group": false,
+   "evidence": "Cornerstone/WebSphere first-party Unbxd proxy /UnbxdAPI?categoryId=273214&returnRespAsJSON=true&isAPI=true (header CBI-AJAX: 1) -> numberOfProducts=45; this is the value the PLP header renders. Verified by full enumeration: paging &unbxdStart returned exactly 45 product tiles then stopped. Two independent reads, identical.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bar & Counter Stools",
+   "qty": 46,
+   "link": "https://www.frontgate.com/indoor-furniture/bar-stools/",
+   "is_group": false,
+   "evidence": "Cornerstone/WebSphere first-party Unbxd proxy /UnbxdAPI?categoryId=145227&returnRespAsJSON=true&isAPI=true (header CBI-AJAX: 1) -> numberOfProducts=46; this is the value the PLP header renders. Verified by full enumeration: paging &unbxdStart returned exactly 46 product tiles then stopped. Two independent reads, identical.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Storage & Display",
+   "qty": 62,
+   "link": "https://www.frontgate.com/indoor-furniture/storage-modular-furniture/",
+   "is_group": false,
+   "evidence": "Cornerstone/WebSphere first-party Unbxd proxy /UnbxdAPI?categoryId=188654&returnRespAsJSON=true&isAPI=true (header CBI-AJAX: 1) -> numberOfProducts=62; this is the value the PLP header renders. Verified by full enumeration: paging &unbxdStart returned exactly 62 product tiles then stopped. Two independent reads, identical.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dining Room",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dining Tables",
+   "qty": 26,
+   "link": "https://www.frontgate.com/indoor-furniture/dining-furniture/dining-tables/",
+   "is_group": false,
+   "evidence": "Cornerstone/WebSphere first-party Unbxd proxy /UnbxdAPI?categoryId=79843&returnRespAsJSON=true&isAPI=true (header CBI-AJAX: 1) -> numberOfProducts=26; this is the value the PLP header renders. Verified by full enumeration: paging &unbxdStart returned exactly 26 product tiles then stopped. Two independent reads, identical.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dining Chairs",
+   "qty": 50,
+   "link": "https://www.frontgate.com/indoor-furniture/dining-furniture/dining-chairs/",
+   "is_group": false,
+   "evidence": "Cornerstone/WebSphere first-party Unbxd proxy /UnbxdAPI?categoryId=79844&returnRespAsJSON=true&isAPI=true (header CBI-AJAX: 1) -> numberOfProducts=50; this is the value the PLP header renders. Verified by full enumeration: paging &unbxdStart returned exactly 50 product tiles then stopped. Two independent reads, identical.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Buffets & Sideboards",
+   "qty": 38,
+   "link": "https://www.frontgate.com/indoor-furniture/dining-furniture/buffets-sideboards/",
+   "is_group": false,
+   "evidence": "Cornerstone/WebSphere first-party Unbxd proxy /UnbxdAPI?categoryId=79842&returnRespAsJSON=true&isAPI=true (header CBI-AJAX: 1) -> numberOfProducts=38; this is the value the PLP header renders. Verified by full enumeration: paging &unbxdStart returned exactly 38 product tiles then stopped. Two independent reads, identical.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bar Cabinets & Carts",
+   "qty": 13,
+   "link": "https://www.frontgate.com/indoor-furniture/dining-furniture/bar-cabinets/",
+   "is_group": false,
+   "evidence": "Cornerstone/WebSphere first-party Unbxd proxy /UnbxdAPI?categoryId=96986&returnRespAsJSON=true&isAPI=true (header CBI-AJAX: 1) -> numberOfProducts=13; this is the value the PLP header renders. Verified by full enumeration: paging &unbxdStart returned exactly 13 product tiles then stopped. Two independent reads, identical.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Living Room",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Coffee, Console & Side Tables",
+   "qty": 48,
+   "link": "https://www.frontgate.com/indoor-furniture/sofas-chairs-benches-ottomans/coffee-tables/",
+   "is_group": false,
+   "evidence": "Cornerstone/WebSphere first-party Unbxd proxy /UnbxdAPI?categoryId=97073&returnRespAsJSON=true&isAPI=true (header CBI-AJAX: 1) -> numberOfProducts=48; this is the value the PLP header renders. Verified by full enumeration: paging &unbxdStart returned exactly 48 product tiles then stopped. Two independent reads, identical.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sofas & Sectionals",
+   "qty": 47,
+   "link": "https://www.frontgate.com/indoor-furniture/sofas-chairs-benches-ottomans/sofas-loveseats/",
+   "is_group": false,
+   "evidence": "Cornerstone/WebSphere first-party Unbxd proxy /UnbxdAPI?categoryId=79698&returnRespAsJSON=true&isAPI=true (header CBI-AJAX: 1) -> numberOfProducts=47; this is the value the PLP header renders. Verified by full enumeration: paging &unbxdStart returned exactly 47 product tiles then stopped. Two independent reads, identical.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Chairs & Chaises",
+   "qty": 45,
+   "link": "https://www.frontgate.com/indoor-furniture/sofas-chairs-benches-ottomans/chairs/",
+   "is_group": false,
+   "evidence": "Cornerstone/WebSphere first-party Unbxd proxy /UnbxdAPI?categoryId=79697&returnRespAsJSON=true&isAPI=true (header CBI-AJAX: 1) -> numberOfProducts=45; this is the value the PLP header renders. Verified by full enumeration: paging &unbxdStart returned exactly 45 product tiles then stopped. Two independent reads, identical.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Ottomans & Benches",
+   "qty": 30,
+   "link": "https://www.frontgate.com/indoor-furniture/sofas-chairs-benches-ottomans/benches-ottomans/",
+   "is_group": false,
+   "evidence": "Cornerstone/WebSphere first-party Unbxd proxy /UnbxdAPI?categoryId=79699&returnRespAsJSON=true&isAPI=true (header CBI-AJAX: 1) -> numberOfProducts=30; this is the value the PLP header renders. Verified by full enumeration: paging &unbxdStart returned exactly 30 product tiles then stopped. Two independent reads, identical.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bedroom",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Beds",
+   "qty": 36,
+   "link": "https://www.frontgate.com/indoor-furniture/bedroom-furnishings-storage/bedroom-furniture-collections-beds/",
+   "is_group": false,
+   "evidence": "Cornerstone/WebSphere first-party Unbxd proxy /UnbxdAPI?categoryId=79674&returnRespAsJSON=true&isAPI=true (header CBI-AJAX: 1) -> numberOfProducts=36; this is the value the PLP header renders. Verified by full enumeration: paging &unbxdStart returned exactly 36 product tiles then stopped. Two independent reads, identical.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Nightstands & Bedside Tables",
+   "qty": 26,
+   "link": "https://www.frontgate.com/indoor-furniture/bedroom-furnishings-storage/nightstands-bedside-tables/",
+   "is_group": false,
+   "evidence": "Cornerstone/WebSphere first-party Unbxd proxy /UnbxdAPI?categoryId=145225&returnRespAsJSON=true&isAPI=true (header CBI-AJAX: 1) -> numberOfProducts=26; this is the value the PLP header renders. Verified by full enumeration: paging &unbxdStart returned exactly 26 product tiles then stopped. Two independent reads, identical.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dressers & Chests",
+   "qty": 37,
+   "link": "https://www.frontgate.com/indoor-furniture/bedroom-furnishings-storage/dressers-chests/",
+   "is_group": false,
+   "evidence": "Cornerstone/WebSphere first-party Unbxd proxy /UnbxdAPI?categoryId=145226&returnRespAsJSON=true&isAPI=true (header CBI-AJAX: 1) -> numberOfProducts=37; this is the value the PLP header renders. Verified by full enumeration: paging &unbxdStart returned exactly 37 product tiles then stopped. Two independent reads, identical.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Vanity Desks & Storage",
+   "qty": 26,
+   "link": "https://www.frontgate.com/indoor-furniture/bedroom-furnishings-storage/vanity-desks-storage/",
+   "is_group": false,
+   "evidence": "Cornerstone/WebSphere first-party Unbxd proxy /UnbxdAPI?categoryId=240657&returnRespAsJSON=true&isAPI=true (header CBI-AJAX: 1) -> numberOfProducts=26; this is the value the PLP header renders. Verified by full enumeration: paging &unbxdStart returned exactly 26 product tiles then stopped. Two independent reads, identical.",
+   "flag": "MANUAL REVIEW: mostly dressing/vanity tables, writing desks and jewelry cabinets (furniture), but 3 of the 26 tiles are jewelry storage MIRRORS, which belong to Wall Decor"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bathroom",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bathroom Vanities",
+   "qty": 33,
+   "link": "https://www.frontgate.com/indoor-furniture/bathroom-furniture/bathroom-vanities/",
+   "is_group": false,
+   "evidence": "Cornerstone/WebSphere first-party Unbxd proxy /UnbxdAPI?categoryId=257161&returnRespAsJSON=true&isAPI=true (header CBI-AJAX: 1) -> numberOfProducts=33; this is the value the PLP header renders. Verified by full enumeration: paging &unbxdStart returned exactly 33 product tiles then stopped. Two independent reads, identical.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bathroom Furniture & Storage",
+   "qty": 41,
+   "link": "https://www.frontgate.com/indoor-furniture/bathroom-furniture/bathroom-furnishings/",
+   "is_group": false,
+   "evidence": "Cornerstone/WebSphere first-party Unbxd proxy /UnbxdAPI?categoryId=233662&returnRespAsJSON=true&isAPI=true (header CBI-AJAX: 1) -> numberOfProducts=41; this is the value the PLP header renders. Verified by full enumeration: paging &unbxdStart returned exactly 41 product tiles then stopped. Two independent reads, identical.",
+   "flag": "MANUAL REVIEW: overlaps its sibling Bathroom Vanities - 32 of that node's 33 product IDs also appear here; both are separate live nav nodes so both are emitted, do not sum"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Vanity Stools",
+   "qty": 16,
+   "link": "https://www.frontgate.com/indoor-furniture/bathroom-furniture/vanity-stools/",
+   "is_group": false,
+   "evidence": "Cornerstone/WebSphere first-party Unbxd proxy /UnbxdAPI?categoryId=233663&returnRespAsJSON=true&isAPI=true (header CBI-AJAX: 1) -> numberOfProducts=16; this is the value the PLP header renders. Verified by full enumeration: paging &unbxdStart returned exactly 16 product tiles then stopped. Two independent reads, identical.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Game Room",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Game Tables",
+   "qty": 13,
+   "link": "https://www.frontgate.com/indoor-furniture/game-media-room-furnishings/game-tables/",
+   "is_group": false,
+   "evidence": "Cornerstone/WebSphere first-party Unbxd proxy /UnbxdAPI?categoryId=201664&returnRespAsJSON=true&isAPI=true (header CBI-AJAX: 1) -> numberOfProducts=13; this is the value the PLP header renders. Verified by full enumeration: paging &unbxdStart returned exactly 13 product tiles then stopped. Two independent reads, identical.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Office",
+   "qty": 20,
+   "link": "https://www.frontgate.com/indoor-furniture/office-furniture/",
+   "is_group": false,
+   "evidence": "Cornerstone/WebSphere first-party Unbxd proxy /UnbxdAPI?categoryId=79694&returnRespAsJSON=true&isAPI=true (header CBI-AJAX: 1) -> numberOfProducts=20; this is the value the PLP header renders. Verified by full enumeration: paging &unbxdStart returned exactly 20 product tiles then stopped. Two independent reads, identical.",
+   "flag": "MANUAL REVIEW: 12 of its 16 unique product IDs (sideboards/modular units) also appear in Storage & Display; only the writing desks are unique to it"
+  },
+  {
+   "category": "Outdoor Furniture",
+   "sub_category": "Outdoor Furniture Sets",
+   "qty": 258,
+   "link": "https://www.frontgate.com/outdoor/furniture-sets/",
+   "is_group": false,
+   "evidence": "Cornerstone/WebSphere first-party Unbxd proxy /UnbxdAPI?categoryId=243681&returnRespAsJSON=true&isAPI=true (header CBI-AJAX: 1) -> numberOfProducts=258; this is the value the PLP header renders. Verified by full enumeration: paging &unbxdStart returned exactly 258 product tiles then stopped. Two independent reads, identical.",
+   "flag": "MANUAL REVIEW: the site's only remaining canonical sets listing - its former children /outdoor/seating/seating-sets/ (160) and /outdoor/dining/dining-sets/ (96) now 301 to facet URLs and all of their IDs are contained here"
+  },
+  {
+   "category": "Outdoor Furniture",
+   "sub_category": "Seating",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Outdoor Furniture",
+   "sub_category": "Chairs & Ottomans",
+   "qty": 139,
+   "link": "https://www.frontgate.com/outdoor/seating/chairs-ottomans/",
+   "is_group": false,
+   "evidence": "Cornerstone/WebSphere first-party Unbxd proxy /UnbxdAPI?categoryId=194177&returnRespAsJSON=true&isAPI=true (header CBI-AJAX: 1) -> numberOfProducts=139; this is the value the PLP header renders. Verified by full enumeration: paging &unbxdStart returned exactly 139 product tiles then stopped. Two independent reads, identical.",
+   "flag": null
+  },
+  {
+   "category": "Outdoor Furniture",
+   "sub_category": "Modular Seating",
+   "qty": 39,
+   "link": "https://www.frontgate.com/outdoor/seating/modular/",
+   "is_group": false,
+   "evidence": "Cornerstone/WebSphere first-party Unbxd proxy /UnbxdAPI?categoryId=194175&returnRespAsJSON=true&isAPI=true (header CBI-AJAX: 1) -> numberOfProducts=39; this is the value the PLP header renders. Verified by full enumeration: paging &unbxdStart returned exactly 39 product tiles then stopped. Two independent reads, identical.",
+   "flag": null
+  },
+  {
+   "category": "Outdoor Furniture",
+   "sub_category": "Sofas & Loveseats",
+   "qty": 89,
+   "link": "https://www.frontgate.com/outdoor/seating/sofas-loveseats/",
+   "is_group": false,
+   "evidence": "Cornerstone/WebSphere first-party Unbxd proxy /UnbxdAPI?categoryId=194176&returnRespAsJSON=true&isAPI=true (header CBI-AJAX: 1) -> numberOfProducts=89; this is the value the PLP header renders. Verified by full enumeration: paging &unbxdStart returned exactly 89 product tiles then stopped. Two independent reads, identical.",
+   "flag": null
+  },
+  {
+   "category": "Outdoor Furniture",
+   "sub_category": "Chaises",
+   "qty": 46,
+   "link": "https://www.frontgate.com/outdoor/seating/chaise-lounges/",
+   "is_group": false,
+   "evidence": "Cornerstone/WebSphere first-party Unbxd proxy /UnbxdAPI?categoryId=194178&returnRespAsJSON=true&isAPI=true (header CBI-AJAX: 1) -> numberOfProducts=46; this is the value the PLP header renders. Verified by full enumeration: paging &unbxdStart returned exactly 46 product tiles then stopped. Two independent reads, identical.",
+   "flag": null
+  },
+  {
+   "category": "Outdoor Furniture",
+   "sub_category": "Daybeds",
+   "qty": 12,
+   "link": "https://www.frontgate.com/outdoor/seating/daybeds/",
+   "is_group": false,
+   "evidence": "Cornerstone/WebSphere first-party Unbxd proxy /UnbxdAPI?categoryId=194179&returnRespAsJSON=true&isAPI=true (header CBI-AJAX: 1) -> numberOfProducts=12; this is the value the PLP header renders. Verified by full enumeration: paging &unbxdStart returned exactly 12 product tiles then stopped. Two independent reads, identical.",
+   "flag": null
+  },
+  {
+   "category": "Outdoor Furniture",
+   "sub_category": "Dining",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Outdoor Furniture",
+   "sub_category": "Dining Tables",
+   "qty": 49,
+   "link": "https://www.frontgate.com/outdoor/dining/dining-tables/",
+   "is_group": false,
+   "evidence": "Cornerstone/WebSphere first-party Unbxd proxy /UnbxdAPI?categoryId=194190&returnRespAsJSON=true&isAPI=true (header CBI-AJAX: 1) -> numberOfProducts=49; this is the value the PLP header renders. Verified by full enumeration: paging &unbxdStart returned exactly 49 product tiles then stopped. Two independent reads, identical.",
+   "flag": null
+  },
+  {
+   "category": "Outdoor Furniture",
+   "sub_category": "Dining Chairs",
+   "qty": 90,
+   "link": "https://www.frontgate.com/outdoor/dining/dining-chairs/",
+   "is_group": false,
+   "evidence": "Cornerstone/WebSphere first-party Unbxd proxy /UnbxdAPI?categoryId=194191&returnRespAsJSON=true&isAPI=true (header CBI-AJAX: 1) -> numberOfProducts=90; this is the value the PLP header renders. Verified by full enumeration: paging &unbxdStart returned exactly 90 product tiles then stopped. Two independent reads, identical.",
+   "flag": null
+  },
+  {
+   "category": "Outdoor Furniture",
+   "sub_category": "Cafe & Bistro",
+   "qty": 45,
+   "link": "https://www.frontgate.com/outdoor/dining/cafe-bistro/",
+   "is_group": false,
+   "evidence": "Cornerstone/WebSphere first-party Unbxd proxy /UnbxdAPI?categoryId=194192&returnRespAsJSON=true&isAPI=true (header CBI-AJAX: 1) -> numberOfProducts=45; this is the value the PLP header renders. Verified by full enumeration: paging &unbxdStart returned exactly 45 product tiles then stopped. Two independent reads, identical.",
+   "flag": null
+  },
+  {
+   "category": "Outdoor Furniture",
+   "sub_category": "Bar Stools & Tables",
+   "qty": 57,
+   "link": "https://www.frontgate.com/outdoor/dining/barstools-tables/",
+   "is_group": false,
+   "evidence": "Cornerstone/WebSphere first-party Unbxd proxy /UnbxdAPI?categoryId=194193&returnRespAsJSON=true&isAPI=true (header CBI-AJAX: 1) -> numberOfProducts=57; this is the value the PLP header renders. Verified by full enumeration: paging &unbxdStart returned exactly 57 product tiles then stopped. Two independent reads, identical.",
+   "flag": null
+  },
+  {
+   "category": "Outdoor Furniture",
+   "sub_category": "Outdoor Kitchen & Bar Carts",
+   "qty": 54,
+   "link": "https://www.frontgate.com/outdoor/dining/cabinets-bar-carts/",
+   "is_group": false,
+   "evidence": "Cornerstone/WebSphere first-party Unbxd proxy /UnbxdAPI?categoryId=194194&returnRespAsJSON=true&isAPI=true (header CBI-AJAX: 1) -> numberOfProducts=54; this is the value the PLP header renders. Verified by full enumeration: paging &unbxdStart returned exactly 54 product tiles then stopped. Two independent reads, identical.",
+   "flag": null
+  },
+  {
+   "category": "Outdoor Furniture",
+   "sub_category": "Coffee, Side & Accent Tables",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Outdoor Furniture",
+   "sub_category": "Coffee & Side Tables",
+   "qty": 50,
+   "link": "https://www.frontgate.com/outdoor/coffee-side-accent-tables/coffee-side-tables/",
+   "is_group": false,
+   "evidence": "Cornerstone/WebSphere first-party Unbxd proxy /UnbxdAPI?categoryId=249173&returnRespAsJSON=true&isAPI=true (header CBI-AJAX: 1) -> numberOfProducts=50; this is the value the PLP header renders. Verified by full enumeration: paging &unbxdStart returned exactly 50 product tiles then stopped. Two independent reads, identical.",
+   "flag": null
+  },
+  {
+   "category": "Outdoor Furniture",
+   "sub_category": "Accent Stools & Drink Tables",
+   "qty": 41,
+   "link": "https://www.frontgate.com/outdoor/coffee-side-accent-tables/accent-stools-drink-tables/",
+   "is_group": false,
+   "evidence": "Cornerstone/WebSphere first-party Unbxd proxy /UnbxdAPI?categoryId=249174&returnRespAsJSON=true&isAPI=true (header CBI-AJAX: 1) -> numberOfProducts=41; this is the value the PLP header renders. Verified by full enumeration: paging &unbxdStart returned exactly 41 product tiles then stopped. Two independent reads, identical.",
+   "flag": null
+  },
+  {
+   "category": "Outdoor Furniture",
+   "sub_category": "Umbrella Tables & Bases",
+   "qty": 24,
+   "link": "https://www.frontgate.com/outdoor/umbrellas/umbrella-tables-bases/",
+   "is_group": false,
+   "evidence": "Cornerstone/WebSphere first-party Unbxd proxy /UnbxdAPI?categoryId=243661&returnRespAsJSON=true&isAPI=true (header CBI-AJAX: 1) -> numberOfProducts=24; this is the value the PLP header renders. Verified by full enumeration: paging &unbxdStart returned exactly 24 product tiles then stopped. Two independent reads, identical.",
+   "flag": "MANUAL REVIEW: mixed node - 14 of the 24 tiles are umbrella/chaise tables (furniture), 10 are umbrella bases, weights and extension poles (accessories). The nav node 'Umbrella Tables' (8 items) 301s to this page, so this is the only canonical URL for it"
+  },
+  {
+   "category": "Outdoor Furniture",
+   "sub_category": "Pool Furniture & Decor",
+   "qty": 31,
+   "link": "https://www.frontgate.com/outdoor/pool-beach/pool-furniture-decor/",
+   "is_group": false,
+   "evidence": "Cornerstone/WebSphere first-party Unbxd proxy /UnbxdAPI?categoryId=194168&returnRespAsJSON=true&isAPI=true (header CBI-AJAX: 1) -> numberOfProducts=31; this is the value the PLP header renders. Verified by full enumeration: paging &unbxdStart returned exactly 31 product tiles then stopped. Two independent reads, identical.",
+   "flag": "MANUAL REVIEW: predominantly chaise lounges, adirondack chairs, daybeds and ottomans (furniture), but about 6 of the 31 tiles are pool floats, LED glow balls, a diver sculpture and chaise covers"
+  }
+ ]
+}

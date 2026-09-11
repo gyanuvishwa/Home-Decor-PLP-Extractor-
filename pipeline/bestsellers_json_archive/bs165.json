@@ -1,0 +1,52 @@
+{
+  "status": "partial",
+  "failure_reason": "Genuine curated Bestsellers PLPs were found and confirmed for the Home & Kitchen department (whole-department listing + 4 real sub-department children), but noon.com's own UI never displays an exact product count for any of them -- only a rounded/bucketed figure (\"100+\", \"200+\", \"700+\"). Per the qty rule this is recorded as qty:null with a MANUAL REVIEW flag rather than estimated, so a large fraction of rows are null even though the category structure itself is reliably confirmed.",
+  "notes": "SCOPE: restricted to the Home & Kitchen department per task instruction (broader than the prior Home-Decor-only pass for this company). ACCESS: direct HTTP fetch via curl_cffi (Chrome TLS impersonation) worked reliably (HTTP 200 on every request); plain curl/PowerShell/urllib and Playwright's bundled Chromium all failed to complete the TCP/TLS handshake to noon.com from this environment (curl: connect timeout; Playwright: net::ERR_HTTP2_PROTOCOL_ERROR / timeout) -- consistent with this project's known intermittent-egress issue, worked around via curl_cffi. One live check via Claude-in-Chrome (real browser) on /home_decor-bestseller-AE/ confirmed the rendered page shows the identical bucketed '100+ Results for \"Best Sellers\"' text as the SSR HTML, proving the exact count genuinely is not exposed anywhere in the UI (not just an SSR truncation) -- no numFound/totalCount/hits field exists in the page's embedded JSON either. robots.txt explicitly allows ClaudeBot (Allow: /), separate/looser than the generic '*' group.\n\nDISCOVERY: checked main nav mega-menu (Home & Kitchen > Home decor/Furniture/Kitchen & dining/Tools & home improvement/Bath & bedding), and the dedicated landing pages for each of those 5 sub-departments (/home-kitchen/, /home-decor/, /furniture/, /kitchen-dining/, /tools-and-home-improvement-store/, /bath-and-bedding/). Found a genuine tabbed 'Home kitchen bestseller' module on /home-kitchen/ with 4 real per-department tabs (Home Decor, Furniture, Kitchen, Tools) each linking to its own distinctly-titled, distinctly-counted '<X>-bestseller-AE' / '<x>-bestsellers-ae' page (all literally titled 'Best Sellers' as their own H1, small bucketed counts 100-200 consistent with a curated tag list, not a full category). Recorded these as a grouping row (whole-department) + 4 leaf children, matching the site's own tab structure.\n\nEXCLUDED as non-genuine: 'Bestsellers in bedding' and 'Bestsellers in bath' carousels shown on /bath-and-bedding/ -- opened both; their VIEW ALL links resolve to the entire Bedding/Bath category pages (H1 'Bedding in UAE' / 'Bath in UAE', ~100K+ results each), i.e. the whole category merely sorted by popularity, not a genuine curated Bestsellers PLP -- fails the 'real bestseller merchandising concept, not an arbitrary filter page' test in Sec 3. Also excluded the marketplace-wide /uae-en/bestsellers/ banner seen on the homepage since it is not Home & Kitchen-scoped (out of this task's department scope), and per-department Bestsellers pages for unrelated departments (Baby, Toys, Fragrance) surfaced in the same mega-menu.\n\nNo local-language (Arabic) equivalent pages were separately checked beyond what the English-locale (uae-en) pages themselves exposed; site defaults fully to English content under /uae-en/.",
+  "rows": [
+    {
+      "category": "Bestsellers",
+      "sub_category": "Home & Kitchen Bestsellers",
+      "qty": null,
+      "link": "https://www.noon.com/uae-en/home-kitchen-bestseller/",
+      "is_group": true,
+      "evidence": "H1 'Best Sellers in home & kitchen'; subtitle '700+ Results for'",
+      "flag": "MANUAL REVIEW: site displays only a rounded/bucketed count ('700+'), not an exact number; no exact total field found in page HTML/JSON"
+    },
+    {
+      "category": "Home Decor Bestsellers",
+      "sub_category": "Home Decor Bestsellers",
+      "qty": null,
+      "link": "https://www.noon.com/uae-en/home_decor-bestseller-AE/",
+      "is_group": false,
+      "evidence": "H1 'Best Sellers'; subtitle '100+ Results for \"Best Sellers\"'; reached via 'Home Decor' tab of the Home & Kitchen bestseller tabbed carousel on /home-kitchen/ and again as the 'Home decor bestsellers' carousel on /home-decor/",
+      "flag": "MANUAL REVIEW: site displays only a rounded/bucketed count ('100+'), not an exact number; confirmed identical in a live rendered browser check, no exact total exists in the UI"
+    },
+    {
+      "category": "Furniture Bestsellers",
+      "sub_category": "Furniture Bestsellers",
+      "qty": null,
+      "link": "https://www.noon.com/uae-en/furniture-bestsellers-ae/",
+      "is_group": false,
+      "evidence": "H1 'Best Sellers'; subtitle '200+ Results for'; reached via 'Furniture' tab of the Home & Kitchen bestseller tabbed carousel and again as 'Furniture bestsellers' carousel on /furniture/",
+      "flag": "MANUAL REVIEW: site displays only a rounded/bucketed count ('200+'), not an exact number"
+    },
+    {
+      "category": "Kitchen & Dining Bestsellers",
+      "sub_category": "Kitchen & Dining Bestsellers",
+      "qty": null,
+      "link": "https://www.noon.com/uae-en/kitchen_dining-bestseller-AE/",
+      "is_group": false,
+      "evidence": "H1 'Best Sellers'; subtitle '100+ Results for'; reached via 'Kitchen' tab of the Home & Kitchen bestseller tabbed carousel and again as 'Kitchen & dining bestsellers' carousel on /kitchen-dining/; product sample distinct from Tools listing (knife set, kitchen scale) confirming a genuinely different listing",
+      "flag": "MANUAL REVIEW: site displays only a rounded/bucketed count ('100+'), not an exact number"
+    },
+    {
+      "category": "Tools & Home Improvement Bestsellers",
+      "sub_category": "Tools & Home Improvement Bestsellers",
+      "qty": null,
+      "link": "https://www.noon.com/uae-en/home_improvement-bestseller-AE/",
+      "is_group": false,
+      "evidence": "H1 'Best Sellers'; subtitle '100+ Results for'; reached via 'Tools' tab of the Home & Kitchen bestseller tabbed carousel and again as 'Home improvement bestsellers' carousel on /tools-and-home-improvement-store/; product sample distinct from Kitchen listing (putty filler, disinfectant, batteries)",
+      "flag": "MANUAL REVIEW: site displays only a rounded/bucketed count ('100+'), not an exact number"
+    }
+  ]
+}

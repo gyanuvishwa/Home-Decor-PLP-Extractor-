@@ -1,0 +1,70 @@
+{
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ROBOTS: https://www.denbypottery.com/robots.txt fetched FIRST, before any other request on the host - HTTP 200, 2,378 bytes, profile safari18_0_ios. It opens with the comment '#we use Shopline as our ecommerce platform'. It names NO Claude agent at all - no ClaudeBot, no Claude-Web, no anthropic-ai, no Claude-User, no Claude-SearchBot - so no Claude-specific group exists and there is no hard stop; the generic 'User-agent: *' group applies and disallows exactly: /admin, ?filter, /*/checkouts/*, /cart, /*/orders/*, /orders/*, /trade/*, /checkout/*, /invoices, /payment_methods, /search, /products/search, /user, /transit_page, /api/merchant/payments/list, /api/trade/center/settle/main_site/detail/first_load, /preview, /%3Fpreview, /apple-app-site-association. Named groups exist only for adsbot-google (same list), Nutch ('Disallow: /'), AhrefsBot and AhrefsSiteAudit (Crawl-Delay 10), Googlebot/Googlebot-image ('Disallow:' i.e. allow all), MJ12bot (Crawl-Delay 10) and Pinterest (Crawl-Delay 1) - none of which is us, so no Crawl-delay binds here; probe.py's 2 s per-host gap was honoured anyway. Every URL touched this session is a bare /collections/<handle> path or a sitemap file, with NO query string at all - in particular no '?filter' facet URL was ever requested, and the site's internal search (/search, /products/search) was deliberately not used. ACCESS: plain direct fetch via probe.py curl_cffi (safari18_0_ios / edge101 / chrome131 / safari15_5) throughout - no proxy, no jina, no 403s, no WAF challenge. TREE SOURCE: the site's OWN mega-menu plus its own collection sitemap, not guessed URL patterns. (a) The storefront is Shopline, and its complete mega-menu is embedded in the homepage as a JSON block <script type=\"application/json\" id=\"megaMenu-config-collection\"> (46.6 KB); I parsed it into 183 nav cards with navTitle + navLink (work/w121_124/db_nodes.json). (b) https://www.denbypottery.com/sitemap.xml -> sitemap_collections_1.xml, 581 collection URLs, and sitemap_products_1.xml, 1,791 product URLs. RESULT OF THE SEARCH FOR BATHROOM NODES - all three of these independent sweeps were run and all three converge on exactly ONE bathroom node: (1) the 183 mega-menu nav titles regex-swept for bath|shower|toilet|soap|basin|sink|tap|faucet|vanity|mirror|towel|wash|dispenser|toothbrush|sanitar|bidet|robe -> ONE hit, 'Bathroom Accessories'; (2) the 581 collection URLs swept for the same vocabulary -> the only real hit is /collections/bathroom-accessories (the other four hits are /tumblers, /small-tumblers, /large-tumblers, /crystal-tumblers, all drinking glassware, inspected and reviewed below); (3) the 1,791 product URLs swept for soap|bath|shower|toilet|toothbrush|beaker|towel|basin|sink|tap|faucet|vanity|mirror|dispenser|robe|sanitar -> 47 hits of which 43 are 'Coffee Beaker Mug' SKUs (kitchen mugs) and the remaining 4 are Halo-Soap-Dish, Halo-Soap-Dispenser, Kiln-Soap-Dish and Kiln-Soap-Dispenser, i.e. products that are already inside the one recorded collection. So there is no hidden or nav-only bathroom node anywhere in Denby's taxonomy. HIERARCHY: Bathroom Accessories is a top-level leaf. Its own rendered breadcrumb is 'Home | Bathroom Accessories' (nav.breadcrumb-section, no intermediate crumb), it has no parent collection, and no sub-collection references it - so its own URL is the deepest valid listing URL and rule 24 does not force a descent. The nearest naming neighbour, /collections/accessories, was fetched to test whether it was the parent: it is not - it is 4 coasters and placemats. QTY SOURCE: the listing page's own rendered total, <div id=\"ProductCountDesktop\" class=\"product-count body3\">16 items</div>, cross-checked against the page's own pagination line <span class=\"all-products-shown\">Showing 16 out of 16 products</span>. VERIFICATION - three independent figures were required to agree and did, on every node touched: the 'N items' header, the 'Showing X out of N products' line, and a direct count of rendered product tiles (h3.product__title) in the same HTML. Bathroom Accessories 16/16/16. Controls: Home Fragrance 18/18/18, Tumblers 17/17/17, Table Accessories 11/11/11, Accessories 4/4/4, Kitchen Accessories 4/4/4, Candle Tins 3/3/3, Ceramic Candle Pots 4/4/4, Diffusers 4/4/4, Dinnerware Sets 19/19/19. PAGE-SIZE PROOF: Denby's grid page size is 48, established on /collections/mugs, which reports '115 items' and 'Showing 48 out of 115 products' with exactly 48 tiles rendered. 16 is therefore well under the cap - the recorded figure is a full enumeration of the collection, not a first-page artifact - and the header is demonstrably a true paginated total, not a page-size echo. DISCRIMINATION: counts differ per node across the 12 collections fetched (0, 3, 4, 4, 4, 11, 16, 17, 18, 19, 115), so this is not a site-wide constant. Each page's <h1> was read and matched the node requested ('Bathroom Accessories', 'Tumblers', 'Home Fragrance', ...). CONTENT CHECK on the single recorded leaf: all 16 products were enumerated by name from the rendered grid - Halo Soap Dispenser, Halo Alt Beaker, Halo Soap Dish, Halo Medium Pot, Halo Medium Oval Tray, Kiln Soap Dispenser, Kiln Beaker, Kiln Soap Dish, Kiln Medium Pot, Kiln Medium Oval Tray (10 items: ceramic soap dispensers, soap dishes, tumblers/beakers, storage pots and trays - rule 13 names Soap Dispensers, Soap Dishes, Tumblers and Bathroom Trays explicitly, and rule 18 puts genuinely-bathroom ceramics in Bathroom, with rule 22 confirming stoneware is no bar), plus 6 home-fragrance crossovers that Denby merchandises into the same node (Halo/Kiln Ceramic Candle Pot, Halo/Kiln Candle Tin, Halo Ceramic Diffuser, Kiln Ceramic Diffuser Pot). The node's primary product type is unambiguously bathroom accessories and the site itself names it Bathroom Accessories, so it is recorded whole at the storefront's own number of 16 rather than adjusted downward - the 6 crossovers are flagged here rather than hidden, and the Home Fragrance node they also belong to is routed out in `review` so nothing is double-counted into Bathroom. DEDUP: dedup.already_extracted() was run on all 12 candidate/review URLs. ZERO hits. The 12,194-URL exclusion index contains NO denbypottery.com entry of any kind - Denby appears in neither Furniture.xlsx nor Final.xlsx - so nothing here was suppressed by a prior pass and the single recorded row is genuinely new. NOT FOUND ON THIS SITE (checked by the three sweeps above, genuinely absent - not assumed): Denby is a Derbyshire stoneware/tableware manufacturer. It sells no sanitaryware, no basins or sinks, no toilets or bidets, no baths, no showers or shower systems, no shower enclosures or screens, no taps, mixers or faucets, no bathroom furniture or vanity units, no bathroom mirrors of any kind, no bathroom storage node, no towels, bath mats, shower curtains or bathrobes, and no towel rails or toilet-roll holders. The 183-card mega-menu is entirely dinnerware, glassware, cookware, bakeware, serveware, home fragrance, gifting and colour/pattern ranges - the single exception is the Bathroom Accessories card recorded above. RESULT: 1 leaf row + 1 grouping row; 6 review entries. This is a small but real bathroom presence, not a NO BATHROOM FOUND.",
+ "rows": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Accessories",
+   "qty": 16,
+   "link": "https://www.denbypottery.com/collections/bathroom-accessories",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  }
+ ],
+ "review": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Home Fragrance",
+   "qty": 18,
+   "issue": "ROUTED TO DECOR / HOME FRAGRANCE (rules 2/21): ceramic candle pots, candle tins and reed diffusers. Checked because six of its products are cross-merchandised into the recorded Bathroom Accessories node (Halo/Kiln Ceramic Candle Pot, Halo/Kiln Candle Tin, Halo/Kiln Ceramic Diffuser). Primary product type is home fragrance, not a bathroom accessory, so the node itself is not Bathroom. Its children Candle Tins (3, /collections/candle-tins), Ceramic Candle Pots (4, /collections/ceramic-candle-pots) and Diffusers (4, /collections/diffusers) route the same way.",
+   "link": "https://www.denbypottery.com/collections/home-fragrance"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Tumblers",
+   "qty": 17,
+   "issue": "ROUTED TO KITCHEN & DINING - keyword false positive, inspected and rejected (rules 2/29). 'Tumbler' is a rule-13 bathroom accessory word, so this node was opened rather than assumed. All 17 products are drinking glassware sold in pairs ('Classic Blue Small Tumblers - Set Of 2', 'Contemporary Clear Large Tumblers - Set Of 2', 'Celeste Leadless Crystal Small Tumblers - Set Of 2'), sitting under Denby's Glassware / Drinkware tree. Not bathroom. Its siblings /collections/small-tumblers, /collections/large-tumblers and /collections/crystal-tumblers are the same drinking glassware.",
+   "link": "https://www.denbypottery.com/collections/tumblers"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Accessories",
+   "qty": 4,
+   "issue": "ROUTED TO KITCHEN & DINING - checked because the name could have made it the parent of Bathroom Accessories, and it is not. All 4 products are table coasters and placemats ('Natural Coasters - Set of 4', 'Colours Natural Placemats - Set Of 6'). It is neither a bathroom node nor a parent of one - Bathroom Accessories' own breadcrumb is 'Home > Bathroom Accessories', i.e. it has no parent collection.",
+   "link": "https://www.denbypottery.com/collections/accessories"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Kitchen Accessories",
+   "qty": 4,
+   "issue": "ROUTED TO KITCHEN & DINING: carving boards, knife block, butcher's block, serving bowl set. Listed because it is the sibling nav card of Bathroom Accessories in Denby's own mega-menu and was inspected in the same pass.",
+   "link": "https://www.denbypottery.com/collections/kitchen-accessories"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Table Accessories",
+   "qty": 11,
+   "issue": "ROUTED TO KITCHEN & DINING: woven placemats and coasters. Sibling nav card of Bathroom Accessories; inspected and rejected.",
+   "link": "https://www.denbypottery.com/collections/table-accessories"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Elements Accessories",
+   "qty": 0,
+   "issue": "EMPTY NODE: renders no product-count header and zero product tiles. No products, so no row (never fabricate). Checked because its name is an 'accessories' node.",
+   "link": "https://www.denbypottery.com/collections/elements-accessories"
+  }
+ ],
+ "_reconstructed_from": "Bathroom.xlsx delivered 2026-09-01 (checkpoint), not original worker JSON"
+}

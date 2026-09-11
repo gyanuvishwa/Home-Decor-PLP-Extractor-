@@ -1,0 +1,226 @@
+{
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ROBOTS: https://www.westwing.it/robots.txt fetched FIRST, before any other request on the host (HTTP 200, 2,032 bytes, profile edge101). It DOES name Claude - 'User-agent: ClaudeBot / User-agent: Claude-Web / User-agent: anthropic-ai' - but inside one combined AI-crawler stanza shared with GPTBot, OAI-SearchBot, ChatGPT-User, PerplexityBot, Amazonbot, Google-Extended, Applebot-Extended, CCBot, FacebookBot, Meta-ExternalAgent, Bytespider, TikTokBot, YouBot, FriendlyCrawler, OpenAI-Webcrawler, DataForSEObot, Diffbot, AI2Bot and NeevaAI, and that stanza is NOT an opt-out: it carries no 'Disallow: /'. Its directives are byte-identical to the generic 'User-agent: *' block plus one extra 'Allow: /llms.txt'. Verbatim, the Claude stanza reads: Allow: /llms.txt | Allow: /new-products/$ | Allow: /customer/invitation/create/ | Allow: /*/customer/invitation/create/ | Disallow: /all-products | Disallow: /p/s/* | Disallow: /customer* | Disallow: *--* | Disallow: /*?*q=* | Disallow: *?c= | Disallow: *&c= | Disallow: /sso/* | Disallow: /c/* | Disallow: /products/* | Disallow: /collections/* | Disallow: /api/*. So there is no named-Claude Disallow covering the paths needed and no section-5 hard stop. Every URL touched this session is a flat slug off the root (/scopini-bagno/, /deco-bagno/) with NO query string, NO double hyphen, and no /c/, /products/, /collections/, /api/, /all-products, /p/s/ or /customer prefix, so nothing disallowed was requested. In particular I did NOT touch /api/* at any point - every quantity below comes from rendered HTML, not from an API. No Crawl-delay is declared; probe.py's 2 s per-host gap was honoured throughout. Same reading as the validated SR 91 Westwing UK pass. ACCESS: plain direct fetch via probe.py curl_cffi (safari15_5 / chrome124 / edge101) throughout - no proxy, no r.jina.ai, no translate.goog, no 403s. One transient TLS error on /specchi-da-terra/ (a slug that does not exist in the sitemap); the real node is the nav's /specchi-da-terra-2/, which fetched cleanly at 10. TREE SOURCE: the site's own mega-menu, not guessed URL patterns. westwing.it is the same Shopify Oxygen/Hydrogen React-Router storefront as the UK site, and its complete navigation is embedded in the homepage (717 KB) as a flattened turbo-stream payload. I concatenated the 7 streamController.enqueue chunks, JSON-unescaped them (278,531 chars) and raw-decoded the 5,938-entry reference array, then resolved the node graph (key index _71 = title, _292 = url, _554 = children) back into the full menu: 598 title+url nodes, 13 top-level departments (Arredamento, Mobili e accessori contenitori, Accessori casa, Illuminazione, Tappeti, Tessili, Tavola, Cucina, Bambini, Giardino, Idee regalo, Ambienti della casa, Marche), rendered to work/w121_124/ww_tree.txt. Cross-checked against https://www.westwing.it/sitemap-categories.xml (595 category URLs, reached from /sitemap.xml) to catch live collections that exist but are not linked from the nav - that surfaced Accappatoi (12), which the mega-menu does not link, and it is routed to Textile in review. TREE SHAPE: Westwing IT has NO top-level Bathroom department. Bathroom content is distributed across 'Accessori casa > Accessori bagno' (9 children - the real accessories tree), 'Accessori casa > Specchi > Specchi make-up', 'Tessili > Biancheria da bagno' (3 children), 'Arredamento > Armadi > Mobili bagno', 'Arredamento > Scaffali > Scaffali bagno', 'Mobili e accessori contenitori > Piccoli contenitori e organizer > Accessori bagno', 'Tappeti > Per stanza > Bagno' and an 'Ambienti della casa > Bagno' room hub. This is the IT storefront's own Bagno tree taken at the assigned URL; nothing was carried over from Westwing DE (SR 103) or Westwing UK (SR 91), though the shape matches UK closely and the two independent readings corroborate each other. QTY METHOD: rendered listing HTML only - no API (robots disallows /api/*). Every leaf carries the storefront's own filter-bar total in the form '<N> Prodotti' plus an independent pagination line 'Visualizzazione di X su N prodotti'. VERIFICATION: three independent figures were required to agree on every recorded leaf, and did, 8 of 8 - (1) the filter-bar '<N> Prodotti' header, (2) the 'Visualizzazione di N su N prodotti' line, (3) a direct count of rendered product tiles (data-testid=\"product-cell-wrapper\") in the same HTML: Dispenser sapone 87/87/87, Portaspazzolini 42/42/42, Decorazioni bagno 70/70/70, Pattumiere da bagno 56/56/56, Scopini bagno 60/60/60, Porta carta igienica 39/39/39, Portasciugamani 36/36/36, Specchi make-up 15/15/15. Each page's <h1> was read and matched the node requested ('Scopini bagno', 'Porta carta igienica', 'Specchi make-up', ...). All 8 recorded leaves are below Westwing's 120-per-page limit, so the tile count is a full enumeration and not a first-page artifact. That the header is a true paginated total and not a page-size artifact is proved by the large nodes, where the header exceeds the 120 tiles rendered (Accessori bagno 411 header vs 120 tiles, Bagno room hub 484 vs 120, Biancheria da bagno 429 vs 120, Asciugamani 225 vs 120). Counts discriminate strongly across 43 URLs fetched (1, 10, 12, 15, 18, 33, 36, 37, 39, 40, 42, 45, 50, 56, 59, 60, 70, 87, 129, 130, 135, 205, 223, 225, 411, 429, 484) - not a site-wide constant. CONTENT CHECK on the one node whose NAME could mislead: 'Decorazioni bagno' (/deco-bagno/, 70) was enumerated rather than judged by its label - the tiles are 'Porta fazzoletti effetto marmo Kyle', 'Scaffale da bagno con ruote Tower', 'Porta dischetti di cotone Mist', 'Mensola per doccia in metallo fatta a mano Shea', 'Organizer per cosmetici Viva', 'Portaoggetti per vasca da bagno in bambu Kit', 'Barattolo in marmo Simba', 'Vassoio effetto ardesia Slate'. Primary product type is bathroom organisers, caddies, trays, canisters and shower/bath shelves - rules 12, 13 and 17 - not decorative objects, so it is recorded in Bathroom despite the word 'Decorazioni' (rule 2: product type beats category label). DEDUP: dedup.already_extracted() was run on all 43 candidate/variant URLs. 2 hits, both Furniture.xlsx SR 121 Westwing IT - Mobili bagno (/mobili-bagno/, 36, recorded there as 'Bathroom Furniture') and Scaffali bagno (/scaffali-bagno/, 37, 'Bathroom Shelving'). Both are in `review`, neither in `rows`, per the OPTION 1 policy. No recorded row is in the exclusion index. NOT FOUND ON THIS SITE (checked, genuinely absent - not skipped): all 595 sitemap category URLs and all 598 nav nodes were regex-swept for rubinett|miscelat|doccia|box-doccia|piatto-doccia|soffion|vasca|wc|sanitari|lavabo|lavandino|bide|bidet|scaldasalviette|termoarredo|colonna-doccia|paravasca|cabina and returned ZERO hits in both. The complete set of sitemap URLs containing 'bagno' is exactly 10: arredamento-bagno, mobili-bagno, bagno-accessori, scopini-bagno, pattumiere-da-bagno, deco-bagno, biancheria-da-bagno, tappetini-bagno, scaffali-bagno, tappeti-per-bagno - every one of which is recorded or reviewed above. Westwing IT is a furniture/decor retailer: it sells no sanitaryware, no taps or mixers, no baths, no showers, no shower enclosures or screens, no WCs, no bidets and no basins (rules 4-8 have no nodes here), and no bathroom mirrors beyond the make-up/magnifying node. RESULT: 8 leaf rows + 2 grouping rows; 18 review entries.",
+ "rows": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bagno",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Accessori bagno",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Accessori bagno > Dispenser sapone e portasaponetta",
+   "qty": 87,
+   "link": "https://www.westwing.it/dispenser-sapone-e-portasaponetta/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Accessori bagno > Portaspazzolini",
+   "qty": 42,
+   "link": "https://www.westwing.it/portaspazzolino/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Accessori bagno > Decorazioni bagno",
+   "qty": 70,
+   "link": "https://www.westwing.it/deco-bagno/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Accessori bagno > Pattumiere da bagno",
+   "qty": 56,
+   "link": "https://www.westwing.it/pattumiere-da-bagno/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Accessori bagno > Scopini bagno",
+   "qty": 60,
+   "link": "https://www.westwing.it/scopini-bagno/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Accessori bagno > Porta carta igienica",
+   "qty": 39,
+   "link": "https://www.westwing.it/porta-carta-igienica/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Accessori bagno > Portasciugamani",
+   "qty": 36,
+   "link": "https://www.westwing.it/portasciugamani/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Specchi make-up",
+   "qty": 15,
+   "link": "https://www.westwing.it/specchi-make-up/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  }
+ ],
+ "review": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Arredamento > Armadi > Mobili bagno",
+   "qty": 36,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Bathroom Furniture' (SR 121 Westwing IT, Furniture pass). Genuine Bathroom content under rule 9 (bathroom vanity/base units and bathroom cabinets) but retained in Furniture per the run-owner OPTION 1 policy. Verified live: h1 'Mobili bagno', header '36 Prodotti', 'Visualizzazione di 36 su 36 prodotti', 36 rendered product-cell tiles.",
+   "link": "https://www.westwing.it/mobili-bagno/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Arredamento > Scaffali > Scaffali bagno",
+   "qty": 37,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Bathroom Shelving' (SR 121 Westwing IT, Furniture pass). Genuine Bathroom content under rules 12/17 (bathroom shelves) but retained in Furniture per the OPTION 1 policy. Verified live: h1 'Scaffali bagno', 37/37/37.",
+   "link": "https://www.westwing.it/scaffali-bagno/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Accessori bagno > Saponi e creme",
+   "qty": 45,
+   "issue": "ROUTED TO BEAUTY / PERSONAL CARE: consumable product, not bathroom hardware, fixtures or accessories (rule 2 - primary product type). All enumerated tiles are bar/liquid hand soaps, hand creams, body creams and one diffuser refill ('Sapone solido Nurture', 'Sapone liquido per le mani Rosa Pura 500 ml', 'Crema corpo Anya', 'Ricarica per diffusore Pura Mediterranea'). Sits inside Westwing's Accessori bagno node, hence logged here rather than dropped. Same call as SR 91 Westwing UK.",
+   "link": "https://www.westwing.it/saponi-creme/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Accessori bagno > Portabiancheria",
+   "qty": 59,
+   "issue": "ROUTED TO STORAGE / LAUNDRY - LOW CONFIDENCE (rules 2/12/29). Primary product type is a laundry basket/hamper: all enumerated tiles are 'Portabiancheria ...', 'Cesto portabiancheria con coperchio', 'Set di 2 cesti per biancheria'. Westwing dual-parents the node - 'Accessori casa > Accessori bagno > Portabiancheria' (/ceste-borse-per-la-biancheria/) AND 'Mobili e accessori contenitori > Piccoli contenitori e organizer > Portabiancheria' (/ceste-borse-per-la-biancheria-3/, verified identical at 59) - so the Storage department owns the type and rule 12's 'clearly-Storage-owned products belong to Storage.xlsx' applies. Same call as SR 91 Westwing UK and SR 92 IKEA UK.",
+   "link": "https://www.westwing.it/ceste-borse-per-la-biancheria/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Tessili > Biancheria da bagno (parent)",
+   "qty": 429,
+   "issue": "ROUTED TO TEXTILE: the whole node is bath linen (rules 15, 20). Also a parent with three live children, all listed separately below, so it would be excluded by rule 24 regardless.",
+   "link": "https://www.westwing.it/biancheria-da-bagno/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Tessili > Biancheria da bagno > Asciugamani",
+   "qty": 225,
+   "issue": "ROUTED TO TEXTILE: bath, hand and guest towels (rules 15/20). Room-hub twin /asciugamani-2/ verified identical at 225.",
+   "link": "https://www.westwing.it/asciugamani/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Tessili > Biancheria da bagno > Tappeti da bagno",
+   "qty": 130,
+   "issue": "ROUTED TO TEXTILE: textile bath mats (rules 16/20). Westwing IT sells no rubber/anti-slip bathroom mat category - the only anti-slip node on the whole site is Tappeti > Tappeti antiscivolo (1 product, a washable fleece rug underlay), reviewed separately below. Room-hub twin /tappetini-bagno-2/ verified identical at 130.",
+   "link": "https://www.westwing.it/tappetini-bagno/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Tessili > Biancheria da bagno > Teli mare",
+   "qty": 59,
+   "issue": "ROUTED TO TEXTILE: beach towels - textile, and not bathroom (rules 15/20). Listed because it is the third child of Biancheria da bagno and would otherwise be a silent skip.",
+   "link": "https://www.westwing.it/teli-mare/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Accappatoi",
+   "qty": 12,
+   "issue": "ROUTED TO TEXTILE: bathrobes (rule 20). Live collection present in /sitemap-categories.xml but not linked from the mega-menu; found by the sitemap sweep, not by URL guessing.",
+   "link": "https://www.westwing.it/accappatoi/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bambini > Tessili per bambini > Biancheria da bagno neonati",
+   "qty": 18,
+   "issue": "ROUTED TO TEXTILE: baby bath linen - hooded towels and washcloths (rules 15/20).",
+   "link": "https://www.westwing.it/asciugamani-neonati/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Tappeti > Per stanza > Bagno",
+   "qty": 130,
+   "issue": "ROUTED TO TEXTILE / RUGS: the Rugs department's bathroom cut. h1 is 'Bagno' but the count is exactly 130, identical to Tessili > Biancheria da bagno > Tappeti da bagno (130), i.e. the same textile bath-rug set reached through a second nav parent (rules 16/20/28).",
+   "link": "https://www.westwing.it/tappeti-per-bagno/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Tappeti > Tappeti antiscivolo",
+   "qty": 1,
+   "issue": "NOT RECORDED - not a bathroom node (rules 2/16). Inspected rather than assumed: the single product is 'Sottotappeto lavabile in pile da interno-esterno Viles', a washable fleece rug UNDERLAY sold in the Tappeti (rugs) department, not an anti-slip bathroom mat. Rule 16's 'rubber/anti-slip mat explicitly sold as a bathroom accessory' does not apply - it has no bathroom parentage.",
+   "link": "https://www.westwing.it/tappeti-antiscivolo/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Accessori casa > Accessori bagno (parent)",
+   "qty": 411,
+   "issue": "EXCLUDED AS PARENT URL (rule 24): this node has 9 live children, 7 of which are recorded above as leaves and 2 routed out (Saponi e creme -> Beauty, Portabiancheria -> Storage). Its 411 total is not recorded and never aggregated. Note the children do NOT sum to it (87+42+70+56+60+39+36+45+59 = 494 > 411, products are multi-parented), which is exactly why summing siblings is forbidden.",
+   "link": "https://www.westwing.it/bagno-accessori/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Ambienti della casa > Bagno (room hub)",
+   "qty": 484,
+   "issue": "EXCLUDED AS PARENT / ROOM HUB (rules 24/25): Westwing IT has no top-level Bathroom department; /arredamento-bagno/ is an 'Ambienti della casa' room hub whose 8 children are room-scoped re-slugs of collections recorded or reviewed above (/mobili-bagno-2/, /dispenser-sapone-e-portasaponetta-2/, /portasciugamani-2/, /pattumiere-da-bagno-2/, /deco-bagno-2/, /ceste-borse-per-la-biancheria-2/, /asciugamani-2/, /tappetini-bagno-2/).",
+   "link": "https://www.westwing.it/arredamento-bagno/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Mobili e accessori contenitori > Piccoli contenitori e organizer > Accessori bagno",
+   "qty": 205,
+   "issue": "EXCLUDED AS PARENT / DUPLICATE (rules 24/28): the Storage department's own bathroom-accessories hub, a 205-product re-cut of the 411-product /bagno-accessori/ node whose leaves are already recorded. h1 'Accessori bagno'.",
+   "link": "https://www.westwing.it/bagno-accessori-2/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Ambienti della casa > Bagno > Mobili bagno (room variant)",
+   "qty": 60,
+   "issue": "EXCLUDED AS DUPLICATE COLLECTION: the room-scoped variant of Mobili bagno. Unlike the other room variants it is NOT count-identical (60 vs 36 on the canonical /mobili-bagno/), i.e. a broader re-cut of the same concept; the canonical node is already held in Furniture.xlsx, so recording this superset would re-extract deduped Furniture rows through a second URL. Held here rather than in rows. (/mobili-bagno-3/, the Mobili e accessori contenitori variant, IS count-identical at 36.)",
+   "link": "https://www.westwing.it/mobili-bagno-2/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Accessori casa > Specchi (decorative mirror tree)",
+   "qty": 223,
+   "issue": "OUT OF SCOPE - DECOR MIRRORS (rules 2/21/29). Inspected in full and not skipped, per rule 10. The Specchi node (223) and its children Specchi da parete (135, /specchi-da-parete/), Specchi lunghi (50, /specchi-interi/) plus the Arredamento mirror tree /specchi-2/ (223), /specchi-da-parete-3/ (129), /specchi-interi-2/ (40), /specchi-da-terra-2/ (10) and the standalone /decorative-mirrors-1/ (33) are decorative, full-length and floor-standing mirrors with no bathroom parentage - none sits under a Bagno node and none is described as a bathroom, vanity, LED, illuminated, demister or cabinet mirror. Only the sibling 'Specchi make-up' (15) is a vanity/magnifying mirror and it IS recorded in rows under rule 10 (enumerated: 'Specchio cosmetico rotondo con ingrandimento Ume', 'Specchio per trucco fatto a mano Whip', 'Specchio cosmetico Tower' etc.). Logged so the mirror sweep is not silent.",
+   "link": "https://www.westwing.it/specchi/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Duplicate re-slugged collections (7 URLs)",
+   "qty": null,
+   "issue": "EXCLUDED AS DUPLICATES (rule 28): Westwing re-slugs the same collection under each nav parent. Each variant was fetched and its count compared with the canonical URL; all seven are exactly count-identical, so each product type is recorded once only at its canonical slug: /dispenser-sapone-e-portasaponetta-2/ 87 = 87; /portasciugamani-2/ 36 = 36; /pattumiere-da-bagno-2/ 56 = 56; /deco-bagno-2/ 70 = 70; /ceste-borse-per-la-biancheria-2/ 59 and /ceste-borse-per-la-biancheria-3/ 59 = 59; /asciugamani-2/ 225 = 225; /tappetini-bagno-2/ 130 = 130; /scaffali-bagno-2/ 37 = 37; /mobili-bagno-3/ 36 = 36. Only the canonical slugs appear in /sitemap-categories.xml, which independently confirms which URL is canonical.",
+   "link": null
+  }
+ ],
+ "_reconstructed_from": "Bathroom.xlsx delivered 2026-09-01 (checkpoint), not original worker JSON"
+}

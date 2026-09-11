@@ -1,0 +1,43 @@
+{
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "Access: direct HTTP fetch (tier 1) sufficient throughout; same robots.txt/Cloudflare notes as bs227.json -- ClaudeBot is disallowed but generic HTTP fetch under User-agent: * Allow: / was used, no Claude-in-Chrome escalation needed. Discovery: main nav/footer only expose a generic '/collections/sale' (checked: <title>Home Decor Sale - Home & Kitchen Accessories On Sale | Nestasia</title> -- a plain seasonal/promotional sale page with no permanence signal, correctly EXCLUDED as Clearance per the Sale-vs-Clearance test). Sitemap_collections_1.xml surfaced several clearance/sale-worded handles; each was opened and checked for a strict clearance/outlet/last-chance signal in its own title/H1 copy: (1) clearance-sale -> <title>Nestasia Sale Online 2026 - Stock Clearance Sale</title>, H1 'Clearance Sale Upto 70% Off' -- consistent clearance wording, INCLUDED. (2) last-piece-clearance -> <title>Stock Clearance Sale - Home Decor Clearance Sale Online | Nestasia</title> -- 'last piece' = end-of-line framing, INCLUDED. (3) last-chance-clearance -> <title>Last Chance Clearance | Nestasia</title> -- direct target-term match, INCLUDED. (4) clearance-sale-1 -> <title>Exclusive Clearance Sale: Up to 50% Off* | Nestasia</title> but on-page H1 reads 'End of Season Sale' (a seasonal/temporary framing that contradicts the clearance title), and the listing is far larger than the other three (1570 unique products vs 112/11/44) -- looks much more like a broad seasonal discount campaign spanning most of the catalog than genuine narrow clearance/outlet stock. Recorded per brief's ambiguity rule rather than excluded or guessed; flagged MANUAL REVIEW. Confirmed all four are genuinely DIFFERENT listings, not aliases of each other or of clearance-sale: pairwise product-id overlap via products.json was clearance-sale vs last-piece-clearance = 1/112 shared, clearance-sale vs last-chance-clearance = 0/112 shared, last-piece-clearance vs last-chance-clearance = 0/11 shared, clearance-sale vs clearance-sale-1 (first 250 of 1570) = 0 shared -- near-zero overlap confirms distinct listings, kept as separate rows (not nested, not merged). Excluded as non-clearance (generic/temporary promo or coupon-code pages, no permanence signal in title/copy): sale, spring-sale, independence-day-sale, christmas-sale, valentine-sale, rakhi-sale, rakhi-sale-copy, harneet-jan-tricolor-sale-picks (seasonal/festival campaigns), flash-sale, flash-sale-offer, cups-flash-sale, mega-price-drop-sale, wishlist-on-sale, buy-1-get-1-free (temporary promo mechanics), nestbest10 (<title>Nestbest10 | Nestasia</title>, a discount-coupon-code landing page, no clearance signal) and by the same naming pattern nestbest15. All 4 included rows are top-level, undifferentiated listings (no genuine site-exposed parent/child sub-structure found for Clearance).",
+  "rows": [
+    {
+      "category": "Clearance",
+      "sub_category": "Clearance Sale",
+      "qty": 112,
+      "link": "https://nestasia.in/collections/clearance-sale",
+      "is_group": false,
+      "evidence": "page <title>Nestasia Sale Online 2026 - Stock Clearance Sale</title>, H1 'Clearance Sale Upto 70% Off'; /collections/clearance-sale/products.json?limit=250&page=1 returned 112 products (single page, under limit -> exhaustive)",
+      "flag": null
+    },
+    {
+      "category": "Clearance",
+      "sub_category": "Last Piece Clearance",
+      "qty": 11,
+      "link": "https://nestasia.in/collections/last-piece-clearance",
+      "is_group": false,
+      "evidence": "page <title>Stock Clearance Sale - Home Decor Clearance Sale Online | Nestasia</title>; /collections/last-piece-clearance/products.json?limit=250&page=1 returned 11 products (single page, under limit -> exhaustive)",
+      "flag": null
+    },
+    {
+      "category": "Clearance",
+      "sub_category": "Last Chance Clearance",
+      "qty": 44,
+      "link": "https://nestasia.in/collections/last-chance-clearance",
+      "is_group": false,
+      "evidence": "page <title>Last Chance Clearance | Nestasia</title>; /collections/last-chance-clearance/products.json?limit=250&page=1 returned 44 products (single page, under limit -> exhaustive)",
+      "flag": null
+    },
+    {
+      "category": "Clearance",
+      "sub_category": "Clearance Sale (Exclusive / End of Season)",
+      "qty": 1570,
+      "link": "https://nestasia.in/collections/clearance-sale-1",
+      "is_group": false,
+      "evidence": "page <title>Exclusive Clearance Sale: Up to 50% Off* | Nestasia</title> but on-page H1 reads 'End of Season Sale'; /collections/clearance-sale-1/products.json?limit=250 exhaustive paging across 7 pages (250,250,250,250,250,250,70) = 1570 unique product ids after dedup",
+      "flag": "MANUAL REVIEW: AMBIGUOUS SALE/CLEARANCE - page <title> calls it 'Exclusive Clearance Sale' but the on-page H1 reads 'End of Season Sale' (a seasonal/temporary-campaign framing, not a permanent-markdown/outlet signal), and at 1570 unique products it is far larger than the site's other three clearance listings (112/11/44) and close to a broad-catalog discount event rather than targeted end-of-line clearance stock. Recorded per brief instruction to keep ambiguous rows rather than guess."
+    }
+  ]
+}

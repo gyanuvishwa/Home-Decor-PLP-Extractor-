@@ -1,0 +1,921 @@
+{
+ "sr": 234,
+ "company": "Etsy US",
+ "brand_site": "etsy.com",
+ "country": "USA",
+ "site_url": "https://www.etsy.com/",
+ "status": "partial",
+ "failure_reason": null,
+ "notes": "Access route: direct requests were 403'd by Etsy's bot defense; curl_cffi with impersonate='chrome116' succeeded consistently (chrome110 failed, chrome116 worked) -- Rule 2 step 2. robots.txt (fetched directly, not via translate.goog) has only 3 User-agent blocks (Spinn3r, AdsBot-Google-Mobile, *) -- no ClaudeBot/GPTBot/CCBot/anthropic-ai/Claude-User entry and no Claude-specific Disallow, so this is not a blocked-by-policy case like Amazon UAE. Scope: per this window's brief note, scoped to Etsy's Home & Living taxonomy: Home Decor (full traversal), Lighting (full traversal incl. the Outdoor Lighting node which lives under Outdoor & Garden), Kitchen & Dining (Drink & Barware / Dining & Serving / Kitchen Decor branches, for tableware/dinnerware/glassware only), Bathroom (Bathroom Decor branch only, for genuinely decorative accessories), and Outdoor & Garden's Garden Decoration + Planters & Pots branches (Rule 0.4/0.5: outdoor is not a blanket exclusion). Art & Collectibles (Etsy's separate top-level department that also carries wall-art prints/paintings) was NOT traversed -- out of the Home & Living scope this window's brief specifies for Etsy. Exclusions applied: Throw Pillows, Chair Pads (textiles); Wallpaper, Seasonal Decor (Ornaments/Christmas Trees/Easter Baskets/Tree Toppers/Tree Skirts/Stockings -- Holiday & Gift); Faux Plants and Greenery, Artificial Flower Arrangements, Fresh Flower Arrangements (faux/fresh flowers -- Fresh treated as perishable consumable, not durable decor); Decorative Baskets (storage function, conservative exclude); Light Switch and Outlet Covers, Light Pulls, Ceiling Medallions, Lamp Harps (Light Accessories branch -- treated as wiring/hardware/trim, not fixtures); Home Fragrances and the general 'Candles' node (scented/unscented mixed roll-up with no clean split -- dropped per 'mixed roll-ups: drop, don't pad'; Candleholders kept, matches brief's explicit include); Flatware and Silverware, Serving Utensils, Chopsticks (cutlery/utensils); Barware (sample titles showed a genuine mix of glass barware AND bar tools/openers -- dropped as a mixed roll-up, brief explicitly excludes 'bar tools'); Olive Oil and Vinegar Cruets (sample titles were dominated by actual bottled-oil food products, not empty decorative cruets -- food/drink consumable); Refrigerator Magnets (novelty, not in include list); Wall Stencils, Wall Shelves (tool / storage-furniture); Bathroom Vanities, Bath Towels, Toilet Paper Holders, Towel Racks and Rods, Shower Curtains and Rings, Beach Towels, Soap Dishes and Dispensers, Bathroom Storage, Bath Mats and Rugs, Medicine Cabinets, Bathtub Trays, Hooded Towels (bathroom furniture/fixtures/plumbing/textiles, not mirrors/lighting); all of Furniture, Floor & Rugs, Bedding, Curtains & Window Treatments (textiles/furniture), Storage & Organization, Cookware/Bakeware/Small Kitchen Appliances/Coffee & Tea Makers/Kitchen Storage/Linens, and the rest of Outdoor & Garden (Patio Furniture, Gardening Tools, Fire Pits, Grills, Coolers, etc.) were not traversed at all as clearly out of scope. Kept borderline calls, documented for review: Dried Flowers (kept as durable decorative florals, distinct from the excluded faux/fresh nodes); Picture Frames/Displays/Collage Frames (kept -- matches this project's precedent on West Elm/Crate & Barrel/Pottery Barn/Target Home, all of which include picture frames under Wall Decor & Mirrors); Wreaths and Door Hangers (kept as year-round decorative accents -- Etsy itself keeps this branch separate from Seasonal Decor); Fireplace Screens, Mobiles (kept as decorative accessories); Serving Odds and Ends (kept -- sample titles were vintage decorative serveware: butter dishes, creamers, sugar bowls); Cheese and Charcuterie Boards, Lazy Susans, Snack Sets (kept under Trays and Platters as tableware/serving decor). Rule 0.6 overlaps (both nodes emitted, not de-duplicated, product-ID diff not feasible at this scale): Home Decor > Clocks (all clock types) vs Wall Decor > Wall Clocks (distinct category IDs/URLs); Lighting > Garden and String Lights vs Outdoor & Garden > Outdoor Lighting (distinct category IDs/URLs, own canonical page); Home Decor > Indoor Planters vs Outdoor & Garden > Planters and Pots > Indoor Planters (distinct URLs). QTY DETERMINATION (why every leaf is null+MANUAL REVIEW): Etsy category/browse pages carry no rendered or embedded exact result-count field. The only numeric signal is an embedded search-state \"total_pages\" value (48 listings/page). For 48 of 85 leaves this value sits at the hard cap of 250 pages (~12,000), which Etsy enforces regardless of true inventory size for any sufficiently large category -- the real total is unknown and likely far larger (a global 'organic_listings_count':19,400,388 site-wide figure was also found in the page JSON and is unusable, since it is a sitewide marketing stat, not category-scoped). For the other 37 leaves, total_pages is below the cap, but boundary testing (fetching the last page and counting actual listing IDs) showed the per-page item count is inflated by ad/related-listing injection beyond the nominal 48/page, and a repeat-request check on one such category (Cake Stands) showed total_pages itself change between two back-to-back fetches (133 -> 131) -- i.e. the figure is not even stable within a session, let alone an exact site-reported total. This is the same class of problem as Noon UAE's rounded '100K+' widget (S.N. 191 precedent) but with instability and ad-pollution rather than rounding as the failure mode; per the brief's explicit guidance for this company, every qty is null + MANUAL REVIEW rather than estimated.",
+ "rows": [
+  {
+   "category": "Lighting",
+   "sub_category": "Light Fixtures",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Ceiling Lights",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Pendant Lights",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.etsy.com/c/home-and-living/lighting/light-fixtures/ceiling-lights/pendant-lights",
+   "evidence": "embedded search-state JSON on https://www.etsy.com/c/home-and-living/lighting/light-fixtures/ceiling-lights/pendant-lights reports \"total_pages\":250 at 48 listings/page (~12,000 shown), which is Etsy's hard pagination cap for large categories -- true inventory size is unknown and almost certainly larger",
+   "flag": "MANUAL REVIEW: Etsy exposes no exact total-count widget on category pages; this category hits the site's 250-page browse cap (~12,000 listings), so the true total cannot be read off the page -- not usable as exact qty (same class of problem as Noon UAE's rounded-count widget)"
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Chandeliers",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.etsy.com/c/home-and-living/lighting/light-fixtures/ceiling-lights/chandeliers",
+   "evidence": "embedded search-state JSON on https://www.etsy.com/c/home-and-living/lighting/light-fixtures/ceiling-lights/chandeliers reports \"total_pages\":250 at 48 listings/page (~12,000 shown), which is Etsy's hard pagination cap for large categories -- true inventory size is unknown and almost certainly larger",
+   "flag": "MANUAL REVIEW: Etsy exposes no exact total-count widget on category pages; this category hits the site's 250-page browse cap (~12,000 listings), so the true total cannot be read off the page -- not usable as exact qty (same class of problem as Noon UAE's rounded-count widget)"
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Wall Lights",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Sconces",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.etsy.com/c/home-and-living/lighting/light-fixtures/wall-lights/sconces",
+   "evidence": "embedded search-state JSON on https://www.etsy.com/c/home-and-living/lighting/light-fixtures/wall-lights/sconces reports \"total_pages\":250 at 48 listings/page (~12,000 shown), which is Etsy's hard pagination cap for large categories -- true inventory size is unknown and almost certainly larger",
+   "flag": "MANUAL REVIEW: Etsy exposes no exact total-count widget on category pages; this category hits the site's 250-page browse cap (~12,000 listings), so the true total cannot be read off the page -- not usable as exact qty (same class of problem as Noon UAE's rounded-count widget)"
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Night Lights",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.etsy.com/c/home-and-living/lighting/light-fixtures/wall-lights/night-lights",
+   "evidence": "embedded search-state JSON on https://www.etsy.com/c/home-and-living/lighting/light-fixtures/wall-lights/night-lights reports \"total_pages\":250 at 48 listings/page (~12,000 shown), which is Etsy's hard pagination cap for large categories -- true inventory size is unknown and almost certainly larger",
+   "flag": "MANUAL REVIEW: Etsy exposes no exact total-count widget on category pages; this category hits the site's 250-page browse cap (~12,000 listings), so the true total cannot be read off the page -- not usable as exact qty (same class of problem as Noon UAE's rounded-count widget)"
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Vanity Lights",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.etsy.com/c/home-and-living/lighting/light-fixtures/wall-lights/vanity-lights",
+   "evidence": "embedded search-state JSON on https://www.etsy.com/c/home-and-living/lighting/light-fixtures/wall-lights/vanity-lights reports \"total_pages\":4 at 48 listings/page (~192 shown); not hitting the 250-page cap, but boundary-page listing counts were found to include paid/related listings beyond the nominal per-page count and the total_pages figure itself was observed to fluctuate across repeated requests on a sibling category (133 -> 131), so it is not a stable, verifiable exact total",
+   "flag": "MANUAL REVIEW: Etsy's own pagination total is not a stable/exact figure (confirmed to change across requests and to be polluted by ad/related listings on boundary pages) -- not usable as exact qty"
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Picture Lights",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.etsy.com/c/home-and-living/lighting/light-fixtures/wall-lights/picture-lights",
+   "evidence": "embedded search-state JSON on https://www.etsy.com/c/home-and-living/lighting/light-fixtures/wall-lights/picture-lights reports \"total_pages\":3 at 48 listings/page (~144 shown); not hitting the 250-page cap, but boundary-page listing counts were found to include paid/related listings beyond the nominal per-page count and the total_pages figure itself was observed to fluctuate across repeated requests on a sibling category (133 -> 131), so it is not a stable, verifiable exact total",
+   "flag": "MANUAL REVIEW: Etsy's own pagination total is not a stable/exact figure (confirmed to change across requests and to be polluted by ad/related listings on boundary pages) -- not usable as exact qty"
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Electric Lanterns",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.etsy.com/c/home-and-living/lighting/light-fixtures/wall-lights/electric-lanterns",
+   "evidence": "embedded search-state JSON on https://www.etsy.com/c/home-and-living/lighting/light-fixtures/wall-lights/electric-lanterns reports \"total_pages\":28 at 48 listings/page (~1,344 shown); not hitting the 250-page cap, but boundary-page listing counts were found to include paid/related listings beyond the nominal per-page count and the total_pages figure itself was observed to fluctuate across repeated requests on a sibling category (133 -> 131), so it is not a stable, verifiable exact total",
+   "flag": "MANUAL REVIEW: Etsy's own pagination total is not a stable/exact figure (confirmed to change across requests and to be polluted by ad/related listings on boundary pages) -- not usable as exact qty"
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Garden and String Lights",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Garden Lights",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.etsy.com/c/home-and-living/lighting/light-fixtures/garden-and-string-lights/garden-lights",
+   "evidence": "embedded search-state JSON on https://www.etsy.com/c/home-and-living/lighting/light-fixtures/garden-and-string-lights/garden-lights reports \"total_pages\":51 at 48 listings/page (~2,448 shown); not hitting the 250-page cap, but boundary-page listing counts were found to include paid/related listings beyond the nominal per-page count and the total_pages figure itself was observed to fluctuate across repeated requests on a sibling category (133 -> 131), so it is not a stable, verifiable exact total",
+   "flag": "MANUAL REVIEW: Etsy's own pagination total is not a stable/exact figure (confirmed to change across requests and to be polluted by ad/related listings on boundary pages) -- not usable as exact qty"
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "String Lights",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.etsy.com/c/home-and-living/lighting/light-fixtures/garden-and-string-lights/string-lights",
+   "evidence": "embedded search-state JSON on https://www.etsy.com/c/home-and-living/lighting/light-fixtures/garden-and-string-lights/string-lights reports \"total_pages\":70 at 48 listings/page (~3,360 shown); not hitting the 250-page cap, but boundary-page listing counts were found to include paid/related listings beyond the nominal per-page count and the total_pages figure itself was observed to fluctuate across repeated requests on a sibling category (133 -> 131), so it is not a stable, verifiable exact total",
+   "flag": "MANUAL REVIEW: Etsy's own pagination total is not a stable/exact figure (confirmed to change across requests and to be polluted by ad/related listings on boundary pages) -- not usable as exact qty"
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Lamps, Shades and Bases",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Lamp Shades",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.etsy.com/c/home-and-living/lighting/lamps-shades-and-bases/lamp-shades",
+   "evidence": "embedded search-state JSON on https://www.etsy.com/c/home-and-living/lighting/lamps-shades-and-bases/lamp-shades reports \"total_pages\":250 at 48 listings/page (~12,000 shown), which is Etsy's hard pagination cap for large categories -- true inventory size is unknown and almost certainly larger",
+   "flag": "MANUAL REVIEW: Etsy exposes no exact total-count widget on category pages; this category hits the site's 250-page browse cap (~12,000 listings), so the true total cannot be read off the page -- not usable as exact qty (same class of problem as Noon UAE's rounded-count widget)"
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Lamp Bases",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.etsy.com/c/home-and-living/lighting/lamps-shades-and-bases/lamp-bases",
+   "evidence": "embedded search-state JSON on https://www.etsy.com/c/home-and-living/lighting/lamps-shades-and-bases/lamp-bases reports \"total_pages\":25 at 48 listings/page (~1,200 shown); not hitting the 250-page cap, but boundary-page listing counts were found to include paid/related listings beyond the nominal per-page count and the total_pages figure itself was observed to fluctuate across repeated requests on a sibling category (133 -> 131), so it is not a stable, verifiable exact total",
+   "flag": "MANUAL REVIEW: Etsy's own pagination total is not a stable/exact figure (confirmed to change across requests and to be polluted by ad/related listings on boundary pages) -- not usable as exact qty"
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Lamps",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.etsy.com/c/home-and-living/lighting/lamps-shades-and-bases/lamps",
+   "evidence": "embedded search-state JSON on https://www.etsy.com/c/home-and-living/lighting/lamps-shades-and-bases/lamps reports \"total_pages\":250 at 48 listings/page (~12,000 shown), which is Etsy's hard pagination cap for large categories -- true inventory size is unknown and almost certainly larger",
+   "flag": "MANUAL REVIEW: Etsy exposes no exact total-count widget on category pages; this category hits the site's 250-page browse cap (~12,000 listings), so the true total cannot be read off the page -- not usable as exact qty (same class of problem as Noon UAE's rounded-count widget)"
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Outdoor Lighting",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.etsy.com/c/home-and-living/outdoor-and-garden/outdoor-lighting",
+   "evidence": "embedded search-state JSON on https://www.etsy.com/c/home-and-living/outdoor-and-garden/outdoor-lighting reports \"total_pages\":140 at 48 listings/page (~6,720 shown); not hitting the 250-page cap, but boundary-page listing counts were found to include paid/related listings beyond the nominal per-page count and the total_pages figure itself was observed to fluctuate across repeated requests on a sibling category (133 -> 131), so it is not a stable, verifiable exact total",
+   "flag": "MANUAL REVIEW: Etsy's own pagination total is not a stable/exact figure (confirmed to change across requests and to be polluted by ad/related listings on boundary pages) -- not usable as exact qty"
+  },
+  {
+   "category": "Mirrors",
+   "sub_category": "Mirrors",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.etsy.com/c/home-and-living/home-decor/mirrors",
+   "evidence": "embedded search-state JSON on https://www.etsy.com/c/home-and-living/home-decor/mirrors reports \"total_pages\":250 at 48 listings/page (~12,000 shown), which is Etsy's hard pagination cap for large categories -- true inventory size is unknown and almost certainly larger",
+   "flag": "MANUAL REVIEW: Etsy exposes no exact total-count widget on category pages; this category hits the site's 250-page browse cap (~12,000 listings), so the true total cannot be read off the page -- not usable as exact qty (same class of problem as Noon UAE's rounded-count widget)"
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Wall Decor",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Wall Hangings",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Signs",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.etsy.com/c/home-and-living/home-decor/wall-decor/wall-hangings/signs",
+   "evidence": "embedded search-state JSON on https://www.etsy.com/c/home-and-living/home-decor/wall-decor/wall-hangings/signs reports \"total_pages\":250 at 48 listings/page (~12,000 shown), which is Etsy's hard pagination cap for large categories -- true inventory size is unknown and almost certainly larger",
+   "flag": "MANUAL REVIEW: Etsy exposes no exact total-count widget on category pages; this category hits the site's 250-page browse cap (~12,000 listings), so the true total cannot be read off the page -- not usable as exact qty (same class of problem as Noon UAE's rounded-count widget)"
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Prints",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.etsy.com/c/home-and-living/home-decor/wall-decor/wall-hangings/prints",
+   "evidence": "embedded search-state JSON on https://www.etsy.com/c/home-and-living/home-decor/wall-decor/wall-hangings/prints reports \"total_pages\":250 at 48 listings/page (~12,000 shown), which is Etsy's hard pagination cap for large categories -- true inventory size is unknown and almost certainly larger",
+   "flag": "MANUAL REVIEW: Etsy exposes no exact total-count widget on category pages; this category hits the site's 250-page browse cap (~12,000 listings), so the true total cannot be read off the page -- not usable as exact qty (same class of problem as Noon UAE's rounded-count widget)"
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Tapestries",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.etsy.com/c/home-and-living/home-decor/wall-decor/wall-hangings/tapestries",
+   "evidence": "embedded search-state JSON on https://www.etsy.com/c/home-and-living/home-decor/wall-decor/wall-hangings/tapestries reports \"total_pages\":250 at 48 listings/page (~12,000 shown), which is Etsy's hard pagination cap for large categories -- true inventory size is unknown and almost certainly larger",
+   "flag": "MANUAL REVIEW: Etsy exposes no exact total-count widget on category pages; this category hits the site's 250-page browse cap (~12,000 listings), so the true total cannot be read off the page -- not usable as exact qty (same class of problem as Noon UAE's rounded-count widget)"
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Paintings",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.etsy.com/c/home-and-living/home-decor/wall-decor/wall-hangings/paintings",
+   "evidence": "embedded search-state JSON on https://www.etsy.com/c/home-and-living/home-decor/wall-decor/wall-hangings/paintings reports \"total_pages\":250 at 48 listings/page (~12,000 shown), which is Etsy's hard pagination cap for large categories -- true inventory size is unknown and almost certainly larger",
+   "flag": "MANUAL REVIEW: Etsy exposes no exact total-count widget on category pages; this category hits the site's 250-page browse cap (~12,000 listings), so the true total cannot be read off the page -- not usable as exact qty (same class of problem as Noon UAE's rounded-count widget)"
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Maps",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.etsy.com/c/home-and-living/home-decor/wall-decor/wall-hangings/maps",
+   "evidence": "embedded search-state JSON on https://www.etsy.com/c/home-and-living/home-decor/wall-decor/wall-hangings/maps reports \"total_pages\":250 at 48 listings/page (~12,000 shown), which is Etsy's hard pagination cap for large categories -- true inventory size is unknown and almost certainly larger",
+   "flag": "MANUAL REVIEW: Etsy exposes no exact total-count widget on category pages; this category hits the site's 250-page browse cap (~12,000 listings), so the true total cannot be read off the page -- not usable as exact qty (same class of problem as Noon UAE's rounded-count widget)"
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Drawings and Sketches",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.etsy.com/c/home-and-living/home-decor/wall-decor/wall-hangings/drawings-and-sketches",
+   "evidence": "embedded search-state JSON on https://www.etsy.com/c/home-and-living/home-decor/wall-decor/wall-hangings/drawings-and-sketches reports \"total_pages\":250 at 48 listings/page (~12,000 shown), which is Etsy's hard pagination cap for large categories -- true inventory size is unknown and almost certainly larger",
+   "flag": "MANUAL REVIEW: Etsy exposes no exact total-count widget on category pages; this category hits the site's 250-page browse cap (~12,000 listings), so the true total cannot be read off the page -- not usable as exact qty (same class of problem as Noon UAE's rounded-count widget)"
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Photographs",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.etsy.com/c/home-and-living/home-decor/wall-decor/wall-hangings/photographs",
+   "evidence": "embedded search-state JSON on https://www.etsy.com/c/home-and-living/home-decor/wall-decor/wall-hangings/photographs reports \"total_pages\":250 at 48 listings/page (~12,000 shown), which is Etsy's hard pagination cap for large categories -- true inventory size is unknown and almost certainly larger",
+   "flag": "MANUAL REVIEW: Etsy exposes no exact total-count widget on category pages; this category hits the site's 250-page browse cap (~12,000 listings), so the true total cannot be read off the page -- not usable as exact qty (same class of problem as Noon UAE's rounded-count widget)"
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Wall Decals and Murals",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Murals",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.etsy.com/c/home-and-living/home-decor/wall-decor/wall-decals-and-murals/murals",
+   "evidence": "embedded search-state JSON on https://www.etsy.com/c/home-and-living/home-decor/wall-decor/wall-decals-and-murals/murals reports \"total_pages\":250 at 48 listings/page (~12,000 shown), which is Etsy's hard pagination cap for large categories -- true inventory size is unknown and almost certainly larger",
+   "flag": "MANUAL REVIEW: Etsy exposes no exact total-count widget on category pages; this category hits the site's 250-page browse cap (~12,000 listings), so the true total cannot be read off the page -- not usable as exact qty (same class of problem as Noon UAE's rounded-count widget)"
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Decal Shapes",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.etsy.com/c/home-and-living/home-decor/wall-decor/wall-decals-and-murals/shapes",
+   "evidence": "embedded search-state JSON on https://www.etsy.com/c/home-and-living/home-decor/wall-decor/wall-decals-and-murals/shapes reports \"total_pages\":162 at 48 listings/page (~7,776 shown); not hitting the 250-page cap, but boundary-page listing counts were found to include paid/related listings beyond the nominal per-page count and the total_pages figure itself was observed to fluctuate across repeated requests on a sibling category (133 -> 131), so it is not a stable, verifiable exact total",
+   "flag": "MANUAL REVIEW: Etsy's own pagination total is not a stable/exact figure (confirmed to change across requests and to be polluted by ad/related listings on boundary pages) -- not usable as exact qty"
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Decal Quotations",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.etsy.com/c/home-and-living/home-decor/wall-decor/wall-decals-and-murals/quotations",
+   "evidence": "embedded search-state JSON on https://www.etsy.com/c/home-and-living/home-decor/wall-decor/wall-decals-and-murals/quotations reports \"total_pages\":176 at 48 listings/page (~8,448 shown); not hitting the 250-page cap, but boundary-page listing counts were found to include paid/related listings beyond the nominal per-page count and the total_pages figure itself was observed to fluctuate across repeated requests on a sibling category (133 -> 131), so it is not a stable, verifiable exact total",
+   "flag": "MANUAL REVIEW: Etsy's own pagination total is not a stable/exact figure (confirmed to change across requests and to be polluted by ad/related listings on boundary pages) -- not usable as exact qty"
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Key Holders and Key Hooks",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.etsy.com/c/home-and-living/home-decor/wall-decor/key-holders-and-key-hooks",
+   "evidence": "embedded search-state JSON on https://www.etsy.com/c/home-and-living/home-decor/wall-decor/key-holders-and-key-hooks reports \"total_pages\":196 at 48 listings/page (~9,408 shown); not hitting the 250-page cap, but boundary-page listing counts were found to include paid/related listings beyond the nominal per-page count and the total_pages figure itself was observed to fluctuate across repeated requests on a sibling category (133 -> 131), so it is not a stable, verifiable exact total",
+   "flag": "MANUAL REVIEW: Etsy's own pagination total is not a stable/exact figure (confirmed to change across requests and to be polluted by ad/related listings on boundary pages) -- not usable as exact qty"
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Window Clings",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.etsy.com/c/home-and-living/home-decor/wall-decor/window-clings",
+   "evidence": "embedded search-state JSON on https://www.etsy.com/c/home-and-living/home-decor/wall-decor/window-clings reports \"total_pages\":199 at 48 listings/page (~9,552 shown); not hitting the 250-page cap, but boundary-page listing counts were found to include paid/related listings beyond the nominal per-page count and the total_pages figure itself was observed to fluctuate across repeated requests on a sibling category (133 -> 131), so it is not a stable, verifiable exact total",
+   "flag": "MANUAL REVIEW: Etsy's own pagination total is not a stable/exact figure (confirmed to change across requests and to be polluted by ad/related listings on boundary pages) -- not usable as exact qty"
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Wall Clocks",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.etsy.com/c/home-and-living/home-decor/wall-decor/wall-clocks",
+   "evidence": "embedded search-state JSON on https://www.etsy.com/c/home-and-living/home-decor/wall-decor/wall-clocks reports \"total_pages\":250 at 48 listings/page (~12,000 shown), which is Etsy's hard pagination cap for large categories -- true inventory size is unknown and almost certainly larger",
+   "flag": "MANUAL REVIEW: Etsy exposes no exact total-count widget on category pages; this category hits the site's 250-page browse cap (~12,000 listings), so the true total cannot be read off the page -- not usable as exact qty (same class of problem as Noon UAE's rounded-count widget)"
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Clocks",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.etsy.com/c/home-and-living/home-decor/clocks",
+   "evidence": "embedded search-state JSON on https://www.etsy.com/c/home-and-living/home-decor/clocks reports \"total_pages\":250 at 48 listings/page (~12,000 shown), which is Etsy's hard pagination cap for large categories -- true inventory size is unknown and almost certainly larger",
+   "flag": "MANUAL REVIEW: Etsy exposes no exact total-count widget on category pages; this category hits the site's 250-page browse cap (~12,000 listings), so the true total cannot be read off the page -- not usable as exact qty (same class of problem as Noon UAE's rounded-count widget)"
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Home Accents",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Vases",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.etsy.com/c/home-and-living/home-decor/home-accents/vases",
+   "evidence": "embedded search-state JSON on https://www.etsy.com/c/home-and-living/home-decor/home-accents/vases reports \"total_pages\":250 at 48 listings/page (~12,000 shown), which is Etsy's hard pagination cap for large categories -- true inventory size is unknown and almost certainly larger",
+   "flag": "MANUAL REVIEW: Etsy exposes no exact total-count widget on category pages; this category hits the site's 250-page browse cap (~12,000 listings), so the true total cannot be read off the page -- not usable as exact qty (same class of problem as Noon UAE's rounded-count widget)"
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Rocks and Geodes",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.etsy.com/c/home-and-living/home-decor/home-accents/rocks-and-geodes",
+   "evidence": "embedded search-state JSON on https://www.etsy.com/c/home-and-living/home-decor/home-accents/rocks-and-geodes reports \"total_pages\":250 at 48 listings/page (~12,000 shown), which is Etsy's hard pagination cap for large categories -- true inventory size is unknown and almost certainly larger",
+   "flag": "MANUAL REVIEW: Etsy exposes no exact total-count widget on category pages; this category hits the site's 250-page browse cap (~12,000 listings), so the true total cannot be read off the page -- not usable as exact qty (same class of problem as Noon UAE's rounded-count widget)"
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Statues",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.etsy.com/c/home-and-living/home-decor/home-accents/statues",
+   "evidence": "embedded search-state JSON on https://www.etsy.com/c/home-and-living/home-decor/home-accents/statues reports \"total_pages\":250 at 48 listings/page (~12,000 shown), which is Etsy's hard pagination cap for large categories -- true inventory size is unknown and almost certainly larger",
+   "flag": "MANUAL REVIEW: Etsy exposes no exact total-count widget on category pages; this category hits the site's 250-page browse cap (~12,000 listings), so the true total cannot be read off the page -- not usable as exact qty (same class of problem as Noon UAE's rounded-count widget)"
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Taxidermy and Curiosities",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.etsy.com/c/home-and-living/home-decor/home-accents/taxidermy-and-curiosities",
+   "evidence": "embedded search-state JSON on https://www.etsy.com/c/home-and-living/home-decor/home-accents/taxidermy-and-curiosities reports \"total_pages\":250 at 48 listings/page (~12,000 shown), which is Etsy's hard pagination cap for large categories -- true inventory size is unknown and almost certainly larger",
+   "flag": "MANUAL REVIEW: Etsy exposes no exact total-count widget on category pages; this category hits the site's 250-page browse cap (~12,000 listings), so the true total cannot be read off the page -- not usable as exact qty (same class of problem as Noon UAE's rounded-count widget)"
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Decorative Tiles",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.etsy.com/c/home-and-living/home-decor/home-accents/decorative-tiles",
+   "evidence": "embedded search-state JSON on https://www.etsy.com/c/home-and-living/home-decor/home-accents/decorative-tiles reports \"total_pages\":250 at 48 listings/page (~12,000 shown), which is Etsy's hard pagination cap for large categories -- true inventory size is unknown and almost certainly larger",
+   "flag": "MANUAL REVIEW: Etsy exposes no exact total-count widget on category pages; this category hits the site's 250-page browse cap (~12,000 listings), so the true total cannot be read off the page -- not usable as exact qty (same class of problem as Noon UAE's rounded-count widget)"
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Bells",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.etsy.com/c/home-and-living/home-decor/home-accents/bells",
+   "evidence": "embedded search-state JSON on https://www.etsy.com/c/home-and-living/home-decor/home-accents/bells reports \"total_pages\":213 at 48 listings/page (~10,224 shown); not hitting the 250-page cap, but boundary-page listing counts were found to include paid/related listings beyond the nominal per-page count and the total_pages figure itself was observed to fluctuate across repeated requests on a sibling category (133 -> 131), so it is not a stable, verifiable exact total",
+   "flag": "MANUAL REVIEW: Etsy's own pagination total is not a stable/exact figure (confirmed to change across requests and to be polluted by ad/related listings on boundary pages) -- not usable as exact qty"
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Piggy Banks",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.etsy.com/c/home-and-living/home-decor/home-accents/piggy-banks",
+   "evidence": "embedded search-state JSON on https://www.etsy.com/c/home-and-living/home-decor/home-accents/piggy-banks reports \"total_pages\":250 at 48 listings/page (~12,000 shown), which is Etsy's hard pagination cap for large categories -- true inventory size is unknown and almost certainly larger",
+   "flag": "MANUAL REVIEW: Etsy exposes no exact total-count widget on category pages; this category hits the site's 250-page browse cap (~12,000 listings), so the true total cannot be read off the page -- not usable as exact qty (same class of problem as Noon UAE's rounded-count widget)"
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Bookends",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.etsy.com/c/home-and-living/home-decor/home-accents/bookends",
+   "evidence": "embedded search-state JSON on https://www.etsy.com/c/home-and-living/home-decor/home-accents/bookends reports \"total_pages\":250 at 48 listings/page (~12,000 shown), which is Etsy's hard pagination cap for large categories -- true inventory size is unknown and almost certainly larger",
+   "flag": "MANUAL REVIEW: Etsy exposes no exact total-count widget on category pages; this category hits the site's 250-page browse cap (~12,000 listings), so the true total cannot be read off the page -- not usable as exact qty (same class of problem as Noon UAE's rounded-count widget)"
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Indoor Fountains",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.etsy.com/c/home-and-living/home-decor/home-accents/indoor-fountains",
+   "evidence": "embedded search-state JSON on https://www.etsy.com/c/home-and-living/home-decor/home-accents/indoor-fountains reports \"total_pages\":11 at 48 listings/page (~528 shown); not hitting the 250-page cap, but boundary-page listing counts were found to include paid/related listings beyond the nominal per-page count and the total_pages figure itself was observed to fluctuate across repeated requests on a sibling category (133 -> 131), so it is not a stable, verifiable exact total",
+   "flag": "MANUAL REVIEW: Etsy's own pagination total is not a stable/exact figure (confirmed to change across requests and to be polluted by ad/related listings on boundary pages) -- not usable as exact qty"
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Book Nooks",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.etsy.com/c/home-and-living/home-decor/home-accents/book-nooks",
+   "evidence": "embedded search-state JSON on https://www.etsy.com/c/home-and-living/home-decor/home-accents/book-nooks reports \"total_pages\":128 at 48 listings/page (~6,144 shown); not hitting the 250-page cap, but boundary-page listing counts were found to include paid/related listings beyond the nominal per-page count and the total_pages figure itself was observed to fluctuate across repeated requests on a sibling category (133 -> 131), so it is not a stable, verifiable exact total",
+   "flag": "MANUAL REVIEW: Etsy's own pagination total is not a stable/exact figure (confirmed to change across requests and to be polluted by ad/related listings on boundary pages) -- not usable as exact qty"
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Globes",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.etsy.com/c/home-and-living/home-decor/home-accents/globes",
+   "evidence": "embedded search-state JSON on https://www.etsy.com/c/home-and-living/home-decor/home-accents/globes reports \"total_pages\":30 at 48 listings/page (~1,440 shown); not hitting the 250-page cap, but boundary-page listing counts were found to include paid/related listings beyond the nominal per-page count and the total_pages figure itself was observed to fluctuate across repeated requests on a sibling category (133 -> 131), so it is not a stable, verifiable exact total",
+   "flag": "MANUAL REVIEW: Etsy's own pagination total is not a stable/exact figure (confirmed to change across requests and to be polluted by ad/related listings on boundary pages) -- not usable as exact qty"
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Decorative Compasses",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.etsy.com/c/home-and-living/home-decor/home-accents/decorative-compasses",
+   "evidence": "embedded search-state JSON on https://www.etsy.com/c/home-and-living/home-decor/home-accents/decorative-compasses reports \"total_pages\":20 at 48 listings/page (~960 shown); not hitting the 250-page cap, but boundary-page listing counts were found to include paid/related listings beyond the nominal per-page count and the total_pages figure itself was observed to fluctuate across repeated requests on a sibling category (133 -> 131), so it is not a stable, verifiable exact total",
+   "flag": "MANUAL REVIEW: Etsy's own pagination total is not a stable/exact figure (confirmed to change across requests and to be polluted by ad/related listings on boundary pages) -- not usable as exact qty"
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Picture Frames and Displays",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Picture Frames",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.etsy.com/c/home-and-living/home-decor/picture-frames-and-displays/picture-frames",
+   "evidence": "embedded search-state JSON on https://www.etsy.com/c/home-and-living/home-decor/picture-frames-and-displays/picture-frames reports \"total_pages\":250 at 48 listings/page (~12,000 shown), which is Etsy's hard pagination cap for large categories -- true inventory size is unknown and almost certainly larger",
+   "flag": "MANUAL REVIEW: Etsy exposes no exact total-count widget on category pages; this category hits the site's 250-page browse cap (~12,000 listings), so the true total cannot be read off the page -- not usable as exact qty (same class of problem as Noon UAE's rounded-count widget)"
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Displays",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.etsy.com/c/home-and-living/home-decor/picture-frames-and-displays/displays",
+   "evidence": "embedded search-state JSON on https://www.etsy.com/c/home-and-living/home-decor/picture-frames-and-displays/displays reports \"total_pages\":250 at 48 listings/page (~12,000 shown), which is Etsy's hard pagination cap for large categories -- true inventory size is unknown and almost certainly larger",
+   "flag": "MANUAL REVIEW: Etsy exposes no exact total-count widget on category pages; this category hits the site's 250-page browse cap (~12,000 listings), so the true total cannot be read off the page -- not usable as exact qty (same class of problem as Noon UAE's rounded-count widget)"
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Collage Frames",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.etsy.com/c/home-and-living/home-decor/picture-frames-and-displays/collage-frames",
+   "evidence": "embedded search-state JSON on https://www.etsy.com/c/home-and-living/home-decor/picture-frames-and-displays/collage-frames reports \"total_pages\":25 at 48 listings/page (~1,200 shown); not hitting the 250-page cap, but boundary-page listing counts were found to include paid/related listings beyond the nominal per-page count and the total_pages figure itself was observed to fluctuate across repeated requests on a sibling category (133 -> 131), so it is not a stable, verifiable exact total",
+   "flag": "MANUAL REVIEW: Etsy's own pagination total is not a stable/exact figure (confirmed to change across requests and to be polluted by ad/related listings on boundary pages) -- not usable as exact qty"
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Candleholders",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Candle Lanterns",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.etsy.com/c/home-and-living/home-decor/candles-and-home-fragrances/candleholders/candle-lanterns",
+   "evidence": "embedded search-state JSON on https://www.etsy.com/c/home-and-living/home-decor/candles-and-home-fragrances/candleholders/candle-lanterns reports \"total_pages\":90 at 48 listings/page (~4,320 shown); not hitting the 250-page cap, but boundary-page listing counts were found to include paid/related listings beyond the nominal per-page count and the total_pages figure itself was observed to fluctuate across repeated requests on a sibling category (133 -> 131), so it is not a stable, verifiable exact total",
+   "flag": "MANUAL REVIEW: Etsy's own pagination total is not a stable/exact figure (confirmed to change across requests and to be polluted by ad/related listings on boundary pages) -- not usable as exact qty"
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Candlestick Holders",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.etsy.com/c/home-and-living/home-decor/candles-and-home-fragrances/candleholders/candlestick-holders",
+   "evidence": "embedded search-state JSON on https://www.etsy.com/c/home-and-living/home-decor/candles-and-home-fragrances/candleholders/candlestick-holders reports \"total_pages\":250 at 48 listings/page (~12,000 shown), which is Etsy's hard pagination cap for large categories -- true inventory size is unknown and almost certainly larger",
+   "flag": "MANUAL REVIEW: Etsy exposes no exact total-count widget on category pages; this category hits the site's 250-page browse cap (~12,000 listings), so the true total cannot be read off the page -- not usable as exact qty (same class of problem as Noon UAE's rounded-count widget)"
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Candle Warmers",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.etsy.com/c/home-and-living/home-decor/candles-and-home-fragrances/candleholders/candle-warmers",
+   "evidence": "embedded search-state JSON on https://www.etsy.com/c/home-and-living/home-decor/candles-and-home-fragrances/candleholders/candle-warmers reports \"total_pages\":15 at 48 listings/page (~720 shown); not hitting the 250-page cap, but boundary-page listing counts were found to include paid/related listings beyond the nominal per-page count and the total_pages figure itself was observed to fluctuate across repeated requests on a sibling category (133 -> 131), so it is not a stable, verifiable exact total",
+   "flag": "MANUAL REVIEW: Etsy's own pagination total is not a stable/exact figure (confirmed to change across requests and to be polluted by ad/related listings on boundary pages) -- not usable as exact qty"
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Hurricanes",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.etsy.com/c/home-and-living/home-decor/candles-and-home-fragrances/candleholders/hurricanes",
+   "evidence": "embedded search-state JSON on https://www.etsy.com/c/home-and-living/home-decor/candles-and-home-fragrances/candleholders/hurricanes reports \"total_pages\":8 at 48 listings/page (~384 shown); not hitting the 250-page cap, but boundary-page listing counts were found to include paid/related listings beyond the nominal per-page count and the total_pages figure itself was observed to fluctuate across repeated requests on a sibling category (133 -> 131), so it is not a stable, verifiable exact total",
+   "flag": "MANUAL REVIEW: Etsy's own pagination total is not a stable/exact figure (confirmed to change across requests and to be polluted by ad/related listings on boundary pages) -- not usable as exact qty"
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Candle Sconces",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.etsy.com/c/home-and-living/home-decor/candles-and-home-fragrances/candleholders/sconces",
+   "evidence": "embedded search-state JSON on https://www.etsy.com/c/home-and-living/home-decor/candles-and-home-fragrances/candleholders/sconces reports \"total_pages\":54 at 48 listings/page (~2,592 shown); not hitting the 250-page cap, but boundary-page listing counts were found to include paid/related listings beyond the nominal per-page count and the total_pages figure itself was observed to fluctuate across repeated requests on a sibling category (133 -> 131), so it is not a stable, verifiable exact total",
+   "flag": "MANUAL REVIEW: Etsy's own pagination total is not a stable/exact figure (confirmed to change across requests and to be polluted by ad/related listings on boundary pages) -- not usable as exact qty"
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Candle Bowls",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.etsy.com/c/home-and-living/home-decor/candles-and-home-fragrances/candleholders/bowls",
+   "evidence": "embedded search-state JSON on https://www.etsy.com/c/home-and-living/home-decor/candles-and-home-fragrances/candleholders/bowls reports \"total_pages\":17 at 48 listings/page (~816 shown); not hitting the 250-page cap, but boundary-page listing counts were found to include paid/related listings beyond the nominal per-page count and the total_pages figure itself was observed to fluctuate across repeated requests on a sibling category (133 -> 131), so it is not a stable, verifiable exact total",
+   "flag": "MANUAL REVIEW: Etsy's own pagination total is not a stable/exact figure (confirmed to change across requests and to be polluted by ad/related listings on boundary pages) -- not usable as exact qty"
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Candelabras",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.etsy.com/c/home-and-living/home-decor/candles-and-home-fragrances/candleholders/candelabras",
+   "evidence": "embedded search-state JSON on https://www.etsy.com/c/home-and-living/home-decor/candles-and-home-fragrances/candleholders/candelabras reports \"total_pages\":78 at 48 listings/page (~3,744 shown); not hitting the 250-page cap, but boundary-page listing counts were found to include paid/related listings beyond the nominal per-page count and the total_pages figure itself was observed to fluctuate across repeated requests on a sibling category (133 -> 131), so it is not a stable, verifiable exact total",
+   "flag": "MANUAL REVIEW: Etsy's own pagination total is not a stable/exact figure (confirmed to change across requests and to be polluted by ad/related listings on boundary pages) -- not usable as exact qty"
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Candle Chandeliers",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.etsy.com/c/home-and-living/home-decor/candles-and-home-fragrances/candleholders/chandeliers",
+   "evidence": "embedded search-state JSON on https://www.etsy.com/c/home-and-living/home-decor/candles-and-home-fragrances/candleholders/chandeliers reports \"total_pages\":5 at 48 listings/page (~240 shown); not hitting the 250-page cap, but boundary-page listing counts were found to include paid/related listings beyond the nominal per-page count and the total_pages figure itself was observed to fluctuate across repeated requests on a sibling category (133 -> 131), so it is not a stable, verifiable exact total",
+   "flag": "MANUAL REVIEW: Etsy's own pagination total is not a stable/exact figure (confirmed to change across requests and to be polluted by ad/related listings on boundary pages) -- not usable as exact qty"
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Indoor Planters",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.etsy.com/c/home-and-living/home-decor/indoor-planters",
+   "evidence": "embedded search-state JSON on https://www.etsy.com/c/home-and-living/home-decor/indoor-planters reports \"total_pages\":250 at 48 listings/page (~12,000 shown), which is Etsy's hard pagination cap for large categories -- true inventory size is unknown and almost certainly larger",
+   "flag": "MANUAL REVIEW: Etsy exposes no exact total-count widget on category pages; this category hits the site's 250-page browse cap (~12,000 listings), so the true total cannot be read off the page -- not usable as exact qty (same class of problem as Noon UAE's rounded-count widget)"
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Wreaths and Door Hangers",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Wreaths",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.etsy.com/c/home-and-living/home-decor/wreaths-and-door-hangers/wreaths",
+   "evidence": "embedded search-state JSON on https://www.etsy.com/c/home-and-living/home-decor/wreaths-and-door-hangers/wreaths reports \"total_pages\":250 at 48 listings/page (~12,000 shown), which is Etsy's hard pagination cap for large categories -- true inventory size is unknown and almost certainly larger",
+   "flag": "MANUAL REVIEW: Etsy exposes no exact total-count widget on category pages; this category hits the site's 250-page browse cap (~12,000 listings), so the true total cannot be read off the page -- not usable as exact qty (same class of problem as Noon UAE's rounded-count widget)"
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Door Hangers",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.etsy.com/c/home-and-living/home-decor/wreaths-and-door-hangers/door-hangers",
+   "evidence": "embedded search-state JSON on https://www.etsy.com/c/home-and-living/home-decor/wreaths-and-door-hangers/door-hangers reports \"total_pages\":250 at 48 listings/page (~12,000 shown), which is Etsy's hard pagination cap for large categories -- true inventory size is unknown and almost certainly larger",
+   "flag": "MANUAL REVIEW: Etsy exposes no exact total-count widget on category pages; this category hits the site's 250-page browse cap (~12,000 listings), so the true total cannot be read off the page -- not usable as exact qty (same class of problem as Noon UAE's rounded-count widget)"
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Fireplace Screens",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.etsy.com/c/home-and-living/home-decor/fireplace-screens",
+   "evidence": "embedded search-state JSON on https://www.etsy.com/c/home-and-living/home-decor/fireplace-screens reports \"total_pages\":21 at 48 listings/page (~1,008 shown); not hitting the 250-page cap, but boundary-page listing counts were found to include paid/related listings beyond the nominal per-page count and the total_pages figure itself was observed to fluctuate across repeated requests on a sibling category (133 -> 131), so it is not a stable, verifiable exact total",
+   "flag": "MANUAL REVIEW: Etsy's own pagination total is not a stable/exact figure (confirmed to change across requests and to be polluted by ad/related listings on boundary pages) -- not usable as exact qty"
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Mobiles",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.etsy.com/c/home-and-living/home-decor/mobiles",
+   "evidence": "embedded search-state JSON on https://www.etsy.com/c/home-and-living/home-decor/mobiles reports \"total_pages\":250 at 48 listings/page (~12,000 shown), which is Etsy's hard pagination cap for large categories -- true inventory size is unknown and almost certainly larger",
+   "flag": "MANUAL REVIEW: Etsy exposes no exact total-count widget on category pages; this category hits the site's 250-page browse cap (~12,000 listings), so the true total cannot be read off the page -- not usable as exact qty (same class of problem as Noon UAE's rounded-count widget)"
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Dried Flowers",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.etsy.com/c/home-and-living/home-decor/flower-arrangements/dried-flowers",
+   "evidence": "embedded search-state JSON on https://www.etsy.com/c/home-and-living/home-decor/flower-arrangements/dried-flowers reports \"total_pages\":250 at 48 listings/page (~12,000 shown), which is Etsy's hard pagination cap for large categories -- true inventory size is unknown and almost certainly larger",
+   "flag": "MANUAL REVIEW: Etsy exposes no exact total-count widget on category pages; this category hits the site's 250-page browse cap (~12,000 listings), so the true total cannot be read off the page -- not usable as exact qty (same class of problem as Noon UAE's rounded-count widget)"
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Decorative Storage",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Decorative Trays",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.etsy.com/c/home-and-living/home-decor/decorative-storage/decorative-trays",
+   "evidence": "embedded search-state JSON on https://www.etsy.com/c/home-and-living/home-decor/decorative-storage/decorative-trays reports \"total_pages\":250 at 48 listings/page (~12,000 shown), which is Etsy's hard pagination cap for large categories -- true inventory size is unknown and almost certainly larger",
+   "flag": "MANUAL REVIEW: Etsy exposes no exact total-count widget on category pages; this category hits the site's 250-page browse cap (~12,000 listings), so the true total cannot be read off the page -- not usable as exact qty (same class of problem as Noon UAE's rounded-count widget)"
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Decorative Bowls",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.etsy.com/c/home-and-living/home-decor/decorative-storage/decorative-bowls",
+   "evidence": "embedded search-state JSON on https://www.etsy.com/c/home-and-living/home-decor/decorative-storage/decorative-bowls reports \"total_pages\":250 at 48 listings/page (~12,000 shown), which is Etsy's hard pagination cap for large categories -- true inventory size is unknown and almost certainly larger",
+   "flag": "MANUAL REVIEW: Etsy exposes no exact total-count widget on category pages; this category hits the site's 250-page browse cap (~12,000 listings), so the true total cannot be read off the page -- not usable as exact qty (same class of problem as Noon UAE's rounded-count widget)"
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Drinkware",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.etsy.com/c/home-and-living/kitchen-and-dining/drink-and-barware/drinkware",
+   "evidence": "embedded search-state JSON on https://www.etsy.com/c/home-and-living/kitchen-and-dining/drink-and-barware/drinkware reports \"total_pages\":250 at 48 listings/page (~12,000 shown), which is Etsy's hard pagination cap for large categories -- true inventory size is unknown and almost certainly larger",
+   "flag": "MANUAL REVIEW: Etsy exposes no exact total-count widget on category pages; this category hits the site's 250-page browse cap (~12,000 listings), so the true total cannot be read off the page -- not usable as exact qty (same class of problem as Noon UAE's rounded-count widget)"
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Trays and Platters",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Cheese and Charcuterie Boards",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.etsy.com/c/home-and-living/kitchen-and-dining/dining-and-serving/trays-and-platters/cheese-and-charcuterie-boards",
+   "evidence": "embedded search-state JSON on https://www.etsy.com/c/home-and-living/kitchen-and-dining/dining-and-serving/trays-and-platters/cheese-and-charcuterie-boards reports \"total_pages\":250 at 48 listings/page (~12,000 shown), which is Etsy's hard pagination cap for large categories -- true inventory size is unknown and almost certainly larger",
+   "flag": "MANUAL REVIEW: Etsy exposes no exact total-count widget on category pages; this category hits the site's 250-page browse cap (~12,000 listings), so the true total cannot be read off the page -- not usable as exact qty (same class of problem as Noon UAE's rounded-count widget)"
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Trays",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.etsy.com/c/home-and-living/kitchen-and-dining/dining-and-serving/trays-and-platters/trays",
+   "evidence": "embedded search-state JSON on https://www.etsy.com/c/home-and-living/kitchen-and-dining/dining-and-serving/trays-and-platters/trays reports \"total_pages\":250 at 48 listings/page (~12,000 shown), which is Etsy's hard pagination cap for large categories -- true inventory size is unknown and almost certainly larger",
+   "flag": "MANUAL REVIEW: Etsy exposes no exact total-count widget on category pages; this category hits the site's 250-page browse cap (~12,000 listings), so the true total cannot be read off the page -- not usable as exact qty (same class of problem as Noon UAE's rounded-count widget)"
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Snack Sets",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.etsy.com/c/home-and-living/kitchen-and-dining/dining-and-serving/trays-and-platters/snack-sets",
+   "evidence": "embedded search-state JSON on https://www.etsy.com/c/home-and-living/kitchen-and-dining/dining-and-serving/trays-and-platters/snack-sets reports \"total_pages\":40 at 48 listings/page (~1,920 shown); not hitting the 250-page cap, but boundary-page listing counts were found to include paid/related listings beyond the nominal per-page count and the total_pages figure itself was observed to fluctuate across repeated requests on a sibling category (133 -> 131), so it is not a stable, verifiable exact total",
+   "flag": "MANUAL REVIEW: Etsy's own pagination total is not a stable/exact figure (confirmed to change across requests and to be polluted by ad/related listings on boundary pages) -- not usable as exact qty"
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Platters",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.etsy.com/c/home-and-living/kitchen-and-dining/dining-and-serving/trays-and-platters/platters",
+   "evidence": "embedded search-state JSON on https://www.etsy.com/c/home-and-living/kitchen-and-dining/dining-and-serving/trays-and-platters/platters reports \"total_pages\":250 at 48 listings/page (~12,000 shown), which is Etsy's hard pagination cap for large categories -- true inventory size is unknown and almost certainly larger",
+   "flag": "MANUAL REVIEW: Etsy exposes no exact total-count widget on category pages; this category hits the site's 250-page browse cap (~12,000 listings), so the true total cannot be read off the page -- not usable as exact qty (same class of problem as Noon UAE's rounded-count widget)"
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Lazy Susans",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.etsy.com/c/home-and-living/kitchen-and-dining/dining-and-serving/trays-and-platters/lazy-susans",
+   "evidence": "embedded search-state JSON on https://www.etsy.com/c/home-and-living/kitchen-and-dining/dining-and-serving/trays-and-platters/lazy-susans reports \"total_pages\":12 at 48 listings/page (~576 shown); not hitting the 250-page cap, but boundary-page listing counts were found to include paid/related listings beyond the nominal per-page count and the total_pages figure itself was observed to fluctuate across repeated requests on a sibling category (133 -> 131), so it is not a stable, verifiable exact total",
+   "flag": "MANUAL REVIEW: Etsy's own pagination total is not a stable/exact figure (confirmed to change across requests and to be polluted by ad/related listings on boundary pages) -- not usable as exact qty"
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Plates",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.etsy.com/c/home-and-living/kitchen-and-dining/dining-and-serving/plates",
+   "evidence": "embedded search-state JSON on https://www.etsy.com/c/home-and-living/kitchen-and-dining/dining-and-serving/plates reports \"total_pages\":250 at 48 listings/page (~12,000 shown), which is Etsy's hard pagination cap for large categories -- true inventory size is unknown and almost certainly larger",
+   "flag": "MANUAL REVIEW: Etsy exposes no exact total-count widget on category pages; this category hits the site's 250-page browse cap (~12,000 listings), so the true total cannot be read off the page -- not usable as exact qty (same class of problem as Noon UAE's rounded-count widget)"
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Bowls",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.etsy.com/c/home-and-living/kitchen-and-dining/dining-and-serving/bowls",
+   "evidence": "embedded search-state JSON on https://www.etsy.com/c/home-and-living/kitchen-and-dining/dining-and-serving/bowls reports \"total_pages\":250 at 48 listings/page (~12,000 shown), which is Etsy's hard pagination cap for large categories -- true inventory size is unknown and almost certainly larger",
+   "flag": "MANUAL REVIEW: Etsy exposes no exact total-count widget on category pages; this category hits the site's 250-page browse cap (~12,000 listings), so the true total cannot be read off the page -- not usable as exact qty (same class of problem as Noon UAE's rounded-count widget)"
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Dinnerware Sets",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.etsy.com/c/home-and-living/kitchen-and-dining/dining-and-serving/dinnerware-sets",
+   "evidence": "embedded search-state JSON on https://www.etsy.com/c/home-and-living/kitchen-and-dining/dining-and-serving/dinnerware-sets reports \"total_pages\":250 at 48 listings/page (~12,000 shown), which is Etsy's hard pagination cap for large categories -- true inventory size is unknown and almost certainly larger",
+   "flag": "MANUAL REVIEW: Etsy exposes no exact total-count widget on category pages; this category hits the site's 250-page browse cap (~12,000 listings), so the true total cannot be read off the page -- not usable as exact qty (same class of problem as Noon UAE's rounded-count widget)"
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Salt and Pepper Shakers",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.etsy.com/c/home-and-living/kitchen-and-dining/dining-and-serving/salt-and-pepper-shakers",
+   "evidence": "embedded search-state JSON on https://www.etsy.com/c/home-and-living/kitchen-and-dining/dining-and-serving/salt-and-pepper-shakers reports \"total_pages\":250 at 48 listings/page (~12,000 shown), which is Etsy's hard pagination cap for large categories -- true inventory size is unknown and almost certainly larger",
+   "flag": "MANUAL REVIEW: Etsy exposes no exact total-count widget on category pages; this category hits the site's 250-page browse cap (~12,000 listings), so the true total cannot be read off the page -- not usable as exact qty (same class of problem as Noon UAE's rounded-count widget)"
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Serving Odds and Ends",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.etsy.com/c/home-and-living/kitchen-and-dining/dining-and-serving/serving-odds-and-ends",
+   "evidence": "embedded search-state JSON on https://www.etsy.com/c/home-and-living/kitchen-and-dining/dining-and-serving/serving-odds-and-ends reports \"total_pages\":250 at 48 listings/page (~12,000 shown), which is Etsy's hard pagination cap for large categories -- true inventory size is unknown and almost certainly larger",
+   "flag": "MANUAL REVIEW: Etsy exposes no exact total-count widget on category pages; this category hits the site's 250-page browse cap (~12,000 listings), so the true total cannot be read off the page -- not usable as exact qty (same class of problem as Noon UAE's rounded-count widget)"
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Cake Stands",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.etsy.com/c/home-and-living/kitchen-and-dining/dining-and-serving/cake-stands",
+   "evidence": "embedded search-state JSON on https://www.etsy.com/c/home-and-living/kitchen-and-dining/dining-and-serving/cake-stands reports \"total_pages\":131 at 48 listings/page (~6,288 shown); not hitting the 250-page cap, but boundary-page listing counts were found to include paid/related listings beyond the nominal per-page count and the total_pages figure itself was observed to fluctuate across repeated requests on a sibling category (133 -> 131), so it is not a stable, verifiable exact total",
+   "flag": "MANUAL REVIEW: Etsy's own pagination total is not a stable/exact figure (confirmed to change across requests and to be polluted by ad/related listings on boundary pages) -- not usable as exact qty"
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Centerpieces and Table Decor",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.etsy.com/c/home-and-living/kitchen-and-dining/kitchen-decor/centerpieces-and-table-decor",
+   "evidence": "embedded search-state JSON on https://www.etsy.com/c/home-and-living/kitchen-and-dining/kitchen-decor/centerpieces-and-table-decor reports \"total_pages\":250 at 48 listings/page (~12,000 shown), which is Etsy's hard pagination cap for large categories -- true inventory size is unknown and almost certainly larger",
+   "flag": "MANUAL REVIEW: Etsy exposes no exact total-count widget on category pages; this category hits the site's 250-page browse cap (~12,000 listings), so the true total cannot be read off the page -- not usable as exact qty (same class of problem as Noon UAE's rounded-count widget)"
+  },
+  {
+   "category": "Bathroom Decor",
+   "sub_category": "Tissue Box Covers",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.etsy.com/c/home-and-living/bathroom/bathroom-decor/tissue-box-covers",
+   "evidence": "embedded search-state JSON on https://www.etsy.com/c/home-and-living/bathroom/bathroom-decor/tissue-box-covers reports \"total_pages\":106 at 48 listings/page (~5,088 shown); not hitting the 250-page cap, but boundary-page listing counts were found to include paid/related listings beyond the nominal per-page count and the total_pages figure itself was observed to fluctuate across repeated requests on a sibling category (133 -> 131), so it is not a stable, verifiable exact total",
+   "flag": "MANUAL REVIEW: Etsy's own pagination total is not a stable/exact figure (confirmed to change across requests and to be polluted by ad/related listings on boundary pages) -- not usable as exact qty"
+  },
+  {
+   "category": "Bathroom Decor",
+   "sub_category": "Toothbrush Holders",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.etsy.com/c/home-and-living/bathroom/bathroom-decor/toothbrush-holders",
+   "evidence": "embedded search-state JSON on https://www.etsy.com/c/home-and-living/bathroom/bathroom-decor/toothbrush-holders reports \"total_pages\":41 at 48 listings/page (~1,968 shown); not hitting the 250-page cap, but boundary-page listing counts were found to include paid/related listings beyond the nominal per-page count and the total_pages figure itself was observed to fluctuate across repeated requests on a sibling category (133 -> 131), so it is not a stable, verifiable exact total",
+   "flag": "MANUAL REVIEW: Etsy's own pagination total is not a stable/exact figure (confirmed to change across requests and to be polluted by ad/related listings on boundary pages) -- not usable as exact qty"
+  },
+  {
+   "category": "Bathroom Decor",
+   "sub_category": "Bathroom Tumblers",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.etsy.com/c/home-and-living/bathroom/bathroom-decor/bathroom-tumblers",
+   "evidence": "embedded search-state JSON on https://www.etsy.com/c/home-and-living/bathroom/bathroom-decor/bathroom-tumblers reports \"total_pages\":4 at 48 listings/page (~192 shown); not hitting the 250-page cap, but boundary-page listing counts were found to include paid/related listings beyond the nominal per-page count and the total_pages figure itself was observed to fluctuate across repeated requests on a sibling category (133 -> 131), so it is not a stable, verifiable exact total",
+   "flag": "MANUAL REVIEW: Etsy's own pagination total is not a stable/exact figure (confirmed to change across requests and to be polluted by ad/related listings on boundary pages) -- not usable as exact qty"
+  },
+  {
+   "category": "Outdoor Decor",
+   "sub_category": "Garden Decoration",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Outdoor Decor",
+   "sub_category": "Yard Art",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.etsy.com/c/home-and-living/outdoor-and-garden/garden-decoration/yard-art",
+   "evidence": "embedded search-state JSON on https://www.etsy.com/c/home-and-living/outdoor-and-garden/garden-decoration/yard-art reports \"total_pages\":250 at 48 listings/page (~12,000 shown), which is Etsy's hard pagination cap for large categories -- true inventory size is unknown and almost certainly larger",
+   "flag": "MANUAL REVIEW: Etsy exposes no exact total-count widget on category pages; this category hits the site's 250-page browse cap (~12,000 listings), so the true total cannot be read off the page -- not usable as exact qty (same class of problem as Noon UAE's rounded-count widget)"
+  },
+  {
+   "category": "Outdoor Decor",
+   "sub_category": "Outdoor Statues",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.etsy.com/c/home-and-living/outdoor-and-garden/garden-decoration/outdoor-statues",
+   "evidence": "embedded search-state JSON on https://www.etsy.com/c/home-and-living/outdoor-and-garden/garden-decoration/outdoor-statues reports \"total_pages\":250 at 48 listings/page (~12,000 shown), which is Etsy's hard pagination cap for large categories -- true inventory size is unknown and almost certainly larger",
+   "flag": "MANUAL REVIEW: Etsy exposes no exact total-count widget on category pages; this category hits the site's 250-page browse cap (~12,000 listings), so the true total cannot be read off the page -- not usable as exact qty (same class of problem as Noon UAE's rounded-count widget)"
+  },
+  {
+   "category": "Outdoor Decor",
+   "sub_category": "Wind Chimes",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.etsy.com/c/home-and-living/outdoor-and-garden/garden-decoration/wind-chimes",
+   "evidence": "embedded search-state JSON on https://www.etsy.com/c/home-and-living/outdoor-and-garden/garden-decoration/wind-chimes reports \"total_pages\":138 at 48 listings/page (~6,624 shown); not hitting the 250-page cap, but boundary-page listing counts were found to include paid/related listings beyond the nominal per-page count and the total_pages figure itself was observed to fluctuate across repeated requests on a sibling category (133 -> 131), so it is not a stable, verifiable exact total",
+   "flag": "MANUAL REVIEW: Etsy's own pagination total is not a stable/exact figure (confirmed to change across requests and to be polluted by ad/related listings on boundary pages) -- not usable as exact qty"
+  },
+  {
+   "category": "Outdoor Decor",
+   "sub_category": "Outdoor Fountains",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.etsy.com/c/home-and-living/outdoor-and-garden/garden-decoration/outdoor-fountains",
+   "evidence": "embedded search-state JSON on https://www.etsy.com/c/home-and-living/outdoor-and-garden/garden-decoration/outdoor-fountains reports \"total_pages\":31 at 48 listings/page (~1,488 shown); not hitting the 250-page cap, but boundary-page listing counts were found to include paid/related listings beyond the nominal per-page count and the total_pages figure itself was observed to fluctuate across repeated requests on a sibling category (133 -> 131), so it is not a stable, verifiable exact total",
+   "flag": "MANUAL REVIEW: Etsy's own pagination total is not a stable/exact figure (confirmed to change across requests and to be polluted by ad/related listings on boundary pages) -- not usable as exact qty"
+  },
+  {
+   "category": "Outdoor Decor",
+   "sub_category": "Bird Feeders",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.etsy.com/c/home-and-living/outdoor-and-garden/garden-decoration/bird-feeders",
+   "evidence": "embedded search-state JSON on https://www.etsy.com/c/home-and-living/outdoor-and-garden/garden-decoration/bird-feeders reports \"total_pages\":70 at 48 listings/page (~3,360 shown); not hitting the 250-page cap, but boundary-page listing counts were found to include paid/related listings beyond the nominal per-page count and the total_pages figure itself was observed to fluctuate across repeated requests on a sibling category (133 -> 131), so it is not a stable, verifiable exact total",
+   "flag": "MANUAL REVIEW: Etsy's own pagination total is not a stable/exact figure (confirmed to change across requests and to be polluted by ad/related listings on boundary pages) -- not usable as exact qty"
+  },
+  {
+   "category": "Outdoor Decor",
+   "sub_category": "Bird Baths",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.etsy.com/c/home-and-living/outdoor-and-garden/garden-decoration/bird-baths",
+   "evidence": "embedded search-state JSON on https://www.etsy.com/c/home-and-living/outdoor-and-garden/garden-decoration/bird-baths reports \"total_pages\":22 at 48 listings/page (~1,056 shown); not hitting the 250-page cap, but boundary-page listing counts were found to include paid/related listings beyond the nominal per-page count and the total_pages figure itself was observed to fluctuate across repeated requests on a sibling category (133 -> 131), so it is not a stable, verifiable exact total",
+   "flag": "MANUAL REVIEW: Etsy's own pagination total is not a stable/exact figure (confirmed to change across requests and to be polluted by ad/related listings on boundary pages) -- not usable as exact qty"
+  },
+  {
+   "category": "Outdoor Decor",
+   "sub_category": "Suncatchers",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.etsy.com/c/home-and-living/outdoor-and-garden/garden-decoration/suncatchers",
+   "evidence": "embedded search-state JSON on https://www.etsy.com/c/home-and-living/outdoor-and-garden/garden-decoration/suncatchers reports \"total_pages\":250 at 48 listings/page (~12,000 shown), which is Etsy's hard pagination cap for large categories -- true inventory size is unknown and almost certainly larger",
+   "flag": "MANUAL REVIEW: Etsy exposes no exact total-count widget on category pages; this category hits the site's 250-page browse cap (~12,000 listings), so the true total cannot be read off the page -- not usable as exact qty (same class of problem as Noon UAE's rounded-count widget)"
+  },
+  {
+   "category": "Outdoor Decor",
+   "sub_category": "Birdhouses",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.etsy.com/c/home-and-living/outdoor-and-garden/garden-decoration/birdhouses",
+   "evidence": "embedded search-state JSON on https://www.etsy.com/c/home-and-living/outdoor-and-garden/garden-decoration/birdhouses reports \"total_pages\":97 at 48 listings/page (~4,656 shown); not hitting the 250-page cap, but boundary-page listing counts were found to include paid/related listings beyond the nominal per-page count and the total_pages figure itself was observed to fluctuate across repeated requests on a sibling category (133 -> 131), so it is not a stable, verifiable exact total",
+   "flag": "MANUAL REVIEW: Etsy's own pagination total is not a stable/exact figure (confirmed to change across requests and to be polluted by ad/related listings on boundary pages) -- not usable as exact qty"
+  },
+  {
+   "category": "Outdoor Decor",
+   "sub_category": "Planters and Pots",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Outdoor Decor",
+   "sub_category": "Indoor Planters (Pots)",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.etsy.com/c/home-and-living/outdoor-and-garden/planters-and-pots/indoor-planters",
+   "evidence": "embedded search-state JSON on https://www.etsy.com/c/home-and-living/outdoor-and-garden/planters-and-pots/indoor-planters reports \"total_pages\":250 at 48 listings/page (~12,000 shown), which is Etsy's hard pagination cap for large categories -- true inventory size is unknown and almost certainly larger",
+   "flag": "MANUAL REVIEW: Etsy exposes no exact total-count widget on category pages; this category hits the site's 250-page browse cap (~12,000 listings), so the true total cannot be read off the page -- not usable as exact qty (same class of problem as Noon UAE's rounded-count widget)"
+  },
+  {
+   "category": "Outdoor Decor",
+   "sub_category": "Outdoor Planters",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.etsy.com/c/home-and-living/outdoor-and-garden/planters-and-pots/outdoor-planters",
+   "evidence": "embedded search-state JSON on https://www.etsy.com/c/home-and-living/outdoor-and-garden/planters-and-pots/outdoor-planters reports \"total_pages\":121 at 48 listings/page (~5,808 shown); not hitting the 250-page cap, but boundary-page listing counts were found to include paid/related listings beyond the nominal per-page count and the total_pages figure itself was observed to fluctuate across repeated requests on a sibling category (133 -> 131), so it is not a stable, verifiable exact total",
+   "flag": "MANUAL REVIEW: Etsy's own pagination total is not a stable/exact figure (confirmed to change across requests and to be polluted by ad/related listings on boundary pages) -- not usable as exact qty"
+  }
+ ]
+}

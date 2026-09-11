@@ -1,0 +1,73 @@
+{
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "Access: direct HTTP GET (curl, desktop UA) - tier 1 sufficient. robots.txt: 'User-agent: ClaudeBot / Disallow:' (empty disallow = allow all) -> explicit permission, no block. Site is a React SPA shell but category listing pages (e.g. /luxury-home/c-lsh14?...&q=:relevance:category:<CODE>) embed a server-rendered window.initialData JSON containing productListingData.facetdatacategory (full L1-L4 category tree with per-node 'quantity') and productListingData.pagination.totalResults for the query's own node - both parsed locally with Python, no browser needed. Tree source: fetched https://luxury.tatacliq.com/luxury-home/c-lsh14 (top 'Home' department, code LSH14, 25212 total products), extracted facetdatacategory tree (276 nodes). Only Bathroom-relevant branch found: Home > Bath (LSH1416, qty 582) with two children: Bath Accessories (LSH1416100, qty 134) and Bath linen (LSH1416102, qty 448). No bathroom fixtures/sanitaryware/taps/showers/baths/vanities/bathroom-storage/bathroom-mirrors exist anywhere on site (checked full tree incl. Decor, Storage, Home Furnishing, Kitchen, Health&Fitness, Bed departments - none named bath/shower/toilet/vanity/faucet/basin/bidet outside the Bath node). This is a curated multi-brand luxury home-decor/accessories marketplace (Nicobar, Good Earth, Mason Home, etc.), not a sanitaryware/fixtures retailer. Qty verification: re-fetched each leaf URL directly; productListingData.pagination.totalResults matched the tree's 'quantity' exactly for every recorded node (63, 71) - both HTTP 200, node selected=true in facetdatacategory confirming correct node identity (not a wrong-slug fallback). Sample product titles for LSH1416100103 (Accessories, 63): 'Mason Home Beige Plastic Toilet Brush', 'INV Home Grey Soap Dispenser', toothbrush caddies, shower caddies, towel stands/trays, toilet paper holder - genuine bathroom accessories, correctly hierarchy-owned by Bathroom. Sample titles for LSH1416100104 (Soap Dish & Dispenser, 71): soap dispensers/dishes, toilet roll holder - genuine Bathroom accessories per rule 13. Exclusions/routing: Bath linen (LSH1416102, 448) and its children Bath Mats (208, LSH1416102100), Bathrobes (13, LSH1416102101), Towels (227, LSH1416102102) are textile products grouped under 'Bath linen' alongside Bathrobes/Towels -> ROUTED TO TEXTILE per rules 15/16/20 (textile hardware exception towel rail/hook does not apply - these are the textile items themselves, not hardware). Also a separate 'Designer > Bath linen > Sets' node (LSH1412120102, qty 3) under the Designer branch -> same textile routing. Decor > Home Accent > Mirrors (LSH1418103105, 106) is a general decorative-mirror category under the Decor/Home Accent hierarchy, not the Bath hierarchy -> not Bathroom (rule 11/24, belongs to Wall Decor's own extraction, out of scope here, no action taken). Cross-category dedup: checked all recorded and excluded leaf URLs against cross_category_url_index.json - all returned null (no prior extraction hit) via the mandated lookup. No fabrication; all qty figures are the site's own facet counts, cross-verified against live SSR pagination.totalResults on the exact node URL.",
+  "rows": [
+    {
+      "category": "Bathroom",
+      "sub_category": "Bath",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": "Grouping node - Home > Bath (LSH1416) in site facet tree; contains Bath Accessories (Bathroom-owned) and Bath linen (routed to Textile, see notes)",
+      "flag": null
+    },
+    {
+      "category": "Bathroom",
+      "sub_category": "Bath Accessories",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": "Grouping node - Home > Bath > Bath Accessories (LSH1416100) in site facet tree, parent quantity 134 = sum of its two children below",
+      "flag": null
+    },
+    {
+      "category": "Bathroom",
+      "sub_category": "Accessories",
+      "qty": 63,
+      "link": "https://luxury.tatacliq.com/luxury-home/c-lsh14?page=0&q=:relevance:category:LSH1416100103&isSortFlow=false",
+      "is_group": false,
+      "evidence": "Site facet tree quantity=63 for LSH1416100103; verified by direct fetch of leaf URL, SSR productListingData.pagination.totalResults=63 (exact match), node selected=true confirming correct category identity. Sample titles: toilet brush, toothbrush/shower caddies, towel stands/trays, toilet paper holder - genuine Bathroom accessories.",
+      "flag": null
+    },
+    {
+      "category": "Bathroom",
+      "sub_category": "Soap Dish & Dispenser",
+      "qty": 71,
+      "link": "https://luxury.tatacliq.com/luxury-home/c-lsh14?page=0&q=:relevance:category:LSH1416100104&isSortFlow=false",
+      "is_group": false,
+      "evidence": "Site facet tree quantity=71 for LSH1416100104; verified by direct fetch of leaf URL, SSR productListingData.pagination.totalResults=71 (exact match), node selected=true. Sample titles: soap dispensers, soap dishes, toilet roll holder - genuine Bathroom accessories per rule 13.",
+      "flag": null
+    }
+  ],
+  "review": [
+    {
+      "category": "Bathroom",
+      "sub_category": "Bath linen > Bath Mats",
+      "qty": 208,
+      "issue": "ROUTED TO TEXTILE - textile bath mats grouped under 'Bath linen' alongside Bathrobes/Towels per site hierarchy; rules 15/16/20 route this to Textile.xlsx, not Bathroom",
+      "link": "https://luxury.tatacliq.com/luxury-home/c-lsh14?page=0&q=:relevance:category:LSH1416102100&isSortFlow=false"
+    },
+    {
+      "category": "Bathroom",
+      "sub_category": "Bath linen > Bathrobes",
+      "qty": 13,
+      "issue": "ROUTED TO TEXTILE per rule 20 (Bathrobes -> Textile)",
+      "link": "https://luxury.tatacliq.com/luxury-home/c-lsh14?page=0&q=:relevance:category:LSH1416102101&isSortFlow=false"
+    },
+    {
+      "category": "Bathroom",
+      "sub_category": "Bath linen > Towels",
+      "qty": 227,
+      "issue": "ROUTED TO TEXTILE per rule 15/20 (Bath Towels -> Textile)",
+      "link": "https://luxury.tatacliq.com/luxury-home/c-lsh14?page=0&q=:relevance:category:LSH1416102102&isSortFlow=false"
+    },
+    {
+      "category": "Bathroom",
+      "sub_category": "Designer > Bath linen > Sets",
+      "qty": 3,
+      "issue": "ROUTED TO TEXTILE - separate 'Bath linen' node under the Designer branch (LSH1412120), same textile routing as above",
+      "link": "https://luxury.tatacliq.com/luxury-home/c-lsh14?page=0&q=:relevance:category:LSH1412120102&isSortFlow=false"
+    }
+  ]
+}

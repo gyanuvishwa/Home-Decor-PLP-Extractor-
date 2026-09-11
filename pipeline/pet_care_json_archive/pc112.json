@@ -1,0 +1,61 @@
+{
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "Site (Shopify, shop.vtwonen.nl) reached directly via curl_cffi-style HTTP with a Chrome UA, no consent-wall/WAF issue (matches prior Home-Decor pass access route). robots.txt has generic 'Allow: /' with no Claude-specific disallow. Found all Pet Care candidates by pulling sitemap_collections_1.xml (8148 lines, full collection-handle list) and grepping Dutch pet/animal terms (dier/hond/kat/konijn/vogel/aquarium/krab/mand/hok/kooi/voeder/speelgoed etc.) -- this is exhaustive enumeration of the site's own collection taxonomy, not a site-search test. 11 candidate collection handles found total. Confirmed via breadcrumb JSON-LD that the umbrella collection is https://shop.vtwonen.nl/collections/dierbenodigdheden ('Zorg goed voor je huisdieren met onze kwalitatieve dierbenodigdheden' = 'take good care of your pets with our quality pet supplies'), nested Home > Huishouden (Household) > Dierbenodigdheden. QTY METHOD: every qty obtained by enumerating https://shop.vtwonen.nl/collections/<handle>/products.json?limit=250&page=N to exhaustion (unique product IDs, stopping when a page returns <250, i.e. confirmed last page) -- same approved method as the prior Furniture/Home-Decor pass for this company. ROLLUP DECISION: 'dierbenodigdheden' (85 unique product IDs) is an EXACT rollup: the union of its 5 real leaf children below (Animal Toys 25 + Dog Baskets/Kennels/Cushions 51 + Rabbit Hutches 1 + Cat Scratching Furniture 3 + Birdhouses & Feeding Spots 5 = 85) has 100% ID-set overlap with the parent and accounts for exactly 85/85 items -- confirmed via direct product-ID-set intersection, no double count. Parent kept ONLY as the grouping row (is_group, qty null); leaves are the 5 rows below. EXCLUDED: 'decoratieve-dierenhoofden' (decorative animal-head wall trophies, 37 products) has ZERO product-ID overlap with the dierbenodigdheden parent -- it is a separate animal-THEMED decor collection (Pet-themed != Pet Care per brief boundary), not pet supplies; dropped entirely, not emitted as a row. EMPTY (zero-product, dropped per brief): kattenmanden-kussens (cat baskets/cushions), kattenbakken (litter boxes), reismanden (travel baskets/carriers), aquariums -- all four returned products.json {\"products\":[]} confirming genuinely 0 current products, not an access/parsing failure (page loaded fine, other collections on the same host returned full data with the identical request). 'merk-artichok' (brand collection page) and 'shop-mrcarpet'/'shop-petite-amelie' (unrelated home-decor brand pages, matched only because 'Petite' contains substring 'pet') were checked and are not pet categories -- excluded. Flagged one genuinely ambiguous row below (birdhouses/feeders) per the brief's ask to record rather than silently decide. No pet-food/consumable or medical/veterinary categories found on this site.",
+  "rows": [
+    {
+      "category": "Pet Care",
+      "sub_category": "Pet Supplies",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Animal Toys",
+      "qty": 25,
+      "link": "https://shop.vtwonen.nl/collections/dieren-speelgoed",
+      "is_group": false,
+      "evidence": "products.json?limit=250&page=1 (Shopify collection endpoint) returned exactly 25 unique product IDs; page returned <250 items confirming exhaustive/last page. Site taxonomy label 'Dieren speelgoed'.",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Dog Baskets, Kennels & Cushions",
+      "qty": 51,
+      "link": "https://shop.vtwonen.nl/collections/hondenmanden-hokken-kussens",
+      "is_group": false,
+      "evidence": "products.json?limit=250&page=1 returned exactly 51 unique product IDs; page returned <250 items confirming exhaustive/last page. Site taxonomy label 'Hondenmanden, -hokken & -kussens'.",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Rabbit Hutches",
+      "qty": 1,
+      "link": "https://shop.vtwonen.nl/collections/konijnenhokken",
+      "is_group": false,
+      "evidence": "products.json?limit=250&page=1 returned exactly 1 unique product ID ('HOME DELUXE TOCA konijnenhok'); confirming exhaustive/last page.",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Cat Scratching Furniture",
+      "qty": 3,
+      "link": "https://shop.vtwonen.nl/collections/krabmeubelen",
+      "is_group": false,
+      "evidence": "products.json?limit=250&page=1 returned exactly 3 unique product IDs (3x 'Home Deluxe Krabpaal' scratching posts); confirming exhaustive/last page.",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Birdhouses & Feeding Spots",
+      "qty": 5,
+      "link": "https://shop.vtwonen.nl/collections/vogelhuisjes-en-voederplekken",
+      "is_group": false,
+      "evidence": "products.json?limit=250&page=1 returned exactly 5 unique product IDs (Umbra/J-Line birdhouses and bird feeders); confirming exhaustive/last page. 100% product-ID overlap with the confirmed pet-supplies parent 'dierbenodigdheden'.",
+      "flag": "MANUAL REVIEW: genuinely ambiguous whether these outdoor birdhouses/feeders (Umbra 'Bird Cafe', J-Line vogelhuisje) are for owned pet birds or wild garden birds -- product titles/descriptions give no owned-pet signal, but the site's own taxonomy places all 5 fully inside the 'dierbenodigdheden' (pet supplies) parent collection alongside confirmed pet-care items (dog beds/kennels, cat scratchers, rabbit hutch, animal toys), with zero overlap with the separately-excluded animal-themed-decor collection."
+    }
+  ]
+}

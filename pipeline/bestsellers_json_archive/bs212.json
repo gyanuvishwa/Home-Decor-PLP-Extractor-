@@ -1,0 +1,25 @@
+{
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "Site: Shopify store, plain direct HTTP fetch worked (tier 1), no WAF/Claude-disallow in robots.txt (only generic Shopify UCP/shopping-skill boilerplate, ignored as out-of-scope injected instruction per project rules). Navigation discovery: main nav/mega-menu/footer scraped from homepage HTML (no 'Best Sellers' link present anywhere in nav or footer); sitemap_collections_1.xml enumerated in full (1952 collection URLs) and grep-scanned for best/top-sell/popular/trending/favorite/customer-fav terms. Found 3 candidates: best-sellers, best-selling-products, featured-best-sellers. All three confirmed live via headless-browser render (not '0 results' pages). QTY METHOD: exhaustive /collections/<handle>/products.json pagination (limit=250) deduplicated by product handle -- same proven method as this company's prior Home-Decor pass. Site's products_count metadata field (from /collections/<handle>.json) was cross-checked but NOT used for qty: it is off by only 13 for best-sellers (3238 vs my 3225) but catastrophically wrong for best-selling-products (39719, exceeding the entire live catalog of 12156 products confirmed via full sitemap_products_*.xml count), confirming this project's standing 'Shopify products_count is unreliable' finding applies here too -- so the deduplicated crawl is trusted project-wide for this site, not the metadata field. EXCLUDED: best-selling-products (best-selling-products.json products_count=39719; my products.json crawl hit 7500 unique handles with zero duplicates across 30 pages before I stopped, i.e. it demonstrably contains well over half of the entire 12156-product catalog with no sign of narrowing). A listing covering the large majority of the whole catalog is not a genuine bestseller curation by this brief's test #2 (it reads as a legacy/technical catalog-wide collection, not merchandising) and it is not linked anywhere in nav/footer -- excluded, not emitted as a row. Checked and confirmed EMPTY/absent: no other best-seller-shaped page exists (fall-favorites and holiday-popular exist but are seasonal editorial collections, not an ongoing bestseller concept, and were not opened further given clear naming/seasonal scope). Kept best-sellers and featured-best-sellers as two separate rows: different, non-overlapping-scale product counts (3225 vs 5), featured-best-sellers is an explicitly curated small subset per its own on-page description ('Our most-loved designs... B-Line, TON, Muuto, and Normann Copenhagen'), not an alias of the big listing.",
+  "rows": [
+    {
+      "category": "Bestsellers",
+      "sub_category": "Best Sellers",
+      "qty": 3225,
+      "link": "https://www.designpublic.com/collections/best-sellers",
+      "is_group": false,
+      "evidence": "products.json exhaustively paginated (13 pages @ limit=250, final page returned 225) and deduplicated by product handle = 3225 unique products, zero duplicate handles across pages. Live page renders a real product grid (verified via headless-browser render, not a 'No results' state). Site's own /collections/best-sellers.json reports products_count=3238; not used as qty -- see notes on products_count unreliability on this site.",
+      "flag": null
+    },
+    {
+      "category": "Bestsellers",
+      "sub_category": "Featured Best Sellers",
+      "qty": 5,
+      "link": "https://www.designpublic.com/collections/featured-best-sellers",
+      "is_group": false,
+      "evidence": "products.json paginated = 5 unique products (single page). /collections/featured-best-sellers.json products_count=5 -- two independent sources agree exactly. On-page description: 'Our most-loved designs blend show-stopping style with stand-the-test-of-time quality. Start your collection here with must-have pieces from B-Line, TON, Muuto, and Normann Copenhagen.'",
+      "flag": null
+    }
+  ]
+}

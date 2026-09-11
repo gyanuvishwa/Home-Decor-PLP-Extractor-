@@ -1,0 +1,336 @@
+{
+ "sr": 255,
+ "company": "Design Within Reach",
+ "brand_site": "dwr.com",
+ "country": "USA",
+ "site_url": "https://www.dwr.com/",
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ACCESS: plain direct HTTPS fetch (curl / curl_cffi chrome124), no WAF, no bypass, no browser needed. robots.txt carries NO Claude-specific disallow (only generic /search, /account, /Search-UpdateGrid style paths); the disallowed Search-UpdateGrid endpoint was NOT used - every count comes from a public category URL. PLATFORM: Salesforce Commerce Cloud (Sites-dwr-Site). COUNT METHOD: each leaf qty is the site's own rendered listing header ('N Results'), cross-checked against the grid's data-product-count attribute AND exhaustion-checked by appending &start=0&sz=500 to the category URL and counting distinct 'grid-tile product' data-pid tiles. All 28 leaves returned header == data-product-count == rendered distinct tiles, so nothing was estimated, rounded or inferred. Multi-style trap noted: DWR splits some products into separate tiles with suffixed PIDs (e.g. 2580373-1/-2/-3 = Colour Frame Mirror Small/Medium/Large) and the site's own header counts those tiles individually, so tile PID is the identity field that reconciles with the site count - no roll-up to base SKU was applied, matching what the site itself reports. CROSS-COMPANY OVERLAPS (documented, deliberately NOT deduplicated): (1) S.N. 28 HAY US - us.hay.com still resolves 200 to https://www.dwr.com/brands-hay, so a HAY-branded subset lives inside this catalogue; (2) S.N. 250 Muuto US - us.muuto.com resolves 200 to https://www.dwr.com/brands-muuto, the same pattern. Both are brand hubs, which the brief never extracts, so neither was emitted as a row - but their products are counted inside DWR's own product-type leaves above. DWR is MillerKnoll-owned and also carries Knoll, Herman Miller, Flos, Louis Poulsen, Kartell, Artek and others, so further brand-level overlap with other roster rows is expected. RULE 0 GAINS: Bedroom Lighting (93) kept per Rule 0.1/0.6 as a genuine room branch under Bed + Bath - verified not a facet re-cut (28 of its 93 PIDs appear in no lighting-type leaf; zero overlap with Ceiling or Floor Lamps, 65 shared with Table + Desk Lamps, 25 with Sconces). Outdoor Lighting traversed to full depth. All mirror types kept per Rule 0.3. DEDUPLICATED ALIASES (exact same listing under a second URL - verified by 301 or rel=canonical or identical PID set): lighting-outdoor 301s to outdoor-lighting and the two PID sets are identical (47), emitted once as the Lighting > Outdoor Lighting parent; office-desk-lamps 301s to lighting-desk-lamps which canonicalises to lighting-table-lamps, and work-from-home-desk-lamps does the same, so the Office Furniture 'Desk Lamps' node is the identical 144-item listing and was not double-emitted; bedroom-mirrors and bed-bath-mirrors both canonicalise to accessories-mirrors; cooking-tabletop (Decor > Tabletop + Bar) canonicalises to kitchen-dining-entertaining and cooking-tabletop-accessories to kitchen-dining-dinnerware; accessories-outdoor-planters-pots and outdoor-planters-and-pots both canonicalise to outdoor-planters-pots; accessories-sculptures-objects to decor-objects; tabletop-centerpieces to kitchen-dining-centerpieces-candleholders; decor-games to decor-books; art to accessories-art; dinnerware to kitchen-dining-dinnerware. Entryway Furniture > Coat Racks + Wall Hooks (entryway-coat-racks-wall-hooks, 16) is a near-identical room re-cut of Decor > Home Organization > Coat Racks + Wall Hooks (15) - 14 PIDs shared, the entryway version only adds a wardrobe and a shelving coat hanger - so only the Decor node was emitted. PARENT-NODE COUNTS (schema gives parents no qty; recorded here for reference): Lighting view-all 488; Outdoor Lighting 47 (children 11 + 31 = 42, so 5 items sit only at the parent); Mirrors 55 (children 39 + 22 overlap by 6, and 2 wall-mirror PIDs are absent from the parent listing); Art 219 (exactly 146 + 6 + 48 + 6 + 13); Home Accents 259; Planters + Pots 30 (= union of Indoor 25 and Outdoor 15, which overlap by 10); Dining + Entertaining 185. STALE-SITEMAP TRAP HANDLED: sitemap_2-category.xml lists 3,932 category URLs including an entire 'Baby, Kids + Teen' department (kids-lighting 22, teen-lighting 84, baby-lighting 5, teen-decor-mirrors 39, kids-art-decor 30, teen-posters-art 63, kids-posters-art 7, baby-decor 6). Those leaves still return 200 with real product grids, but the department landing https://www.dwr.com/baby-kids-teen returns HTTP 410 Gone and no link to kids-furniture / teen-furniture / baby-furniture exists anywhere in the live header, main menu or footer. Treated as a retired, delisted branch under Rule 3 and EXCLUDED - recorded here so a reviewer can reinstate it if the merge wants delisted nodes. Other live-but-never-extracted stale or promotional clones confirmed and skipped: clearance-*, sale-*, black-friday-*, cyber-*, memorial-day-*, summer-sale-*, in-stock-*, newarrivals-*, collection-*, brands-*, artist-*, designer-*, shop-by-collection-*, *-view-all. EXCLUSIONS APPLIED: all furniture (Furniture, Storage, Outdoor Furniture, and the Bedroom / Kitchen / Office / Entryway / Gaming furniture branches); Ceiling Fans (lighting-ceiling-fans, 9); Rugs and the entire rug facet tree (by type, color, material, style, shape); textiles (Bedding + Pillows, Pillows + Throws, Table Linens + Coasters, bath towels); Flatware / cutlery (kitchen-dining-flatware-cutlery); Kitchen Tools + Accessories and Kitchen Storage + Organization; Books + Games (decor-books, 50) and Pet Accessories (decor-pet-accessories, 9); the Home Organization sub-nodes that are storage rather than decor (baskets + crates, desk and office organizers, folding screens and room dividers, step stools, cleaning tools, fireplace tools); Landscape + Garden Accessories (outdoor-gardening-tools, 14); Gifts, Sale, Icons, Brands, Designers, Collections, New Arrivals, Bestsellers. MIXED ROLL-UPS DROPPED RATHER THAN PADDED: Bathroom Decor + Accessories (bath, 31) reads as majority bathroom storage, furniture and textiles (Facet Storage Cabinet, String Bathroom Shelving, Vipp pedal bins, laundry basket, beach towels, bathmat, Dania Stool) with only about 10 genuinely decorative items, and its 4 in-scope mirrors (Strap Mirror No 2 and Colour Frame Mirror Small/Medium/Large) are already inside the Mirrors branch; Living Room Decor + Accessories (accessories-living-room, 268) and Bedroom Accessories (bedroom-accessories, 43) are cross-type room roll-ups of decor plus textiles plus mirrors already counted elsewhere. KEPT DESPITE MINOR MIXING (composition read from actual product titles): Candles + Candleholders 32 = 24 candleholders and candelabra plus 8 scented Flamingo Estate candles; Barware 13 = 5 serving trays, a wine carafe, a champagne cooler and an ice-cube set, plus 5 true bar tools (bottle opener, stirrer, wine stopper, cocktail sticks, hip flask).",
+ "rows": [
+  {
+   "category": "Lighting",
+   "sub_category": "Lighting",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Ceiling and Pendant Lamps",
+   "parent": false,
+   "qty": 192,
+   "link": "https://www.dwr.com/lighting-ceiling?lang=en_US",
+   "evidence": "listing header '192 Results' (Salesforce Commerce Cloud grid, data-product-count=192); exhaustion-checked: 192 distinct grid-tile product PIDs rendered at &start=0&sz=500",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Floor Lamps",
+   "parent": false,
+   "qty": 76,
+   "link": "https://www.dwr.com/lighting-floor?lang=en_US",
+   "evidence": "listing header '76 Results' (Salesforce Commerce Cloud grid, data-product-count=76); exhaustion-checked: 76 distinct grid-tile product PIDs rendered at &start=0&sz=500",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Table and Desk Lamps",
+   "parent": false,
+   "qty": 144,
+   "link": "https://www.dwr.com/lighting-table-lamps?lang=en_US",
+   "evidence": "listing header '144 Results' (Salesforce Commerce Cloud grid, data-product-count=144); exhaustion-checked: 144 distinct grid-tile product PIDs rendered at &start=0&sz=500",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Portable Lamps",
+   "parent": false,
+   "qty": 42,
+   "link": "https://www.dwr.com/lighting-portable-lamps?lang=en_US",
+   "evidence": "listing header '42 Results' (Salesforce Commerce Cloud grid, data-product-count=42); exhaustion-checked: 42 distinct grid-tile product PIDs rendered at &start=0&sz=500",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Sconces and Wall Lamps",
+   "parent": false,
+   "qty": 66,
+   "link": "https://www.dwr.com/lighting-wall-sconce?lang=en_US",
+   "evidence": "listing header '66 Results' (Salesforce Commerce Cloud grid, data-product-count=66); exhaustion-checked: 66 distinct grid-tile product PIDs rendered at &start=0&sz=500",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Outdoor Lighting",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Outdoor Sconces and Ceiling Lamps",
+   "parent": false,
+   "qty": 11,
+   "link": "https://www.dwr.com/outdoor-lighting-sconces-ceiling-lamps?lang=en_US",
+   "evidence": "listing header '11 Results' (Salesforce Commerce Cloud grid, data-product-count=11); exhaustion-checked: 11 distinct grid-tile product PIDs rendered at &start=0&sz=500",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Outdoor Lamps",
+   "parent": false,
+   "qty": 31,
+   "link": "https://www.dwr.com/outdoor-lighting-portable-lanterns?lang=en_US",
+   "evidence": "listing header '31 Results' (Salesforce Commerce Cloud grid, data-product-count=31); exhaustion-checked: 31 distinct grid-tile product PIDs rendered at &start=0&sz=500",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Lighting by Room",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Bedroom Lighting",
+   "parent": false,
+   "qty": 93,
+   "link": "https://www.dwr.com/bedroom-lighting?lang=en_US",
+   "evidence": "listing header '93 Results' (Salesforce Commerce Cloud grid, data-product-count=93); exhaustion-checked: 93 distinct grid-tile product PIDs rendered at &start=0&sz=500",
+   "flag": null
+  },
+  {
+   "category": "Mirrors",
+   "sub_category": "Mirrors",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Mirrors",
+   "sub_category": "Wall Mirrors",
+   "parent": false,
+   "qty": 39,
+   "link": "https://www.dwr.com/mirrors-wall-mirrors?lang=en_US",
+   "evidence": "listing header '39 Results' (Salesforce Commerce Cloud grid, data-product-count=39); exhaustion-checked: 39 distinct grid-tile product PIDs rendered at &start=0&sz=500",
+   "flag": null
+  },
+  {
+   "category": "Mirrors",
+   "sub_category": "Floor and Full-Length Mirrors",
+   "parent": false,
+   "qty": 22,
+   "link": "https://www.dwr.com/mirrors-floor-mirrors?lang=en_US",
+   "evidence": "listing header '22 Results' (Salesforce Commerce Cloud grid, data-product-count=22); exhaustion-checked: 22 distinct grid-tile product PIDs rendered at &start=0&sz=500",
+   "flag": null
+  },
+  {
+   "category": "Decor",
+   "sub_category": "Home Accents",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Decor",
+   "sub_category": "Decorative Objects",
+   "parent": false,
+   "qty": 56,
+   "link": "https://www.dwr.com/decor-objects?lang=en_US",
+   "evidence": "listing header '56 Results' (Salesforce Commerce Cloud grid, data-product-count=56); exhaustion-checked: 56 distinct grid-tile product PIDs rendered at &start=0&sz=500",
+   "flag": null
+  },
+  {
+   "category": "Decor",
+   "sub_category": "Vases",
+   "parent": false,
+   "qty": 54,
+   "link": "https://www.dwr.com/decor-vases?lang=en_US",
+   "evidence": "listing header '54 Results' (Salesforce Commerce Cloud grid, data-product-count=54); exhaustion-checked: 54 distinct grid-tile product PIDs rendered at &start=0&sz=500",
+   "flag": null
+  },
+  {
+   "category": "Decor",
+   "sub_category": "Clocks",
+   "parent": false,
+   "qty": 12,
+   "link": "https://www.dwr.com/decor-clocks?lang=en_US",
+   "evidence": "listing header '12 Results' (Salesforce Commerce Cloud grid, data-product-count=12); exhaustion-checked: 12 distinct grid-tile product PIDs rendered at &start=0&sz=500",
+   "flag": null
+  },
+  {
+   "category": "Decor",
+   "sub_category": "Decorative Bowls and Trays",
+   "parent": false,
+   "qty": 47,
+   "link": "https://www.dwr.com/decor-bowls-trays?lang=en_US",
+   "evidence": "listing header '47 Results' (Salesforce Commerce Cloud grid, data-product-count=47); exhaustion-checked: 47 distinct grid-tile product PIDs rendered at &start=0&sz=500",
+   "flag": null
+  },
+  {
+   "category": "Decor",
+   "sub_category": "Candles and Candleholders",
+   "parent": false,
+   "qty": 32,
+   "link": "https://www.dwr.com/decor-candles?lang=en_US",
+   "evidence": "listing header '32 Results' (Salesforce Commerce Cloud grid, data-product-count=32); exhaustion-checked: 32 distinct grid-tile product PIDs rendered at &start=0&sz=500",
+   "flag": null
+  },
+  {
+   "category": "Decor",
+   "sub_category": "Planters and Pots",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Decor",
+   "sub_category": "Indoor Planters and Pots",
+   "parent": false,
+   "qty": 25,
+   "link": "https://www.dwr.com/indoor-planters-pots?lang=en_US",
+   "evidence": "listing header '25 Results' (Salesforce Commerce Cloud grid, data-product-count=25); exhaustion-checked: 25 distinct grid-tile product PIDs rendered at &start=0&sz=500",
+   "flag": null
+  },
+  {
+   "category": "Decor",
+   "sub_category": "Outdoor Planters and Pots",
+   "parent": false,
+   "qty": 15,
+   "link": "https://www.dwr.com/outdoor-planters-pots?lang=en_US",
+   "evidence": "listing header '15 Results' (Salesforce Commerce Cloud grid, data-product-count=15); exhaustion-checked: 15 distinct grid-tile product PIDs rendered at &start=0&sz=500",
+   "flag": null
+  },
+  {
+   "category": "Decor",
+   "sub_category": "Art",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Decor",
+   "sub_category": "Wall Posters and Prints",
+   "parent": false,
+   "qty": 146,
+   "link": "https://www.dwr.com/art-wall-posters-prints?lang=en_US",
+   "evidence": "listing header '146 Results' (Salesforce Commerce Cloud grid, data-product-count=146); exhaustion-checked: 146 distinct grid-tile product PIDs rendered at &start=0&sz=500",
+   "flag": null
+  },
+  {
+   "category": "Decor",
+   "sub_category": "Canvas Wall Art",
+   "parent": false,
+   "qty": 6,
+   "link": "https://www.dwr.com/art-canvas-wall-art?lang=en_US",
+   "evidence": "listing header '6 Results' (Salesforce Commerce Cloud grid, data-product-count=6); exhaustion-checked: 6 distinct grid-tile product PIDs rendered at &start=0&sz=500",
+   "flag": null
+  },
+  {
+   "category": "Decor",
+   "sub_category": "Photography",
+   "parent": false,
+   "qty": 48,
+   "link": "https://www.dwr.com/art-photography?lang=en_US",
+   "evidence": "listing header '48 Results' (Salesforce Commerce Cloud grid, data-product-count=48); exhaustion-checked: 48 distinct grid-tile product PIDs rendered at &start=0&sz=500",
+   "flag": null
+  },
+  {
+   "category": "Decor",
+   "sub_category": "Wall Hangings",
+   "parent": false,
+   "qty": 6,
+   "link": "https://www.dwr.com/art-wall-hangings?lang=en_US",
+   "evidence": "listing header '6 Results' (Salesforce Commerce Cloud grid, data-product-count=6); exhaustion-checked: 6 distinct grid-tile product PIDs rendered at &start=0&sz=500",
+   "flag": null
+  },
+  {
+   "category": "Decor",
+   "sub_category": "Sculptures",
+   "parent": false,
+   "qty": 13,
+   "link": "https://www.dwr.com/art-sculptures?lang=en_US",
+   "evidence": "listing header '13 Results' (Salesforce Commerce Cloud grid, data-product-count=13); exhaustion-checked: 13 distinct grid-tile product PIDs rendered at &start=0&sz=500",
+   "flag": null
+  },
+  {
+   "category": "Decor",
+   "sub_category": "Coat Racks and Wall Hooks",
+   "parent": false,
+   "qty": 15,
+   "link": "https://www.dwr.com/accessories-coat-racks-wall-hooks?lang=en_US",
+   "evidence": "listing header '15 Results' (Salesforce Commerce Cloud grid, data-product-count=15); exhaustion-checked: 15 distinct grid-tile product PIDs rendered at &start=0&sz=500",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Dining and Entertaining",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Dinnerware",
+   "parent": false,
+   "qty": 33,
+   "link": "https://www.dwr.com/kitchen-dining-dinnerware?lang=en_US",
+   "evidence": "listing header '33 Results' (Salesforce Commerce Cloud grid, data-product-count=33); exhaustion-checked: 33 distinct grid-tile product PIDs rendered at &start=0&sz=500",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Serveware",
+   "parent": false,
+   "qty": 54,
+   "link": "https://www.dwr.com/kitchen-dining-serverware?lang=en_US",
+   "evidence": "listing header '54 Results' (Salesforce Commerce Cloud grid, data-product-count=54); exhaustion-checked: 54 distinct grid-tile product PIDs rendered at &start=0&sz=500",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Drinkware",
+   "parent": false,
+   "qty": 52,
+   "link": "https://www.dwr.com/kitchen-dining-drinkware?lang=en_US",
+   "evidence": "listing header '52 Results' (Salesforce Commerce Cloud grid, data-product-count=52); exhaustion-checked: 52 distinct grid-tile product PIDs rendered at &start=0&sz=500",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Barware",
+   "parent": false,
+   "qty": 13,
+   "link": "https://www.dwr.com/kitchen-dining-barware?lang=en_US",
+   "evidence": "listing header '13 Results' (Salesforce Commerce Cloud grid, data-product-count=13); exhaustion-checked: 13 distinct grid-tile product PIDs rendered at &start=0&sz=500",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Centerpieces and Candleholders",
+   "parent": false,
+   "qty": 42,
+   "link": "https://www.dwr.com/kitchen-dining-centerpieces-candleholders?lang=en_US",
+   "evidence": "listing header '42 Results' (Salesforce Commerce Cloud grid, data-product-count=42); exhaustion-checked: 42 distinct grid-tile product PIDs rendered at &start=0&sz=500",
+   "flag": null
+  }
+ ]
+}

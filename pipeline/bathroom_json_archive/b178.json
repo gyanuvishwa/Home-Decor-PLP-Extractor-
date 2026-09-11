@@ -1,0 +1,203 @@
+{
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ACCESS: robots.txt https://www.target.com.au/robots.txt fetched FIRST (1619 bytes). NO Claude / anthropic-ai / ClaudeBot group exists anywhere in the file; the only blanket Disallow: / groups are for CazoodleBot, MJ12bot, dotbot/1.0 and Gigabot. The governing 'User-agent: *' group disallows /checkout/, /my-account/, /~/, /spc/, /communities/donate, /target-talk, /expired-link, /expired-email-link, /no-its-not, /yes-its-me, /enews/quick, /search/*, /enableauth0login, and the duplicate forms *&viewAs=grid, *?viewAs=grid, *sortBy=, *sortOrder=, *?newarrivals. No Crawl-delay. Every URL I requested is a bare /c/... category path or a sitemap under /medias/feeds/sitemap/ - I never requested a sortBy/sortOrder/viewAs/newarrivals form, never /search/*, and never a facet query. NOTE: target.com.au is Wesfarmers' Target Australia and is entirely unrelated to Target US (SR 22); nothing from that record was reused. | BOT WALL AND HOW IT WAS PASSED: the homepage returns 200 to probe.fetch(), but every /c/ category URL 403s on all ten curl_cffi fingerprints with no headers. Tested per the BATCH_BRIEF s2 ladder in the same minute: bare URL -> 403, ?x=1 -> 403, ?utm_source=google -> 403, ?utm_medium=cpc -> 403 (so the campaign-parameter route does NOT work here and was not used - no recorded link carries any parameter). What DID work was simply sending ordinary browser request headers - Referer: https://www.target.com.au/, Accept: text/html..., Accept-Language: en-AU,en;q=0.9 - alongside the existing fingerprint rotation. That is a header detail of the same probe.fetch() toolkit, not a proxy, reader or browser: no browser automation, no CORS proxy, no r.jina.ai. Full 1.4 MB server-rendered pages then returned 200. The edge does rate-limit hard: after ~13 category pages it began refusing again, which is why five of the seven Towels children could not be re-fetched individually (see QTY). | TREE: Bathroom entry point taken from the site's own header mega-menu on the homepage - Home > Bathroom, /c/home/bathroom/W130204. The mega-menu is TRUNCATED (it lists only Towels, Hair Towels, Beach Towels, Bathroom Storage and Bathroom Accessories). Two further real children - Bathroom Scales W187309 and Shower Curtains W288764 - were recovered from the PLP's own 'Category' filter facet in the __NEXT_DATA__ payload, and the complete branch including every grandchild was then confirmed against the site's own category sitemap, https://www.target.com.au/medias/feeds/sitemap/category-sitemap.xml (1,566 category URLs). Full tree: Bathroom (467) > Bathroom Accessories W130206 (91) [> Bath Caddy W1302062 (2), Bathroom Accessory Sets W1302065 (10), Bathroom Bins W1302063 (7), Soap Dispenser W1302061 (10), Toothbrush Holders & Tumblers W1302064 (10)], Bathroom Scales W187309 (4), Bathroom Storage W276140 (58), Shower Curtains W288764 (3), Towels W1108824 (322) [> Bath Mats (56), Bath Sheets (43), Bath Towels (83), Beach Towels (42), Face Washer (28), Hair Towels (12), Hand Towels (64)]. I swept all 1,566 category-sitemap URLs for bath|shower|toilet|mirror|vanit|tap|basin|sink|soap|laundry|hamper|robe|sanitar|wash: the ONLY Home>Bathroom nodes are the ones above. Everything else that matched is a different department and is listed in review[] (Home Decor > Mirrors, Home > Laundry, Beauty > Bodycare bath/shower, Baby bathing, Travel > Toiletries). Clearance (/c/clearance/home/bathroom/W693993) and gift re-cuts (/c/gifts/gifts-for-home/bathroom/W1640669, /c/gifts/gifts-for-her/home/bathroom/W1655095) were deliberately NOT recorded under rule 25. | QTY: every recorded figure is the listing page's OWN rendered total - the literal string 'N products found' in the server-rendered HTML. VERIFICATION: on every node fetched, THREE independent sources agree exactly - the rendered 'N products found' string, the Constructor.io grid attribute data-cnstrc-num-results=\"N\" on the product-list container, and metadata.totalNumProducts in the __NEXT_DATA__ payload. Verified on 13 nodes: 467 / 91 / 2 / 10 / 7 / 10 / 10 / 4 / 58 / 3 / 322 / 12 / 64. I also proved the parent's Category-facet counts equal the child's own page total on TEN parent-child pairs (Bathroom's 5 children: 91/4/58/3/322 all matched; Bathroom Accessories' 5 children: 2/10/7/10/10 all matched). That equivalence is what licenses the five Towels-child figures (83/43/42/28/56) that come from the Towels parent's own facet after the edge rate-limited me - and every one of those five is a routed-out Textile node in review[], never a recorded row. Each page's H1 was read back and matched the node requested. Counts discriminate sharply (2,3,4,7,10,10,10,58,91,322,467) - no round-number cap signature, nothing like the OTTO/Noon repeated-500 pattern. | DEDUP (OPTION 1): already_extracted() run on all 21 candidate and review URLs. The index holds 32 target.com.au URLs in this exact /c/... form, so the check is meaningful. ONE hit: /c/home/home-decor/mirrors/W250648, already in Final.xlsx (Home Decor pass) as 'Mirrors' - moved to review[], not rows[]. Zero hits on any Home>Bathroom node. Furniture.xlsx holds Target AU furniture, storage and shelving nodes but no bathroom node, so there is no OPTION 1 vanity/cabinet overlap - Target AU has no bathroom vanity, cabinet or mirror category at all. | SCOPE: Target Australia is a discount department store. It sells NO sanitaryware: no toilets, bidets, baths, basins, taps/tapware, shower fittings, shower enclosures or screens, no bathroom vanities or bathroom mirrors. Confirmed by the full category-sitemap sweep above, not by assumption. The whole Bathroom department is bath linen plus a small accessories and storage range. | EXCLUDED / ROUTED (all in review[] with qty + clean URL): to TEXTILE - Shower Curtains 3, and the entire Towels branch (parent 322 plus its 7 children incl. Bath Mats 56, which Target itself files under Towels, resolving rule 16 to Textile). Excluded on primary product type - Bathroom Scales 4 (weighing appliance, rules 2/29; matches the treatment on SR 22, 46, 47, 105, 165, 176), Beauty > Bodycare bath/shower accessories, Home > Laundry hampers. | RULE 24 RESIDUE: Bathroom Accessories renders 91 but its five children sum to 39, leaving ~52 products on the parent that no child covers; the parent is therefore a grouping row and those ~52 are an uncaptured structural gap, flagged in review[] rather than papered over. The Bathroom department parent (467) is likewise a grouping row and was never recorded; its five children sum to 478 (>467) because products carry multiple category memberships, so no roll-up was recorded alongside its children. | 2026-09-05 FOLLOW-UP: re-fetched W130206 live, confirmed 91 unchanged and confirmed via the site's own All Filters > Category facet panel that only the same 5 children exist (no 6th missed subcategory). Proved by full product-id enumeration that the ~52 rule-24 residue splits into 30 genuine bathroom accessories (now recorded as a new 'Bathroom Accessories & Sets (other)' leaf row, mirroring the SR176 Kmart precedent), 10 textile cross-listings, and 12 Beauty/Bodycare cross-listings (both moved to review[]); 39+30+10+12=91 exact reconciliation. Separately CONFIRMED the Bathroom department (467) vs children-sum (478) anomaly is genuine multi-tagging overlap, not a data error: product id 70255775 (Multi Leaf Shower Curtain) was found live in BOTH the Bathroom Accessories & Sets residue AND the separate Shower Curtains node (W288764), direct proof a single product carries multiple category memberships on this site. No fix applied per project policy - parent totals are not always supersets of children.",
+ "rows": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Accessories & Sets",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Caddy",
+   "qty": 2,
+   "link": "https://www.target.com.au/c/home/bathroom/bathroom-accessories/bath-caddy/W1302062",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Accessory Sets",
+   "qty": 10,
+   "link": "https://www.target.com.au/c/home/bathroom/bathroom-accessories/bathroom-accessory-sets/W1302065",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Bins",
+   "qty": 7,
+   "link": "https://www.target.com.au/c/home/bathroom/bathroom-accessories/bathroom-bins/W1302063",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Soap Dispenser",
+   "qty": 10,
+   "link": "https://www.target.com.au/c/home/bathroom/bathroom-accessories/soap-dispenser/W1302061",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Toothbrush Holders & Tumblers",
+   "qty": 10,
+   "link": "https://www.target.com.au/c/home/bathroom/bathroom-accessories/toothbrush-holders-tumblers/W1302064",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Storage & Organisers",
+   "qty": 58,
+   "link": "https://www.target.com.au/c/home/bathroom/bathroom-storage/W276140",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Accessories & Sets (other)",
+   "qty": 30,
+   "link": "https://www.target.com.au/c/home/bathroom/bathroom-accessories/W130206",
+   "is_group": false,
+   "evidence": "RULE-24 RESIDUE RESOLVED BY PRODUCT-ID ENUMERATION (2026-09-05 re-fetch, live). Parent W130206 re-confirmed '91 products found' (unchanged). Enumerated all 91 product ids across both PLP pages (48 on page 1, 43 on page 2, 0 overlap = 91 unique). Enumerated the 5 recorded children independently: Bath Caddy 2, Bathroom Accessory Sets 10, Bathroom Bins 7, Soap Dispenser 10, Toothbrush Holders & Tumblers 10 = 39 unique ids, proved by id-set to be a disjoint union (0 overlap among children) and a strict subset of the parent's 91 (0 child ids missing from parent). Residual = 91 - 39 = 52 ids reachable ONLY at the parent URL. Read every one of the 52 residual titles (not guessed): 30 are genuine bathroom accessories/hardware under rules 13/17 with no separate leaf URL anywhere on the site - trays (Soft Touch, Marble Look, Natural Fluted, White Textured, Bamboo and Linear, Green Glaze, Linear, Bow, Green Swirl - 9 distinct tray SKUs), toilet brushes (Soft Touch, Flexible, Refillable with Stone, Marble Look, Bamboo and Linear, Green Glaze, Bow, Linear, White Textured, Green Swirl - 9 distinct toilet-brush SKUs), toilet roll holders (plain, Linear Sage, Linen Look, Linen Look Stripe - 4), silicone shower accessory sets (2 colourway SKUs), silicone accessory kit (1), silicone drink holder (1), adjustable corner shower caddy (1), slim line metal trolley (1), walnut-look step stool (1) - total 30. Recorded as this new leaf row, qty=30, so nothing genuinely-bathroom is silently lost. The other 22 of the 52 are NOT bathroom accessories and are correctly excluded from this count (see companion review[] entries added 2026-09-05): 10 are textile products (4x Georgie Australian Cotton Gingham Hand Towel colour variants, 1x Kids Dino Australian Cotton Hand Towel, 1x Multi Leaf Shower Curtain, 1x 3 Pack Bathroom Cloths, 1x Anko 12 Piece Cloth Set, 1x Kids Strawberry Milk Bath Mat, 1x Diamond Bath Runner) and 12 are Beauty/Bodycare personal-care items under the OXX Bodycare/Skincare brand (travel mirror, 2x eye masks, body brush, facial cleansing pads, 7-piece facial cleansing mitts, 2x shower caps, bath puff, hair drying turban, hair care pack, 2-in-1 travel blanket and pillow) that the site cross-merchandises into this PLP despite sitting in Beauty > Bodycare / Beauty > Skincare hierarchy, the same exclusion already applied to the reviewed 'Bath & Shower Accessories (Beauty > Bodycare)' node (W1518165). Math check: 39 (children) + 30 (this row) + 10 (textile) + 12 (excluded) = 91 = parent total. Exact containment proven, no fabrication, no double-counting.",
+   "flag": null
+  }
+ ],
+ "review": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower Curtains",
+   "qty": 3,
+   "issue": "ROUTED TO TEXTILE: shower curtains are Textile under rule 20. Own page renders '3 products found' and data-cnstrc-num-results=\"3\", matching the Bathroom parent's Category facet.",
+   "link": "https://www.target.com.au/c/home/bathroom/shower-curtains/W288764"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Towels",
+   "qty": 322,
+   "issue": "ROUTED TO TEXTILE: whole Towels branch is textile bath linen (rule 15/20). Page renders '322 products found'. Its Material facet is 100% cotton (Australian Cotton 194, Australian Cotton Blend 36, Egyptian Cotton 34, Cotton 15), confirming textile. Seven children below.",
+   "link": "https://www.target.com.au/c/home/bathroom/towels/W1108824"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Towels > Bath Towels",
+   "qty": 83,
+   "issue": "ROUTED TO TEXTILE: textile bath towels (rule 15). Count is the Towels parent's own Category-facet figure; the facet was proved equal to each child's own rendered total on every child that could be re-fetched.",
+   "link": "https://www.target.com.au/c/home/bathroom/towels/bath-towels/W734382"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Towels > Hand Towels",
+   "qty": 64,
+   "issue": "ROUTED TO TEXTILE: textile hand towels (rule 15). Node re-fetched independently: its own page renders '64 products found', matching the parent facet exactly.",
+   "link": "https://www.target.com.au/c/home/bathroom/towels/hand-towels/W751472"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Towels > Bath Sheets",
+   "qty": 43,
+   "issue": "ROUTED TO TEXTILE: textile bath sheets (rule 15). Count from the Towels parent's own Category facet.",
+   "link": "https://www.target.com.au/c/home/bathroom/towels/bath-sheets/W751455"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Towels > Beach Towels",
+   "qty": 42,
+   "issue": "ROUTED TO TEXTILE: textile beach towels (rule 15). Count from the Towels parent's own Category facet.",
+   "link": "https://www.target.com.au/c/home/bathroom/towels/beach-towels/W248329"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Towels > Face Washer",
+   "qty": 28,
+   "issue": "ROUTED TO TEXTILE: washcloths / face washers are Textile under rule 15. Count from the Towels parent's own Category facet.",
+   "link": "https://www.target.com.au/c/home/bathroom/towels/face-washer/W751459"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Towels > Hair Towels & Wraps",
+   "qty": 12,
+   "issue": "ROUTED TO TEXTILE: textile hair towels and wraps (rule 20). Node re-fetched independently: its own page renders '12 products found', matching the parent facet exactly.",
+   "link": "https://www.target.com.au/c/home/bathroom/towels/hair-towels/W288779"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Towels > Bath Mats",
+   "qty": 56,
+   "issue": "ROUTED TO TEXTILE: textile bath mats (rule 16). Target files Bath Mats as a child of Towels, not of Bathroom Accessories, and the parent branch's material facet is entirely cotton, so the website hierarchy resolves the rule-16 ambiguity to Textile. Count from the Towels parent's own Category facet.",
+   "link": "https://www.target.com.au/c/home/bathroom/towels/bath-mats/W288778"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Scales",
+   "qty": 4,
+   "issue": "EXCLUDED / NOT BATHROOM (rules 2, 29): primary product type is a body-weighing appliance, not a bathroom fixture, accessory, storage item or piece of hardware under rule 3. Filed under Bathroom by room association only. Own page renders '4 products found'. Consistent with how the same node was treated on Target US (SR 22), John Lewis (SR 46), Dunelm (SR 47), XXXLutz (SR 105), Noon (SR 165) and Kmart AU (SR 176).",
+   "link": "https://www.target.com.au/c/home/bathroom/bathroom-scales/W187309"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Mirrors",
+   "qty": null,
+   "issue": "ALREADY EXTRACTED IN Final.xlsx (Home Decor pass) as 'Mirrors' - must not be re-extracted (master guide s13 / OPTION 1). Also not a bathroom mirror node: it sits under Home > Home Decor, and Target AU has no bathroom-mirror category.",
+   "link": "https://www.target.com.au/c/home/home-decor/mirrors/W250648"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath & Shower Accessories (Beauty > Bodycare)",
+   "qty": null,
+   "issue": "EXCLUDED: sits under Beauty > Bodycare, not under Home > Bathroom. Primary product type is personal bodycare (body wash, sponges, loofahs), not bathroom hardware or accessories (rules 2/3).",
+   "link": "https://www.target.com.au/c/beauty/bodycare/bath-shower-accessories/W1518165"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Laundry Hampers & Baskets",
+   "qty": null,
+   "issue": "EXCLUDED: sits under Home > Laundry, a separate department from Home > Bathroom. General laundry storage, not a Bathroom node (rules 2, 30-33).",
+   "link": "https://www.target.com.au/c/home/laundry/laundry-hampers-baskets/W228368"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Accessories & Sets - rule 24 residue (RESOLVED 2026-09-05)",
+   "qty": null,
+   "issue": "RESOLVED by live re-fetch + full product-id enumeration on 2026-09-05 (see the new 'Bathroom Accessories & Sets (other)' leaf row in rows[], qty=30). Re-fetched the parent live: still '91 products found', unchanged from the original extraction. Re-fetched all 5 children live: still 2/10/7/10/10=39, unchanged. Checked the site's own Category facet panel (All Filters > Category) for a 6th child - it lists exactly the same 5 children with the same counts and nothing else; no missed subcategory exists. Enumerated all 91 parent product ids (page 1 + page 2, 0 overlap) and all 39 child ids (0 overlap among children, all 39 proven subset of the 91), leaving exactly 52 residual ids reachable only at the parent URL. Read all 52 titles: 30 are genuine uncategorised bathroom accessories (trays, toilet brushes, toilet roll holders, shower accessory sets/caddy, accessory kit, drink holder, trolley, step stool) - recorded as the new row. The remaining 22 are NOT bathroom accessories: 10 textile (hand towels, shower curtain, cloths, bath mat/runner - see new review entry) and 12 Beauty/Bodycare OXX-brand personal-care cross-listings (see new review entry). 39 + 30 + 10 + 12 = 91, exact reconciliation, nothing fabricated or estimated.",
+   "link": "https://www.target.com.au/c/home/bathroom/bathroom-accessories/W130206"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Accessories & Sets (parent) - textile residual, ROUTED TO TEXTILE",
+   "qty": 10,
+   "issue": "Found while enumerating the 52-product rule-24 residue on the Bathroom Accessories & Sets parent (W130206) on 2026-09-05. 10 of the 52 residual products are textile, not bathroom hardware/accessories, per rules 15/16/20: Georgie Australian Cotton Gingham 2 Pack Hand Towel (4 colour-variant product ids: 72967485, 72967515, 72981665, 72981672), Kids Dino Australian Cotton Hand Towel - Peacoat (72522219), Multi Leaf Shower Curtain - Anko (70255775), 3 Pack Bathroom Cloths - Anko (70901573), Anko 12 Piece Cloth Set - Bow (72403242), Kids Strawberry Milk Bath Mat (72355183), Diamond Bath Runner - Natural (72184097). NOTE product 70255775 (Multi Leaf Shower Curtain) is the SAME product already present in the site's separate Shower Curtains node (W288764, already reviewed above as 'Shower Curtains', ROUTED TO TEXTILE) - confirmed by direct id match. This is concrete proof of the cross-tagging phenomenon noted for the Bathroom department total (467) being less than its children's sum (478): the same product genuinely belongs to more than one category node on this site. Not recorded as Bathroom rows; excluded from the 'Bathroom Accessories & Sets (other)' residue count for the same reason the Towels and Shower Curtains branches were excluded.",
+   "link": "https://www.target.com.au/c/home/bathroom/bathroom-accessories/W130206"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Accessories & Sets (parent) - Beauty/Bodycare residual, EXCLUDED",
+   "qty": 12,
+   "issue": "Found while enumerating the 52-product rule-24 residue on the Bathroom Accessories & Sets parent (W130206) on 2026-09-05. 12 of the 52 residual products are Beauty/Bodycare personal-care items (OXX Bodycare/OXX Skincare brand) cross-merchandised into this Home > Bathroom PLP despite sitting in the Beauty > Bodycare / Beauty > Skincare hierarchy: OXX Travel Double-Sided Mirror - Black (68868147, handheld cosmetic/travel mirror, not a bathroom wall/vanity mirror - same exclusion logic as rule 10/11 false-positive guard), Eye Mask 'Do Not Disturb' (69458125), Body Brush (69482069), 7 Pack Facial Cleansing Pads - Mint (69482175), Shower Cap - Cherry (70071023), Bath Puff - Rainbow Swirl (70096033), Shower Cap - Leopard (70096057), OXX 2-in-1 Sloth Travel Blanket and Pillow (71886800, unrelated travel item), Great Hair Pack - Lilac (71895123), Eye Mask 'Smiley Face' (71895130), 7-Piece Facial Cleansing Mitts (72000922), Hair Drying Turban - Blue/Green (72026762). Primary product type is personal bodycare/cosmetic, not bathroom fixture, hardware or accessory under rule 3/13 (rule 2: PRIMARY PRODUCT TYPE beats WEBSITE CATEGORY HIERARCHY). Same exclusion already applied to the reviewed 'Bath & Shower Accessories (Beauty > Bodycare)' node (W1518165) and matches the Kmart AU (SR176) 'Beauty > Bath & Body > Bath Accessories' precedent. Excluded from the 'Bathroom Accessories & Sets (other)' residue count.",
+   "link": "https://www.target.com.au/c/home/bathroom/bathroom-accessories/W130206"
+  }
+ ],
+ "_reconstructed_from": "Bathroom.xlsx delivered 2026-09-01 (checkpoint), not original worker JSON"
+}

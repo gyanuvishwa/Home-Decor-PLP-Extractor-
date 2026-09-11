@@ -1,0 +1,93 @@
+{
+  "sr": 221,
+  "company": "Flipkart Home & Kitchen",
+  "brand_site": "flipkart.com",
+  "country": "India",
+  "site_url": "https://www.flipkart.com/",
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "Tier 1 (direct HTTP) succeeded throughout - no Playwright/Chrome needed. robots.txt fetch itself was intercepted by Flipkart's reCAPTCHA/bot-check (returned an HTML 'Are you a human?' challenge page instead of the text robots file), but direct fetches of homepage and category pages via curl with a standard desktop UA + Accept-Language header returned full real SSR HTML (200, 0.5-1.4MB) with no challenge, so Tier 1 access was reliable and no Claude-in-Chrome escalation was required or attempted. Investigated Flipkart's real Home & Kitchen taxonomy: homepage/footer nav lists Home Decor, Home Furnishings, Kitchen Cookware & Serveware, Wallpapers, Home Improvement Tools, Home Cleaning & Bathroom Accessories, and Festive Decor & Gifting as sibling Home & Kitchen-department sections; 'Festive Decor & Gifting' is also reachable nested under /home-decor/ (confirmed via search results for /home-decor/festive-decor/... URLs), making it a genuine Home & Kitchen category branch, not a separate department. Fetched the Festive Decor & Gifting > Festive Decor node directly (breadcrumb: Home > Festive Decor & Gifting > Festive Decor) and extracted its embedded category-tree JSON, which lists exactly 14 leaf subcategories with their own dedicated /pr URLs: Balloons, Holi Colors, Holi Combos, Rangoli Powder, Rangoli Stencils, Artificial Christmas Tree, Christmas Tree Decoration, Christmas Swags & Wreaths, Nativity Sets, Christmas Stockings & Sacks, Ceramic Easter Eggs, Toran, Dandia Sticks, Printed Currency. Each has its own breadcrumb, H1, and dedicated PLP with a product grid (verified by sampling product titles on later pages, e.g. page 12 of Christmas Tree Decoration and page 2 of Nativity Sets - overwhelmingly on-topic real products, e.g. 'Penaxa Bethleham Haven Wooden Christmas Nativity Crib', 'CraftVatika Xmas Tree Decoration String Garlands'), confirming these are genuine PLPs and not raw search-results pages. IMPORTANT qty caveat: each leaf page's own left-nav category-tree metadata states a small 'totalProduct' figure (e.g. Christmas Tree Decoration: 467, Nativity Sets: 26, Holi Colors: 408) but the page's own displayed on-page header ('Showing 1-40 products of N products', directly above the product grid) is far larger for every single one of these categories (e.g. Christmas Tree Decoration actually showed 4,276-4,285 across repeated fetches of pages 1/11/12, all populated with genuine on-topic products through at least item 480) - the nav-tree count is evidently stale/a curated-merchandising number, not the true PLP size, so per the qty priority (displayed category-page total first) the ON-PAGE displayed total was used, not the smaller nav-tree number. The displayed total fluctuated by under 0.5% between separate fetches (4,276 vs 4,285), consistent with normal live-inventory drift on a large marketplace, not a search-engine style estimate - each category kept its own stable breadcrumb/H1/URL identity throughout. Included as genuine holiday-branded categories (site's own subcategory name explicitly names the holiday): Christmas - Christmas Tree Decoration, Artificial Christmas Tree, Christmas Swags & Wreaths, Nativity Sets, Christmas Stockings & Sacks; Holi - Holi Colors, Holi Combos; Easter - Ceramic Easter Eggs; Navratri - Dandia Sticks (site's own subcategory copy explicitly says 'Navratri Wooden Dandiya Sticks for Garba Night'). No genuine parent grouping page exists for any single holiday (all 14 subcategories sit as flat siblings directly under 'Festive Decor', which itself spans multiple unrelated holidays), so no synthetic Christmas/Holi parent grouping row was added, consistent with prior-batch precedent of not inventing a parent the site itself doesn't have. EXCLUDED as generic/multi-occasion (not branded to one specific holiday by the site's own taxonomy, per rules SS2/SS5): Balloons (used for any party/celebration, not holiday-specific), Rangoli Powder and Rangoli Stencils (used across Diwali, Onam, Navratri, weddings, and everyday decor - the site does not name a holiday in the subcategory itself), Toran (generic door-hanging decor used across multiple Indian festivals, not holiday-named), Printed Currency (generic pooja/festival prop, not holiday-named). Specifically checked for a genuine Diwali PRODUCT CATEGORY node per the task's explicit instruction: searched the full festive-decor category tree and the raw HTML for diya/deepavali/deepawali-slug category nodes - none exist. The only Diwali-related hits on the entire page were (a) one individual product PDP with 'diwali' in its own slug (a rangoli stencil product) and (b) a '/q/diwali-gift-set' link, which is a SEARCH QUERY URL (/q/ prefix), not a category URL - both correctly excluded as marketing/search rather than a stable Diwali taxonomy node, confirming Diwali shopping on Flipkart Home & Kitchen is search/campaign-driven ('Big Diwali Sale' style), exactly as the task anticipated, and not backed by a real Diwali category page the way Christmas/Holi/Easter/Navratri are. Also checked for New Year, Raksha Bandhan/Rakhi, Eid, and Mother's/Father's Day category nodes within Festive Decor and via the homepage nav/footer - none found as dedicated Home & Kitchen category nodes (only generic gifting categories with no holiday name, or absent entirely); not included per the same genuine-PLP test.",
+  "rows": [
+    {
+      "category": "Christmas",
+      "sub_category": "Christmas Tree Decoration",
+      "qty": 4285,
+      "link": "https://www.flipkart.com/festive-decor-gifting/festive-decor/christmas-tree-decoration/pr?sid=bro,tez,9ol",
+      "is_group": false,
+      "evidence": "Breadcrumb: Home > Festive Decor & Gifting > Festive Decor > Christmas Tree Decoration; H1 'Christmas Tree Decoration'; on-page header 'Showing 1 – 40 products of 4,285 products'",
+      "flag": null
+    },
+    {
+      "category": "Christmas",
+      "sub_category": "Artificial Christmas Tree",
+      "qty": 949,
+      "link": "https://www.flipkart.com/festive-decor-gifting/festive-decor/artificial-christmas-tree/pr?sid=bro,tez,8td",
+      "is_group": false,
+      "evidence": "Breadcrumb: Home > Festive Decor & Gifting > Festive Decor > Artificial Christmas Tree; H1 'Artificial Christmas Tree'; on-page header 'Showing 1 – 40 products of 949 products'",
+      "flag": null
+    },
+    {
+      "category": "Christmas",
+      "sub_category": "Christmas Swags & Wreaths",
+      "qty": 174,
+      "link": "https://www.flipkart.com/festive-decor-gifting/festive-decor/christmas-swags-wreaths/pr?sid=bro,tez,nnw",
+      "is_group": false,
+      "evidence": "Breadcrumb: Home > Festive Decor & Gifting > Festive Decor > Christmas Swags & Wreaths; H1 'Christmas Swags & Wreaths'; on-page header 'Showing 1 – 40 products of 174 products'",
+      "flag": null
+    },
+    {
+      "category": "Christmas",
+      "sub_category": "Nativity Sets",
+      "qty": 93,
+      "link": "https://www.flipkart.com/festive-decor-gifting/festive-decor/nativity-sets/pr?sid=bro,tez,tsc",
+      "is_group": false,
+      "evidence": "Breadcrumb: Home > Festive Decor & Gifting > Festive Decor > Nativity Sets; H1 'Nativity Sets'; on-page header 'Showing 1 – 40 products of 93 products'",
+      "flag": null
+    },
+    {
+      "category": "Christmas",
+      "sub_category": "Christmas Stockings & Sacks",
+      "qty": 527,
+      "link": "https://www.flipkart.com/festive-decor-gifting/festive-decor/christmas-stockings-sacks/pr?sid=bro,tez,ig7",
+      "is_group": false,
+      "evidence": "Breadcrumb: Home > Festive Decor & Gifting > Festive Decor > Christmas Stockings & Sacks; H1 'Christmas Stockings & Sacks'; on-page header 'Showing 1 – 40 products of 527 products'",
+      "flag": null
+    },
+    {
+      "category": "Holi",
+      "sub_category": "Holi Colors",
+      "qty": 3045,
+      "link": "https://www.flipkart.com/festive-decor-gifting/festive-decor/holi-colors/pr?sid=bro,tez,w8e",
+      "is_group": false,
+      "evidence": "Breadcrumb: Home > Festive Decor & Gifting > Festive Decor > Holi Colors; H1 'Holi Colors'; on-page header 'Showing 1 – 40 products of 3,045 products'",
+      "flag": null
+    },
+    {
+      "category": "Holi",
+      "sub_category": "Holi Combos",
+      "qty": 1018,
+      "link": "https://www.flipkart.com/festive-decor-gifting/festive-decor/holi-combos/pr?sid=bro,tez,jbl",
+      "is_group": false,
+      "evidence": "Breadcrumb: Home > Festive Decor & Gifting > Festive Decor > Holi Combos; H1 'Holi Combos'; on-page header 'Showing 1 – 40 products of 1,018 products'",
+      "flag": null
+    },
+    {
+      "category": "Easter",
+      "sub_category": "Ceramic Easter Eggs",
+      "qty": 56,
+      "link": "https://www.flipkart.com/festive-decor-gifting/festive-decor/ceramic-easter-eggs/pr?sid=bro,tez,da5",
+      "is_group": false,
+      "evidence": "Breadcrumb: Home > Festive Decor & Gifting > Festive Decor > Ceramic Easter Eggs; H1 'Ceramic Easter Eggs'; on-page header 'Showing 1 – 40 products of 56 products'",
+      "flag": null
+    },
+    {
+      "category": "Navratri",
+      "sub_category": "Dandia Sticks",
+      "qty": 661,
+      "link": "https://www.flipkart.com/festive-decor-gifting/festive-decor/dandia-sticks/pr?sid=bro,tez,mye",
+      "is_group": false,
+      "evidence": "Breadcrumb: Home > Festive Decor & Gifting > Festive Decor > Dandia Sticks; H1 'Dandia Sticks'; on-page header 'Showing 1 – 40 products of 661 products'; product copy explicitly says 'Navratri Wooden Dandiya Sticks for Garba Night'",
+      "flag": null
+    }
+  ]
+}

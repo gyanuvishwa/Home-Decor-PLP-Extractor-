@@ -1,0 +1,16 @@
+{
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "Access: same blocking pattern as the Bestsellers/Clearance files for this company -- direct HTTP (curl, curl_cffi chrome120) and headless Playwright both hard-blocked (403 Access Denied, Akamai) on every macys.com URL, so used Claude-in-Chrome as last resort after confirming robots.txt has no Claude-specific disallow. Found one genuine Home-scoped New Arrivals PLP: 'Home New Arrivals | Macy's' at /shop/new-trending/new-arrivals/home?id=113745, breadcrumb New & Trending > New at Macy's > Home, heading 'Home New Arrivals (500+)'. Real filterable/sortable product grid (Department, Item Type, Gender, Price, Brand, Color facets) with many products explicitly badged 'NEW!' in their titles -- confirmed genuine 'recently added to catalogue' listing, not a lookbook/editorial/campaign page. However the header count is explicitly capped at '(500+)' rather than an exact figure, and pagination runs to page 143 -- at roughly 60 items/page that implies on the order of 8,000+ products, far beyond the displayed cap, so '500+' cannot be used as qty. Tried to resolve the true total via the last pagination page: a directly-constructed '&Pageindex=143' query parameter returned a bot-check interstitial page rather than the real listing; per policy this was abandoned immediately rather than interacted with (CAPTCHA/bot-check pages are never bypassed). No other reliable exact-count source (e.g. an unobfuscated totalResults JSON field) was found in the rendered page's script payloads -- the site serves an obfuscated React Server Components flight stream where a 'totalResults' key present in the payload resolves to an unrelated index reference, not a literal value. Given the qty rule's explicit prohibition on estimating or aggregating a count, qty was left null rather than reporting any computed figure. A 'Bed & Bath New Arrivals' card appears as a promotional tile under the page's 'What's trending now' widget but is a cross-sell shortcut, not a documented child-taxonomy node comparable to the Bestsellers/Clearance parent-child pattern seen in the prior Home-Decor pass, so no sub-rows were added. No other New-Arrivals-type PLP (Just In, What's New, Latest Arrivals) was found in Home department nav, footer, or sitemap beyond this one.",
+  "rows": [
+    {
+      "category": "New Arrivals",
+      "sub_category": "New Arrivals",
+      "qty": null,
+      "link": "https://www.macys.com/shop/new-trending/new-arrivals/home?id=113745",
+      "is_group": false,
+      "evidence": "Page heading text 'Home New Arrivals (500+)' -- an explicitly capped, non-exact display; pagination runs '1 2 3 4 5 ... 143' implying far more than 500 items, but no exact figure is shown anywhere on the page",
+      "flag": "MANUAL REVIEW: exact qty not obtainable -- site caps the displayed count at '500+'; true total (roughly 8,000+ based on 143 pages) could not be verified without aggregating across all pages, which the qty rule prohibits, and attempting to jump directly to the last page via a constructed URL parameter triggered a bot-check interstitial that was not interacted with"
+    }
+  ]
+}

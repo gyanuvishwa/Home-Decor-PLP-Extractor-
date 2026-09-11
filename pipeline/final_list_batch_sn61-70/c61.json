@@ -1,0 +1,75 @@
+{
+  "sr": 61,
+  "company": "Pottery Barn Kids UK",
+  "brand_site": "potterybarnkids.co.uk",
+  "country": "UK",
+  "site_url": "https://www.potterybarnkids.co.uk/",
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "NOT a re-cut of any US Pottery Barn Kids/Teen sibling row: potterybarnkids.co.uk runs on a completely different platform (NetSuite SuiteCommerce Advanced, COMPID 3572911, theme 'pk-uk-18-2') from potterybarnkids.com and pbteen.com (Williams-Sonoma WSI SPA). Category tree, URL slugs, product IDs and item counts are all independently UK-specific; there is no product-ID overlap possible to test against S.N. 5 (PB Kids US, potterybarnkids.com) or S.N. 39 (Pottery Barn Dorm, pbteen.com) because they are different backends with disjoint internal-id namespaces and different SKU sets - confirmed by inspecting the item JSON (UK internalids are NetSuite-native integers distinct in format/range from the US site's item codes). ACCESS: direct requests get HTTP 200 on all URLs, but the SPA is 100% client-rendered for every category/PLP route (server returns only a ~5.9KB app shell with meta name=robots content=nofollow,noindex) so raw HTML carries no product data. r.jina.ai hit a Cloudflare 'Just a moment' challenge (contention) on the one route tried. SOLUTION: the site runs SEO dynamic rendering - requesting the exact same URLs with a Googlebot user-agent (Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)) returns a fully pre-rendered ~116KB page. Embedded in that render is a same-origin prefetch call to the site's own NetSuite SuiteCommerce items REST API: https://www.potterybarnkids.co.uk/api/items?c=3572911&commercecategoryurl=<url-encoded category path>&country=US&currency=GBP&custitem_is_preview_item_uk=false&custitem_is_subitem_merch_only=false&facet.exclude=custitem_is_subitem_merch_only,custitem_is_preview_item_uk&fieldset=search&include=facets&language=en&limit=<n>&matrixchilditems_fieldset=matrixchilditems_search&n=34&offset=0&pricelevel=5&sort=custitem_merchant_display_ranking_uk:asc - this is the literal same-origin call the storefront's own JS makes to populate each PLP grid (confirmed present verbatim in two independently rendered pages, lighting and mirrors), so its 'total' field is the site's own authoritative count, not a third-party search-engine estimate. Every qty below is that 'total' field, re-fetched twice on 2026-08-10 with identical results both times (no drift observed). CATEGORY TREE: read from the site's own category sitemap (https://www.potterybarnkids.co.uk/SitemapFiles/PKUK/sitemap-1786284087999-PKUK-category-0.xml), cross-checked against the live 287-link header/footer nav. Decor > Decor by Category has exactly 10 leaf nodes, no further sub-nesting exists anywhere in the sitemap (confirmed - no lighting/mirror/clock sub-URLs beyond the ones listed here exist site-wide). SCOPE DECISIONS: INCLUDED - Lighting (28, clean, all fixtures/lamps); Mirrors (21, clean, all genuine mirror products); Shelving & Hooks (28, clean, all decorative shelves/hook racks, no storage furniture); Coin Banks & Snowglobes (15, clean decor objects/bookends; category URL slug still says '-clocks' but zero clock SKUs are currently listed - kept the site's full total since every item present is decor-typed, not padding). RULE 0 GAIN: found 2 vanity mirrors ('Penny Storage Vanity Mirror' id 20648804, 'Ava Ribbon Vanity Mirror' id 20648647) buried inside the otherwise-excluded Jewellery Boxes listing (total 21, rest are jewellery/trinket/keepsake boxes = storage, out of scope) - verified via full enumeration of all 21 items and cross-checked against the Mirrors category's own 21-item ID set (no overlap, genuinely uncounted elsewhere) - added as its own 'Vanity Mirrors' row per Rule 0.3, flagged since the qty is a manual product-type extraction from a mixed listing rather than the page's own segmented total. MIXED ROLL-UP - Wall Art & Decor (site total 59): full enumeration of all 59 items found the listing merges genuine wall art/frames with a large seasonal block - 26 Christmas ornaments/stockings/tree-toppers/advent-calendars (Holiday & Gift, excluded), 5 pinboards + 1 hanging-hardware 'Acrylic Art Cable' (excluded, functional), 1 faux-flower-garland item and 1 crepe-paper-flowers set (excluded, faux florals), and 1 functional phone/tablet stand (excluded) = 35 excluded of 59; the remaining 22 (9 keepsake/first-year frames, 13 wall-art pieces including a felted-animal set, Marvel wall art, a tapestry and a dimensional fabric wall hanging) are genuine decor and are reported as the qty for this row, flagged as a manual audit since the site does not itself segment this listing. EXCLUDED entirely (checked, not padded): Bins & Baskets (55, storage/Easter baskets); Canopies (10, bed canopies + window cornices/sheers, furniture/textile); Pinboards (7, functional cork/campaign boards); Cot Mobiles (11, nursery function/toy); Jewellery Boxes (21, storage, apart from the 2 mirrors pulled out above); All Decor (200, marketing roll-up aggregating the above); Bathroom Accessories (bath/bath-by-category/bathroom-accessories, 9 items - hampers, toothbrush holder, countertop organiser, toiletry bag, step stools - all storage/hardware/furniture, zero decor items, correctly excluded under Rule 0.4); Feeding & Tabletop (baby/baby-by-category/all-feeding-tabletop, 32 items - dominated by baby feeding sets, character-branded melamine sets, tablecloths/table runners/placemats (textiles) and muslin bibs/burp cloths (baby textiles); this is a nursery-feeding utility category, not the decor-tabletop node the US site has, so it was excluded whole rather than picked apart). DEDUP - Table & Task Lamps (backpacks-study/study-accessories/table-floor-lamps, site total 25): full ID comparison against the Lighting category's 28 items found 22 of 25 (88%) already counted there; the 3 genuinely new lamp SKUs (Grace Flower Lamp 43cm, Amelia Adjustable Floor Lamp 152cm, Sculpted Bird Table Lamp 46cm) were judged too marginal to justify a second row that would double-count the other 22 - treated as a near-total re-cut of Lighting under Study Accessories merchandising, not a separate branch, consistent with this batch's Pottery Barn Dorm precedent (S.N. 39) for handling cross-listed lamp SKUs. No Kitchen & Dining row: no dinnerware/tableware/glassware category exists anywhere on this site outside the excluded Feeding node. No clocks: zero clock SKUs found anywhere on the site.",
+  "rows": [
+    {
+      "category": "Lighting",
+      "sub_category": "Lighting",
+      "parent": false,
+      "qty": 28,
+      "link": "https://www.potterybarnkids.co.uk/decor/decor-by-category/lighting",
+      "evidence": "NetSuite SuiteCommerce items API (same-origin call the PLP itself makes) total:28 for commercecategoryurl=/decor/decor-by-category/lighting, re-fetched twice 2026-08-10 with identical result",
+      "flag": null
+    },
+    {
+      "category": "Wall Decor & Mirrors",
+      "sub_category": "Mirrors",
+      "parent": true,
+      "qty": null,
+      "link": null,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Wall Decor & Mirrors",
+      "sub_category": "Wall Mirrors",
+      "parent": false,
+      "qty": 21,
+      "link": "https://www.potterybarnkids.co.uk/decor/decor-by-category/mirrors",
+      "evidence": "NetSuite SuiteCommerce items API total:21 for commercecategoryurl=/decor/decor-by-category/mirrors, re-fetched twice 2026-08-10 with identical result; all 21 titles confirmed genuine mirror products",
+      "flag": null
+    },
+    {
+      "category": "Wall Decor & Mirrors",
+      "sub_category": "Vanity Mirrors",
+      "parent": false,
+      "qty": 2,
+      "link": "https://www.potterybarnkids.co.uk/decor/decor-by-category/jewellery-boxes",
+      "evidence": "RULE 0 GAIN: this URL's own API total is 21 (mostly jewellery/trinket/keepsake boxes, out of scope), but full enumeration of all 21 items found 2 genuine vanity mirrors merchandised inside it - 'Penny Storage Vanity Mirror' (id 20648804) and 'Ava Ribbon Vanity Mirror' (id 20648647) - neither present in the main Mirrors category's own 21-item ID set, so they are not double-counted",
+      "flag": "MANUAL REVIEW: qty is a manual product-type extraction from a mixed non-mirror listing, not the page's own segmented total"
+    },
+    {
+      "category": "Wall Decor & Mirrors",
+      "sub_category": "Wall Art & Decor",
+      "parent": false,
+      "qty": 22,
+      "link": "https://www.potterybarnkids.co.uk/decor/decor-by-category/wall-art-decor",
+      "evidence": "This URL's own API total is 59; full enumeration of all 59 items found 35 out of scope (26 Christmas ornaments/stockings/tree-toppers/advent-calendars, 5 pinboards, 1 art-hanging-cable hardware item, 2 faux-floral items, 1 functional phone stand). qty=22 is the manually audited count of the remaining genuine frames and wall-art pieces from that same exhaustive 59-item enumeration",
+      "flag": "MANUAL REVIEW: qty is a manual product-type audit of a mixed listing (heavy Christmas/holiday contamination), not the page's own segmented total; raw site total for this URL is 59"
+    },
+    {
+      "category": "Home Accessories",
+      "sub_category": "Shelving & Hooks",
+      "parent": false,
+      "qty": 28,
+      "link": "https://www.potterybarnkids.co.uk/decor/decor-by-category/shelving",
+      "evidence": "NetSuite SuiteCommerce items API total:28 for commercecategoryurl=/decor/decor-by-category/shelving, re-fetched twice 2026-08-10 with identical result; all 28 titles confirmed decorative shelves/hook racks, no storage furniture",
+      "flag": null
+    },
+    {
+      "category": "Home Accessories",
+      "sub_category": "Coin Banks & Snowglobes",
+      "parent": false,
+      "qty": 15,
+      "link": "https://www.potterybarnkids.co.uk/decor/decor-by-category/coin-banks-clocks",
+      "evidence": "NetSuite SuiteCommerce items API total:15 for commercecategoryurl=/decor/decor-by-category/coin-banks-clocks, re-fetched twice 2026-08-10 with identical result; all 15 titles confirmed decor coin banks/snow globes/bookends (zero clock SKUs currently listed despite the URL slug)",
+      "flag": null
+    }
+  ]
+}

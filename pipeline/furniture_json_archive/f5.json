@@ -1,0 +1,210 @@
+{
+  "sr": 5,
+  "company": "PB Kids US",
+  "brand_site": "potterybarnkids.com",
+  "country": "USA",
+  "site_url": "https://www.potterybarnkids.com/",
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "ACCESS: r.jina.ai (the route the prior Home-Decor pass used) was returning a Cloudflare 'Just a moment' 403 on every retry this session, and WebFetch got a hard Akamai 403. Two routes worked instead. (1) curl_cffi with impersonate=safari18_0_ios was the ONLY profile of 7 swept that got HTTP 200 on /shop/ HTML (chrome131/chrome124/safari17_0/edge99/chrome110 all got Akamai 403 'Restricted Access'); it goes stale after a handful of hits, so a fresh un-sessioned request per URL with profile rotation was needed. robots.txt (fetched cleanly by every profile) names only EasouSpider and Pinterestbot - NO anthropic-ai / ClaudeBot / Claude-Web directive, so no Claude-specific disallow to respect. (2) The Chrome browser rendered the SPA. Note the browser egress geolocates to India: the site shows a 'Looks like you're in India' interstitial and, until 'No thanks, I'd like to proceed to the US site' is clicked, PLPs render 'There are no products available in your location.' with NO number. That failure mode is loud, never a wrong number, so every 'N Items' reading below is a genuine US-assortment read.\n\nTREE: taken from the site's own Furniture left-nav (div.left-nav) in the server-rendered HTML of /shop/furniture/, cross-checked against /llms.txt (which the site publishes and robots.txt explicitly Allows), the Study and Baby department left-navs, and the shop sitemap (netstorage/sitemaps/shop-sitemap-1.xml.gz, 908 URLs, 60 under /shop/furniture/). Five furniture departments: Nursery, Toddler, Bedroom, Desks & Study, Playroom & Storage. Department landing URLs (e.g. /shop/furniture/nursery-furniture-category/) 302 to their 'All X' listing, so they are grouping rows here. Leaf PLPs carry no left-nav of their own, i.e. the tree is exactly two levels deep. Parent placement follows each leaf's own rendered breadcrumb, which resolves the three places the left-nav repeats a URL under two departments: kids-nightstands -> Bedroom Furniture (not Nursery), toddler-bed-conversion-kit -> Toddler Furniture (not Nursery), kids-bookcases -> Playroom & Storage Furniture (not Desks & Study). Each URL therefore appears exactly once.\n\nQTY: every qty is the listing page's own rendered header ('N Items') read in Chrome directly under the PLP breadcrumb/title - 17 of 17 leaves read individually. Each was independently cross-checked against the Constructor.io browse API (ac.cnstrc.com/browse/group_id/<slug>, key_htxi9FJkmICHToi6) and total_num_results matched the rendered header EXACTLY on 17 of 17, plus on three controls (nursery-all-furniture 418, all-toddler-furniture 691, and lighting/table-lamps 39). The prior Home-Decor pass had rejected that API as inflated (42 vs a rendered 35 on table-lamps); that no longer reproduces - table-lamps today renders 39 and the API returns 39 - so the earlier gap looks like catalogue drift plus a stale jina cache rather than systematic inflation. Nothing here relies on the API alone: the rendered header is the recorded source in every case.\n\nEXCLUDED and why. Mattresses (bedding, not furniture): Crib Mattresses 15, Mattresses 22. Marketing collections per the brief's section 3: Nursery Collections 265, Bedroom Collections 244, Playroom & Wall System Collections 123 - these are style re-slices of the same pieces (the PLPs surface 'Cameron Collection / Charlie Collection / Parker Collection' chips), not distinct assortments. View-all nodes: All Nursery Furniture 418, All Toddler Furniture 691, All Bedroom Furniture 317, All Desks & Study Furniture 218, All Playroom Furniture 339, all-furniture 1005. Facet/filter URLs presented as nav items: 'Toddler Playroom Furniture' (/shop/furniture/toddler+all-kids-playroom-furniture/age-m-age-ff000d-1/) and the whole visual-nav chip strip on the Desks PLP (Writing/Storage/Wall System/Bed/Toddler Desks all resolve to facet URLs like /shop/furniture/writing-desk+kids-desks/furniturefinish-m-desk-style-.../). Furniture care/parts: Anywhere Slipcovers 106, Furniture Wood Swatches. Availability filters: the eight in-stock-* / instock-* pages and 'In-Stock & Ready to Ship Furniture'. Best-seller, new-arrival, sale and 'Designed & Assembled in America' pages. 'Study Bunk Beds & Lofts' (/shop/study/study-bunk-beds-and-lofts/), a Study-department re-slice of Bunk Beds & Lofts.\n\nSitemap-only SEO landing pages deliberately NOT recorded: /shop/furniture/ has 14 listing URLs that exist in the sitemap but appear nowhere in the site's navigation - bassinets 13, writing-desks 11, storage-desks 14, tech-desks 21, toddler-desk 7, vanity-desks 2, wall-system-desks 4, bed-desks 8, desk-chairs 5, kids-lounge-furniture 34, kids-tents-playhouses 15, kids-trundles-accessories 15, kids-upholstered-beds 26. I opened /shop/furniture/writing-desks/ to test them: it renders '11 Items' but its breadcrumb is 'Furniture > Writing Desks', i.e. it hangs flat off Furniture rather than sitting under Desks & Desk Chairs, and its products are a subset of the nav leaf. They are SEO landing pages, not IA nodes, so recording them would have produced overlapping duplicate rows.\n\nOTHER DEPARTMENTS CHECKED for stray furniture: Baby (/shop/baby-all/) reuses cribs/changing-tables/nursery-chairs and adds none; Study (/shop/study/) reuses kids-desks/kids-desk-chairs/kids-bookcases/kids-storage-wall-systems; Toys & Play (/shop/toys-gifts/) is toys only (its 'Rockers' are plush ride-on toys). Outdoor/seasonal has only playhouses, sand & water tables and pool floats - play equipment, not furniture. No outdoor, dining, sofa, wardrobe, bathroom-vanity or office-furniture departments exist on this kids-only site.\n\nSANITY: counts differ per category (no constant site-wide number); nothing is suspiciously round; every h1/breadcrumb matched the URL requested; no child count was summed into a parent (children of Bedroom sum to 338 against an all-bedroom listing of 317 because Beds & Trundles and Bunk Beds & Lofts share stock, which is exactly why parents are grouping rows here).",
+  "rows": [
+    {
+      "category": "Furniture",
+      "sub_category": "Nursery Furniture",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Cribs & Bassinets",
+      "qty": 82,
+      "link": "https://www.potterybarnkids.com/shop/furniture/cribs/",
+      "is_group": false,
+      "evidence": "rendered listing header '82 Items' under breadcrumb Furniture > Nursery Furniture > Cribs & Bassinets (Chrome); Constructor browse group_id/cribs total_num_results=82 agrees",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Changing Tables",
+      "qty": 76,
+      "link": "https://www.potterybarnkids.com/shop/furniture/changing-tables/",
+      "is_group": false,
+      "evidence": "rendered listing header '76 Items' (Chrome); Constructor browse group_id/changing-tables total_num_results=76 agrees",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Nursery Chairs & Ottomans",
+      "qty": 72,
+      "link": "https://www.potterybarnkids.com/shop/furniture/nursery-chairs/",
+      "is_group": false,
+      "evidence": "rendered listing header '72 Items' (Chrome); Constructor browse group_id/nursery-chairs total_num_results=72 agrees",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Toddler Furniture",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Toddler Beds & Conversion Kits",
+      "qty": 119,
+      "link": "https://www.potterybarnkids.com/shop/furniture/toddler-bed-conversion-kit/",
+      "is_group": false,
+      "evidence": "rendered listing header '119 Items' under breadcrumb Furniture > Toddler Furniture > Toddler Beds & Conversion Kits (Chrome); Constructor browse group_id/toddler-bed-conversion-kit total_num_results=119 agrees",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Bedroom Furniture",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Beds & Trundles",
+      "qty": 149,
+      "link": "https://www.potterybarnkids.com/shop/furniture/kids-beds/",
+      "is_group": false,
+      "evidence": "rendered listing header '149 Items' (Chrome); Constructor browse group_id/kids-beds total_num_results=149 agrees",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Bunk Beds & Lofts",
+      "qty": 44,
+      "link": "https://www.potterybarnkids.com/shop/furniture/kids-bunk-beds-lofts/",
+      "is_group": false,
+      "evidence": "rendered listing header '44 Items' under breadcrumb Furniture > Bedroom Furniture > Bunk Beds & Lofts (Chrome); Constructor browse group_id/kids-bunk-beds-lofts total_num_results=44 agrees",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Dressers & Armoires",
+      "qty": 91,
+      "link": "https://www.potterybarnkids.com/shop/furniture/kids-dressers-armoires/",
+      "is_group": false,
+      "evidence": "rendered listing header '91 Items' under breadcrumb Furniture > Bedroom Furniture > Dressers & Armoires (Chrome); Constructor browse group_id/kids-dressers-armoires total_num_results=91 agrees",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Nightstands",
+      "qty": 54,
+      "link": "https://www.potterybarnkids.com/shop/furniture/kids-nightstands/",
+      "is_group": false,
+      "evidence": "rendered listing header '54 Items' under breadcrumb Furniture > Bedroom Furniture > Nightstands (Chrome); Constructor browse group_id/kids-nightstands total_num_results=54 agrees",
+      "flag": "MANUAL REVIEW: the Nursery Furniture left-nav lists this same URL as 'Nightstands & Side Tables'; recorded once, under Bedroom Furniture, which is the page's own breadcrumb"
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Desks & Study Furniture",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Desks & Desk Chairs",
+      "qty": 76,
+      "link": "https://www.potterybarnkids.com/shop/furniture/kids-desks/",
+      "is_group": false,
+      "evidence": "rendered listing header 'View 76 Items' under breadcrumb Furniture > Desks & Study Furniture > Desks & Desk Chairs (Chrome); Constructor browse group_id/kids-desks total_num_results=76 agrees",
+      "flag": "MANUAL REVIEW: overlapping siblings - all 15 products of the Desk Chairs node are also in this listing (product-id set comparison), but the site files both as siblings under Desks & Study Furniture and offers no desks-only node"
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Desk Chairs",
+      "qty": 15,
+      "link": "https://www.potterybarnkids.com/shop/furniture/kids-desk-chairs/",
+      "is_group": false,
+      "evidence": "rendered listing header '15 Items' under breadcrumb Furniture > Desks & Study Furniture > Desk Chairs (Chrome); Constructor browse group_id/kids-desk-chairs total_num_results=15 agrees",
+      "flag": "MANUAL REVIEW: these 15 products are a subset of the 76 in Desks & Desk Chairs"
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Playroom & Storage Furniture",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Anywhere Chairs & Anywhere Beanbags",
+      "qty": 127,
+      "link": "https://www.potterybarnkids.com/shop/furniture/anywhere-chairs/",
+      "is_group": false,
+      "evidence": "rendered listing header '127 Items' (Chrome); Constructor browse group_id/anywhere-chairs total_num_results=127 agrees",
+      "flag": "MANUAL REVIEW: overlapping siblings - all 21 products of the Anywhere Beanbags node are also in this listing (product-id set comparison), but the site files both as siblings under Playroom & Storage Furniture"
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Anywhere Beanbags",
+      "qty": 21,
+      "link": "https://www.potterybarnkids.com/shop/furniture/anywhere-bean-bags/",
+      "is_group": false,
+      "evidence": "rendered listing header '21 Items' under breadcrumb Furniture > Playroom & Storage Furniture > Anywhere Beanbags (Chrome); Constructor browse group_id/anywhere-bean-bags total_num_results=21 agrees",
+      "flag": "MANUAL REVIEW: these 21 products are a subset of the 127 in Anywhere Chairs & Anywhere Beanbags"
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Play Tables & Chairs",
+      "qty": 30,
+      "link": "https://www.potterybarnkids.com/shop/furniture/kids-play-tables/",
+      "is_group": false,
+      "evidence": "rendered listing header '30 Items' under breadcrumb Furniture > Playroom & Storage Furniture > Play Tables & Chairs (Chrome); Constructor browse group_id/kids-play-tables total_num_results=30 agrees",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Play Kitchens & Vanities",
+      "qty": 21,
+      "link": "https://www.potterybarnkids.com/shop/furniture/play-kitchens/",
+      "is_group": false,
+      "evidence": "rendered listing header '21 Items' under breadcrumb Furniture > Playroom & Storage Furniture > Play Kitchens & Vanities (Chrome); Constructor browse group_id/play-kitchens total_num_results=21 agrees",
+      "flag": "MANUAL REVIEW: borderline toys-vs-furniture - tiles are large wooden play kitchens and play vanities (e.g. 'Chelsea All-in-1 Toddler Play Kitchen 36w x 33h', 'Madeline Play Vanity 38w x 42h'); kept because the site files the node under its Playroom & Storage FURNITURE department"
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Bookcases",
+      "qty": 38,
+      "link": "https://www.potterybarnkids.com/shop/furniture/kids-bookcases/",
+      "is_group": false,
+      "evidence": "rendered listing header '38 Items' under breadcrumb Furniture > Playroom & Storage Furniture > Bookcases (Chrome); Constructor browse group_id/kids-bookcases total_num_results=38 agrees",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Wall Storage Systems",
+      "qty": 119,
+      "link": "https://www.potterybarnkids.com/shop/furniture/kids-storage-wall-systems/",
+      "is_group": false,
+      "evidence": "rendered listing header 'View 119 Items' under breadcrumb Furniture > Playroom & Storage Furniture > Wall Storage Systems (Chrome); Constructor browse group_id/kids-storage-wall-systems total_num_results=119 agrees",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Toy Storage",
+      "qty": 15,
+      "link": "https://www.potterybarnkids.com/shop/furniture/kids-toy-storage/",
+      "is_group": false,
+      "evidence": "rendered listing header '15 Items' (Chrome); Constructor browse group_id/kids-toy-storage total_num_results=15 agrees",
+      "flag": "MANUAL REVIEW: storage-vs-furniture line - tiles are predominantly furniture (toy chests, lidded storage trunks, cubbies, an end-of-bed storage bench, a playroom storage tower) but two of the fifteen are 'Stackable Bins, Set of 2' standalone storage goods"
+    }
+  ]
+}

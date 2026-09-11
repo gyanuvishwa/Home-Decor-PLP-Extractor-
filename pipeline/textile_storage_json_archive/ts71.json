@@ -1,0 +1,194 @@
+{
+  "sr": 71,
+  "company": "TJ Maxx Home",
+  "brand_site": "tjmaxx.tjx.com",
+  "country": "USA",
+  "site_url": "https://tjmaxx.tjx.com/store/index.jsp",
+  "status": "partial",
+  "failure_reason": "All product-listing pages under /store/shop/ are gated by Akamai Bot Manager (a JS sensor/behavioral-challenge page is served instead of real content). RETRY (2026-08-25) tried substantially harder on tiers (a)/(b) than the first attempt and still could not get a category page through: (a) curl_cffi across 6 impersonation profiles (chrome131/124/120/110, safari17_0, edge101 - edge101 errored at the TLS/HTTP2 layer) all returned either the classic 'sec-bc-cpt-container' challenge stub or a 200 'Something went wrong' securityfailover page; a warmed session (homepage first, cookies carried) made no difference; probing for a separate Endeca/ATG structured-count API (Accept:application/json, ?format=json, ?Ns=0, /store/rest/model/atg/commerce/catalog/CategoryActor) found no such endpoint - all returned the same blocked HTML or 404, i.e. TJX exposes no unblocked count API the way this task hoped to find (unlike sister-brand Marshalls SR24, which never used such an API either - it got through via a live authenticated Chrome fingerprint, not a JSON endpoint). (b) Playwright headless with stealth args + mouse/scroll simulation: blocked. Playwright headed with the bundled Chromium: blocked (this time headed mode DID run to completion in this Windows sandbox, unlike the first attempt's report of a hung display - that constraint was not reproduced). Playwright headed with the real installed Chrome channel (channel='chrome', not bundled Chromium), with homepage warm-up, realistic multi-step mouse movement and scroll before every read: on isolated single-navigation tests this occasionally rendered the real homepage (title 'TJ Maxx Official Site...', ~350KB real DOM) - a genuine partial breakthrough beyond the first attempt - but every subsequent navigation to an actual /store/shop/ category page within that same session, and every fresh-browser single-shot attempt against a category page directly, still hit the Akamai challenge; the pass was inconsistent even for the homepage across repeated fresh launches (2 of 4 runs blocked at the homepage itself). No combination tried ever got a real rendered category listing page. Claude-in-Chrome tier remains unavailable - list_connected_browsers returned an empty list again this retry. Only robots.txt-permitted static resources (robots.txt itself and /store/resources/xml/categorySiteMap.xml) were reliably reachable; the category TREE below is built from that official sitemap (re-fetched and re-diffed this retry, confirmed unchanged), but qty and live h1/canonical confirmation could not be obtained for any leaf, so every row's qty is null with a MANUAL REVIEW flag.",
+  "notes": "ACCESS: tier (a) direct HTTP (curl_cffi, chrome110-131, safari17, edge101 impersonation, with and without a homepage warm-up to carry session cookies) succeeded only for robots.txt and /store/resources/xml/categorySiteMap.xml (both explicitly Allow-listed in robots.txt); every /store/shop/ category page returned an Akamai behavioral-challenge page, not real content. Also probed for a TJX Endeca/ATG structured-count API reachable independent of the HTML (Accept:application/json header, ?format=json, ?Ns=0 query params, and a guessed /store/rest/model/atg/commerce/catalog/CategoryActor REST path) - none exposed real JSON; all either mirrored the same blocked HTML or 404'd. Escalated to tier (b) Playwright: headless (stealth flag + homepage warm-up + synthetic mouse/scroll) hit the identical Akamai challenge page. Headed Playwright with the bundled Chromium ran successfully in this environment (no display issue this time) but was still blocked. Headed Playwright with the real installed Chrome browser channel (channel='chrome') plus a homepage warm-up (multi-step mouse movement, wheel scroll, dwell time) got past the challenge for the bare homepage in roughly half of repeated fresh-session attempts (a genuine improvement over every other method tried), but navigating on from there - or navigating to a category URL directly in a fresh session - was blocked every single time across many category-page attempts (Bed & Bath > Bath Towels, Bedding > Blankets & Throws/Comforters & Quilts/Duvet Covers/Pillows & Bedding Essentials/Sheets, Bath > Bath Accessories, Pillows & Decor > Blankets & Throws/Curtains & Window Treatments/Rugs/Throw Pillows/Baskets & Storage, Kitchen & Tabletop > Table & Kitchen Linens, Outdoor). Category-listing pages specifically appear to require a stronger behavioral/sensor_data proof than Playwright's synthetic CDP-driven mouse/scroll events can satisfy, regardless of browser binary or warm-up strategy. Escalated to tier (c) Claude-in-Chrome: mcp__claude-in-chrome__list_connected_browsers returned an empty list again this retry, i.e. no Chrome extension is connected to this session, so tier (c) is genuinely unavailable. Stopped per the first-block-stops-you rule after exhausting all three tiers with materially more effort than the prior attempt. TREE: built from the union of categorySiteMap.xml (robots.txt Allow: /store/resources/xml/categorySiteMap.xml), re-fetched fresh this retry and re-diffed node-for-node against the prior attempt's tree - identical, no missed or changed nodes - filtered to /store/shop/home* paths, the site's own Home-department category map. Home is organized as 'Shop By Category' (Bed & Bath, Furniture & Lighting, Kitchen & Tabletop, Luggage & Travel, Outdoor, Pillows & Decor, Stationery, plus seasonal Back to Campus/Fall Decor/Halloween/Holiday Decor collections), 'Shop By Room' (Bathroom/Bedroom/Kitchen & Dining Room/Living Room aggregator pages spanning multiple categories) and 'Shop By Style' (Global Home/Home Essentials). QTY: could not be captured for any row - every category-listing page is behind the Akamai challenge on every accessible tier, so no rendered count, JSON field, or pagination total was ever visible. All qty=null with flag='MANUAL REVIEW: qty not captured - /store/shop/ pages return an Akamai bot-challenge page on every access tier available (HTTP w/ multiple impersonation profiles and API-endpoint probing, headless Playwright, headed Playwright with both bundled Chromium and the real Chrome channel, no Claude-in-Chrome browser connected)'. EXCLUDED: Furniture & Lighting (Chairs & Seating, Lighting, Tables) - Furniture/Lighting domain, out of scope. Kitchen & Tabletop's Cookbooks/Cookware & Bakeware/Cutlery & Flatware/Dinnerware & Serveware/Drinkware - Kitchen & Dining domain. Luggage & Travel (Carry-On Luggage, Weekenders & Duffels) - apparel/travel bags, explicitly excluded by storage.md #6 ('Travel Bag -> NOT Storage'). Stationery, home-books, home-candles, home-decorative-accessories, home-frames, home-mirrors-wall-art, home-plants-planters - Decorative Home Accessories/Wall Decor domain (other workers). Back to Campus, Fall Decor, Halloween, Holiday Decor - seasonal collection landing pages, excluded per textile.md #27/#15 and storage.md #35 even though they duplicate real Bed & Bath/Pillows & Decor/Kitchen & Dining subcategories. Shop By Room (Bathroom/Bedroom/Kitchen & Dining Room/Living Room) and Shop By Style (Global Home/Home Essentials) - cross-category room/style aggregator pages that mix Furniture, Textile, Storage and Decor together on one listing, not a single-category subcategory page; excluded per the room-name-never-determines-classification principle and because a valid deeper subcategory exists for every genuine textile/storage item reachable from them. Bath Soaps - not textile/storage. Bath Accessories - excluded as genuinely ambiguous (could be shower caddies/storage, bath mats/textile, or soap dispensers/neither) with no way to verify actual contents; not forced into either array per textile.md #22/storage.md #42. Outdoor (home-shop-by-category-outdoor) - single node with no visible subcategory split in the sitemap and page content unverifiable (Akamai-blocked), so its Furniture-vs-Textile mix could not be confirmed; excluded rather than guessed. Pillows & Bedding Essentials - included in Textile at MEDIUM confidence (bed pillows/mattress protectors read as bedding-textile by name, but the exact product mix inside could not be verified).",
+  "textile_rows": [
+    {
+      "category": "Textile",
+      "sub_category": "Bed & Bath",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Bath",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Bath Towels",
+      "qty": null,
+      "link": "https://tjmaxx.tjx.com/store/shop/home-shop-by-category-bed-bath-bath-towels/_/N-2195141259",
+      "is_group": false,
+      "evidence": "Node path from robots.txt-permitted categorySiteMap.xml (Home > Shop By Category > Bed & Bath > Bath > Bath Towels); page unreachable for direct qty confirmation (Akamai bot challenge on all tiers)",
+      "flag": "MANUAL REVIEW: qty not captured - /store/shop/ pages return an Akamai bot-challenge page on every access tier available",
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Bedding",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Blankets & Throws",
+      "qty": null,
+      "link": "https://tjmaxx.tjx.com/store/shop/home-shop-by-category-bed-bath-bedding-blankets-throws/_/N-4262143911",
+      "is_group": false,
+      "evidence": "Node path from categorySiteMap.xml (Home > Shop By Category > Bed & Bath > Bedding > Blankets & Throws); page unreachable for direct qty confirmation (Akamai bot challenge on all tiers)",
+      "flag": "MANUAL REVIEW: qty not captured - /store/shop/ pages return an Akamai bot-challenge page on every access tier available",
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Comforters & Quilts",
+      "qty": null,
+      "link": "https://tjmaxx.tjx.com/store/shop/home-shop-by-category-bed-bath-bedding-comforters-quilts/_/N-2630366559",
+      "is_group": false,
+      "evidence": "Node path from categorySiteMap.xml (Home > Shop By Category > Bed & Bath > Bedding > Comforters & Quilts); page unreachable for direct qty confirmation (Akamai bot challenge on all tiers)",
+      "flag": "MANUAL REVIEW: qty not captured - /store/shop/ pages return an Akamai bot-challenge page on every access tier available",
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Duvet Covers",
+      "qty": null,
+      "link": "https://tjmaxx.tjx.com/store/shop/home-shop-by-category-bed-bath-bedding-duvet-covers/_/N-985361034",
+      "is_group": false,
+      "evidence": "Node path from categorySiteMap.xml (Home > Shop By Category > Bed & Bath > Bedding > Duvet Covers); page unreachable for direct qty confirmation (Akamai bot challenge on all tiers)",
+      "flag": "MANUAL REVIEW: qty not captured - /store/shop/ pages return an Akamai bot-challenge page on every access tier available",
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Pillows & Bedding Essentials",
+      "qty": null,
+      "link": "https://tjmaxx.tjx.com/store/shop/home-shop-by-category-bed-bath-bedding-pillows-bedding-essentials/_/N-1276962912",
+      "is_group": false,
+      "evidence": "Node path from categorySiteMap.xml (Home > Shop By Category > Bed & Bath > Bedding > Pillows & Bedding Essentials); page unreachable for direct qty or content confirmation (Akamai bot challenge on all tiers)",
+      "flag": "MANUAL REVIEW: qty not captured, and exact product mix inside (bed pillows/mattress protectors vs other) could not be verified",
+      "confidence": "MEDIUM"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Sheets",
+      "qty": null,
+      "link": "https://tjmaxx.tjx.com/store/shop/home-shop-by-category-bed-bath-bedding-sheets/_/N-1954978394",
+      "is_group": false,
+      "evidence": "Node path from categorySiteMap.xml (Home > Shop By Category > Bed & Bath > Bedding > Sheets); page unreachable for direct qty confirmation (Akamai bot challenge on all tiers)",
+      "flag": "MANUAL REVIEW: qty not captured - /store/shop/ pages return an Akamai bot-challenge page on every access tier available",
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Pillows & Decor",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Blankets & Throws",
+      "qty": null,
+      "link": "https://tjmaxx.tjx.com/store/shop/home-shop-by-category-pillows-decor-blankets-throws/_/N-4270462648",
+      "is_group": false,
+      "evidence": "Node path from categorySiteMap.xml (Home > Shop By Category > Pillows & Decor > Blankets & Throws) - distinct N-code/URL from the Bed & Bath > Bedding > Blankets & Throws node; page unreachable for direct qty confirmation (Akamai bot challenge on all tiers)",
+      "flag": "MANUAL REVIEW: qty not captured - /store/shop/ pages return an Akamai bot-challenge page on every access tier available",
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Curtains & Window Treatments",
+      "qty": null,
+      "link": "https://tjmaxx.tjx.com/store/shop/home-shop-by-category-pillows-decor-curtains-window-treatments/_/N-3596306771",
+      "is_group": false,
+      "evidence": "Node path from categorySiteMap.xml (Home > Shop By Category > Pillows & Decor > Curtains & Window Treatments); page unreachable for direct qty confirmation (Akamai bot challenge on all tiers)",
+      "flag": "MANUAL REVIEW: qty not captured - /store/shop/ pages return an Akamai bot-challenge page on every access tier available",
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Rugs",
+      "qty": null,
+      "link": "https://tjmaxx.tjx.com/store/shop/home-shop-by-category-pillows-decor-rugs/_/N-2379067347",
+      "is_group": false,
+      "evidence": "Node path from categorySiteMap.xml (Home > Shop By Category > Pillows & Decor > Rugs); page unreachable for direct qty confirmation (Akamai bot challenge on all tiers)",
+      "flag": "MANUAL REVIEW: qty not captured - /store/shop/ pages return an Akamai bot-challenge page on every access tier available",
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Throw Pillows",
+      "qty": null,
+      "link": "https://tjmaxx.tjx.com/store/shop/home-shop-by-category-pillows-decor-throw-pillows/_/N-164604053",
+      "is_group": false,
+      "evidence": "Node path from categorySiteMap.xml (Home > Shop By Category > Pillows & Decor > Throw Pillows); page unreachable for direct qty confirmation (Akamai bot challenge on all tiers)",
+      "flag": "MANUAL REVIEW: qty not captured - /store/shop/ pages return an Akamai bot-challenge page on every access tier available",
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Kitchen & Tabletop",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Table & Kitchen Linens",
+      "qty": null,
+      "link": "https://tjmaxx.tjx.com/store/shop/home-shop-by-category-kitchen-tabletop-table-kitchen-linens/_/N-1992543294",
+      "is_group": false,
+      "evidence": "Node path from categorySiteMap.xml (Home > Shop By Category > Kitchen & Tabletop > Table & Kitchen Linens); page unreachable for direct qty confirmation (Akamai bot challenge on all tiers)",
+      "flag": "MANUAL REVIEW: qty not captured - /store/shop/ pages return an Akamai bot-challenge page on every access tier available",
+      "confidence": "HIGH"
+    }
+  ],
+  "storage_rows": [
+    {
+      "category": "Storage",
+      "sub_category": "Pillows & Decor",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Baskets & Storage",
+      "qty": null,
+      "link": "https://tjmaxx.tjx.com/store/shop/home-shop-by-category-pillows-decor-baskets-storage/_/N-2832378117",
+      "is_group": false,
+      "evidence": "Node path from robots.txt-permitted categorySiteMap.xml (Home > Shop By Category > Pillows & Decor > Baskets & Storage); page unreachable for direct qty confirmation (Akamai bot challenge on all tiers)",
+      "flag": "MANUAL REVIEW: qty not captured - /store/shop/ pages return an Akamai bot-challenge page on every access tier available",
+      "confidence": "HIGH"
+    }
+  ]
+}

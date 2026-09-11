@@ -1,0 +1,39 @@
+{
+  "sr": 279,
+  "company": "Liberty London Home",
+  "brand_site": "libertylondon.com",
+  "country": "UK",
+  "site_url": "https://www.libertylondon.com/uk/department/home/",
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "ACCESS: robots.txt has no Claude-specific disallow and no site-wide block, so worked HTTP-first (curl). The site is Salesforce Commerce Cloud (demandware) with Algolia InstantSearch powering every PLP grid client-side, so raw HTML fetch shows nav/breadcrumb/links correctly but the product grid and results counter are injected by JS and are NOT present in the raw HTML (confirmed: hidden gtm-search-result-data field is a static stub, no SSR product state in the markup). Escalated to Tier 2 (Playwright/Chromium) to render pages and read the live '<N> RESULTS' counter plus the rendered nav tree - this worked cleanly, no blocks encountered. Also pulled the site's public Algolia credentials (appId Z519VQ03VH, search-only apiKey) from the page source to sanity-check product counts against the rendered counters; useful for confirming presence/absence but the category-hierarchy attributes were not configured as filterable facets so exact per-category counts were taken from the rendered PLP counter text, per qty-priority rules (displayed PLP total). DISCOVERY: Liberty's own top nav has NO dedicated Home-department Christmas branch - the Home department page (site_url) itself carries zero holiday nav items except a generic 'Christmas Shop: Now Open' banner link and a fabric 'Festive Collection' link. All genuine Christmas product taxonomy lives under a separate 'Christmas & Gifts' department at /uk/department/gifts/christmas/ ('Christmas Shop'), which nonetheless contains real home-decor product types (baubles/tree ornaments, home decorations) - included per the Seasonal rules' coexistence principle (site's actual seasonal taxonomy governs, not URL department prefix), scoped to only the home-decor-relevant branches (Baubles, Home Decorations), explicitly excluding the Christmas fashion/beauty/jewellery gift-guide branches per the Home-only scope instruction. STRUCTURE: Christmas Shop (root PLP, rendered '340 RESULTS') branches into exactly two real sub-categories: Baubles ('306 RESULTS') and Home Decorations ('30 RESULTS'). 306+30=336 vs the root's 340 (small residual of items sitting directly under Christmas Shop outside either child, or minor live-inventory drift between page loads) - close enough that Baubles+Home Decorations are treated as the real subset structure and Christmas Shop is kept as a grouping/parent row only (qty/link null) rather than double-counted as a third leaf. AMBIGUOUS/EXCLUDED - logged per skill Sec4 for cross-session visibility (also added to qa_notes.md): (1) Baubles further branches into 8 named style/print collections (Liberty Baubles, Cult Collectables [verified 127 results], London City, Alpine Forest, Snow Queen, Grand Pantomime, Fairground Brights, Florabunda Peacock) - these are design/style collections of the SAME product type (baubles), not distinct product-type sub-categories, so not extracted as separate rows (would double-count against the Baubles total and reflects the 'Collection = style filter, not category' pattern from the shared rules); Baubles is kept as the single leaf row with its own exact count. (2) 'Festive Collection' fabric line (/uk/department/fabrics/collections/festive-collection/, 5 results) - breadcrumb is Fabrics > Collections > Festive Collection, sibling to (not nested under) the Christmas & Gifts department; likely a themed print/pattern name rather than an actual Christmas-dated shopping category (rules explicitly warn not to assume every 'Festive' label maps to a specific holiday); excluded as an unresolved ambiguous case rather than a clean include. (3) 'Gift Inspiration' sub-tree under Christmas & Gifts (Jellycat Gifts, Beauty Gifts, Home Gifts [158 results], Food Gifts, Gifts that Give Back, By Occasion > Wedding, Gifts Under GBP250, Gift Cards) - confirmed via breadcrumb (Christmas & Gifts > Gift Inspiration > Home Gifts) to be curated cross-department gift-guide/recipient/price pages, matching the rules' explicit Gift Guide/Gift Inspiration exclusion; also 'Home Gifts' mixes non-decor gift items and is not itself a seasonal-dated category. OTHER HOLIDAYS - checked via the site's own Algolia product index (search-only key) rather than the disallowed /*/search URL path: Halloween (7 hits), Easter (33), Valentine (4), New Year (1), Thanksgiving (0), Diwali (0) all returned only scattered incidental product-name matches with zero results carrying any dedicated category/breadcrumb - no genuine PLP exists for any of these. Mother's Day (109) and Father's Day (78) returned more hits, but sampled __primary_category values for those hits resolved to ordinary departments (Beauty, Women, etc.) with no distinct Mother's/Father's Day category path anywhere in the department nav (content-verified per task instruction not to include on name-match alone) - correctly excluded, no dedicated seasonal category exists. No Diwali/Holi/Eid/other South-Asian festival presence at all (UK luxury department store). CONCLUSION: exactly one genuine seasonal holiday represented in Home-relevant taxonomy - Christmas - via the Christmas Shop > {Baubles, Home Decorations} structure.",
+  "rows": [
+    {
+      "category": "Christmas",
+      "sub_category": "Christmas Shop",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": "Parent/grouping node: https://www.libertylondon.com/uk/department/gifts/christmas/ rendered '340 RESULTS' as its own combined PLP header, but its two real children (Baubles 306 + Home Decorations 30 = 336) account for nearly the entire total; kept as a name-only grouping row per parent/child rule to avoid double-counting against its children.",
+      "flag": null
+    },
+    {
+      "category": "Christmas",
+      "sub_category": "Christmas Baubles",
+      "qty": 306,
+      "link": "https://www.libertylondon.com/uk/department/gifts/christmas/baubles/",
+      "is_group": false,
+      "evidence": "Playwright-rendered PLP shows '306 RESULTS' in the Algolia results counter; page title 'Christmas Baubles | Liberty'.",
+      "flag": null
+    },
+    {
+      "category": "Christmas",
+      "sub_category": "Christmas Home Decorations",
+      "qty": 30,
+      "link": "https://www.libertylondon.com/uk/department/gifts/christmas/home-decorations/",
+      "is_group": false,
+      "evidence": "Playwright-rendered PLP shows '30 RESULTS' in the Algolia results counter; page title 'Christmas Home Decor | Liberty'.",
+      "flag": null
+    }
+  ]
+}

@@ -1,0 +1,52 @@
+{
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "Burrow (Hydrogen/Shopify-Oxygen headless). Direct HTTP fetch throughout, no blocking, robots.txt clean. Site's own nav exposes a genuine parent/child taxonomy: home-page + mega-menu link labelled 'Warehouse Sale' / 'Up to 70% off Warehouse' -> /collections/clearance (H1 'Warehouse', meta 'Save on quality furniture with warehouse pricing... while supplies last', breadcrumb Home>Bestsellers>Warehouse[sic on breadcrumb 3rd segment likely a CMS quirk]), with 3 nav-linked children by breadcrumb 'Warehouse Sale > {Seating|Outdoor|Storage}': /collections/clearance-seating, /collections/clearance-outdoor, /collections/clearance-storage. Verified via Playwright (unique /products/ base handles in <main>, Load-more exhausted) that parent and children are genuinely DIFFERENT product sets, not aliases: parent(40) vs clearance-seating(40) share only 24/40 (16 unique each side); parent(40) vs clearance-outdoor(50) share only 6/50 -- so each is a distinct real listing, kept as separate rows per brief. Sitemap also lists /collections/clearance-dining, /collections/clearance-rugs, /collections/clearance-pillows and /collections/labor-day-clearance, none linked from current nav. The first three (dining/rugs/pillows) rendered 0 products (confirmed empty via main-grid DOM count) -- dropped per 'drop zero-product listings' rule, not emitted as rows. /collections/labor-day-clearance DOES have live products (42, verified same DOM method) and its title/breadcrumb literally say 'Labor Day Clearance', so it is recorded -- but flagged ambiguous: its breadcrumb is flat (Home>Labor Day Clearance, NOT nested under 'Warehouse Sale' like the 3 confirmed children), the homepage's own banner calls the current event a 'Labor Day SALE' (temporary/seasonal), and its product mix (mostly Dunes teak outdoor + Relay outdoor sectionals, 35 of 42 items) only overlaps 7/42 with the Warehouse clearance parent -- consistent with a time-limited end-of-summer outdoor promotional sale rather than permanent outlet/discontinued stock, though the literal 'Clearance' naming argues the other way. Checked for other clearance/outlet/final-sale/last-chance wording via full sitemap grep (156 handles) and homepage nav dump -- no other candidates found.",
+  "rows": [
+    {
+      "category": "Clearance",
+      "sub_category": "Warehouse Sale",
+      "qty": 40,
+      "link": "https://burrow.com/collections/clearance",
+      "is_group": true,
+      "evidence": "Playwright DOM count: unique /products/ base handles in <main> after exhausting 'Load more' = 40. Page H1='Warehouse', meta description 'Save on quality furniture with warehouse pricing... Limited-time deals... while supplies last', nav label 'Warehouse Sale' / 'Up to 70% off Warehouse'.",
+      "flag": null
+    },
+    {
+      "category": "Clearance",
+      "sub_category": "Warehouse Sale: Seating",
+      "qty": 40,
+      "link": "https://burrow.com/collections/clearance-seating",
+      "is_group": false,
+      "evidence": "Playwright DOM count = 40 after exhausting Load-more. Breadcrumb JSON-LD: Home > Warehouse Sale > Seating.",
+      "flag": null
+    },
+    {
+      "category": "Clearance",
+      "sub_category": "Warehouse Sale: Outdoor",
+      "qty": 50,
+      "link": "https://burrow.com/collections/clearance-outdoor",
+      "is_group": false,
+      "evidence": "Playwright DOM count = 50 after exhausting Load-more. Breadcrumb JSON-LD: Home > Warehouse Sale > Outdoor.",
+      "flag": null
+    },
+    {
+      "category": "Clearance",
+      "sub_category": "Warehouse Sale: Storage",
+      "qty": 2,
+      "link": "https://burrow.com/collections/clearance-storage",
+      "is_group": false,
+      "evidence": "Playwright DOM count = 2, no Load-more button present (page loaded complete on first render). Breadcrumb JSON-LD: Home > Warehouse Sale > Storage.",
+      "flag": null
+    },
+    {
+      "category": "Clearance",
+      "sub_category": "Labor Day Clearance",
+      "qty": 42,
+      "link": "https://burrow.com/collections/labor-day-clearance",
+      "is_group": false,
+      "evidence": "Playwright DOM count = 42 after exhausting Load-more. Breadcrumb JSON-LD: Home > Labor Day Clearance (flat, not nested under Warehouse Sale).",
+      "flag": "MANUAL REVIEW: AMBIGUOUS SALE/CLEARANCE - page title/breadcrumb literally say 'Labor Day Clearance' and it has real, distinct products (only 7/42 overlap with the Warehouse Sale parent), but it is not nested under the site's own 'Warehouse Sale' taxonomy (flat breadcrumb), the homepage banner calls the live event a 'Labor Day SALE' (a named-holiday, presumably time-limited promotion), and its contents are 35/42 outdoor teak/sectional SKUs -- reads as a seasonal end-of-summer outdoor sale rather than permanent outlet/discontinued stock. Recording per brief's uncertain-case instruction rather than guessing."
+    }
+  ]
+}

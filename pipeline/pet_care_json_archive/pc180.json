@@ -1,0 +1,79 @@
+{
+  "status": "partial",
+  "failure_reason": "davidjones.com sits behind Imperva/Incapsula (confirmed again on this pass: direct curl_cffi HTTP fetch and headless Playwright both blocked identically to the prior pass; no AAAA record for www.davidjones.com so no IPv6 route). Escalated to Claude-in-Chrome (robots.txt has no Claude-specific disallow). Homepage and the Pets department landing page (/home/pets) loaded fine after the JS challenge resolved, and 3 of 7 Pet Care sub-category pages returned an exact rendered 'N Results' count. The other 3 sub-category pages (Pet Feeding & Bowls, Pet Grooming, Dog Waste Bags) served an hCaptcha 'Just a quick check' challenge on load; per policy CAPTCHAs are never solved, so those qty values are unresolved. One sub-category (Pet Collars & Leads) returned a persistent generic client-side app error ('Oops. Something went wrong') across 3 separate fresh-tab load attempts - a site bug, not a bot-detection signature - so its qty is also unresolved. Stopped further requests to the host once the pattern was established rather than continuing to retry through hCaptcha walls.",
+  "notes": "Prior Home-Decor pass (notes/180.md) used the now-banned translate.goog proxy; this pass re-verified access fresh via Claude-in-Chrome only. Site nav (Home & Food > Pets, href /home/pets) exposes a dedicated Pets department with 115 aggregate results across a 'Category' facet listing exactly 7 sub-categories (confirmed via accessibility tree of the left-hand facet panel, not inferred): Pet Clothes (/home/pets/clothing), Pet Collars & Leads (/home/pets/collars-leads), Pet Feeding & Bowls (/home/pets/food-bowls), Pet Toys (/home/pets/toys), Pet Grooming (/home/pets/grooming), Pet Beds & Carriers (/home/pets/beds-carriers), Dog Waste Bags (/home/pets/dog-waste-bags-holders). 'Top Brands' also appears in that facet list but is a brand filter (href has ?refine=brand_name=...), not a category, so excluded per the navigation/marketing-page rule. The 115 total on the parent /home/pets page is an aggregate across all sub-categories, not used as a leaf qty (recorded as the group row with qty:null per the grouping-row rule). All 7 confirmed sub-categories are Tier-1 decisive Pet Care signals (clothing, collars & leads, feeding & bowls, toys, grooming, beds & carriers, waste bags) - no pet-food/consumable or medical/veterinary categories were found in the facet list, so no policy-gap flags apply. Confirmed exact qty via the rendered '<N> Results' header (curl_cffi/Playwright could not reach this page at all, so this count came only from the CDP-rendered DOM): Pet Clothes=3, Pet Toys=41, Pet Beds & Carriers=21. Pet Feeding & Bowls, Pet Grooming, and Dog Waste Bags could not be confirmed due to an hCaptcha wall (not solved, per policy) - recorded as qty:null with a MANUAL REVIEW flag; their category identity and URL are still certain from the facet-panel enumeration on the parent page, only the exact count is unverified. Pet Collars & Leads hit a persistent app-level error (3/3 fresh-tab attempts) unrelated to bot detection - also recorded as qty:null with a MANUAL REVIEW flag.",
+  "rows": [
+    {
+      "category": "Pets",
+      "sub_category": "Pets",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Pets",
+      "sub_category": "Pet Clothes",
+      "qty": 3,
+      "link": "https://www.davidjones.com/home/pets/clothing",
+      "is_group": false,
+      "evidence": "rendered listing header '3 Results' on https://www.davidjones.com/home/pets/clothing",
+      "flag": null
+    },
+    {
+      "category": "Pets",
+      "sub_category": "Pet Collars & Leads",
+      "qty": null,
+      "link": "https://www.davidjones.com/home/pets/collars-leads",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: qty not verified - page returned a persistent client-side app error ('Oops. Something went wrong') across 3 separate fresh-tab load attempts, not a bot-detection block; category confirmed to exist (and this is its URL) via the Pets department facet-panel enumeration"
+    },
+    {
+      "category": "Pets",
+      "sub_category": "Pet Feeding & Bowls",
+      "qty": null,
+      "link": "https://www.davidjones.com/home/pets/food-bowls",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: qty not verified - page served an hCaptcha 'Just a quick check' bot-check challenge on load; per policy CAPTCHAs are never solved, so extraction stopped. Category confirmed to exist (and this is its URL) via the Pets department facet-panel enumeration"
+    },
+    {
+      "category": "Pets",
+      "sub_category": "Pet Toys",
+      "qty": 41,
+      "link": "https://www.davidjones.com/home/pets/toys",
+      "is_group": false,
+      "evidence": "rendered listing header '41 Results' on https://www.davidjones.com/home/pets/toys",
+      "flag": null
+    },
+    {
+      "category": "Pets",
+      "sub_category": "Pet Grooming",
+      "qty": null,
+      "link": "https://www.davidjones.com/home/pets/grooming",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: qty not verified - page served an hCaptcha 'Just a quick check' bot-check challenge on load; per policy CAPTCHAs are never solved, so extraction stopped. Category confirmed to exist (and this is its URL) via the Pets department facet-panel enumeration"
+    },
+    {
+      "category": "Pets",
+      "sub_category": "Pet Beds & Carriers",
+      "qty": 21,
+      "link": "https://www.davidjones.com/home/pets/beds-carriers",
+      "is_group": false,
+      "evidence": "rendered listing header '21 Results' on https://www.davidjones.com/home/pets/beds-carriers",
+      "flag": null
+    },
+    {
+      "category": "Pets",
+      "sub_category": "Dog Waste Bags",
+      "qty": null,
+      "link": "https://www.davidjones.com/home/pets/dog-waste-bags-holders",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: qty not verified - page served an hCaptcha 'Just a quick check' bot-check challenge on load; per policy CAPTCHAs are never solved, so extraction stopped. Category confirmed to exist (and this is its URL) via the Pets department facet-panel enumeration"
+    }
+  ]
+}

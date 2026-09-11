@@ -1,0 +1,70 @@
+{
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "Access: direct HTTP fetch, same Next.js SSR storefront, exact totalProductsFromServer field in __NEXT_DATA__ for every PLP. robots.txt explicitly disallows crawling /ae/en/c/clearance-sale/* (for search-engine bots) but the page is directly fetchable and returns full content - not a wall. Discovery: (1) homepage mega-menu (411 category paths) had no Clearance/Outlet/Final-Sale link visible; (2) category_sitemap_ae_en.xml (1539 URLs) keyword-scanned for clearance/outlet/final-sale/last-chance/end-of-line/discontinued - found a 'Clearance Sale' hub with 20 children, plus 'sale/clearance-prices', plus several other-market/event-named clearance-ish pages; (3) site search (/ae/en/catalogsearch?q=clearance) returned 0 (platform's search likely needs a different param on this template; not conclusive alone, but the exhaustive sitemap scan covers this). CRITICAL Sale-vs-Clearance test applied throughout: the site's generic '/ae/en/c/sale' root (5042 products, title 'Furniture Sale Upto 70% Discounts in UAE') is a temporary promotional Sale page, NOT Clearance, and is excluded. 'Clearance Sale' (/ae/en/c/clearance-sale) is a distinct, separately-named hub (breadcrumb category_name literally 'Clearance Sale') with 20 real furniture-type children (2-seater/3-seater/corner sofas, recliners, sofa-beds, bedroom furniture, mattresses, seating, dining furniture, outdoor, office furniture, rugs-and-carpets, storage units, TV/media units, tables & stands) - this passes the site's-own-taxonomy test cleanly. Only 5 of those 20 children carry a non-zero product count as of this fetch (the rest returned totalProductsFromServer=0 and were dropped per the zero-qty rule: 2-seater-sofas, bedroom-furniture, mattresses, corner-sofas, dining-furniture, outdoor, office-furniture, recliners, rugs-and-carpets, tv-media-units, and the 'Sofas & Recliners' mid-level node itself). Also kept 'sale/clearance-prices' (293 products, page title literally 'Clearance Prices') even though it is nested one level under the generic 'Sale' parent in its breadcrumb - flagged for manual review since it sits under the generic Sale branch rather than the dedicated Clearance Sale hub, though its own page name is an explicit clearance term. Its 293-count does not match the Clearance Sale hub's ~438 non-zero total so it is kept as a separate listing rather than merged/deduped, since no evidence the two are the same underlying query. EXCLUDED as zero-product / dropped: rugs-clearance-ae (0), kitchen/ramadan-clearance-sale (0, and separately would fail the test anyway as a seasonal Ramadan campaign name), furnishings/floor-covering/clearance-price-rugs (0). EXCLUDED as other-market artifacts or temporary event promos found only via the shared cross-market sitemap (not in AE mega-menu/footer/homepage): rugs-clearance-bh, rugs-clearance-om, bh-last-chance, om-last-chance, qa-last-chance, mr-25-last-chance-deals-oman, mr25-last-chance-deals, 3-day-final-sale, outdoor/dss-final-sale.",
+  "rows": [
+    {
+      "category": "Clearance",
+      "sub_category": "Clearance Sale",
+      "qty": 2,
+      "link": "https://www.danubehome.com/ae/en/c/clearance-sale",
+      "is_group": true,
+      "evidence": "__NEXT_DATA__ props.pageProps.totalProductsFromServer=2 (root hub's own directly-tagged count); breadcrumb category_name 'Clearance Sale'; real non-zero children listed as separate rows below",
+      "flag": null
+    },
+    {
+      "category": "Clearance",
+      "sub_category": "3-Seater Sofas (Clearance Sale)",
+      "qty": 424,
+      "link": "https://www.danubehome.com/ae/en/c/clearance-sale/sofas-recliners/3-seater-sofas",
+      "is_group": false,
+      "evidence": "__NEXT_DATA__ props.pageProps.totalProductsFromServer=424",
+      "flag": null
+    },
+    {
+      "category": "Clearance",
+      "sub_category": "Sofa Beds (Clearance Sale)",
+      "qty": 8,
+      "link": "https://www.danubehome.com/ae/en/c/clearance-sale/sofas-recliners/sofa-beds",
+      "is_group": false,
+      "evidence": "__NEXT_DATA__ props.pageProps.totalProductsFromServer=8",
+      "flag": null
+    },
+    {
+      "category": "Clearance",
+      "sub_category": "Clearance Sale Seating",
+      "qty": 2,
+      "link": "https://www.danubehome.com/ae/en/c/clearance-sale/seating",
+      "is_group": false,
+      "evidence": "__NEXT_DATA__ props.pageProps.totalProductsFromServer=2; page title 'Clearance Sale Seating'",
+      "flag": null
+    },
+    {
+      "category": "Clearance",
+      "sub_category": "Storage Units (Clearance Sale)",
+      "qty": 2,
+      "link": "https://www.danubehome.com/ae/en/c/clearance-sale/storage-units",
+      "is_group": false,
+      "evidence": "__NEXT_DATA__ props.pageProps.totalProductsFromServer=2",
+      "flag": null
+    },
+    {
+      "category": "Clearance",
+      "sub_category": "Tables & Stands (Clearance Sale)",
+      "qty": 2,
+      "link": "https://www.danubehome.com/ae/en/c/clearance-sale/tables-stands",
+      "is_group": false,
+      "evidence": "__NEXT_DATA__ props.pageProps.totalProductsFromServer=2",
+      "flag": null
+    },
+    {
+      "category": "Clearance",
+      "sub_category": "Clearance Prices",
+      "qty": 293,
+      "link": "https://www.danubehome.com/ae/en/c/sale/clearance-prices",
+      "is_group": false,
+      "evidence": "__NEXT_DATA__ props.pageProps.totalProductsFromServer=293; page title 'Clearance Prices'; breadcrumb Sale > Clearance Prices",
+      "flag": "MANUAL REVIEW: AMBIGUOUS SALE/CLEARANCE - the page's own name ('Clearance Prices') is an explicit clearance term, but its breadcrumb nests it under the generic 'Sale' branch (Sale > Clearance Prices) rather than under the dedicated 'Clearance Sale' hub, so it is unclear whether the site treats this as a genuine permanent-clearance listing or as a filtered price-band view of the temporary Sale campaign."
+    }
+  ]
+}

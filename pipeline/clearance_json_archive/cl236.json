@@ -1,0 +1,25 @@
+{
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "Access: direct HTTP fetch (tier 1) worked throughout; site is Angular/Spartacus on SAP Commerce Cloud, exact counts sourced from the OCC REST API (apisap.fabindia.com/occ/v2/fabindiab2c/products/search?query=:relevancy:allCategories:<slug>), reading pagination.totalResults - the same authoritative method used in the prior Home-Decor pass for this company (facet-widget numbers are not used). Sale-vs-Clearance reasoning: Fabindia's hamburger nav has a top-level 'Sale' node structurally identical to 'New Arrivals' (same depth, permanent presence, not a named seasonal campaign banner) with children All in Sale, Women, Men, Kids, Home & Living, Furniture, Personal Care, Food. Resolved the Home & Living and Furniture child links via the CMS components OCC endpoint to /shop/sale-home-living and /shop/sale-furniture respectively (excluded Women/Men/Kids=apparel, Personal Care and Food=non-decor departments). Checked page <title>/meta description/on-page SEO text of both pages plus the whole sitemap-category.xml (720KB) for the words Clearance/Outlet/Final Sale/Last Chance/End of Line/Discontinued - zero hits anywhere on the site; both pages are literally titled 'Buy at Home & Living Sale Online' / 'Buy at Furniture Sale Online', i.e. plain 'Sale', which per the brief should NOT be auto-classified as Clearance. However, spot-checked product records returned by the sale-home-living API query and most (not all) carry the site's own 'sale': true product attribute, consistent with genuine markdowns rather than an arbitrary filter; combined with the section's permanent (non-campaign) placement in the main nav, this has clearance-like characteristics without clearance-specific wording. Treated as the brief's explicit ambiguous case: recorded both rows with a MANUAL REVIEW flag rather than including or excluding outright. Also found ~10 deeper per-subcategory sale-<slug> pages nested under Home & Living (e.g. sale-home-decor=90, sale-kitchen-dining=284, sale-lighting=1, sale-storage-utility=1) but reported at the department level (Home & Living / Furniture, matching the site's actual main-nav depth for this concept) rather than itemizing every leaf subcategory, to avoid re-deriving the full category catalog structure covered by other category-specific deliverables. Scope: excluded Women/Men/Kids apparel sale sections and Food/Personal Care sale sections as non-decor per task instructions.",
+  "rows": [
+    {
+      "category": "Clearance",
+      "sub_category": "Home & Living Sale",
+      "qty": 864,
+      "link": "https://www.fabindia.com/shop/sale-home-living",
+      "is_group": false,
+      "evidence": "OCC API https://apisap.fabindia.com/occ/v2/fabindiab2c/products/search?query=:relevancy:allCategories:sale-home-living -> pagination.totalResults=864, totalPages=36 (36x24=864, exact, verified last page returns a full 24 products with no overflow); page <title>Buy at Home & Living Sale Online | Fabindia</title>",
+      "flag": "MANUAL REVIEW: AMBIGUOUS SALE/CLEARANCE - page and entire site only ever use the word 'Sale', never Clearance/Outlet/Final Sale/Last Chance/End of Line; but it is a permanent standing nav section (sibling of New Arrivals in the main hamburger menu, not a named seasonal/festival campaign) and sampled products carry the site's own 'sale': true attribute, so it is plausibly clearance-style permanent markdown merchandising rather than a temporary promo - could not resolve with certainty from page evidence alone"
+    },
+    {
+      "category": "Clearance",
+      "sub_category": "Furniture Sale",
+      "qty": 7,
+      "link": "https://www.fabindia.com/shop/sale-furniture",
+      "is_group": false,
+      "evidence": "OCC API https://apisap.fabindia.com/occ/v2/fabindiab2c/products/search?query=:relevancy:allCategories:sale-furniture -> pagination.totalResults=7, totalPages=1; page <title>Buy at Furniture Sale Online | Fabindia</title>",
+      "flag": "MANUAL REVIEW: AMBIGUOUS SALE/CLEARANCE - same reasoning as the Home & Living Sale row: plain 'Sale' wording, but permanent standing nav placement mirroring New Arrivals"
+    }
+  ]
+}

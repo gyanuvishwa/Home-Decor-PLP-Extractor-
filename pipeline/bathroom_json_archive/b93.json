@@ -1,0 +1,79 @@
+{
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ACCESS: direct curl_cffi fetch, HTTP 200 on every URL (chrome124 / safari18_0_ios), no WAF, same route as the Furniture and Home-Decor passes. ROBOTS: https://www.rockettstgeorge.co.uk/robots.txt fetched FIRST. It is the standard Shopify agent-aware file - a single 'User-agent: *' group with 'Allow: /' plus disallows for /admin, /cart, /checkout(s), /orders, /account, /services, /sf_*, /cart.js, /recommendations/products and the sort_by / multi-filter crawl traps. There is NO ClaudeBot / anthropic-ai / Claude-Web group and no Disallow covering /collections/. Nothing I requested is disallowed: I used only bare /collections/<handle> and /collections/<handle>/products.json (never a sort_by or multi-filter URL). TREE: taken from the site's own desktop mega-menu embedded in the homepage HTML. Bathroom is ONE node, data-menu-handle=\"accessories\" -> <h4><a href=\"/collections/bathroom\">Bathroom</a></h4>, and its <ul depth=\"1\"> is empty, i.e. the mega-menu gives it no children. The mobile drawer menu (drawer-menu__link href=\"/collections/bathroom\") agrees. No other top-level menu (new/kitchen/wall-decor/furniture/lighting/gifts/garden/sale/inspiration) contains a bathroom node. TREE (beyond the nav): the full collection list was swept via /collections.json?limit=250 over 2 pages = 336 collections, filtered with a bath|shower|toilet|wc|basin|sink|vanity|mirror|soap|towel|tap|faucet|sanitary regex over handle+title. That surfaced exactly three genuine bathroom collections - bathroom, bathroom-mirrors, bathroom-lighting - plus the textile node bathmats-towels, the empty curtains-shower-curtains node and three styling edits. 'Bathroom Mirrors' is not in the mega-menu but IS linked from the Bathroom category page's own body copy (<a href=\".../collections/bathroom-mirrors\" title=\"bathroom mirror\">), renders h1 'Bathroom Mirrors' and holds 3 live products, so it is recorded as a Bathroom leaf per rule 10 (bathroom mirrors must never be skipped). It is NOT a subset of /collections/bathroom (product-id sets compared: only 1 of its 3 products, 'Small Pretty Gold Hanging Mirror', also sits in the Bathroom collection), so /collections/bathroom is not a parent URL being recorded over its children - the two are sibling listings and both are recorded under a 'Bathroom' grouping row. QTY: the Shopify global /collections.json products_count is WILDLY INFLATED on this store (the same defect the Furniture pass flagged: it reports bathroom=160 vs the real 44, bathroom-mirrors=17 vs 3, bathroom-lighting=3 vs 1) and was NOT used for any number. Every qty comes from four mutually-agreeing reads on the collection page itself: (1) the rendered header \"You're viewing 1-N of N products\", (2) the filter-bar \"N Results\", (3) the theme attribute data-collection-products-count, (4) exhaustive paging of /collections/<handle>/products.json?limit=250 counting unique product ids. All four agreed on every node: Bathroom 44/44/44/44, Bathroom Mirrors 3/3/3/3, Bathroom Lighting 1/1/1/1, Bath Mats & Towels 9/9/9/9. VERIFICATION: counts discriminate (44 / 3 / 1 / 9 / 14 / 11 / 22 - no site-wide constant); every fetched page's <h1> matched the node requested (Bathroom, Bathroom Mirrors, Bathroom Lighting, Bath Mats & Towels); a second cache-bypassing read of all five listing URLs a few minutes later returned identical numbers, so no intra-session drift. Contents were eyeballed: the 44 Bathroom products are soap dispensers/dishes, bathroom tumblers, toothbrush holders, storage canisters, a brass toilet roll holder, bathroom shelves, tissue boxes, loo/bathroom door signs and bath mats - a genuine mixed bathroom-accessories listing, recorded whole as the site presents it (no per-product splitting, no aggregation). EXCLUDED: /collections/bathroom-lighting -> Lighting (rule 19). /collections/bathmats-towels and /collections/curtains-shower-curtains -> Textile (rules 15/20); the Curtains node is currently empty (0 products) in any case. Three bathroom styling edits (spa-bathroom 14, laid-back-luxe-bathroom-edit 11, vintage-glamour-bathroom-edit 22) are 'Get The Look' look-book pages, unlinked from the nav, dropped under rule 25. Site-wide mirror collections (mirrors 43, decorative-mirrors, wall-mirrors, round-mirrors, floor-mirrors, picture-wall-mirrors, mirrored-wall-art, convex-mirror-sets, outdoor-garden-mirrors, new-mirrors, mirror-sale) are general Wall Decor mirrors under the Wall Decor mega-menu, not bathroom mirrors, and are left to Wall Decor. 'Utility & Storage' is a utility-room/general-storage node, not bathroom. RSG sells no sanitaryware, baths, showers, taps, basins or bathroom furniture - confirmed against all 336 collection titles. DEDUP: lib/dedup.already_extracted() run on every candidate leaf and on every routed-out URL (bathroom, bathroom-mirrors, bathroom-lighting, bathmats-towels, curtains-shower-curtains, utility-storage-1) - NO hits, none of them appear in Furniture.xlsx or Final.xlsx, so nothing was dropped for prior extraction.",
+ "rows": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom",
+   "qty": 44,
+   "link": "https://www.rockettstgeorge.co.uk/collections/bathroom",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Mirrors",
+   "qty": 3,
+   "link": "https://www.rockettstgeorge.co.uk/collections/bathroom-mirrors",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  }
+ ],
+ "review": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Lighting",
+   "qty": 1,
+   "issue": "ROUTED TO LIGHTING: primary product type is lighting (rules 11/19). Live collection, h1 'Bathroom Lighting', 1 product ('Ribbed Boulevard Orb Indoor/Outdoor Ceiling Light'). Not linked from any nav node.",
+   "link": "https://www.rockettstgeorge.co.uk/collections/bathroom-lighting"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Mats & Towels",
+   "qty": 9,
+   "issue": "ROUTED TO TEXTILE: bath towels and textile bath mats (rules 15/20). Site places it under Accessories > Soft Furnishings, not under Bathroom.",
+   "link": "https://www.rockettstgeorge.co.uk/collections/bathmats-towels"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Curtains (incl. shower curtains)",
+   "qty": 0,
+   "issue": "ROUTED TO TEXTILE: nav node 'Curtains' whose handle is curtains-shower-curtains, sits under Accessories > Soft Furnishings. Verified EMPTY right now - page renders no product count / no grid and products.json returns 0 products - so nothing to record either way.",
+   "link": "https://www.rockettstgeorge.co.uk/collections/curtains-shower-curtains"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Spa Bathroom",
+   "qty": 14,
+   "issue": "EXCLUDED (rule 25): styling 'edit' collection, not a catalogue subcategory; unlinked from the nav and from the Bathroom page. Recorded here so it is not silently skipped.",
+   "link": "https://www.rockettstgeorge.co.uk/collections/spa-bathroom"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Laid-Back Luxe (bathroom edit)",
+   "qty": 11,
+   "issue": "EXCLUDED (rule 25): 'Get The Look' styling edit (handle laid-back-luxe-bathroom-edit), promotional look-book page, not a subcategory listing.",
+   "link": "https://www.rockettstgeorge.co.uk/collections/laid-back-luxe-bathroom-edit"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Vintage Glamour (bathroom edit)",
+   "qty": 22,
+   "issue": "EXCLUDED (rule 25): styling edit (handle vintage-glamour-bathroom-edit), promotional look-book page, not a subcategory listing.",
+   "link": "https://www.rockettstgeorge.co.uk/collections/vintage-glamour-bathroom-edit"
+  }
+ ],
+ "_reconstructed_from": "Bathroom.xlsx delivered 2026-09-01 (checkpoint), not original worker JSON"
+}

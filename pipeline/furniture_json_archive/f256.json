@@ -1,0 +1,30 @@
+{
+  "sr": 256,
+  "company": "The Bombay Store",
+  "brand_site": "thebombaystore.com",
+  "country": "India",
+  "site_url": "https://www.thebombaystore.com/",
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "Shopify store, reached directly via Chrome (no Cloudflare/challenge encountered on this pass; robots.txt has no Claude-specific disallow, general 'Allow: /'). Read the mega-menu (a[href*='/collections/'] scan) plus collections.json (250-limit) for every handle/title containing furniture or chowki-related keywords, then confirmed via same-origin fetch() which handles are actually linked from the live nav: /collections/home-decor-furniture ('Furniture', child of the Home Decor department) and /collections/home-accents-chowki ('Chowki', child of Home Accents). Two other handles (/collections/furniture-1, /collections/chowki) exist but are NOT linked anywhere in the nav - furniture-1 is a legacy duplicate with only 2 products incl. a non-furniture bookend, and chowki is an empty (0-product) dead collection; both rejected as non-canonical per the sitemap/orphan-collection check. Also pulled the full product catalog (1565 products via /products.json pagination) and keyword/product_type-scanned it for furniture terms (table, chair, stool, mandir, temple, pedestal, cabinet, rack, shelf, sofa, wardrobe, bookcase, nightstand, dresser, recliner, ottoman, daybed, sideboard, bench, bar stool/cart, tv/media unit, desk, almirah, diwan, takhat, etc.) to catch furniture scattered outside a dedicated department (per the SR105-127 trap notes). This surfaced 4 extra candidates - two 'Wood Pedestal with Bells', a 'Brass Table in 2 Tone Finish 18 in', and an 'Acacia Wood Mandir 30x16x39 in' (a genuine home-temple-cabinet-sized piece) - all four carry product_type 'Artefacts - Idols & Figurines - Masterpieces/Wood/Brass' and have NO live collection tags at all (orphan products only reachable via the raw product feed or a direct product-detail URL, not through any category page). Per Rule 3 (no product-detail-page-only extraction) and the site's own classification of them as decor/idol artefacts rather than furniture, these were inspected and excluded, not turned into rows. The 'Furniture' collection (home-decor-furniture) itself mixes categories: its site-rendered header says '5 products', but full products.json enumeration (reached the true end, 5/5 matches the header) shows 2 of the 5 are floor cushions (textiles, out of scope for this task) and only 3 are genuine furniture (an elephant-motif accent table, an elephant-motif wood stool, and a 5-drawer teakwood chest of drawers). qty for that row is reported as 3, the exact enumerated furniture-only count, not the site's raw 5-product header, and flagged accordingly. The 'Chowki' collection (home-accents-chowki) is homogeneous: site header '4 products', cross-checked via products.json enumeration (4/4 match) - all 4 are chowki-family low wooden/brass stools or stands, classified as furniture consistent with the prior Home-Decor pass's own note that Chowki is 'furniture' (explicitly excluded from that pass's decor scope for that reason). One of the 4 chowki items carries an internal product_type of 'Idols & Figurines - Wood' rather than a Chowki-specific type; flagged for visibility but kept in the count since it is still a physical chowki (low stool/stand) object. No other furniture department, room-based furniture section, or product-type section exists anywhere in the nav or sitemap; the company is fundamentally a gifting/artefacts/tableware/decor retailer with only a token furniture assortment.",
+  "rows": [
+    {
+      "category": "Furniture",
+      "sub_category": "Furniture",
+      "qty": 3,
+      "link": "https://www.thebombaystore.com/collections/home-decor-furniture",
+      "is_group": false,
+      "evidence": "products.json full enumeration of the collection (5 total items, matching the rendered page header '5 products'); 3 of the 5 are furniture (Wooden Handpainted Elephant Table, Wood Elephant Stool with Brass Sheet, Teakwood Brass Fitting Chest with 5 Drawer) and 2 are floor cushions (textiles, out of this task's scope)",
+      "flag": "MANUAL REVIEW: this site collection mixes furniture with floor cushions; qty=3 counts only the furniture items, not the site's raw header count of 5"
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Chowki",
+      "qty": 4,
+      "link": "https://www.thebombaystore.com/collections/home-accents-chowki",
+      "is_group": false,
+      "evidence": "listing header text '4 products', cross-checked against products.json full enumeration (4 items, exact match)",
+      "flag": "MANUAL REVIEW: 1 of the 4 items ('Wood Octangle Chowki with Bells 19 in') carries internal product_type 'Idols & Figurines - Wood' rather than a Chowki type; kept as furniture (chowki = low wooden stool/stand) but worth a second look"
+    }
+  ]
+}

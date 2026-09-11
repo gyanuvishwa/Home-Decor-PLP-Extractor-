@@ -1,0 +1,143 @@
+{
+  "sr": 197,
+  "company": "The Home Depot",
+  "brand_site": "homedepot.com",
+  "country": "USA",
+  "site_url": "https://www.homedepot.com/",
+  "status": "partial",
+  "failure_reason": "Akamai/bot-wall (Home Depot's own branded 403 'Error Page') blocked direct HTTP fetch (curl_cffi, warmed session) and bare Playwright immediately on every /b/ category-browse URL (homepage and /s/ search worked fine, but every /b/ page 403'd) -- tier(a) and tier(b) never returned category data. Tier(c) Claude-in-Chrome (real logged-in session) DID work initially and returned real category pages with real product counts, but after roughly 20 successful /b/ page loads in this session the same 'Oops!! Something went wrong' 403 Error Page started appearing on /b/ URLs that had worked moments earlier (confirmed by immediately re-requesting a previously-successful URL, Storage-Organization-Cube-Storage, which now also 403'd) -- a mid-session rate-limit/soft-block, not a bad URL. Per the hard rule, stopped requesting the host at that point instead of retrying/chasing the block. As a result: (1) the Storage tree is only partially quantified -- several top-level Storage & Organization branches confirmed to exist in the site nav (Moving Boxes & Supplies, Outdoor Storage, Kitchen Organization, Office Organization, Laundry Storage, Folding Furniture, Tool Storage, Garage Storage plus its 5 sub-branches Garage Wall Organization/Garage Cabinets/Garage Storage Systems/Garage Shelving/Overhead Garage Storage, plus Closet Accessories' Portable Closets/Shelf Dividers/Blanket Bags) could not be opened before the block hit, so they are omitted rather than guessed; (2) Textile research (Bath towels/mats/shower curtains, Window Treatments/curtains, door mats) was not reached at all before the block -- textile_rows is empty for lack of access, not because Textile was confirmed absent.",
+  "notes": "ACCESS: tier(a) HTTP (curl_cffi impersonate=chrome124, warmed session with cookies from homepage) -> homepage 200 but every /b/ category page 403 (Home Depot's own 'Error Page', Akamai-style). tier(b) bare Playwright chromium -> same 403 on /b/ pages. tier(c) Claude-in-Chrome (real Chrome session) -> worked for ~20 page loads then began 403'ing on both new and previously-successful /b/ URLs (mid-session rate limit) -- stopped per hard rule 4, did not chase the block via another route. robots.txt (checked first) has no anthropic-ai/ClaudeBot/Claude-Web disallow and no blanket Disallow:/, so tier(c) was permitted; it disallows /s/ and /Search? patterns (crawler search-results paths) which is why no /s/ URL is recorded as a category link here (search was only used interactively to locate the correct department, never recorded as a category URL). TREE METHOD: mega-menu tile hrefs were extracted from the homepage HTML (curl_cffi) to find the real Storage & Organization department N-id (the department's own top tile URL found on the /b/Storage-Organization/N-5yc1vZc3wz guess was stale/wrong and 403'd everywhere including Playwright with a friendly 'OOPS' page -- the correct id N-5yc1vZas7e was recovered from the homepage's own embedded /b/ links). From there the department landing page's own tile links (read via DOM script, not visually) gave Storage Containers, Closet Organizers, Closet Accessories, Moving Boxes & Supplies, Outdoor Storage, Kitchen Organization, Office Organization, Laundry Storage, Folding Furniture, Tool Storage, Garage Storage (+5 garage sub-tiles), Special Buys (promotional, excluded per View-All/Collections rule). Closet Organizers' own landing page revealed Wood Closets (Systems/Shelves/Drawers) and Wire Closets (Systems/Shelves/Drawers) plus the embedded Closet Accessories tile group (Cube Storage, Clothes Racks, Shoe Storage, Closet Drawer Organizers, Closet Rods, Closet Hardware, Portable Closets, Shelf Dividers, Blanket Bags). QTY METHOD: exact 'Viewing X-Y of N' / 'N results' text scraped from each leaf's own rendered listing page in the live Chrome session; h1/canonical checked on every leaf actually recorded. EXCLUDED and why: Wood Closet Shelves -- its own nav href silently redirected/canonicalized to the Wood Closet Systems page (h1 and canonical both came back as 'Wood Closet Systems'), so it is not a distinct listing and was dropped rather than double-counted (this is exactly the 'bad slug serves a plausible wrong number' trap the brief warns about). Closet Rods and Closet Hardware -- excluded as hardware/fittings (rods, brackets, tracks), not storage containers, consistent with the curtain-rod-style hardware exclusion pattern in the rule files (storage.md section 9's included list has no rods/hardware entry); both also happened to 403 on request, which is moot since they were being excluded on classification grounds anyway. Storage Containers -- recorded as a grouping row only; its own listing page showed 695 results but its single genuine child 'Storage Bins' (588 results) is the deepest valid subcategory per the parent-URL rule, so the parent's own qty was not recorded. Office Organization -- the site's own nav tile for this routes to /b/Furniture-Home-Office-Furniture (a Furniture department), not a Storage sub-tree; not opened before the block, so left out entirely rather than guessed as either Furniture or Storage. Folding Furniture -- name strongly suggests folding tables/chairs (Furniture, not Storage) per the site's own tile grouping; not opened before the block. Garage/Tool Storage sub-tree (Garage Cabinets, Garage Storage Systems, Garage Shelving, Overhead Garage Storage, Garage Wall Organization, Tool Storage, Moving Boxes & Supplies, Outdoor Storage, Kitchen Organization, Laundry Storage) -- all confirmed present in the site's own department nav (real hrefs captured) but not yet opened for qty when the block hit; omitted rather than fabricated, see failure_reason. No Textile pages (Bath, Window Treatments/Curtains, door mats under Building Materials/Outdoors) were reached before the block, so textile_rows is empty for lack of access, not a confirmed absence -- Home Depot is a home-improvement retailer that does carry door mats and bath/shower textiles per general site awareness, so this company should be prioritized for a re-run/top-up rather than treated as textile-negative.",
+  "textile_rows": [],
+  "storage_rows": [
+    {
+      "category": "Storage",
+      "sub_category": "Storage Containers",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Storage Bins",
+      "qty": 588,
+      "link": "https://www.homedepot.com/b/Storage-Organization-Storage-Containers-Storage-Bins/N-5yc1vZcl3z",
+      "is_group": false,
+      "evidence": "Rendered listing page text: 'Viewing 1-24 of 588'",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Closet Organizers",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Wood Closet Systems",
+      "qty": 554,
+      "link": "https://www.homedepot.com/b/Storage-Organization-Closet-Organizers-Wood-Closet-Organizers-Wood-Closet-Systems/N-5yc1vZcd8v",
+      "is_group": false,
+      "evidence": "Rendered listing page text: 'Viewing 1-12 of 554'",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Wood Closet Drawers & Organizer Doors",
+      "qty": 35,
+      "link": "https://www.homedepot.com/b/Storage-Organization-Closet-Organizers-Wood-Closet-Organizers-Wood-Closet-Drawers-Organizer-Doors/N-5yc1vZcd8w",
+      "is_group": false,
+      "evidence": "Rendered listing page text: '35 results'",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Wire Closet Systems",
+      "qty": 52,
+      "link": "https://www.homedepot.com/b/Storage-Organization-Closet-Organizers-Wire-Closet-Organizers-Wire-Closet-Systems/N-5yc1vZcd8r",
+      "is_group": false,
+      "evidence": "Rendered listing page text: 'Viewing 1-24 of 52'",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Wire Closet Shelves",
+      "qty": 91,
+      "link": "https://www.homedepot.com/b/Storage-Organization-Closet-Organizers-Wire-Closet-Shelves/N-5yc1vZcd8n",
+      "is_group": false,
+      "evidence": "Rendered listing page text: 'Viewing 1-12 of 91'",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Wire Closet Drawers",
+      "qty": 80,
+      "link": "https://www.homedepot.com/b/Storage-Organization-Closet-Organizers-Wire-Closet-Organizers-Wire-Closet-Drawers/N-5yc1vZcd8q",
+      "is_group": false,
+      "evidence": "Rendered listing page text: 'Viewing 1-24 of 80'",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Closet Accessories",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Cube Storage",
+      "qty": 263,
+      "link": "https://www.homedepot.com/b/Storage-Organization-Cube-Storage/N-5yc1vZcfzj",
+      "is_group": false,
+      "evidence": "Rendered listing page text: 'Viewing 1-12 of 263'",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Clothes Racks",
+      "qty": 166,
+      "link": "https://www.homedepot.com/b/Storage-Organization-Closet-Organizers-Clothes-Racks/N-5yc1vZc89q",
+      "is_group": false,
+      "evidence": "Rendered listing page text: 'Viewing 1-12 of 166'",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Shoe Storage",
+      "qty": 634,
+      "link": "https://www.homedepot.com/b/Storage-Organization-Shoe-Storage/N-5yc1vZc89c",
+      "is_group": false,
+      "evidence": "Rendered listing page text: 'Viewing 1-12 of 634'",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Closet Drawer Organizers",
+      "qty": 37,
+      "link": "https://www.homedepot.com/b/Storage-Organization-Closet-Organizers-Closet-Accessories-Closet-Drawer-Organizers/N-5yc1vZclg8",
+      "is_group": false,
+      "evidence": "Rendered listing page text: '37 results'",
+      "flag": null,
+      "confidence": "HIGH"
+    }
+  ]
+}

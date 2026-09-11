@@ -1,0 +1,16 @@
+{
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "Site: IKEA France (ikea.com/fr/fr), sibling of IKEA UK (SR92) and IKEA DE (SR107), same global platform per notes/140.md. Tier 1 (curl HTTP fetch) of homepage confirmed only client-rendered mega-menu nav JSON in raw HTML (no product grid), same pattern as UK/DE, so escalated to tier 2 (Playwright/Chromium; networkidle wait hung indefinitely due to persistent background XHR polling, switched to domcontentloaded + 6s settle, worked fine). Homepage/offers-hub HTML scan (grep across raw HTML) surfaced 'Nouveautes', 'Bonnes affaires', 'Outlet', 'Derniere chance', and a literal 'CLEARANCE' token but no 'Meilleures ventes' link visible in the raw nav JSON dump, so guessed the canonical URL slug by analogy to UK (/gb/en/cat/best-sellers/) and DE (/de/de/cat/best-sellers/), both of which keep the English 'best-sellers' slug even on non-English locales: https://www.ikea.com/fr/fr/cat/best-sellers/ resolved directly (HTTP 200, no redirect-to-search/404), confirming the FR site follows the same convention. Opened with Playwright: H1 'Meilleures ventes', on-page copy 'Vous etes-vous deja demande quels sont nos articles les plus vendus ? Des meubles classiques, intemporels, aux articles les plus populaires du moment, vous trouverez ici nos meilleures ventes.' plus a footer section 'Pourquoi acheter les produits les plus vendus ?' explaining the site ranks products by what other customers buy most often - a genuine bestseller/popularity merchandising concept with a real, sortable/filterable product grid (Couleur, Taille, Type, Categorie, etc.), not editorial. Individual product tiles carry a 'Top ventes' badge but per the brief's own-PDP-badge exclusion this doesn't independently qualify a PDP; only the dedicated listing page was recorded. Page text shows '198 elements' twice (page header + filter-panel header) and the results-list footer independently confirms 'Affiche 24 resultats sur 198' - both consistent, qty verified reliable. Checked homepage nav (all mega-menu groups), the 'Bonnes affaires' offers hub (/fr/fr/offers/) and its sub-links (family-offers, limited-time-offers, last-chance), and the raw HTML for 'meilleure(s) vente(s)' / 'populaire' / 'top vente' terms - no second, differently-scoped Bestsellers entry point found (no per-department Bestsellers children; the filter-panel Categorie facet is an in-page filter, not a distinct URL). No Claude-specific disallow in robots.txt; did not need Claude-in-Chrome (tier 3).",
+  "rows": [
+    {
+      "category": "Bestsellers",
+      "sub_category": "Bestsellers",
+      "qty": 198,
+      "link": "https://www.ikea.com/fr/fr/cat/best-sellers/",
+      "is_group": false,
+      "evidence": "Rendered page text (Playwright render of https://www.ikea.com/fr/fr/cat/best-sellers/): '198 elements' shown twice (page header directly below H1 'Meilleures ventes', and again as the sort-and-filter panel header) and 'Affiche 24 resultats sur 198' (results-list footer) - all three consistent.",
+      "flag": null
+    }
+  ]
+}

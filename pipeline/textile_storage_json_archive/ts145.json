@@ -1,0 +1,924 @@
+{
+  "sr": 145,
+  "company": "Galeries Lafayette Maison",
+  "brand_site": "galerieslafayette.com",
+  "country": "France",
+  "site_url": "https://www.galerieslafayette.com/",
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "ACCESS: robots.txt checked first (no anthropic-ai/ClaudeBot/Claude-Web disallow found; only search-URL and two unrelated /c/ paths disallowed for User-agent:*, our /c/ category paths are allowed). Tier (a) direct HTTP via curl_cffi (impersonate=chrome120) worked end-to-end: fetched robots.txt, sitemap.xml, and the Category-fr-EUR.xml sitemap (526 /maison URLs). The storefront itself is an Angular SPA with an empty SSR shell (no data in raw HTML), so tier (b) Playwright headless was tried next to render it and capture the underlying API calls; Playwright rendering was itself unreliable (static JS chunks on www.galerieslafayette.com returned intermittent 403s that crashed the Angular bootstrap in ~70% of attempts, a client-side asset-CDN flakiness, not a data-access block). The product-listing API endpoint captured from Playwright's network log (sapapi.galerieslafayette.com/occ/v2/gl-fr/products/search, an unauthenticated public OCC REST API, no bearer token needed) was then called directly via curl_cffi and succeeded on 84/84 category queries (all HTTP 200) - stepped back down to tier (a) once the endpoint was known, per the access-tier order. Claude-in-Chrome (tier c) was not needed. TREE: sitemap /maison URLs filtered to the branches containing home-textile or storage content per the two rule files (linge-de-maison, literie, decoration-de-la-maison>{rideaux-et-stores, tapis, objets-de-decoration}, jardin>{mobilier-de-jardin>housses-de-protection, decorations-de-jardin>coffres-de-jardin}, rangement and its 4 subgroups). All other /maison branches (art-de-la-table, culinaire, electromenager, luminaires, mobilier, and the rest of decoration-de-la-maison/jardin) are Kitchen&Dining/Appliances/Lighting/Furniture/Decor and out of scope, so excluded entirely. Each candidate leaf URL was queried via the products/search API and its returned breadcrumbs array checked to confirm it resolves to the exact requested node (no silent parent/sibling substitution observed on any of the 84 calls). For the 'Tapis' node, all 5 sitemap sub-URLs returned 0 products while the parent 'Tapis' node itself returned 430; the site's own categories API (subcategories field) confirmed these 5 are still live, currently-empty subcategories (not stale/merged), so they are recorded as a group with qty=0 children rather than collapsing to the parent URL. QTY: pagination.totalResults from the products/search JSON response for each leaf category query (currentPage=0). This is the site's own exact filtered SKU count; not estimated or aggregated. 'Stores' (blinds) sampled directly (10 products) to confirm they are genuinely fabric (linen/cotton Roman blinds 'Store Bateau', polyester roller blinds 'Store enroulable') before including as Textile per rules/textile.md SS5. EXCLUDED and why: trousses-de-toilette (toiletry travel bag, personal-carrying not home textile); derouleurs/derouleurs-papier-toilette (kitchen film/paper dispensers - excluded from Storage as dispensing-function fixtures, except Toilet Roll Holders which was kept as a flagged LOW-confidence Storage row because the site explicitly places it under Bathroom Storage); distributeurs-de-savon (soap dispensers, Kitchen&Dining fixture); poubelles-de-cuisine/poubelles-de-salle-de-bain (trash/waste bins - waste disposal is not organizational storage per storage.md core principle, even though sited under a 'Rangement' parent); sacs-et-cabas-de-cuisine (reusable shopping totes - personal-carrying bag boundary, storage.md SS6); paravents (folding screens/room dividers - decorative furniture, not storage); vide-poches (decorative entryway valet trays - storage.md SS23/26 explicit 'Decorative Tray -> NOT Storage'); all of mobilier, mobilier-de-jardin (except housses-de-protection), art-de-la-table, culinaire, electromenager, luminaires, and the wall-decor/candles/mirrors/clocks/vases/plants portions of decoration-de-la-maison/objets-de-decoration and autres-decorations-murales (Furniture/Kitchen&Dining/Appliances/Lighting/Wall Decor/Decorative Accessories, out of this combined task's scope per rule boundaries). Pillows/Bolsters/Mattress-Toppers/Bed-Canopy/Bed-Base-Covers/Headboard-Covers/Bed-Skirts/Pillow-Protectors/Cushion-Inserts/Bath-Capes are MEDIUM confidence since they are not verbatim-named in textile.md's example lists but are standard fabric-based home-textile bedding/bath items sold under the site's 'Linge de Maison'/'Literie' departments alongside explicitly-listed sibling items.",
+  "textile_rows": [
+    {
+      "category": "Textile",
+      "sub_category": "Home Linens (Linge de Maison)",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Duvets & Pillows (Couettes et Oreillers)",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Duvets",
+      "qty": 237,
+      "link": "https://www.galerieslafayette.com/c/maison-et-loisirs/maison/linge-de-maison/couettes-et-oreillers/couettes",
+      "is_group": false,
+      "evidence": "OCC REST API https://sapapi.galerieslafayette.com/occ/v2/gl-fr/products/search?query=/c/maison-et-loisirs/maison/linge-de-maison/couettes-et-oreillers/couettes -> pagination.totalResults; breadcrumbs confirmed match to this exact category node",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Pillows",
+      "qty": 204,
+      "link": "https://www.galerieslafayette.com/c/maison-et-loisirs/maison/linge-de-maison/couettes-et-oreillers/oreillers",
+      "is_group": false,
+      "evidence": "OCC REST API https://sapapi.galerieslafayette.com/occ/v2/gl-fr/products/search?query=/c/maison-et-loisirs/maison/linge-de-maison/couettes-et-oreillers/oreillers -> pagination.totalResults; breadcrumbs confirmed match to this exact category node",
+      "flag": null,
+      "confidence": "MEDIUM"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Duvet & Pillow Sets",
+      "qty": 6,
+      "link": "https://www.galerieslafayette.com/c/maison-et-loisirs/maison/linge-de-maison/couettes-et-oreillers/packs-couette-et-oreillers",
+      "is_group": false,
+      "evidence": "OCC REST API https://sapapi.galerieslafayette.com/occ/v2/gl-fr/products/search?query=/c/maison-et-loisirs/maison/linge-de-maison/couettes-et-oreillers/packs-couette-et-oreillers -> pagination.totalResults; breadcrumbs confirmed match to this exact category node",
+      "flag": null,
+      "confidence": "MEDIUM"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Bolsters",
+      "qty": 26,
+      "link": "https://www.galerieslafayette.com/c/maison-et-loisirs/maison/linge-de-maison/couettes-et-oreillers/traversins",
+      "is_group": false,
+      "evidence": "OCC REST API https://sapapi.galerieslafayette.com/occ/v2/gl-fr/products/search?query=/c/maison-et-loisirs/maison/linge-de-maison/couettes-et-oreillers/traversins -> pagination.totalResults; breadcrumbs confirmed match to this exact category node",
+      "flag": null,
+      "confidence": "MEDIUM"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Bath Linens (Linge de Bain)",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Bath Capes & Ponchos",
+      "qty": 72,
+      "link": "https://www.galerieslafayette.com/c/maison-et-loisirs/maison/linge-de-maison/linge-de-bain/capes-et-ponchos-de-bain",
+      "is_group": false,
+      "evidence": "OCC REST API https://sapapi.galerieslafayette.com/occ/v2/gl-fr/products/search?query=/c/maison-et-loisirs/maison/linge-de-maison/linge-de-bain/capes-et-ponchos-de-bain -> pagination.totalResults; breadcrumbs confirmed match to this exact category node",
+      "flag": null,
+      "confidence": "MEDIUM"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Bath Sheets",
+      "qty": 453,
+      "link": "https://www.galerieslafayette.com/c/maison-et-loisirs/maison/linge-de-maison/linge-de-bain/draps-de-bain",
+      "is_group": false,
+      "evidence": "OCC REST API https://sapapi.galerieslafayette.com/occ/v2/gl-fr/products/search?query=/c/maison-et-loisirs/maison/linge-de-maison/linge-de-bain/draps-de-bain -> pagination.totalResults; breadcrumbs confirmed match to this exact category node",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Washcloths",
+      "qty": 211,
+      "link": "https://www.galerieslafayette.com/c/maison-et-loisirs/maison/linge-de-maison/linge-de-bain/gants-de-toilette",
+      "is_group": false,
+      "evidence": "OCC REST API https://sapapi.galerieslafayette.com/occ/v2/gl-fr/products/search?query=/c/maison-et-loisirs/maison/linge-de-maison/linge-de-bain/gants-de-toilette -> pagination.totalResults; breadcrumbs confirmed match to this exact category node",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Bath Linen Sets",
+      "qty": 1,
+      "link": "https://www.galerieslafayette.com/c/maison-et-loisirs/maison/linge-de-maison/linge-de-bain/parures-de-toilette",
+      "is_group": false,
+      "evidence": "OCC REST API https://sapapi.galerieslafayette.com/occ/v2/gl-fr/products/search?query=/c/maison-et-loisirs/maison/linge-de-maison/linge-de-bain/parures-de-toilette -> pagination.totalResults; breadcrumbs confirmed match to this exact category node",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Bathrobes",
+      "qty": 412,
+      "link": "https://www.galerieslafayette.com/c/maison-et-loisirs/maison/linge-de-maison/linge-de-bain/peignoirs",
+      "is_group": false,
+      "evidence": "OCC REST API https://sapapi.galerieslafayette.com/occ/v2/gl-fr/products/search?query=/c/maison-et-loisirs/maison/linge-de-maison/linge-de-bain/peignoirs -> pagination.totalResults; breadcrumbs confirmed match to this exact category node",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Shower Curtains",
+      "qty": 16,
+      "link": "https://www.galerieslafayette.com/c/maison-et-loisirs/maison/linge-de-maison/linge-de-bain/rideaux-de-douche",
+      "is_group": false,
+      "evidence": "OCC REST API https://sapapi.galerieslafayette.com/occ/v2/gl-fr/products/search?query=/c/maison-et-loisirs/maison/linge-de-maison/linge-de-bain/rideaux-de-douche -> pagination.totalResults; breadcrumbs confirmed match to this exact category node",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Beach Towels & Foutas",
+      "qty": 125,
+      "link": "https://www.galerieslafayette.com/c/maison-et-loisirs/maison/linge-de-maison/linge-de-bain/serviettes-de-plage-et-foutas",
+      "is_group": false,
+      "evidence": "OCC REST API https://sapapi.galerieslafayette.com/occ/v2/gl-fr/products/search?query=/c/maison-et-loisirs/maison/linge-de-maison/linge-de-bain/serviettes-de-plage-et-foutas -> pagination.totalResults; breadcrumbs confirmed match to this exact category node",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Bath Towels",
+      "qty": 601,
+      "link": "https://www.galerieslafayette.com/c/maison-et-loisirs/maison/linge-de-maison/linge-de-bain/serviettes-de-toilette",
+      "is_group": false,
+      "evidence": "OCC REST API https://sapapi.galerieslafayette.com/occ/v2/gl-fr/products/search?query=/c/maison-et-loisirs/maison/linge-de-maison/linge-de-bain/serviettes-de-toilette -> pagination.totalResults; breadcrumbs confirmed match to this exact category node",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Bath Mats & Contours",
+      "qty": 335,
+      "link": "https://www.galerieslafayette.com/c/maison-et-loisirs/maison/linge-de-maison/linge-de-bain/tapis-de-bain-et-contours",
+      "is_group": false,
+      "evidence": "OCC REST API https://sapapi.galerieslafayette.com/occ/v2/gl-fr/products/search?query=/c/maison-et-loisirs/maison/linge-de-maison/linge-de-bain/tapis-de-bain-et-contours -> pagination.totalResults; breadcrumbs confirmed match to this exact category node",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Decorative Linens (Linge de Decoration)",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Cushion Inserts",
+      "qty": 6,
+      "link": "https://www.galerieslafayette.com/c/maison-et-loisirs/maison/linge-de-maison/linge-de-decoration/coussins-de-garnissage",
+      "is_group": false,
+      "evidence": "OCC REST API https://sapapi.galerieslafayette.com/occ/v2/gl-fr/products/search?query=/c/maison-et-loisirs/maison/linge-de-maison/linge-de-decoration/coussins-de-garnissage -> pagination.totalResults; breadcrumbs confirmed match to this exact category node",
+      "flag": null,
+      "confidence": "MEDIUM"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Chair Pads & Cushions",
+      "qty": 48,
+      "link": "https://www.galerieslafayette.com/c/maison-et-loisirs/maison/linge-de-maison/linge-de-decoration/galettes-et-coussins-de-chaise",
+      "is_group": false,
+      "evidence": "OCC REST API https://sapapi.galerieslafayette.com/occ/v2/gl-fr/products/search?query=/c/maison-et-loisirs/maison/linge-de-maison/linge-de-decoration/galettes-et-coussins-de-chaise -> pagination.totalResults; breadcrumbs confirmed match to this exact category node",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Sofa Covers",
+      "qty": 28,
+      "link": "https://www.galerieslafayette.com/c/maison-et-loisirs/maison/linge-de-maison/linge-de-decoration/housses-de-canape",
+      "is_group": false,
+      "evidence": "OCC REST API https://sapapi.galerieslafayette.com/occ/v2/gl-fr/products/search?query=/c/maison-et-loisirs/maison/linge-de-maison/linge-de-decoration/housses-de-canape -> pagination.totalResults; breadcrumbs confirmed match to this exact category node",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Chair Covers",
+      "qty": 12,
+      "link": "https://www.galerieslafayette.com/c/maison-et-loisirs/maison/linge-de-maison/linge-de-decoration/housses-de-chaise",
+      "is_group": false,
+      "evidence": "OCC REST API https://sapapi.galerieslafayette.com/occ/v2/gl-fr/products/search?query=/c/maison-et-loisirs/maison/linge-de-maison/linge-de-decoration/housses-de-chaise -> pagination.totalResults; breadcrumbs confirmed match to this exact category node",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Cushion Covers",
+      "qty": 531,
+      "link": "https://www.galerieslafayette.com/c/maison-et-loisirs/maison/linge-de-maison/linge-de-decoration/housses-de-coussin",
+      "is_group": false,
+      "evidence": "OCC REST API https://sapapi.galerieslafayette.com/occ/v2/gl-fr/products/search?query=/c/maison-et-loisirs/maison/linge-de-maison/linge-de-decoration/housses-de-coussin -> pagination.totalResults; breadcrumbs confirmed match to this exact category node",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Armchair Covers",
+      "qty": 6,
+      "link": "https://www.galerieslafayette.com/c/maison-et-loisirs/maison/linge-de-maison/linge-de-decoration/housses-de-fauteuil",
+      "is_group": false,
+      "evidence": "OCC REST API https://sapapi.galerieslafayette.com/occ/v2/gl-fr/products/search?query=/c/maison-et-loisirs/maison/linge-de-maison/linge-de-decoration/housses-de-fauteuil -> pagination.totalResults; breadcrumbs confirmed match to this exact category node",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Pouf Covers & Floor Cushions",
+      "qty": 111,
+      "link": "https://www.galerieslafayette.com/c/maison-et-loisirs/maison/linge-de-maison/linge-de-decoration/housses-de-pouf-et-coussins-de-sol",
+      "is_group": false,
+      "evidence": "OCC REST API https://sapapi.galerieslafayette.com/occ/v2/gl-fr/products/search?query=/c/maison-et-loisirs/maison/linge-de-maison/linge-de-decoration/housses-de-pouf-et-coussins-de-sol -> pagination.totalResults; breadcrumbs confirmed match to this exact category node",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Throws",
+      "qty": 326,
+      "link": "https://www.galerieslafayette.com/c/maison-et-loisirs/maison/linge-de-maison/linge-de-decoration/plaids-et-jetes",
+      "is_group": false,
+      "evidence": "OCC REST API https://sapapi.galerieslafayette.com/occ/v2/gl-fr/products/search?query=/c/maison-et-loisirs/maison/linge-de-maison/linge-de-decoration/plaids-et-jetes -> pagination.totalResults; breadcrumbs confirmed match to this exact category node",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Bed Linen (Linge de Lit)",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Mattress Protectors",
+      "qty": 117,
+      "link": "https://www.galerieslafayette.com/c/maison-et-loisirs/maison/linge-de-maison/linge-de-lit/aleses-proteges-matelas",
+      "is_group": false,
+      "evidence": "OCC REST API https://sapapi.galerieslafayette.com/occ/v2/gl-fr/products/search?query=/c/maison-et-loisirs/maison/linge-de-maison/linge-de-lit/aleses-proteges-matelas -> pagination.totalResults; breadcrumbs confirmed match to this exact category node",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Bed Base Covers",
+      "qty": 68,
+      "link": "https://www.galerieslafayette.com/c/maison-et-loisirs/maison/linge-de-maison/linge-de-lit/caches-sommier",
+      "is_group": false,
+      "evidence": "OCC REST API https://sapapi.galerieslafayette.com/occ/v2/gl-fr/products/search?query=/c/maison-et-loisirs/maison/linge-de-maison/linge-de-lit/caches-sommier -> pagination.totalResults; breadcrumbs confirmed match to this exact category node",
+      "flag": null,
+      "confidence": "MEDIUM"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Bed Canopy",
+      "qty": 1,
+      "link": "https://www.galerieslafayette.com/c/maison-et-loisirs/maison/linge-de-maison/linge-de-lit/ciel-de-lit",
+      "is_group": false,
+      "evidence": "OCC REST API https://sapapi.galerieslafayette.com/occ/v2/gl-fr/products/search?query=/c/maison-et-loisirs/maison/linge-de-maison/linge-de-lit/ciel-de-lit -> pagination.totalResults; breadcrumbs confirmed match to this exact category node",
+      "flag": null,
+      "confidence": "MEDIUM"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Blankets",
+      "qty": 74,
+      "link": "https://www.galerieslafayette.com/c/maison-et-loisirs/maison/linge-de-maison/linge-de-lit/couvertures",
+      "is_group": false,
+      "evidence": "OCC REST API https://sapapi.galerieslafayette.com/occ/v2/gl-fr/products/search?query=/c/maison-et-loisirs/maison/linge-de-maison/linge-de-lit/couvertures -> pagination.totalResults; breadcrumbs confirmed match to this exact category node",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Bedspreads, Eiderdowns & Quilts",
+      "qty": 349,
+      "link": "https://www.galerieslafayette.com/c/maison-et-loisirs/maison/linge-de-maison/linge-de-lit/couvre-lits-edredons-et-boutis",
+      "is_group": false,
+      "evidence": "OCC REST API https://sapapi.galerieslafayette.com/occ/v2/gl-fr/products/search?query=/c/maison-et-loisirs/maison/linge-de-maison/linge-de-lit/couvre-lits-edredons-et-boutis -> pagination.totalResults; breadcrumbs confirmed match to this exact category node",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Fitted Sheets",
+      "qty": 1278,
+      "link": "https://www.galerieslafayette.com/c/maison-et-loisirs/maison/linge-de-maison/linge-de-lit/draps-housses",
+      "is_group": false,
+      "evidence": "OCC REST API https://sapapi.galerieslafayette.com/occ/v2/gl-fr/products/search?query=/c/maison-et-loisirs/maison/linge-de-maison/linge-de-lit/draps-housses -> pagination.totalResults; breadcrumbs confirmed match to this exact category node",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Flat Sheets",
+      "qty": 718,
+      "link": "https://www.galerieslafayette.com/c/maison-et-loisirs/maison/linge-de-maison/linge-de-lit/draps-plats",
+      "is_group": false,
+      "evidence": "OCC REST API https://sapapi.galerieslafayette.com/occ/v2/gl-fr/products/search?query=/c/maison-et-loisirs/maison/linge-de-maison/linge-de-lit/draps-plats -> pagination.totalResults; breadcrumbs confirmed match to this exact category node",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Duvet Covers",
+      "qty": 1808,
+      "link": "https://www.galerieslafayette.com/c/maison-et-loisirs/maison/linge-de-maison/linge-de-lit/housses-de-couettes",
+      "is_group": false,
+      "evidence": "OCC REST API https://sapapi.galerieslafayette.com/occ/v2/gl-fr/products/search?query=/c/maison-et-loisirs/maison/linge-de-maison/linge-de-lit/housses-de-couettes -> pagination.totalResults; breadcrumbs confirmed match to this exact category node",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Headboard Covers",
+      "qty": 23,
+      "link": "https://www.galerieslafayette.com/c/maison-et-loisirs/maison/linge-de-maison/linge-de-lit/housses-de-tete-de-lit",
+      "is_group": false,
+      "evidence": "OCC REST API https://sapapi.galerieslafayette.com/occ/v2/gl-fr/products/search?query=/c/maison-et-loisirs/maison/linge-de-maison/linge-de-lit/housses-de-tete-de-lit -> pagination.totalResults; breadcrumbs confirmed match to this exact category node",
+      "flag": null,
+      "confidence": "MEDIUM"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Bed Linen Sets",
+      "qty": 225,
+      "link": "https://www.galerieslafayette.com/c/maison-et-loisirs/maison/linge-de-maison/linge-de-lit/parures-de-lit",
+      "is_group": false,
+      "evidence": "OCC REST API https://sapapi.galerieslafayette.com/occ/v2/gl-fr/products/search?query=/c/maison-et-loisirs/maison/linge-de-maison/linge-de-lit/parures-de-lit -> pagination.totalResults; breadcrumbs confirmed match to this exact category node",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Pillow Protectors",
+      "qty": 16,
+      "link": "https://www.galerieslafayette.com/c/maison-et-loisirs/maison/linge-de-maison/linge-de-lit/sous-taies-d-oreiller",
+      "is_group": false,
+      "evidence": "OCC REST API https://sapapi.galerieslafayette.com/occ/v2/gl-fr/products/search?query=/c/maison-et-loisirs/maison/linge-de-maison/linge-de-lit/sous-taies-d-oreiller -> pagination.totalResults; breadcrumbs confirmed match to this exact category node",
+      "flag": null,
+      "confidence": "MEDIUM"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Pillowcases & Bolster Cases",
+      "qty": 2364,
+      "link": "https://www.galerieslafayette.com/c/maison-et-loisirs/maison/linge-de-maison/linge-de-lit/taies-d-oreiller-traversins",
+      "is_group": false,
+      "evidence": "OCC REST API https://sapapi.galerieslafayette.com/occ/v2/gl-fr/products/search?query=/c/maison-et-loisirs/maison/linge-de-maison/linge-de-lit/taies-d-oreiller-traversins -> pagination.totalResults; breadcrumbs confirmed match to this exact category node",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Bed Skirts",
+      "qty": 29,
+      "link": "https://www.galerieslafayette.com/c/maison-et-loisirs/maison/linge-de-maison/linge-de-lit/tours-de-lit",
+      "is_group": false,
+      "evidence": "OCC REST API https://sapapi.galerieslafayette.com/occ/v2/gl-fr/products/search?query=/c/maison-et-loisirs/maison/linge-de-maison/linge-de-lit/tours-de-lit -> pagination.totalResults; breadcrumbs confirmed match to this exact category node",
+      "flag": null,
+      "confidence": "MEDIUM"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Table Linens (Linge de Table)",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Table Runners",
+      "qty": 169,
+      "link": "https://www.galerieslafayette.com/c/maison-et-loisirs/maison/linge-de-maison/linge-de-table/chemins-de-table",
+      "is_group": false,
+      "evidence": "OCC REST API https://sapapi.galerieslafayette.com/occ/v2/gl-fr/products/search?query=/c/maison-et-loisirs/maison/linge-de-maison/linge-de-table/chemins-de-table -> pagination.totalResults; breadcrumbs confirmed match to this exact category node",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Tablecloth & Napkin Sets",
+      "qty": 0,
+      "link": "https://www.galerieslafayette.com/c/maison-et-loisirs/maison/linge-de-maison/linge-de-table/ensembles-nappes-et-serviettes",
+      "is_group": false,
+      "evidence": "OCC REST API https://sapapi.galerieslafayette.com/occ/v2/gl-fr/products/search?query=/c/maison-et-loisirs/maison/linge-de-maison/linge-de-table/ensembles-nappes-et-serviettes -> pagination.totalResults; breadcrumbs confirmed match to this exact category node",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Oven Gloves & Pot Holders",
+      "qty": 9,
+      "link": "https://www.galerieslafayette.com/c/maison-et-loisirs/maison/linge-de-maison/linge-de-table/gants-maniques-de-cuisine",
+      "is_group": false,
+      "evidence": "OCC REST API https://sapapi.galerieslafayette.com/occ/v2/gl-fr/products/search?query=/c/maison-et-loisirs/maison/linge-de-maison/linge-de-table/gants-maniques-de-cuisine -> pagination.totalResults; breadcrumbs confirmed match to this exact category node",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Tablecloths",
+      "qty": 683,
+      "link": "https://www.galerieslafayette.com/c/maison-et-loisirs/maison/linge-de-maison/linge-de-table/nappes",
+      "is_group": false,
+      "evidence": "OCC REST API https://sapapi.galerieslafayette.com/occ/v2/gl-fr/products/search?query=/c/maison-et-loisirs/maison/linge-de-maison/linge-de-table/nappes -> pagination.totalResults; breadcrumbs confirmed match to this exact category node",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Table Protectors",
+      "qty": 0,
+      "link": "https://www.galerieslafayette.com/c/maison-et-loisirs/maison/linge-de-maison/linge-de-table/protections-de-table",
+      "is_group": false,
+      "evidence": "OCC REST API https://sapapi.galerieslafayette.com/occ/v2/gl-fr/products/search?query=/c/maison-et-loisirs/maison/linge-de-maison/linge-de-table/protections-de-table -> pagination.totalResults; breadcrumbs confirmed match to this exact category node",
+      "flag": "MANUAL REVIEW: 0 products currently listed; material/fabric-vs-non-fabric could not be sampled to confirm textile nature",
+      "confidence": "LOW"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Table Napkins",
+      "qty": 372,
+      "link": "https://www.galerieslafayette.com/c/maison-et-loisirs/maison/linge-de-maison/linge-de-table/serviettes-de-table",
+      "is_group": false,
+      "evidence": "OCC REST API https://sapapi.galerieslafayette.com/occ/v2/gl-fr/products/search?query=/c/maison-et-loisirs/maison/linge-de-maison/linge-de-table/serviettes-de-table -> pagination.totalResults; breadcrumbs confirmed match to this exact category node",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Placemats",
+      "qty": 242,
+      "link": "https://www.galerieslafayette.com/c/maison-et-loisirs/maison/linge-de-maison/linge-de-table/sets-de-table",
+      "is_group": false,
+      "evidence": "OCC REST API https://sapapi.galerieslafayette.com/occ/v2/gl-fr/products/search?query=/c/maison-et-loisirs/maison/linge-de-maison/linge-de-table/sets-de-table -> pagination.totalResults; breadcrumbs confirmed match to this exact category node",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Kitchen Aprons",
+      "qty": 123,
+      "link": "https://www.galerieslafayette.com/c/maison-et-loisirs/maison/linge-de-maison/linge-de-table/tabliers-de-cuisine",
+      "is_group": false,
+      "evidence": "OCC REST API https://sapapi.galerieslafayette.com/occ/v2/gl-fr/products/search?query=/c/maison-et-loisirs/maison/linge-de-maison/linge-de-table/tabliers-de-cuisine -> pagination.totalResults; breadcrumbs confirmed match to this exact category node",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Tea Towels",
+      "qty": 373,
+      "link": "https://www.galerieslafayette.com/c/maison-et-loisirs/maison/linge-de-maison/linge-de-table/torchons",
+      "is_group": false,
+      "evidence": "OCC REST API https://sapapi.galerieslafayette.com/occ/v2/gl-fr/products/search?query=/c/maison-et-loisirs/maison/linge-de-maison/linge-de-table/torchons -> pagination.totalResults; breadcrumbs confirmed match to this exact category node",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Mattress Toppers",
+      "qty": 24,
+      "link": "https://www.galerieslafayette.com/c/maison-et-loisirs/maison/literie/matelas/surmatelas",
+      "is_group": false,
+      "evidence": "OCC REST API https://sapapi.galerieslafayette.com/occ/v2/gl-fr/products/search?query=/c/maison-et-loisirs/maison/literie/matelas/surmatelas -> pagination.totalResults; breadcrumbs confirmed match to this exact category node",
+      "flag": null,
+      "confidence": "MEDIUM"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Home Decoration (Decoration de la Maison)",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Curtains & Blinds (Rideaux et Stores)",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Curtains",
+      "qty": 792,
+      "link": "https://www.galerieslafayette.com/c/maison-et-loisirs/maison/decoration-de-la-maison/rideaux-et-stores/rideaux",
+      "is_group": false,
+      "evidence": "OCC REST API https://sapapi.galerieslafayette.com/occ/v2/gl-fr/products/search?query=/c/maison-et-loisirs/maison/decoration-de-la-maison/rideaux-et-stores/rideaux -> pagination.totalResults; breadcrumbs confirmed match to this exact category node",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Blinds",
+      "qty": 29,
+      "link": "https://www.galerieslafayette.com/c/maison-et-loisirs/maison/decoration-de-la-maison/rideaux-et-stores/stores",
+      "is_group": false,
+      "evidence": "OCC REST API https://sapapi.galerieslafayette.com/occ/v2/gl-fr/products/search?query=/c/maison-et-loisirs/maison/decoration-de-la-maison/rideaux-et-stores/stores -> pagination.totalResults; breadcrumbs confirmed match to this exact category node",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Sheer Curtains",
+      "qty": 119,
+      "link": "https://www.galerieslafayette.com/c/maison-et-loisirs/maison/decoration-de-la-maison/rideaux-et-stores/voilages",
+      "is_group": false,
+      "evidence": "OCC REST API https://sapapi.galerieslafayette.com/occ/v2/gl-fr/products/search?query=/c/maison-et-loisirs/maison/decoration-de-la-maison/rideaux-et-stores/voilages -> pagination.totalResults; breadcrumbs confirmed match to this exact category node",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Rugs (Tapis)",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Bedside Rugs",
+      "qty": 0,
+      "link": "https://www.galerieslafayette.com/c/maison-et-loisirs/maison/decoration-de-la-maison/tapis/descentes-de-lit",
+      "is_group": false,
+      "evidence": "OCC REST API https://sapapi.galerieslafayette.com/occ/v2/gl-fr/products/search?query=/c/maison-et-loisirs/maison/decoration-de-la-maison/tapis/descentes-de-lit -> pagination.totalResults; breadcrumbs confirmed match to this exact category node",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Living Room Rugs",
+      "qty": 0,
+      "link": "https://www.galerieslafayette.com/c/maison-et-loisirs/maison/decoration-de-la-maison/tapis/tapis-de-salon",
+      "is_group": false,
+      "evidence": "OCC REST API https://sapapi.galerieslafayette.com/occ/v2/gl-fr/products/search?query=/c/maison-et-loisirs/maison/decoration-de-la-maison/tapis/tapis-de-salon -> pagination.totalResults; breadcrumbs confirmed match to this exact category node",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Hallway & Entrance Rugs",
+      "qty": 0,
+      "link": "https://www.galerieslafayette.com/c/maison-et-loisirs/maison/decoration-de-la-maison/tapis/tapis-couloir-et-entree",
+      "is_group": false,
+      "evidence": "OCC REST API https://sapapi.galerieslafayette.com/occ/v2/gl-fr/products/search?query=/c/maison-et-loisirs/maison/decoration-de-la-maison/tapis/tapis-couloir-et-entree -> pagination.totalResults; breadcrumbs confirmed match to this exact category node",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Doormats & Outdoor Rugs",
+      "qty": 0,
+      "link": "https://www.galerieslafayette.com/c/maison-et-loisirs/maison/decoration-de-la-maison/tapis/paillassons-et-tapis-d-exterieur",
+      "is_group": false,
+      "evidence": "OCC REST API https://sapapi.galerieslafayette.com/occ/v2/gl-fr/products/search?query=/c/maison-et-loisirs/maison/decoration-de-la-maison/tapis/paillassons-et-tapis-d-exterieur -> pagination.totalResults; breadcrumbs confirmed match to this exact category node",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Kitchen Rugs",
+      "qty": 0,
+      "link": "https://www.galerieslafayette.com/c/maison-et-loisirs/maison/decoration-de-la-maison/tapis/tapis-de-cuisine",
+      "is_group": false,
+      "evidence": "OCC REST API https://sapapi.galerieslafayette.com/occ/v2/gl-fr/products/search?query=/c/maison-et-loisirs/maison/decoration-de-la-maison/tapis/tapis-de-cuisine -> pagination.totalResults; breadcrumbs confirmed match to this exact category node",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Decorative Objects (Objets de Decoration)",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Cushions",
+      "qty": 425,
+      "link": "https://www.galerieslafayette.com/c/maison-et-loisirs/maison/decoration-de-la-maison/objets-de-decoration/coussins",
+      "is_group": false,
+      "evidence": "OCC REST API https://sapapi.galerieslafayette.com/occ/v2/gl-fr/products/search?query=/c/maison-et-loisirs/maison/decoration-de-la-maison/objets-de-decoration/coussins -> pagination.totalResults; breadcrumbs confirmed match to this exact category node",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Floor Cushions",
+      "qty": 8,
+      "link": "https://www.galerieslafayette.com/c/maison-et-loisirs/maison/decoration-de-la-maison/objets-de-decoration/coussins-de-sol",
+      "is_group": false,
+      "evidence": "OCC REST API https://sapapi.galerieslafayette.com/occ/v2/gl-fr/products/search?query=/c/maison-et-loisirs/maison/decoration-de-la-maison/objets-de-decoration/coussins-de-sol -> pagination.totalResults; breadcrumbs confirmed match to this exact category node",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Garden Furniture Covers",
+      "qty": 0,
+      "link": "https://www.galerieslafayette.com/c/maison-et-loisirs/maison/jardin/mobilier-de-jardin/housses-de-protection",
+      "is_group": false,
+      "evidence": "OCC REST API https://sapapi.galerieslafayette.com/occ/v2/gl-fr/products/search?query=/c/maison-et-loisirs/maison/jardin/mobilier-de-jardin/housses-de-protection -> pagination.totalResults; breadcrumbs confirmed match to this exact category node",
+      "flag": null,
+      "confidence": "HIGH"
+    }
+  ],
+  "storage_rows": [
+    {
+      "category": "Storage",
+      "sub_category": "Storage (Rangement)",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Kitchen Storage (Rangements de Cuisine)",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Kitchen Storage Accessories",
+      "qty": 28,
+      "link": "https://www.galerieslafayette.com/c/maison-et-loisirs/maison/rangement/rangements-de-cuisine/accessoires-de-rangements-de-cuisine",
+      "is_group": false,
+      "evidence": "OCC REST API https://sapapi.galerieslafayette.com/occ/v2/gl-fr/products/search?query=/c/maison-et-loisirs/maison/rangement/rangements-de-cuisine/accessoires-de-rangements-de-cuisine -> pagination.totalResults; breadcrumbs confirmed match to this exact category node",
+      "flag": null,
+      "confidence": "MEDIUM"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Shopping Trolleys",
+      "qty": 2,
+      "link": "https://www.galerieslafayette.com/c/maison-et-loisirs/maison/rangement/rangements-de-cuisine/chariots-de-course",
+      "is_group": false,
+      "evidence": "OCC REST API https://sapapi.galerieslafayette.com/occ/v2/gl-fr/products/search?query=/c/maison-et-loisirs/maison/rangement/rangements-de-cuisine/chariots-de-course -> pagination.totalResults; breadcrumbs confirmed match to this exact category node",
+      "flag": null,
+      "confidence": "MEDIUM"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Drawer & Cupboard Organizers",
+      "qty": 5,
+      "link": "https://www.galerieslafayette.com/c/maison-et-loisirs/maison/rangement/rangements-de-cuisine/organisateurs-tiroirs-et-placards",
+      "is_group": false,
+      "evidence": "OCC REST API https://sapapi.galerieslafayette.com/occ/v2/gl-fr/products/search?query=/c/maison-et-loisirs/maison/rangement/rangements-de-cuisine/organisateurs-tiroirs-et-placards -> pagination.totalResults; breadcrumbs confirmed match to this exact category node",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Bathroom Storage (Rangements de Salle de Bain)",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Bathroom Storage Accessories",
+      "qty": 44,
+      "link": "https://www.galerieslafayette.com/c/maison-et-loisirs/maison/rangement/rangements-de-salle-de-bain/accessoires-de-rangement-de-salle-de-bain",
+      "is_group": false,
+      "evidence": "OCC REST API https://sapapi.galerieslafayette.com/occ/v2/gl-fr/products/search?query=/c/maison-et-loisirs/maison/rangement/rangements-de-salle-de-bain/accessoires-de-rangement-de-salle-de-bain -> pagination.totalResults; breadcrumbs confirmed match to this exact category node",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Toilet Roll Holders",
+      "qty": 25,
+      "link": "https://www.galerieslafayette.com/c/maison-et-loisirs/maison/rangement/rangements-de-salle-de-bain/derouleurs-papier-toilette",
+      "is_group": false,
+      "evidence": "OCC REST API https://sapapi.galerieslafayette.com/occ/v2/gl-fr/products/search?query=/c/maison-et-loisirs/maison/rangement/rangements-de-salle-de-bain/derouleurs-papier-toilette -> pagination.totalResults; breadcrumbs confirmed match to this exact category node",
+      "flag": "MANUAL REVIEW: primary function is dispensing rather than storage; included because site explicitly categorizes under bathroom storage",
+      "confidence": "LOW"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Laundry Baskets",
+      "qty": 98,
+      "link": "https://www.galerieslafayette.com/c/maison-et-loisirs/maison/rangement/rangements-de-salle-de-bain/paniers-a-linge",
+      "is_group": false,
+      "evidence": "OCC REST API https://sapapi.galerieslafayette.com/occ/v2/gl-fr/products/search?query=/c/maison-et-loisirs/maison/rangement/rangements-de-salle-de-bain/paniers-a-linge -> pagination.totalResults; breadcrumbs confirmed match to this exact category node",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Towel Racks",
+      "qty": 43,
+      "link": "https://www.galerieslafayette.com/c/maison-et-loisirs/maison/rangement/rangements-de-salle-de-bain/porte-serviettes",
+      "is_group": false,
+      "evidence": "OCC REST API https://sapapi.galerieslafayette.com/occ/v2/gl-fr/products/search?query=/c/maison-et-loisirs/maison/rangement/rangements-de-salle-de-bain/porte-serviettes -> pagination.totalResults; breadcrumbs confirmed match to this exact category node",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Decorative Storage (Rangements Decoratifs)",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Jewelry Boxes",
+      "qty": 56,
+      "link": "https://www.galerieslafayette.com/c/maison-et-loisirs/maison/rangement/rangements-decoratifs/boites-a-bijoux",
+      "is_group": false,
+      "evidence": "OCC REST API https://sapapi.galerieslafayette.com/occ/v2/gl-fr/products/search?query=/c/maison-et-loisirs/maison/rangement/rangements-decoratifs/boites-a-bijoux -> pagination.totalResults; breadcrumbs confirmed match to this exact category node",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Baskets/Bins",
+      "qty": 0,
+      "link": "https://www.galerieslafayette.com/c/maison-et-loisirs/maison/rangement/rangements-decoratifs/corbeilles",
+      "is_group": false,
+      "evidence": "OCC REST API https://sapapi.galerieslafayette.com/occ/v2/gl-fr/products/search?query=/c/maison-et-loisirs/maison/rangement/rangements-decoratifs/corbeilles -> pagination.totalResults; breadcrumbs confirmed match to this exact category node",
+      "flag": "MANUAL REVIEW: ambiguous - 'corbeilles' may denote wastebaskets (non-storage) rather than storage baskets; 0 products currently listed so could not sample",
+      "confidence": "LOW"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Decorative Baskets & Boxes",
+      "qty": 173,
+      "link": "https://www.galerieslafayette.com/c/maison-et-loisirs/maison/rangement/rangements-decoratifs/paniers-et-boites-decoratives",
+      "is_group": false,
+      "evidence": "OCC REST API https://sapapi.galerieslafayette.com/occ/v2/gl-fr/products/search?query=/c/maison-et-loisirs/maison/rangement/rangements-decoratifs/paniers-et-boites-decoratives -> pagination.totalResults; breadcrumbs confirmed match to this exact category node",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Wall Hooks & Coat Racks",
+      "qty": 142,
+      "link": "https://www.galerieslafayette.com/c/maison-et-loisirs/maison/rangement/rangements-decoratifs/pateres-et-portemanteaux",
+      "is_group": false,
+      "evidence": "OCC REST API https://sapapi.galerieslafayette.com/occ/v2/gl-fr/products/search?query=/c/maison-et-loisirs/maison/rangement/rangements-decoratifs/pateres-et-portemanteaux -> pagination.totalResults; breadcrumbs confirmed match to this exact category node",
+      "flag": null,
+      "confidence": "MEDIUM"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Umbrella Stands",
+      "qty": 0,
+      "link": "https://www.galerieslafayette.com/c/maison-et-loisirs/maison/rangement/rangements-decoratifs/portes-parapluies",
+      "is_group": false,
+      "evidence": "OCC REST API https://sapapi.galerieslafayette.com/occ/v2/gl-fr/products/search?query=/c/maison-et-loisirs/maison/rangement/rangements-decoratifs/portes-parapluies -> pagination.totalResults; breadcrumbs confirmed match to this exact category node",
+      "flag": "MANUAL REVIEW: borderline decorative/functional item, not explicitly listed in storage rules; 0 products currently listed",
+      "confidence": "LOW"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Magazine Racks",
+      "qty": 15,
+      "link": "https://www.galerieslafayette.com/c/maison-et-loisirs/maison/rangement/rangements-decoratifs/portes-revues",
+      "is_group": false,
+      "evidence": "OCC REST API https://sapapi.galerieslafayette.com/occ/v2/gl-fr/products/search?query=/c/maison-et-loisirs/maison/rangement/rangements-decoratifs/portes-revues -> pagination.totalResults; breadcrumbs confirmed match to this exact category node",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Wall Storage",
+      "qty": 9,
+      "link": "https://www.galerieslafayette.com/c/maison-et-loisirs/maison/rangement/rangements-decoratifs/rangements-muraux",
+      "is_group": false,
+      "evidence": "OCC REST API https://sapapi.galerieslafayette.com/occ/v2/gl-fr/products/search?query=/c/maison-et-loisirs/maison/rangement/rangements-decoratifs/rangements-muraux -> pagination.totalResults; breadcrumbs confirmed match to this exact category node",
+      "flag": null,
+      "confidence": "MEDIUM"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "CD/DVD Storage Racks",
+      "qty": 0,
+      "link": "https://www.galerieslafayette.com/c/maison-et-loisirs/maison/rangement/rangements-decoratifs/ranges-cd-dvd",
+      "is_group": false,
+      "evidence": "OCC REST API https://sapapi.galerieslafayette.com/occ/v2/gl-fr/products/search?query=/c/maison-et-loisirs/maison/rangement/rangements-decoratifs/ranges-cd-dvd -> pagination.totalResults; breadcrumbs confirmed match to this exact category node",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Utility Storage (Rangements Utilitaires)",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Storage Boxes",
+      "qty": 80,
+      "link": "https://www.galerieslafayette.com/c/maison-et-loisirs/maison/rangement/rangements-utilitaires/boites-de-rangement",
+      "is_group": false,
+      "evidence": "OCC REST API https://sapapi.galerieslafayette.com/occ/v2/gl-fr/products/search?query=/c/maison-et-loisirs/maison/rangement/rangements-utilitaires/boites-de-rangement -> pagination.totalResults; breadcrumbs confirmed match to this exact category node",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Hangers",
+      "qty": 1,
+      "link": "https://www.galerieslafayette.com/c/maison-et-loisirs/maison/rangement/rangements-utilitaires/cintres",
+      "is_group": false,
+      "evidence": "OCC REST API https://sapapi.galerieslafayette.com/occ/v2/gl-fr/products/search?query=/c/maison-et-loisirs/maison/rangement/rangements-utilitaires/cintres -> pagination.totalResults; breadcrumbs confirmed match to this exact category node",
+      "flag": null,
+      "confidence": "MEDIUM"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Garment Storage Bags",
+      "qty": 20,
+      "link": "https://www.galerieslafayette.com/c/maison-et-loisirs/maison/rangement/rangements-utilitaires/housses-a-vetements",
+      "is_group": false,
+      "evidence": "OCC REST API https://sapapi.galerieslafayette.com/occ/v2/gl-fr/products/search?query=/c/maison-et-loisirs/maison/rangement/rangements-utilitaires/housses-a-vetements -> pagination.totalResults; breadcrumbs confirmed match to this exact category node",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Vacuum Storage Bags",
+      "qty": 0,
+      "link": "https://www.galerieslafayette.com/c/maison-et-loisirs/maison/rangement/rangements-utilitaires/housses-vide-d-air",
+      "is_group": false,
+      "evidence": "OCC REST API https://sapapi.galerieslafayette.com/occ/v2/gl-fr/products/search?query=/c/maison-et-loisirs/maison/rangement/rangements-utilitaires/housses-vide-d-air -> pagination.totalResults; breadcrumbs confirmed match to this exact category node",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Office Storage",
+      "qty": 24,
+      "link": "https://www.galerieslafayette.com/c/maison-et-loisirs/maison/rangement/rangements-utilitaires/rangements-de-bureau",
+      "is_group": false,
+      "evidence": "OCC REST API https://sapapi.galerieslafayette.com/occ/v2/gl-fr/products/search?query=/c/maison-et-loisirs/maison/rangement/rangements-utilitaires/rangements-de-bureau -> pagination.totalResults; breadcrumbs confirmed match to this exact category node",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Garden Storage Chests",
+      "qty": 1,
+      "link": "https://www.galerieslafayette.com/c/maison-et-loisirs/maison/jardin/decorations-de-jardin/coffres-de-jardin",
+      "is_group": false,
+      "evidence": "OCC REST API https://sapapi.galerieslafayette.com/occ/v2/gl-fr/products/search?query=/c/maison-et-loisirs/maison/jardin/decorations-de-jardin/coffres-de-jardin -> pagination.totalResults; breadcrumbs confirmed match to this exact category node",
+      "flag": null,
+      "confidence": "MEDIUM"
+    }
+  ]
+}

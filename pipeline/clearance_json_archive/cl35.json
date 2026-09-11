@@ -1,0 +1,151 @@
+{
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "Access: direct curl_cffi (impersonate chrome124) to www.frontgate.com, 200 OK throughout, no block encountered. Counts from the site's own Unbxd API proxy (UnbxdAPI?categoryId=<id>...) -> numberOfProducts, double-verified with a boundary test (unbxdStart=N-1 -> 1 item, unbxdStart=N -> 0 items) for every row below (all matched exactly; the single 1-item row, Outdoor Entertaining Clearance, could not be boundary-tested the same way because Unbxd ignores 'start' entirely below its page size for a 1-result set, so numberOfProducts=1 was instead cross-checked by re-querying 4 times with different start offsets, all returning the same single product consistently). Discovery: pulled the site's own full nav/category JSON tree (/JSONAPIs?module=categories, ~1600 nodes) and located Frontgate's entire Sale/Outlet/Clearance tree. The company is indeed an HSN/QVC-group site with an explicit 'Outlet' section as the task flagged: the top nav node whose OWN categoryTitle is literally 'Clearance' (categoryId 98147, URL /sale/) contains a child also titled 'Clearance' (categoryId 98150, URL /sale/outlet/) - this passes the Sale-vs-Clearance test cleanly since the site's own taxonomy label is 'Clearance', not a generic 'Sale/Deals/Offers' name, even though the URL slug happens to be /sale/. Below 98150 sit two structurally different lists that turned out to be numeric ALIASES of the same master pool: 'Clearance'(98150, /sale/outlet/) and 'All Clearance'(211154, /sale/outlet/view-all/) both report numberOfProducts=268 - kept the canonical visible-in-nav node (98150) as the master Clearance row and did NOT duplicate 211154 (its child department tiles are hidden-from-nav river tiles pointing at the same 268-item pool, not separate assortments). All named department-level clearance sub-listings (Outdoor Furniture, Outdoor Decor & Pool, Furniture, Bed & Bath [+ its Bath/Bed children], Lighting & Decor, Rugs & Pillows, Tabletop & Entertaining [+ its Serveware/Outdoor Entertaining children], Holiday Decor & Gifts, Clearance Under $100, and 'New to Clearance' which despite its /sale/outlet/new-arrivals/ URL slug is a recently-marked-down-to-clearance filter INSIDE the Clearance tree, not the site's separate New Arrivals concept - kept here, excluded from the New Arrivals file) are real, non-empty, distinct product-count listings kept as leaf rows under the Clearance parent. DROPPED as zero-product (site itself returns numberOfProducts=0): 'Tabletop Clearance' (categoryId 221202) and 'Bar & Wine Clearance' (categoryId 221203) under the Tabletop & Entertaining Clearance branch, and three legacy alternate-path clearance URLs discovered elsewhere in the tree that are effectively dead/depopulated (Outdoor Furniture Clearance at /outdoor/outdoor-savings/ catId 194170, Outdoor Decor & Pool Clearance at /outdoor/outdoor-decor-savings/ catId 220184, and Holiday Clearance at /holiday-decor/special-savings/ catId 89178 - all return numberOfProducts=0 despite appearing as live nav-visible nodes; they look like older duplicate entry points for the same content now reachable canonically via /sale/outlet/*, so nothing was lost by dropping them). AMBIGUOUS: 'Limited Time Only' (categoryId 197154, /sale/limited-time-only/, numberOfProducts=260) is a direct sibling of the 'Clearance' node under the same top-level 'Clearance'/sale hub, and is a real, large, non-empty product listing - but its own category title is 'Limited Time Only', not Clearance/Outlet/Final Sale/Last Chance, and its MULTI_LEVEL_TEMPLATE_CATEGORY attribute reads like a time-boxed promotional sale filter rather than a permanent-markdown outlet listing. Recorded per the brief's guidance rather than guessed either way; flagged for manual review. EXCLUDED outright (not recorded): 'Free Shipping' (categoryId 251654, /sale/free-shipping/) and its Bedding/Outdoor-Sets children - a shipping-perk filter, no markdown/clearance signal at all.",
+  "rows": [
+    {
+      "category": "Clearance",
+      "sub_category": "Clearance",
+      "qty": 268,
+      "link": "https://www.frontgate.com/sale/outlet/",
+      "is_group": true,
+      "evidence": "Unbxd API categoryId=98150 -> numberOfProducts=268; identical total on canonical alias /sale/outlet/view-all/ (categoryId 211154); boundary-verified (unbxdStart=267 -> 1 item, unbxdStart=268 -> 0 items)",
+      "flag": null
+    },
+    {
+      "category": "Clearance",
+      "sub_category": "New to Clearance",
+      "qty": 157,
+      "link": "https://www.frontgate.com/sale/outlet/new-arrivals/",
+      "is_group": false,
+      "evidence": "Unbxd API categoryId=98159 -> numberOfProducts=157; boundary-verified (unbxdStart=156 -> 1 item, unbxdStart=157 -> 0 items). Note: despite the URL slug 'new-arrivals', this is nested under the Clearance/Outlet tree and its own categoryTitle is 'New to Clearance' - it means recently-marked-down items, not the site's separate New Arrivals concept.",
+      "flag": null
+    },
+    {
+      "category": "Clearance",
+      "sub_category": "Clearance Under $100",
+      "qty": 51,
+      "link": "https://www.frontgate.com/sale/outlet/clearance-under-100/",
+      "is_group": false,
+      "evidence": "Unbxd API categoryId=144147 -> numberOfProducts=51; boundary-verified (unbxdStart=50 -> 1 item, unbxdStart=51 -> 0 items)",
+      "flag": null
+    },
+    {
+      "category": "Clearance",
+      "sub_category": "Outdoor Furniture Clearance",
+      "qty": 75,
+      "link": "https://www.frontgate.com/sale/outlet/outdoor-furniture/",
+      "is_group": false,
+      "evidence": "Unbxd API categoryId=98162 -> numberOfProducts=75 (page H1 override 'Outdoor Clearance'); boundary-verified (unbxdStart=74 -> 1 item, unbxdStart=75 -> 0 items)",
+      "flag": null
+    },
+    {
+      "category": "Clearance",
+      "sub_category": "Outdoor Decor & Pool Clearance",
+      "qty": 39,
+      "link": "https://www.frontgate.com/sale/outlet/outdoor-living/",
+      "is_group": false,
+      "evidence": "Unbxd API categoryId=98163 -> numberOfProducts=39; boundary-verified (unbxdStart=38 -> 1 item, unbxdStart=39 -> 0 items)",
+      "flag": null
+    },
+    {
+      "category": "Clearance",
+      "sub_category": "Furniture Clearance",
+      "qty": 34,
+      "link": "https://www.frontgate.com/sale/outlet/indoor-furniture/",
+      "is_group": false,
+      "evidence": "Unbxd API categoryId=98167 -> numberOfProducts=34 (page H1 override 'Furniture Clearance'); boundary-verified (unbxdStart=33 -> 1 item, unbxdStart=34 -> 0 items)",
+      "flag": null
+    },
+    {
+      "category": "Clearance",
+      "sub_category": "Bed & Bath Clearance",
+      "qty": 30,
+      "link": "https://www.frontgate.com/sale/outlet/bed-bath/",
+      "is_group": true,
+      "evidence": "Unbxd API categoryId=98165 -> numberOfProducts=30 (page H1 override 'Bed & Bath Clearance'); boundary-verified (unbxdStart=29 -> 1 item, unbxdStart=30 -> 0 items)",
+      "flag": null
+    },
+    {
+      "category": "Clearance",
+      "sub_category": "Bath Clearance",
+      "qty": 6,
+      "link": "https://www.frontgate.com/sale/outlet/bed-bath/bath/",
+      "is_group": false,
+      "evidence": "Unbxd API categoryId=221192 -> numberOfProducts=6; boundary-verified (unbxdStart=5 -> 1 item, unbxdStart=6 -> 0 items)",
+      "flag": null
+    },
+    {
+      "category": "Clearance",
+      "sub_category": "Bed Clearance",
+      "qty": 15,
+      "link": "https://www.frontgate.com/sale/outlet/bed-bath/bed/",
+      "is_group": false,
+      "evidence": "Unbxd API categoryId=221193 -> numberOfProducts=15; boundary-verified (unbxdStart=14 -> 1 item, unbxdStart=15 -> 0 items)",
+      "flag": null
+    },
+    {
+      "category": "Clearance",
+      "sub_category": "Lighting & Decor Clearance",
+      "qty": 54,
+      "link": "https://www.frontgate.com/sale/outlet/lighting-decor/",
+      "is_group": false,
+      "evidence": "Unbxd API categoryId=222696 -> numberOfProducts=54; boundary-verified (unbxdStart=53 -> 1 item, unbxdStart=54 -> 0 items)",
+      "flag": null
+    },
+    {
+      "category": "Clearance",
+      "sub_category": "Rugs & Pillows Clearance",
+      "qty": 48,
+      "link": "https://www.frontgate.com/sale/outlet/rugs-pillows/",
+      "is_group": false,
+      "evidence": "Unbxd API categoryId=222697 -> numberOfProducts=48; boundary-verified (unbxdStart=47 -> 1 item, unbxdStart=48 -> 0 items)",
+      "flag": null
+    },
+    {
+      "category": "Clearance",
+      "sub_category": "Tabletop & Entertaining Clearance",
+      "qty": 8,
+      "link": "https://www.frontgate.com/sale/outlet/kitchen-entertaining/",
+      "is_group": true,
+      "evidence": "Unbxd API categoryId=98169 -> numberOfProducts=8 (page H1 override 'Tabletop & Entertaining Clearance'); boundary-verified (unbxdStart=7 -> 1 item, unbxdStart=8 -> 0 items)",
+      "flag": null
+    },
+    {
+      "category": "Clearance",
+      "sub_category": "Serveware Clearance",
+      "qty": 2,
+      "link": "https://www.frontgate.com/sale/outlet/kitchen-entertaining/serveware/",
+      "is_group": false,
+      "evidence": "Unbxd API categoryId=221201 -> numberOfProducts=2; boundary-verified (unbxdStart=1 -> 1 item, unbxdStart=2 -> 0 items)",
+      "flag": null
+    },
+    {
+      "category": "Clearance",
+      "sub_category": "Outdoor Entertaining Clearance",
+      "qty": 1,
+      "link": "https://www.frontgate.com/sale/outlet/kitchen-entertaining/outdoor-entertaining/",
+      "is_group": false,
+      "evidence": "Unbxd API categoryId=221204 -> numberOfProducts=1, confirmed identical across 4 repeated queries at different unbxdStart offsets (Unbxd ignores start below its own page size on a 1-item result set)",
+      "flag": null
+    },
+    {
+      "category": "Clearance",
+      "sub_category": "Holiday Decor & Gifts Clearance",
+      "qty": 13,
+      "link": "https://www.frontgate.com/sale/outlet/holiday-decor/",
+      "is_group": false,
+      "evidence": "Unbxd API categoryId=98172 -> numberOfProducts=13 (page H1 override 'Holiday Decor & Gifts Clearance'); boundary-verified (unbxdStart=12 -> 1 item, unbxdStart=13 -> 0 items)",
+      "flag": null
+    },
+    {
+      "category": "Clearance",
+      "sub_category": "Limited Time Only",
+      "qty": 260,
+      "link": "https://www.frontgate.com/sale/limited-time-only/",
+      "is_group": false,
+      "evidence": "Unbxd API categoryId=197154 -> numberOfProducts=260; boundary-verified (unbxdStart=259 -> 1 item, unbxdStart=260 -> 0 items)",
+      "flag": "MANUAL REVIEW: AMBIGUOUS SALE/CLEARANCE - node is a direct sibling of the site's 'Clearance' node under the shared top-level /sale/ 'Clearance' hub, and is a real non-empty PLP, but its own categoryTitle is 'Limited Time Only' (not Clearance/Outlet/Final Sale/Last Chance) and reads as a time-boxed promotional sale rather than confirmed permanent-markdown outlet stock."
+    }
+  ]
+}

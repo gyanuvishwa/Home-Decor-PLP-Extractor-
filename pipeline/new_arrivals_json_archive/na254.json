@@ -1,0 +1,25 @@
+{
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "Access: direct HTTP GET throughout, no WAF/bot-protection encountered. Checked: robots.txt (no Claude disallow), agents.md/llms.txt/llms-full.txt, sitemap.xml -> collections.sitemap.xml (511 collection URLs), homepage embedded nav JSON (full header mega-menu incl. sub_navigation, footer nav), site search. Found /collection/new-arrivals -- own og:title is literally 'New Arrivals | West Elm New Arrivals', a genuine filterable PLP (embedded 'filters' key present, real distinct diverse product set e.g. Archer Barware Metal Tray, Berra Chair, Corina Ceramic Vases) with item_total=184 (verified via 2 consistent occurrences of the embedded JSON item_total field, same method that reproduced the prior pass's verified Chandeliers qty=18). Recorded as the primary New Arrivals row, no flag -- its own permanent URL slug and title unambiguously self-identify as New Arrivals. SEPARATE finding: /collection/spring-summer-25 is also a real, distinct, filterable PLP (item_total=144, only 2 of ~14 sampled product uids overlap with new-arrivals, i.e. genuinely different product sets, not an alias) whose own og:title is 'Shop New Arrivals | Spring Summer 2025 Collection | West Elm India' -- it explicitly self-identifies with 'Shop New Arrivals' wording too, but is season/date-branded to Spring/Summer 2025, over a year stale as of this 2026-09-09 check, so it is genuinely ambiguous whether it still represents 'recently added' stock vs. being a leftover dead seasonal campaign page that merely used New-Arrivals-flavoured marketing copy at launch. Recorded as a second row with a MANUAL REVIEW flag rather than silently excluding or including it. NAV-ROTATION CAVEAT (relevant context, not itself a reason to include/exclude): the live homepage mega-menu's 'Shop New Arrivals' label currently points to a THIRD page, /collection/fall-collection (og:title 'Fall Collection | Fall Collection with West Elm', item_total=196) and a 'Furniture' sub-item under the top 'New Arrivals' nav points to /collection/fall-furniture (og:title 'Fall Furniture | Fall Collection | Furniture', item_total=34) -- neither of these two pages' own titles mention 'New Arrivals' at all, only 'Fall Collection'; a prior crawl (llms-full.txt, 2026-09-04) shows the same 'Shop New Arrivals' label pointing to spring-summer-25 instead, confirming this nav slot rotates seasonally (Dynamic Yield personalization script present in page head) independent of which page is genuinely self-titled 'New Arrivals'. Per brief section 3, fall-collection and fall-furniture were excluded as seasonal campaign pages with no New-Arrivals self-identification in their own copy.",
+  "rows": [
+    {
+      "category": "New Arrivals",
+      "sub_category": "New Arrivals",
+      "qty": 184,
+      "link": "https://westelm.in/collection/new-arrivals",
+      "is_group": false,
+      "evidence": "embedded page JSON \"item_total\":184 (og:title \"New Arrivals | West Elm New Arrivals\")",
+      "flag": null
+    },
+    {
+      "category": "New Arrivals",
+      "sub_category": "Spring Summer 2025 Collection",
+      "qty": 144,
+      "link": "https://westelm.in/collection/spring-summer-25",
+      "is_group": false,
+      "evidence": "embedded page JSON \"item_total\":144 (og:title \"Shop New Arrivals | Spring Summer 2025 Collection | West Elm India\")",
+      "flag": "MANUAL REVIEW: AMBIGUOUS NEW COLLECTION - real distinct filterable PLP (144 items, mostly non-overlapping with /collection/new-arrivals) whose own title says 'Shop New Arrivals' but is season/date-branded to Spring/Summer 2025, over a year stale as of 2026-09-09 check; judgment call whether this still counts as a live New Arrivals sub-listing or is a dead seasonal campaign page."
+    }
+  ]
+}

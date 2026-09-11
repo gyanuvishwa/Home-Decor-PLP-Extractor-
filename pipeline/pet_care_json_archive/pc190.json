@@ -1,0 +1,170 @@
+{
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "Access: same PerimeterX-gated site as the prior Home-Decor pass. robots.txt re-checked (https://www.samsclub.com/robots.txt): only standard disallows (search/cart/checkout/account/etc), no Claude-specific block. Plain requests blocked; curl_cffi impersonate='chrome120' worked on every fetch this session (17 URLs, 0 failures, no retries needed this time). Nav discovery: /cp/pet-care/2011 ('Pet Care' department landing page) embeds a HubSpokesNxM 'Shop by Category' module in __NEXT_DATA__ (JSON is minified here, no spaces after colons, so the regex from the prior pass's notes had to be adjusted) listing 18 tiles; drilled into the two sub-hub pages it links (/cp/dogs/2012, /cp/cats/2026), each with their own HubSpokesNxM module, plus /cp/pet-medication/30001795 which instead carries a StaticNavigationPills module pointing to /browse/pet-wellness/6400172. All leaf tiles resolved to /browse/<slug>/<catId> PLPs whose __NEXT_DATA__ props.pageProps.initialData.searchResult.itemStacks[0] holds both 'meta.totalItemCount' (exact site-computed total) and the literal 'items' array (used for de-dup/content verification only). QTY METHOD: used meta.totalItemCount as qty, NOT the raw 'items' array length or the top-level 'count'/'gridItemsCount' fields (those are inflated by 1 unlabelled AdPlaceholder entry per page, same defect the Home-Decor pass documented). Cross-validated meta.totalItemCount as exact (not the '(N+)' display's apparent approximation) on the two multi-page categories found: Dog Treats page1(45 unique)+page2(10 unique)=55 == meta 55; Pet Accessories/feeding-accessories-2024 page1(45)+page2(14)=59 == meta 59 -- exact match in both cases, so meta.totalItemCount is trusted site-truth throughout, including single-page categories where the raw ad-slot-stripped item count ran 1 below meta (e.g. Dog Food: 39 raw vs meta 40) -- treated as one SKU present in the count but not rendered in the SSR payload (e.g. hidden/oos variant), not as an inflation artifact. GROUPING: 'Pet Accessories' (catId 2024) is the real parent of Dog Beds(2021)/Dog Accessories(2029)/Cat Accessories(9259) -- confirmed via their shared breadCrumb ['All Departments','Pet Supplies','Pet Accessories']; made it a grouping row instead of double-counting its own 59-count against its children's 12+17+20=49 (the gap is other facets with no dedicated nav tile). 'Flea & Tick Care' (catId 15370153) is likewise parent of Dog Flea & Tick Care(2360135, breadcrumb '...>Flea & Tick Care') and Cat Flea & Tick Care(2400101, same breadcrumb) -- children's real-product sum (13+18-...=~18) matches the parent's own de-duped unique count (18) almost exactly, confirming the relationship; made it a grouping row rather than counting it a third time. EXCLUDED, not emitted as rows: 'New!'/'Savings'/'Shareable Packs' (facet-filtered promo/marketing tiles off the top hub, explicitly excluded category types per brief); 'Pet Insurance' (external link to quote.spotpet.com, a quote form, not a PLP); \"Member's Mark Pet Supplies\" (catId 17080255, breadcrumb 'Member's Mark Products' -- a brand rollup, not a product-type category; its sample items are the same SKUs already counted under Dog Food/Dog Treats/Pet Beds, e.g. 'Member's Mark Chicken Jerky Recipe Dog Treats' appears verbatim in both); 'Puppy Essentials' (catId 15720501 -- a curated new-puppy starter-kit merchandising bucket, breadcrumb sits at the bare 'Pet Supplies' level not under Dogs, and its sample items duplicate Dog Food/Dog Treats/Pet Accessories SKUs already counted, e.g. 'Member's Mark Grain Free Salmon and Sweet Potato Dry Dog Food' appears in both Dog Food and here); 'Smart Pet' (catId 3450119, breadcrumb 'Electronics & Computers > Cool Tech & Gadgets' -- a cross-department gadget collection mixing wild-bird tech (Birdfy feeders/cameras, not owned-pet care) with Petkit items that duplicate SKUs already counted under Dog/Cat Accessories); 'Wildlife Supplies' (catId 16700408, breadcrumb 'Outdoor & Patio > Lawn & Garden' -- wild bird feeders/birdseed/squirrel supplies for backyard wildlife, not owned pets; out of Pet Care scope per the boundary rules despite one stray dog-kennel item bleeding into the results). ABSENCE CHECK: navigated the full Pet Care hub tree (Pet Care -> Dogs/Cats/Pet Accessories/Flea & Tick/Supplements/Medication) plus the 4 excluded tiles above; no dedicated Dog Collars/Leashes/Harnesses, Cat Trees/Scratchers, Pet Carriers/Travel, Pet Clothing, Pet Gates/Crates, or Pet Grooming-tools category exists as its own nav tile anywhere in this tree -- those product types (if carried at all) live unlabelled inside the broad 'Dog Accessories'/'Cat Accessories' buckets already counted. Did not rely on site search (banned as sole absence proof per brief); relied on the embedded nav-module JSON, which is exhaustive for this page type. All qty values below are single evidence-bearing fetches, not re-derived or estimated. Not treated as a duplicate company (no prior Pet Care S.N. for samsclub.com in this batch)."
+  ,
+  "rows": [
+    {
+      "category": "Pet Care",
+      "sub_category": "Pet Care",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Dogs",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Dog Food",
+      "qty": 40,
+      "link": "https://www.samsclub.com/browse/dog-food/15110132",
+      "is_group": false,
+      "evidence": "__NEXT_DATA__:props.pageProps.initialData.searchResult.itemStacks[0].meta.totalItemCount=40 (catId 15110132, catName 'Dog Food')",
+      "flag": "MANUAL REVIEW: PET CONSUMABLE - dog food/kibble/wet food category, no include/exclude policy set yet"
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Dog Treats",
+      "qty": 55,
+      "link": "https://www.samsclub.com/browse/dog-treats/9225",
+      "is_group": false,
+      "evidence": "__NEXT_DATA__:props.pageProps.initialData.searchResult.itemStacks[0].meta.totalItemCount=55, cross-verified by fetching both pages: page1 45 unique real product IDs + page2(?page=2) 10 unique real product IDs = 55, exact match",
+      "flag": "MANUAL REVIEW: PET CONSUMABLE - dog treats/chews/jerky category, no include/exclude policy set yet"
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Dog Toys",
+      "qty": 12,
+      "link": "https://www.samsclub.com/browse/dog-toys/2014",
+      "is_group": false,
+      "evidence": "__NEXT_DATA__:props.pageProps.initialData.searchResult.itemStacks[0].meta.totalItemCount=12 (catId 2014, catName 'Dog Toys'); 11 real product entries rendered in SSR payload",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Cats",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Cat Food & Treats",
+      "qty": 20,
+      "link": "https://www.samsclub.com/browse/cat-food/2027",
+      "is_group": false,
+      "evidence": "__NEXT_DATA__:props.pageProps.initialData.searchResult.itemStacks[0].meta.totalItemCount=20 (catId 2027, catName 'Cat Food & Treats')",
+      "flag": "MANUAL REVIEW: PET CONSUMABLE - cat food/treats category, no include/exclude policy set yet"
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Cat Litter",
+      "qty": 10,
+      "link": "https://www.samsclub.com/browse/cat-litter/2030",
+      "is_group": false,
+      "evidence": "__NEXT_DATA__:props.pageProps.initialData.searchResult.itemStacks[0].meta.totalItemCount=10 (catId 2030, catName 'Cat Litter')",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Pet Accessories",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Dog Beds",
+      "qty": 12,
+      "link": "https://www.samsclub.com/browse/dog-beds-houses/2021",
+      "is_group": false,
+      "evidence": "__NEXT_DATA__:props.pageProps.initialData.searchResult.itemStacks[0].meta.totalItemCount=12 (catId 2021, catName 'Pet Beds'); same URL was also tiled as 'Dog Beds' on the Dogs hub and 'Pet Beds' on the top Pet Care hub -- one underlying listing, emitted once here",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Dog Accessories",
+      "qty": 17,
+      "link": "https://www.samsclub.com/browse/dog-accessories/2029",
+      "is_group": false,
+      "evidence": "__NEXT_DATA__:props.pageProps.initialData.searchResult.itemStacks[0].meta.totalItemCount=17 (catId 2029, catName 'Dog Accessories', breadCrumb confirms parent = Pet Accessories)",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Cat Accessories",
+      "qty": 20,
+      "link": "https://www.samsclub.com/browse/cat-accessories/9259",
+      "is_group": false,
+      "evidence": "__NEXT_DATA__:props.pageProps.initialData.searchResult.itemStacks[0].meta.totalItemCount=20 (catId 9259, catName 'Cat Accessories', breadCrumb confirms parent = Pet Accessories)",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Flea & Tick Care",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: PET MEDICAL / VETERINARY CATEGORY - flea/tick prevention & treatment products (topical drops, oral tablets, sprays), OTC but medicinal in nature"
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Dog Flea & Tick Care",
+      "qty": 13,
+      "link": "https://www.samsclub.com/browse/flea-tick-care/2360135",
+      "is_group": false,
+      "evidence": "__NEXT_DATA__:props.pageProps.initialData.searchResult.itemStacks[0].meta.totalItemCount=13 (catId 2360135, catName 'Dog Flea & Tick Care')",
+      "flag": "MANUAL REVIEW: PET MEDICAL / VETERINARY CATEGORY - topical/oral flea & tick prevention products (e.g. PetArmor Plus)"
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Cat Flea & Tick Care",
+      "qty": 5,
+      "link": "https://www.samsclub.com/browse/flea-tick/2400101",
+      "is_group": false,
+      "evidence": "__NEXT_DATA__:props.pageProps.initialData.searchResult.itemStacks[0].meta.totalItemCount=5 (catId 2400101, catName 'Cat Flea & Tick Care')",
+      "flag": "MANUAL REVIEW: PET MEDICAL / VETERINARY CATEGORY - topical/oral flea & tick prevention products for cats"
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Pet Supplements",
+      "qty": 32,
+      "link": "https://www.samsclub.com/browse/health-care/2022",
+      "is_group": false,
+      "evidence": "__NEXT_DATA__:props.pageProps.initialData.searchResult.itemStacks[0].meta.totalItemCount=32 (catId 2022, catName 'Pet Supplements'); same URL cross-linked from both the top Pet Care hub and the Dogs hub, listing covers both dog and cat products (e.g. 'Nutramax Cosequin Joint Health Supplement for Cats') so placed at top level, not nested under Dogs",
+      "flag": "MANUAL REVIEW: PET MEDICAL / VETERINARY CATEGORY - joint/hip health, probiotic and multivitamin supplement chews, health-adjacent rather than routine food"
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Pet Medication",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: PET MEDICAL / VETERINARY CATEGORY - hub page markets Sam's Club Plus member pricing on prescription pet medications (Apoquel, Heartgard Plus, Nexgard Combo) fulfilled via a third-party pharmacy flow (spotrx-style), not a browsable in-house PLP; its only linked Sam's-hosted catalog page is 'Pet Wellness' below"
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Pet Wellness",
+      "qty": 1,
+      "link": "https://www.samsclub.com/browse/pet-wellness/6400172",
+      "is_group": false,
+      "evidence": "__NEXT_DATA__:props.pageProps.initialData.searchResult.itemStacks[0].meta.totalItemCount=1 (catId 6400172, catName 'Pet Wellness', breadCrumb 'Pharmacy, Health & Wellness > Pet Medication'); sole item is 'PawSpa DogWash 11-Setting Indoor/Outdoor Pet Washing Kit' -- a grooming product, not medication, despite the page's placement under the Pet Medication hub",
+      "flag": null
+    }
+  ]
+}

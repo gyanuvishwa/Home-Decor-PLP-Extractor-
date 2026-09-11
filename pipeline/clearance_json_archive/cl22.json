@@ -1,0 +1,61 @@
+{
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "Target Home (SR22). Access: direct HTTP fetch (curl_cffi impersonation) of target.com /c/ pages worked (200s), taxonomy read from embedded __NEXT_DATA__ JSON. Qty came from Target's own redsky_aggregations plp_search_v2 API (search_response.metadata.total_results) - this endpoint is PerimeterX-protected for direct curl_cffi calls (403/captcha) and for headless Playwright (also served a PerimeterX captcha JSON to the intercepted XHR), so all qty values here were retrieved via the WebFetch tool hitting the redsky URL directly (tier-1 HTTP fetch of the count API, not a banned proxy). Sale-vs-Clearance check: found Target's global top-nav 'Deals' mega menu exposes two DISTINCT departments - 'Deals' (/c/top-deals/-/N-4xw74, generic temporary promotional sale, home-relevant equivalent is the separate 'Home Deals'/N-4u97i tree with children literally named '<Dept> Deals') and 'Clearance' (/c/clearance/-/N-5q0ga, permanent-markdown outlet taxonomy, seo_h1 literally 'Clearance', children literally named '<Dept> Clearance'). Per brief this is the textbook case of a site-taxonomy-confirmed Clearance department distinct from generic Sale/Deals - no ambiguity, so no rows from the 'Home Deals' generic-sale tree were included. Under global Clearance (5q0ga) found 'Home Clearance' (/c/home-clearance/-/N-5tg3v, seo_h1='Home Clearance', a Tag-type taxonomy node exactly analogous to the other departments' clearance nodes e.g. Toys Clearance, Beauty Clearance). Home Clearance's own on-page 'shop by category' module (taxonomy_nodes, not just the sparser server 'children' array) cross-links 7 sub-listings: Furniture, Bedding, Kitchen & Dining, Decor, Bath, Christmas(Holiday), and Patio & Garden Clearance. Included as home-relevant per task scope (furniture/decor/kitchen/bedding/bath/patio): Bedding, Bath, Home Decor (all 3 also appear in Home Clearance's own server-rendered taxonomy 'children' array, confirming they are true nested children, not just cross-links), plus Kitchen & Dining Clearance and Patio & Garden Clearance (both are genuine sibling Clearance departments in Target's global Clearance taxonomy but are explicitly listed as children of the main Home department page itself, N-5xtvd, in Target's own nav, so are home-relevant per the task's 'furniture, decor, kitchen, bedding, etc.' scope). Furniture Clearance (/c/furniture-clearance/-/N-5tg3x) was checked and returned total_results=0 (confirmed via a full metadata dump, not a truncated/error response - total_pages=0, empty products array, internally consistent) - dropped per 'drop zero-product listings' rule; currently no clearance-flagged furniture inventory live, not a missing category. Christmas/Holiday Clearance (/c/holiday-clearance/-/N-rud4e) was excluded as a seasonal category - out of scope for this Home-merchandising pass (Seasonal/Holiday is a separate project in this pipeline). Home Clearance parent total (732) is larger than the sum of its 3 literal taxonomy children (10+6+56=72) - this is expected/normal, the parent node's redsky total_results aggregates the full clearance subtree (including items in categories like Rugs/Lighting/Storage/Mattresses that don't get their own 'shop by category' tile), not just the 3 displayed tiles; noting this so it is not mistaken for a data error.",
+  "rows": [
+    {
+      "category": "Clearance",
+      "sub_category": "Home Clearance",
+      "qty": 732,
+      "link": "https://www.target.com/c/home-clearance/-/N-5tg3v",
+      "is_group": true,
+      "evidence": "redsky plp_search_v2 search_response.metadata.total_results=732, total_pages=31 (=ceil(732/24), matches page-size formula exactly, not capped); seo_h1='Home Clearance'",
+      "flag": null
+    },
+    {
+      "category": "Clearance",
+      "sub_category": "Bedding Clearance",
+      "qty": 10,
+      "link": "https://www.target.com/c/bedding-clearance/-/N-sdq8o",
+      "is_group": false,
+      "evidence": "redsky plp_search_v2 search_response.metadata.total_results=10",
+      "flag": null
+    },
+    {
+      "category": "Clearance",
+      "sub_category": "Bath Clearance",
+      "qty": 6,
+      "link": "https://www.target.com/c/bath-clearance/-/N-6p8ub",
+      "is_group": false,
+      "evidence": "redsky plp_search_v2 search_response.metadata.total_results=6",
+      "flag": null
+    },
+    {
+      "category": "Clearance",
+      "sub_category": "Home Decor Clearance",
+      "qty": 56,
+      "link": "https://www.target.com/c/home-decor-clearance/-/N-u9xjf",
+      "is_group": false,
+      "evidence": "redsky plp_search_v2 search_response.metadata.total_results=56",
+      "flag": null
+    },
+    {
+      "category": "Clearance",
+      "sub_category": "Kitchen & Dining Clearance",
+      "qty": 159,
+      "link": "https://www.target.com/c/kitchen-dining-clearance/-/N-54u2m",
+      "is_group": false,
+      "evidence": "redsky plp_search_v2 search_response.metadata.total_results=159, total_pages=7 (=ceil(159/24), matches, not capped)",
+      "flag": null
+    },
+    {
+      "category": "Clearance",
+      "sub_category": "Patio & Garden Clearance",
+      "qty": 93,
+      "link": "https://www.target.com/c/patio-garden-clearance/-/N-5tg3o",
+      "is_group": false,
+      "evidence": "redsky plp_search_v2 search_response.metadata.total_results=93",
+      "flag": null
+    }
+  ]
+}

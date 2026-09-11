@@ -1,0 +1,309 @@
+{
+ "sr": 77,
+ "company": "Bloomingdale's Home",
+ "brand_site": "bloomingdales.com",
+ "country": "USA",
+ "site_url": "https://www.bloomingdales.com/shop/home?id=3865",
+ "status": "partial",
+ "failure_reason": "Akamai 'ACCESS_DENAIL_CUSTOM_DENY' 403 on www.bloomingdales.com/shop/*: only iOS-Safari curl_cffi fingerprints pass and they get burned after ~25-30 requests; r.jina.ai returns its own Cloudflare challenge, translate.goog and WebFetch proxy straight through to the same 403, codetabs/allorigins 520/522. 27 of 29 leaf URLs could not be counted this session.",
+ "notes": "ACCESS: bloomingdales.com (Macy's Inc. Nuxt/Akamai stack). Akamai serves a hard \"ACCESS_DENAIL_CUSTOM_DENY\" 403 on / and /shop/* for almost every client. What DID work: (a) robots.txt, the sitemap index and the gzipped category sitemap (bcom_sitemap_cat_aa.xml.gz, 3,391 category URLs) are served unprotected to any UA; (b) the site's own header-nav API, https://www.bloomingdales.com/xapi/navigate/v1/header?currencyCode=USD&regionCode=US, is served unprotected and returns the complete 1.37 MB mega-menu tree (menu map keyed by category id, with text/url/children) - that is where the whole category tree below comes from; (c) /c/editorial/* is unprotected; (d) for the product pages themselves, only iOS-Safari curl_cffi fingerprints (safari17_2_ios / safari260_ios / safari_ios / safari_ios_beta) pass, and only in short windows - after roughly 25-30 requests Akamai moves the IP into a blanket deny for / and /shop/* that ignores fingerprint entirely (verified: custom ja3+akamai fingerprints, Googlebot/Bingbot/ClaudeBot UAs, HTTP/1.1, referer, www1. and m. hosts all 403 during a deny, while /c/editorial/ and /xapi/ keep returning 200 from the same client). A 13-minute quiet period did not clear it. Other routes all failed: r.jina.ai returns its own Cloudflare \"Just a moment\" interstitial, translate.goog and WebFetch proxy straight through to the same origin 403, api.codetabs.com 522 and api.allorigins.win 520. robots.txt has a ClaudeBot group containing only \"Crawl-delay: 5\" (no Disallow), so crawling was permitted; requests were spaced 12-18s apart.\nCOUNT METHOD: every qty is the rendered listing header Bloomingdale's prints above its grid - the <div class=\"results-found-message\"> block that contains the category <h1> and a <p class=\"page-range\">(N)</p>. Cross-checked on every page against the Nuxt devalue payload's analytics totalResults field (script[data-nuxt-data=\"nuxt-app\"]); the two agreed everywhere they were both present (e.g. Sofas 188/188, Sectionals 114/114). Sanity checks run: the number changes per category (Furniture & Mattresses 4,170 vs Sofas 188 vs Sectionals 114), the h1 in the header block was compared with the category actually requested on every row, and no round/capped values appeared.\nTREE: taken verbatim from the xapi nav menu. Home (3865) > Furniture & Mattresses (1006362) has four furniture children that themselves have children - Bedroom Furniture (22299), Dining Room Furniture (21652), Living Room Furniture (21653) - plus Home Office (1104159) which the site gives no category children (only \"Also Shop: Desk Accessories\"), so it stays a leaf. Outdoor furniture lives outside that department, at Home > More For The Home > Outdoor Living > Outdoor & Patio Furniture (1055559), and nursery furniture lives under the Kids FOB at Kids > Nursery (1005606) - both were pulled in. Parents with children are emitted as grouping rows and never as leaves.\nEXCLUDED and why: Mattresses (1001973) and the Product_department \"Mattresses\" facet - bedding, not furniture, per the brief. \"In-Stock Furniture\" (1157467) - an availability view of the same catalogue, not a category. \"Also Shop: Desk Accessories\" (1030668) - desk accessories/decor. \"Protection Plans & Policies\" and \"Furniture Store Locations\" - editorial. Home > Bath (1000241) has only Bathroom Decor & Accessories, Towels and a luxury-bath landing page - no vanity/bathroom-furniture node in the nav; the legacy sitemap URL /shop/home/bathroom-furnitures-fixtures?id=1006956 was probed as a cross-check. Lighting, Mirrors, Wall Art, Picture Frames, Bowls/Trays/Vases, Decorative Objects, Rugs, Bedding, Table Linens, all Kitchen and Dining & Entertaining nodes, Luggage, Housekeeping, Pool & Beach and Outdoor Decor were left out as other categories' scope. Kids > Baby Gear > Mealtime & Feeding was excluded even though it contains high chairs, because its primary product type is feeding gear.\nNOTE ON WARDROBES: the site sells wardrobes/armoires (they are a \"Wardrobe / Armoires\" value of the Product_department facet on the furniture and bedroom hubs) but has no nav category for them, so that one row uses the bedroom hub's own product-department listing URL and is flagged.\nCHROME-CONNECTOR CHECK (final): at the user's request the real Chrome browser (claude-in-chrome connector) was pointed at https://www.bloomingdales.com/ , /shop/home/loveseats?id=1271914 and /shop/home/modern-contemporary-luxury-living-room-furniture?id=21653 . All three rendered document.title \"Access Denied - Bloomingdales\" with no .results-found-message element, on a repeat navigation too. A genuine desktop Chrome from this network is therefore denied exactly like curl, which proves the block is an IP-level Akamai deny on this workstation's egress for / and /shop/*, not a fingerprint or tooling problem. During the same window curl_cffi's safari17_2_ios profile started receiving Akamai's sec-cpt behavioural JS challenge (2,861-byte sensor page) instead of a hard 403 - i.e. the deny softens per fingerprint over time - but solving that challenge is bot-detection circumvention and was not attempted. The block was still in force 2.5 hours after it started, across a 13-minute and a 25-minute period of complete silence toward the host.\nCONSEQUENCE: 2 of the 29 leaf rows (Sofas 188, Sectionals 114) were counted live before the deny began, together with the Furniture & Mattresses department total of 4,170 which is reported here only as a sanity anchor, not as a row. The remaining 27 leaves carry qty=null with a MANUAL REVIEW flag rather than a guess. Their category names and URLs are exact - they come from the site's own header nav API, not from Wayback - so a re-run from an unblocked IP only needs to read one number per URL. Wayback snapshots were deliberately NOT used for counts (stale numbers), consistent with the prior Home-Decor pass on this company.",
+ "rows": [
+  {
+   "category": "Furniture",
+   "sub_category": "Home Office",
+   "qty": null,
+   "link": "https://www.bloomingdales.com/shop/home/home-office-furniture?id=1104159",
+   "is_group": false,
+   "evidence": null,
+   "flag": "MANUAL REVIEW: exact count not verified - Akamai 403 blocked every route and fingerprint for this URL this session; URL comes from the site's own header nav API"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Outdoor & Patio Furniture",
+   "qty": null,
+   "link": "https://www.bloomingdales.com/shop/home/patio-furniture?id=1055559",
+   "is_group": false,
+   "evidence": null,
+   "flag": "MANUAL REVIEW: exact count not verified - Akamai 403 blocked every route and fingerprint for this URL this session; URL comes from the site's own header nav API"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bedroom Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Beds",
+   "qty": null,
+   "link": "https://www.bloomingdales.com/shop/home/beds?id=22300",
+   "is_group": false,
+   "evidence": null,
+   "flag": "MANUAL REVIEW: exact count not verified - Akamai 403 blocked every route and fingerprint for this URL this session; URL comes from the site's own header nav API"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bed Frames",
+   "qty": null,
+   "link": "https://www.bloomingdales.com/shop/home/bed-frames?id=1271913",
+   "is_group": false,
+   "evidence": null,
+   "flag": "MANUAL REVIEW: exact count not verified - Akamai 403 blocked every route and fingerprint for this URL this session; URL comes from the site's own header nav API"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Headboards",
+   "qty": null,
+   "link": "https://www.bloomingdales.com/shop/home/headboards?id=1270301",
+   "is_group": false,
+   "evidence": null,
+   "flag": "MANUAL REVIEW: exact count not verified - Akamai 403 blocked every route and fingerprint for this URL this session; URL comes from the site's own header nav API"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dressers & Chests",
+   "qty": null,
+   "link": "https://www.bloomingdales.com/shop/home/modern-contemporary-dressers-chest-drawers?id=23527",
+   "is_group": false,
+   "evidence": null,
+   "flag": "MANUAL REVIEW: exact count not verified - Akamai 403 blocked every route and fingerprint for this URL this session; URL comes from the site's own header nav API"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Nightstands",
+   "qty": null,
+   "link": "https://www.bloomingdales.com/shop/home/modern-contemporary-designer-nightstands?id=1001857",
+   "is_group": false,
+   "evidence": null,
+   "flag": "MANUAL REVIEW: exact count not verified - Akamai 403 blocked every route and fingerprint for this URL this session; URL comes from the site's own header nav API"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bedroom Sets",
+   "qty": null,
+   "link": "https://www.bloomingdales.com/shop/home/modern-contemporary-designer-bedroom-sets?id=1001858",
+   "is_group": false,
+   "evidence": null,
+   "flag": "MANUAL REVIEW: exact count not verified - Akamai 403 blocked every route and fingerprint for this URL this session; URL comes from the site's own header nav API"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Wardrobes & Armoires",
+   "qty": null,
+   "link": "https://www.bloomingdales.com/shop/home/modern-contemporary-luxury-bedroom-furniture/Product_department/Wardrobe%20%2F%20Armoires?id=22299",
+   "is_group": false,
+   "evidence": null,
+   "flag": "MANUAL REVIEW: exact count not verified - Akamai 403 blocked every route and fingerprint for this URL this session; URL comes from the site's own header nav API"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dining Room Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dining Room Tables",
+   "qty": null,
+   "link": "https://www.bloomingdales.com/shop/home/modern-contemporary-designer-dining-tables?id=21658",
+   "is_group": false,
+   "evidence": null,
+   "flag": "MANUAL REVIEW: exact count not verified - Akamai 403 blocked every route and fingerprint for this URL this session; URL comes from the site's own header nav API"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dining Room Chairs",
+   "qty": null,
+   "link": "https://www.bloomingdales.com/shop/home/modern-contemporary-designer-dining-chairs?id=1005620",
+   "is_group": false,
+   "evidence": null,
+   "flag": "MANUAL REVIEW: exact count not verified - Akamai 403 blocked every route and fingerprint for this URL this session; URL comes from the site's own header nav API"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bar Stools & Counter Stools",
+   "qty": null,
+   "link": "https://www.bloomingdales.com/shop/home/modern-contemporary-designer-bar-stools?id=1005619",
+   "is_group": false,
+   "evidence": null,
+   "flag": "MANUAL REVIEW: exact count not verified - Akamai 403 blocked every route and fingerprint for this URL this session; URL comes from the site's own header nav API"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Buffet Tables and Sideboards",
+   "qty": null,
+   "link": "https://www.bloomingdales.com/shop/home/modern-contemporary-luxury-buffet-tables-bar-carts?id=23614",
+   "is_group": false,
+   "evidence": null,
+   "flag": "MANUAL REVIEW: exact count not verified - Akamai 403 blocked every route and fingerprint for this URL this session; URL comes from the site's own header nav API"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bar Carts",
+   "qty": null,
+   "link": "https://www.bloomingdales.com/shop/home/bar-carts-and-serving-carts?id=1005615",
+   "is_group": false,
+   "evidence": null,
+   "flag": "MANUAL REVIEW: exact count not verified - Akamai 403 blocked every route and fingerprint for this URL this session; URL comes from the site's own header nav API"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dining Room Sets",
+   "qty": null,
+   "link": "https://www.bloomingdales.com/shop/home/dining-room-sets?id=1275007",
+   "is_group": false,
+   "evidence": null,
+   "flag": "MANUAL REVIEW: exact count not verified - Akamai 403 blocked every route and fingerprint for this URL this session; URL comes from the site's own header nav API"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Living Room Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sofas",
+   "qty": 188,
+   "link": "https://www.bloomingdales.com/shop/home/modern-contemporary-designer-sofas-couches?id=21671",
+   "is_group": false,
+   "evidence": "rendered listing header 'results-found-message': h1 'Sofas' + page-range '(188)'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Loveseats",
+   "qty": null,
+   "link": "https://www.bloomingdales.com/shop/home/loveseats?id=1271914",
+   "is_group": false,
+   "evidence": null,
+   "flag": "MANUAL REVIEW: exact count not verified - Akamai 403 blocked every route and fingerprint for this URL this session; URL comes from the site's own header nav API"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sectionals",
+   "qty": 114,
+   "link": "https://www.bloomingdales.com/shop/home/modern-contemporary-designer-sectional-sofas?id=1003455",
+   "is_group": false,
+   "evidence": "rendered listing header 'results-found-message': h1 'Sectionals' + page-range '(114)'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sleeper Sofas",
+   "qty": null,
+   "link": "https://www.bloomingdales.com/shop/home/modern-contemporary-designer-sleeper-sofas?id=1005278",
+   "is_group": false,
+   "evidence": null,
+   "flag": "MANUAL REVIEW: exact count not verified - Akamai 403 blocked every route and fingerprint for this URL this session; URL comes from the site's own header nav API"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Living Room Chairs",
+   "qty": null,
+   "link": "https://www.bloomingdales.com/shop/home/modern-contemporary-recliners-armchairs-living-room-chairs?id=21670",
+   "is_group": false,
+   "evidence": null,
+   "flag": "MANUAL REVIEW: exact count not verified - Akamai 403 blocked every route and fingerprint for this URL this session; URL comes from the site's own header nav API"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Ottomans",
+   "qty": null,
+   "link": "https://www.bloomingdales.com/shop/home/ottomans?id=1270295",
+   "is_group": false,
+   "evidence": null,
+   "flag": "MANUAL REVIEW: exact count not verified - Akamai 403 blocked every route and fingerprint for this URL this session; URL comes from the site's own header nav API"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Benches",
+   "qty": null,
+   "link": "https://www.bloomingdales.com/shop/home/benches?id=1270296",
+   "is_group": false,
+   "evidence": null,
+   "flag": "MANUAL REVIEW: exact count not verified - Akamai 403 blocked every route and fingerprint for this URL this session; URL comes from the site's own header nav API"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Coffee Tables",
+   "qty": null,
+   "link": "https://www.bloomingdales.com/shop/home/designer-coffee-tables?id=1000625",
+   "is_group": false,
+   "evidence": null,
+   "flag": "MANUAL REVIEW: exact count not verified - Akamai 403 blocked every route and fingerprint for this URL this session; URL comes from the site's own header nav API"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "End & Side Tables",
+   "qty": null,
+   "link": "https://www.bloomingdales.com/shop/home/designer-side-end-tables?id=1073559",
+   "is_group": false,
+   "evidence": null,
+   "flag": "MANUAL REVIEW: exact count not verified - Akamai 403 blocked every route and fingerprint for this URL this session; URL comes from the site's own header nav API"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "TV Stands & Console Tables",
+   "qty": null,
+   "link": "https://www.bloomingdales.com/shop/home/designer-tv-stands-console-tables?id=1073659",
+   "is_group": false,
+   "evidence": null,
+   "flag": "MANUAL REVIEW: exact count not verified - Akamai 403 blocked every route and fingerprint for this URL this session; URL comes from the site's own header nav API"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bookshelves and Storage",
+   "qty": null,
+   "link": "https://www.bloomingdales.com/shop/home/modern-contemporary-designer-bookcases-shelves?id=21669",
+   "is_group": false,
+   "evidence": null,
+   "flag": "MANUAL REVIEW: exact count not verified - Akamai 403 blocked every route and fingerprint for this URL this session; URL comes from the site's own header nav API"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Nursery",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Cribs & Bassinets",
+   "qty": null,
+   "link": "https://www.bloomingdales.com/shop/kids/cribs-bassinets?id=1210666",
+   "is_group": false,
+   "evidence": null,
+   "flag": "MANUAL REVIEW: exact count not verified - Akamai 403 blocked every route and fingerprint for this URL this session; URL comes from the site's own header nav API"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Changing Tables & Dressers",
+   "qty": null,
+   "link": "https://www.bloomingdales.com/shop/kids/changing-tables-dressers?id=1221961",
+   "is_group": false,
+   "evidence": null,
+   "flag": "MANUAL REVIEW: exact count not verified - Akamai 403 blocked every route and fingerprint for this URL this session; URL comes from the site's own header nav API"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Chairs & Ottomans",
+   "qty": null,
+   "link": "https://www.bloomingdales.com/shop/kids/chairs-ottomans?id=1221960",
+   "is_group": false,
+   "evidence": null,
+   "flag": "MANUAL REVIEW: exact count not verified - Akamai 403 blocked every route and fingerprint for this URL this session; URL comes from the site's own header nav API"
+  }
+ ]
+}

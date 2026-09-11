@@ -1,0 +1,75 @@
+{
+  "sr": 142,
+  "company": "Sostrene Grene",
+  "brand_site": "sostrenegrene.com",
+  "country": "Denmark",
+  "site_url": "https://www.sostrenegrene.com/",
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "ACCESS: Claude-in-Chrome only, in my own tab, at https://sostrenegrene.com/da/ (Denmark locale; www redirects to the apex host). robots.txt re-checked live: 'User-agent: * / Allow: /', no Claude / ClaudeBot / anthropic-ai directive anywhere. No 403, CAPTCHA or rate-limit was encountered at any point. Declined non-essential cookies on the CookieInformation banner. TREE: the DK sitemap (https://sostrenegrene.com/da/sitemap.xml, 5286 locs -> 188 category URLs) is the authority. Furniture is a TOP-LEVEL department 'Moebler' (/da/produkter/mobler-c-8311, h1 'MOEBLER', internal categoryId 11) with exactly 7 children and no third level. TRAP 1 CONFIRMED AND AVOIDED: the rendered mega-menu DOM exposed only 2 of them (Borde, Stole); the category sitemap and the Moebler page's own sub-category tile strip each independently gave all 7, and those two sources agree exactly. HIDDEN-CHILD CHECK: pulled the parent's full item list (242 unique product ids) and the union of the 7 children (242 unique ids) - 0 orphans, so the 7 children completely cover the department and there is no 8th child hiding. QTY METHOD: the storefront is an Umbraco-headless SPA; counts come from its own backend, GET /umbraco/api/catalog/search?categoryId=<id>&pageSize=500 -> {total:N}. categoryId was read from each category page's embedded jsonContent.content.categoryId (111 Borde, 112 Baenke, 113 Stole, 114 Hylder, 115 Boernemoebler, 116 Puffer, 117 Skabe) - NOT the c-NNNN URL suffix, which is an unrelated CMS contentId. I anchored this to Rule 1 rather than trusting the API blind: on the Tables node the page rendered the literal header '37 PRODUKTER', exactly equal to that endpoint's total=37, which establishes that 'total' IS the number the site displays. On the other six the SPA grid never hydrated in the automated tab, so their qty is that same JSON field, declared per Rule 2. COUNT STABILITY: the prior Home-Decor pass found this endpoint non-deterministic and that reproduced - the first read of a session can differ (Borde 45, Baenke 4, Boernemoebler 6, Puffer 21 each appeared once). I therefore sampled repeatedly; every category then returned one value unanimously across 12 consecutive reads for the four volatile nodes and 6 for the rest, and the settled Borde value (37) is the one the rendered header showed. Separately, the endpoint's 'total' is consistently LOWER than the number of items it returns (Moebler total 219 vs 242 items; Borde 37 vs 45), and the gap is NOT an availability filter (status split 20/25 does not reconcile to 37) - the returned array and the total come from desynced backend replicas behind the site's load balancer. I report the site's displayed number (total) per Rule 1; the published catalogue is somewhat larger. SCOPE: keyword-scanned all 188 DK category slugs for furniture terms in English and Danish (moebler, stole, borde, reol, skabe, senge, baenke, sofa, kommode, puffer, skrivebord, natbord, garderobe, taburet, hylder, plus furniture/chair/table/bed/desk/cabinet/wardrobe/bench/stool/shelving/bookcase/seating). The ONLY hits are the 8 Moebler URLs; the 3 other hits are false positives (craft 'redskaber', office 'skriveredskaber', 'skrivebordstilbehoer' - all supplies). I also title-scanned the three departments that could hide furniture without a furniture slug: Udeliv/Outdoor (categoryId 24000, total 84) holds only 3 furniture-typed items (hanging balcony table, lounge chair, folding chair) and all 3 are already counted inside Borde/Stole; Bolig>Have/Garden (categoryId 17, total 31) is entirely growing and planting supplies; Boern>Boerneinterior (categoryId 54, total 20) holds only a kids chair already counted in Stole. So Soestrene Grene has NO separate outdoor or garden furniture department - its few outdoor pieces sit inside the indoor Tables and Chairs nodes, and emitting those departments would double-count. EXCLUDED as not furniture-typed: Bolig>Interior (storage, baskets, vases, candle holders, decoration, frames, mirrors, lamps), Tekstiler, Koekkenudstyr, Boeger, Elektronik, Have, Udeliv, Lys, Fest, Kontorartikler, Boern (toys/clothing), Accessories, Mad og drikke, Skoenhed, Jul, Paaske, Gaver, Rejsetilbehoer, Kreativitet. STRUCTURE: Moebler maps onto the Category column itself, so all 7 nodes are emitted as leaves and no grouping row is needed (a 'Furniture' grouping row would merely duplicate the Category value). TRAP 2: all 7 leaf URLs confirmed HTTP 200 with h1/title/canonical matching the node requested (BORDE, BAENKE, STOLE, HYLDER, BOERNEMOEBLER, PUFFER, SKABE) - no silent parent-listing substitution. TRAP 3: nodes keyed by slug/categoryId, never by display label. TRAP 4: the totals behave like an in-stock snapshot (see COUNT STABILITY). Benches reading only 3 is genuine, not a misread - the node lists just 4 bench products in total.",
+  "rows": [
+    {
+      "category": "Furniture",
+      "sub_category": "Tables",
+      "qty": 37,
+      "link": "https://sostrenegrene.com/da/produkter/mobler/borde-c-8317",
+      "is_group": false,
+      "evidence": "rendered listing header '37 PRODUKTER' on /da/produkter/mobler/borde-c-8317 (h1 'BORDE'); identical to /umbraco/api/catalog/search?categoryId=111&pageSize=500 -> total=37 (11 of 12 consecutive reads; one transient 45)",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Benches",
+      "qty": 3,
+      "link": "https://sostrenegrene.com/da/produkter/mobler/baenke-c-8318",
+      "is_group": false,
+      "evidence": "JSON field 'total' from same-origin fetch of /umbraco/api/catalog/search?categoryId=112&pageSize=500 -> total=3 (11 of 12 consecutive reads identical; one transient 4). Rendered header unobtainable in automation (SPA product grid never hydrated behind the CookieInformation consent overlay, staying on its '0 PRODUKTER' placeholder); this exact field was proven identical to the rendered header on the Tables node ('37 PRODUKTER' == total 37).",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Chairs",
+      "qty": 46,
+      "link": "https://sostrenegrene.com/da/produkter/mobler/stole-c-8319",
+      "is_group": false,
+      "evidence": "JSON field 'total' from same-origin fetch of /umbraco/api/catalog/search?categoryId=113&pageSize=500 -> total=46 (6 of 6 consecutive reads identical). Rendered header unobtainable in automation (SPA product grid never hydrated behind the CookieInformation consent overlay, staying on its '0 PRODUKTER' placeholder); this exact field was proven identical to the rendered header on the Tables node ('37 PRODUKTER' == total 37).",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Shelves",
+      "qty": 78,
+      "link": "https://sostrenegrene.com/da/produkter/mobler/hylder-c-8320",
+      "is_group": false,
+      "evidence": "JSON field 'total' from same-origin fetch of /umbraco/api/catalog/search?categoryId=114&pageSize=500 -> total=78 (6 of 6 consecutive reads identical). Rendered header unobtainable in automation (SPA product grid never hydrated behind the CookieInformation consent overlay, staying on its '0 PRODUKTER' placeholder); this exact field was proven identical to the rendered header on the Tables node ('37 PRODUKTER' == total 37).",
+      "flag": "MANUAL REVIEW: ambiguous shelving - the site files this node under its own Moebler (Furniture) department, but a title scan of all 95 listed items shows roughly 60 percent are wall-mounted shelves (Vaeghylde 35, Vaegreol 5, plus door and bathroom shelves) which are Wall Decor scope. The furniture core is about 14 freestanding shelving units (Reol 10, Reol i fyrretrae, Gulvreol, Firkantet reol, Reolkube) plus 2 headboards, 1 bedside table and 1 shoe cabinet. Included per the site's own classification; qty is the whole node."
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Children's Furniture",
+      "qty": 5,
+      "link": "https://sostrenegrene.com/da/produkter/mobler/bornemobler-c-8321",
+      "is_group": false,
+      "evidence": "JSON field 'total' from same-origin fetch of /umbraco/api/catalog/search?categoryId=115&pageSize=500 -> total=5 (10 of 12 consecutive reads identical; two transient 6). Rendered header unobtainable in automation (SPA product grid never hydrated behind the CookieInformation consent overlay, staying on its '0 PRODUKTER' placeholder); this exact field was proven identical to the rendered header on the Tables node ('37 PRODUKTER' == total 37).",
+      "flag": "MANUAL REVIEW: only 1-2 of the 6 listed items are furniture (kids boucle chair; arguably a kids clothes rack). The rest are a wall shelf with hooks, a kids wall mirror, a wall height chart and a play tepee. Kept because the site itself files the node under Moebler as children's furniture."
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Poufs",
+      "qty": 18,
+      "link": "https://sostrenegrene.com/da/produkter/mobler/puffer-c-8322",
+      "is_group": false,
+      "evidence": "JSON field 'total' from same-origin fetch of /umbraco/api/catalog/search?categoryId=116&pageSize=500 -> total=18 (11 of 12 consecutive reads identical; one transient 21). Rendered header unobtainable in automation (SPA product grid never hydrated behind the CookieInformation consent overlay, staying on its '0 PRODUKTER' placeholder); this exact field was proven identical to the rendered header on the Tables node ('37 PRODUKTER' == total 37).",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Cabinets",
+      "qty": 16,
+      "link": "https://sostrenegrene.com/da/produkter/mobler/skabe-c-10790",
+      "is_group": false,
+      "evidence": "JSON field 'total' from same-origin fetch of /umbraco/api/catalog/search?categoryId=117&pageSize=500 -> total=16 (6 of 6 consecutive reads identical). Rendered header unobtainable in automation (SPA product grid never hydrated behind the CookieInformation consent overlay, staying on its '0 PRODUKTER' placeholder); this exact field was proven identical to the rendered header on the Tables node ('37 PRODUKTER' == total 37).",
+      "flag": null
+    }
+  ]
+}

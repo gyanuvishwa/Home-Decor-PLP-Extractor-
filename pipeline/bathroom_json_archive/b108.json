@@ -1,0 +1,247 @@
+{
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ROBOTS: https://www.connox.com/robots.txt fetched FIRST, before any other request on the host (saved at work/w105_108/connox_robots.txt, HTTP 200, 261 bytes) and re-verified by me rather than taken from the previous worker's dump. It is a single 'User-agent: *' group with five Disallows - /customer-area.html, /watch-list.html, /customer-area/, /design-newsletter-registered.html, /orly.php - plus two Sitemap lines. NO Claude agent is named: no ClaudeBot, anthropic-ai or Claude-Web group, and no Content-Signal line. None of the five disallowed paths is anywhere near the category tree. No Crawl-delay is declared, so probe.py's 2 s per-host gap was used unchanged. SECOND HOST: the PLP renders from api.connox.io, a different host, so per the per-host rule I fetched https://api.connox.io/robots.txt separately BEFORE using it - it returns HTTP 404, i.e. no robots file and therefore no directive of any kind, named or generic. cdn.connox.com and cdn.connox.de were deliberately NOT used: both JS bundles I read are also served from www.connox.com and I took them from there so no third host was touched. ACCESS: plain HTTP 200 on every page via probe.fetch(); no bot wall, no interstitial, no 403. The storefront is served in English with c_ActiveCountry = 'DE' and body data-channel = '100005', i.e. this is the German channel of connox.com. The manifest site for SR 108 is https://www.connox.com/ and Furniture.xlsx already recorded all 50 of its Connox rows on connox.com English URLs (verified by dumping every connox key in the exclusion index), so the URL form used here is consistent with the prior pass. TREE: taken from the site's own taxonomy, not guessed. Connox has two parallel structures and I used the product one. (1) /bathroom.html is category type 'Raum' (room) under Inspiration > Rooms - an editorial room hub whose four children are type 'Seite' with zero products; it is NOT the product tree. (2) The product tree is Categories > Home Accessories > Bathroom Decor at https://www.connox.com/categories/accessories/bathroom-accessories.html (categoryId 102051, type 'Produktkategorie'). Its children came from that page's own 'All categories in Bathroom Decor' block (28 links, 27 unique), cross-checked against the rendered mega-menu on the home page, which lists the same set. Every page reports its own identity in three independent places that I read on every fetch: body id='C<categoryId>', the dataLayer push ('CategoryId', 'CategoryTypeId', 'CategoryTypeName'), and the rendered breadcrumb + BreadcrumbList ld+json. HIDDEN-CHILD CHECK (this is what a mega-menu 'Mehr' truncation would hide): I downloaded all eight sitemap files declared in robots.txt (13,587 URLs, 13,087 of them under /categories/) and derived the child set independently from URL structure - every product under a Bathroom Decor subcategory lives at /categories/accessories/bathroom-accessories/<subcat>/<product>.html, so the distinct second-level segments ARE the child set. That produced 20 segments against the nav's 21 in-path children. The six segments the nav did not show (bathroom-attachments, bathroom-equipment, care-wellness, hand-creams, soap-dishes, soap-dispensers) were each fetched and every one is a legacy path alias that resolves to a category I already had: bathroom-attachments.html and care-wellness.html -> C102051 Bathroom Decor, bathroom-equipment.html -> C111060 the room hub, soap-dishes.html -> C186118 (canonical is the bathroom-attachments/soap-dishes.html form the nav uses, which is what rows[] records), soap-dispensers.html -> C125172, hand-creams.html 404s. So the child set is closed - there is no truncated branch. QTY: the PLP is fully client-rendered (<div id=\"PageContent\"><!--empty div--></div>), so there is no rendered total in the HTML and no pagination markup. I therefore used the storefront's OWN product API - the one the PLP itself renders from, established by reading the site's React bundle https://www.connox.com/script/cnxwp.124.min.js: fetchProductList -> Items.getItems -> GET `/shop/${shopId}/items?${query}` against base https://api.connox.io/v1, where shopId = document.body.dataset.channel (100005 on these pages) and the query builder seeds queryParams with view:'search' and adds categoryId, limit, offset, currencyCode; the response fields it consumes are itemContent and totalSearchHits. The exact request form used here is https://api.connox.io/v1/shop/100005/items?view=search&limit=<n>&offset=<n>&currencyCode=EUR&categoryId=<id>, and the categoryId is always the one the PLP itself declares in its own body id / dataLayer. No parameter was invented. VERIFICATION: (a) EQUIVALENCE PROVED BY EXHAUSTIVE ENUMERATION on four categories of deliberately different size - Washing accessories (191688), Shower squeegee (183850), Toothbrush mug (183844) and Soap dispenser (125172). Paging offset=0,100,200... to exhaustion and counting itemIds gave total / fetched / unique = 4/4/4, 29/29/29, 106/106/106 and 119/119/119. totalSearchHits therefore equals the real number of distinct products on the grid, on small, medium and multi-page nodes alike, and is not a filtered or capped figure. (b) H1 and breadcrumb were checked on EVERY node and match the node asked for: all nine recorded leaves render breadcrumb 'Categories > Home Accessories > Bathroom Decor' with an H1 equal to the nav label (Bath shelves & Shower shelves, Cosmetic tissue boxes, Shower squeegee, Soap dishes, Soap dispenser, Toilet brushes, Toilet roll holder, Toothbrush mug, Towel rail) and CategoryTypeName 'Produktunterkategorie'. Nodes whose breadcrumb showed a different parent (Home Textiles, Home Decor, Household) were routed out on that evidence, not on their name. (c) Counts discriminate strongly and are nowhere a site-wide constant: 4, 7, 9, 17, 21, 22, 29, 29, 35, 39, 48, 49, 50, 55, 56, 67, 98, 99, 101, 106, 113, 119, 137, 154, 280, 351, 418. (d) Ambiguous nodes were resolved by reading their actual product titles through the same API rather than by keyword: 'Washing accessories' turned out to be four Steamery laundry-detergent items, 'Lint brushes & Lint shaver' seven Steamery garment-care tools, 'Body care' Meraki shampoo and body wash - all three routed out; 'Cosmetic tissue boxes' (Nichba wall paper dispenser, Zone Denmark Ume handkerchief boxes, Alessi Birillo tissue box) and 'Bath shelves & Shower shelves' (Umbra Cubiko shower trays, Zone Denmark Ume jars, Mette Ditmer marble cube) are genuine bathroom accessories and are recorded. ASSORTMENT - EXPLICIT NEGATIVE FINDING: Connox is a design-homeware retailer and sells NO sanitaryware. I searched the full 13,587-URL sitemap for washbasin, wash-basin, bathtub, bath-tub, faucet, sanitary, shower-head, toilet-seat and waschbecken: the only hits anywhere on the site are two product pages whose names merely contain the words (Radius Design Puro towel holder for a washbasin; Umbra Aquala bathtub shelf). There is no baths, toilets, basins, taps, showers or enclosures node, so rules 4-8 have no nodes here, and rule 9 (bathroom furniture / vanity units) has none either - the site's only 'Bathroom furniture' URL is an empty editorial 'Seite'. Rule 10 (mirrors) was actively checked and Connox's mirror categories are all filed under Home Decor / Entryway Furniture with no bathroom mirror node; they are in review[] routed to Decor rather than skipped. These absences are facts about the assortment, established by search, not gaps in the walk. DEDUP: already_extracted() was run on all 29 candidate URLs (the nine recorded leaves, the hub, and every routed-out or withheld node). ZERO hits - the Furniture pass took 50 Connox URLs but all of them are furniture, outdoor and kids nodes and none is in the bathroom branch. So no OPTION 1 exclusion applies to this company and all nine leaves are genuinely unextracted. EXCLUDED: 'Bathroom Decor' (102051) is a grouping row with blank qty and blank link (rule 38); its own totalSearchHits is 13 and all 13 items belong to four type-'Produkt' single-product landing nodes, which confirms it has no grid of its own worth recording and is not a leaf. /bathroom.html (418) is withheld as a room-level roll-up that spans the recorded leaves (roll-up rule + rule 24). The three 'Produkt' landing pages in the hub's child list are not categories (rule 27). The four /bathroom/* editorial pages are EMPTY NODES (0 products each) and named in review[]. Five textile nodes (Bath towels 101, Bathrobes 39, Bath mats 49, Shower Curtains 35, Towels 280) route to Textile; Scented candles 99 and the two mirror nodes (351, 154) route to Decor; Body care 21, Hand creams 17, Soaps 29, Toiletry bags 48, Washing accessories 4, Lint brushes 7, Steam straightener 9, Trash cans 137, Laundry baskets 113 and Hot-water bottles 4 are not Bathroom by primary product type or by the site's own hierarchy. All are in review[] with qty and URL so nothing is silently skipped.",
+ "rows": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Decor",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Decor > Bath shelves & Shower shelves",
+   "qty": 55,
+   "link": "https://www.connox.com/categories/accessories/bathroom-accessories/bath-shelves-shower-shelves.html",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Decor > Cosmetic tissue boxes",
+   "qty": 22,
+   "link": "https://www.connox.com/categories/accessories/bathroom-accessories/cosmetic-tissue-boxes.html",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Decor > Shower squeegee",
+   "qty": 29,
+   "link": "https://www.connox.com/categories/accessories/bathroom-accessories/shower-squeegee.html",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Decor > Soap dishes",
+   "qty": 50,
+   "link": "https://www.connox.com/categories/accessories/bathroom-accessories/bathroom-attachments/soap-dishes.html",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Decor > Soap dispenser",
+   "qty": 119,
+   "link": "https://www.connox.com/categories/accessories/bathroom-accessories/soap-dispenser.html",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Decor > Toilet brushes",
+   "qty": 98,
+   "link": "https://www.connox.com/categories/accessories/bathroom-accessories/toilet-brushes.html",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Decor > Toilet roll holder",
+   "qty": 67,
+   "link": "https://www.connox.com/categories/accessories/bathroom-accessories/toilet-roll-holder.html",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Decor > Toothbrush mug",
+   "qty": 106,
+   "link": "https://www.connox.com/categories/accessories/bathroom-accessories/toothbrush-mug.html",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Decor > Towel rail",
+   "qty": 56,
+   "link": "https://www.connox.com/categories/accessories/bathroom-accessories/towel-rail.html",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  }
+ ],
+ "review": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Decor > Bath towels",
+   "qty": 101,
+   "issue": "ROUTED TO TEXTILE: bath towels (rules 15, 20). Category type 'Produktunterkategorie', breadcrumb Categories > Home Accessories > Bathroom Decor, categoryId 185503.",
+   "link": "https://www.connox.com/categories/accessories/bathroom-accessories/bath-towels.html"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Decor > Bathrobes",
+   "qty": 39,
+   "issue": "ROUTED TO TEXTILE: bathrobes (rule 20). categoryId 191461.",
+   "link": "https://www.connox.com/categories/accessories/bathroom-accessories/bathrobes.html"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Home Textiles > Bath mats & bath rugs",
+   "qty": 49,
+   "issue": "ROUTED TO TEXTILE: textile bath mats and rugs, not rubber/anti-slip bathroom accessories (rule 16). Linked from the Bathroom Decor hub but its own breadcrumb is Categories > Home Textiles (categoryId 116593), so the site itself files it as textile.",
+   "link": "https://www.connox.com/categories/home-textiles/bath-mats.html"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Home Textiles > Shower Curtains",
+   "qty": 35,
+   "issue": "ROUTED TO TEXTILE: shower curtains (rule 20). Breadcrumb Categories > Home Textiles, categoryId 114832.",
+   "link": "https://www.connox.com/categories/home-textiles/shower-curtains.html"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Home Textiles > Towels",
+   "qty": 280,
+   "issue": "ROUTED TO TEXTILE: towels (rule 15). Breadcrumb Categories > Home Textiles, categoryId 101233.",
+   "link": "https://www.connox.com/categories/home-textiles/towels.html"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Home Accessories > Home Decor > Scented candles",
+   "qty": 99,
+   "issue": "ROUTED TO DECOR: scented candles (rule 21). Linked from the Bathroom Decor hub but filed by the site under Categories > Home Accessories > Home Decor, categoryId 183843.",
+   "link": "https://www.connox.com/categories/accessories/home-decor/scented-candles.html"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Home Accessories > Home Decor > Mirrors",
+   "qty": 351,
+   "issue": "ROUTED TO DECOR: Connox has NO bathroom mirror category. Its mirror categories are decorative and sit under Categories > Home Accessories > Home Decor (Mirrors, categoryId 105557) and under Entryway Furniture; primary function is wall/room decor, not bathroom (rules 11, 21). Recorded here so the absence of a bathroom mirror node is evidenced rather than silently skipped (rule 10 was actively checked, not ignored).",
+   "link": "https://www.connox.com/categories/accessories/home-decor/mirrors.html"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Home Accessories > Home Decor > Wall mirror",
+   "qty": 154,
+   "issue": "ROUTED TO DECOR: decorative wall mirrors under Home Decor (categoryId 185490), same reasoning as Mirrors above.",
+   "link": "https://www.connox.com/categories/accessories/home-decor/wall-mirror.html"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Decor > Body care",
+   "qty": 21,
+   "issue": "NOT BATHROOM: cosmetics/toiletries (Meraki shampoo, conditioner, body wash, body lotion, foot cream, body scrub) - primary product type is a consumable cosmetic, not bathroom equipment (rule 2 puts PRIMARY PRODUCT TYPE above website hierarchy). categoryId 193708.",
+   "link": "https://www.connox.com/categories/accessories/bathroom-accessories/body-care.html"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Decor > Hand creams",
+   "qty": 17,
+   "issue": "NOT BATHROOM: hand creams are consumable cosmetics (rule 2). categoryId 185603.",
+   "link": "https://www.connox.com/categories/accessories/bathroom-accessories/hand-cream.html"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Decor > Soaps",
+   "qty": 29,
+   "issue": "NOT BATHROOM: bar/liquid soap is a consumable cosmetic. Rule 13 admits soap DISPENSERS, DISHES and HOLDERS - all three of which are recorded in rows[] - but not the soap itself. categoryId 185605.",
+   "link": "https://www.connox.com/categories/accessories/bathroom-accessories/soaps.html"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Decor > Toiletry bag & Cosmetic bags",
+   "qty": 48,
+   "issue": "NOT BATHROOM: soft-goods travel/cosmetic bags, primary product type is a bag (rules 2, 30-33). The site also cross-lists this same node under KLEIDUNG/Bags. categoryId 194203.",
+   "link": "https://www.connox.com/categories/accessories/bathroom-accessories/toiletry-bag-cosmetic-bags.html"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Decor > Washing accessories",
+   "qty": 4,
+   "issue": "NOT BATHROOM: laundry care, not bathroom - all four products are Steamery laundry items (liquid detergent Hypoallergenic 750 ml, liquid detergent White 750 ml, felt dryer balls set of 4, textile spray 500 ml). Verified by reading the node's own product titles rather than its name. categoryId 191688.",
+   "link": "https://www.connox.com/categories/accessories/bathroom-accessories/washing-accessories.html"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Decor > Lint brushes & Lint shaver",
+   "qty": 7,
+   "issue": "NOT BATHROOM: garment care - all seven products are Steamery lint shavers, lint brushes and a clothes brush. Primary product type is clothing care (rule 2). categoryId 191690.",
+   "link": "https://www.connox.com/categories/accessories/bathroom-accessories/lint-brushes-lint-shaver.html"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Decor > Steam straightener",
+   "qty": 9,
+   "issue": "NOT BATHROOM: handheld garment steamers - clothing care appliances (rule 2). categoryId 191689.",
+   "link": "https://www.connox.com/categories/accessories/bathroom-accessories/steam-straightener.html"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Home Accessories > Household > Trash can & Pedal garbage can",
+   "qty": 137,
+   "issue": "NOT BATHROOM: general household waste bins. Linked from the Bathroom Decor hub but filed by the site under Categories > Home Accessories > Household (categoryId 135196); general household storage/waste stays out of Bathroom (rules 30-33).",
+   "link": "https://www.connox.com/categories/accessories/household/trash-cans-and-pedal-bins.html"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Home Accessories > Household > Laundry baskets",
+   "qty": 113,
+   "issue": "NOT BATHROOM: laundry baskets filed under Categories > Home Accessories > Household (categoryId 105911), not under Bathroom Decor. Reached only from the curated /bathroom.html room menu. Flagged because Zara Home DE's equivalent node sits INSIDE its bathroom department and was recorded there - here the site's own hierarchy puts it in Household, so it is withheld (rules 12, 30-33).",
+   "link": "https://www.connox.com/categories/accessories/household/laundry-baskets.html"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Home Textiles > Hot-Water Bottles",
+   "qty": 4,
+   "issue": "NOT BATHROOM: hot-water bottles, filed under Categories > Home Textiles (categoryId 110778). Listed because the Bathroom Decor hub links to it.",
+   "link": "https://www.connox.com/categories/home-textiles/hot-water-bottles.html"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Inspiration > Rooms > Bathroom (room hub)",
+   "qty": 418,
+   "issue": "NOT RECORDED - roll-up. /bathroom.html is category type 'Raum' (room) with breadcrumb Inspiration > Rooms, id 111060, and its 418 products are a room-level roll-up spanning the Bathroom Decor leaves recorded in rows[] plus textiles, lighting, mirrors and household bins. Recording it alongside its children would aggregate quantities (rule 24 and the roll-up rule). It is also an inspiration page, not a product subcategory.",
+   "link": "https://www.connox.com/bathroom.html"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Inspiration > Rooms > Bathroom > Organization / Bathroom furniture / Bathroom textiles / Wellness",
+   "qty": 0,
+   "issue": "EMPTY NODES - the four children of the /bathroom.html room hub (bathroom-organization.html id 191926, bathroom-furniture.html id 191929, bathroom-textiles.html id 191930, wellness.html id 191933) are all category type 'Seite' (editorial page) under Inspiration > Rooms > Bathroom and each returns totalSearchHits = 0 from the storefront's own product API. They hold no products of their own and are editorial landing pages that link out to categories filed elsewhere, so they are named here rather than recorded as zero-qty rows. NOTE: 'Bathroom furniture' being an empty editorial page is the evidence that Connox has no bathroom furniture / vanity category at all (rule 9 checked, no node exists).",
+   "link": "https://www.connox.com/bathroom/bathroom-furniture.html"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Decor > HAY 'Stripe' Bath Towel / HAY Waffle Slippers / Marimekko Galleria Slippers",
+   "qty": 9,
+   "issue": "NOT RECORDED - these three links in the hub's own 'All categories in Bathroom Decor' block are category type 'Produkt' (ids 199384 qty 4, 199365 qty 3, 199385 qty 2), i.e. single-product colour-variant landing pages, not category listings (rules 25, 27). Their 9 products plus a fourth Produkt node (199368, 4 products) are the only 13 items attached directly to the Bathroom Decor hub itself, which is why the hub's own totalSearchHits is 13 and it is a grouping row.",
+   "link": "https://www.connox.com/categories/accessories/bathroom-accessories/hay-stripe-bath-towel.html"
+  }
+ ],
+ "_reconstructed_from": "Bathroom.xlsx delivered 2026-09-01 (checkpoint), not original worker JSON"
+}

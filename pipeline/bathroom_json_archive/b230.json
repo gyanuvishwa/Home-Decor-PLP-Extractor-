@@ -1,0 +1,22 @@
+{
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "Access: HTTP-first, tier 1 sufficient (Shopify storefront, SSR + /products.json endpoints, no browser needed). robots.txt: generic 'User-agent: * / Allow: /' plus adsbot rules; no Claude/anthropic-ai/ClaudeBot-specific disallow -> not blocked. Tree source: sitemap_collections_1.xml (1651 collection URLs) cross-checked against the live mega-menu (home.html nav extraction) to find the real 'Home > Bath' hierarchy, since the sitemap is dominated by colour/sale/promo collections. Real nav under Home > Bath has exactly two children: 'Towels | Mats' (/collections/bath-towels-mats) and 'Bath Accessories' (/collections/bath-bath-accessories); the parent /collections/bath is a 'View All' node (rule 25, excluded) and its Shopify products_count field (856) is confirmed inflated/unreliable vs. the real /products.json list (87), consistent with prior findings -- not used. Verified via /collections/<handle>/products.json?limit=250 (exact item counts + product_type per item, more reliable than the client-rendered '0 items' PLP shell and the inflated collection-level count field). /collections/bath-towels-mats content is pure textile (bath towels/mats/sheets/face/hand towels) -> Textile scope, not inspected further since not our category. /collections/bath-bath-accessories (18 items: 14 Laundry Baskets/organisers + 2 Bathroom Accessory Sets + 1 Soap Dish + 1 Laundry Detergent Caddy) is the site's own single taxonomy node for 'Bath Accessories' (site hierarchy places the laundry baskets under this same Bath node). Also checked /collections/bath-and-body-care and /collections/studiowest-bath-body: both are personal-care (shower gel/body lotion/body wash) -- out of Bathroom-category scope entirely, not recorded. Checked /collections/home-bed-and-bath: a broad cross-shop promo grouping (Bed+Bath+Fragrance mixed, not part of the primary nav tree) that adds no new candidate URL beyond the two above; excluded as non-hierarchy promo per rule 25 reasoning. No dedicated fixtures/sanitaryware/basins/taps/toilets/vanities/mirrors/shower-enclosure collections exist anywhere in the sitemap (grep for mirror|toilet|basin|tap|faucet|vanity|shower|sink|bidet against all 1651 collection URLs returned zero matches besides the already-checked bath-and-body-care/bath-shower-view-all) -- Westside is a fashion + home-textile/decor retailer, not a sanitaryware brand. Cross-category dedup check (mandatory, run against cross_category_url_index.json): https://www.westside.com/collections/bath-bath-accessories -> already indexed under Storage.xlsx; https://www.westside.com/collections/bath-towels-mats -> already indexed under Textile.xlsx; https://www.westside.com/collections/bath -> not indexed but is a View-All parent, excluded on its own merits. Both dedup hits routed to review[] per the mandatory 'always add every dedup exclusion' instruction, never to rows[]. Net result: no genuine standalone Bathroom leaf exists for this company -- confirmed absence, not a fabricated zero.",
+  "rows": [],
+  "review": [
+    {
+      "category": "Bathroom",
+      "sub_category": "Bath Accessories",
+      "qty": 18,
+      "issue": "ALREADY EXTRACTED IN Storage.xlsx (cross_category_url_index.json). Node mixes 14 Laundry Baskets/organisers with 2 Bathroom Accessory Sets, 1 Soap Dish and 1 Laundry Detergent Caddy under one site-hierarchy URL; owned by Storage per Option-1 dedup regardless of the genuine bathroom-accessory items present.",
+      "link": "https://www.westside.com/collections/bath-bath-accessories"
+    },
+    {
+      "category": "Bathroom",
+      "sub_category": "Towels | Mats",
+      "qty": 69,
+      "issue": "ALREADY EXTRACTED IN Textile.xlsx (cross_category_url_index.json). Pure textile bath mats/towels/sheets (rule 15/16 routes these to Textile); confirmed no non-textile (rubber/anti-slip) mats in the listing.",
+      "link": "https://www.westside.com/collections/bath-towels-mats"
+    }
+  ]
+}

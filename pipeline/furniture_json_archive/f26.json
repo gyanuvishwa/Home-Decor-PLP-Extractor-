@@ -1,0 +1,174 @@
+{
+ "sr": 26,
+ "company": "HAY US",
+ "brand_site": "hay.com",
+ "country": "USA",
+ "site_url": "https://us.hay.com/",
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ACCESS: us.hay.com is retired - it 301s to https://www.dwr.com/brands-hay (Design Within Reach, HAY's US retailer), whose HAY brand page is a brand/designer filter listing and is barred by the brief, so rows come from www.hay.com, HAY's own US-facing English catalogue - the same source the prior Home-Decor pass for this SR used. Reached by plain direct fetch (probe.fetch, no proxy). robots.txt is 'User-agent: *' with no Claude/anthropic-ai directive. Re-fetching 4 furniture PLPs with Cookie 'Hay.countrySelected=USA' returned identical tile counts (13/52/0/12), confirming one global catalogue.\n\nTREE: taken from the site's own mega-menu (there is no /products/furniture landing page - it 404s). Furniture department = Seating (Bar Stools, Benches, Chairs, Lounge, Seat Cushions, Sofas, Stools), Tables (Coffee & Side, Conference & High, Desks, Dining & Cafe, Frames & Spare parts), Beds, Shelves, Wardrobe, Outdoor (Seating, Tables + 9 named collection pages), New Furniture, New Order System. I crawled every furniture URL recursively to find sub-pages the menu does not show.\n\nQTY METHOD: www.hay.com publishes NO product-count header anywhere - no 'N items', no 'N products', no pagination total, no Algolia/Next/structured count (grepped; the only 'results' strings belong to the site-search typeahead widget). So every qty is method 3, full enumeration. Each PLP grid is a MixItUp list with pagingSettings pagingEnabled:false and showCount:0, so the complete list is server-rendered in the first response and 'show more' merely unhides existing .mix-item nodes. I counted distinct /hay/... product-detail URLs, not hrefs: tiles come in two flavours (.hayproduct and, for a few products, imagewithlinkblock) and I accounted for every mix-item on every page as product / sub-page link / intro-text block, so nothing is silently dropped or double-counted. 14 categories were read twice (second read cache-busted) and every number was identical - no session drift.\n\nCOLLECTION HANDLING: HAY nests product families under some categories. For Chairs, Sofas and Shelves the family/system sub-pages hold products that appear NOWHERE on the parent PLP (verified by set intersection: zero overlap), so the category's real listing is split across those pages and I report the exhaustive de-duplicated union, flagged, with the hub-only figure stated in each flag. The family pages themselves are NOT emitted as rows (brief section 3 bars 'Collections'). For Outdoor the 9 named collection pages (Palissade, Crate, Hee, Deville, Traverse, Weekday, Balcony, Palissade Cantilever, Palissade Cord) are cross-cuts that are almost entirely redundant with Outdoor Seating + Outdoor Tables - their only non-redundant products are 10 outdoor seat cushions and 1 furniture cover, all out of scope - so Outdoor Seating and Outdoor Tables are the correct leaves and the collection pages are dropped.\n\nEXCLUDED, with reason: Seating > Seat Cushions (17 items, all seat pads/cushions = textiles); Tables > Frames & Spare parts (5 items, all /hay/furniture/tables/table-accessory = furniture parts); Furniture > New Furniture and New Order System (new-arrivals / info landing pages, brief section 3); the 14 outdoor and chair and sofa family collection pages (brief section 3). Accessories department checked node by node for stray furniture and none found: indoor-living/office = 6 desk accessories (pen, notebook, bins, laptop cover, tool box); indoor-living/storage = 3 Colour Storage boxes; indoor-living/wardrobe = 5 hooks/hangers/coat-rack accessories; accessories/bedroom = 16 duvet covers, pillowcases, bedspreads and pyjamas; accessories/bathroom = 24 towels, mats, shower curtains, bathrobes (no vanity units); accessories/flooring = 18 rugs and mats; colour-crate = 5 crates/lids; dogs = 10 pet items; travel = 18 bags/umbrellas; outdoor-living/terrazza-collection = 9 parasols/cushions/tablecloth; outdoor-living/outdoor-market-by-jasper-morrison = 29 picnic/BBQ accessories of which only 4 are furniture (folding chair, sofa, stool, table) - the node's primary product type is outdoor accessories, so it is out.\n\nSANITY CHECKS: numbers differ per category (no site-wide constant); no suspiciously round figures; every page's h3/title matched the category requested and the final URL never redirected; sitemap-products.xml was deliberately NOT used for counts because the prior pass proved it is a superset that retains discontinued products (51 table-lamp URLs vs 31 live tiles).",
+ "rows": [
+  {
+   "category": "Furniture",
+   "sub_category": "Beds",
+   "qty": 2,
+   "link": "https://www.hay.com/products/furniture/beds",
+   "is_group": false,
+   "evidence": "exhaustive enumeration of the server-rendered product tiles in the initial HTML of this PLP (2 distinct /hay/ product-detail URLs). www.hay.com is a brand catalogue that publishes NO 'N items'/'N products' header anywhere; its grid is a MixItUp list with pagingSettings pagingEnabled:false / showCount:0, so the full list is present in the first response and 'show more' only unhides already-rendered .mix-item nodes. Verified: tile count = 2 products + 1 intro-text block. Two independent reads (one cache-busted) agreed.",
+   "flag": "MANUAL REVIEW: HAY's entire Beds category is 2 items - Connect Bed and Standard Bed Slats; the second is a bed component rather than a bed. Bed-frames-only would be 1."
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Shelves",
+   "qty": 59,
+   "link": "https://www.hay.com/products/furniture/shelves",
+   "is_group": false,
+   "evidence": "exhaustive enumeration of distinct /hay/ product-detail URLs across the Shelves PLP (12 tiles: 9 cabinets, Korpus Shelf, Woody Shelving, New Order Combination) and its one sub-page /products/furniture/shelves/pier-system (47 tiles), zero overlap = 59 distinct. Site publishes no count header; both grids are complete in their initial HTML (pagingEnabled:false).",
+   "flag": "MANUAL REVIEW: 59 = 12 tiles on the Shelves PLP + 47 on its Pier System sub-page (a modular shelving system, not a marketing collection). Hub-PLP-only would be 12."
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Wardrobe",
+   "qty": 4,
+   "link": "https://www.hay.com/products/furniture/storage",
+   "is_group": false,
+   "evidence": "exhaustive enumeration of the server-rendered product tiles in the initial HTML of this PLP (4 distinct /hay/ product-detail URLs). www.hay.com is a brand catalogue that publishes NO 'N items'/'N products' header anywhere; its grid is a MixItUp list with pagingSettings pagingEnabled:false / showCount:0, so the full list is present in the first response and 'show more' only unhides already-rendered .mix-item nodes. Verified: tile count = 4 products + 1 intro-text block. Two independent reads (one cache-busted) agreed.",
+   "flag": "MANUAL REVIEW: HAY's nav labels this node 'Wardrobe' (URL /products/furniture/storage, page h3 'Wardrobe'); its 4 products are freestanding coat racks / clothes rails / hall stands (Loop Stand Wardrobe, Loop Stand Hall, Colour Rack, Knit) - treated as hall/entryway furniture."
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Seating",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bar Stools",
+   "qty": 15,
+   "link": "https://www.hay.com/products/furniture/seating/bar-stools",
+   "is_group": false,
+   "evidence": "exhaustive enumeration of the server-rendered product tiles in the initial HTML of this PLP (15 distinct /hay/ product-detail URLs). www.hay.com is a brand catalogue that publishes NO 'N items'/'N products' header anywhere; its grid is a MixItUp list with pagingSettings pagingEnabled:false / showCount:0, so the full list is present in the first response and 'show more' only unhides already-rendered .mix-item nodes. Verified: tile count = 15 products + 1 intro-text block. Two independent reads (one cache-busted) agreed.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Benches",
+   "qty": 1,
+   "link": "https://www.hay.com/products/furniture/seating/benches",
+   "is_group": false,
+   "evidence": "exhaustive enumeration of the server-rendered product tiles in the initial HTML of this PLP (1 distinct /hay/ product-detail URLs). www.hay.com is a brand catalogue that publishes NO 'N items'/'N products' header anywhere; its grid is a MixItUp list with pagingSettings pagingEnabled:false / showCount:0, so the full list is present in the first response and 'show more' only unhides already-rendered .mix-item nodes. Verified: tile count = 1 products + 1 intro-text block. Two independent reads (one cache-busted) agreed.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Chairs",
+   "qty": 122,
+   "link": "https://www.hay.com/products/furniture/seating/chairs",
+   "is_group": false,
+   "evidence": "exhaustive enumeration of distinct /hay/ product-detail URLs across the Chairs PLP and the five product-family sub-pages linked from its grid (the site publishes no count header of any kind): /chairs 13 + /chairs/about-a-chair 39 + /chairs/layout-chair 24 + /chairs/layout-armchair 24 + /chairs/soft-edge-chairs 16 + /chairs/j-series 6 = 122 distinct URLs, with zero overlap between the six pages (checked by set intersection). Each page's grid is complete in its initial HTML (pagingEnabled:false).",
+   "flag": "MANUAL REVIEW: HAY splits Chairs across a hub PLP (13 tiles) plus 5 product-family sub-pages (About A Chair, Layout Chair, Layout Armchair, Soft Edge, J-Series) that hold the other 109 products and share no products with the hub; 122 is the exhaustive union. If only the hub PLP's own tiles are wanted the number is 13. Composition by HAY's own product-URL taxonomy: 116 chair, 5 bar-stool, 1 seating-accessory (Backflip Wall Bracket)."
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Lounge",
+   "qty": 25,
+   "link": "https://www.hay.com/products/furniture/seating/lounge",
+   "is_group": false,
+   "evidence": "exhaustive enumeration of the server-rendered product tiles in the initial HTML of this PLP (25 distinct /hay/ product-detail URLs). www.hay.com is a brand catalogue that publishes NO 'N items'/'N products' header anywhere; its grid is a MixItUp list with pagingSettings pagingEnabled:false / showCount:0, so the full list is present in the first response and 'show more' only unhides already-rendered .mix-item nodes. Verified: tile count = 25 products + 1 intro-text block. Two independent reads (one cache-busted) agreed. 24 of the 25 are /hay/furniture/seating/lounge, 1 is a lounge-type chair.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sofas",
+   "qty": 71,
+   "link": "https://www.hay.com/products/furniture/seating/sofas",
+   "is_group": false,
+   "evidence": "exhaustive enumeration of distinct /hay/ product-detail URLs reachable from the Sofas PLP: the PLP itself carries no product tiles, only 10 sofa-family tiles, so the products live one and two levels down. aal-sofa-collection 2 + amanta-sofa 4 + arbour 4 + can-sofa-collection 3 + mags-sofa-collection/mags 10 + mags-sofa-collection/mags-low 10 + mags-soft/mags-soft 10 + mags-soft/mags-soft-low-armrest 10 + mags-soft/mags-soft-low-armrest-removable-cover 7 + mimi 6 + quilton 2 + quilton-lift 5 + silhouette-sofa-collection 2 = 75 tiles, 71 distinct after de-duplication (4 products appear on two family pages). Site publishes no count header.",
+   "flag": "MANUAL REVIEW: the Sofas PLP itself lists 0 product tiles - it is a hub of 10 sofa-family pages - so 71 is the exhaustive de-duplicated union of those families' tiles. By HAY's own product-URL taxonomy the 71 break down as 65 sofa, 4 lounge and 2 cushions (cushions carried on the family pages); sofas-only would be 65."
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Stools",
+   "qty": 6,
+   "link": "https://www.hay.com/products/furniture/seating/stools",
+   "is_group": false,
+   "evidence": "exhaustive enumeration of the server-rendered product tiles in the initial HTML of this PLP (6 distinct /hay/ product-detail URLs). www.hay.com is a brand catalogue that publishes NO 'N items'/'N products' header anywhere; its grid is a MixItUp list with pagingSettings pagingEnabled:false / showCount:0, so the full list is present in the first response and 'show more' only unhides already-rendered .mix-item nodes. Verified: tile count = 6 products + 1 intro-text block. Two independent reads (one cache-busted) agreed. 3 are /hay/furniture/seating/stool and 3 are Soft Edge stool-height chairs, both filed by HAY under Stools.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Tables",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Coffee & Side Tables",
+   "qty": 14,
+   "link": "https://www.hay.com/products/furniture/tables/coffee-tables-side-tables",
+   "is_group": false,
+   "evidence": "exhaustive enumeration of the server-rendered product tiles in the initial HTML of this PLP (14 distinct /hay/ product-detail URLs). www.hay.com is a brand catalogue that publishes NO 'N items'/'N products' header anywhere; its grid is a MixItUp list with pagingSettings pagingEnabled:false / showCount:0, so the full list is present in the first response and 'show more' only unhides already-rendered .mix-item nodes. Verified: tile count = 14 products + 1 intro-text block (13 rendered as .hayproduct tiles plus 1 product rendered as an imagewithlinkblock tile, the New Order Trolley - both link to /hay/ product pages). Two independent reads (one cache-busted) agreed.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Conference & High Tables",
+   "qty": 8,
+   "link": "https://www.hay.com/products/furniture/tables/conference-high-tables",
+   "is_group": false,
+   "evidence": "exhaustive enumeration of the server-rendered product tiles in the initial HTML of this PLP (8 distinct /hay/ product-detail URLs). www.hay.com is a brand catalogue that publishes NO 'N items'/'N products' header anywhere; its grid is a MixItUp list with pagingSettings pagingEnabled:false / showCount:0, so the full list is present in the first response and 'show more' only unhides already-rendered .mix-item nodes. Verified: tile count = 8 products + 1 intro-text block (7 .hayproduct tiles plus the New Order High Table rendered as an imagewithlinkblock tile). Two independent reads (one cache-busted) agreed.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Desks",
+   "qty": 5,
+   "link": "https://www.hay.com/products/furniture/tables/desks",
+   "is_group": false,
+   "evidence": "exhaustive enumeration of the server-rendered product tiles in the initial HTML of this PLP (5 distinct /hay/ product-detail URLs). www.hay.com is a brand catalogue that publishes NO 'N items'/'N products' header anywhere; its grid is a MixItUp list with pagingSettings pagingEnabled:false / showCount:0, so the full list is present in the first response and 'show more' only unhides already-rendered .mix-item nodes. Verified: tile count = 5 products + 1 intro-text block. Two independent reads (one cache-busted) agreed.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dining & Cafe Tables",
+   "qty": 28,
+   "link": "https://www.hay.com/products/furniture/tables/dining-tables",
+   "is_group": false,
+   "evidence": "exhaustive enumeration of the server-rendered product tiles in the initial HTML of this PLP (28 distinct /hay/ product-detail URLs). www.hay.com is a brand catalogue that publishes NO 'N items'/'N products' header anywhere; its grid is a MixItUp list with pagingSettings pagingEnabled:false / showCount:0, so the full list is present in the first response and 'show more' only unhides already-rendered .mix-item nodes. Verified: tile count = 28 products + 1 intro-text block (27 .hayproduct tiles plus the New Order Table rendered as an imagewithlinkblock tile). Two independent reads (one cache-busted) agreed.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Outdoor",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Outdoor Seating",
+   "qty": 52,
+   "link": "https://www.hay.com/products/furniture/outdoor/seating",
+   "is_group": false,
+   "evidence": "exhaustive enumeration of the server-rendered product tiles in the initial HTML of this PLP (52 distinct /hay/ product-detail URLs). www.hay.com is a brand catalogue that publishes NO 'N items'/'N products' header anywhere; its grid is a MixItUp list with pagingSettings pagingEnabled:false / showCount:0, so the full list is present in the first response and 'show more' only unhides already-rendered .mix-item nodes. Verified: tile count = 52 products + 1 intro-text block. Two independent reads (one cache-busted) agreed. Composition by HAY's product-URL taxonomy: 16 outdoor-chair, 13 outdoor-bench, 12 outdoor-lounge, 4 outdoor-sofa, 3 outdoor-stool, 2 outdoor-bar-stool, 2 indoor/outdoor chairs - all furniture.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Outdoor Tables",
+   "qty": 16,
+   "link": "https://www.hay.com/products/furniture/outdoor/tables",
+   "is_group": false,
+   "evidence": "exhaustive enumeration of the server-rendered product tiles in the initial HTML of this PLP (16 distinct /hay/ product-detail URLs). www.hay.com is a brand catalogue that publishes NO 'N items'/'N products' header anywhere; its grid is a MixItUp list with pagingSettings pagingEnabled:false / showCount:0, so the full list is present in the first response and 'show more' only unhides already-rendered .mix-item nodes. Verified: tile count = 16 products + 1 intro-text block. Two independent reads (one cache-busted) agreed. All 16 are /hay/furniture/tables/outdoor-table.",
+   "flag": null
+  }
+ ]
+}

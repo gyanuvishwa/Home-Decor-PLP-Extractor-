@@ -1,0 +1,43 @@
+{
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "Direct HTTP fetch worked throughout (same access route as prior Home-Decor/Furniture pass, archive c146: no WAF, robots.txt has no Claude-specific disallow). Found the site's single dedicated pet branch via the homepage mega-menu JSON nav payload: 'Udstyr til kæledyr' (Pet Equipment) at /indretning/udstyr-til-kaeledyr, with exactly 3 children: 'Senge til kæledyr' (Pet Beds), 'Legetøj til kæledyr' (Pet Toys), 'Tilbehør til kæledyr' (Pet Accessories -- dog bowls, bowl mats, waste bags/holders, treat pouches). Counted each page via 3 mutually-agreeing signals (same method as the prior pass): JSON-LD CollectionPage mainEntity.numberOfItems, the itemListElement product array length, and rendered product-card count -- all three agreed exactly for every page (parent=20, beds=4, toys=4, accessories=12). Confirmed the parent 'Udstyr til kæledyr' page is a pure aggregator (its itemListElement is literally the ordered union of the 3 children's items, 4+4+12=20 with no extra/unique items of its own), so it is emitted as a grouping row (is_group:true) rather than a leaf with its own qty, per the grouping-row rule. ABSENCE PROOF: fetched the full site sitemap.xml (2MB, ~34k+ URLs) and grepped for kaeledyr/hund/kat-prefixed paths -- the only category URLs under any pet-equipment path are exactly these 3 leaves + the parent, and the only individual product URLs matching are the 20 products in these 3 categories (verified by counting the sitemap hits, which matched the JSON-LD ItemList content exactly). No separate cat-specific branch, litter/hygiene branch, pet-food branch, pet-clothing branch, pet-carrier/travel branch, or pet-housing (e.g. dog house/kennel) branch exists anywhere else on the site (checked homepage nav JSON in full, and sitemap grep for kaeledyr/hund/kat- patterns). All 20 products in scope are genuine Tier-1 pet care (dog beds, dog toys, dog feeding bowls + bowl mats, dog waste bags + bag holders, treat pouch) -- none are pet-themed decor, pet-owner merch, or generic products under a non-pet parent. No pet-food/consumable or medical/veterinary categories found (none to flag). Site is Danish-language; category/sub-category names translated to English while preserving the site's own taxonomy structure exactly (1 parent group + 3 leaf children, no invented categories).",
+  "rows": [
+    {
+      "category": "Pet Care",
+      "sub_category": "Pet Equipment",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Pet Beds",
+      "qty": 4,
+      "link": "https://jysk.dk/indretning/udstyr-til-kaeledyr/senge-til-kaeledyr",
+      "is_group": false,
+      "evidence": "JSON-LD CollectionPage mainEntity.numberOfItems=4, itemListElement array length=4, rendered product-card count=4 (all agree)",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Pet Toys",
+      "qty": 4,
+      "link": "https://jysk.dk/indretning/udstyr-til-kaeledyr/legetoj-til-kaeledyr",
+      "is_group": false,
+      "evidence": "JSON-LD CollectionPage mainEntity.numberOfItems=4, itemListElement array length=4, rendered product-card count=4 (all agree)",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Pet Accessories",
+      "qty": 12,
+      "link": "https://jysk.dk/indretning/udstyr-til-kaeledyr/tilbehor-til-kaeledyr",
+      "is_group": false,
+      "evidence": "JSON-LD CollectionPage mainEntity.numberOfItems=12, itemListElement array length=12, rendered product-card count=12 (all agree); products are dog feeding bowls (hundeskål), bowl mats (underlag til hundeskål), waste bags/holders (hundepose/hundeposeholder), and a treat pouch (godbidstaske)",
+      "flag": null
+    }
+  ]
+}

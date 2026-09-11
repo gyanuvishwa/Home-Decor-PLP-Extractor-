@@ -1,0 +1,84 @@
+{
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ACCESS: no bot wall. probe.fetch() returned HTTP 200 on the first try for every URL; no 403, no challenge, no membership gate. ROBOTS (www.quince.com/robots.txt, fetched first, HTTP 200, 2333 bytes): NO Claude opt-out. The generic group is 'User-agent: * / Allow: /' with Disallow only on /account/*, /accounts/*, /log-in*, /sign-up*, /tracking*, /checkout/thank-you*, /p/* and /partner/*. There IS a named Anthropic group - 'User-agent: Claude-SearchBot' - but it carries the SAME eight path Disallows and NOT 'Disallow: /', so it is not an opt-out; it does not cover /shop/* and it does not cover the sitemaps. ClaudeBot / anthropic-ai / Claude-Web are not named at all, so the '*' group governs us either way. Note the site disallows /*?*sortBy=, /*?*utm_ etc ONLY inside the 'User-agent: Googlebot' group; I still used no sort, facet, utm or search URL anywhere. No disallowed path was requested. No Crawl-delay declared; probe.py's 2s/host gap was used throughout. api.onequince.com (the regional API host named in the Next.js payload) was deliberately NEVER contacted - it is a separate host that would need its own robots check, and all counts came from the page's own server-rendered payload instead.\nTREE: taken from the site's OWN mega-menu, not guessed. Homepage __NEXT_DATA__ -> props.pageProps.siteData.siteData.menuPrimary[6] ('Home') -> submenuColumnTwo -> header 'Bath', which lists exactly four entries: Shop All (/shop/home/all-bath), Bath Towels & Bundles, Bath Mats, Robes & Accessories. The mega-menu TRUNCATES (BATCH_BRIEF s5): the category sitemap recovers two further real children of all-bath that appear in no menu - Shower Curtains and Baby & Kids Towels - and, critically, a seventh node the menu never shows: BATHROOM ACCESSORIES. Sitemap route: /sitemap.xml -> /sitemap_us.xml -> sitemap_shop.xml (537 locs) + sitemap_subcollections.xml (1174) + sitemap_misc.xml (94), 1800 URLs total. sitemap_subcollections.xml declares exactly six children of /shop/home/all-bath/: baby-kids-towels, bath-mats, bath-towels-bundles, bathroom-accessories, luxury-robes, shower-curtains. Each was fetched and its rel=canonical followed; four of the six canonicalise away from the /all-bath/ form (blind spot (a)) and the canonical form is what is recorded. All 319 /shop/home/* URLs were listed and swept for soap|toilet|faucet|tap|sink|vanit|tub|hardware|hook|shelf|caddy|dispenser|organiz|tray|basket|hamper|brush|tooth|bidet|toiletr - the only hits were curtain rods-hardware (window curtains), consoles-bookshelves (Furniture, already extracted), storage-organization, and travel toiletry bags (luggage). There is NO sanitaryware, NO tap/faucet, NO shower fitting, NO bath, NO toilet, NO vanity unit and NO bathroom mirror anywhere in the taxonomy - Quince is a DTC soft-goods brand and its Bath department is almost entirely Textile.\nROWS: exactly one Bathroom leaf. 'Bathroom Accessories' (H1 'Bathroom Accessories', canonical https://www.quince.com/shop/home/bathroom-accessories) holds the 'Handwoven Rattan Bathroom Accessories Set' and the 'Handwoven Rattan Hamper' - a bathroom accessory set is Bathroom under rule 13, and the node's own name and its parentage under all-bath settle the hierarchy question (rule 2: website category hierarchy). The alias /shop/home/all-bath/bathroom-accessories rel=canonicals onto the recorded URL and is therefore ONE record under rule 28, not two.\nQTY: recorded 2 = DISTINCT PRODUCTS, enumerated to exhaustion. Basis and proof: the PLP is server-rendered into __NEXT_DATA__; the widget of type PRODUCT_LIST carries pagination {limit:30, hasMore:false, total:N} and one PRODUCT_CARD child per card, and for this node hasMore is false, so the payload IS the whole collection - this is enumeration to exhaustion, not a reported total. WHY NOT THE RENDERED FIGURE: Quince's own rendered 'N items' (data-testid=collection-product-count), its filterSortData.total, its pagination.total and its JSON-LD numberOfItems all agree with each other on any single fetch, but they count COLOURWAY CARDS, not products, AND they are UNSTABLE - ten fetches of this exact URL across the session returned 3,3,3,3,3,4,4,4,4 (one fetch rendered no count element at all). The 3-variant suppresses one colourway card of the hamper; the 4-variant shows the full 2 products x 2 colourways (Natural / White Wash) grid. The DISTINCT product set was identical in all ten fetches: ids 8669 and 8670. This is the Sostrene Grene instability trap (BATCH_BRIEF s3) - an unstable figure is not an 'exact figure shown on the listing page' under rule 26, so the reproducible distinct-product count is recorded and the card figures are disclosed here in full. Same instability was proved on Bath Mats (8 vs 9 cards, 3 distinct in every fetch).\nVERIFICATION: counts discriminate (2 / 3 / 5 / 12 / 27 / 94 across the nodes examined - no site-wide constant). Every H1 was checked against the node requested and matched. Pagination arithmetic was NOT used anywhere: ?page=2 and ?cursor=30 on /shop/home/all-bath both re-serve page 1 with an identical first-three product sequence (the IKEA trap, confirmed here), so pagination was never multiplied. JSON-LD was checked and REJECTED as a source: all-bath's ItemList claims numberOfItems 134 while emitting only 20 itemListElement entries.\nDEDUP (OPTION 1, URL-exact index): already_extracted() was run on all 21 candidate/alias/canonical URLs touched. ZERO hits. quince.com appears in the index only via Furniture.xlsx, with 12 furniture nodes (living-room, dining-room, bedroom, outdoor) - none of them bathroom, none of them a vanity, and no bath vanity or bathroom cabinet exists on this site to be deduped. Blind spots worked: (a) every rel=canonical target was index-checked as well as the fetched URL; (b)/(c) locale - the sitemap index exposes /ca/, /fr-ca/ and /uk/ storefronts on the same host, but this company is USA and both prior workbooks recorded Quince under the bare www.quince.com/shop/ US form, so there is no locale-alias miss; (d) the /all-bath/ duplicate path is collapsed to the canonical, one record.\nEXCLUDED and why: Bath Towels & Bundles, Bath Mats, Robes & Accessories, Shower Curtains and Baby & Kids Towels -> Textile (rules 15/16/20), all five in review[] with URLs and qty. Home Decor > Mirrors -> not recorded: 5 general decorative wall mirrors under Home Decor, no bathroom/vanity/LED mirror exists (rule 11 judged on primary type, and BATCH_BRIEF s6's warning that 'mirror' is a false-positive magnet applies). Home Decor > Storage & Organization -> withheld as general Storage AND as a proven overlap: it contains both products of the recorded Bathroom Accessories leaf, so recording it too would double-count them. Shop All / all-bath -> rule 25 + rule 24. No empty nodes were found in the Bath tree; /shop/home/living-room-decor/mirrors resolves but renders no grid and is noted as an empty alias in review.",
+ "rows": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Accessories",
+   "qty": 2,
+   "link": "https://www.quince.com/shop/home/bathroom-accessories",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  }
+ ],
+ "review": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Home > Bath > Bath Towels & Bundles",
+   "qty": 94,
+   "issue": "ROUTED TO TEXTILE: bath towels, bath sheets, hand towels, washcloths and towel bundles are Textile under rules 15/20. Nav node 'Bath Towels & Bundles'; H1 'Bath Towels & Bundles'; canonical is this URL (the sitemap alias https://www.quince.com/shop/home/all-bath/bath-towels-bundles carries rel=canonical onto it). QTY CAVEAT: the site's rendered 'N items' counts COLOURWAY CARDS, not distinct products - it read 96 on one fetch and 94 on another in the same session; only the first 30 cards are server-rendered (pagination.hasMore=true and ?page=/?cursor= are ignored, IKEA trap), so no exhaustive distinct-product count was obtainable. The 11 distinct products visible in page 1 are all towels. Figure recorded here is the rendered card count and is NOT verified. It has five further sub-collections in the category sitemap (classic-towels, organic-plush-towels, ribbed-quick-dry-towels, ultra-plush-towels, waffle-terry-towels) - all towel fabric cuts, all Textile.",
+   "link": "https://www.quince.com/shop/home/bath/towels-and-bundles"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Home > Bath > Bath Mats",
+   "qty": 3,
+   "issue": "ROUTED TO TEXTILE: rule 16 - every product is a textile bath mat/rug, not a rubber or anti-slip bathroom accessory. Enumerated to exhaustion (pagination.hasMore=false) across four fetches: 3 distinct products, all cotton - 'Turkish Cotton Bath Mat Bundle' (id 157), 'Turkish Cotton Non-Slip Bath Rug' (id 8657, cotton pile with a non-slip backing, still a textile rug), 'Ribbed Quick Dry Bath Mat (Set of 2)' (id 5951). Rendered 'N items' read 8 or 9 depending on fetch because it counts colourway cards; distinct products were 3 in every fetch. qty here is the distinct-product count. Canonical URL; https://www.quince.com/shop/home/all-bath/bath-mats rel=canonicals onto it (blind spot (a) alias, both checked against the index, both miss).",
+   "link": "https://www.quince.com/shop/home/bath-mats"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Home > Bath > Robes & Accessories",
+   "qty": 27,
+   "issue": "ROUTED TO TEXTILE: nav node whose contents are bathrobes plus soft accessories - rule 20 sends bathrobes to Textile. Enumerated to exhaustion (hasMore=false): 10 distinct products - 5 robes (Soft Layered Turkish Cotton, 2x Organic Turkish Waffle, Turkish Cotton Terry, Bamboo Jersey), silk pillowcase, silk sleep mask, 2 silk scrunchies, wool dryer balls. NOT ONE bathroom hardware or accessory item, so nothing here is Bathroom under rules 13/17. qty 27 is the rendered colourway-card figure. Its three child collections are /robes/robes (Robes, 14 cards / 5 distinct), /robes/silk-accessories (Silk Accessories, 12 cards / 4 distinct - pillowcase, sleep mask, scrunchies: bedding/hair, not bathroom) and /robes/accessories (H1 'Dryer Balls', 1 product, laundry).",
+   "link": "https://www.quince.com/shop/home/robes"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Home > Bath > Shower Curtains",
+   "qty": 2,
+   "issue": "ROUTED TO TEXTILE: rule 20 sends shower curtains to Textile explicitly. Enumerated to exhaustion (hasMore=false): 2 distinct products - 'European Linen Shower Curtain' and 'Organic Luxe Waffle Shower Curtain'; rendered figure 5 counts colourway cards. Not in the mega-menu; recovered from sitemap_subcollections.xml as a child of all-bath (https://www.quince.com/shop/home/all-bath/shower-curtains, which rel=canonicals onto this URL). No shower rods, rings or hooks anywhere on the site, so no Bathroom-hardware residue here.",
+   "link": "https://www.quince.com/shop/home/shower-curtains"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Home > Bath > Baby & Kids Towels",
+   "qty": 5,
+   "issue": "ROUTED TO TEXTILE: hooded towels and baby bath towel bundles - rule 15. Sixth child of all-bath in sitemap_subcollections.xml (https://www.quince.com/shop/home/all-bath/baby-kids-towels) whose rel=canonical is this Baby & Kids URL, so the canonical form is recorded. Enumerated to exhaustion (hasMore=false): 5 distinct products, all Organic Turkish Cotton baby/kids hooded-towel or bath bundles; rendered 14 counts colourway cards.",
+   "link": "https://www.quince.com/shop/baby/home/bath"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Home > Bath > Shop All (all-bath)",
+   "qty": null,
+   "issue": "NOT RECORDED - rule 25 (View All / Shop All is never recorded) and rule 24 (valid children exist). This is the site's Bath department landing page, rendered total 134 colourway cards. Recorded here so the node is not silently skipped and so the residue is on the record: the six children the site itself declares under it are bath-towels-bundles, bath-mats, bathroom-accessories, luxury-robes, shower-curtains and baby-kids-towels; five of the six are Textile and only Bathroom Accessories is a Bathroom row. RULE 24 RESIDUE UNKNOWN: the child card counts are colourway-based and jitter, and all-bath's own grid is not enumerable (hasMore=true, ?page=/?cursor= re-serve page 1, and its JSON-LD ItemList claims numberOfItems 134 while listing only 20 itemListElement entries - a fresh instance of the BATCH_BRIEF s3 JSON-LD trap), so I cannot prove whether all-bath holds products no child covers. Page 1 of all-bath was inspected in full (30 cards, 15 distinct products) and contained only towels, robes, baby towels and the linen shower curtain - no bathroom hardware, fixture or fitting.",
+   "link": "https://www.quince.com/shop/home/all-bath"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Home > Home Decor > Mirrors",
+   "qty": 5,
+   "issue": "NOT RECORDED - inspected under rule 10/11 (bathroom mirrors must never be skipped) and rejected on primary product type + website hierarchy (rule 2/29). The node sits under Home Decor, not Bath; enumerated to exhaustion (hasMore=false): 5 distinct products, all general decorative wall mirrors - Arched Metal Framed Wall Mirror, Wavy Wood Round Wall Mirror, Rattan Arched Wall Mirror, Square Metal Framed Wall Mirror, Rectangle Metal Framed Wall Mirror. None is a bathroom, vanity, LED, illuminated, demister, cabinet or shaving mirror; none appears in the Bath tree. Quince has no bathroom mirror node at all. The alias https://www.quince.com/shop/home/living-room-decor/mirrors resolves but renders no product grid (EMPTY alias). Index-checked: miss on both URLs.",
+   "link": "https://www.quince.com/shop/home/mirrors"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Home > Home Decor > Storage & Organization",
+   "qty": 12,
+   "issue": "NOT RECORDED - general Storage under rules 12/30-33, and a partial ROLL-UP OVERLAP with the recorded Bathroom Accessories leaf. Enumerated to exhaustion (hasMore=false): 12 distinct products - decorative bowls, palm/seagrass/leather baskets, shagreen boxes, rattan trays, rattan storage chest and legal-size box, i.e. general home storage sold under Home Decor, not under Bath. It DOES contain both of the two products in the Bathroom Accessories leaf (ids 8669 Handwoven Rattan Bathroom Accessories Set and 8670 Handwoven Rattan Hamper), so recording it alongside that leaf would double-count them (BATCH_BRIEF s5). Withheld for that reason and because its own hierarchy is Storage, not Bathroom. Alias https://www.quince.com/shop/home/all-decor/storage-organization rel=canonicals onto it; both index-checked, both miss.",
+   "link": "https://www.quince.com/shop/home/boxes-and-storage"
+  }
+ ],
+ "_reconstructed_from": "Bathroom.xlsx delivered 2026-09-01 (checkpoint), not original worker JSON"
+}

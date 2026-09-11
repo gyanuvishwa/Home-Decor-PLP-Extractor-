@@ -1,0 +1,114 @@
+{
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ACCESS: homepage, category pages, JS chunks and sitemaps all read directly with curl_cffi profile rotation (firefox133 / chrome124 / safari17_2_ios all returned 200 this session); DataDome (dd.serenaandlily.com) did not block. ROBOTS: https://www.serenaandlily.com/robots.txt fetched FIRST (200, 3486 bytes). It carries EXPLICIT named groups for AI agents, including one for ClaudeBot, and it is an ALLOW, not a block: 'User-agent: ClaudeBot / Allow: / / Allow: /search?q= / Disallow: /account / Disallow: /checkout / Disallow: /shoppingbag / Disallow: /order-confirmation / Disallow: /favorites / Disallow: /estimate / Disallow: /estimate-search / Disallow: /trackmyorder / Disallow: /api/'. Identical Allow-based groups exist for Claude-User and Claude-SearchBot (and for ChatGPT-User, GPTBot, OAI-SearchBot, Gemini-Deep-Research, GeminiOS, PerplexityBot, Perplexity-User, Storebot-Google). So there is NO Disallow covering /category/, and processing is permitted. I honoured the one directive that could have bitten: nothing under www.serenaandlily.com/api/ was requested. The product-grid API used for counts lives on a DIFFERENT host, middleware.production.serenaandlily.com, whose own /robots.txt returns 404 (no restrictions); robots.txt is per-host, so the www '/api/' rule does not reach it. No Crawl-delay is declared for any group. TREE: taken from the site's OWN mega-nav JSON in __NEXT_DATA__ at props.pageProps.globalContent.headerV2.slideOutMenu.categoryMenu.menuItems - all 14 top-level departments (New, Furniture, Outdoor, Bedding, Bath, Rugs, Lighting, Wallpaper, Pillows & Throws, Decor, Kids, Art, Clearance, Design) were walked in full. The BATH department has exactly 8 entries and no third level: All Bath (/category/bedroom-bath-shop-all), Bath Rugs & Mats, Bath Towels, Bath Towel Sets, Shower Curtains, Hampers & Storage, Bathroom Decor (/category/bedroom-bath-accessories), Robes & Loungewear. Every other department was checked for bath nodes: Lighting > Bathroom Lighting, Decor > Mirrors, Decor > Baskets, Kids > Mirrors - all routed out or excluded below. The site's own gzipped category sitemap (sitemap.xml.gz, 1,261 URLs of which 1,019 are /category/) was then swept for every bath|shower|toilet|vanit|mirror|towel|soap|sink|faucet|basin slug; it surfaced only four /category/ pages beyond the nav - /category/bath (duplicate shop-all), /category/bedroom-bath-countertop, /category/bedroom-bath-kids-bath, /category/project-bathroom and /category/reels-all-bath - all four handled in `review`. WHY NO BATHROOM FOUND: Serena & Lily sells no bathroom fixtures, sanitaryware, basins, toilets, baths, showers, enclosures, taps/faucets, bathroom hardware, vanity units, medicine cabinets or bathroom-specific mirrors. Its entire Bath department is (a) bath TEXTILES - towels, towel sets, bath rugs and mats, shower curtains, robes - which route to Textile under rules 15/16/20, (b) one general-storage node (Hampers & Storage) whose 17 products the site's own taxonomy classes as Bins/Hampers/Baskets/Outdoor Storage, and (c) one room-styling edit ('Bathroom Decor') whose 38 products the site's own taxonomy classes as Wall Mirrors/Sconces/Stools/Bar Carts/Flushmounts. Nothing survives rule 2's PRIMARY PRODUCT TYPE test, so `rows` is empty and all 15 findings sit in `review` with exact quantities and URLs - none silently skipped. The two nodes a reviewer might want to promote are documented in full in `review` (Hampers & Storage 17, Bathroom Decor 38) with the exact per-product category-facet breakdown that drove the decision. QTY (recorded in `review` for every node above, none estimated): the PLP grid is client-side only, fetched by Apollo from https://middleware.production.serenaandlily.com/graphql (AWS AppSync in front of Constructor.io). The working call is the site's own query SearchGetCategoryResults(categorySlug, maxPromoMessages, searchParameters, userParameters, customerEmail, guestToken){results}, lifted verbatim from /_next/static/chunks/pages/_app-d172fd2b30bc38f0.js, sent with the two headers that same bundle attaches: 'ecp-app-source: production' and an 'Authorization' bearer that falls back to the hardcoded 510-char anonymous-guest JWT compiled into the bundle (payload {isEmployee:false,isDso:false,isTrade:false,customerToken:'',userId:'',customerId:''}). qty = JSON.parse(results).response.total_num_results. PROOF THAT THIS IS THE RENDERED 'N Products' HEADER: in chunk /_next/static/chunks/5540-af9f31f034a84091.js the PLP filter bar renders its count as copy: r && \"\".concat(r,\"\\xa0\").concat(1===r?\"Product\":\"Products\") where r is the component's totalItems prop; the same chunk feeds that component from totalResults: m.total_num_results and totalNumResults: (m.total_num_results)||0. So the number recorded is literally what the page prints as 'N Products'. VERIFICATION: (1) NODE IDENTITY - every response carries groups[0].display_name, which matched the requested node every time (All Bath, Bath Rugs & Mats, Bath Towels, Bath Bundles, Shower Curtains, Hampers & Storage, Bath Stools & Decor, Robes & Pajamas, Bathroom Lighting, All Mirrors, Baskets, Project Bathroom), so no silent fallback to a parent grid. (2) DISCRIMINATION - the invented slug 'zzz-not-a-real-slug-xyz' returns total_num_results = 0 with groups = null, while every real slug returns its own distinct number (6, 16, 17, 21, 25, 25, 32, 35, 38, 46, 50, 51, 54); no site-wide constant appears. (3) FULL ENUMERATION - five categories of differing size (6, 17, 21, 35, 38) were paged to exhaustion at resultsPerPage=24 and the returned grid tiles counted: rows == total_num_results == unique (product id, variation_slice) pairs on all five, exactly. Note the grid renders one tile per colour variation slice, so the correct unit is tiles, not distinct product ids - e.g. Shower Curtains is 6 tiles of 2 products; counting distinct ids would under-report and was rejected. (4) COMPOSITION AUDIT - each enumerated product's own 'category' facet was tallied, which is what proved Hampers & Storage and Bathroom Decor are not Bathroom (breakdowns quoted in `review`). DEDUP: dedup.already_extracted() was called on all 16 candidate URLs; ZERO hits - the exclusion index holds 50 serenaandlily.com URLs, all of them /category/*-furniture-* and outdoor/custom-upholstery/kids furniture nodes from Furniture.xlsx, and none of them in the Bath department. So NO BATHROOM FOUND here is a genuine absence, not a dedup artefact.",
+ "rows": [],
+ "review": [
+  {
+   "category": "Bathroom",
+   "sub_category": "All Bath",
+   "qty": 51,
+   "issue": "EXCLUDED as a Shop-All roll-up (rule 25). Node identity confirmed by the API's own groups[0].display_name = 'All Bath'. Its 51 tiles are the bath towels/rugs/robes/shower-curtain textiles plus the decorative mirrors, stools, carts and sconces of the 'Bathroom Decor' edit - no bathroom fixture, tap, sanitaryware, hardware or bathroom-specific mirror anywhere in it.",
+   "link": "https://www.serenaandlily.com/category/bedroom-bath-shop-all"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath (duplicate slug)",
+   "qty": 51,
+   "issue": "EXCLUDED - sitemap-only duplicate of the All Bath shop-all above (same 51 tiles, groups[0].display_name = 'Bath'); not linked from the mega-menu. Rules 25/28.",
+   "link": "https://www.serenaandlily.com/category/bath"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Rugs & Mats",
+   "qty": 21,
+   "issue": "ROUTED TO TEXTILE: the site's own per-product category facet is Bath Mat 8 / Bath Rug 13 - textile bath mats and rugs (rules 16/20).",
+   "link": "https://www.serenaandlily.com/category/bedroom-bath-bath-rugs"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Towels",
+   "qty": 35,
+   "issue": "ROUTED TO TEXTILE: per-product category facet is Bath Towels 26 / Robes 9 (rules 15/20).",
+   "link": "https://www.serenaandlily.com/category/bedroom-bath-bath-towels"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Towel Sets (Bath Bundles)",
+   "qty": 25,
+   "issue": "ROUTED TO TEXTILE: towel and bath-linen bundles (rules 15/20).",
+   "link": "https://www.serenaandlily.com/category/bedroom-bath-bath-sets"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower Curtains",
+   "qty": 6,
+   "issue": "ROUTED TO TEXTILE: per-product category facet is Shower Curtains 6/6 (rule 20).",
+   "link": "https://www.serenaandlily.com/category/bedroom-bath-shower-curtains"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Robes & Loungewear",
+   "qty": 25,
+   "issue": "ROUTED TO TEXTILE: bathrobes, spa robes and pyjamas (rule 20). Same URL also appears under the Bedding menu as 'Pajamas & Robes' (rule 28, one record).",
+   "link": "https://www.serenaandlily.com/category/robes-pajamas"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Hampers & Storage",
+   "qty": 17,
+   "issue": "ROUTED TO STORAGE / LOW CONFIDENCE - NOT recorded. This is the only node in the Bath menu that rule 12 could pull into Bathroom, so it was enumerated in full and inspected item by item. All 17 tiles are general storage: the site's OWN per-product category facet reads Bins 6, Hampers 5, Baskets 3, Outdoor Storage 2, Utility Basket 1 - not one product carries a bath category, and two are explicitly Outdoor Storage (Madaket Outdoor Basket). Every item also appears in the Decor > Baskets node /category/decor-pillow-decor-baskets-storage (32 tiles, groups display_name 'Baskets'), which is where the site's product taxonomy actually owns them. Rule 2's priority (PRIMARY PRODUCT TYPE > FUNCTION > HIERARCHY > ROOM) and rule 12's own 'Clearly-Storage-owned products belong to Storage.xlsx' therefore outrank the fact that the Bath mega-menu links to it, and rules 30-33 forbid re-extracting general storage baskets/bins merely because the site sells them. Flagged here at LOW confidence per rule 29 rather than guessed into rows - if the run owner prefers the hierarchy reading of rule 12/33 ('Bathroom > Bathroom Baskets = Bathroom'), this is the single row to promote: Bathroom / Hampers & Storage / 17 / this URL.",
+   "link": "https://www.serenaandlily.com/category/bedroom-bath-storage"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Decor (Bath Stools & Decor)",
+   "qty": 38,
+   "issue": "ROUTED TO DECOR (with a lighting component) - NOT recorded. Despite the slug 'bath-accessories' and the menu label 'Bathroom Decor', full enumeration of all 38 tiles shows the site's own per-product category facet is Wall Mirrors 16, Sconces 8, Stools 6, Bar Carts 4, Flushmounts 3, Floor Mirrors 1. There is NO soap dispenser, toothbrush holder, tumbler, toilet-roll holder, tray, caddy or any other rule-13 bathroom accessory in it. The 17 mirrors are the same decorative rattan / bone-inlay pieces (Lanai, Montara, Ojai, Bar Harbor, Darbrook) that the Decor > Mirrors node owns, so their primary product type is decorative wall/floor mirror, not bathroom mirror (rules 11/21); the 11 sconces and flush mounts (Larkspur, Capiz Honeycomb, Westbrooke, Aptos, Santa Barbara) are ROUTED TO LIGHTING (rule 19); the stools and bar carts are furniture. The node is a room styling edit, not a product-type subcategory.",
+   "link": "https://www.serenaandlily.com/category/bedroom-bath-accessories"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Lighting",
+   "qty": 16,
+   "issue": "ROUTED TO LIGHTING: primary product type is lighting (rule 19). Sits in the site's Lighting mega-menu, not under Bath.",
+   "link": "https://www.serenaandlily.com/category/lighting-bathroom"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Mirrors (Decor)",
+   "qty": 50,
+   "issue": "ROUTED TO DECOR: groups display_name 'All Mirrors'; decorative wall and floor mirrors under the Decor department. Serena & Lily publishes no bathroom / vanity / medicine-cabinet mirror node anywhere in its nav or its 1,019-URL category sitemap, so rule 10 has nothing to attach to here.",
+   "link": "https://www.serenaandlily.com/category/decor-pillow-decor-mirrors"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Project Bathroom",
+   "qty": 54,
+   "issue": "EXCLUDED - room-inspiration edit, not a category (rule 25). Contents span rugs, chandeliers, pendants, vases, stools, robes and shower curtains.",
+   "link": "https://www.serenaandlily.com/category/project-bathroom"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Reels: All Bath",
+   "qty": 46,
+   "issue": "EXCLUDED - social/reels merchandising edit, not a category (rule 25); a subset of the All Bath shop-all.",
+   "link": "https://www.serenaandlily.com/category/reels-all-bath"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Countertop",
+   "qty": 0,
+   "issue": "EMPTY - sitemap-only slug, not in the nav; the category API returns total_num_results = 0. This was the most promising candidate for rule-13 countertop accessories (soap dispensers, tumblers, trays) and it holds no products.",
+   "link": "https://www.serenaandlily.com/category/bedroom-bath-countertop"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Kids Bath",
+   "qty": 0,
+   "issue": "EMPTY - sitemap-only slug, not in the nav; the category API returns total_num_results = 0.",
+   "link": "https://www.serenaandlily.com/category/bedroom-bath-kids-bath"
+  }
+ ],
+ "_reconstructed_from": "Bathroom.xlsx delivered 2026-09-01 (checkpoint), not original worker JSON"
+}

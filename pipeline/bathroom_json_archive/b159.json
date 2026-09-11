@@ -1,0 +1,126 @@
+{
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ACCESS: robots.txt fetched FIRST at https://www.merci-merci.com/robots.txt (HTTP 200 via probe.fetch, profile safari18_0). It is the standard Shopify file. NO Claude/ClaudeBot/anthropic-ai/Claude-Web user-agent group exists anywhere in it - the named groups are adsbot-google, Nutch (Disallow: /), AhrefsBot (Crawl-delay: 10), AhrefsSiteAudit (Crawl-delay: 10), MJ12bot (Crawl-Delay: 10) and Pinterest (Crawl-delay: 1). We fall under 'User-agent: *', which disallows /admin, /cart, /orders, /checkout(s), /carts, /account, /policies, /search, /apple-app-site-association, /.well-known/shopify/monorail, *.atom, *?s=, *?attachment_id=, */vendors?, */recommendations/products*, /*?*oseid=*, /*preview_theme_id*, /*preview_script_id*, /*wpm*, /*web-pixels-manager*, and critically the facet and sort shapes /collections/*sort_by*, /*/collections/*sort_by*, /collections/*?filter*, /*/collections/*?filter*, /collections/*+* (and its %2B/%2b encodings), plus /products/*?_pos*. NO Crawl-delay binds us; probe.py's 2s/host gap was used. Every request made was a bare /collections/<handle> path, a bare /en/collections/<handle> path, a ?page=N paginated collection, a /collections/<handle>/products.json?limit=250[&page=N] call, or a declared sitemap file. NONE of those matches a Disallow: no sort_by, no ?filter, no '+' facet, no .atom, no /search, no vendors, no recommendations, no _pos. No disallowed URL was requested. All pages returned HTTP 200 server-rendered; no bot wall, no reader or campaign-parameter fallback needed. TREE: Merci is a Paris concept store on Shopify. Its taxonomy is a flat collection space navigated by a hand-built sidebar mega-menu. Contrary to the working assumption that it merchandises only by product type, Merci HAS a dedicated top-level ROOM node: 'The Bath' / 'Le Bain', a data-level=1 sibling of 'The Bed', 'The Table', 'Deco & lifestyle', 'Beaute', 'La mode femme/homme', 'Enfant' and 'New In', whose data-url is /en/collections/bain. Its full menu contents were extracted from the rendered mega-menu markup rather than inferred: heading 'By product' -> Bath towels (/collections/bath-towels), Bathrobes (/collections/bathrobes), Bath mats (/collections/tapis-de-bain), See all (/collections/bain); heading 'By fabric' -> In washed linen (/collections/linge-de-bain-en-lin-lave), Terrycloth (/collections/la-collection-en-eponge), See all; heading 'Bathroom accessories' -> Toiletry bags (/collections/trousses-et-accessoires), Bathroom accessories (/collections/accessoires-salle-de-bain), See all (/collections/accessoires). Exactly ONE of those nine links is Bathroom under rules 2/3/13/17 - accessoires-salle-de-bain - and it is the only row recorded. 'The Bath' itself is a grouping row with blank qty and blank link (rules 24, 38) because it has extractable children and because its own listing is bath LINEN. ORPHAN SWEEP (BATCH_BRIEF s5 - Nkuku had bathroom collections linked from no menu at all): the mega-menu was NOT trusted on its own. https://merci-merci.com/sitemap_collections_1.xml?from=262604718275&to=692627505537 was downloaded in full - 1,919 collection URLs - and regex-swept for bain|bath|salle-de-bain|savon|soap|miroir|mirror|serviette|towel|douche|shower|toilette|brosse|dent|peignoir|porte-|patere|crochet|hook|etagere|panier|rangement|hygiene|beaute|corps|sanitaire|lavabo|robinet|wc, returning 84 candidates, every one of which was classified. That sweep is what surfaced the two orphan nodes now in review[] - /collections/accessoires-de-bain and /collections/porte-savons - which the mega-menu does not expose at all. The sweep also confirms what does NOT exist on this site: no sanitaryware, no basins, no toilets, no baths, no shower enclosures or screens, no taps or mixers, no vanity units, no bathroom cabinets and no bathroom storage of any kind. Merci sells bath LINEN, toiletries and a small bathroom-accessories assortment. QTY: the Merci theme renders the full collection grid server-side at a page size of 50 with a .Pagination element appearing only when a collection exceeds 50. The recorded figure - Bathroom accessories = 45 - is the rendered .ProductList .ProductItem count on https://www.merci-merci.com/collections/accessoires-salle-de-bain with NO Pagination element present, i.e. the complete grid. Nothing was estimated and no parent number was reused. VERIFICATION: (a) the rendered-grid method was cross-proved against the storefront's own product API on FOUR collections of differing size - accessoires-salle-de-bain rendered 45 / products.json 45 unique handles, accessoires-de-bain 31 / 31, porte-savons 10 / 10, and bain 50 on page 1 + 38 on ?page=2 = 88 / products.json 88 - i.e. exact agreement including one multi-page case, which satisfies the WORKER_BRIEF requirement to prove equivalence on 2-3 pages of differing size. (b) The method's limits are disclosed rather than hidden: /collections/bath-towels and /collections/bathrobes render 46 and 17 cards but return an EMPTY products.json, so for those two the rendered grid is the sole source; this does not touch the recorded row, whose two sources agree. (c) Counts discriminate - 95 / 88 / 67 / 52 / 46 / 45 / 31 / 30 / 28 / 21 / 17 / 16 / 10 / 5 / 2, no site-wide constant, no round-number cap. (d) H1 and canonical checked on every page: 'Accessoires salle de bain' (canonical https://merci-merci.com/collections/accessoires-salle-de-bain, x-default), 'Bath accessories', 'Soap holders', 'Linge de bain' / 'Bath linen', 'Mirrors'. All self-canonical, so blind spot (a) does not apply. (e) Product-level classification of the recorded node was verified from products.json rather than assumed: its 45 products carry product_type Accessoire de bain x25, Porte-savon x10, Brosse a dents x5, Porte Savon x2, Savon x2, Bien-etre x1, and the titles are soap dishes, soap dispensers, toothbrush pots and toothbrush stands, porcelain and wooden wall hooks and 2/3/4/7-peg pateres, hotel hooks by Piet Hein Eek, a bathroom tray and a x10 suction magnifying mirror - Bathroom under rules 13, 17, 10 and 11. DEDUP: already_extracted() was run on every candidate leaf and every review node in FOUR URL forms each - www/bare host x FR-root //collections/ and EN //en/collections/ - because BATCH_BRIEF blind spot (b) warns the two prior workbooks disagree on locale form, and this store proves it: the exclusion index holds 10 merci-merci.com URLs from Furniture.xlsx all on the FR root (/collections/armoire, banc, bouts-de-canape, canapes-convertible, canapes-merci, chaises, fauteuils, table-1, table-basse, tabourets) and 17 from Final.xlsx all on the EN root (/en/collections/appliques, bougeoirs, bougies, carafes, dessous-de-verre-en-lin, lampes, miroirs, plates-and-bowls, plats, plats-de-services, posters-and-paintings, sets-de-table, suspensions, tasses, theieres-et-cafetieres, vase, verres). Result: /collections/miroirs MISSES but /en/collections/miroirs HITS - the mirrors node is already extracted and is in review[], not rows[]. The recorded leaf accessoires-salle-de-bain misses in all four forms, as do accessoires-de-bain, porte-savons, bain, tapis-de-bain, bath-towels, bathrobes, trousses-et-accessoires, savons, brosses-a-dent, paniers, storage-boxes, la-selection-de-bain-merci, salle-de-bain-esprit-japonais and accessoires. The site is single-host (merci-merci.com, with www redirecting to it) and the hreflang set declares only fr/en/x-default, so cross-HOST blind spot (c) does not arise. EXCLUDED, with reasons: bath linen and all its by-product and by-fabric children -> Textile (review[]); Toiletry bags -> bags, not bathroom (review[]); Mirrors -> already extracted (review[]); Soaps and Toothbrushes -> consumable toiletries (review[]); the two orphan overlapping collections -> would double-count (review[]); the curated edits 'Bathroom: Japanese Spirit' and 'The Thank You Selection' -> rule 25 (review[]); /collections/all, /collections/last-chance-*, /collections/derniere-chance-linge-de-bain, /collections/merci-days-* and /collections/paired-* (promotional, sale and archive collections, rule 25); /collections/maillot-de-bain-femme and /maillot-de-bain-pour-homme (SWIMWEAR - a 'bain' keyword false positive, rule 2); /collections/expo-gm-la-salle-de-bain, /collections/thematique-autour-du-bain, /collections/nouvelle-collection-bain, /collections/la-bonne-brosse, /collections/bather (editorial, brand and event collections); /collections/paniers ('Shopping bags', not bathroom baskets); /collections/soin-du-corps, /soin-des-mains-1, /soin-des-cheveux, /soin-du-visage-et-des-levres, /dentaire, /dentifrice, /beaute, /toute-la-beaute (cosmetics/personal care); /collections/entretien-rangement ('Maintenance & Gardening') and /collections/boites-rangement, /collections/storage-boxes (general Storage, rules 30-33).",
+ "rows": [
+  {
+   "category": "Bathroom",
+   "sub_category": "The Bath",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom accessories",
+   "qty": 45,
+   "link": "https://www.merci-merci.com/collections/accessoires-salle-de-bain",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  }
+ ],
+ "review": [
+  {
+   "category": "Bathroom",
+   "sub_category": "The Bath > Bath accessories (Accessoires de bain)",
+   "qty": 31,
+   "issue": "NOT RECORDED - OVERLAPPING NEAR-DUPLICATE of the recorded node (BATCH_BRIEF s5 roll-up rule). Proved by product-handle extraction from the storefront's own products.json: this collection's 31 handles intersect the recorded 'Bathroom accessories' 45 handles in 25 products, so recording both would double-count 25 items. It is also an ORPHAN - it appears in sitemap_collections_1.xml but is linked from no menu; the site's 'The Bath' mega-menu exposes only accessoires-salle-de-bain under its 'Bathroom accessories' heading. IMPORTANT RESIDUE FOR THE RUN OWNER: 6 of its products are NOT in the recorded node and are therefore uncaptured - pommeau-de-douche-filtrage-blanc-seoni and pommeau-de-douche-filtrage-noir-seoni (filtering SHOWER HEADS, Bathroom under rule 6), filtre-pommeau-seoni (their replacement filter), and patere-porcelaine-ebene / patere-porcelaine-jaune / patere-porcelaine-vert (porcelain wall hooks, Bathroom under rule 17). Every product in the collection carries product_type 'Accessoire de bain'. Qty 31 is the rendered ProductList count (no Pagination element, theme page size 50) and is confirmed exactly by products.json.",
+   "link": "https://www.merci-merci.com/collections/accessoires-de-bain"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "The Bath > Soap holders (Porte-savons)",
+   "qty": 10,
+   "issue": "NOT RECORDED - STRICT SUBSET of the recorded node, proved by handle-set containment (all 10 handles are inside the 45 of 'Bathroom accessories'; the recorded node's own product_type histogram shows exactly 10 items typed 'Porte-savon'). Recording it alongside the parent would double-count all 10. It is an orphan collection - present in sitemap_collections_1.xml, linked from no menu - so it is not a site-declared subcategory that would force rule 24; the site's own nav treats accessoires-salle-de-bain as the leaf. Its content IS unambiguously Bathroom under rule 13 (Porte-savon en verre recycle, Porte-savon en metal, Porte savon en verre et etain Cosi Tabellini, two rotating soap-dish-with-soap sets, silicone soap dishes). H1 'Soap holders' / 'Porte-savons'. Qty 10 from the rendered ProductList, confirmed by products.json.",
+   "link": "https://www.merci-merci.com/collections/porte-savons"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "The Bath (Linge de bain) - the top nav node's own landing listing",
+   "qty": 88,
+   "issue": "ROUTED TO TEXTILE: the top-level nav item is called 'The Bath' but its landing collection's own H1 is 'Linge de bain' / 'Bath linen' and its 88 products are towels, bathrobes, bath mats and bath linen - textile under rules 15 and 20. Recorded in rows[] only as a GROUPING row (blank qty and link, rule 38/24) because it has extractable children. Qty 88 verified two ways: rendered grid 50 on page 1 + 38 on ?page=2 = 88, and products.json enumeration to exhaustion = 88 unique handles.",
+   "link": "https://www.merci-merci.com/collections/bain"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "The Bath > By product > Bath towels",
+   "qty": 46,
+   "issue": "ROUTED TO TEXTILE: bath towels are textile under rules 15 and 20. Qty 46 is the rendered ProductList count (no Pagination element). NOTE ON SOURCE: this collection returns an EMPTY products.json while rendering 46 cards, so for this node the rendered grid is the only trustworthy source - flagged because it shows products.json is not universally reliable on this store even though it matched the rendered grid exactly on accessoires-salle-de-bain (45), accessoires-de-bain (31), porte-savons (10) and bain (88).",
+   "link": "https://www.merci-merci.com/collections/bath-towels"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "The Bath > By product > Bathrobes",
+   "qty": 17,
+   "issue": "ROUTED TO TEXTILE: bathrobes are textile under rules 15 and 20. Qty 17 is the rendered ProductList count (no Pagination element). Same products.json caveat as Bath towels - the API returns 0 for this handle while the page renders 17 cards.",
+   "link": "https://www.merci-merci.com/collections/bathrobes"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "The Bath > By product > Bath mats",
+   "qty": 16,
+   "issue": "ROUTED TO TEXTILE: rule 16 - these are textile bath mats (the site files them inside its Bath LINEN branch alongside towels and bathrobes, and the by-fabric siblings are 'washed linen' and 'terrycloth'), so the website hierarchy decides and it is Textile, not a rubber/anti-slip bathroom accessory. Qty 16 from products.json enumeration.",
+   "link": "https://www.merci-merci.com/collections/tapis-de-bain"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "The Bath > By fabric > In washed linen",
+   "qty": 67,
+   "issue": "ROUTED TO TEXTILE: bath linen in washed linen - rules 15/20. This is also a BY-FABRIC re-cut of the same 'The Bath' stock rather than a distinct product node, so it would overlap the by-product children even within Textile; flagged for the Textile owner. Qty 67 from products.json enumeration.",
+   "link": "https://www.merci-merci.com/collections/linge-de-bain-en-lin-lave"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "The Bath > By fabric > Terrycloth",
+   "qty": 21,
+   "issue": "ROUTED TO TEXTILE: terry cotton bath linen - rules 15/20. Also a by-fabric re-cut of the same stock. Qty 21 from products.json enumeration.",
+   "link": "https://www.merci-merci.com/collections/la-collection-en-eponge"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "The Bath > Bathroom accessories > Toiletry bags",
+   "qty": 95,
+   "issue": "NOT RECORDED - primary product type is a BAG, not a bathroom fitting or accessory (rule 2: primary product type beats room/location). The site places 'Toiletry bags' beside 'Bathroom accessories' under its Bathroom accessories heading, so it was inspected and not silently skipped, but a washbag is luggage/small leather goods and is not in the rule 3/13 inventory. Qty 95 from products.json enumeration.",
+   "link": "https://www.merci-merci.com/collections/trousses-et-accessoires"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Deco & lifestyle > Mirrors (Miroirs)",
+   "qty": 2,
+   "issue": "ALREADY EXTRACTED IN Final.xlsx (Home Decor pass) as 'Mirrors' (company 'Merci Paris'). THIS IS A LOCALE BLIND-SPOT (b) CATCH: already_extracted('https://www.merci-merci.com/collections/miroirs') - the FR x-default form - MISSES the index, while already_extracted('https://www.merci-merci.com/en/collections/miroirs') - the hreflang EN alternate - is a HARD HIT. The dedup was only correct because every candidate was tested in BOTH locale forms as BATCH_BRIEF s4 requires. Not re-extracted. Qty 2 (rendered grid and products.json agree).",
+   "link": "https://www.merci-merci.com/en/collections/miroirs"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Beauty > Soaps (Savons)",
+   "qty": 28,
+   "issue": "NOT RECORDED - consumable toiletry, not bathroom equipment. Rule 13 admits soap DISPENSERS, DISHES and HOLDERS (all of which are captured inside the recorded 'Bathroom accessories' node); bar and liquid soap itself is a cosmetic/beauty product and is not in the rule 3 inventory. Sits in the site's Beaute branch. Qty 28 from products.json enumeration.",
+   "link": "https://www.merci-merci.com/collections/savons"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Beauty > Toothbrushes (Brosses a dents)",
+   "qty": 5,
+   "issue": "NOT RECORDED - consumable toiletry, not bathroom equipment. Rule 13 admits TOOTHBRUSH HOLDERS (the recorded node contains 'Pot a brosse a dents', 'Rangement pour brosses a dents' and 'Presentoir porte brosse a dents'); the brushes themselves are personal-care items. Note the 5 branded toothbrushes ALSO appear inside the recorded 'Bathroom accessories' 45 (product_type 'Brosse a dents' x5) - they are not additive and no quantity was adjusted, per rule 26. Qty 5 from products.json enumeration.",
+   "link": "https://www.merci-merci.com/collections/brosses-a-dent"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom: Japanese Spirit (Salle de bain esprit japonais)",
+   "qty": 30,
+   "issue": "NOT RECORDED - curated/editorial theme collection, banned by rule 25 (Collections / promotional pages) and by rule 27. It is a merchandising edit that cuts across bath linen, soaps and bathroom accessories rather than a taxonomy node, and it overlaps the recorded node. Listed here so it is not silently skipped. Qty 30 from products.json enumeration.",
+   "link": "https://www.merci-merci.com/collections/salle-de-bain-esprit-japonais"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "The Thank You Selection (La selection de bain Merci)",
+   "qty": 52,
+   "issue": "NOT RECORDED - curated/promotional selection, banned by rule 25. Same reasoning as 'Bathroom: Japanese Spirit'; it is a Merci-brand edit spanning bath linen and accessories, not a category. Qty 52 from products.json enumeration.",
+   "link": "https://www.merci-merci.com/collections/la-selection-de-bain-merci"
+  }
+ ],
+ "_reconstructed_from": "Bathroom.xlsx delivered 2026-09-01 (checkpoint), not original worker JSON"
+}

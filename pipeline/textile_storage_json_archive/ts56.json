@@ -1,0 +1,374 @@
+{
+  "sr": 56,
+  "company": "CB2 (US)",
+  "brand_site": "cb2.com",
+  "country": "USA",
+  "site_url": "https://www.cb2.com/",
+  "status": "partial",
+  "failure_reason": "Category/subcategory listing pages are blocked by a persistent bot-protection wall at every access tier. Tier (a): curl_cffi with Chrome impersonation got HTTP 403 'Access Denied' (Akamai) on every /category/subcategory/N or /category/subcategory/ URL tested (e.g. /rugs/rugs/1, /bed-and-bath/bedding/, /accessories/organization/), while the homepage and /site-index (a full sitemap-style page) returned 200 with real HTML. Tier (b): Playwright headless got the same 403 Access Denied; Playwright headed with --disable-blink-features=AutomationControlled returned HTTP 200 but the body was still the Akamai 'Access Denied' page. Tier (c): Claude-in-Chrome (real logged-in Chrome session) hit a 'Powered and protected by ... Privacy' PerimeterX-style human-challenge interstitial on the same listing URLs, both via direct navigation and via clicking the real in-page nav links from the homepage after dismissing the country-selector modal; it did not resolve after an 8-second wait. This matches prior known CB2/Akamai behavior against listing pages. No quantities or h1/canonical confirmations could be obtained for any leaf. The full category TREE itself was still recoverable (see notes) because /site-index and the homepage were not subject to this block.",
+  "notes": "ACCESS: tier (a) direct HTTP via curl_cffi (impersonate=chrome124) worked for https://www.cb2.com/ and https://www.cb2.com/site-index (both 200) but every category/subcategory listing URL returned 403 Access Denied (Akamai). Escalated to tier (b) Playwright (headless, then headed with --disable-blink-features=AutomationControlled) - same block (403, or 200-wrapped Access Denied body). Escalated to tier (c) Claude-in-Chrome real browser session - hit a PerimeterX-style 'Powered and protected by' challenge on listing pages that did not clear after waiting or after navigating via genuine nav-menu clicks. robots.txt (fetched via tier a) has no Anthropic/Claude/ClaudeBot specific disallow, only a generic 'User-agent: *' block on /Browse/*, /browse/*, /checkout/, /account/ etc, none of which cover the category paths used here, so tier (c) was not itself robots-blocked - the block encountered was an active WAF/anti-bot wall, not robots.txt. Per STEP 1 rule 4, stopped after the first block was confirmed at the final tier rather than retrying further. TREE: built entirely from https://www.cb2.com/site-index, parsed for real DOM structure (not just link hrefs) - it is CB2's own full site index page, organized under h3 section headers ('Decor & Mirrors', 'Pillows & Throws', 'Rugs', 'Kitchen & Dining', 'Bedding & Bath', 'Furniture' etc) each containing the genuine sub-category link labels and hrefs in page order, functioning as the sitemap + mega-menu union required by STEP 2. h1/canonical confirmation on each leaf was NOT possible because the leaf pages are blocked at all tiers - flagged per row. QTY: could not be obtained for any row - every listing page is blocked at all three tiers; qty=null with a MANUAL REVIEW flag on every leaf row per STEP 1 rule 3 (no fabrication/estimation). EXCLUDED: all 'View All X' / 'All X' links (e.g. all-curtains, all-bedding, all-rugs, all-organization, all-kitchen-linens, all-kitchen-storage-tools, all-bath, all-pillows-throws) as View-All pages; all 'Best Sellers: X' links as curated cross-category promotional pages, not genuine subcategories; hardware items (Curtain Rods & Hardware, Bath Hardware, Cabinet Hardware, Knobs & Pulls etc) per the Textile/Storage hardware exclusions; Bath Accessories, Bath Mirrors (bathroom fixtures/mirrors, out of scope); Poufs (furniture/seating, not textile, per Furniture Boundary rule); all Kitchen Gadgets & Tools, Dinnerware/Flatware/Serveware/Drinkware (Kitchen & Dining task, out of scope); all Wall Decor/Mirrors/Home Accessories/Electronics/Games/Wallpaper (Wall Decor / Decorative Home Accessories tasks, out of scope); all /furniture/ paths including Storage & Media Furniture, Storage Cabinets, File Cabinets, Wardrobes & Cabinets, Bookcases, Entryway & Mudroom - these sit explicitly under CB2's own Furniture nav section, so per storage.md rule 21/27 (site explicitly places them in Furniture -> prefer Furniture) they were excluded from Storage entirely, this is the Furniture-task's territory (Furniture.xlsx already validated, not touched). AMBIGUOUS (kept, LOW/MEDIUM confidence, flagged): Shelves & Wall Hooks, Display & Jewelry Boxes, Office Accessories, Bookends (all under CB2's own 'Organization' nav section, but the labels themselves are not unambiguous storage-only products) - kept per storage.md rule 42 (website hierarchy is the strongest signal) but flagged for manual review since page contents could not be verified. One naming quirk found in the site-index: the link labeled 'Entryway Storage' points to href /accessories/baskets/1 (not /accessories/entryway-storage/1, which also exists as a separate URL discovered via the homepage footer nav but was not present anywhere in the site-index); treated the site-index's own canonical pairing ('Entryway Storage' -> /accessories/baskets/1) as authoritative and did not add a second duplicate row for the other URL, per the duplicate-prevention rule.",
+  "textile_rows": [
+    {
+      "category": "Textile",
+      "sub_category": "Curtains & Curtain Hardware",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Curtains",
+      "qty": null,
+      "link": "https://www.cb2.com/accessories/curtains/1",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: qty unavailable - listing page blocked by bot-protection wall at all access tiers (see notes)",
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Kitchen Linens",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Table Runners & Tablecloths",
+      "qty": null,
+      "link": "https://www.cb2.com/dining/table-runners/1",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: qty unavailable - listing page blocked by bot-protection wall at all access tiers (see notes)",
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Placemats",
+      "qty": null,
+      "link": "https://www.cb2.com/dining/placemats/1",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: qty unavailable - listing page blocked by bot-protection wall at all access tiers (see notes)",
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Napkins",
+      "qty": null,
+      "link": "https://www.cb2.com/dining/napkins/1",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: qty unavailable - listing page blocked by bot-protection wall at all access tiers (see notes)",
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Dish Towels",
+      "qty": null,
+      "link": "https://www.cb2.com/dining/dish-towels/1",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: qty unavailable - listing page blocked by bot-protection wall at all access tiers (see notes)",
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Bedding",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Duvets & Quilts",
+      "qty": null,
+      "link": "https://www.cb2.com/bed-and-bath/duvets-quilts/1",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: qty unavailable - listing page blocked by bot-protection wall at all access tiers (see notes)",
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Blankets",
+      "qty": null,
+      "link": "https://www.cb2.com/bed-and-bath/blankets/1",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: qty unavailable - listing page blocked by bot-protection wall at all access tiers (see notes)",
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Sheet Sets",
+      "qty": null,
+      "link": "https://www.cb2.com/bed-and-bath/sheet-sets/1",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: qty unavailable - listing page blocked by bot-protection wall at all access tiers (see notes)",
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Bedding Bundles",
+      "qty": null,
+      "link": "https://www.cb2.com/bed-and-bath/bedding-bundles/1",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: qty unavailable - listing page blocked by bot-protection wall at all access tiers (see notes)",
+      "confidence": "MEDIUM"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Bedding Essentials",
+      "qty": null,
+      "link": "https://www.cb2.com/bed-and-bath/bedding-essentials/1",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: qty unavailable - listing page blocked by bot-protection wall at all access tiers (see notes)",
+      "confidence": "MEDIUM"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Bath",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Bath Linens",
+      "qty": null,
+      "link": "https://www.cb2.com/bed-and-bath/bath-linens/1",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: qty unavailable - listing page blocked by bot-protection wall at all access tiers (see notes)",
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Bath Linen Bundles",
+      "qty": null,
+      "link": "https://www.cb2.com/bed-and-bath/bath-linen-bundles/1",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: qty unavailable - listing page blocked by bot-protection wall at all access tiers (see notes)",
+      "confidence": "MEDIUM"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Bath Mats & Rugs",
+      "qty": null,
+      "link": "https://www.cb2.com/bed-and-bath/bath-mats-rugs/1",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: qty unavailable - listing page blocked by bot-protection wall at all access tiers (see notes)",
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Shower Curtains",
+      "qty": null,
+      "link": "https://www.cb2.com/bed-and-bath/shower-curtains/1",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: qty unavailable - listing page blocked by bot-protection wall at all access tiers (see notes)",
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Pillows & Throws",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Pillows",
+      "qty": null,
+      "link": "https://www.cb2.com/pillows-throws/pillows/1",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: qty unavailable - listing page blocked by bot-protection wall at all access tiers (see notes)",
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Throws",
+      "qty": null,
+      "link": "https://www.cb2.com/pillows-throws/throws/1",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: qty unavailable - listing page blocked by bot-protection wall at all access tiers (see notes)",
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Rugs",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Area Rugs",
+      "qty": null,
+      "link": "https://www.cb2.com/rugs/rugs/1",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: qty unavailable - listing page blocked by bot-protection wall at all access tiers (see notes)",
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Runners",
+      "qty": null,
+      "link": "https://www.cb2.com/rugs/runners/1",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: qty unavailable - listing page blocked by bot-protection wall at all access tiers (see notes)",
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "One-of-a-Kind Rugs",
+      "qty": null,
+      "link": "https://www.cb2.com/rugs/one-of-a-kind-rugs/1",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: qty unavailable - listing page blocked by bot-protection wall at all access tiers (see notes)",
+      "confidence": "MEDIUM"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Doormats",
+      "qty": null,
+      "link": "https://www.cb2.com/rugs/doormats/1",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: qty unavailable - listing page blocked by bot-protection wall at all access tiers (see notes)",
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Kitchen Rugs",
+      "qty": null,
+      "link": "https://www.cb2.com/rugs/kitchen-rugs/1",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: qty unavailable - listing page blocked by bot-protection wall at all access tiers (see notes)",
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Outdoor Rugs",
+      "qty": null,
+      "link": "https://www.cb2.com/rugs/outdoor-rugs/1",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: qty unavailable - listing page blocked by bot-protection wall at all access tiers (see notes)",
+      "confidence": "HIGH"
+    }
+  ],
+  "storage_rows": [
+    {
+      "category": "Storage",
+      "sub_category": "Organization",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Shelves & Wall Hooks",
+      "qty": null,
+      "link": "https://www.cb2.com/accessories/shelves-wall-hooks/1",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: qty unavailable - listing page blocked by bot-protection wall at all access tiers; also classification ambiguous (Storage vs Wall Decor per storage.md rule 18) - included on the site's own Organization-section placement, verify manually",
+      "confidence": "MEDIUM"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Entryway Storage",
+      "qty": null,
+      "link": "https://www.cb2.com/accessories/baskets/1",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: qty unavailable - listing page blocked by bot-protection wall at all access tiers (see notes)",
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Display & Jewelry Boxes",
+      "qty": null,
+      "link": "https://www.cb2.com/accessories/display-jewelry-boxes/1",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: qty unavailable - listing page blocked by bot-protection wall at all access tiers; also classification ambiguous ('display' framing could skew decorative rather than storage) - included on the site's own Organization-section placement, verify manually",
+      "confidence": "MEDIUM"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Office Accessories",
+      "qty": null,
+      "link": "https://www.cb2.com/accessories/office-accessories/1",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: qty unavailable - listing page blocked by bot-protection wall at all access tiers; also classification ambiguous (name does not confirm storage-primary contents) - included on the site's own Organization-section placement, verify manually",
+      "confidence": "MEDIUM"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Bookends",
+      "qty": null,
+      "link": "https://www.cb2.com/accessories/bookends/1",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: qty unavailable - listing page blocked by bot-protection wall at all access tiers; also classification ambiguous (bookends are borderline decorative/shelf-accessory, not a listed storage rule example) - included on the site's own Organization-section placement, verify manually",
+      "confidence": "LOW"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Kitchen Storage & Tools",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Kitchen Storage",
+      "qty": null,
+      "link": "https://www.cb2.com/dining/kitchen-storage/1",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: qty unavailable - listing page blocked by bot-protection wall at all access tiers (see notes)",
+      "confidence": "HIGH"
+    }
+  ]
+}

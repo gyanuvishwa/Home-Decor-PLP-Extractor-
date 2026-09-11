@@ -1,0 +1,34 @@
+{
+  "status": "partial",
+  "failure_reason": "Akamai bot-management returns HTTP 403 'Restricted Access' on every /shop/* PLP URL tested, confirmed independently across all 3 access tiers: (1) curl_cffi with Chrome-120 TLS impersonation, both cold and with a warmed session (homepage cookies + same-origin Referer/Sec-Fetch headers); (2) Playwright, both headless Chromium and headful real-Chrome channel; (3) a live Claude-in-Chrome browser session (navigating from the already-loaded, working homepage). All three returned the same 'Pottery Barn Kids: 403 - Restricted Access' page. Only the homepage (/), /robots.txt, the sitemap XML files under /netstorage/sitemaps/, and /llms.txt (all outside /shop/) returned HTTP 200. This matches the prior Furniture-pass note for this company (archive c5) exactly. r.jina.ai / translate.goog / archive.org were not used per this task's rules, so no PLP content or product count could be verified this pass.",
+  "notes": "Navigation checked: homepage raw HTML href scan (found /shop/best-sellers/all-best-sellers/ directly linked); the site's own /llms.txt Secondary Navigation section, which independently confirms 'Best Sellers' -> https://www.potterybarnkids.com/shop/best-sellers/all-best-sellers/ with page title 'Kids' Best Sellers: Furniture, Bedding & Deco' and description 'Shop Pottery Barn Kids' most-loved furniture, bedding, and decor. Discover top-rated items parents trust' -- this is strong site-authored confirmation of a genuine Bestsellers merchandising concept, independent of the blocked live page. Sitemap enumeration of shop-sitemap-1.xml.gz (911 shop URLs, fetched successfully since it sits outside /shop/) surfaced the dedicated /shop/best-sellers/ branch (parent + all-best-sellers + valentines-day-best-sellers), plus /shop/registry/customer-favorites/, plus roughly 20 additional department-embedded best-seller filter pages scattered across Furniture/Bedding/Decor/Lighting/Baby Gear/Backpacks/Toys/Halloween/Easter/Beach/Storage/Anywhere Chair/Christmas/Rugs/Windows/Bath (e.g. /shop/furniture/kids-furniture-best-sellers/, /shop/decor/decor-best-sellers/, /shop/lighting/lighting-best-sellers/, several appearing in '-best-sellers' vs '-best-sellers-category' near-duplicate pairs). These department-level pages were NOT added as separate rows: none could be opened to confirm they are genuine distinct listings rather than facet-nav aliases, and the near-duplicate naming pattern makes canonical-vs-alias disambiguation impossible without live access. The site's own internal search UI sits behind the same Akamai wall and could not be tested. All three rows below are recorded from authoritative site-owned sources (main nav, llms.txt, sitemap) but qty is unverifiable this pass.",
+  "rows": [
+    {
+      "category": "Bestsellers",
+      "sub_category": "Bestsellers",
+      "qty": null,
+      "link": "https://www.potterybarnkids.com/shop/best-sellers/all-best-sellers/",
+      "is_group": true,
+      "evidence": "Confirmed via site's own llms.txt Secondary Navigation: title 'Kids' Best Sellers: Furniture, Bedding & Deco', description 'Shop Pottery Barn Kids' most-loved furniture, bedding, and decor. Discover top-rated items parents trust'; also directly linked in homepage nav HTML and present in shop-sitemap-1.xml.gz. Live page/count could not be loaded (Akamai 403 on every access tier).",
+      "flag": "MANUAL REVIEW: qty unverifiable - Akamai 403 blocks this PLP on all 3 access tiers (curl_cffi, Playwright, Claude-in-Chrome)"
+    },
+    {
+      "category": "Bestsellers",
+      "sub_category": "Valentine's Day Best Sellers",
+      "qty": null,
+      "link": "https://www.potterybarnkids.com/shop/best-sellers/valentines-day-best-sellers/",
+      "is_group": false,
+      "evidence": "URL present in shop-sitemap-1.xml.gz under the same /shop/best-sellers/ branch as all-best-sellers, naming indicates a seasonal Best Sellers sub-listing.",
+      "flag": "MANUAL REVIEW: qty unverifiable - Akamai 403 blocks this PLP on all 3 access tiers (curl_cffi, Playwright, Claude-in-Chrome); also confirm this seasonal listing is still in-season/live"
+    },
+    {
+      "category": "Bestsellers",
+      "sub_category": "Customer Favorites (Registry)",
+      "qty": null,
+      "link": "https://www.potterybarnkids.com/shop/registry/customer-favorites/",
+      "is_group": false,
+      "evidence": "URL present in shop-sitemap-1.xml.gz. 'Customer Favorites' is an explicit Bestsellers target term, but this page sits under /shop/registry/ rather than the /shop/best-sellers/ branch.",
+      "flag": "MANUAL REVIEW: AMBIGUOUS SCOPE - page lives under /shop/registry/, may be a registry-specific curated list rather than a genuine sitewide Bestsellers PLP; MANUAL REVIEW: qty unverifiable - Akamai 403 blocks this PLP on all 3 access tiers (curl_cffi, Playwright, Claude-in-Chrome)"
+    }
+  ]
+}

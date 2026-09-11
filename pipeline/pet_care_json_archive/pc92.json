@@ -1,0 +1,35 @@
+{
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "Access: direct HTTP fetch (curl, desktop UA) of ikea.com/gb/en/ worked with no blocking; robots.txt at ikea.com/robots.txt checked, no Claude/anthropic-ai/ClaudeBot disallow present, so no escalation needed. Found the site's own Pet Care hub via the homepage 'Pet products' promo tile linking to https://www.ikea.com/gb/en/cat/pet-products-pt001/ (id pt001, embedded page-meta JSON script tag). That page's hierarchyObjs.subCategories lists exactly two children: Cats (id 39569) and Dogs (id 39570) -- both confirmed leaf categories (their own page-meta JSON shows subCategories: [] for Cats; same structure for Dogs). The pt001 'Pet products' page itself has no product listing / no 'Showing X of Y' block and no JSON-LD ItemList -- it is a pure grouping/landing page (tiles only), so emitted as is_group=true with qty/link null. Cats and Dogs pages are full SSR HTML (not client-only) and each carries two independent exact-count signals that agree: the visible 'catalog-product-list__total-count' text ('Showing 11 of 11 results' / 'Showing 13 of 13 results') and the JSON-LD ItemList numberOfItems (11 / 13 respectively) plus a matching <progress value/max>. Spot-checked the actual item names in both listings (UTSADD cat houses/scratching mat/pet cushion/pet bowl/cat tunnel/pet blanket/pet bed for Cats; UTSADD/BOLMSA dog beds, dog toys, pet bowl/blanket/cushion for Dogs) -- all genuinely pet-specific products (LURVIG has apparently been superseded by the UTSADD line on the current UK site; no separate LURVIG-named category page exists, searched for it via the internal search API (q=lurvig) which returned 0 results, consistent with the product line being retired/renamed rather than proof of absence on its own -- the category-tree check above is the real absence/coverage proof). Attempted to use the site's internal search backend (sik.search.blue.cdtapps.com/gb/en/search-result-page) with a category= query param as a cross-check per the prior Home-Decor pass's method note, but for this session that GET param was accepted syntactically without actually filtering (returned the generic full-catalog fallback, max=9641, unrelated products like a kitchen trolley) -- this matches the brief's warning that some site search/query mechanisms return non-discriminating default results, so it was abandoned in favor of the reliable, already-verified SSR HTML total-count + JSON-LD signal on the category pages themselves, which is unambiguous and internally consistent (Showing N of N == JSON-LD numberOfItems == progress max for both leaves). Overlap note: several UTSADD SKUs (pet bowl, pet blanket, pet bed M, pet cushion, place mat for food bowl) appear in BOTH the Cats and Dogs listings -- these are genuinely two separate site category IDs/URLs each reporting its own accurate total, not a duplicate-link defect, so both rows are kept per Rule 0.6 (overlap expected and documented, not merged). No other pet-related category nodes were found anywhere else on the site (checked homepage full nav/promo scan for 'pet' substring, and the pt001 hierarchy is the sole Pet-branded node under Products) -- Small pets/birds/fish/aquarium categories do not exist on IKEA UK. No pet food/consumables or medical/veterinary categories found (none to flag)."
+,
+  "rows": [
+    {
+      "category": "Pet Care",
+      "sub_category": "Pet products",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Cats",
+      "qty": 11,
+      "link": "https://www.ikea.com/gb/en/cat/cats-39569/",
+      "is_group": false,
+      "evidence": "catalog-product-list__total-count text 'Showing 11 of 11 results'; corroborated by JSON-LD ItemList numberOfItems=11 and <progress value=11 max=11>",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Dogs",
+      "qty": 13,
+      "link": "https://www.ikea.com/gb/en/cat/dogs-39570/",
+      "is_group": false,
+      "evidence": "catalog-product-list__total-count text 'Showing 13 of 13 results'; corroborated by JSON-LD ItemList numberOfItems=13 and <progress value=13 max=13>",
+      "flag": null
+    }
+  ]
+}

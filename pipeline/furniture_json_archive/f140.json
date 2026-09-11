@@ -1,0 +1,1344 @@
+{
+ "sr": 140,
+ "company": "IKEA France",
+ "brand_site": "ikea.com",
+ "country": "France",
+ "site_url": "https://www.ikea.com/fr/fr/",
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ROUTE: Claude-in-Chrome connector only, one dedicated tab (tabId 1961714863). robots.txt was fetched same-origin from the loaded FR page first: 4054 bytes, 92 Disallow lines under User-agent: *, none of them covering /fr/ or /cat/, no blanket Disallow: /, and no mention anywhere of anthropic-ai / ClaudeBot / Claude-Web / Claude-User / Claude-SearchBot. No curl / requests / WebFetch / proxy was used at any point; every fetch() ran inside the loaded ikea.com/fr/fr page context. No 403, CAPTCHA, DataDome or rate-limit was seen at any stage.\n\nTREE SOURCE: script[type=text/hydrate] -> data.config.catalogSlim on https://www.ikea.com/fr/fr/cat/meubles-fu001/ (child key is 'subs', as f107 established on the DE store, NOT 'subCategories'). The FR payload has 21 top-level departments. Furniture was assembled from the FR store's real departments: fu002 Tables & chaises, 700640 Canapes & fauteuils, bm001 Lits & matelas, st001 Rangements, fu004 Bureaux & chaises de bureau, ba001 Salle de bain, od001 Amenagement exterieur (od003 Mobilier de jardin) and bc001 Bebe & enfant - 548 nodes in those eight. To satisfy the 'nav under-reports' trap the whole catalogSlim (all 21 departments) was keyword-swept in French for canape/fauteuil/chaise/tabouret/table/bureau/lit/armoire/commode/banc/buffet/etagere/bibliotheque/meuble/coiffeuse/penderie/desserte/vitrine/pouf; every hit outside the eight furniture departments was a kitchen fixture (ka001 METOD/ENHET/KNOXHULT fitted-kitchen cabinets), tableware (kt001 'linge de table', 'couverts de table'), lighting (li001 'lampes de bureau'), decor (de001 'horloges murales et de table') or a desk accessory (st007 'organisateurs de bureau') - i.e. no furniture node lives outside the eight departments.\n\nQTY METHOD AND THE HEADER CONVENTION - THIS MATCHES f107 (IKEA DE) DELIBERATELY: for every leaf the figure in qty is productListPage.productCount from sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=<id>, fetched from the loaded page. IKEA's rendered listing header is INFLATED BY EXACTLY +1 whenever plannerCount>0, because client-side hydration injects a non-product planner tile. This was MEASURED on FR, not assumed, on four category pages loaded in the tab and read from the live DOM: tables-basses-10716 productCount 44 / plannerCount 1 / header '45 elements'; tables-de-salle-a-manger-21825 productCount 86 / plannerCount 2 / header '87 elements' (so it is +1 even at plannerCount=2 - the header is NOT productCount+plannerCount); rangements-cubiques-55012 productCount 78 / plannerCount 0 / header '78 elements'; armoires-integrees-43632 productCount 403 / plannerCount 0 / header '403 elements'. The server-delivered HTML carries the un-inflated number (a raw same-origin fetch of tables-basses-10716 returns '44 elements' inside p.plp-filter-information__total-count while the hydrated DOM shows '45 elements'), exactly as on the DE store. 82 of the 116 FR leaves have plannerCount>0 and are therefore affected. FOLLOWING f107 EXPLICITLY: qty is the ENUMERATED PRODUCT COUNT and the header figure is stated inside every evidence string, so whichever convention the orchestrator settles on stays recoverable, and IKEA FR is directly comparable with IKEA DE. CACHING CAUTION worth passing on: a raw same-origin fetch of armoires-integrees-43632 returned a STALE CDN-cached SSR snapshot saying '445 elements' / 'Affiche 24 resultats sur 445', while the same page loaded live in the tab showed '403 elements' and the API 403 - so the raw-HTML header is not always current, and the live DOM plus the API agree.\n\nVERIFICATION: (1) full enumeration - /product-list-page/more-products?category=<id>&start=0&end=productCount+30 was run on a 12-leaf sample spanning the whole range (25206=1, 47360=1, 55021=1, 700441=2, 19143=3, 45815=4, 20611=7, 20926=52, 21958=56, 25219=110, 10382=116, fu003=227) and returned exactly productCount tiles with exactly productCount unique itemNoGlobal values in 12/12 cases - unique product IDs, not href counting. (2) boundary test - start=productCount-1 returned exactly 1 item and start=productCount returned 0 items on an 8-leaf sample (20611=7, 20926=52, 21958=56, 25219=110, 10382=116, 20720=134, fu003=227, 43632=403), 8/8 pass, so no total is truncated or padded. The exhaustive 117/117 version of both checks was already run by f107 on the same global platform, so it was sampled rather than repeated here. (3) the API echoed back category.name and category.url for all 116 ids and each matched the node taken from catalogSlim, so no id silently served a parent listing; the h1 of every page actually loaded matched the node requested. (4) 59 distinct qty values across 116 leaves spanning 1-403 - no site-wide constant, no suspiciously round display cap.\n\nINDEPENDENCE FROM IKEA DE (f107): IKEA runs one global platform, so 116 of DE's 117 leaf category IDs also resolve on FR (700424 Conference table with chairs sets does not exist in the FR tree - that is the single missing node). The FR figures are nevertheless the FR market's own: Coffee Tables DE 45 / FR 44, Dining Tables DE 92 / FR 86, Sofas DE 274 / FR 227, Beds DE 226 / FR 232, Fitted Wardrobes DE 389 / FR 403, Dining Chairs DE 112 / FR 110. The FR department layout also differs from DE's: FR groups tables under 700675 Tables with a 10705 'Tables basses et tables d'appoint' sub-branch, puts the wardrobe leaves under 19053 'Armoires et penderies' rather than a wardrobe hub, files office storage under st001>10385 rather than the office department, and splits garden chairs under 21964 and outdoor tables under 700191, neither of which exists as a node on DE. All names below are translated from the FR store's own wording; nothing was copied from the German labels.\n\nSTOPPING RULE: stopped above nodes that only split by seat count, size, material or series - 21825 Tables de salle a manger -> Tables 2/4/6/8/10 personnes, 19145 Ensembles tables et chaises -> max. 2/4/6/10 pers., 25219 Chaises de salle a manger -> chaises de table / rembourrees / personnalisables, fu003 Canapes -> 2 places / 3 places / angle / meridienne / modulables / relax, fu006 Fauteuils -> tissu / cuir / rotin / club / relax, 10663 Convertibles -> 2 places / 3 places / angle / chauffeuses, 20926 Repose-pieds -> tissu / cuir / rotin, bm003 Lits -> lits doubles / simples / avec rangement / matelasses / sommiers tapissiers / lits d'appoint et banquettes. NOTE on bm003: its children also cross-link to 18723 Lits enfant, 19039 Lits mezzanine et lits superposes and 18755 Sommeil bebe, all of which ARE emitted as their own leaves under the children's branch; bm003 is kept as a single leaf exactly as f107 did on DE, so the 232 figure covers the adult bed range including 19037 Lits d'appoint et banquettes (day beds), which is not emitted separately.\n\nEXCLUDED, and why: the whole named-series layer under st001>46052 (PAX, BESTA, PLATSA, EKET, IVAR, ELVARLI, BROR, BOAXEL, JONAXEL, JOSTEIN, TROFAST, OMAR, LASTARE, LADMAKARE, GULDDRAGARE, SMASTAD), the bathroom series under ba001>700450, the desk systems under fu004>20649>47423 (MITTZON, TROTTEN, IDASEN, RELATERA) and 11811 Bureaux modulables - all component listings. Also excluded: mattresses and bed bases (bm002 Matelas and its children, 24826 Surmatelas, 18724 Matelas enfant, 45855 Matelas lits bebe, 24825 Sommiers tapissiers, 24827 Sommiers a lattes); bedding and textiles (tl003, tl004, 20542 Galettes de chaise, 46400 Coussins de chaise d'exterieur, 17893 Coussins d'exterieur, 34204 Tapis d'exterieur); furniture parts, covers and care (10664 Housses and its 19 series children, 25223 Housses pour chaise, 57654 Housses pour repose-pieds, 30572 Plateaux et pieds de table, 34006 Chaises personnalisables, 24822 Pieds de lit, 57280 Housses du cadre de lit, 55997 Combinaison porte coulissante, 11845 Pieds et treteaux, 11844 Plateaux de table, 34205 Housses mobilier de jardin, 42948 Huile et lasure); standalone storage goods (st007 Accessoires de rangement, 10797 Boites de stockage, 19059 Rangements de lit, 20479 Boites et paniers enfant, 20474 Rangements jouets, 16233 Paniers de rangement salle de bain); wall shelving (10398 Etageres murales, 20660 Etageres, 20481 rangements muraux enfant, 20615 Etageres murales de salle de bain - Wall Decor's job); bathroom fixtures and mirrors (20723 Vasques et lavabos, 20724 Robinets, 40690 Douches, 30565 Plans de travail, 10555 Accessoires, 20498 Miroirs a poser, 20499 Miroirs grossissants, 49138 Miroirs avec lumieres - only 20500 Meubles hauts avec miroir is kept, because it is a wall cabinet); lighting (li001, 16283 Eclairage integre dressing, 10736, 18773, 17897 Luminaires d'exterieur); appliances and laundry machines (20826, 20608, 24898 Barbecues, 700543/700544 outdoor kitchens); desk screens and office supplies (700336 Separateurs de bureau, 55397 Accessoires de gaming, 10551 Organisateurs de bureau); and the fitted-kitchen tree (ka001 METOD / ENHET / KNOXHULT and their fronts, worktops and sinks). The two furniture nodes IKEA files inside the kitchen and storage trees - 10471 Dessertes et ilots cuisine and 16200 Rangement cellier - are reached through fu005 and st002 and ARE included.\n\nOVERLAPS: the FR tree lists many nodes under two parents (21825 and 25219 under both 700675/700676 and 700417 Meubles de salle a manger; 22659 Tabourets at fu002 level and under 700417; 10412 Buffets under st003 and 30454; 16246 Consoles under 10705 and 30454; 20656 Tables de chevet under bm001 and st004; fu006 Fauteuils under 700676 and 700640; 20862/20864 under both 700675/700676 and 16244; 19143/19144 under those and 19141; 47386 Bancs d'exterieur under 700319 and 700350; 21966 Chaises de jardin under 21964 and 700351; 700192 under od003 and 700191; 21958 under st001 and od003; 20858 under fu005 and ba001; 18707/18708/24714/24715/45816/20483/45815/18768/18769/45782/19049/19048 under both their type parent and the children's tree). Each such leaf is emitted exactly once, under its most natural parent, so there are no duplicate rows. Grouping rows whose every child is placed elsewhere are therefore not emitted at all: 700417 Meubles de salle a manger, 30454 Buffets et consoles, 19141 Mobilier de restaurants et cafes, bc004 Chaises enfant, 700440 Rangements pour le garage, 18706 Rangements enfant, bc002/bc003, 20490 Miroirs salle de bain and ba003 Buanderie.",
+ "rows": [
+  {
+   "category": "Furniture",
+   "sub_category": "Tables & Chairs",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Stools",
+   "qty": 25,
+   "link": "https://www.ikea.com/fr/fr/cat/tabourets-22659/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=22659 -> productListPage.productCount=25 (API echoed category.name 'Tabourets' and this exact URL); plannerCount=0, so the site's hydrated listing header reads '25 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dressing Table Chairs & Stools",
+   "qty": 15,
+   "link": "https://www.ikea.com/fr/fr/cat/chaises-de-coiffeuses-et-tabourets-59250/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=59250 -> productListPage.productCount=15 (API echoed category.name 'Chaises, tabourets et fauteuils de coiffeuses' and this exact URL); plannerCount=1, so the site's hydrated listing header reads '16 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dining Table & Chair Sets",
+   "qty": 121,
+   "link": "https://www.ikea.com/fr/fr/cat/ensembles-tables-et-chaises-19145/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=19145 -> productListPage.productCount=121 (API echoed category.name 'Ensembles tables et chaises' and this exact URL); plannerCount=2, so the site's hydrated listing header reads '122 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Step Stools & Ladders",
+   "qty": 7,
+   "link": "https://www.ikea.com/fr/fr/cat/marchepieds-et-escabeaux-20611/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=20611 -> productListPage.productCount=7 (API echoed category.name 'Marchepieds et escabeaux' and this exact URL); plannerCount=0, so the site's hydrated listing header reads '7 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Tables",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Extendable Tables",
+   "qty": 23,
+   "link": "https://www.ikea.com/fr/fr/cat/tables-extensibles-21829/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=21829 -> productListPage.productCount=23 (API echoed category.name 'Tables extensibles' and this exact URL); plannerCount=1, so the site's hydrated listing header reads '24 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dining Tables",
+   "qty": 86,
+   "link": "https://www.ikea.com/fr/fr/cat/tables-de-salle-a-manger-21825/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=21825 -> productListPage.productCount=86 (API echoed category.name 'Tables de salle a manger' and this exact URL); plannerCount=2; rendered listing header on the live page read directly from the DOM: '87 elements'; server-delivered HTML of the same URL carries the un-inflated '86 elements'; qty here is the enumerated product count, not the hydrated header figure",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Wall-Mounted Tables",
+   "qty": 1,
+   "link": "https://www.ikea.com/fr/fr/cat/tables-fixation-murale-25206/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=25206 -> productListPage.productCount=1 (API echoed category.name 'Tables fixation murale' and this exact URL); plannerCount=0, so the site's hydrated listing header reads '1 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Round Tables",
+   "qty": 14,
+   "link": "https://www.ikea.com/fr/fr/cat/tables-rondes-59244/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=59244 -> productListPage.productCount=14 (API echoed category.name 'Tables rondes' and this exact URL); plannerCount=1, so the site's hydrated listing header reads '15 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Multifunctional Tables",
+   "qty": 5,
+   "link": "https://www.ikea.com/fr/fr/cat/tables-multifonctionnelles-57537/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=57537 -> productListPage.productCount=5 (API echoed category.name 'Tables multifonctionnelles' and this exact URL); plannerCount=0, so the site's hydrated listing header reads '5 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bar Tables",
+   "qty": 6,
+   "link": "https://www.ikea.com/fr/fr/cat/tables-de-bar-20862/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=20862 -> productListPage.productCount=6 (API echoed category.name 'Tables hautes & mange debout' and this exact URL); plannerCount=1, so the site's hydrated listing header reads '7 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Cafe & Restaurant Tables",
+   "qty": 3,
+   "link": "https://www.ikea.com/fr/fr/cat/tables-de-cafe-et-restaurant-19143/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=19143 -> productListPage.productCount=3 (API echoed category.name 'Tables de restaurants et cafes' and this exact URL); plannerCount=1, so the site's hydrated listing header reads '4 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Coffee & Side Tables",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Coffee Tables",
+   "qty": 44,
+   "link": "https://www.ikea.com/fr/fr/cat/tables-basses-10716/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=10716 -> productListPage.productCount=44 (API echoed category.name 'Tables basses' and this exact URL); plannerCount=1; rendered listing header on the live page read directly from the DOM: '45 elements'; server-delivered HTML of the same URL carries the un-inflated '44 elements'; qty here is the enumerated product count, not the hydrated header figure",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Side Tables",
+   "qty": 68,
+   "link": "https://www.ikea.com/fr/fr/cat/tables-dappoint-10717/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=10717 -> productListPage.productCount=68 (API echoed category.name 'Tables d'appoint' and this exact URL); plannerCount=1, so the site's hydrated listing header reads '69 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Console Tables",
+   "qty": 1,
+   "link": "https://www.ikea.com/fr/fr/cat/consoles-16246/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=16246 -> productListPage.productCount=1 (API echoed category.name 'Consoles' and this exact URL); plannerCount=1, so the site's hydrated listing header reads '2 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Nesting Tables",
+   "qty": 7,
+   "link": "https://www.ikea.com/fr/fr/cat/tables-gigognes-57298/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=57298 -> productListPage.productCount=7 (API echoed category.name 'Tables gigognes' and this exact URL); plannerCount=1, so the site's hydrated listing header reads '8 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Chairs",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Folding Chairs",
+   "qty": 7,
+   "link": "https://www.ikea.com/fr/fr/cat/chaises-pliantes-25222/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=25222 -> productListPage.productCount=7 (API echoed category.name 'Chaises pliantes' and this exact URL); plannerCount=0, so the site's hydrated listing header reads '7 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dining Chairs",
+   "qty": 110,
+   "link": "https://www.ikea.com/fr/fr/cat/chaises-de-salle-a-manger-25219/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=25219 -> productListPage.productCount=110 (API echoed category.name 'Chaises de salle a manger' and this exact URL); plannerCount=1, so the site's hydrated listing header reads '111 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bar Chairs",
+   "qty": 15,
+   "link": "https://www.ikea.com/fr/fr/cat/chaises-de-bar-20864/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=20864 -> productListPage.productCount=15 (API echoed category.name 'Chaises de bar' and this exact URL); plannerCount=1, so the site's hydrated listing header reads '16 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Cafe & Restaurant Chairs",
+   "qty": 6,
+   "link": "https://www.ikea.com/fr/fr/cat/chaises-de-cafe-et-restaurant-19144/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=19144 -> productListPage.productCount=6 (API echoed category.name 'Chaises de restaurants et cafes' and this exact URL); plannerCount=0, so the site's hydrated listing header reads '6 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bar Tables & Chairs",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bar Table & Chair Sets",
+   "qty": 1,
+   "link": "https://www.ikea.com/fr/fr/cat/ensemble-tables-et-chaises-de-bar-47360/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=47360 -> productListPage.productCount=1 (API echoed category.name 'Ensemble tables et chaises de bar' and this exact URL); plannerCount=2, so the site's hydrated listing header reads '2 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Benches",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dining Benches",
+   "qty": 6,
+   "link": "https://www.ikea.com/fr/fr/cat/bancs-de-salle-a-manger-59245/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=59245 -> productListPage.productCount=6 (API echoed category.name 'Bancs de salle a manger' and this exact URL); plannerCount=1, so the site's hydrated listing header reads '7 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Hallway Benches",
+   "qty": 32,
+   "link": "https://www.ikea.com/fr/fr/cat/bancs-dentree-59246/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=59246 -> productListPage.productCount=32 (API echoed category.name 'Bancs d'entree' and this exact URL); plannerCount=0, so the site's hydrated listing header reads '32 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "End of Bed Benches",
+   "qty": 6,
+   "link": "https://www.ikea.com/fr/fr/cat/bancs-de-bout-de-lit-59247/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=59247 -> productListPage.productCount=6 (API echoed category.name 'Bancs de bout de lit' and this exact URL); plannerCount=0, so the site's hydrated listing header reads '6 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Storage Benches",
+   "qty": 19,
+   "link": "https://www.ikea.com/fr/fr/cat/bancs-de-rangement-59248/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=59248 -> productListPage.productCount=19 (API echoed category.name 'Bancs de rangement' and this exact URL); plannerCount=0, so the site's hydrated listing header reads '19 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sofas & Armchairs",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sofas",
+   "qty": 227,
+   "link": "https://www.ikea.com/fr/fr/cat/canapes-fu003/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=fu003 -> productListPage.productCount=227 (API echoed category.name 'Canapes' and this exact URL); plannerCount=2, so the site's hydrated listing header reads '228 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sofa Beds",
+   "qty": 77,
+   "link": "https://www.ikea.com/fr/fr/cat/convertibles-10663/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=10663 -> productListPage.productCount=77 (API echoed category.name 'Canapes convertibles' and this exact URL); plannerCount=2, so the site's hydrated listing header reads '78 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Armchairs",
+   "qty": 108,
+   "link": "https://www.ikea.com/fr/fr/cat/fauteuils-fu006/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=fu006 -> productListPage.productCount=108 (API echoed category.name 'Fauteuils' and this exact URL); plannerCount=1, so the site's hydrated listing header reads '109 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Chaise Longues",
+   "qty": 12,
+   "link": "https://www.ikea.com/fr/fr/cat/meridiennes-57527/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=57527 -> productListPage.productCount=12 (API echoed category.name 'Meridiennes' and this exact URL); plannerCount=2, so the site's hydrated listing header reads '13 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Footstools & Poufs",
+   "qty": 52,
+   "link": "https://www.ikea.com/fr/fr/cat/repose-pieds-et-poufs-20926/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=20926 -> productListPage.productCount=52 (API echoed category.name 'Repose-pieds et poufs' and this exact URL); plannerCount=1, so the site's hydrated listing header reads '53 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Beds & Mattresses",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Beds",
+   "qty": 232,
+   "link": "https://www.ikea.com/fr/fr/cat/lits-bm003/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=bm003 -> productListPage.productCount=232 (API echoed category.name 'Lits' and this exact URL); plannerCount=1, so the site's hydrated listing header reads '233 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Headboards",
+   "qty": 9,
+   "link": "https://www.ikea.com/fr/fr/cat/tetes-de-lit-19064/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=19064 -> productListPage.productCount=9 (API echoed category.name 'Tetes de lit' and this exact URL); plannerCount=0, so the site's hydrated listing header reads '9 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Beds with Mattresses Included",
+   "qty": 12,
+   "link": "https://www.ikea.com/fr/fr/cat/lits-avec-matelas-inclus-700513/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=700513 -> productListPage.productCount=12 (API echoed category.name 'Lits avec matelas inclus' and this exact URL); plannerCount=1, so the site's hydrated listing header reads '13 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bedroom Furniture Sets",
+   "qty": 31,
+   "link": "https://www.ikea.com/fr/fr/cat/ensemble-meuble-chambre-54992/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=54992 -> productListPage.productCount=31 (API echoed category.name 'Ensemble meuble chambre' and this exact URL); plannerCount=1, so the site's hydrated listing header reads '32 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Storage",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Room Dividers",
+   "qty": 14,
+   "link": "https://www.ikea.com/fr/fr/cat/separateurs-de-piece-46080/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=46080 -> productListPage.productCount=14 (API echoed category.name 'Separateurs de piece' and this exact URL); plannerCount=0, so the site's hydrated listing header reads '14 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Hallway Furniture Sets",
+   "qty": 10,
+   "link": "https://www.ikea.com/fr/fr/cat/ensembles-de-meubles-de-couloir-700411/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=700411 -> productListPage.productCount=10 (API echoed category.name 'Ensembles de meubles de couloir' and this exact URL); plannerCount=1, so the site's hydrated listing header reads '11 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Shoe Racks & Shoe Cabinets",
+   "qty": 35,
+   "link": "https://www.ikea.com/fr/fr/cat/etageres-et-armoires-a-chaussures-10456/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=10456 -> productListPage.productCount=35 (API echoed category.name 'Meubles a chaussures' and this exact URL); plannerCount=1, so the site's hydrated listing header reads '36 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": "MANUAL REVIEW: IKEA's own node 'Meubles a chaussures' (shoe furniture) mixes freestanding shoe cabinets with slimmer shoe racks; kept whole because the site files it as furniture, but the rack end of it borders on standalone storage"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Wardrobes",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Fitted Wardrobes",
+   "qty": 403,
+   "link": "https://www.ikea.com/fr/fr/cat/armoires-integrees-43632/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=43632 -> productListPage.productCount=403 (API echoed category.name 'Dressing' and this exact URL); plannerCount=0; rendered listing header on the live page read directly from the DOM: '403 elements'; qty here is the enumerated product count, not the hydrated header figure",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Hinged Door Wardrobes",
+   "qty": 355,
+   "link": "https://www.ikea.com/fr/fr/cat/armoires-a-portes-battantes-48005/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=48005 -> productListPage.productCount=355 (API echoed category.name 'Armoires a portes battantes' and this exact URL); plannerCount=1, so the site's hydrated listing header reads '356 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sliding Door Wardrobes",
+   "qty": 68,
+   "link": "https://www.ikea.com/fr/fr/cat/armoires-coulissantes-43635/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=43635 -> productListPage.productCount=68 (API echoed category.name 'Armoires coulissantes' and this exact URL); plannerCount=1, so the site's hydrated listing header reads '69 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Open Wardrobes",
+   "qty": 87,
+   "link": "https://www.ikea.com/fr/fr/cat/armoires-ouvertes-43634/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=43634 -> productListPage.productCount=87 (API echoed category.name 'Armoires ouvertes' and this exact URL); plannerCount=0, so the site's hydrated listing header reads '87 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Hallway Wardrobes",
+   "qty": 78,
+   "link": "https://www.ikea.com/fr/fr/cat/armoires-de-couloir-48007/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=48007 -> productListPage.productCount=78 (API echoed category.name 'Meuble d'entree' and this exact URL); plannerCount=1, so the site's hydrated listing header reads '79 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Mirrored Door Wardrobes",
+   "qty": 53,
+   "link": "https://www.ikea.com/fr/fr/cat/armoires-a-portes-miroir-48006/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=48006 -> productListPage.productCount=53 (API echoed category.name 'Armoires a portes miroir' and this exact URL); plannerCount=1, so the site's hydrated listing header reads '54 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Freestanding Wardrobes",
+   "qty": 36,
+   "link": "https://www.ikea.com/fr/fr/cat/armoires-independantes-43631/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=43631 -> productListPage.productCount=36 (API echoed category.name 'Armoires independantes' and this exact URL); plannerCount=1, so the site's hydrated listing header reads '37 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Walk-In Wardrobes",
+   "qty": 21,
+   "link": "https://www.ikea.com/fr/fr/cat/armoires-dressing-43633/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=43633 -> productListPage.productCount=21 (API echoed category.name 'Armoires dressing' and this exact URL); plannerCount=0, so the site's hydrated listing header reads '21 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Corner Wardrobes",
+   "qty": 16,
+   "link": "https://www.ikea.com/fr/fr/cat/armoires-dangle-43636/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=43636 -> productListPage.productCount=16 (API echoed category.name 'Armoires d'angle' and this exact URL); plannerCount=0, so the site's hydrated listing header reads '16 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Wardrobe Shelving Units",
+   "qty": 52,
+   "link": "https://www.ikea.com/fr/fr/cat/etageres-pour-armoire-49079/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=49079 -> productListPage.productCount=52 (API echoed category.name 'Etageres de rangement' and this exact URL); plannerCount=0, so the site's hydrated listing header reads '52 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Wardrobes for Sloped Ceilings",
+   "qty": 25,
+   "link": "https://www.ikea.com/fr/fr/cat/penderies-a-plafond-incline-700422/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=700422 -> productListPage.productCount=25 (API echoed category.name 'Dressing sous pente' and this exact URL); plannerCount=0, so the site's hydrated listing header reads '25 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Additional Wardrobes",
+   "qty": 2,
+   "link": "https://www.ikea.com/fr/fr/cat/penderies-dappoint-700441/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=700441 -> productListPage.productCount=2 (API echoed category.name 'Penderies d'appoint' and this exact URL); plannerCount=0, so the site's hydrated listing header reads '2 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bookcases & Shelving Units",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Cube Shelving Units",
+   "qty": 78,
+   "link": "https://www.ikea.com/fr/fr/cat/rangements-cubiques-55012/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=55012 -> productListPage.productCount=78 (API echoed category.name 'Etagere cube et cube de rangement' and this exact URL); plannerCount=0; rendered listing header on the live page read directly from the DOM: '78 elements'; qty here is the enumerated product count, not the hydrated header figure",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Shelving Units",
+   "qty": 137,
+   "link": "https://www.ikea.com/fr/fr/cat/meuble-etagere-11465/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=11465 -> productListPage.productCount=137 (API echoed category.name 'Meubles etageres' and this exact URL); plannerCount=1, so the site's hydrated listing header reads '138 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bookcases",
+   "qty": 116,
+   "link": "https://www.ikea.com/fr/fr/cat/bibliotheques-10382/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=10382 -> productListPage.productCount=116 (API echoed category.name 'Bibliotheques' and this exact URL); plannerCount=1, so the site's hydrated listing header reads '117 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Pantry Shelving",
+   "qty": 34,
+   "link": "https://www.ikea.com/fr/fr/cat/etageres-et-cremailleres-16200/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=16200 -> productListPage.productCount=34 (API echoed category.name 'Rangement cellier' and this exact URL); plannerCount=1, so the site's hydrated listing header reads '35 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Garage, Pantry & Laundry Shelving",
+   "qty": 80,
+   "link": "https://www.ikea.com/fr/fr/cat/systemes-de-rangement-10397/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=10397 -> productListPage.productCount=80 (API echoed category.name 'Rangement pour garage, cellier et buanderie' and this exact URL); plannerCount=1, so the site's hydrated listing header reads '81 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Chests of Drawers & Drawer Units",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Chests of Drawers",
+   "qty": 123,
+   "link": "https://www.ikea.com/fr/fr/cat/commodes-10451/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=10451 -> productListPage.productCount=123 (API echoed category.name 'Commodes' and this exact URL); plannerCount=1, so the site's hydrated listing header reads '124 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bedside Tables",
+   "qty": 60,
+   "link": "https://www.ikea.com/fr/fr/cat/tables-de-chevet-20656/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=20656 -> productListPage.productCount=60 (API echoed category.name 'Tables de chevet' and this exact URL); plannerCount=1, so the site's hydrated listing header reads '61 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dressing Tables",
+   "qty": 14,
+   "link": "https://www.ikea.com/fr/fr/cat/coiffeuses-20657/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=20657 -> productListPage.productCount=14 (API echoed category.name 'Coiffeuses' and this exact URL); plannerCount=1, so the site's hydrated listing header reads '15 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Storage Units with Wire Baskets",
+   "qty": 7,
+   "link": "https://www.ikea.com/fr/fr/cat/paniers-tiroirs-46081/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=46081 -> productListPage.productCount=7 (API echoed category.name 'Paniers tiroirs' and this exact URL); plannerCount=0, so the site's hydrated listing header reads '7 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": "MANUAL REVIEW: ambiguous - IKEA files 'Paniers tiroirs' under its Chests of Drawers & Drawer Units branch, but the products are wire-basket drawer units that could read as standalone storage"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Living Room Storage Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Living Room Cabinets",
+   "qty": 114,
+   "link": "https://www.ikea.com/fr/fr/cat/meubles-de-rangement-salon-10409/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=10409 -> productListPage.productCount=114 (API echoed category.name 'Rangements salon' and this exact URL); plannerCount=1, so the site's hydrated listing header reads '115 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sideboards & Buffets",
+   "qty": 43,
+   "link": "https://www.ikea.com/fr/fr/cat/buffets-et-bahuts-10412/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=10412 -> productListPage.productCount=43 (API echoed category.name 'Buffets et bahuts' and this exact URL); plannerCount=1, so the site's hydrated listing header reads '44 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Display Cabinets & Dressers",
+   "qty": 86,
+   "link": "https://www.ikea.com/fr/fr/cat/vitrines-et-vaisselier-10410/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=10410 -> productListPage.productCount=86 (API echoed category.name 'Vitrines et vaisseliers' and this exact URL); plannerCount=1, so the site's hydrated listing header reads '87 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "TV Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "TV Storage Combinations",
+   "qty": 63,
+   "link": "https://www.ikea.com/fr/fr/cat/meubles-tv-avec-rangements-14885/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=14885 -> productListPage.productCount=63 (API echoed category.name 'Meubles TV avec rangements' and this exact URL); plannerCount=1, so the site's hydrated listing header reads '64 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "TV Benches",
+   "qty": 37,
+   "link": "https://www.ikea.com/fr/fr/cat/banc-tv-10810/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=10810 -> productListPage.productCount=37 (API echoed category.name 'Banc TV' and this exact URL); plannerCount=1, so the site's hydrated listing header reads '38 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Trolleys & Kitchen Islands",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Kitchen Islands & Kitchen Trolleys",
+   "qty": 24,
+   "link": "https://www.ikea.com/fr/fr/cat/dessertes-et-ilots-cuisine-10471/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=10471 -> productListPage.productCount=24 (API echoed category.name 'Dessertes et ilots cuisine' and this exact URL); plannerCount=0, so the site's hydrated listing header reads '24 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bathroom Trolleys",
+   "qty": 6,
+   "link": "https://www.ikea.com/fr/fr/cat/dessertes-de-salle-de-bain-20858/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=20858 -> productListPage.productCount=6 (API echoed category.name 'Dessertes de salle de bain' and this exact URL); plannerCount=0, so the site's hydrated listing header reads '6 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Office Storage & Drawer Units",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Office Filing & Storage Cabinets",
+   "qty": 27,
+   "link": "https://www.ikea.com/fr/fr/cat/meubles-de-rangement-bureau-professionnels-47084/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=47084 -> productListPage.productCount=27 (API echoed category.name 'Rangements et caissons bureau professionnels' and this exact URL); plannerCount=2, so the site's hydrated listing header reads '28 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Drawer Units for Home Office",
+   "qty": 27,
+   "link": "https://www.ikea.com/fr/fr/cat/caissons-a-tiroirs-pour-la-maison-47081/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=47081 -> productListPage.productCount=27 (API echoed category.name 'Caissons a tiroirs pour la maison' and this exact URL); plannerCount=1, so the site's hydrated listing header reads '28 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Desks & Office Chairs",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Conference & Meeting Tables",
+   "qty": 9,
+   "link": "https://www.ikea.com/fr/fr/cat/tables-de-conference-et-de-reunion-54173/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=54173 -> productListPage.productCount=9 (API echoed category.name 'Tables de conference et de reunion' and this exact URL); plannerCount=0, so the site's hydrated listing header reads '9 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Desk & Chair Sets",
+   "qty": 29,
+   "link": "https://www.ikea.com/fr/fr/cat/ensembles-chaise-et-bureau-53249/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=53249 -> productListPage.productCount=29 (API echoed category.name 'Ensembles chaises et bureau' and this exact URL); plannerCount=1, so the site's hydrated listing header reads '30 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Conference Chairs",
+   "qty": 11,
+   "link": "https://www.ikea.com/fr/fr/cat/chaises-conference-47068/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=47068 -> productListPage.productCount=11 (API echoed category.name 'Chaises conference' and this exact URL); plannerCount=1, so the site's hydrated listing header reads '12 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Desks",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sit-Stand Desks",
+   "qty": 14,
+   "link": "https://www.ikea.com/fr/fr/cat/bureaux-debout-55008/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=55008 -> productListPage.productCount=14 (API echoed category.name 'Bureaux assis-debout' and this exact URL); plannerCount=1, so the site's hydrated listing header reads '15 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Home Desks",
+   "qty": 78,
+   "link": "https://www.ikea.com/fr/fr/cat/bureaux-pour-la-maison-20651/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=20651 -> productListPage.productCount=78 (API echoed category.name 'Bureaux pour la maison' and this exact URL); plannerCount=1, so the site's hydrated listing header reads '79 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Office Desks",
+   "qty": 16,
+   "link": "https://www.ikea.com/fr/fr/cat/bureaux-professionnels-47069/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=47069 -> productListPage.productCount=16 (API echoed category.name 'Bureaux professionnels' and this exact URL); plannerCount=1, so the site's hydrated listing header reads '17 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Gaming Desks",
+   "qty": 5,
+   "link": "https://www.ikea.com/fr/fr/cat/bureaux-de-gaming-47070/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=47070 -> productListPage.productCount=5 (API echoed category.name 'Bureaux gamer' and this exact URL); plannerCount=1, so the site's hydrated listing header reads '6 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Laptop Tables & Laptop Stands",
+   "qty": 14,
+   "link": "https://www.ikea.com/fr/fr/cat/supports-pc-portables-et-tablettes-24830/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=24830 -> productListPage.productCount=14 (API echoed category.name 'Supports PC/tablettes' and this exact URL); plannerCount=0, so the site's hydrated listing header reads '14 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": "MANUAL REVIEW: ambiguous - the FR node is named 'Supports PC/tablettes' (laptop/tablet stands); IKEA files it under Desks, and the DE store calls the same id 'Laptoptische & Laptophalter', but part of the range is a stand rather than a table"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Office Chairs",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Home Office Chairs",
+   "qty": 47,
+   "link": "https://www.ikea.com/fr/fr/cat/chaises-de-bureau-pour-la-maison-20653/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=20653 -> productListPage.productCount=47 (API echoed category.name 'Chaises de bureau pour la maison' and this exact URL); plannerCount=1, so the site's hydrated listing header reads '48 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Professional Office Chairs",
+   "qty": 23,
+   "link": "https://www.ikea.com/fr/fr/cat/chaises-de-bureau-professionnelles-20654/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=20654 -> productListPage.productCount=23 (API echoed category.name 'Chaises de bureau professionnelles' and this exact URL); plannerCount=1, so the site's hydrated listing header reads '24 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Gaming Chairs",
+   "qty": 9,
+   "link": "https://www.ikea.com/fr/fr/cat/fauteuils-de-gaming-47067/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=47067 -> productListPage.productCount=9 (API echoed category.name 'Chaises gaming' and this exact URL); plannerCount=0, so the site's hydrated listing header reads '9 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Gaming Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Gaming Desk & Chair Sets",
+   "qty": 5,
+   "link": "https://www.ikea.com/fr/fr/cat/bureaux-et-chaises-gaming-56516/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=56516 -> productListPage.productCount=5 (API echoed category.name 'Ensemble bureaux et chaises gaming' and this exact URL); plannerCount=0, so the site's hydrated listing header reads '5 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bathroom Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bathroom Shelf Units & Tall Cabinets",
+   "qty": 59,
+   "link": "https://www.ikea.com/fr/fr/cat/etageres-salles-de-bain-20804/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=20804 -> productListPage.productCount=59 (API echoed category.name 'Etageres salle de bain' and this exact URL); plannerCount=0, so the site's hydrated listing header reads '59 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bathroom Wall Cabinets",
+   "qty": 16,
+   "link": "https://www.ikea.com/fr/fr/cat/armoires-toilette-20808/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=20808 -> productListPage.productCount=16 (API echoed category.name 'Armoires et colonnes de salle de bain' and this exact URL); plannerCount=1, so the site's hydrated listing header reads '17 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bathroom Stools & Benches",
+   "qty": 12,
+   "link": "https://www.ikea.com/fr/fr/cat/tabourets-et-bancs-salle-de-bain-20859/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=20859 -> productListPage.productCount=12 (API echoed category.name 'Tabourets et bancs salle de bain' and this exact URL); plannerCount=0, so the site's hydrated listing header reads '12 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bathroom Mirror Cabinets",
+   "qty": 10,
+   "link": "https://www.ikea.com/fr/fr/cat/meubles-hauts-avec-miroir-20500/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=20500 -> productListPage.productCount=10 (API echoed category.name 'Meubles hauts avec miroir' and this exact URL); plannerCount=1, so the site's hydrated listing header reads '11 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Laundry Cabinets",
+   "qty": 21,
+   "link": "https://www.ikea.com/fr/fr/cat/meubles-buanderie-48925/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=48925 -> productListPage.productCount=21 (API echoed category.name 'Meubles de buanderie' and this exact URL); plannerCount=0, so the site's hydrated listing header reads '21 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Washstands & Sink Cabinets",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Washstands with Basin",
+   "qty": 134,
+   "link": "https://www.ikea.com/fr/fr/cat/meubles-vasque-a-poser-20720/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=20720 -> productListPage.productCount=134 (API echoed category.name 'Meubles bas avec vasque' and this exact URL); plannerCount=1, so the site's hydrated listing header reads '135 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Washstands without Basin",
+   "qty": 13,
+   "link": "https://www.ikea.com/fr/fr/cat/meubles-bas-sans-vasque-54989/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=54989 -> productListPage.productCount=13 (API echoed category.name 'Meubles bas sans vasque' and this exact URL); plannerCount=0, so the site's hydrated listing header reads '13 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Under-Sink Cabinets",
+   "qty": 7,
+   "link": "https://www.ikea.com/fr/fr/cat/meuble-bas-sous-lavabo-20721/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=20721 -> productListPage.productCount=7 (API echoed category.name 'Meubles sous lavabo' and this exact URL); plannerCount=1, so the site's hydrated listing header reads '8 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Outdoor Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Children's Garden Furniture",
+   "qty": 6,
+   "link": "https://www.ikea.com/fr/fr/cat/mobilier-de-jardin-pour-enfant-37899/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=37899 -> productListPage.productCount=6 (API echoed category.name 'Mobilier de jardin pour enfant' and this exact URL); plannerCount=0, so the site's hydrated listing header reads '6 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sun Loungers & Hammocks",
+   "qty": 10,
+   "link": "https://www.ikea.com/fr/fr/cat/bains-de-soleil-et-hamacs-21963/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=21963 -> productListPage.productCount=10 (API echoed category.name 'Bains de soleil et hamacs' and this exact URL); plannerCount=1, so the site's hydrated listing header reads '11 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Outdoor Storage Cabinets & Boxes",
+   "qty": 56,
+   "link": "https://www.ikea.com/fr/fr/cat/rangements-dexterieur-21958/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=21958 -> productListPage.productCount=56 (API echoed category.name 'Rangements d'exterieur' and this exact URL); plannerCount=1, so the site's hydrated listing header reads '57 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Outdoor Sofas & Armchairs",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Garden Sofas",
+   "qty": 30,
+   "link": "https://www.ikea.com/fr/fr/cat/canapes-exterieurs-21959/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=21959 -> productListPage.productCount=30 (API echoed category.name 'Canapes de jardin' and this exact URL); plannerCount=2, so the site's hydrated listing header reads '31 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Garden Lounge Sets",
+   "qty": 15,
+   "link": "https://www.ikea.com/fr/fr/cat/salons-de-jardin-21960/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=21960 -> productListPage.productCount=15 (API echoed category.name 'Ensembles de salons de jardin' and this exact URL); plannerCount=1, so the site's hydrated listing header reads '16 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Outdoor Sofa Modules",
+   "qty": 25,
+   "link": "https://www.ikea.com/fr/fr/cat/modules-de-jardin-21961/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=21961 -> productListPage.productCount=25 (API echoed category.name 'Modules de canape d'exterieur' and this exact URL); plannerCount=2, so the site's hydrated listing header reads '26 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Garden Benches",
+   "qty": 8,
+   "link": "https://www.ikea.com/fr/fr/cat/bancs-dexterieur-47386/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=47386 -> productListPage.productCount=8 (API echoed category.name 'Bancs d'exterieur' and this exact URL); plannerCount=2, so the site's hydrated listing header reads '9 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Garden Armchairs & Chairs",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Garden Armchairs",
+   "qty": 16,
+   "link": "https://www.ikea.com/fr/fr/cat/fauteuils-de-jardin-21962/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=21962 -> productListPage.productCount=16 (API echoed category.name 'Fauteuils de jardin' and this exact URL); plannerCount=1, so the site's hydrated listing header reads '17 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Garden Chairs",
+   "qty": 37,
+   "link": "https://www.ikea.com/fr/fr/cat/chaises-de-jardin-21966/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=21966 -> productListPage.productCount=37 (API echoed category.name 'Chaises de jardin' and this exact URL); plannerCount=1, so the site's hydrated listing header reads '38 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Outdoor Tables & Chairs",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Garden Table & Chair Sets",
+   "qty": 32,
+   "link": "https://www.ikea.com/fr/fr/cat/ensembles-table-et-chaises-de-jardin-21967/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=21967 -> productListPage.productCount=32 (API echoed category.name 'Ensembles table et chaises de jardin' and this exact URL); plannerCount=1, so the site's hydrated listing header reads '33 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Garden Table & Chair Sets for 2",
+   "qty": 11,
+   "link": "https://www.ikea.com/fr/fr/cat/ensembles-table-et-chaises-de-jardin-2-personnes-59249/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=59249 -> productListPage.productCount=11 (API echoed category.name 'Ensembles table et chaises de jardin 2 personnes' and this exact URL); plannerCount=1, so the site's hydrated listing header reads '12 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Outdoor Tables",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Garden Tables",
+   "qty": 29,
+   "link": "https://www.ikea.com/fr/fr/cat/tables-de-jardin-21965/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=21965 -> productListPage.productCount=29 (API echoed category.name 'Tables de jardin' and this exact URL); plannerCount=1, so the site's hydrated listing header reads '30 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Outdoor Coffee & Side Tables",
+   "qty": 10,
+   "link": "https://www.ikea.com/fr/fr/cat/tables-dappoint-jardin-700192/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=700192 -> productListPage.productCount=10 (API echoed category.name 'Tables basses et d'appoint d'exterieur' and this exact URL); plannerCount=1, so the site's hydrated listing header reads '11 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Children's & Baby Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Children's Tables & Chairs",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Children's Seating",
+   "qty": 22,
+   "link": "https://www.ikea.com/fr/fr/cat/sieges-enfant-18769/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=18769 -> productListPage.productCount=22 (API echoed category.name 'Sieges enfant' and this exact URL); plannerCount=1, so the site's hydrated listing header reads '23 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Children's Tables",
+   "qty": 11,
+   "link": "https://www.ikea.com/fr/fr/cat/tables-enfant-18768/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=18768 -> productListPage.productCount=11 (API echoed category.name 'Tables enfant' and this exact URL); plannerCount=1, so the site's hydrated listing header reads '12 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Children's Stools & Benches",
+   "qty": 14,
+   "link": "https://www.ikea.com/fr/fr/cat/tabourets-et-bancs-enfant-45816/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=45816 -> productListPage.productCount=14 (API echoed category.name 'Tabourets et bancs enfant' and this exact URL); plannerCount=1, so the site's hydrated listing header reads '15 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Children's Armchairs",
+   "qty": 6,
+   "link": "https://www.ikea.com/fr/fr/cat/fauteuils-enfant-20483/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=20483 -> productListPage.productCount=6 (API echoed category.name 'Fauteuils enfant' and this exact URL); plannerCount=1, so the site's hydrated listing header reads '7 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Junior Chairs",
+   "qty": 4,
+   "link": "https://www.ikea.com/fr/fr/cat/chaises-hautes-enfant-45815/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=45815 -> productListPage.productCount=4 (API echoed category.name 'Chaises hautes enfant' and this exact URL); plannerCount=0, so the site's hydrated listing header reads '4 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Children's Beds",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Children's Single Beds",
+   "qty": 23,
+   "link": "https://www.ikea.com/fr/fr/cat/lits-simples-enfant-45848/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=45848 -> productListPage.productCount=23 (API echoed category.name 'Lits simples enfant' and this exact URL); plannerCount=1, so the site's hydrated listing header reads '24 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Extendable Beds",
+   "qty": 9,
+   "link": "https://www.ikea.com/fr/fr/cat/lits-extensibles-45847/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=45847 -> productListPage.productCount=9 (API echoed category.name 'Lits evolutifs' and this exact URL); plannerCount=1, so the site's hydrated listing header reads '10 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Loft Beds",
+   "qty": 10,
+   "link": "https://www.ikea.com/fr/fr/cat/lits-mezzanine-19049/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=19049 -> productListPage.productCount=10 (API echoed category.name 'Lits mezzanine' and this exact URL); plannerCount=1, so the site's hydrated listing header reads '11 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bunk Beds",
+   "qty": 4,
+   "link": "https://www.ikea.com/fr/fr/cat/lits-superposes-19048/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=19048 -> productListPage.productCount=4 (API echoed category.name 'Lits superposes' and this exact URL); plannerCount=1, so the site's hydrated listing header reads '5 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Study Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Children's Desks",
+   "qty": 34,
+   "link": "https://www.ikea.com/fr/fr/cat/bureaux-enfant-24714/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=24714 -> productListPage.productCount=34 (API echoed category.name 'Bureaux enfant' and this exact URL); plannerCount=0, so the site's hydrated listing header reads '34 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Children's Desk Chairs",
+   "qty": 6,
+   "link": "https://www.ikea.com/fr/fr/cat/chaises-de-bureau-enfant-24715/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=24715 -> productListPage.productCount=6 (API echoed category.name 'Chaises de bureau enfant' and this exact URL); plannerCount=0, so the site's hydrated listing header reads '6 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Baby Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Children's Wardrobes",
+   "qty": 17,
+   "link": "https://www.ikea.com/fr/fr/cat/armoires-enfant-18707/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=18707 -> productListPage.productCount=17 (API echoed category.name 'Armoires enfant' and this exact URL); plannerCount=1, so the site's hydrated listing header reads '18 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Children's Chests of Drawers",
+   "qty": 8,
+   "link": "https://www.ikea.com/fr/fr/cat/commodes-enfant-18708/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=18708 -> productListPage.productCount=8 (API echoed category.name 'Commodes enfant' and this exact URL); plannerCount=1, so the site's hydrated listing header reads '9 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Cots",
+   "qty": 10,
+   "link": "https://www.ikea.com/fr/fr/cat/lits-bebe-45781/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=45781 -> productListPage.productCount=10 (API echoed category.name 'Lits bebe' and this exact URL); plannerCount=1, so the site's hydrated listing header reads '11 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Highchairs",
+   "qty": 12,
+   "link": "https://www.ikea.com/fr/fr/cat/chaises-hautes-45782/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=45782 -> productListPage.productCount=12 (API echoed category.name 'Chaises hautes bebe' and this exact URL); plannerCount=1, so the site's hydrated listing header reads '13 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Changing Tables",
+   "qty": 15,
+   "link": "https://www.ikea.com/fr/fr/cat/tables-a-langer-45783/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=45783 -> productListPage.productCount=15 (API echoed category.name 'Tables a langer' and this exact URL); plannerCount=1, so the site's hydrated listing header reads '16 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Cot & Changing Table Sets",
+   "qty": 1,
+   "link": "https://www.ikea.com/fr/fr/cat/ensembles-lits-bebe-table-a-langer-55021/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/fr/fr/product-list-page?category=55021 -> productListPage.productCount=1 (API echoed category.name 'Ensembles lits bebe et table a langer' and this exact URL); plannerCount=1, so the site's hydrated listing header reads '2 elements' (+1 planner tile when plannerCount>0 - measured on 4 FR pages); qty here is the enumerated product count",
+   "flag": null
+  }
+ ]
+}

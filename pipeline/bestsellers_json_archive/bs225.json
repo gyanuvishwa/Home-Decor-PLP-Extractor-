@@ -1,0 +1,16 @@
+{
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "Tier 1 (curl_cffi, safari18_0_ios) fetched the Home department homepage cleanly (first request this session) and extracted the full Home nav tree via headerData.menuItems/siteStructure. Scanned that full tree (and footerData) case-insensitively for Bestsellers/Best Selling/Top Sellers/Popular/Trending/Customer Favorites terms: exactly one Home-department candidate exists, nav label 'BESTSELLERS UNDER ₹999' -> /en_in/home/global-node-2.html. Cross-checked against the flat siteStructure tree: only one Home-scoped bestsellers-type node exists (targetTemplate '/apps/hm/templates/content/subdepartment', targetPath 'seasonal-trending/best') - confirmed not a duplicate/alias of anything else, and distinct from an unrelated Men-department 'bestsellers' editorial campaign node (different department, excluded). Tier 1/2 (curl_cffi and Playwright) were then Akamai-blocked (403 Access Denied, errors.edgesuite.net) on this exact host/IP, matching the prior Home-Decor pass's documented 'session-persistent Akamai IP block' for this same company. robots.txt checked: Claude/anthropic-ai explicitly listed under 'Allow: /' (no Claude-specific disallow), so escalated to Claude-in-Chrome (tier 3) which used a different, unblocked session and loaded the page successfully. Opened and confirmed the candidate directly: page's own plpProps.heading = 'BESTSELLERS' (not just a nav label), pageType = 'hm/components/page/content/subdepartment' (genuine listing template, not editorial), totalHits = 108 via productListingData, pagination pageSize=36/totalPages=3 (36+36+36=108, exact, consistent). priceFilterData confirms the listing is intrinsically price-capped (minPrice=399, maxPrice=999, both selected = full un-narrowable range) - i.e. the site itself curates this specific Bestsellers listing to the sub-₹999 price band; there is no separate unscoped 'all Bestsellers' page anywhere in the Home nav or siteStructure, so this price-scoped listing is the complete Bestsellers PLP for this company. Recorded as a single row (no genuine site-exposed sub-structure - node has empty children in both menuItems and siteStructure). Also checked 'New In' and 'SALE' nodes while on the same site visit (for the sibling New Arrivals/Clearance passes) but neither contains a bestsellers-type listing.",
+  "rows": [
+    {
+      "category": "Bestsellers",
+      "sub_category": "Bestsellers Under Rs. 999",
+      "qty": 108,
+      "link": "https://www2.hm.com/en_in/home/seasonal-trending/best.html",
+      "is_group": false,
+      "evidence": "__NEXT_DATA__ props.pageProps.plpProps.heading='BESTSELLERS'; productListingSectionProps.productListingData.totalHits=108; pagination {currentPage:1,totalPages:3,pageSize:36} (36x3=108, exact); priceFilterData minPrice=399/maxPrice=999 both selected (full range, confirms this is the complete listing, not a narrower filter)",
+      "flag": null
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "SR116 Maisons du Monde BE (maisonsdumonde.com/BE/nl, Dutch/Flemish locale). Checked independently from FR (SR96) - BE's pet universe is smaller: 3 leaf categories vs FR's 5. Access: robots.txt has no Claude-specific disallow (checked in prior Home-Decor pass, notes/116.md). Direct HTTP (curl_cffi, multiple impersonation profiles: chrome124/131/120, edge101, safari18_0/17_2_ios, firefox135) got a single grace-window 200 on the homepage only, then 403 (DataDome JS challenge, 781-byte block body) on every category URL and every subsequent homepage refetch, matching the persistent (not transient) DataDome block documented in the prior Home-Decor pass for this same BE storefront. Playwright headless (chrome124 UA) also got 403 on both category URLs. Escalated to Claude-in-Chrome (real authenticated Chrome session) which loaded all pages normally (200, full DOM) - used this to verify final counts. Category discovery: parsed the homepage's embedded navigation JSON (__INITIAL_STATE__-style menu payload) for a 'Universe' node labeled 'Huisdieren' (Pets) nested under the 'Tuin' (Garden) top-level menu group (breadcrumb on every pet page reads Home / Tuin / Huisdieren / <leaf>). The nav JSON exposed only 2 of its 3 children (Mandjes/speelgoed/matten voor huisdieren, Voerbakken); the 3rd (Bakje voor droogvoer) was only visible as a sibling pill/filter facet on the live category pages, found via Claude-in-Chrome. Confirmed completeness: opened the 'Categorie' filter facet on the Huisdieren parent listing page - it lists exactly these same 3 categories with counts (Mandjes... unlabelled/no count shown in facet but total accounts for it, Voerbakken (38), Bakje voor droogvoer (18)), and the parent aggregate page's own 'Huisdieren' listing shows 96 artikelen = 18+40+38 exactly, proving no 4th/hidden child category exists and the parent page is purely an aggregate 'view all' (its own additionalChild nav entry is literally labeled 'Bekijk alle accessoires voor huisdieren' = View all pet accessories), so the parent is emitted as a grouping row only, not a separate counted row (avoids double count). Also grepped the full homepage HTML/JSON for other pet-indicative Dutch terms (katten/honden/krabpaal/kattenbak/riem/halsband/hondenmand/kattenmand/drinkbak - all 0 hits outside the Huisdieren branch) confirming no cat/dog-specific, litter, leash/collar, or grooming categories exist elsewhere in the site's nav; Pet Care is limited to this one small Tuin>Huisdieren branch. All 3 leaf categories are genuinely pet-specific by name/parent (Tier 1: feeding bowls/dry-food storage, and pet baskets/toys/mats) - none are generic-name-borrowed-from-elsewhere.",
+  "rows": [
+    {
+      "category": "Pet Care",
+      "sub_category": "Huisdieren (Pets)",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Bakje voor droogvoer (Dry Food Bowl)",
+      "qty": 18,
+      "link": "https://www.maisonsdumonde.com/BE/nl/c/bakje-voor-droogvoer-n117bd95745605e42c3d675c53625ec06da79677",
+      "is_group": false,
+      "evidence": "listing header '18 artikelen'; category filter facet shows 'Bakje voor droogvoer (18)'",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Mandjes, speelgoed en matten voor huisdieren (Baskets, Toys and Mats for Pets)",
+      "qty": 40,
+      "link": "https://www.maisonsdumonde.com/BE/nl/c/mandjes-speelgoed-en-matten-voor-huisdieren-na3d7e61b6e291a12b0167db7e4936a291cd91ae",
+      "is_group": false,
+      "evidence": "listing header '40 artikelen'",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Voerbakken (Feeding Bowls/Troughs)",
+      "qty": 38,
+      "link": "https://www.maisonsdumonde.com/BE/nl/c/voerbakken-n7888c47589364a4b24094e046ccf97d46d55093",
+      "is_group": false,
+      "evidence": "listing header '38 artikelen'; category filter facet shows 'Voerbakken (38)'",
+      "flag": null
+    }
+  ]
+}

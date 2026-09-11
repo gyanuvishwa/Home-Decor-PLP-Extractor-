@@ -1,0 +1,70 @@
+{
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ROBOTS: https://www.bloomingville.com/robots.txt fetched FIRST, before any other request on the host (HTTP 200, 68 bytes, profile safari17_2_ios). Quoted IN FULL, it is three lines: 'User-agent: *' / 'Disallow: /Files/Papirkurv/' / 'Disallow: /*?cartcmd=*'. There is NO Claude agent anywhere in it - no ClaudeBot, no anthropic-ai, no Claude-Web, no Content-Signal - and no Crawl-delay and no Sitemap directive. Neither disallowed pattern was requested: nothing under /Files/ was touched, and the only query string used anywhere was the site's own '?GroupID=&PageNum=N' pagination, which contains no cartcmd. ACCESS: clean. probe.fetch() returned HTTP 200 on the first or second fingerprint every time (chrome131, safari18_0_ios, safari17_0); no bot wall, no challenge, no 403, no 429. 2s per-host pacing left in force. TREE: taken from Bloomingville's OWN A-Z category index at https://www.bloomingville.com/en/products/category, which is the site's own complete category tree (the mega-menu dropdowns are injected client-side and expose only the 11 departments - Category, Series, Tableware, Kitchen, Accessories, Kids, Outdoor, Furniture, Lighting, Christmas, New products - so I did NOT stop at the menu, exactly as BATCH_BRIEF s5 warns). https://www.bloomingville.com/sitemap.xml exists but is a 281-byte stub containing only /redirect/redirect, and /en/sitemap.xml and /sitemap_index.xml both 404, so the A-Z index IS the authoritative tree. THE BATH DEPARTMENT: grepping the EN A-Z index for /en/products/bath and /en/products/bed-bath returns exactly six nodes and no more - all-for-bed-bath, a-mix-of-this-and-that, cosmetic-bags, dispensers-tumblers, jewelry-stands-boxes, towels - plus the alias entry 'All for the bathroom' -> /en/products/category/bed-bath. I cross-checked the DANISH A-Z at https://www.bloomingville.com/da/produkter/kategori in case the English site suppressed a local node: it exposes five (/da/produkter/badevaerelse/alt-til-sovevaerelse-bad, /badevaerelse/haandklaeder, /badevaerelse/saebedispensere-krus, /sovevaerelse-bad/diverse, /sovevaerelse-bad/smykkestativer-smykkeskrin) - a strict SUBSET of the English six, so EN is the superset and nothing is hidden. The Danish labels are worth recording because they disambiguate two English names: 'Sæbedispensere & krus' = the recorded Dispensers & Tumblers node, and 'Badeværelsestilbehør' (literally 'bathroom accessories') is the node whose English label is the vaguer 'Various for bedroom & bathroom' / H1 'Diverse'. There is no bath, shower, enclosure, tap, basin, toilet, bidet, vanity, bathroom cabinet, towel rail or toilet-roll holder node anywhere on the site in either language. WHY THE RECORDED LEAF IS BATHROOM (rules 13, 23, 24): 'Dispensers & Tumblers' is a bath-department child at the deepest available level, self-canonical, with its own product grid. Its 2 products are Bea Soap Dispenser Set (Nature, Stoneware) and Aurora Tumbler (Blue, Stoneware) - a soap dispenser and a bathroom tumbler, both named explicitly in rule 13, and ceramic/stoneware which rule 22 does not exclude. The DA label 'Sæbedispensere & krus' confirms the intent. QTY SOURCE AND PROOF - THIS SITE PRINTS NO TOTAL, AND ITS JSON-LD IS UNSAFE: Bloomingville renders no 'N products' string on any PLP (probe.counts_in() surfaces nothing usable). Each PLP DOES carry a CollectionPage JSON-LD whose mainEntity is an ItemList, but I tested it and it is BADLY WRONG - for /bath/towels it reports 1,141 itemListElements against a grid of exactly 1 product; for /category/baskets it reports 42 against a grid of 30; for /category/hooks-coat-racks 24 against 20; for /bed-bath 10 against 5; and on /bath/dispensers-tumblers, /bath/jewelry-stands-boxes, /category/bags and /category/mirrors it emits no ItemList at all. It is therefore NOT used for any figure here. Every count in this record comes from ENUMERATION TO EXHAUSTION of the rendered grid (rule 26's fallback), page size 12, walking ?GroupID=&PageNum=N until a page returns no product tile not already seen: Towels 1 (1 page), Dispensers & Tumblers 2 (1), Diverse 5 (1), All for the bathroom 5 (1), Jewelry Stands & Boxes 8 (1), Bags 13 (2: 12+1), Mirrors 17 (2: 12+5), Hooks & Coat racks 20 (2: 12+8), Baskets 30 (3: 12+12+6, page 4 empty). Unique product handles were collected from the tiles' own /varekort/<handle> hrefs, so duplicates across pages cannot inflate a figure. The results discriminate fully per node (1, 2, 5, 5, 8, 13, 17, 20, 30 - no constant, no round cap) and every page's H1 matched the node requested. Nothing is estimated, no parent figure is reused for a child, and nothing is summed across siblings. DEDUP: already_extracted() run on every candidate leaf, every review node and every rel=canonical target. One hard hit - /en/products/category/mirrors (Final.xlsx 'Mirrors'), banked in review[]. The recorded leaf returns None. Locale blind spots (b) and (c) checked explicitly rather than assumed: the recorded page's own hreflang block lists five alternates, ALL on www.bloomingville.com - da /da/produkter/badevaerelse/saebedispensere-krus, fr /fr/produit/salle-de-bain/distributeurs-de-savon-et-gobelets, de /de/produkte/badezimmer/seifenspender-becher, and en/x-default on the recorded URL - and already_extracted() returns None for every one of them, so there is no cross-host or cross-locale alias hiding in the index. Bloomingville runs no separate country domain. Blind spot (a) was also live here and was caught: /en/products/bath/cosmetic-bags and /en/products/category/bed-bath and /en/products/bath/all-for-bed-bath are canonical ALIASES of /category/bags and /products/bed-bath respectively, and were collapsed to one record each under rule 28. EXCLUDED AND WHY: Category > Hooks & Coat racks (20) inspected in full and excluded - Chalix/Ferri/Lester/Lewi/Cella hooks and Mille/Blu/Mallen/Oswall/Padova/Ross coat racks, i.e. hallway coat hardware, with no towel rail, towel ring or robe hook and no bathroom parent, so rule 17 does not reach it. Category > Baskets (30) and Category > Storage inspected and excluded as general storage (rules 12, 31/33) - water-hyacinth, seagrass, rattan and polyrattan baskets w/lid; the one laundry basket (Mios) carries no bathroom designation. Category > Rugs & Doormats, Category > Textiles, Living room > Cushions/Throws (rule 20 Textile). Category > Trays, Jars w/lids, Bowls & trays for decoration, Vases, Candles, Candle holders, Decoration, Wall decoration, Illustrations, Pedestals (rule 21 Decor - most already in Final.xlsx). Lighting and its 5 children (rule 19, all already in Final.xlsx). Furniture and its children (Furniture.xlsx). Kitchen and Tableware (Kitchen & Dining, already in Final.xlsx). Room scents / Scent diffusers (personal-care and home fragrance, not bathroom fittings). Christmas, Easter, Offers, Outlet, Must-haves, Spot items, News, Series (rule 25 promotional). CONCLUSION: Bloomingville does operate a small bath department, and its one genuine bathroom leaf - Dispensers & Tumblers, 2 products - is recorded. Its four sibling nodes are a textile (routed), a jewellery-box node, a canonical alias of the general Bags node, and an overlapping roll-up, all banked in review[] with their exact counts and URLs so nothing is silently skipped, along with the two roll-up-only residue products. This is NOT a robots exclusion and NOT an access block - robots.txt names no Claude agent and every request returned HTTP 200.",
+ "rows": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Dispensers & Tumblers",
+   "qty": 2,
+   "link": "https://www.bloomingville.com/en/products/bath/dispensers-tumblers",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  }
+ ],
+ "review": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Towels",
+   "qty": 1,
+   "issue": "ROUTED TO TEXTILE: primary product type is a textile bath towel (rules 15, 20). The node sits inside Bloomingville's own bath department (DA label 'Haandklaeder') and holds exactly one product, Malou Towel, Nature, Cotton OEKO-TEX. Towel HARDWARE would be Bathroom under rule 15, but this node contains no rail, ring or bar - it is the textile itself.",
+   "link": "https://www.bloomingville.com/en/products/bath/towels"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Jewelry Stands & Boxes",
+   "qty": 8,
+   "issue": "NOT BATHROOM despite sitting in the bath department (rule 2: PRIMARY PRODUCT TYPE beats ROOM). Enumerated in full: Gretl, Nenon, Cheri, Hamida, Kabela, Lally, Nubia and Vercelli - all 'Box w/Lid' jewellery boxes in iron, MDF, resin, reclaimed wood, rattan, soapstone and mango wood. Their primary type is a decorative lidded box / jewellery store, not a bathroom accessory from rule 13's list, and Bloomingville itself cross-lists this family under Accessories > Jars w/lids. Flagged rather than recorded so the run owner can decide; it is the only judgement call on this site.",
+   "link": "https://www.bloomingville.com/en/products/bath/jewelry-stands-boxes"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathroom accessories ('Diverse' / 'Various for bedroom & bathroom')",
+   "qty": 5,
+   "issue": "OVERLAPPING ROLL-UP - NOT RECORDED alongside its siblings (BATCH_BRIEF s5, rule 24). Enumerated to exhaustion: its 5 products are Aurora Tumbler and Bea Soap Dispenser Set (both already in the recorded Dispensers & Tumblers node), Malou Towel (already in the Towels node routed to Textile), plus Aden Clothes Rack and Aden Laundry Basket. It is a byte-identical product set to the department roll-up /en/products/bed-bath, so recording it would double-count the 2 products already recorded. RULE 24 RESIDUE, DISCLOSED: Aden Clothes Rack (bamboo) and Aden Laundry Basket (bamboo) appear ONLY here and in the roll-up - no leaf of their own exists - so they are not captured by any recorded row. The clothes rack is bedroom furniture; the laundry basket is the one item a run owner might want in Bathroom.",
+   "link": "https://www.bloomingville.com/en/products/bath/a-mix-of-this-and-that"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom ('All for the bathroom' department roll-up)",
+   "qty": 5,
+   "issue": "PARENT ROLL-UP - NOT RECORDED (rule 24: never record the parent URL when valid subcategories exist; rule 25: it is an 'All for...' node). H1 'All for the bathroom', <title> 'Bathroom | Bloomingville'. Reachable by two nav paths - /en/products/category/bed-bath and /en/products/bath/all-for-bed-bath - both of which rel=canonical onto https://www.bloomingville.com/en/products/bed-bath, so it is ONE record under rule 28, not three. Enumerated to exhaustion at 5 products, identical to the 'Diverse' set above. Its valid children (Dispensers & Tumblers, Towels, Jewelry Stands & Boxes, Cosmetic bags) are handled individually.",
+   "link": "https://www.bloomingville.com/en/products/bed-bath"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Cosmetic bags (= Bags and cosmetic bags)",
+   "qty": 13,
+   "issue": "NOT BATHROOM, and a CANONICAL ALIAS (dedup blind spot (a)). The bath-department URL /en/products/bath/cosmetic-bags renders H1 'Bags and cosmetic bags' and rel=canonical https://www.bloomingville.com/en/products/category/bags - i.e. the bath path is an alias of the general Bags node, one record under rule 28. Enumerated to exhaustion at 13 products, of which only 2 are cosmetic bags (Sofina, Stefania); the other 11 are tote, shopping and jute bags (Eviaya, Trina x3, Anniversary, Bergamo, Celebrate, Mushroom, Simona, Check, Yule). A cosmetic bag is a soft travel case, not one of rule 13's bathroom accessory types, and rule 26 forbids adjusting the node's own total of 13.",
+   "link": "https://www.bloomingville.com/en/products/category/bags"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Category > Mirrors",
+   "qty": 17,
+   "issue": "ALREADY EXTRACTED IN Final.xlsx (Home Decor pass) as 'Mirrors' (company 'Bloomingville'). already_extracted('https://www.bloomingville.com/en/products/category/mirrors') is an EXACT URL match, and the page is self-canonical, so this is a hard dedup hit. Not re-extracted under OPTION 1. Independently it is not a bathroom node either: it lives in the general Category index with no bathroom parent, and its 17 products are decorative wall and table mirrors (Aika, Mas, Vaka, Aimie, Ashlie, Atle, Avoa, Badia, Faun, Inge, Malukka, Milde, Moony...) with no illuminated, demister, cabinet or vanity mirror among them.",
+   "link": "https://www.bloomingville.com/en/products/category/mirrors"
+  }
+ ],
+ "_reconstructed_from": "Bathroom.xlsx delivered 2026-09-01 (checkpoint), not original worker JSON"
+}

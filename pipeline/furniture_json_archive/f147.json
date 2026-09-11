@@ -1,0 +1,237 @@
+{
+ "sr": 147,
+ "company": "Normann Copenhagen",
+ "brand_site": "normann-copenhagen.com",
+ "country": "Denmark",
+ "site_url": "https://www.normann-copenhagen.com/",
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ACCESS: Claude-in-Chrome only, own tab, no HTTP-layer tooling. Site auto-geo-redirects to /da/; I worked on the locale-neutral /en/ path for English node names. robots.txt is 147 bytes and names no Claude/anthropic UA - no block. No 403/CAPTCHA/rate-limit encountered at any point; requests paced ~0.5-1.3s apart. TREE: Sitecore/.NET store with exactly three product departments - /en/products/furniture, /en/products/lighting, /en/products/accessories (verified by scanning every /en/products/ link on the department index). All furniture lives under /en/products/furniture. Mega-menu tree: chairs(dining-chairs, lounge-chairs, barstools, swivel-chairs, benches, chair-accessories), beds, sofas(2-seater, 3-seater, modular, sofa-cushion), poufs--stools, tables(dining, coffee, side, desks, cafe), storage(shelving, sideboards--cabinets, wardrobe-furniture), rugs, outdoor(outdoor-seating, outdoor-tables). TRAP-1 CROSS-CHECK: /sitemap.xml returns HTTP 500 (server error, not a block), so the sitemap route was unavailable; instead I harvested the full a[href*=/products/furniture] set from EVERY category page fetched (23 pages) and the union is identical to the mega-menu set - no hidden nodes. TRAP-2: every leaf was fetched individually, all HTTP 200, and the h1 was confirmed to match the requested node on all 23 fetches (no silent parent-serving). TRAP-3: nodes keyed by slug, not label. QTY METHOD: the site renders NO numeric product-count header anywhere (checked the live DOM and innerText of a listing page - no 'N products'/'N items'/'N produkter' string exists), so Rule 4 priority 2 applies. Every count is the data-totalhits attribute the site's own search layer returns for that exact category: I read each category page, pulled its Sitecore contextId from the inline script, then called the same-origin endpoint /CustomSearch/GetResultsAjax with that contextId (page 0) and read data-totalhits off the returned result block. This is the same field the prior Home-Decor pass on this company used, where it matched a full-pagination enumeration exactly on every category checked. SANITY CHECKS: counts differ per category (no constant/site-wide value); none are suspiciously round; sums are coherent - Chairs children 155+52+130+39+7+12=395 vs Chairs parent 392, Sofas children 10+4+27+8=49 vs parent 47, Storage children 26+21+14=61 vs parent 53, and the 8 top branches sum to 999 vs the Furniture landing page's own 960 (children exceed parents by small margins because a product may be filed in two sibling nodes, e.g. outdoor chairs also appear under Chairs) - the direction and magnitude are what genuine per-category indexes look like, not a display cap. Direct exhaustion check on Outdoor Tables: paginated to the end, 16 unique product URLs vs data-totalhits 16 - exact match. VARIANT/TILE CAVEAT (important for the reviewer): each colourway is a separate purchasable product with its own product page (e.g. bit-stool-white-603005 and bit-stool-white-603007), and data-totalhits counts those SKUs. The listing GRID, however, groups colourways under one representative tile - Lounge Chairs shows 14 tiles for data-totalhits 52, and the first tile links to timb-lounge-armchair-beige-1401904 while displaying the label 'Timb Lounge Armchair, Tan'. Full enumeration was NOT a usable alternative here: the paging endpoint returns empty pages then repeats already-seen items (on /chairs it plateaued at 171 unique hrefs against data-totalhits 392), so Rule 4 priority 3 could not be honestly satisfied. The reported qty is therefore the site's own SKU-level total per category. Small categories where the whole result set fits one page corroborate it exactly (Beds 2/2, Benches 7/7, Desks 8/8, Wardrobe Furniture 14/14, Sideboards & Cabinets 21/21, Shelving 26/26). EXCLUSIONS: Chair Accessories (12) - title-scanned, all furniture parts/care: Form Glides, Form Seat Cushions, Chair Suspensions, outdoor chair covers, Chair Rack, Limit Lounge Chair Connector. Sofa Cushion (8) - textiles. Rugs (52) - textiles. Accessories>Organizing (baskets/bins) and Accessories>Hooks & Shoehorns (wall hooks) are standalone storage / wall goods, not furniture. Lighting department entirely out of scope. INCLUSION CALLS: Poufs & Stools (83) kept - the site files it directly under Furniture and the products are seating. Wardrobe Furniture (14) kept - title-scanned: 8 Hide Storage Poufs, 4 Toj Clothes Racks, 2 Sko Shoe Racks, all freestanding hall/entryway furniture. Shelving (26) kept - title-scanned as Pap Bookcase units (freestanding bookcases), not decorative wall shelves. Outdoor (89+16) kept per the outdoor-furniture-in-scope rule.",
+ "rows": [
+  {
+   "category": "Furniture",
+   "sub_category": "Chairs",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dining Chairs",
+   "qty": 155,
+   "link": "https://www.normann-copenhagen.com/en/products/furniture/chairs/dining-chairs/",
+   "is_group": false,
+   "evidence": "data-totalhits=\"155\" on the search-result block returned by /CustomSearch/GetResultsAjax for this category page's Sitecore contextId (site renders no numeric product-count header anywhere)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Lounge Chairs",
+   "qty": 52,
+   "link": "https://www.normann-copenhagen.com/en/products/furniture/chairs/lounge-chairs/",
+   "is_group": false,
+   "evidence": "data-totalhits=\"52\" on the search-result block returned by /CustomSearch/GetResultsAjax for this category page's Sitecore contextId (site renders no numeric product-count header anywhere)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Barstools",
+   "qty": 130,
+   "link": "https://www.normann-copenhagen.com/en/products/furniture/chairs/barstools/",
+   "is_group": false,
+   "evidence": "data-totalhits=\"130\" on the search-result block returned by /CustomSearch/GetResultsAjax for this category page's Sitecore contextId (site renders no numeric product-count header anywhere)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Swivel Chairs",
+   "qty": 39,
+   "link": "https://www.normann-copenhagen.com/en/products/furniture/chairs/swivel-chairs/",
+   "is_group": false,
+   "evidence": "data-totalhits=\"39\" on the search-result block returned by /CustomSearch/GetResultsAjax for this category page's Sitecore contextId (site renders no numeric product-count header anywhere)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Benches",
+   "qty": 7,
+   "link": "https://www.normann-copenhagen.com/en/products/furniture/chairs/benches/",
+   "is_group": false,
+   "evidence": "data-totalhits=\"7\" on the search-result block returned by /CustomSearch/GetResultsAjax for this category page's Sitecore contextId (site renders no numeric product-count header anywhere)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Beds",
+   "qty": 2,
+   "link": "https://www.normann-copenhagen.com/en/products/furniture/beds/",
+   "is_group": false,
+   "evidence": "data-totalhits=\"2\" on the search-result block returned by /CustomSearch/GetResultsAjax for this category page's Sitecore contextId (site renders no numeric product-count header anywhere)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sofas",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "2 Seater Sofas",
+   "qty": 10,
+   "link": "https://www.normann-copenhagen.com/en/products/furniture/sofas/2-seater-sofas/",
+   "is_group": false,
+   "evidence": "data-totalhits=\"10\" on the search-result block returned by /CustomSearch/GetResultsAjax for this category page's Sitecore contextId (site renders no numeric product-count header anywhere)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "3 Seater Sofas",
+   "qty": 4,
+   "link": "https://www.normann-copenhagen.com/en/products/furniture/sofas/3-seater-sofas/",
+   "is_group": false,
+   "evidence": "data-totalhits=\"4\" on the search-result block returned by /CustomSearch/GetResultsAjax for this category page's Sitecore contextId (site renders no numeric product-count header anywhere)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Modular Sofas",
+   "qty": 27,
+   "link": "https://www.normann-copenhagen.com/en/products/furniture/sofas/modular-sofas/",
+   "is_group": false,
+   "evidence": "data-totalhits=\"27\" on the search-result block returned by /CustomSearch/GetResultsAjax for this category page's Sitecore contextId (site renders no numeric product-count header anywhere)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Poufs & Stools",
+   "qty": 83,
+   "link": "https://www.normann-copenhagen.com/en/products/furniture/poufs--stools/",
+   "is_group": false,
+   "evidence": "data-totalhits=\"83\" on the search-result block returned by /CustomSearch/GetResultsAjax for this category page's Sitecore contextId (site renders no numeric product-count header anywhere)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Tables",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dining Tables",
+   "qty": 43,
+   "link": "https://www.normann-copenhagen.com/en/products/furniture/tables/dining-tables/",
+   "is_group": false,
+   "evidence": "data-totalhits=\"43\" on the search-result block returned by /CustomSearch/GetResultsAjax for this category page's Sitecore contextId (site renders no numeric product-count header anywhere)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Coffee Tables",
+   "qty": 120,
+   "link": "https://www.normann-copenhagen.com/en/products/furniture/tables/coffee-tables/",
+   "is_group": false,
+   "evidence": "data-totalhits=\"120\" on the search-result block returned by /CustomSearch/GetResultsAjax for this category page's Sitecore contextId (site renders no numeric product-count header anywhere)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Side Tables",
+   "qty": 103,
+   "link": "https://www.normann-copenhagen.com/en/products/furniture/tables/side-tables/",
+   "is_group": false,
+   "evidence": "data-totalhits=\"103\" on the search-result block returned by /CustomSearch/GetResultsAjax for this category page's Sitecore contextId (site renders no numeric product-count header anywhere)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Desks",
+   "qty": 8,
+   "link": "https://www.normann-copenhagen.com/en/products/furniture/tables/desks/",
+   "is_group": false,
+   "evidence": "data-totalhits=\"8\" on the search-result block returned by /CustomSearch/GetResultsAjax for this category page's Sitecore contextId (site renders no numeric product-count header anywhere)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Cafe Tables",
+   "qty": 89,
+   "link": "https://www.normann-copenhagen.com/en/products/furniture/tables/cafe-tables/",
+   "is_group": false,
+   "evidence": "data-totalhits=\"89\" on the search-result block returned by /CustomSearch/GetResultsAjax for this category page's Sitecore contextId (site renders no numeric product-count header anywhere)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Storage",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Shelving",
+   "qty": 26,
+   "link": "https://www.normann-copenhagen.com/en/products/furniture/storage/shelving/",
+   "is_group": false,
+   "evidence": "data-totalhits=\"26\" on the search-result block returned by /CustomSearch/GetResultsAjax for this category page's Sitecore contextId (site renders no numeric product-count header anywhere)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sideboards & Cabinets",
+   "qty": 21,
+   "link": "https://www.normann-copenhagen.com/en/products/furniture/storage/sideboards--cabinets/",
+   "is_group": false,
+   "evidence": "data-totalhits=\"21\" on the search-result block returned by /CustomSearch/GetResultsAjax for this category page's Sitecore contextId (site renders no numeric product-count header anywhere)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Wardrobe Furniture",
+   "qty": 14,
+   "link": "https://www.normann-copenhagen.com/en/products/furniture/storage/wardrobe-furniture/",
+   "is_group": false,
+   "evidence": "data-totalhits=\"14\" on the search-result block returned by /CustomSearch/GetResultsAjax for this category page's Sitecore contextId (site renders no numeric product-count header anywhere)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Outdoor",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Outdoor Seating",
+   "qty": 89,
+   "link": "https://www.normann-copenhagen.com/en/products/furniture/outdoor/outdoor-seating/",
+   "is_group": false,
+   "evidence": "data-totalhits=\"89\" on the search-result block returned by /CustomSearch/GetResultsAjax for this category page's Sitecore contextId (site renders no numeric product-count header anywhere)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Outdoor Tables",
+   "qty": 16,
+   "link": "https://www.normann-copenhagen.com/en/products/furniture/outdoor/outdoor-tables/",
+   "is_group": false,
+   "evidence": "data-totalhits=\"16\" on the search-result block returned by /CustomSearch/GetResultsAjax for this category page's Sitecore contextId (site renders no numeric product-count header anywhere)",
+   "flag": null
+  }
+ ]
+}

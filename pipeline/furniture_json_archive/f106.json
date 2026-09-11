@@ -1,0 +1,192 @@
+{
+  "sr": 106,
+  "company": "Zara Home DE",
+  "brand_site": "zarahome.com/de/",
+  "country": "Germany",
+  "site_url": "https://www.zarahome.com/de/",
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "ACCESS: Claude-in-Chrome connector only, one dedicated tab, no HTTP client / proxy / reader of any kind. robots.txt (www.zarahome.com/robots.txt, read in the tab) names no Claude / anthropic-ai / ClaudeBot agent and does not disallow /de; the only /itxrest disallow is scoped to user-agent 'proximic'. A real Chrome session cleared the Akamai interstitial by itself - no solver was needed, unlike the earlier Home-Decor pass on this company. The DE homepage loaded first, then every catalogue call was a same-origin fetch() issued from the loaded page via javascript_tool, paced at about 1 request every 6s. No 403 or 429 was seen at any point. STORE: German storefront store 84009904 / catalog 80290000 / languageId -3, the ids confirmed by the prior Home-Decor pass as a genuinely separate Inditex catalogue from Zara Home UK (84009906/80290024, S.N. 90) and Zara Home UAE (85009931/50333562, S.N. 21). TREE: full category tree from /itxrest/2/catalog/store/84009904/80290000/category?languageId=-3&appId=1 (1.26 MB, 731 nodes walked). Zara Home DE has ONE furniture department, node 1020564154 MOEBEL (moebel-alle-n4143), and it is FLAT - none of its 36 children has subcategories, so every kept child is a leaf and there are no grouping rows to emit. Each node's attachments carry HIDE_CATEGORY_MENU, which separates menu-visible from hidden nodes. A regex sweep of the whole 731-node tree for furniture slugs (sofa, sessel, stuhl, hocker, pouf, tisch, regal, schrank, kommode, sideboard, bettgestell, kopfteil, konsole, garderobe, moebel, furniture, chair, table, desk, shelv, cabinet, stool, bench, console, wardrobe, garten, outdoor) found no furniture node anywhere outside MOEBEL except aliases that reuse MOEBEL's own slugs: SCHLAFZIMMER > BETTEN UND KOPFTEILE (a second category id, 1020742387, on the same slug schlafzimmer-bettgestelle-n4166 with the identical 13-product population), KINDER UND BABY > MOEBEL (id 1020695656 on kinder-moebel-n1122), the seasonal BACK TO SCHOOL 'Desks and chairs' and 'Storage' entries (same kinder-moebel-n1122 slug) and SCHLAFZIMMER > ANKLEIDE > Moebel (which points at the SEE ALL slug moebel-n4104). Each is recorded once, under its MOEBEL node. BADEZIMMER, KUECHE UND ESSZIMMER and HOME OFFICE contain no furniture node of their own (HOME OFFICE is a stationery editorial). There is exactly one outdoor node on the whole storefront, MOEBEL > GARTEN. QTY METHOD: Zara Home DE publishes no 'N Artikel' / 'N items' / 'Showing 1-N of M' header anywhere and numberOfProducts is null for every node in the category tree, so qty is the exact size of the node's own server-rendered grid: the unique productIds returned by /itxrest/3/catalog/store/84009904/80290000/category/<id>/product?showProducts=false&showNoStock=false&withSubCategories=false&languageId=-3&appId=1. This is the method both sibling workers validated against the rendered PLP grid on the UK and UAE storefronts. VALIDATION: for all 20 emitted leaves I also fetched the canonical SEO PLP over the same session and parsed the page's OWN embedded serverApp-state transfer entry. In 20 of 20 the rendered category id equalled the intended node id (no slug silently served a parent listing), and in 19 of 20 the rendered grid size equalled the API count exactly. The single exception is Kids Furniture, where the cached SSR HTML carried 56 and the live API 55; the extra id (509149728) is absent from the live API, and the SEE ALL page shows the identical +1 (SSR 325 vs API 324), so this is one product that went out of stock behind a CDN-cached page render, not a per-node discrepancy. The live API value is used. Every h1 was checked against the node name (moebel-schraenke-n4899 gives 'Sideboards und Konsolen ...', badmoebel-n2469 gives 'Praktische und stilvolle Badezimmermoebel', konsolen-n5062 gives 'Konsolen', schlafzimmer-bettgestelle-n4166 gives 'KOPFTEILE UND BETTRAHMEN'); all 20 returned HTTP 200. DRIFT: every one of the 25 category counts was read twice in two full separate passes several minutes apart - all 25 identical, zero drift. Counts range 6-55, none equals the department total (324) and none is a round display cap. EXCLUDED per brief section 3: ALLES SEHEN / SEE ALL (moebel-n4104, 324 items), BESTSELLERS (same slug), and the VINCENT VAN DUYSEN designer collection (vincent-van-duysen-furniture-n3879, 35 items). MOEBEL > SPIEGEL (dekoration-spiegel-wohnzimmer-n993) is mirrors and belongs to Wall Decor. DUPLICATE ROOM ROLL-UPS DROPPED, all hidden nodes, measured by product-ID overlap against the union of the 20 emitted leaves (333 distinct products): KUECHENMOEBEL / Kitchen furniture (aufbewahrungsmobel-n1409, 19 items, 19/19 already inside the leaves - a pure duplicate, exactly as both siblings found); SCHLAFZIMMERMOEBEL / Bedroom furniture (schlafzimmer-moebel-alle-n4130, 35 items, 34/35 inside, the single other being one ASH WOOD CHEST OF DRAWERS); MUEBLES COMEDOR / Dining room furniture (esszimmer-moebel-alles-n4740, 22 items, 20/22 inside, the two others being 'TABLE 01' and 'TABLE 03'); BUERO / Office (furniture-office-n5761, 20 items, 17/20 inside, the three others being 'DESK 01' twice and 'DESK 02'). This matches the UK store's decision and diverges from the UAE store's, correctly so: unlike UAE, the DE tree DOES carry explicit type leaves for headboards and bed frames, dining tables, desks and chests of drawers, so the room roll-ups add essentially nothing. FLUR / Hall (hausflur-n4981, 116 items, hidden) was also dropped, but for a different reason: only 32 of its 116 products are furniture already covered by the leaves - the page is a mixed room landing (opened and read in the tab: runner rugs, wall mirrors, seagrass baskets, magnetic blackboards alongside the furniture), so its primary product type is not furniture. OUT OF SCOPE, left behind: mirrors, lamps and lighting, rugs, cushions, throws, blankets, bed linen, bedspreads, duvets and pillows, towels, bath mats, shower curtains, bathroom accessories and fixtures, laundry baskets, standalone storage baskets and boxes, tableware, glassware, cutlery, cookware, table linen, vases, candles, candle holders, photo frames, fragrances, stationery, clothing and footwear, pets. CROSS-CHECK: the 20 leaves union to 333 distinct products, 291 of which sit inside the 324-product SEE ALL page; the 33 SEE ALL items no leaf covers were fetched by name and are colour variants of outdoor and lounge pieces, metal flowerpots and unclassified placeholder-named Vincent Van Duysen items ('ARMCHAIR 01', 'LIBRARY SYSTEM 01', 'CHAISE LONGUE 01'), i.e. no furniture category is missing from the emitted set.",
+  "rows": [
+    {
+      "category": "Furniture",
+      "sub_category": "Outdoor Furniture",
+      "qty": 27,
+      "link": "https://www.zarahome.com/de/mobel-outdoor-n4250",
+      "is_group": false,
+      "evidence": "unique productIds from same-origin fetch of /itxrest/3/catalog/store/84009904/80290000/category/1020742389/product?showProducts=false&showNoStock=false&withSubCategories=false&languageId=-3&appId=1 = 27 (site publishes no 'N items' header and numberOfProducts is null on every node); the canonical PLP's own server-rendered transfer state for the same node id returned the same 27",
+      "flag": "MANUAL REVIEW: outdoor furniture node (loungers, chairs, armchairs, tables, bench, rattan couch, folding stools) but the 27-item grid also carries 2 car roof tents, a folding camping kitchen, a striped topper, a seat cushion and a folding beach trolley"
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Accent Chairs",
+      "qty": 18,
+      "link": "https://www.zarahome.com/de/moebel-armsessel-n4106",
+      "is_group": false,
+      "evidence": "unique productIds from same-origin fetch of /itxrest/3/catalog/store/84009904/80290000/category/1020564655/product?showProducts=false&showNoStock=false&withSubCategories=false&languageId=-3&appId=1 = 18 (site publishes no 'N items' header and numberOfProducts is null on every node); the canonical PLP's own server-rendered transfer state for the same node id returned the same 18",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Couches and Armchairs",
+      "qty": 41,
+      "link": "https://www.zarahome.com/de/moebel-sofas-n4113",
+      "is_group": false,
+      "evidence": "unique productIds from same-origin fetch of /itxrest/3/catalog/store/84009904/80290000/category/1020564658/product?showProducts=false&showNoStock=false&withSubCategories=false&languageId=-3&appId=1 = 41 (site publishes no 'N items' header and numberOfProducts is null on every node); the canonical PLP's own server-rendered transfer state for the same node id returned the same 41",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Stools",
+      "qty": 30,
+      "link": "https://www.zarahome.com/de/moebel-hocker-n4892",
+      "is_group": false,
+      "evidence": "unique productIds from same-origin fetch of /itxrest/3/catalog/store/84009904/80290000/category/1020615411/product?showProducts=false&showNoStock=false&withSubCategories=false&languageId=-3&appId=1 = 30 (site publishes no 'N items' header and numberOfProducts is null on every node); the canonical PLP's own server-rendered transfer state for the same node id returned the same 30",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Benches",
+      "qty": 14,
+      "link": "https://www.zarahome.com/de/moebel-sitzbaenke-n4891",
+      "is_group": false,
+      "evidence": "unique productIds from same-origin fetch of /itxrest/3/catalog/store/84009904/80290000/category/1020615412/product?showProducts=false&showNoStock=false&withSubCategories=false&languageId=-3&appId=1 = 14 (site publishes no 'N items' header and numberOfProducts is null on every node); the canonical PLP's own server-rendered transfer state for the same node id returned the same 14",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Chairs",
+      "qty": 30,
+      "link": "https://www.zarahome.com/de/moebel-stuehle-n4105",
+      "is_group": false,
+      "evidence": "unique productIds from same-origin fetch of /itxrest/3/catalog/store/84009904/80290000/category/1020699133/product?showProducts=false&showNoStock=false&withSubCategories=false&languageId=-3&appId=1 = 30 (site publishes no 'N items' header and numberOfProducts is null on every node); the canonical PLP's own server-rendered transfer state for the same node id returned the same 30",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Footstools",
+      "qty": 17,
+      "link": "https://www.zarahome.com/de/moebel-pouf-n4843",
+      "is_group": false,
+      "evidence": "unique productIds from same-origin fetch of /itxrest/3/catalog/store/84009904/80290000/category/1020615413/product?showProducts=false&showNoStock=false&withSubCategories=false&languageId=-3&appId=1 = 17 (site publishes no 'N items' header and numberOfProducts is null on every node); the canonical PLP's own server-rendered transfer state for the same node id returned the same 17",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Side Tables",
+      "qty": 26,
+      "link": "https://www.zarahome.com/de/moebel-beistelltische-n4895",
+      "is_group": false,
+      "evidence": "unique productIds from same-origin fetch of /itxrest/3/catalog/store/84009904/80290000/category/1020615418/product?showProducts=false&showNoStock=false&withSubCategories=false&languageId=-3&appId=1 = 26 (site publishes no 'N items' header and numberOfProducts is null on every node); the canonical PLP's own server-rendered transfer state for the same node id returned the same 26",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Coffee Tables",
+      "qty": 10,
+      "link": "https://www.zarahome.com/de/moebel-couchtische-n4896",
+      "is_group": false,
+      "evidence": "unique productIds from same-origin fetch of /itxrest/3/catalog/store/84009904/80290000/category/1020615419/product?showProducts=false&showNoStock=false&withSubCategories=false&languageId=-3&appId=1 = 10 (site publishes no 'N items' header and numberOfProducts is null on every node); the canonical PLP's own server-rendered transfer state for the same node id returned the same 10",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Bedside Tables",
+      "qty": 18,
+      "link": "https://www.zarahome.com/de/moebel-nachttische-n4110",
+      "is_group": false,
+      "evidence": "unique productIds from same-origin fetch of /itxrest/3/catalog/store/84009904/80290000/category/1020564159/product?showProducts=false&showNoStock=false&withSubCategories=false&languageId=-3&appId=1 = 18 (site publishes no 'N items' header and numberOfProducts is null on every node); the canonical PLP's own server-rendered transfer state for the same node id returned the same 18",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Desks",
+      "qty": 12,
+      "link": "https://www.zarahome.com/de/schreibtische-n5104",
+      "is_group": false,
+      "evidence": "unique productIds from same-origin fetch of /itxrest/3/catalog/store/84009904/80290000/category/1020379215/product?showProducts=false&showNoStock=false&withSubCategories=false&languageId=-3&appId=1 = 12 (site publishes no 'N items' header and numberOfProducts is null on every node); the canonical PLP's own server-rendered transfer state for the same node id returned the same 12",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Dining Tables",
+      "qty": 7,
+      "link": "https://www.zarahome.com/de/esszimmertische-n4743",
+      "is_group": false,
+      "evidence": "unique productIds from same-origin fetch of /itxrest/3/catalog/store/84009904/80290000/category/1020689624/product?showProducts=false&showNoStock=false&withSubCategories=false&languageId=-3&appId=1 = 7 (site publishes no 'N items' header and numberOfProducts is null on every node); the canonical PLP's own server-rendered transfer state for the same node id returned the same 7",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Shelving Units",
+      "qty": 14,
+      "link": "https://www.zarahome.com/de/moebel-regale-n4898",
+      "is_group": false,
+      "evidence": "unique productIds from same-origin fetch of /itxrest/3/catalog/store/84009904/80290000/category/1020615414/product?showProducts=false&showNoStock=false&withSubCategories=false&languageId=-3&appId=1 = 14 (site publishes no 'N items' header and numberOfProducts is null on every node); the canonical PLP's own server-rendered transfer state for the same node id returned the same 14",
+      "flag": "MANUAL REVIEW: ambiguous shelving - 11 of the 14 are freestanding furniture (tall shelving units, elm/oak shelving units, rotating bookcase, sideboards, storage unit with shelves, kids' metal shelving unit) but 3 read as wall shelves (STEEL AND WOOD SHELF, METAL MESH SHELF, ACACIA WOOD SHELF)"
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Sideboards and Cabinets",
+      "qty": 20,
+      "link": "https://www.zarahome.com/de/moebel-schraenke-n4899",
+      "is_group": false,
+      "evidence": "unique productIds from same-origin fetch of /itxrest/3/catalog/store/84009904/80290000/category/1020615415/product?showProducts=false&showNoStock=false&withSubCategories=false&languageId=-3&appId=1 = 20 (site publishes no 'N items' header and numberOfProducts is null on every node); the canonical PLP's own server-rendered transfer state for the same node id returned the same 20",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Storage Furniture",
+      "qty": 22,
+      "link": "https://www.zarahome.com/de/moebel-aufbewahrung-n4111",
+      "is_group": false,
+      "evidence": "unique productIds from same-origin fetch of /itxrest/3/catalog/store/84009904/80290000/category/1020564157/product?showProducts=false&showNoStock=false&withSubCategories=false&languageId=-3&appId=1 = 22 (site publishes no 'N items' header and numberOfProducts is null on every node); the canonical PLP's own server-rendered transfer state for the same node id returned the same 22",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Coat Stands and Towel Racks",
+      "qty": 9,
+      "link": "https://www.zarahome.com/de/moebel-garderobenstander-handtuchhalter-n4900",
+      "is_group": false,
+      "evidence": "unique productIds from same-origin fetch of /itxrest/3/catalog/store/84009904/80290000/category/1020615416/product?showProducts=false&showNoStock=false&withSubCategories=false&languageId=-3&appId=1 = 9 (site publishes no 'N items' header and numberOfProducts is null on every node); the canonical PLP's own server-rendered transfer state for the same node id returned the same 9",
+      "flag": "MANUAL REVIEW: mixed node - 6 of 9 are hall furniture (valet stand, ash and metal clothes racks, metal and wood rack, coat stand, wood and linen folding screen), 3 are freestanding towel racks"
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Console Tables",
+      "qty": 6,
+      "link": "https://www.zarahome.com/de/konsolen-n5062",
+      "is_group": false,
+      "evidence": "unique productIds from same-origin fetch of /itxrest/3/catalog/store/84009904/80290000/category/1020448936/product?showProducts=false&showNoStock=false&withSubCategories=false&languageId=-3&appId=1 = 6 (site publishes no 'N items' header and numberOfProducts is null on every node); the canonical PLP's own server-rendered transfer state for the same node id returned the same 6",
+      "flag": "MANUAL REVIEW: node carries HIDE_CATEGORY_MENU (not shown in the mega-menu) but its SEO page loads and renders its own 6-item grid; 4 of the 6 carry the placeholder catalogue name 'DESK 01', the other two are an ash wood console and a wooden storage unit"
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Headboards and Bed Frames",
+      "qty": 13,
+      "link": "https://www.zarahome.com/de/schlafzimmer-bettgestelle-n4166",
+      "is_group": false,
+      "evidence": "unique productIds from same-origin fetch of /itxrest/3/catalog/store/84009904/80290000/category/1020711635/product?showProducts=false&showNoStock=false&withSubCategories=false&languageId=-3&appId=1 = 13 (site publishes no 'N items' header and numberOfProducts is null on every node); the canonical PLP's own server-rendered transfer state for the same node id returned the same 13",
+      "flag": "MANUAL REVIEW: 12 of 13 are headboards and bed frames; 1 is a QUILTED MATTRESS BASE"
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Bathroom Furniture",
+      "qty": 22,
+      "link": "https://www.zarahome.com/de/badmoebel-n2469",
+      "is_group": false,
+      "evidence": "unique productIds from same-origin fetch of /itxrest/3/catalog/store/84009904/80290000/category/1020690629/product?showProducts=false&showNoStock=false&withSubCategories=false&languageId=-3&appId=1 = 22 (site publishes no 'N items' header and numberOfProducts is null on every node); the canonical PLP's own server-rendered transfer state for the same node id returned the same 22",
+      "flag": "MANUAL REVIEW: visible menu department and all 22 items are furniture (storage units, display cabinet, benches, stools, one shelf, towel racks), but all 22 also appear inside Storage Furniture / Stools / Benches / Shelving Units / Sideboards and Cabinets / Coat Stands and Towel Racks"
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Kids Furniture",
+      "qty": 55,
+      "link": "https://www.zarahome.com/de/kinder-moebel-n1122",
+      "is_group": false,
+      "evidence": "unique productIds from same-origin fetch of /itxrest/3/catalog/store/84009904/80290000/category/1020576160/product?showProducts=false&showNoStock=false&withSubCategories=false&languageId=-3&appId=1 = 55 (site publishes no 'N items' header and numberOfProducts is null on every node); the canonical PLP's own server-rendered transfer state for the same node id returned the same 55",
+      "flag": "MANUAL REVIEW: predominantly kids furniture (cots, mini cot, desks, chairs, high chair, bedside tables, chest of drawers, headboard, bed frame, shelving units, bookcase, console) but the 55-item grid also carries 2 cot mattresses, a basket changing mat, a rocking horse toy, a wooden blackboard, a baby gym, a baby hammock and moses basket, a floor pouffe and an iron hanger"
+    }
+  ]
+}

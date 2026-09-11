@@ -1,0 +1,282 @@
+{
+ "sr": 50,
+ "company": "OKA",
+ "brand_site": "oka.com",
+ "country": "UK",
+ "site_url": "https://www.oka.com/uk",
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ACCESS: plain requests/curl throughout, no blocking. https://www.oka.com/uk 301s to https://www.oka.com/ (UK is the default locale, GBP), so canonical links use the bare www.oka.com/collections/ paths. TREE: taken from the rendered mega-menu in the homepage HTML (li.hd-Banner_Item > div.hd-Banner_Dropdown), then confirmed and deepened per node from each collection page's own breadcrumb (a.bdc-Breadcrumb_Link) and its in-page child banner (a.clc-Banner_Link). OKA's hierarchy is Furniture > {Seating, Tables, Storage Furniture and Shelving, Beds} plus a separate top-level Garden department (breadcrumb 'Garden Furniture & Accessories' > 'Garden Furniture' > leaves); garden furniture is NOT filed under the Furniture department, which is why it carries the 'Outdoor Furniture' top bucket. The a.clc-Signposting_Button lists on every page are colour/material/size/seater SEO filter cuts (wood-side-tables, oak-dining-tables, 8-seater-dining-tables, green-armchairs, black-storage-furniture, linen-sofas, wood-outdoor-garden-furniture, metal-outdoor-garden-furniture, gloss-and-painted-furniture, stone-and-marble-furniture which is empty) and were all dropped per the filter-page rule. COUNT METHOD: the product grid is rendered client-side by Graphene HC (Advanced Commerce), so raw HTML and WebFetch both return an empty 'Showing of items' header. The theme JS inside the page does exactly document.querySelector('[data-graphene-hc-el=\"pagination-total\"]').textContent = responseData.product_count, so templates.category.product_count IS the rendered header figure. Counts were read from POST https://okashopify-1.store-uk1.advancedcommerce.services/api/js/query (theme 38caf17c88c5431c932b42cdc117b64e, template id 'category'). The collection is resolved from the X-Referer HEADER, not the body: omit it and the API silently returns the whole 1,637-product catalogue with header.category_id=null, which looks like a valid response. Every row here came back with a distinct non-null category_id and a distinct count. VERIFICATION: (1) six collections were opened in a real Chrome tab and the header read after JS ran - Sofas 'Showing 46 of 46 items', Beds 48, Storage Furniture and Shelving 80, Wardrobes and Cupboards 18, Outdoor Garden Seating 30, Storage Ottomans and Footstools 45 - all identical to product_count. (2) every emitted node was proved by exhaustion: paged with ?pg=N (the page number travels in the URL / X-Referer, not the request body) until an empty page, counting unique data-product-id values; unique IDs == product_count on 100% of nodes, including the multi-page parents (furniture 443 over 8 pages, seating 205, tables 154, storage-furniture 80). (3) a second read of all 24 leaves showed zero drift. Shopify /collections/<handle>/products.json was deliberately NOT used: OKA sells each size/colour as its own Shopify product and Graphene collapses them into one grid tile, so products.json runs consistently higher than the rendered header (prior pass measured mirrors 54 vs 34). PARENT/CHILD: Seating (205), Tables (154), Storage Furniture and Shelving (80), Beds (48) and Garden Furniture (44) are emitted as grouping rows because their children cover them; residues were measured by product-ID set difference - Seating 3 (fabric/leather care kits), Tables 3 (drinks trolleys, already emitted under Storage Furniture), Storage Furniture 0, Garden Furniture 0, Beds 6 (flagged on the row). OKA's collections cross-cut heavily, so several genuine nav nodes turn out to be full subsets of a sibling; each such row carries a documented-overlap flag rather than being dropped. Coffee Tables (25) and Storage Ottomans and Footstools (45) are kept as leaves despite having children because 17/25 and 29/45 of their products are in no child. EXCLUDED, with reasons: 'Ready-Made Sofas' (/collections/ready-made-sofas, 46) - identical product-ID set to Sofas, a duplicate listing. 'Tailored by OKA' (/collections/made-to-order, 27) - OKA's made-to-order programme, a service/brand cross-cut (22 of its 27 already sit in Sofas, Armchairs, Ottomans, Benches and Dining Chairs), not a product type. 'Tailored by OKA Loose Covers' (192) and 'Fabric Swatches' (62) - furniture covers and swatches. Mattresses (7) and Bed Valances (4) - bedding. 'Bar Accessories and Furniture' (58, breadcrumb Home > Homeware) - mixed roll-up whose furniture is Bar Stools and Drinks Trolleys, both already emitted. Storage Accessories (32), Baskets & Boxes, Waste Bins - standalone storage goods. Fire Screens (5) - decorative screens and fire fenders, proven decor in the prior pass. Mirrors (incl. mirrors-standing and mirrors-table), all Lighting, Rugs, Cushions, Textiles, Tableware, Planters and Faux Flowers - other departments. Product/design ranges (Balabac Furniture Collection 9, Anastasius Bookcases, Costellini Ottomans, Rander Ceramic Stools, Stafford/Tarma/Vasa/Coleridge Seating, Icons) and all Sale/New/Gifts/Back-in-Stock nodes - collection and promo pages. Room roll-ups Living Room, Dining Room, Bedroom, Study, Hallway and the parent 'Garden Furniture & Accessories' (58) - whole-room supersets that only re-link the furniture nodes already emitted, alongside rugs, cushions, lamps, tableware and planters. ABSENCE SWEEP: the full collections sitemap (sitemap_collections_1.xml, 330 handles) was pulled and grepped for every furniture slug; the only real furniture node missing from the mega-menu was 'wardrobes', which is included above.",
+ "rows": [
+  {
+   "category": "Furniture",
+   "sub_category": "Seating",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sofas",
+   "qty": 46,
+   "link": "https://www.oka.com/collections/sofas",
+   "is_group": false,
+   "evidence": "rendered listing header 'Showing N of 46 items' ([data-graphene-hc-el=\"pagination-total\"]); same value returned as templates.category.product_count by POST okashopify-1.store-uk1.advancedcommerce.services/api/js/query (X-Referer=https://www.oka.com/collections/sofas); confirmed by exhaustion: paged ?pg=N to an empty page, 46 unique data-product-id values",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Armchairs",
+   "qty": 43,
+   "link": "https://www.oka.com/collections/armchairs",
+   "is_group": false,
+   "evidence": "rendered listing header 'Showing N of 43 items' ([data-graphene-hc-el=\"pagination-total\"]); same value returned as templates.category.product_count by POST okashopify-1.store-uk1.advancedcommerce.services/api/js/query (X-Referer=https://www.oka.com/collections/armchairs); confirmed by exhaustion: paged ?pg=N to an empty page, 43 unique data-product-id values",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dining Chairs",
+   "qty": 55,
+   "link": "https://www.oka.com/collections/dining-chairs",
+   "is_group": false,
+   "evidence": "rendered listing header 'Showing N of 55 items' ([data-graphene-hc-el=\"pagination-total\"]); same value returned as templates.category.product_count by POST okashopify-1.store-uk1.advancedcommerce.services/api/js/query (X-Referer=https://www.oka.com/collections/dining-chairs); confirmed by exhaustion: paged ?pg=N to an empty page, 55 unique data-product-id values",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bar Stools",
+   "qty": 15,
+   "link": "https://www.oka.com/collections/stools",
+   "is_group": false,
+   "evidence": "rendered listing header 'Showing N of 15 items' ([data-graphene-hc-el=\"pagination-total\"]); same value returned as templates.category.product_count by POST okashopify-1.store-uk1.advancedcommerce.services/api/js/query (X-Referer=https://www.oka.com/collections/stools); confirmed by exhaustion: paged ?pg=N to an empty page, 15 unique data-product-id values",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Benches",
+   "qty": 8,
+   "link": "https://www.oka.com/collections/benches",
+   "is_group": false,
+   "evidence": "rendered listing header 'Showing N of 8 items' ([data-graphene-hc-el=\"pagination-total\"]); same value returned as templates.category.product_count by POST okashopify-1.store-uk1.advancedcommerce.services/api/js/query (X-Referer=https://www.oka.com/collections/benches); confirmed by exhaustion: paged ?pg=N to an empty page, 8 unique data-product-id values",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Storage Ottomans and Footstools",
+   "qty": 45,
+   "link": "https://www.oka.com/collections/ottomans",
+   "is_group": false,
+   "evidence": "rendered listing header 'Showing N of 45 items' ([data-graphene-hc-el=\"pagination-total\"]); same value returned as templates.category.product_count by POST okashopify-1.store-uk1.advancedcommerce.services/api/js/query (X-Referer=https://www.oka.com/collections/ottomans); confirmed by exhaustion: paged ?pg=N to an empty page, 45 unique data-product-id values",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Pouffes",
+   "qty": 8,
+   "link": "https://www.oka.com/collections/pouffes-ottomans",
+   "is_group": false,
+   "evidence": "rendered listing header 'Showing N of 8 items' ([data-graphene-hc-el=\"pagination-total\"]); same value returned as templates.category.product_count by POST okashopify-1.store-uk1.advancedcommerce.services/api/js/query (X-Referer=https://www.oka.com/collections/pouffes-ottomans); confirmed by exhaustion: paged ?pg=N to an empty page, 8 unique data-product-id values",
+   "flag": "MANUAL REVIEW: documented overlap - all 8 product IDs are also in Storage Ottomans and Footstools (45); kept because it is OKA's own nav node for poufs, which the site files under Furniture > Seating"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Tables",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Side Tables",
+   "qty": 43,
+   "link": "https://www.oka.com/collections/side-tables",
+   "is_group": false,
+   "evidence": "rendered listing header 'Showing N of 43 items' ([data-graphene-hc-el=\"pagination-total\"]); same value returned as templates.category.product_count by POST okashopify-1.store-uk1.advancedcommerce.services/api/js/query (X-Referer=https://www.oka.com/collections/side-tables); confirmed by exhaustion: paged ?pg=N to an empty page, 43 unique data-product-id values",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bedside Tables",
+   "qty": 17,
+   "link": "https://www.oka.com/collections/bedside-tables",
+   "is_group": false,
+   "evidence": "rendered listing header 'Showing N of 17 items' ([data-graphene-hc-el=\"pagination-total\"]); same value returned as templates.category.product_count by POST okashopify-1.store-uk1.advancedcommerce.services/api/js/query (X-Referer=https://www.oka.com/collections/bedside-tables); confirmed by exhaustion: paged ?pg=N to an empty page, 17 unique data-product-id values",
+   "flag": "MANUAL REVIEW: documented overlap - all 17 product IDs are also in Side Tables (43); both are genuine breadcrumb children of Furniture > Tables"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dining Tables",
+   "qty": 28,
+   "link": "https://www.oka.com/collections/dining-tables",
+   "is_group": false,
+   "evidence": "rendered listing header 'Showing N of 28 items' ([data-graphene-hc-el=\"pagination-total\"]); same value returned as templates.category.product_count by POST okashopify-1.store-uk1.advancedcommerce.services/api/js/query (X-Referer=https://www.oka.com/collections/dining-tables); confirmed by exhaustion: paged ?pg=N to an empty page, 28 unique data-product-id values",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Coffee Tables",
+   "qty": 25,
+   "link": "https://www.oka.com/collections/coffee-tables",
+   "is_group": false,
+   "evidence": "rendered listing header 'Showing N of 25 items' ([data-graphene-hc-el=\"pagination-total\"]); same value returned as templates.category.product_count by POST okashopify-1.store-uk1.advancedcommerce.services/api/js/query (X-Referer=https://www.oka.com/collections/coffee-tables); confirmed by exhaustion: paged ?pg=N to an empty page, 25 unique data-product-id values",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Ottoman Coffee Tables",
+   "qty": 8,
+   "link": "https://www.oka.com/collections/coffee-table-ottomans",
+   "is_group": false,
+   "evidence": "rendered listing header 'Showing N of 8 items' ([data-graphene-hc-el=\"pagination-total\"]); same value returned as templates.category.product_count by POST okashopify-1.store-uk1.advancedcommerce.services/api/js/query (X-Referer=https://www.oka.com/collections/coffee-table-ottomans); confirmed by exhaustion: paged ?pg=N to an empty page, 8 unique data-product-id values",
+   "flag": "MANUAL REVIEW: documented overlap - cross-cut node; all 8 product IDs are inside both Coffee Tables (25) and Storage Ottomans and Footstools (45). Coffee Tables is kept as a leaf because 17 of its 25 products are in no child"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Console Tables",
+   "qty": 17,
+   "link": "https://www.oka.com/collections/console-tables",
+   "is_group": false,
+   "evidence": "rendered listing header 'Showing N of 17 items' ([data-graphene-hc-el=\"pagination-total\"]); same value returned as templates.category.product_count by POST okashopify-1.store-uk1.advancedcommerce.services/api/js/query (X-Referer=https://www.oka.com/collections/console-tables); confirmed by exhaustion: paged ?pg=N to an empty page, 17 unique data-product-id values",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dressing Tables and Desks",
+   "qty": 11,
+   "link": "https://www.oka.com/collections/dressing-tables-and-desks",
+   "is_group": false,
+   "evidence": "rendered listing header 'Showing N of 11 items' ([data-graphene-hc-el=\"pagination-total\"]); same value returned as templates.category.product_count by POST okashopify-1.store-uk1.advancedcommerce.services/api/js/query (X-Referer=https://www.oka.com/collections/dressing-tables-and-desks); confirmed by exhaustion: paged ?pg=N to an empty page, 11 unique data-product-id values",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Storage Furniture and Shelving",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sideboards and Consoles",
+   "qty": 18,
+   "link": "https://www.oka.com/collections/sideboards",
+   "is_group": false,
+   "evidence": "rendered listing header 'Showing N of 18 items' ([data-graphene-hc-el=\"pagination-total\"]); same value returned as templates.category.product_count by POST okashopify-1.store-uk1.advancedcommerce.services/api/js/query (X-Referer=https://www.oka.com/collections/sideboards); confirmed by exhaustion: paged ?pg=N to an empty page, 18 unique data-product-id values",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Chests of Drawers",
+   "qty": 13,
+   "link": "https://www.oka.com/collections/chest-drawers",
+   "is_group": false,
+   "evidence": "rendered listing header 'Showing N of 13 items' ([data-graphene-hc-el=\"pagination-total\"]); same value returned as templates.category.product_count by POST okashopify-1.store-uk1.advancedcommerce.services/api/js/query (X-Referer=https://www.oka.com/collections/chest-drawers); confirmed by exhaustion: paged ?pg=N to an empty page, 13 unique data-product-id values",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Storage Trunks and Chests",
+   "qty": 18,
+   "link": "https://www.oka.com/collections/storage-trunks",
+   "is_group": false,
+   "evidence": "rendered listing header 'Showing N of 18 items' ([data-graphene-hc-el=\"pagination-total\"]); same value returned as templates.category.product_count by POST okashopify-1.store-uk1.advancedcommerce.services/api/js/query (X-Referer=https://www.oka.com/collections/storage-trunks); confirmed by exhaustion: paged ?pg=N to an empty page, 18 unique data-product-id values",
+   "flag": "MANUAL REVIEW: documented overlap - all 18 product IDs are also in Storage Ottomans and Footstools (45); the products are upholstered storage trunks and chests (furniture-style storage, not baskets or boxes)"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bookcases and Cabinets",
+   "qty": 29,
+   "link": "https://www.oka.com/collections/bookcases",
+   "is_group": false,
+   "evidence": "rendered listing header 'Showing N of 29 items' ([data-graphene-hc-el=\"pagination-total\"]); same value returned as templates.category.product_count by POST okashopify-1.store-uk1.advancedcommerce.services/api/js/query (X-Referer=https://www.oka.com/collections/bookcases); confirmed by exhaustion: paged ?pg=N to an empty page, 29 unique data-product-id values",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Wardrobes and Cupboards",
+   "qty": 18,
+   "link": "https://www.oka.com/collections/wardrobes",
+   "is_group": false,
+   "evidence": "rendered listing header 'Showing N of 18 items' ([data-graphene-hc-el=\"pagination-total\"]); same value returned as templates.category.product_count by POST okashopify-1.store-uk1.advancedcommerce.services/api/js/query (X-Referer=https://www.oka.com/collections/wardrobes); confirmed by exhaustion: paged ?pg=N to an empty page, 18 unique data-product-id values",
+   "flag": "MANUAL REVIEW: documented overlap - all 18 product IDs are also in Bookcases and Cabinets (29). Not in the mega-menu; found via the collections sitemap, breadcrumb Home > Furniture > Storage Furniture and Shelving"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Drinks Trolleys and Cabinets",
+   "qty": 7,
+   "link": "https://www.oka.com/collections/drinks-trolleys",
+   "is_group": false,
+   "evidence": "rendered listing header 'Showing N of 7 items' ([data-graphene-hc-el=\"pagination-total\"]); same value returned as templates.category.product_count by POST okashopify-1.store-uk1.advancedcommerce.services/api/js/query (X-Referer=https://www.oka.com/collections/drinks-trolleys); confirmed by exhaustion: paged ?pg=N to an empty page, 7 unique data-product-id values",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Beds",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": "MANUAL REVIEW: /collections/beds reports 48 items but OKA has no bed-frames-only child node - 6 of the 48 (5 bed frames: Hester Four-Poster, Muncaster King and Super King, Durbar King and Super King, plus the Egerton Sofa Bed) sit in no emitted child. Its other children Mattresses (7) and Bed Valances (4) are out of scope"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Headboards",
+   "qty": 19,
+   "link": "https://www.oka.com/collections/bed-headboards",
+   "is_group": false,
+   "evidence": "rendered listing header 'Showing N of 19 items' ([data-graphene-hc-el=\"pagination-total\"]); same value returned as templates.category.product_count by POST okashopify-1.store-uk1.advancedcommerce.services/api/js/query (X-Referer=https://www.oka.com/collections/bed-headboards); confirmed by exhaustion: paged ?pg=N to an empty page, 19 unique data-product-id values",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Divan Beds",
+   "qty": 14,
+   "link": "https://www.oka.com/collections/divan-beds",
+   "is_group": false,
+   "evidence": "rendered listing header 'Showing N of 14 items' ([data-graphene-hc-el=\"pagination-total\"]); same value returned as templates.category.product_count by POST okashopify-1.store-uk1.advancedcommerce.services/api/js/query (X-Referer=https://www.oka.com/collections/divan-beds); confirmed by exhaustion: paged ?pg=N to an empty page, 14 unique data-product-id values",
+   "flag": null
+  },
+  {
+   "category": "Outdoor Furniture",
+   "sub_category": "Garden Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Outdoor Furniture",
+   "sub_category": "Garden Tables",
+   "qty": 24,
+   "link": "https://www.oka.com/collections/garden-tables",
+   "is_group": false,
+   "evidence": "rendered listing header 'Showing N of 24 items' ([data-graphene-hc-el=\"pagination-total\"]); same value returned as templates.category.product_count by POST okashopify-1.store-uk1.advancedcommerce.services/api/js/query (X-Referer=https://www.oka.com/collections/garden-tables); confirmed by exhaustion: paged ?pg=N to an empty page, 24 unique data-product-id values",
+   "flag": null
+  },
+  {
+   "category": "Outdoor Furniture",
+   "sub_category": "Outdoor Garden Seating",
+   "qty": 30,
+   "link": "https://www.oka.com/collections/garden-seating",
+   "is_group": false,
+   "evidence": "rendered listing header 'Showing N of 30 items' ([data-graphene-hc-el=\"pagination-total\"]); same value returned as templates.category.product_count by POST okashopify-1.store-uk1.advancedcommerce.services/api/js/query (X-Referer=https://www.oka.com/collections/garden-seating); confirmed by exhaustion: paged ?pg=N to an empty page, 30 unique data-product-id values",
+   "flag": null
+  },
+  {
+   "category": "Outdoor Furniture",
+   "sub_category": "Garden Furniture Sets",
+   "qty": 9,
+   "link": "https://www.oka.com/collections/garden-furniture-sets",
+   "is_group": false,
+   "evidence": "rendered listing header 'Showing N of 9 items' ([data-graphene-hc-el=\"pagination-total\"]); same value returned as templates.category.product_count by POST okashopify-1.store-uk1.advancedcommerce.services/api/js/query (X-Referer=https://www.oka.com/collections/garden-furniture-sets); confirmed by exhaustion: paged ?pg=N to an empty page, 9 unique data-product-id values",
+   "flag": "MANUAL REVIEW: documented overlap - 6 of the 9 also appear in Garden Tables and 7 of the 9 in Outdoor Garden Seating (a set is listed under both its table and its seating); also 1 of the 9 tiles is a tray set ('Set of 3 Nava and Atara Trays'), not furniture"
+  }
+ ]
+}

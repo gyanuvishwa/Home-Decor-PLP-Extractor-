@@ -1,0 +1,95 @@
+{
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ACCESS: robots.txt fetched FIRST at https://www.housedoctor.com/robots.txt. It is a Shopify storefront file with ONE group for us, 'User-agent: *', which begins 'Allow: /'; there is NO ClaudeBot / anthropic-ai / Claude-Web group anywhere in it and no Crawl-delay. Its header explicitly states 'Public product, collection, page, blog, policy, cart, and localized HTML is crawlable.' The only other named group is adsbot-google. Disallowed paths that matter to this job were respected and NOT requested: /collections/*sort_by*, /collections/*+*, /collections/*%2B*, /collections/*filter*&*filter*, /recommendations/products, /cart.js, /services, /sf_*, /account, /checkout. Every listing was fetched as the bare collection path or with a single ?page=N parameter, which no directive covers. No product API, no facet URL, no reader proxy, no campaign parameter, no browser automation. All fetches via probe.fetch() (curl_cffi rotation, 2s/host) returned 200. LOCALE - blind spots (b) and (c) checked explicitly: housedoctor.com is one Shopify shop serving eight locales, declared in the homepage hreflang set as x-default and da = https://housedoctor.com/, en = /en, de = /de, de-DE = /de-de, en-DE = /en-de, en-IE = /en-int, en-SE = /en-se. There is NO separate country domain, so blind spot (c) does not arise. Blind spot (b) very much does: the two prior workbooks used DIFFERENT locales on this shop - Furniture.xlsx recorded housedoctor.com/en-int/collections/... (12 furniture rows) while Final.xlsx recorded housedoctor.com/en/collections/... (18 lighting/decor/kitchen rows). www.housedoctor.com/ served English and every page returns rel=canonical on the bare host under /en (e.g. https://housedoctor.com/en/collections/bathroom-accessories-1), so the site's own canonical locale for English is /en and that is the form recorded here - the same form Final.xlsx used. Dedup was nevertheless run for every candidate in EIGHT path forms (root, /en, /en-int, /da, /de, /en-de, /en-se, /de-de) so a locale mismatch could not hide a prior extraction. TREE: taken from the site's own mega-menu (menu-drawer <details>/<summary> markup parsed from the rendered homepage) and cross-checked against the Shopify collections sitemap. The menu has two shopping roots. Products > {Lighting, Home decor, Home textiles, Storage, Furniture, Kitchen accessories, BATHROOM ACCESSORIES, Outdoor, Home Office}. Rooms > {Entrance, Kitchen, Dining area, Living room, BATHROOM, Bedroom, Wardrobe, Outdoor}. The bathroom branch is Products > Bathroom accessories (/collections/bathroom-accessories-1) with exactly three children in the menu: Bathroom storage, Laundry baskets, Bins. Because the parent has extractable children it is a grouping row with blank qty and link (rules 24 and 38). Note 'Bins' is reached by four nav paths (Products > Kitchen accessories > Bins, Products > Bathroom accessories > Bins, Rooms > Kitchen > Bins, Rooms > Bathroom > Bins) but is ONE URL, so it is ONE record under rule 28; it is placed in Bathroom because the site files it under Bathroom accessories AND because all 7 of its products are members of the bathroom-accessories-1 collection (verified by handle: bin-hd-sono-black/green, 5x bin-hd-sort). ORPHAN CHECK (the Ferm Living / Nkuku failure mode was tested for): the full collections sitemap https://housedoctor.com/en/sitemap_collections_1.xml was fetched and all 271 collection handles were listed and read, then regex-searched for bath|bad|shower|bruse|toilet|soap|saebe|tooth|tand|mirror|spejl|towel|haandkl|sanit|basin|vask|wc|hygien|laundry|vaske. That surfaced five collections that are in NO menu - towels, meraki-hands-soap, meraki-kitchen-soap, meraki-towels-cloths-robes, eau-de-toilette - plus hooks-hangers, meraki-trays-jars, meraki-storage, meraki-accessories and magazine-holders found by eyeballing the full handle list. Each was opened and its products read; the four that could bear on Bathroom are in review[]. No orphan bathroom listing exists beyond those. QTY: each collection page renders its own exact total in <p id=\"ProductCount\">N products</p>. That figure was PROVEN by independent enumeration - paging ?page=N and collecting unique /products/<handle> hrefs from the <ul id=\"product-grid\"> only - on four nodes of differing size and page depth: Bathroom accessories rendered 60 / enumerated 60 over 2 pages; Bathroom storage 41 / 41 over 2 pages; Laundry baskets 12 / 12 on 1 page; Bins 7 / 7 on 1 page. Exact agreement in all four cases including both multi-page nodes, so the rendered ProductCount is authoritative on this theme. No estimate, no parent figure reused for a child, no aggregation. VERIFICATION: each page's H1 matches the node ('Collection: Bathroom storage', 'Collection: Laundry baskets', 'Collection: Bins') and each rel=canonical matches the URL recorded. Counts discriminate (41/12/7). ROLL-UP ARITHMETIC: the three children are PROVEN strict subsets of the 60-product parent and PROVEN to partition it exactly - 41+12+7 = 60, parent minus the union of children = 0, so the children are pairwise disjoint and there is NO rule-24 residue and no double counting anywhere in the recorded rows. Parent product content confirms the node is genuinely bathroom rather than name-only: soap dishes (soap-dish-hd-wah), soap dispensers (able/edga/petra/wah), toilet brushes, toilet paper holders (welo/paper/text), towel rails (pati/welo), a towel shelf, tumblers, bath hooks and bath baskets, laundry baskets and bags, bins, tissue boxes, toiletry bags. DEDUP: already_extracted() run on every candidate leaf, every review node and every canonical target, in all eight locale forms. All four recorded bathroom URLs are CLEAN in every form. The single hit on this domain in the Bathroom-relevant area is /en/collections/mirrors-1 = Final.xlsx 'Mirrors', which is in review[] and never in rows[]. No Furniture.xlsx collision: House Doctor has no bathroom vanity or bathroom cabinet collection at all (Furniture > Cabinets & sideboards is general living-room casegoods and is itself already in Furniture.xlsx). EXCLUDED after inspection, with reasons: Storage > Racks, hangers & hooks (50) - opened and read; contents are coat racks, clothes racks, wire clothes hangers, nail hooks and wall racks for the entrance and wardrobe (HDCleo, HDRobe, HDFlex, HDBall, HDWall), general storage hardware under rules 30-33, not bathroom, and the site files it under Storage and Rooms > Wardrobe/Entrance, never under Bathroom. Home textiles > Door mats, Rugs, Throws & blankets, Cushion covers - textile (rule 20); the site sells no bath mat collection. Home decor, Lighting, Kitchen accessories branches - Decor / Lighting / Kitchen, most already in Final.xlsx. Meraki > hands soap (14), kitchen soap, body wash, shampoo, deo, face care, eau de toilette - consumable cosmetics and toiletries; primary product type is a personal-care consumable, not a bathroom fitting (rule 2). Meraki > Storage (20) and Accessories (7) - bottle hangers duplicated from Hooks & Hangers, and body-care implements (nail brush, foot file, exfoliating glove, therapy pillow), i.e. personal grooming, not bathroom fitment. Magazine holders (1) - living-room decor. Seasonal and promotional collections (news, aw26-collection, sale, black-friday-*, christmas-*, easter-*, gifts-under-*, cille-fjord-favourites, inspiring-spaces) and brand roll-ups (house-doctor-collection, meraki-collection, nicolas-vahe-products-all, bynord-*) are barred from rows[] by rule 25.",
+ "rows": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom accessories",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom accessories > Bathroom storage",
+   "qty": 41,
+   "link": "https://housedoctor.com/en/collections/bathroom-storage",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom accessories > Laundry baskets",
+   "qty": 12,
+   "link": "https://housedoctor.com/en/collections/laundry-baskets",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom accessories > Bins",
+   "qty": 7,
+   "link": "https://housedoctor.com/en/collections/bins",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  }
+ ],
+ "review": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Rooms > Bathroom (shop-by-room re-cut)",
+   "qty": 60,
+   "issue": "DUPLICATE, NOT AN EXTRA ROW (rule 28, BATCH_BRIEF s5). /collections/bathroom is a shop-by-room re-cut of Products > Bathroom accessories. PROVEN by full product-handle enumeration of both collections: 60 vs 60 with EXACT set equality (A-B = 0 and B-A = 0). Its nav children are the same three collections already recorded. Withheld so the same 60 products are not counted twice.",
+   "link": "https://housedoctor.com/en/collections/bathroom"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Home decor > Mirrors",
+   "qty": 26,
+   "issue": "ALREADY EXTRACTED IN Final.xlsx (Home Decor pass) as 'Mirrors' at this exact /en/ URL - must not be re-extracted (master guide s13, OPTION 1). Also not a bathroom-mirror node: it sits under Home decor beside vases and clocks.",
+   "link": "https://housedoctor.com/en/collections/mirrors-1"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Rooms > Entrance / Bedroom > Mirrors",
+   "qty": 1,
+   "issue": "LOW CONFIDENCE, withheld under rule 29. A second, distinct mirror collection (NOT the same URL as mirrors-1 and NOT in the dedup index in any locale form) holding one product, 'Mirror, MKMarble, Beige' - a small Meraki marble mirror that could read as a vanity/cosmetic mirror (Bathroom, rules 10-11) but is merchandised by the site only as an Entrance and Bedroom room collection, with no bathroom framing anywhere. Ambiguity unresolved, so review rather than a guessed row.",
+   "link": "https://housedoctor.com/en/collections/mirrors"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Meraki > Hooks & Hangers",
+   "qty": 15,
+   "issue": "LOW CONFIDENCE, withheld under rule 29. Orphan/brand collection: absent from the Products and Rooms taxonomies, reachable only from the Brands > Meraki landing page (found via the collections sitemap, then confirmed on /en/pages/meraki). Contents are 12 Meraki 'Bottle hanger' wall fittings (1/2/3-hole racks that hold shampoo and soap bottles - bathroom hardware under rule 17) plus 3 'Hooks, MKThapsus' wall hooks. The site never labels the collection bathroom, and none of its 15 products appears in the Bathroom accessories collection, so it is not covered by the recorded rows. Flagged rather than guessed.",
+   "link": "https://housedoctor.com/en/collections/hooks-hangers"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Meraki > Trays & jars",
+   "qty": 16,
+   "issue": "LOW CONFIDENCE, withheld under rule 29. Another orphan Meraki collection recovered from the collections sitemap. It contains 2 genuine 'Soap dish, MKDatura' products (Bathroom under rules 13 and 18) alongside marble/ceramic trays, jars and storage pots that are vanity-or-tabletop decor. Mixed node with no bathroom labelling and no membership in the Bathroom accessories collection; not split into a row because the site gives no hierarchy evidence to split on.",
+   "link": "https://housedoctor.com/en/collections/meraki-trays-jars"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Meraki > Towels, cloths & robes",
+   "qty": 5,
+   "issue": "ROUTED TO TEXTILE: bath robes (MKTrue L/XL and S/M), wash cloth and towel - textile under rules 15 and 20.",
+   "link": "https://housedoctor.com/en/collections/meraki-towels-cloths-robes"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Towels (orphan collection)",
+   "qty": 0,
+   "issue": "EMPTY NODE (BATCH_BRIEF s5) - a real collection present in the collections sitemap but in no menu; the page renders 'Sorry, there are no products in this collection' and has no ProductCount element. Would in any case be ROUTED TO TEXTILE (rule 15). Logged rather than silently dropped; never recorded as a zero-qty row.",
+   "link": "https://housedoctor.com/en/collections/towels"
+  }
+ ],
+ "_reconstructed_from": "Bathroom.xlsx delivered 2026-09-01 (checkpoint), not original worker JSON"
+}

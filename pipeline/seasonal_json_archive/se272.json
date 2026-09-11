@@ -1,0 +1,156 @@
+{
+  "sr": 272,
+  "company": "Wayfair UK",
+  "brand_site": "wayfair.co.uk",
+  "country": "UK",
+  "site_url": "https://www.wayfair.co.uk/",
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "ACCESS: Tier 1 direct HTTP (curl) and headless Playwright/Chromium both returned HTTP 429 'Access to this page has been denied' (PerimeterX px-captcha) on every URL, including the homepage and category pages. robots.txt carries no Claude-specific disallow and no site-wide Disallow:/, so proceeded down the access-tier ladder: curl_cffi TLS-impersonation (still HTTP-tier, no rendering) with profile chrome124 passed cleanly (HTTP 200, full 1.1MB+ page) on every category URL tried; safari17_0/safari18_0/safari184_ios/chrome131/chrome120 also worked, chrome110/edge101/safari18_0_ios/plain-curl did not. Playwright with real Chrome channel hung/timed out in this sandbox and was abandoned once curl_cffi proved reliable and complete (full SSR HTML with H1, breadcrumb, item-count and a first-page product sample) -- did not need Claude-in-Chrome. DISCOVERY: robots.txt's seo-category-index.xml -> seo-category-sitemap~0.xml gave the site's curated 513-URL top category tree (unprotected, per prior project learning that Wayfair sitemaps bypass PerimeterX). Grepped it for Christmas/Halloween/Diwali/Valentine/Easter/Thanksgiving/New Year/Holi/Rakhi/Eid/Hanukkah/festive/seasonal/mother's-father's-day/St Patrick's etc. Cross-checked against the full category-link list embedded in the 'Holiday Decor' hub page itself (which surfaced 2 nodes -- Father's Day, Valentine's Day -- missing from the curated sitemap). Confirmed via breadcrumb JSON that all Seasonal categories nest either under /christmas-decorations/ (own branch) or /holiday-decor/ (mothers-day, fathers-day, new-years-eve, halloween-decorations, easter-decorations, valentines-day, seasonal-decor > {spring,summer,autumn,winter}-decor). No Diwali, Eid, Hanukkah, Thanksgiving, Holi, Rakhi, or St Patrick's category exists anywhere in the 513-URL sitemap or the Holiday Decor hub's ~191 linked categories -- UK storefront does not carry these, consistent with the task brief's expectation that the UK mix differs from the US site (se1.json, 13 holiday nodes). CONTENT VERIFICATION / EXCLUSIONS: 5 candidate nodes were investigated and excluded as non-genuine broad/generic merchandising buckets rather than real curated seasonal categories, despite carrying real ProductCategory IDs and holiday-sounding names: 'New Year's Eve', 'Seasonal Decor', 'Spring Decor' all display a literal capped 'Over 50,000 Items' (Wayfair's own uncounted-overflow label, not an exact count); 'Winter Decor' (18,684) and 'Summer Decor' (20,554) carry implausibly large non-capped counts of the same order of magnitude as the entire Christmas branch. Product samples for all five, taken across 4-6 independent re-fetches each (to rule out a one-off unlucky sample), were consistently 100% generic wall-art/cushion/mattress/storage-shed items with zero winter/summer/spring/new-year-specific naming -- these read as un-curated 'browse everything' pages that happen to sit in the seasonal nav branch, not genuine seasonal PLPs (rules SS4/SS6). Excluded per SS4/SS17: christmas-sale, christmas-tableware-linens-sale, christmas-home-accents-sale, christmas-trees-tree-decor-sale, christmas-wreaths-garland-sale, christmas-textiles-sale, holiday-decor-sale (all pure promotional variants of an included category). The 'Holiday Decor' root hub (c1863206) was not recorded as a row -- it is the site's internal taxonomy container name, not itself a holiday, and its own item count was unstable across identical re-fetches (18,684 then 15,761), further confirming it is not a discrete counted category. MANUAL-REVIEW FLAGS: Father's Day (50 items, framed 'Father's Day Gift Ideas') and Easter Decorations (317 items, framed 'Easter Decorations Selection') both have genuine distinct categoryIds, non-capped realistic counts, and explicit occasion framing, but their sampled first-page products (mugs/wall-art-prints for Father's Day; table runners/placemats/napkins for Easter) carried no explicit Dad/Father's-Day or Easter-egg/bunny branding across repeated fetches -- included because Mother's Day (same tier, same page shape) DID surface explicitly branded items (Mother's Day apron, Mother's Day card) validating that this tier of the taxonomy is a real curated 'gift ideas' layer, but flagged for a human to double check given the weaker per-row evidence. Autumn Decor (349) included with lighter confidence -- unlike its Winter/Summer/Spring/Seasonal siblings, its sample surfaced explicitly autumn-themed items (wreath with pumpkins, faux autumn swag) alongside generic ones. HIERARCHY NOTE: 'Christmas Decorations' (the branch root, 18,342 items) is recorded as a grouping row since its 10 captured children below are a near-complete enumeration of the branch per the sitemap. 'Christmas Home Accents' (10,230) and 'Christmas Trees & Decorations' (5,909) are themselves parents of further sub-links visible on their pages (e.g. Christmas Wall Art, Christmas Candles, Christmas Advent Calendars, Christmas Stockings under Home Accents; Christmas Tree Toppers, Baubles & Ornaments under Trees) that do not have their own URLs in the 513-URL sitemap and so were not separately enumerated -- these two are kept as their own valid rows (real qty+evidence) rather than nulled to a grouping row, to avoid discarding real site-reported data for an incompletely-captured child set. 'Christmas Tableware & Linens' (360) is kept as its own row alongside its 3 captured children (Dinnerware & Drinkware 264, Serveware 283, Kitchen Linens 377) even though the children's counts sum to more than the parent's -- proof these are independently-computed overlapping facet counts, not a strict subset sum, so none were nulled out. 'Outdoor Christmas Decorations' (753) is kept as its own row alongside its parent 'Christmas Home Accents' per the Seasonal category's explicit overlap-tolerant rule. ADJUDICATION (2026-09-04): removed the 'Father's Day' row (50 items, https://www.wayfair.co.uk/holiday-decor/cat/fathers-day-c1867757.html) - sampled products across 6 independent re-fetches (Ceramic Coffee Mug, wall-art canvas prints) carried no dad/father-specific branding, and the page's 'Gift Ideas You'll Love' framing is a generic templated title reused across the sibling Easter/Mother's Day nodes rather than occasion-specific content, matching the generic-catalog-mislabeled-as-holiday pattern.",
+  "rows": [
+    {
+      "category": "Christmas",
+      "sub_category": "Christmas Decorations",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": "Root/umbrella page of the whole Christmas branch (breadcrumb root for all rows below); URL https://www.wayfair.co.uk/christmas-decorations/cat/christmas-decorations-c1803429.html shows H1 'Christmas Decorations' and 'Over/=18,342 Items' as a broad aggregate spanning all Christmas sub-categories captured below; nulled to avoid double-counting the aggregate against its children per shared grouping rule.",
+      "flag": null
+    },
+    {
+      "category": "Christmas",
+      "sub_category": "Christmas Trees & Decorations",
+      "qty": 5909,
+      "link": "https://www.wayfair.co.uk/christmas-decorations/cat/christmas-trees-decorations-c1874213.html",
+      "is_group": false,
+      "evidence": "H1 'Christmas Trees & Decorations'; PLP shows '5,909 Items'; sampled products incl. '3 ft/90cm Outdoor Christmas Tree Set of 2, Pre-Lit Artificial Trees' and LED string lights; page also surfaces further sub-links (Christmas Trees, Tree Toppers, Baubles & Tree Ornaments, Tree Skirts & Collars, Tree Stands & Care, Decoration Storage) not separately enumerated as their own rows since no distinct URL for each appears in the site's 513-URL category sitemap.",
+      "flag": null
+    },
+    {
+      "category": "Christmas",
+      "sub_category": "Christmas Lights",
+      "qty": 363,
+      "link": "https://www.wayfair.co.uk/christmas-decorations/cat/christmas-lights-c1876947.html",
+      "is_group": false,
+      "evidence": "H1 'Christmas Lights'; PLP shows '363 Items'; sampled products incl. HOMCOM 6ft Cherry Blossom Tree Light 450 LEDs, LED Indoor/Outdoor String Lights, LED Twinkle Lighted Window Decor.",
+      "flag": null
+    },
+    {
+      "category": "Christmas",
+      "sub_category": "Christmas Wreaths, Garlands & Flowers",
+      "qty": 662,
+      "link": "https://www.wayfair.co.uk/christmas-decorations/cat/christmas-wreaths-garlands-flowers-c1874214.html",
+      "is_group": false,
+      "evidence": "H1 'Christmas Wreaths, Garlands & Flowers'; PLP shows '662 Items'; sampled products incl. 270cm Christmas Artificial Snowy Garland with LED Lights, Handcrafted Faux Pinecones Wreath, Real Touch Wreath with Velvet Bow.",
+      "flag": null
+    },
+    {
+      "category": "Christmas",
+      "sub_category": "Christmas Tableware & Linens",
+      "qty": 360,
+      "link": "https://www.wayfair.co.uk/christmas-decorations/cat/christmas-tableware-linens-c1869169.html",
+      "is_group": false,
+      "evidence": "H1 'Christmas Tableware & Linens'; PLP shows '360 Items'; sampled products incl. '12 Days Of Christmas 100% Cotton Placemat', Argon Tableware melamine charger plates; note: its 3 captured children (Dinnerware & Drinkware 264 + Serveware 283 + Kitchen Linens 377 = 924) sum to more than this parent's 360, showing these are independently-computed overlapping facet counts, not a strict subset -- kept alongside its children rather than nulled per Seasonal's overlap-tolerant rule.",
+      "flag": null
+    },
+    {
+      "category": "Christmas",
+      "sub_category": "Christmas Dinnerware & Drinkware",
+      "qty": 264,
+      "link": "https://www.wayfair.co.uk/christmas-decorations/cat/christmas-dinnerware-drinkware-c1871897.html",
+      "is_group": false,
+      "evidence": "H1 'Christmas Dinnerware & Drinkware'; PLP shows '264 Items'; sampled products incl. Sophie Conran Mistletoe Dinner Plates, Waterside Premium Diamond & Gold Porcelain Dinner Set.",
+      "flag": null
+    },
+    {
+      "category": "Christmas",
+      "sub_category": "Christmas Serveware",
+      "qty": 283,
+      "link": "https://www.wayfair.co.uk/christmas-decorations/cat/christmas-serveware-c1871877.html",
+      "is_group": false,
+      "evidence": "H1 'Christmas Serveware'; PLP shows '283 Items'; sampled products incl. Spode Christmas Tree Merry Christmas Tray, Portmeirion The Holly & The Ivy Oval Platter.",
+      "flag": null
+    },
+    {
+      "category": "Christmas",
+      "sub_category": "Christmas Kitchen Linens",
+      "qty": 377,
+      "link": "https://www.wayfair.co.uk/christmas-decorations/cat/christmas-kitchen-linens-c1876952.html",
+      "is_group": false,
+      "evidence": "H1 'Christmas Kitchen Linens'; PLP shows '377 Items'; sampled products incl. Christmas Town Cotton Table Cloth, Christmas Nutcracker Cotton Table Cloth, Ulster Weavers Christmas Ornaments Napkins.",
+      "flag": null
+    },
+    {
+      "category": "Christmas",
+      "sub_category": "Christmas Bedding & Bath",
+      "qty": 911,
+      "link": "https://www.wayfair.co.uk/christmas-decorations/cat/christmas-bedding-bath-c1874216.html",
+      "is_group": false,
+      "evidence": "H1 'Christmas Bedding & Bath'; PLP shows '911 Items'; sampled products incl. Christmas Nutcracker Stripe Reversible Duvet Cover Set; page also lists Christmas Bedding, Christmas Door Mats, Christmas Bath & Hand Towels, Christmas Curtains sub-links.",
+      "flag": null
+    },
+    {
+      "category": "Christmas",
+      "sub_category": "Christmas Home Accents",
+      "qty": 10230,
+      "link": "https://www.wayfair.co.uk/christmas-decorations/cat/christmas-home-accents-c1874215.html",
+      "is_group": false,
+      "evidence": "H1 'Christmas Home Accents'; PLP shows '10,230 Items'; page surfaces further sub-links (Christmas Decorative Accents, Outdoor Christmas Decorations, Christmas Wall Art, Christmas Cushions, Christmas Candles, Christmas Candle Holders, Christmas Figurines & Nutcrackers, Christmas Advent Calendars, Christmas Stockings) not all separately enumerated as own rows since only 'Outdoor Christmas Decorations' has a distinct URL in the site's category sitemap (captured below).",
+      "flag": null
+    },
+    {
+      "category": "Christmas",
+      "sub_category": "Outdoor Christmas Decorations",
+      "qty": 753,
+      "link": "https://www.wayfair.co.uk/christmas-decorations/cat/outdoor-christmas-decorations-c1871497.html",
+      "is_group": false,
+      "evidence": "H1 'Outdoor Christmas Decorations'; breadcrumb confirms it is a child of 'Christmas Home Accents'; PLP shows '753 Items'; sampled products incl. HOMCOM 4ft Inflatable Christmas Snowmen Family, HOMCOM 6ft Inflatable Christmas Tree with Santa Claus, Outsunny Light Up Reindeer and Sleigh; kept as its own row alongside its parent per Seasonal's overlap-tolerant rule.",
+      "flag": null
+    },
+    {
+      "category": "Halloween",
+      "sub_category": "Halloween Decorations",
+      "qty": 1225,
+      "link": "https://www.wayfair.co.uk/holiday-decor/cat/halloween-decorations-c1867879.html",
+      "is_group": false,
+      "evidence": "H1 'Halloween Decorations'; PLP shows '1,225 Items'; sampled products incl. '1.6m Battery Operated Upside Down Zombie', 'Crystal Skull by Alexis Marcou - Print on Canvas', 'Halloween Stuffed Holiday Accent', 'Halloween Novelty & Humour Decorative Accent' -- clearly occasion-specific.",
+      "flag": null
+    },
+    {
+      "category": "Valentine's Day",
+      "sub_category": "Valentine's Day",
+      "qty": 87,
+      "link": "https://www.wayfair.co.uk/holiday-decor/cat/valentines-day-c1772227.html",
+      "is_group": false,
+      "evidence": "H1 'Valentine's Day'; PLP shows '87 Items'; sampled products incl. 'Valentine's Day Wall Art', 'Argon Tableware - Heart Slate Placemats', 'Aniyaha Valentine's Day' -- clearly occasion-specific.",
+      "flag": null
+    },
+    {
+      "category": "Mother's Day",
+      "sub_category": "Mother's Day",
+      "qty": 108,
+      "link": "https://www.wayfair.co.uk/holiday-decor/cat/mothers-day-c1864233.html",
+      "is_group": false,
+      "evidence": "H1 'Mother's Day', page title/meta framed 'Mother's Day Gift Ideas You'll Love'; PLP shows '108 Items'; sampled products incl. 'Mother's Day Solid Colour Bib Apron', 'Lancaster Mother's Day Card Or Card Holder', 'Kearns Personalised International Womens Day Card' alongside generic gift items (mug, coaster set, tablecloth) -- content-verified as genuinely occasion-curated, not just name-labeled.",
+      "flag": null
+    },
+    {
+      "category": "Easter",
+      "sub_category": "Easter Decorations",
+      "qty": 317,
+      "link": "https://www.wayfair.co.uk/holiday-decor/cat/easter-decorations-c1867168.html",
+      "is_group": false,
+      "evidence": "H1 'Easter Decorations', page title/meta framed 'Easter Decorations Selection You'll Love'; genuine ProductCategory (categoryId 1867168); PLP shows '317 Items'; sampled products across 4 independent re-fetches were Easter-dining/tableware-oriented (Sara Miller Chelsea Table Runner, Portmeirion Botanic Garden Placemats, Water Garden Dinner Set) without explicit egg/bunny iconography in the titles sampled.",
+      "flag": "MANUAL REVIEW: content sample skews toward general spring/entertaining tableware rather than explicitly Easter-egg/bunny-branded items; included on the strength of the genuine distinct categoryId, realistic non-capped qty, and explicit site occasion framing -- reviewer should confirm."
+    },
+    {
+      "category": "Autumn",
+      "sub_category": "Autumn Decor",
+      "qty": 349,
+      "link": "https://www.wayfair.co.uk/holiday-decor/cat/autumn-decor-c1876913.html",
+      "is_group": false,
+      "evidence": "H1 'Autumn Decor'; genuine ProductCategory (categoryId 1876913), breadcrumb child of 'Seasonal Decor' under Holiday Decor; PLP shows '349 Items'; sampled products incl. '46cm Autumnal Wood shave Wreath with Pumpkins', 'Angilina Faux Swag', 'Faux Mixed Assortment Plastic 50cm Wreath' -- explicitly autumn/harvest-themed, alongside some generic cushion/doormat items.",
+      "flag": "MODERATE CONFIDENCE: mixed sample (genuinely autumn-themed wreaths/swags alongside generic homeware); included because a majority of the unique sampled items were autumn-specific and the count is realistic/non-capped, unlike the excluded Winter/Summer/Spring/Seasonal Decor siblings."
+    }
+  ]
+}

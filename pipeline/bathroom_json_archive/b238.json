@@ -1,0 +1,53 @@
+{
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "Access: robots.txt fetched via curl_cffi impersonate=chrome124 (200) -> 'User-agent: * / Allow: / / Disallow: /ndsxadm/, /catalogsearch/, /widget-listing/, /all-reviews, /gateway-api/, /rest/appapi/V2/' - no Claude-specific disallow, not blocked. Tier1 HTTP: homepage fetched via curl_cffi (chrome124) and parsed embedded mega-menu JSON (mobile nav tree) for full Home>Bath category tree - reliable, deterministic. Category listing pages (PLP) are client-rendered (Next.js, product grid empty in SSR, count only in hydrated client state) and blocked plain HTTP/plain Playwright by Akamai Bot Manager (curl_cffi chrome* impersonations and edge101 got 403; firefox133 impersonation got SSR 200 but no product data in markup; plain Playwright got ERR_HTTP2_PROTOCOL_ERROR / timeout on both http2 and http1 fallback) -> escalated to Claude-in-Chrome (tier3) for the one candidate leaf page, which loaded normally and rendered the true item count. Tree source: homepage mega-menu JSON, id 8559 'Bath' under parent 8528 'Home', full children_data enumerated (Shop All, Bath Accessories & Utilities id8568, Bath Towel/Face Towel/Hand Towel/Bath Robes/Bath Mats/Shower Curtains). No Bathroom/Sanitaryware/Vanity/Faucet/Toilet/Bidet/Basin nodes anywhere else on site (checked Home's other top-level nodes: Decor, Kitchen & Dining, Bedding, Storage, Appliances, Home Essentials - Storage's sub-nodes are Dressing Table/Kitchen/Multi-Utility/Desk/Wardrobe Organisers only, none bathroom-specific). Site does not sell fixtures/sanitaryware/taps - it is a curated home-decor/accessories marketplace. Qty verification: 'Bath Accessories & Utilities' (/home/bath/bath-accessories-utilities/c/8568) rendered header 'Bath Accessories & Utilities - 1,248 items' via Claude-in-Chrome get_page_text - used as evidence (rendered header, not a storefront count API). Contains a mixed assortment (soap dispensers, toothbrush holders, toilet brush holders, bath sets, plus some seagrass/foldable laundry baskets) but the entire node sits under the site's own Home>Bath hierarchy (not under Storage), so recorded as one Bathroom leaf per rule 9/12 hierarchy-decides; not split further since the Category filter facet exposes no separate crawlable URLs (query-param facets only, no stable per-subcategory slugs) - rule 24 parent-URL exception applies (its own URL is the deepest valid listing). Exclusions/routing: Bath Towel + Face Towel + Hand Towel (/home/bath/towels/c/8560) and Bath Robes (/home/bath/bath-robes/c/8593) and Bath Mats (/home/bath/bath-mats/c/8591) and Shower Curtains (filter on /home/bath/c/8559) are cross-category dedup hits - all three distinct URLs (towels/c/8560, bath-robes/c/8593, bath-mats/c/8591) returned ['Textile.xlsx'] from cross_category_url_index.json, confirmed via manual inspection of bath-mats listing (predominantly polyester/cotton/chenille/microfiber fabric mats, textile-dominant) consistent with rule 15/16/20 Textile ownership - logged to review as ALREADY EXTRACTED IN Textile.xlsx, not recorded as Bathroom rows. Separately checked /home/decor/mirrors/c/8599 ('Mirrors', 143 items) found via homepage menu scan for mirror keyword - inspected via Claude-in-Chrome: generic decorative/vanity/floor/table wall mirrors under Home>Decor hierarchy (not under Bath), not in cross_category_url_index yet - excluded per site-hierarchy rule 9 (belongs to Wall Decor per master skill, not a bathroom-specific mirror node) and logged to review as routed-out, not a dedup hit.",
+  "rows": [
+    {
+      "category": "Bathroom",
+      "sub_category": "Bath Accessories & Utilities",
+      "qty": 1248,
+      "link": "https://www.nykaafashion.com/home/bath/bath-accessories-utilities/c/8568",
+      "is_group": false,
+      "evidence": "Rendered PLP header 'Bath Accessories & Utilities - 1,248 items' captured via Claude-in-Chrome get_page_text after page load (tier3, plain HTTP/Playwright blocked by Akamai).",
+      "flag": null
+    }
+  ],
+  "review": [
+    {
+      "category": "Bathroom",
+      "sub_category": "Bath Towel / Face Towel / Hand Towel (Towels)",
+      "qty": null,
+      "issue": "ALREADY EXTRACTED IN Textile.xlsx - cross_category_url_index.json confirms this URL as a Textile leaf; site nav labels it under Home>Bath but product type is textile towels per rule 15.",
+      "link": "https://www.nykaafashion.com/home/bath/towels/c/8560"
+    },
+    {
+      "category": "Bathroom",
+      "sub_category": "Bath Robes",
+      "qty": null,
+      "issue": "ALREADY EXTRACTED IN Textile.xlsx - cross_category_url_index.json confirms this URL as a Textile leaf; bathrobes are Textile per rule 20.",
+      "link": "https://www.nykaafashion.com/home/bath/bath-robes/c/8593"
+    },
+    {
+      "category": "Bathroom",
+      "sub_category": "Bath Mats",
+      "qty": null,
+      "issue": "ALREADY EXTRACTED IN Textile.xlsx - cross_category_url_index.json confirms this URL as a Textile leaf; manually inspected listing is predominantly fabric (polyester/cotton/chenille/microfiber) bath mats grouped with Towels/Robes/Shower Curtains under the same Bath sub-menu, consistent with Textile ownership per rule 16 (a minority of rubber/PVC/silicon mats are present but the node as a whole is Textile-dominant and already claimed there).",
+      "link": "https://www.nykaafashion.com/home/bath/bath-mats/c/8591"
+    },
+    {
+      "category": "Bathroom",
+      "sub_category": "Shower Curtains",
+      "qty": null,
+      "issue": "NOT A SEPARATE URL - rendered via a category_filter on the parent /home/bath/c/8559 page, no dedicated slug. Shower Curtains are Textile per rule 20 regardless; not recorded as Bathroom.",
+      "link": "https://www.nykaafashion.com/home/bath/c/8559"
+    },
+    {
+      "category": "Bathroom",
+      "sub_category": "Mirrors (general/decorative/vanity/floor/table)",
+      "qty": 143,
+      "issue": "NOT BATHROOM - routed to Wall Decor per site hierarchy (Home > Decor > Mirrors, not under Bath) and per master-skill rule that Mirrors belong to Wall Decor, not Bathroom, unless presented as a bathroom-specific mirror node (this one is not - generic decorative/vanity/table/floor mirrors). Not present in cross_category_url_index.json yet, so not a confirmed dedup hit, just excluded on hierarchy grounds.",
+      "link": "https://www.nykaafashion.com/home/decor/mirrors/c/8599"
+    }
+  ]
+}

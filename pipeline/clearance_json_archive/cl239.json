@@ -1,0 +1,34 @@
+{
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "Site's own nav has TWO separate, distinct top-level branches: 'Clearance' (genuine clearance taxonomy, with sub-items All Clearance / Furniture / Bath & Bedding / Kitchen & Dining / Decor) and 'Sale' (generic promotional 'Sale by Category' with %-off tiers 50/30/20/10-off, a 'First Ever Sale' campaign page, and category sale pages like furniture-sale, living-room-sale etc). Per the Sale-vs-Clearance rule, only the Clearance branch was extracted; /collection/sale (item_total=178, confirmed via page.item_total on the live grid) and its %-off/category-sale children were excluded as generic temporary promotional pages, not clearance/outlet-taxonomy. /collection/clearance (canonical, item_total=16) and /collection/clearance-all-clearance ('All Clearance' sub-nav item, also item_total=16, ~83% first-page item_code overlap with the canonical page) are the same underlying listing -- kept only the canonical /collection/clearance and dropped the alias. Real genuine sub-structure confirmed: Furniture (item_total=9) + Decor (item_total=7) = 16, exactly matching the parent's own item_total, confirming these are true non-overlapping children of the Clearance listing, so Clearance is emitted as a group parent with Furniture and Decor as its children. Two clearance sub-pages returned zero products (\"items\":[], item_total=0) and were dropped per the zero-product rule: Clearance Bath & Bedding and Clearance Kitchen & Dining. Separately found /collection/open-box--outlet-deals ('Open Box & Outlet Deals', item_total=5) -- although this URL is nested under the 'Sale' nav branch rather than the 'Clearance' branch, its own page title/content is explicitly Outlet-style (open-box/outlet returns and overstock), which is one of this brief's target Clearance terms (Outlet), so it was recorded as its own Clearance-family row rather than folded under the generic Sale exclusion; flagged for review given its placement under the Sale nav branch. Checked main nav, footer, sitemap/collections.sitemap.xml for clearance/outlet/final-sale/end-of-line/discontinued terms; no other candidates found. Access: direct HTTP GET throughout, no WAF/block; robots.txt has no Claude-specific disallow.\n\n[POLICY UPDATE 2026-09-11] Removed 1 Outlet-classified row(s) per corrected policy: Outlet is not Clearance.",
+  "rows": [
+    {
+      "category": "Clearance",
+      "sub_category": "Clearance",
+      "qty": 16,
+      "link": "https://www.potterybarn.in/collection/clearance",
+      "is_group": true,
+      "evidence": "embedded product-listing JSON: \"page\":{\"has_previous\":false,\"has_next\":true,\"item_total\":16,...} on the live grid at /collection/clearance; canonical of alias /collection/clearance-all-clearance which reports the same item_total=16",
+      "flag": null
+    },
+    {
+      "category": "Clearance",
+      "sub_category": "Clearance Furniture",
+      "qty": 9,
+      "link": "https://www.potterybarn.in/collection/clearance-furniture",
+      "is_group": false,
+      "evidence": "embedded product-listing JSON: \"page\":{...,\"item_total\":9,...} on the live grid at /collection/clearance-furniture",
+      "flag": null
+    },
+    {
+      "category": "Clearance",
+      "sub_category": "Clearance Decor",
+      "qty": 7,
+      "link": "https://www.potterybarn.in/collection/clearance-decor",
+      "is_group": false,
+      "evidence": "embedded product-listing JSON: \"page\":{...,\"item_total\":7,...} on the live grid at /collection/clearance-decor",
+      "flag": null
+    }
+  ]
+}

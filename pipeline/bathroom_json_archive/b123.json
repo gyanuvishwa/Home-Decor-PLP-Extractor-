@@ -1,0 +1,179 @@
+{
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ROBOTS (www2.hm.com): fetched FIRST, before any other request on the host - HTTP 200, 3,874 bytes, profile chrome124. ClaudeBot IS named, and the brief's reading is confirmed verbatim: the file contains a multi-UA stanza 'User-agent: GPTBot / User-agent: OAI-SearchBot / User-agent: ChatGPT-User / User-agent: ClaudeBot / User-agent: Claude-Web / User-agent: anthropic-ai / User-agent: Google-Extended / ... / User-agent: Timpibot' terminated by a single directive: 'Allow: /'. That is an explicit opt-IN for Claude site-wide, not an opt-out - specificity cuts both ways, and the most specific matching group for us grants access. There is NO Claude Disallow anywhere in the file, so no section-5 hard stop. Only Baiduspider, Yeti, Daumoa and PetalBot receive 'Disallow: /'. The generic '*' stanza disallows /alive/user, /m/, /*/cart$, /*/checkout$, /*login, /*logout, /*minicart, /*my-account, /*password, /*register, /reviews/, /*_ui, /*unsubscribe.html, /*manage-subscription, /en_eur, /en/*, /*.product-article-, */resell/productpage/, */search-results.html*, /assets/ and */index.*.html - none of which was requested; in particular no internal search was used. The only Crawl-delay in the file belongs to Pinterestbot; requests were paced by probe.py's 2 s per-host gap regardless. ROBOTS (api.hm.com - SECOND HOST, checked separately and independently this session): https://api.hm.com/robots.txt returns HTTP 503 from the Akamai edge, while https://api.hm.com/ itself returns 200 with the body 'api.hm.com'. This host publishes NO robots.txt at all - the /robots.txt path is simply not mapped to an origin - so there is no directive of any kind, and specifically no Claude directive, to honour or to violate. It is the same H&M Group property and the storefront's own PLP data service. Flagged explicitly rather than glossed. ACCESS: unlike the UK storefront (SR 89), the it_it HTML routes are NOT Akamai-blocked - every www2.hm.com/it_it/home/... listing page fetched cleanly at HTTP 200 via probe.py curl_cffi (chrome124 / edge101 / safari17_0), 2.1 MB each. So this pass took its quantities from the site's OWN rendered pages, with the API used only as corroboration. TREE SOURCE: the it_it sitemap set, not guessed URL patterns - https://www2.hm.com/it_it.sitemap.xml (declared in robots.txt) -> it_it.pages.subdepartment.0-29.xml + it_it.pages.department.0.xml, 2,861 URLs of which 324 sit under /it_it/home. H&M Home IT runs the SAME two parallel nav axes over one catalogue as the UK site, in Italian: 'Acquista per stanza' (/it_it/home/acquista-per-stanza/bagno/...) and 'Acquista per prodotto' (/it_it/home/acquista-per-prodotto/accessori-bagno/...). Room-axis Bagno children (8, complete): accessori, asciugamani, contenitori, dispenser-sapone, prodotti-per-la-casa, sacche-lavanderia, tappetini-bagno, tende-per-la-doccia. Product-axis Accessori bagno children: accessori, asciugamani (-> asciugamani-piccoli, per-ospiti, teli-bagno, teli-mare), tappetini-bagno, tende-per-la-doccia, vedi-tutto. To avoid double counting I recorded the ROOM axis (the node the site itself calls Bagno, rule 23) and put the product-axis twins in review with the reason. SIBLING NODES - EXPLICIT (as instructed, and confirmed for the IT storefront): 'Dispenser per sapone' (6) and 'Accessori per il bagno' (77) are SIBLING children of Bagno in H&M's own room nav, not parent/child. The 6 soap dispensers are also inside the 77-item accessories assortment (e.g. 'Dispenser per sapone in marmo' and 'Dispenser per sapone in acciaio inox' appear in both grids). Both are recorded separately per rule 28 and they MUST NOT be summed - 77 and 6 are each the storefront's own figure for its own node. The IT storefront has exactly the same shape as the UK one, where the corresponding pair was 86 and 5. QTY SOURCE: the listing page's own rendered total, the string '<N> prodotti' in the sort/filter bar. VERIFICATION - FOUR independent figures were required to agree on every recorded leaf, and did, 3 of 3: (1) the rendered '<N> prodotti' header; (2) the totalHits value embedded in the same page's own JSON payload; (3) plpList.numberOfHits from the storefront's own Elevate PLP endpoint https://api.hm.com/search-services/v1/it_IT/listing/resultpage?pageSource=PLP&page=N&sort=RELEVANCE&pageId=<path>&page-size=S&touchPoint=DESKTOP&categoryId=x (the service the PLP itself renders from; note it 422s without a categoryId, whose value is then ignored); (4) pagination.totalPages at page-size=1, which equals numberOfHits exactly for every node tested. Accessori 77/77/77/77, Dispenser sapone 6/6/6/6, Contenitori 21/21/21/21. ENUMERATION TO EXHAUSTION was then run on all three recorded leaves at page-size=36, collecting unique product ids: accessories 77 rows / 77 unique, storage 21/21, soap-dispensers 6/6 - exact matches with no paging repeats. DISCRIMINATION: a bogus pageId /home/thisdoesnotexist12345 returns numberOfHits 0 and totalPages 0, while real nodes vary widely - bathroom 332, towels 144, teli-bagno 84, accessories 77, asciugamani-piccoli 48, bath-mats 42, per-ospiti 27, storage 21, mirrors 21, shower-curtains 15, laundry-bags 13, soap-dispensers 6, teli-mare 3 - so this is not a site-wide constant. The rendered first page shows 36 tiles, and for every node at or below 36 the unique rendered tile count equals the header exactly (contenitori 21/21, dispenser 6/6, sacche 13/13, specchi 21/21), while for larger nodes the header exceeds 36 - proving the header is a true paginated total, not a page-size artifact. SLUG NOTE: the API pageId namespace is ENGLISH even on the Italian storefront - /home/shop-by-room/bathroom/accessories, /soap-dispensers, /storage - while the public URL slugs are Italian. The Italian slug passed as a pageId returns 0. Every 'link' emitted is the canonical www2.hm.com it_it origin URL taken verbatim from the sitemap and fetched at 200; no API path is ever recorded. CONTENT CHECK on the recorded leaves: Accessori per il bagno (77) - the rendered grid is soap dispensers, stainless-steel toothbrush holders, cotton-pad dispensers, marble/wood/stoneware trays, lidded glass jars, plus a beauty crossover tail that H&M cross-merchandises into the bathroom (hand lotion, hand-and-body wash, microfibre hair turbans, combs, headbands, scented candles). Primary product type of the node is bathroom accessories, so it is recorded whole at the site's own number - same treatment as SR 89. Contenitori (21) - lidded glass and ceramic jars, wooden and metal organisers, cotton-pad dispensers, jute/bamboo/rattan storage baskets, modular cosmetic organisers, laundry-detergent bins; rule 12 (bathroom storage) puts this in Bathroom. Dispenser per sapone (6) - all six are 'Dispenser per sapone' in marble or stainless steel; rule 13. DEDUP: dedup.already_extracted() was run on all 23 candidate/review URLs. ZERO hits. The Furniture pass for SR 123 H&M Home IT took only 16 /acquista-per-prodotto/arredamento/* leaves (sofas, chairs, tables, wardrobes, cabinets, shelves), so nothing here collides and all three recorded rows are genuinely new. NOT FOUND ON THIS SITE (checked, genuinely absent - not skipped): the whole 324-URL /it_it/home sitemap branch was swept for sanitary, tap, shower-hardware and mirror vocabulary. H&M Home IT sells no sanitaryware, no baths, no shower systems or enclosures, no taps/faucets, no toilets, no basins, no vanity units and no bathroom mirror node - its bathroom offer is accessories, storage and textiles only. The only mirror node on the site is Decorazioni > Specchi, routed to Decor above. RESULT: 3 leaf rows + 1 grouping row; 18 review entries.",
+ "rows": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bagno",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Accessori per il bagno",
+   "qty": 77,
+   "link": "https://www2.hm.com/it_it/home/acquista-per-stanza/bagno/accessori.html",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Dispenser per sapone",
+   "qty": 6,
+   "link": "https://www2.hm.com/it_it/home/acquista-per-stanza/bagno/dispenser-sapone.html",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Contenitori (bagno)",
+   "qty": 21,
+   "link": "https://www2.hm.com/it_it/home/acquista-per-stanza/bagno/contenitori.html",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  }
+ ],
+ "review": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bagno (room-axis parent)",
+   "qty": 332,
+   "issue": "EXCLUDED AS PARENT URL (rule 24): h1 'Arredo Bagno'. It has 8 live children, 3 recorded above as leaves and 5 routed out below. Its 332 total is not recorded and never aggregated.",
+   "link": "https://www2.hm.com/it_it/home/acquista-per-stanza/bagno.html"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bagno > Asciugamani",
+   "qty": 144,
+   "issue": "ROUTED TO TEXTILE: bath, hand and guest towels (rules 15/20). Room-axis node with no children; the deepest towel leaves are the four product-axis nodes listed below.",
+   "link": "https://www2.hm.com/it_it/home/acquista-per-stanza/bagno/asciugamani.html"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bagno > Tappetini per il Bagno",
+   "qty": 42,
+   "issue": "ROUTED TO TEXTILE: enumerated the rendered grid - every tile is a textile mat ('Tappetino da bagno in spugna di cotone', 'Tappetino da bagno in cotone taftato', 'Tappetino da bagno taftato a forma di fiore', 'Tappetino da bagno strutturato'). Rule 16: textile bath mat -> Textile. No rubber/anti-slip variant exists in this node or anywhere on the site.",
+   "link": "https://www2.hm.com/it_it/home/acquista-per-stanza/bagno/tappetini-bagno.html"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bagno > Tende per la Doccia",
+   "qty": 15,
+   "issue": "ROUTED TO TEXTILE: shower curtains (rule 20). The parallel product-axis node /acquista-per-prodotto/accessori-bagno/tende-per-la-doccia.html serves the same 15 items.",
+   "link": "https://www2.hm.com/it_it/home/acquista-per-stanza/bagno/tende-per-la-doccia.html"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bagno > Sacche da lavanderia",
+   "qty": 13,
+   "issue": "ROUTED TO STORAGE: sits under Bagno in the room nav but all 13 enumerated products are laundry baskets/bags/hampers ('Cesto per la biancheria in seagrass', 'Cesto per biancheria di paglia', 'Sacca per biancheria in misto iuta', 'Cesto in rattan per la biancheria'). Rule 12 - clearly-Storage-owned products belong to Storage. Proof it is the Storage assortment, not a Bathroom one: /acquista-per-prodotto/contenitori/portabiancheria.html ('Cesti per la biancheria') returns the identical count of 13. Same call as SR 89 H&M Home UK.",
+   "link": "https://www2.hm.com/it_it/home/acquista-per-stanza/bagno/sacche-lavanderia.html"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bagno > Prodotti per la casa",
+   "qty": 0,
+   "issue": "EMPTY NODE: linked from the Bagno room nav and present in the it_it sitemap, but the page renders '0 prodotti' and its embedded totalHits is 0. No products, so no row (never fabricate). Recorded here so the eighth child of Bagno is not a silent omission.",
+   "link": "https://www2.hm.com/it_it/home/acquista-per-stanza/bagno/prodotti-per-la-casa.html"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Accessori per il bagno & Asciugamani (product-axis parent)",
+   "qty": 306,
+   "issue": "EXCLUDED AS PARENT URL + DUPLICATE NAV PATH (rules 24/28): H&M runs two parallel nav axes ('Acquista per stanza' and 'Acquista per prodotto') over one catalogue. This is the product-axis parent of the same bathroom assortment; it has 4 live children. Not recorded, not aggregated. Its View All twin /acquista-per-prodotto/accessori-bagno/vedi-tutto.html returns the identical 306 and is excluded under rule 25.",
+   "link": "https://www2.hm.com/it_it/home/acquista-per-prodotto/accessori-bagno.html"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Accessori per il bagno (product-axis duplicate path)",
+   "qty": 75,
+   "issue": "DUPLICATE NAV PATH - NOT RECORDED to avoid double counting. Same h1 ('Accessori per il bagno') and same catalogue node as the recorded room-axis /acquista-per-stanza/bagno/accessori.html (77). The 77 vs 75 drift is two items that are room-tagged but not product-tagged. Recorded the room-axis URL because 'Bagno' is the node the site itself names Bathroom (rule 23). Same handling as SR 89 H&M Home UK (86 vs 85 there).",
+   "link": "https://www2.hm.com/it_it/home/acquista-per-prodotto/accessori-bagno/accessori.html"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Asciugamani (product-axis parent)",
+   "qty": 173,
+   "issue": "ROUTED TO TEXTILE + EXCLUDED AS PARENT (rules 15/20/24): the product-axis towel parent, which unlike the room-axis towel node does have four children. All four are listed below.",
+   "link": "https://www2.hm.com/it_it/home/acquista-per-prodotto/accessori-bagno/asciugamani.html"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Asciugamani > Teli Bagno",
+   "qty": 84,
+   "issue": "ROUTED TO TEXTILE: bath towels/sheets (rule 15). Deepest towel leaf on the product axis.",
+   "link": "https://www2.hm.com/it_it/home/acquista-per-prodotto/accessori-bagno/asciugamani/teli-bagno.html"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Asciugamani > Asciugamani piccoli",
+   "qty": 48,
+   "issue": "ROUTED TO TEXTILE: hand towels (rule 15). Deepest towel leaf.",
+   "link": "https://www2.hm.com/it_it/home/acquista-per-prodotto/accessori-bagno/asciugamani/asciugamani-piccoli.html"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Asciugamani > Per Ospiti",
+   "qty": 27,
+   "issue": "ROUTED TO TEXTILE: guest towels (rule 15). Deepest towel leaf.",
+   "link": "https://www2.hm.com/it_it/home/acquista-per-prodotto/accessori-bagno/asciugamani/per-ospiti.html"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Asciugamani > Teli da mare",
+   "qty": 3,
+   "issue": "ROUTED TO TEXTILE: beach towels - textile, and not bathroom at all; listed only because it is the fourth child of the product-axis Asciugamani node and would otherwise be a silent skip.",
+   "link": "https://www2.hm.com/it_it/home/acquista-per-prodotto/accessori-bagno/asciugamani/teli-mare.html"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Tappeti e Tappetini Bagno (product-axis duplicate path)",
+   "qty": 43,
+   "issue": "ROUTED TO TEXTILE + DUPLICATE NAV PATH: product-axis twin of the room-axis bath-mat node (42). Textile either way.",
+   "link": "https://www2.hm.com/it_it/home/acquista-per-prodotto/accessori-bagno/tappetini-bagno.html"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Tende Doccia (product-axis duplicate path)",
+   "qty": 15,
+   "issue": "ROUTED TO TEXTILE + DUPLICATE NAV PATH: product-axis twin of the room-axis shower-curtain node, identical at 15 (rule 20/28).",
+   "link": "https://www2.hm.com/it_it/home/acquista-per-prodotto/accessori-bagno/tende-per-la-doccia.html"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Decorazioni > Specchi",
+   "qty": 21,
+   "issue": "ROUTED TO DECOR (rules 2/11/21/29). Inspected in full and not skipped, per rule 10. It sits under Home > Acquista per prodotto > Decorazioni, NOT under Bagno, and the Bagno room nav has no mirror child at all. Enumerated: 'Specchio Con Cornice In Legno', 'Specchio Grande Mirza', 'Specchio da tavolo in marmo', 'Specchio asimmetrico', 'Specchio Fred', 'Specchio Grande Skeppsvik' - decorative wall and table mirrors, none described as a bathroom, vanity, LED, illuminated, demister or cabinet mirror. Same call as SR 89 H&M Home UK (33 there).",
+   "link": "https://www2.hm.com/it_it/home/acquista-per-prodotto/decorazioni/specchi.html"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Contenitori > Cesti per la biancheria",
+   "qty": 13,
+   "issue": "ROUTED TO STORAGE: the Contenitori (storage) department's laundry-basket node. Recorded here only as the evidence that Bagno > Sacche da lavanderia (13) is the same Storage-owned assortment reached through the bathroom room nav - the two counts are identical.",
+   "link": "https://www2.hm.com/it_it/home/acquista-per-prodotto/contenitori/portabiancheria.html"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Trend stagionale > Contenitori per il bagno",
+   "qty": 5,
+   "issue": "EXCLUDED PER RULE 25 (seasonal/trend page, not a catalogue node). Its 5 products ('Portadischetti in metallo', 'Portaoggetti in metallo', 'Vassoio a due piani', 'Portagioielli in metallo') are all already inside the recorded Contenitori (21) node. Logged so it is not a silent skip.",
+   "link": "https://www2.hm.com/it_it/home/trend-stagionale/contenitori-per-il-bagno.html"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Up to 40% > Bathroom",
+   "qty": 0,
+   "issue": "EXCLUDED PER RULE 25 (promotional/sale page) and empty in any case - renders '0 prodotti', totalHits 0.",
+   "link": "https://www2.hm.com/it_it/home/up-to-40/bathroom.html"
+  }
+ ],
+ "_reconstructed_from": "Bathroom.xlsx delivered 2026-09-01 (checkpoint), not original worker JSON"
+}

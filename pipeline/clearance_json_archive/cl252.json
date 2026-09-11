@@ -1,0 +1,16 @@
+{
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "Same site/access as bs252/na252 (curl tier-1 hit a sustained 429 mid-session, escalated to Playwright tier-2 which succeeded; curl recovered later for products.json spot-checks). Nav discovery: the mega-menu's 'Offers' tab (/collections/sale) contains 3 sibling promo collections: 'clearance-sale' (menu-labelled '40% OFF'), 'open-box' ('Open Box Sale'), and 'only-one' ('Only One'). All 3, plus the /collections/sale hub itself, were opened and evaluated individually against the Clearance-vs-Sale test. RESULT: (1) /collections/sale itself EXCLUDED - its own H1 reads 'Sale - Big Savings on Home Decor & Luxury Lighting', a generic promotional multi-category sale hub with no clearance/outlet/permanence signal (206 products). (2) /collections/clearance-sale INCLUDED, no ambiguity flag - although its on-page promo H1 is only 'Get Upto 40% Off' and the nav badge calls it '40% OFF', the page's own <title> tag and meta description explicitly say 'Shop Clearance Sale Home Decor Online at Whispering Homes' / 'Discover unbeatable savings at our ... Clearance Sale!', and its URL handle is literally 'clearance-sale' - this is the site's own taxonomy naming it Clearance. (3) /collections/open-box INCLUDED, no ambiguity flag - its <title> tag is literally 'Open Box Clearance Sale - Up to 50% Off on Home Decor products' (the site's own words use 'Clearance' directly) and its meta description confirms permanent-markdown/outlet framing: 'products are fully functional with only minor imperfections and non-returnable. Stock is limited.' (4) /collections/only-one EXCLUDED - despite the intriguing name, its H1 is 'Only One: Unique Decor & Lighting Designs' and on-page body copy repeatedly frames it as a one-of-a-kind DESIGN/STYLE curation ('Unique pieces can give your interiors more personality...', 'A single distinctive object can become a focal point') with zero last-chance/limited-stock/clearance language anywhere on the page - this is a merchandising style theme, not a clearance concept, so it was not recorded even as an ambiguous row. QTY METHOD: the site's collection pages default to an in-stock-only rendered view (confirmed via an in-page dev comment referencing 'filter.v.availability=1'); the rendered #ProductCount figure was used as qty. The raw /collections/<handle>/products.json feed (all-time collection membership incl. out-of-stock items) returns notably higher counts for both included rows - clearance-sale: 460 raw vs 245 rendered; open-box: 67 raw vs 25 rendered - consistent with this project's established pattern that a storefront membership/count API can overstate the actually-available PLP count; the rendered figure actually shown to a visitor was trusted.\n\n[POLICY UPDATE 2026-09-11 PASS 3] Removed 1 Open Box row(s) per user directive: Open Box is not Clearance.",
+  "rows": [
+    {
+      "category": "Clearance",
+      "sub_category": "Clearance Sale (40% Off)",
+      "qty": 245,
+      "link": "https://www.whisperinghomes.com/collections/clearance-sale",
+      "is_group": false,
+      "evidence": "#ProductCount span: '245 products' (rendered via Playwright); page <title> = 'Shop Clearance Sale Home Decor Online at Whispering Homes'; meta description references 'Clearance Sale'",
+      "flag": null
+    }
+  ]
+}

@@ -1,0 +1,88 @@
+{
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ACCESS: direct curl_cffi, chrome124/chrome131/chrome120 desktop profiles, HTTP 200 on every request, no proxy, no retries needed (plain python-requests is 403'd by Akamai). Platform is IBM WebSphere Commerce / Cornerstone Brands React PWA with an Unbxd grid layer - identical mechanics to the sibling Ballard Designs site, and the same route the Furniture pass used. robots.txt was fetched FIRST (3,868 bytes): one 'User-agent: *' group plus an 'AdsBot-Google' group; it names NO anthropic-ai, ClaudeBot or Claude-Web agent, declares no Crawl-delay, and disallows nothing under /bed-bath/ or /indoor-furniture/bathroom-furniture/ (its Disallow list is checkout/account/registry controllers, /catalogs, /hidden-categories, several sale landing pages, and specifically /indoor-furniture/dining-room/* - a dining path, not touched here). probe.py's 2s per-host gap was applied throughout. TREE: taken from the site's OWN nav API https://www.frontgate.com/JSONAPIs?module=categories (9 top departments, 413 nodes, each with categoryId + targetURL) - no URL was guessed. Bathroom content sits in exactly two places in that tree: (1) Furniture [79671] > Bathroom [233661] /indoor-furniture/bathroom-furniture/ with children Bathroom Vanities [257161], Bathroom Furniture & Storage [233662], Vanity Stools [233663]; and (2) Bed & Bath [12055] > Bath [198230] /bed-bath/bath/ with children Bath Towels [198235], Bath Rugs & Mats [198234], Bathroom Accessories [198233], Bathroom Furniture & Storage [198232], Bathroom Vanities [248660], Vanity Stools [257654], Candles & Home Fragrance [198231]. The whole 413-node tree was grepped for bath|shower|mirror|vanity|towel|toilet|sink|basin|faucet|tap|sanitary|soap|robe: Frontgate sells NO sanitaryware, baths, showers, enclosures, toilets, basins or taps at all - there is no such node anywhere - so the Bathroom footprint here is vanities, bath storage furniture and bath accessories/hardware only. NAV ALIASES COLLAPSED (this is the key finding, it prevents three duplicate rows): the three Bed & Bath duplicates are dead shells. categoryIds 248660, 198232 and 257654 each return numberOfProducts = 0 from the storefront's own grid API, and fetching their URLs shows the server resolves them to the Furniture-department URLs instead - /bed-bath/bath/bathroom-vanities/ resolves to /indoor-furniture/bathroom-furniture/bathroom-vanities/ and serves categoryId 257161; /bed-bath/bath/bathroom-furnishings/ resolves to /indoor-furniture/bathroom-furniture/bathroom-furnishings/ (233662); /bed-bath/bath/vanity-stools/ resolves to /indoor-furniture/bathroom-furniture/vanity-stools/ (233663). Only the canonical /indoor-furniture/bathroom-furniture/ URLs are recorded. Likewise /bed-bath/bath/home-fragrance/ resolves out of the Bath department entirely, to /lighting-decor/indoor-decor-accessories/candles-home-fragrance. QTY: the storefront's own PLP grid controller https://www.frontgate.com/UnbxdAPI?categoryId=<id>&returnRespAsJSON=true&isAPI=true&requesttype=ajax with header 'CBI-AJAX: 1' -> numberOfProducts. That structured number was NOT trusted on its own: every node was paged with &unbxdStart to exhaustion and the returned tiles counted, and the enumerated tile count equalled numberOfProducts EXACTLY on all nine nodes touched - Bathroom Accessories 26/26, Bathroom Vanities 30/30, Bathroom Furniture & Storage 38/38, Vanity Stools 16/16, Bath Rugs & Mats 14/14, Bath Towels 26/26, Mirrors 33/33, Bath parent 70/70, Furniture>Bathroom parent 58/58. Every count was then read a second time in a separate pass with identical results (zero drift). Counts discriminate properly (14 to 70, nine distinct values, no round display cap, no site-wide constant) and each leaf is below its parent (Bathroom Vanities 30 and Bathroom Furniture & Storage 38 under Furniture>Bathroom 58; Bathroom Accessories 26 under Bath 70). Note this platform renders one tile per colourway, so the site's own reported number IS the tile count, which is exactly what numberOfProducts returns. VERIFICATION OF IDENTITY: each recorded URL was re-fetched with ?templateInfo=true, returned HTTP 200 resolving to ITSELF, and carried its own categoryId in the served page (198233, 257161, 233662) - so no page was counted against the wrong node. CONTENT CHECK (every recorded leaf was enumerated by name, not just counted): Bathroom Vanities = 30 bath vanity units (Regency Bow Front 36\" Single Bath Vanity, Etienne 72\" Double Bath Vanity, Olivier 27\" Powder Bath Vanity ...) -> rule 9. Bathroom Furniture & Storage = 38 bath vanities plus bath storage cabinets and bath furniture collections (Miro Teak Bath Furniture Collection, Frontgate Resort Collection Bath Storage Collection, Regency/Brando/Angelina/Kamila Storage Cabinet, Annecy Bath Collection) -> rules 9 and 12. Bathroom Accessories = 26 tiles that are predominantly genuine bathroom accessories and hardware (Frontgate Resort Collection Bathroom Hardware, Bath Accessories, Maison/Padova/Bern/Bowen/Newham Bath Accessories, Alisa and Woven Bath Accessories by Labrazel, Roma Alabaster Collection, Dalton/Andria/Pomaria/Holly Wreath Countertop Collections, Casafina Taormina and Costa Nova Brisa Countertop Accessories, Personalized Vanity Trays, and three bathroom mirrors - Frontgate Resort Collection LED Vanity Mirror, LED Articulating Rechargeable Vanity Mirror, Zadro LED Cordless Dual-sided Mirror, all Bathroom under rules 10/11 since primary type is mirror not lighting) -> rules 13, 17, 18. A minority of tiles in that node are textiles (Plush Robe, Hair Wrap, Plush Slippers, Guest Towels, Turkish Hand Towel, Vienna Shower Curtain); the node's own primary type and the site's own hierarchy label are Bathroom Accessories, so the node stays in Bathroom per rule 2 and is recorded once at its site-reported total of 26 - no partial or derived count was invented. PARENTS SUPPRESSED (rule 24): Bath [198230] and Furniture>Bathroom [233661] both have extractable children, so they are emitted as grouping rows with blank qty and blank URL; for the record their own API totals are 70 and 58, and those numbers are roll-ups whose children overlap (the same Etienne/Regency vanities appear in both Bathroom Vanities and Bathroom Furniture & Storage), which is exactly why no aggregation was attempted. EXCLUDED: /sale/outlet/bed-bath/bath/ 'Bath Clearance' and /bed-bath/special-savings/ (promotional/clearance pages, rule 25); /whats-new/resort-collection/bath-accessories/ and /whats-new/resort-collection/bath-towels/ and /whats-new/new/bed-bath/ (New & Trending promotional shells, rule 25); /bed-bath/resort-collection/ and /bed-bath/discover/guest-essentials/ (brand collection / edit pages, rule 25); /bed-bath/pool-beach-towels/ and /outdoor/pool-beach/towels-stands/ (pool and beach towels, not bathroom, and textile anyway); /bed-bath/bath/home-fragrance/ (resolves to the Lighting & Decor candles node, rule 21 -> Decor); /lighting-decor/indoor-lighting/* including Wall Lighting & Sconces (general room lighting - there is no bathroom or vanity lighting node on this site, so rule 19 had nothing to route); /indoor-furniture/bedroom-furnishings-storage/vanity-desks-storage/ and /vanity-stools/ (bedroom dressing-table furniture, rule 29 disambiguation - 'vanity' here means a bedroom dressing table, not a bathroom vanity unit). || CROSS-FILE DEDUP: 2 leaf record(s) removed as already extracted in a prior category workbook. See Review sheet.",
+ "rows": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Accessories",
+   "qty": 26,
+   "link": "https://www.frontgate.com/bed-bath/bath/bathroom-accessories/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  }
+ ],
+ "review": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Furniture > Bathroom > Vanity Stools",
+   "qty": 16,
+   "issue": "ROUTED TO FURNITURE: primary product type is a seating stool/chair, not a bathroom fixture, cabinet or vanity unit (rule 2 - primary product type outranks room/hierarchy). All 16 enumerated tiles are stools or chairs (Jules Rectangular Vanity Stool, Loretta Vanity Stool, Alana Vanity Chair, Lyla Swivel Vanity Stool, Angelina Accent Stool, Reba Accent Stool ...); rule 9's bathroom-furniture list covers vanity units/cabinets/storage, not seating. Frontgate itself files an identical node under Bedroom (/indoor-furniture/bedroom-furnishings-storage/vanity-stools/, categoryId 79687), which confirms it is a seating type, not a bathroom-only type. The Furniture pass already recorded this exact URL as Furniture (16), so pulling it into Bathroom would also duplicate across category files.",
+   "link": "https://www.frontgate.com/indoor-furniture/bathroom-furniture/vanity-stools/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bed & Bath > Bath > Bath Towels",
+   "qty": 26,
+   "issue": "ROUTED TO TEXTILE: bath/hand/guest towels (rules 15 and 20). All 26 enumerated tiles are woven towels (Frontgate Resort Collection Bath Towels, Egyptian Cotton Bath Towels, Nyah Damask Bath Towels, Turkish Hand Towel Set of Two, Fingertip Towels ...). The node has six named sub-collections in the nav (/bath-towels/resort-towel/, /organic/, /quick-dry/, /egyptian-cotton/, /border-trim/, /ladder-stitch/) but every one of those categoryIds (278656, 278657, 283197, 278658, 278659, 278660) returns numberOfProducts = 0 from the storefront's own grid API, i.e. they are empty collection landing shells, so Bath Towels is the real listing node and is recorded here once.",
+   "link": "https://www.frontgate.com/bed-bath/bath/bath-towels/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bed & Bath > Bath > Bath Rugs & Mats",
+   "qty": 14,
+   "issue": "ROUTED TO TEXTILE: textile bath rugs and bath mats (rule 16 - textile bath mat goes to Textile). All 14 enumerated tiles are woven/tufted/memory-foam textile rugs and mats (Skid-resistant Bath Rug, Memory Foam Bath Rug, Naomi Vintage Bath Rug, Ladder Stitch Bath Mat, Reversible Bath Rug ...). No rubber or hard anti-slip bathroom-accessory mat is present, so nothing in this node stays in Bathroom.",
+   "link": "https://www.frontgate.com/bed-bath/bath/bath-rugs/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Lighting & Decor > Wall Art & Mirrors > Mirrors",
+   "qty": 33,
+   "issue": "ROUTED TO DECOR: not a Bathroom node. Frontgate files it under Lighting & Decor > Wall Art & Mirrors, with no bathroom parent anywhere above it, and all 33 enumerated tiles are decorative wall/floor/console mirrors (Graciella Old World Oval Wall Mirror, Venus Floor Mirror, Marigot Shell Wall Mirror, Loren Jewelry Storage Mirror ...). Zero bathroom, vanity, LED/illuminated, medicine-cabinet, shaving or magnifying mirrors in the set, so rules 10/11 do not pull it into Bathroom. Frontgate's genuine bathroom mirrors (Frontgate Resort Collection LED Vanity Mirror, LED Articulating Rechargeable Vanity Mirror, Zadro LED Cordless Dual-sided Mirror) live inside Bath > Bathroom Accessories, which IS recorded in rows. Listed here only so the mirror node is not silently skipped.",
+   "link": "https://www.frontgate.com/lighting-decor/art/indoor-mirrors/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Vanities",
+   "qty": 30,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Bathroom Vanities' - excluded from Bathroom per cross-category dedup (master guide s13)",
+   "link": "https://www.frontgate.com/indoor-furniture/bathroom-furniture/bathroom-vanities/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Furniture & Storage",
+   "qty": 38,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Bathroom Furniture & Storage' - excluded from Bathroom per cross-category dedup (master guide s13)",
+   "link": "https://www.frontgate.com/indoor-furniture/bathroom-furniture/bathroom-furnishings/"
+  }
+ ],
+ "_reconstructed_from": "Bathroom.xlsx delivered 2026-09-01 (checkpoint), not original worker JSON"
+}

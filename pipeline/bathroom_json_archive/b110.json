@@ -1,0 +1,56 @@
+{
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ACCESS: robots.txt fetched FIRST (https://www.butlers.com/robots.txt, 200, 5530 bytes). NO group names ClaudeBot, anthropic-ai or Claude-Web - the full text was grepped for 'claude|anthropic', zero hits. Groups present: '*', adsbot-google, Nutch (Disallow: /), AhrefsBot (Crawl-delay: 10), AhrefsSiteAudit. The '*' group carries no Crawl-delay and no blanket Disallow. Disallows that constrain this run: /search, /collections/*sort_by*, /collections/*+* and %2B/%2b variants, */collections/*filter*&*filter*, /checkout, /cart, /account, /policies/. I requested NO sort_by, NO multi-filter and NO /search URL. Only a bare '?page=2' pagination parameter was used, which is not disallowed. Sitemap declared: https://www.butlers.com/sitemap.xml. probe.fetch() (curl_cffi, safari17_2_ios/chrome rotation) with its 2s/host pacing; every request returned HTTP 200.\nTREE (from the site's own mega-menu, not guessed): homepage https://www.butlers.com/ (200, 696600 bytes) renders the complete Shopify mega-menu server-side. Located the branch by finding the literal 'bad-wellness' node in the header <nav>: <summary data-link=\"/collections/bad-wellness\">Bad &amp; Wellness</summary> followed by its dropdown__nav <ul> listing EXACTLY five children in this order: Bad-Accessoires (/collections/bad-accessoires), Handtuecher (/collections/handtuecher), Duschvorhaenge (/collections/duschvorhaenge), Badmoebel (/collections/badmoebel), Raumduefte & Diffuser (/pages/raumdufte-von-butlers). Bad & Wellness itself sits under the DEKO & WOHNEN top-level menu. Cross-checked against the site's own collection sitemap https://www.butlers.com/sitemap_collections_1.xml (200, 172 collections, the complete list): the ONLY bathroom-vocabulary collections in the entire store are bad-wellness, bad-accessoires, badmoebel and duschvorhaenge. Searched all 172 handles for bad|wellness|dusch|wc|toilet|seife|spiegel|zahn|wanne|handtuch|kosmetik|waschbecken|sanitaer - no mirror collection, no sanitaryware, no taps, no baths, no showers exist on this store at all. Depth check: fetched bad-accessoires and badmoebel and stripped header/footer/nav - neither exposes any sub-collection of its own (the in-body /collections/ links are SEO cross-links to sibling nodes Koerbe/Handtuecher/Duschvorhang), so both are true deepest leaves. Bad & Wellness is therefore a grouping row with blank qty and blank link (rules 24, 38).\nQTY SOURCE + PROOF: Butlers is Shopify and renders its own exact total in the PLP toolbar as 'N von M Produkten' (or 'N Produkte' when the collection fits one page). Read from the rendered DOM: Bad & Wellness '24 von 96 Produkten' = 96; Bad-Accessoires '24 von 35 Produkten' = 35; Badmoebel '3 Produkte' = 3; Handtuecher 12; Duschvorhaenge 4. EQUIVALENCE PROVEN on five collections of five different sizes against the storefront's own collection endpoint /collections/<handle>/products.json?limit=250 (paginated to exhaustion): bad-wellness 96, bad-accessoires 35, badmoebel 3, handtuecher 12, duschvorhaenge 4 - an exact match to the rendered figure in every case, so the rendered total is the true product count and not a page-window artefact. Pagination cross-check: https://www.butlers.com/collections/bad-accessoires?page=2 returns HTTP 200, H1 'Bad-Accessoires', and still reports total 35, confirming a real second page behind the 24-per-page window. Counts discriminate (96/35/12/4/3 - not a site-wide constant) and each page's H1 matched the node requested ('Bad & Wellness', 'Bad-Accessoires', 'Badmoebel', 'Handtuecher', 'Duschvorhaenge').\nPARENT NOT RECORDED: Bad & Wellness (96) has valid children, so rule 24 forbids recording it. Its number is NOT reused for any child and no siblings were summed. The 96 is fully explained: diffing the parent's 96 product handles against the union of the four child collections leaves 48 residual products, and all 48 are room-fragrance SKUs (Raumduft / Raumspray / Duftoel / Raeucherstaebchen / Aroma Diffuser) belonging to the fifth, non-listing nav child Raumduefte & Diffuser -> Decor. So no bathroom product is stranded in the parent and no bathroom leaf is missed.\nDEDUP: already_extracted() run on every candidate leaf. HIT: /collections/badmoebel -> Furniture.xlsx, company 'Butlers', sub_category 'Bathroom Furniture' -> review[], never rows[] (OPTION 1). NO HIT: /collections/bad-accessoires, /collections/bad-wellness, /collections/handtuecher, /collections/duschvorhaenge, /collections/koerbe.\nEXCLUDED / WHY: Koerbe (baskets) is a child of Wohnaccessoires, not of Bad & Wellness - general Storage, rules 30-33, not re-extracted. Muelleimer (bins) sits under Tisch & Kueche, not Bad. Lampen branch is general Lighting with no bathroom-lighting node. No View All / Shop All / 'all' collection, no /search, no PDP and no promotional collection (sale, neu, aktion-*, geschenkideen*, manual_*, tax_*) was recorded. NET RESULT: one recordable Bathroom leaf, Bad-Accessoires (35).",
+ "rows": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bad & Wellness",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bad-Accessoires",
+   "qty": 35,
+   "link": "https://www.butlers.com/collections/bad-accessoires",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  }
+ ],
+ "review": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bad & Wellness > Badmoebel (Bathroom Furniture)",
+   "qty": 3,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Bathroom Furniture'. OPTION 1 policy: bathroom furniture/cabinets already taken by the Furniture pass stay in Furniture and are NOT re-extracted into Bathroom, even though rule 9 would otherwise class this node as Bathroom. Rendered total on the page: '3 Produkte'; collection products.json returns exactly 3.",
+   "link": "https://www.butlers.com/collections/badmoebel"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bad & Wellness > Handtuecher (Towels)",
+   "qty": 12,
+   "issue": "ROUTED TO TEXTILE: primary product type is bath/hand towels - textile (rules 15, 20). Sits inside the Bad & Wellness mega-menu branch, so recorded here rather than silently skipped.",
+   "link": "https://www.butlers.com/collections/handtuecher"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bad & Wellness > Duschvorhaenge (Shower Curtains)",
+   "qty": 4,
+   "issue": "ROUTED TO TEXTILE: shower curtains are explicitly Textile (rule 20). Sits inside the Bad & Wellness mega-menu branch.",
+   "link": "https://www.butlers.com/collections/duschvorhaenge"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bad & Wellness > Raumduefte & Diffuser (Room Fragrance & Diffusers)",
+   "qty": null,
+   "issue": "ROUTED TO DECOR: fifth child of the Bad & Wellness mega-menu branch, but its nav target is a /pages/ editorial landing page, NOT a product listing collection, so it carries no rendered product total and is not a recordable leaf under rule 27. Primary product type is room fragrance (Raumduft, Raumspray, Duftoel, Raeucherstaebchen, Aroma Diffuser) -> Decorative Home Accessories (rule 21). This branch is what accounts for the parent's residual: the Bad & Wellness collection holds 96 products, of which 48 belong to no nav child and are ALL room-fragrance items (verified by title/handle diff against the four child collections).",
+   "link": "https://www.butlers.com/pages/raumdufte-von-butlers"
+  }
+ ],
+ "_reconstructed_from": "Bathroom.xlsx delivered 2026-09-01 (checkpoint), not original worker JSON"
+}

@@ -1,0 +1,88 @@
+{
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "ACCESS: confirmed today (2026-09-02) that all live www.qvc.com listing pages remain behind Akamai Bot Manager returning HTTP 418 to every route tried (plain curl, and curl_cffi impersonating chrome124/chrome120/safari17_0/edge101) -- same hard block documented in the prior Home-Decor pass for SR79. robots.txt has no Claude/Anthropic-specific disallow (generic 'User-agent: *  Allow: /'), so Claude-in-Chrome would be permitted, but was not needed: category discovery used the site's own unblocked XML nav sitemap (sitemap-us-navigation-for-the-home.xml, 200 OK) and qty came from the unblocked api.qvc.com product-search API (api/product/v5/us/search), same technique validated in the prior pass. DISCOVERY: searched all department nav sitemaps (for-the-home, garden-and-outdoor-living, beauty, electronics, fashion, handbags-and-luggage, health-and-fitness, jewelry, kitchen-and-food, shoes) for 'pet' -- the only real pet department is For the Home > Pet Supplies (groupId xsfzqx); garden-and-outdoor-living and all other departments have none (one 'health-and-fitness' hit was a false positive substring match inside 'appetizers'). QTY METHOD: for the parent (xsfzqx) and each of its 8 leaf subcategories, queried api.qvc.com with groupId=<id> and three pass-through stopword searchTerms ('the'/'for'/'home') -- all three returned an identical totalElements for every node (parent 911; children 346/125/55/84/113/11/142/55), proving the stopwords do not filter. Independently cross-verified every child count by browsing the parent's own 'Category' refinement facet under groupId=xsfzqx, which listed the identical 8 subcategories with identical counts -- double confirmation, not estimation. Sum of the 8 children (931) slightly exceeds the parent total (911), i.e. ~20 products are cross-listed in 2 subcategories on QVC's own site; this is the site's own overlap, not a counting error, and is why parent is left as a null-qty grouping row per the no-double-count rule rather than backed into from children. EXCLUDED: two orphaned sitemap URLs, .../pet-supplies/storage-and-organization/-/qd3ump-xsfzqx/c.html and .../pet-supplies/carriers-and-cages/storage-and-organization/-/l89abm-qd3ump/c.html, do NOT appear as entries in the live 'Category' facet under xsfzqx (only the 8 rows below exist there) and their compound groupId is not a queryable API id (returns a metadata-only response, no totalElements) -- treated as stale/auto-generated cross-facet sitemap artifacts, not real distinct leaf categories, and dropped rather than guessed at. CONTENT CHECK: drilled into Grooming & Health's own 'Type' facet (Grooming Tools/Supplies, Training Tools/Pads, Pet Waste Bags, Cleaning Supplies, Ramps, Collars, Travel) -- all Tier-1 grooming/training/hygiene, no medical/veterinary or supplement items found, so no PET MEDICAL flag warranted. Drilled into Toys & Treats' own 'Type' facet: 41/55 Toys, and only 1/55 is 'Treats' -- overwhelmingly a toy category, not a genuine treat/food category, so no PET CONSUMABLE flag raised (noted here per the brief's instruction to record the check rather than silently apply a policy). All 8 subcategory names and sitemap URLs come directly from QVC's own sitemap-us-navigation-for-the-home.xml; page rendering could not be visually confirmed (host-wide 418 block) but this mirrors the same verified-URL methodology the prior successful Home-Decor pass used for the same site.",
+  "rows": [
+    {
+      "category": "Pet Supplies",
+      "sub_category": "Pet Supplies",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Pet Supplies",
+      "sub_category": "Beds & Houses",
+      "qty": 346,
+      "link": "https://www.qvc.com/c/for-the-home/pet-supplies/beds-and-houses/-/br4zza/c.html",
+      "is_group": false,
+      "evidence": "api.qvc.com/api/product/v5/us/search?searchTerm={the,for,home}&groupId=br4zza -> totalElements=346 for all 3 stopword terms (pass-through convergence); confirmed identical via parent xsfzqx's own Category facet value 'Beds & Houses'=346",
+      "flag": null
+    },
+    {
+      "category": "Pet Supplies",
+      "sub_category": "Bowls & Storage",
+      "qty": 125,
+      "link": "https://www.qvc.com/c/for-the-home/pet-supplies/bowls-and-storage/-/2g8rjh/c.html",
+      "is_group": false,
+      "evidence": "api.qvc.com search groupId=2g8rjh -> totalElements=125 for all 3 stopword terms; confirmed via parent Category facet 'Bowls & Storage'=125",
+      "flag": null
+    },
+    {
+      "category": "Pet Supplies",
+      "sub_category": "Carriers & Cages",
+      "qty": 55,
+      "link": "https://www.qvc.com/c/for-the-home/pet-supplies/carriers-and-cages/-/l89abm/c.html",
+      "is_group": false,
+      "evidence": "api.qvc.com search groupId=l89abm -> totalElements=55 for all 3 stopword terms; confirmed via parent Category facet 'Carriers & Cages'=55",
+      "flag": null
+    },
+    {
+      "category": "Pet Supplies",
+      "sub_category": "Collars & Leashes",
+      "qty": 84,
+      "link": "https://www.qvc.com/c/for-the-home/pet-supplies/collars-and-leashes/-/kge1hd/c.html",
+      "is_group": false,
+      "evidence": "api.qvc.com search groupId=kge1hd -> totalElements=84 for all 3 stopword terms; confirmed via parent Category facet 'Collars & Leashes'=84",
+      "flag": null
+    },
+    {
+      "category": "Pet Supplies",
+      "sub_category": "Grooming & Health",
+      "qty": 113,
+      "link": "https://www.qvc.com/c/for-the-home/pet-supplies/grooming-and-health/-/1jcwyn0/c.html",
+      "is_group": false,
+      "evidence": "api.qvc.com search groupId=1jcwyn0 -> totalElements=113 for all 3 stopword terms; confirmed via parent Category facet 'Grooming & Health'=113; own Type facet shows Grooming Tools/Supplies, Training Tools/Pads, Pet Waste Bags, Cleaning Supplies, Ramps, Collars, Travel -- no medical/veterinary items found",
+      "flag": null
+    },
+    {
+      "category": "Pet Supplies",
+      "sub_category": "Odor Control",
+      "qty": 11,
+      "link": "https://www.qvc.com/c/for-the-home/pet-supplies/odor-control/-/1frfn9u/c.html",
+      "is_group": false,
+      "evidence": "api.qvc.com search groupId=1frfn9u -> totalElements=11 for all 3 stopword terms; confirmed via parent Category facet 'Odor Control'=11",
+      "flag": null
+    },
+    {
+      "category": "Pet Supplies",
+      "sub_category": "Pet Apparel",
+      "qty": 142,
+      "link": "https://www.qvc.com/c/for-the-home/pet-supplies/pet-apparel/-/sz88lr/c.html",
+      "is_group": false,
+      "evidence": "api.qvc.com search groupId=sz88lr -> totalElements=142 for all 3 stopword terms; confirmed via parent Category facet 'Pet Apparel'=142",
+      "flag": null
+    },
+    {
+      "category": "Pet Supplies",
+      "sub_category": "Toys & Treats",
+      "qty": 55,
+      "link": "https://www.qvc.com/c/for-the-home/pet-supplies/toys-and-treats/-/eluliv/c.html",
+      "is_group": false,
+      "evidence": "api.qvc.com search groupId=eluliv -> totalElements=55 for all 3 stopword terms; confirmed via parent Category facet 'Toys & Treats'=55; own Type facet shows 41/55 Toys and only 1/55 Treats, so treated as a toy category not a food/treat category",
+      "flag": null
+    }
+  ]
+}

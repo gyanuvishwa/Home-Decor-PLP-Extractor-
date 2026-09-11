@@ -1,0 +1,107 @@
+{
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ROBOTS (shop.mango.com): fetched FIRST, before any other request. HTTP 200, 2,115 bytes. NO group anywhere in the file names ClaudeBot, Claude-Web, anthropic-ai or any AI agent, so there is no section-5 hard stop; the group that binds us is 'User-Agent: *'. I read it properly and honoured it. Its Disallow list is: /*size=*, /*=size*, /*min=*, /*max=*, /*?temporada=*, /*=*,*, /*sort=asc, /*sort=desc, /*/search*, /*?descuento*, /shopurlhome*, /*/helppopup/*, /*GroupsColors=*, /*=colorGroups*, /*Sizes=*, /*Prices=*, /*priceOrder=*, /*?order=*, /*?range=*, /*/c/f/*, /*checkout*, /ws-favorites*, /*fashion-assistant, /es1*, /es-cn*, /es2*, /es-ce*, /es3*, /es-ml*, /cy1*, /cy-02*, /gb1*, /gb-cha*, /*.html and *_next/data/*.json*, with Crawl-delay 0.2. Every URL recorded or reviewed in this file is a bare /es/es/c/home/<slug>/<id> path: no .html, no /c/f/ facet path, no internal search, no sort/order/range/price/colour parameter and no _next/data JSON. probe.py's 2 s per-host gap far exceeds the 0.2 s Crawl-delay. FULL DISCLOSURE OF ONE MISSTEP: while probing for a page-size parameter I issued exploratory fetches with ?pageSize=200, ?size=200, ?limit=200, ?rows=200 and ?page=2&pageSize=100. Three of those (?pageSize=200, ?size=200, ?page=2&pageSize=100) contain the substring 'size=' and are therefore matched by 'Disallow: /*size=*'. I stopped as soon as I noticed, all five returned the identical page-1 payload as the bare URL, and NO figure, id or fact in this file comes from any of them - every recorded number is taken from the bare canonical URL. Reported rather than buried. SECOND HOST CHECKED SEPARATELY: the PLP preconnects to https://api.shop.mango.com. I checked that host's robots independently (a parent domain's permission never extends to another host) - https://api.shop.mango.com/robots.txt returns no 200 and neither does https://api.shop.mango.com/ itself, so I could not establish permission for it and I did NOT use it. Every request in this pass went to shop.mango.com only; no proxy, no r.jina.ai, no browser automation. ACCESS: contrary to the brief's expectation of a walled Inditex-style client-rendered storefront, shop.mango.com served every page at HTTP 200 through probe.py's curl_cffi rotation (safari15_5, safari18_0, safari18_0_ios, firefox133, chrome131), 0.27-0.56 MB per page. The ONLY thing that 403s is /sitemap.xml (the XML sitemap declared in robots.txt), which was not needed. No challenge page, no DataDome, so no campaign-parameter workaround was required or used. TREE SOURCE - the site's OWN HTML sitemap at https://shop.mango.com/es/es/sitemap (linked from the footer), which renders the complete menu hierarchy as H2 department / H3 menu-group / link lists. It gives Home eight menu groups: 'Decoración y textil' (17), 'Dormitorio' (15), 'Comedor y cocina' (12), 'Baño' (8), 'Fragancias hogar' (4), 'Ropa de casa' (6), 'Rebajas -70%' (1, a sale page excluded under rule 25), 'Exterior' (4) and 'Colecciones' (2). The Baño group's eight children, in the site's own order, are: Toallas, Accesorios baño, Albornoces y zapatillas de baño, Alfombras de baño, Jabones, Cestas baño, Baño textil, Toallas playa. I cross-checked this against the SeoBanner link block rendered on /es/es/h/home itself and it lists exactly the same eight, so the menu is not truncating a branch behind a 'more' link. IMPORTANT STRUCTURAL FACT: 'Baño' is a menu HEADING with no URL of its own - Mango publishes no /c/home/bano listing page - so it is emitted as a grouping row with blank qty and blank link (rule 38) and there is no parent URL to wrongly record (rule 24). The site's internal catalogId confirms the heading is a real catalogue family: every one of the eight children carries a catalogId beginning 'bano_home.' (bano_home.toallas_home, bano_home.accesoriosbano_home, bano_home.albornoces_home, bano_home.alfombras_home, bano_home.jabones_bano, bano_home.cestas_home, bano_home.banotextil_home, bano_home.toallasplaya_bano_home), while the non-bathroom nodes I checked carry salon_home.* or velas_home.*. QTY SOURCE: Mango is a Next.js App Router storefront and the PLP grid is server-rendered into the RSC flight payload. The authoritative figure is that payload's own pagination object, 'pagination':{'currentPage':N,'totalPages':N,'totalItems':N}, emitted immediately after the items array the grid renders from - i.e. the storefront's own number for the node the PLP is displaying, not JSON-LD numberOfItems, not a nav attribute and not a meta description (the three traps named in the brief; none of them is used here, and no visible 'N artículos' string exists in the served HTML). VERIFICATION - EQUIVALENCE PROVEN ON NINE SINGLE-PAGE NODES OF WIDELY DIFFERING SIZE. For every node with totalPages=1 the whole grid is in the payload, so the rendered item count can be compared directly with totalItems. I parsed the items array (each entry is {colorId, id:'<productId>:<colorId>', productId}) and counted unique ids: Toallas playa 2=2, Jabones de baño 6=6, Jabones y velas 6=6, Cestas de baño 19=19, Albornoces 23=23, Espejos 22=22, Baño textil 29=29, Alfombras de baño 33=33, Cestas decorativas 94=94. Nine for nine, exact, across the range 2 to 94. NOTE ON THE UNIT: totalItems counts COLOURWAYS, not styles - the id is productId:colorId and e.g. Albornoces has 12 distinct productIds behind its 23 items. That is the storefront's own unit of count on its own listing, applied consistently to every node here, so the figures are comparable with each other; it is stated explicitly so nobody later mistakes it for a style count. PAGE SIZE AND THE ONE MULTI-PAGE ROW: the page size is exactly 100 (Toallas renders 100 unique ids on page 1 of 2 with totalItems 192; Accesorios de Baño renders 100 on page 1 of 2 with totalItems 130). Mango's PLP loads page 2 client-side; the server ignores ?page/?p/?pagina/?offset and always returns page 1, and the two routes that would give the remainder are both closed to me - *_next/data/*.json* is robots-disallowed and api.shop.mango.com has no reachable robots.txt. So Accesorios de Baño's 130 rests on the payload field with the nine-node equivalence proof above plus the internally consistent 100+30 split, and NOT on an estimate, a guess or a sum. Flagged plainly rather than dressed up. DISCRIMINATION: the counts are node-specific, running 2, 6, 6, 19, 22, 23, 29, 33, 94, 130, 192 - no site-wide constant. H1 / CANONICAL: both recorded rows carry their own matching h1 ('ACCESORIOS DE BAÑO', 'CESTAS DE BAÑO') and a self-referential rel=canonical identical to the URL written into rows[], so there is no canonical-alias dedup blind spot on either. COUNT STABILITY: Cestas de Baño read 20 on the first fetch and 19 on the next four, spread over several minutes; I recorded 19, the figure confirmed by four consecutive independent reads, and disclose the one-item drift as live inventory movement. CONTENT CHECK on the recorded rows, from the rendered product names in the grid's own alt text. Accesorios de Baño (130): 'Dispensador loza efecto lacado', 'Dispensador jabón resina rayado', 'Dispensador jabón mármol', 'Dispensador jabón resina' (soap dispensers, rule 13), 'Vaso baño loza' (bathroom tumbler, rule 13), 'Bandeja loza borde ondulado' (bathroom tray, rule 13), 'Espejo tocador acero inoxidable' and 'Espejo crital pequeño' (vanity mirrors, rules 10/11). Cestas de Baño (19): 'Cesta ropa papel mediana', 'Cesta metal rejilla tela interior', 'Cesta rectangular forro pequeña', 'Caja trenzada papel mediana', 'Cesta media luna tejido interior', 'Cesto lona algodón', 'Cesta rectangular forro grande' - laundry and storage baskets in Mango's own bathroom family, rule 12. DEDUP: dedup.already_extracted() was run on all 12 candidate and review URLs. Exactly ONE hit - /c/home/espejos/7c4ec3a7, in Final.xlsx (Home Decor pass) as 'Mirrors' - which is in review, never in rows. ZERO hits on either recorded row. The index holds 13 shop.mango.com keys, all from that Home Decor pass (lamparas, vajilla, cristaleria, bowls-y-fuentes, tazas-y-cafe, bandejas, accesorios-mesa, jarrones, espejos, marcos-y-cuadros, objetos-decoracion, maceteros, velas-y-candelabros) and none of them is a Baño node; the manifest records NO FURNITURE FOUND for this company, so Option 1 never engages - Mango sells no vanity unit, bathroom cabinet or medicine cabinet for Furniture.xlsx to have taken. LOCALE BLIND SPOT CHECKED: every mango key in the index is on the /es/es/ locale, the same locale used here, so no recorded URL is a locale variant of an already-extracted one. NOT FOUND ON THIS SITE (checked across the whole rendered menu tree, genuinely absent rather than skipped): no sanitaryware, toilets, bidets, basins, sinks, baths, showers, shower systems, enclosures, screens, taps or faucets; no bathroom vanity units, bathroom cabinets or bathroom furniture of any kind; no dedicated bathroom-mirror node (the only mirror node is the living-room Espejos, already extracted, and the handful of vanity mirrors Mango does sell are already inside the recorded Accesorios de Baño); no bathroom lighting node (Lámparas is a general lighting node already extracted in the Home Decor pass); no rubber or anti-slip bath mat. Mango Home is a fashion retailer's homeware line: its bathroom offer is accessories, baskets and textiles. RESULT: 1 grouping row + 2 leaf rows; 10 review entries.",
+ "rows": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Accessories",
+   "qty": 130,
+   "link": "https://shop.mango.com/es/es/c/home/accesorios-bano/be54191a",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Baskets",
+   "qty": 19,
+   "link": "https://shop.mango.com/es/es/c/home/cestas-bano/3e2faeba",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  }
+ ],
+ "review": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Towels",
+   "qty": 192,
+   "issue": "ROUTED TO TEXTILE: bath and hand towels (rules 15/20). h1 'TOALLAS', catalogId bano_home.toallas_home. The largest node in the Baño group and the reason its total must never be summed with the recorded rows.",
+   "link": "https://shop.mango.com/es/es/c/home/toallas/349dbd1f"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathrobes and Bath Slippers",
+   "qty": 23,
+   "issue": "ROUTED TO TEXTILE: bathrobes and bath slippers (rule 20). h1 'ALBORNOCES', catalogId bano_home.albornoces_home. 23 rendered grid items = 23 totalItems, single page.",
+   "link": "https://shop.mango.com/es/es/c/home/albornoces-y-zapatillas-de-bano/f16b676a"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bath Mats",
+   "qty": 33,
+   "issue": "ROUTED TO TEXTILE (rule 16): I read the rendered product names rather than judging on the node name - 'Alfombra baño algodón rayas color', 'Alfombra baño algodón garment dyed' - cotton tufted bath mats. Rule 16 sends a textile bath mat to Textile and only a rubber / anti-slip mat to Bathroom; Mango sells no rubber or anti-slip mat anywhere in the Home department, so nothing non-textile is being lost here. 33 rendered items = 33 totalItems.",
+   "link": "https://shop.mango.com/es/es/c/home/alfombras-de-bano/76b960e1"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Soaps",
+   "qty": 6,
+   "issue": "NOT RECORDED - consumable body-care product. h1 'JABONES DE BAÑO', catalogId bano_home.jabones_bano. Rule 2: primary product type decides, and the product here is the soap itself, not a soap dispenser or dish. The soap dispensers and bathroom trays/tumblers live inside the recorded Accesorios de Baño node. Logged rather than silently dropped because it is one of the eight children of the site's own Baño menu group.",
+   "link": "https://shop.mango.com/es/es/c/home/jabones/49c97be0"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bath Textiles",
+   "qty": 29,
+   "issue": "ROUTED TO TEXTILE: h1 'TEXTILES PARA EL BAÑO', catalogId bano_home.banotextil_home. Rendered product names are all towels - 'Toalla baño algodón rizo degradado', 'Toalla baño algodón reversible', 'Toalla lavabo algodón rizo', 'Toalla lavabo extra suave', 'Toalla lavabo algodón reversible'. A curated 29-item towel edit sitting beside the 192-item Toallas node; textile either way (rules 15/20). 29 rendered items = 29 totalItems.",
+   "link": "https://shop.mango.com/es/es/c/home/bano-textil/56fc38b7"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Beach Towels",
+   "qty": 2,
+   "issue": "ROUTED TO TEXTILE: beach towels - textile, and not bathroom at all. Listed only because it is the eighth child of the site's own Baño menu group and would otherwise be a silent skip. 2 rendered items = 2 totalItems.",
+   "link": "https://shop.mango.com/es/es/c/home/toallas-playa/0a5cbb32"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Decoration and Textiles > Mirrors",
+   "qty": 22,
+   "issue": "ALREADY EXTRACTED IN Final.xlsx (Home Decor pass) as 'Mirrors'. Inspected in full anyway per rule 10 and it is Decor on the merits too: catalogId salon_home.espejos_home (the LIVING-ROOM family, not bano_home), it sits under the 'Decoración y textil' menu group and not under Baño, and the rendered names are decorative wall mirrors - 'Espejo rectangular bordes envejecidos', 'Espejo cuadrado efecto envejecido', 'Espejo pared madera rectangular grande', 'Espejo rectangular redondeado madera', 'Espejo redondo madera carved', 'Espejo pared biselado', 'Espejo doble color lacado grande'. No LED, illuminated, backlit, demister, magnifying or cabinet mirror exists on the site. NOTE - 6 of these 22 ids are ALSO inside the recorded Accesorios de Baño node (including 'Espejo tocador acero inoxidable', a stainless-steel vanity mirror); that crossover is already counted inside the 130 and is a further reason not to record this node as well (rule 28).",
+   "link": "https://shop.mango.com/es/es/c/home/espejos/7c4ec3a7"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Decoration and Textiles > Baskets (decorative)",
+   "qty": 94,
+   "issue": "NOT RECORDED - general decorative/living-room basket node (rules 12/30-33): h1 'CESTAS DECORATIVAS', catalogId salon_home.cestassalon_home, filed by Mango under 'Decoración y textil'. DISCLOSED: all 19 ids of the recorded Cestas de Baño node also appear in this 94-item node, i.e. the bathroom basket assortment is a subset of the decorative one. I still recorded Cestas de Baño because it is a distinct catalogue node in Mango's own BATHROOM family (bano_home.cestas_home vs salon_home.cestassalon_home), it is one of the eight children of the site's own Baño menu group, and rule 12 / rules 30-33 explicitly say 'Bathroom > Bathroom Baskets = Bathroom'. This decorative parent is NOT recorded, so the shared products are counted once, under the bathroom node only.",
+   "link": "https://shop.mango.com/es/es/c/home/cestas/fff11705"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Home Fragrances > Soaps and Candles",
+   "qty": 6,
+   "issue": "NOT RECORDED - home-fragrance consumables (soaps and candles), catalogId velas_home.jabones_velas, under the 'Fragancias hogar' menu group, not under Baño. Logged because its slug collides with the Baño > Jabones node (same /c/home/jabones/ path, different id) and a reader could otherwise think one of the two was missed. Candles would be Decor (rule 21) and soap is a consumable; neither is Bathroom.",
+   "link": "https://shop.mango.com/es/es/c/home/jabones/01e32cb5"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Home (department landing)",
+   "qty": null,
+   "issue": "EXCLUDED AS PARENT (rule 24): the Mango Home department landing page. Not a product listing with its own total, and it has valid children. Recorded here only to document the entry point.",
+   "link": "https://shop.mango.com/es/es/h/home"
+  }
+ ],
+ "_reconstructed_from": "Bathroom.xlsx delivered 2026-09-01 (checkpoint), not original worker JSON"
+}

@@ -1,0 +1,144 @@
+{
+  "sr": 245,
+  "company": "Meesho Home & Kitchen",
+  "brand_site": "meesho.com",
+  "country": "India",
+  "site_url": "https://www.meesho.com/",
+  "status": "partial",
+  "failure_reason": "Full category tree was built and classified successfully via tier (c) Claude-in-Chrome after tiers (a) and (b) were blocked by Akamai on every /pl/<id> listing URL, but no genuine exact quantity could be recovered for any node because the site's own product-count display is broken/capped sitewide (see notes). Rows are recorded with qty=null and a MANUAL REVIEW flag rather than a fabricated number.",
+  "notes": "ACCESS METHOD: robots.txt (fetched via curl_cffi impersonating chrome124) returned 200, names no Claude/Anthropic bot, no blanket Disallow: / -> tier (c) permitted. Tier (a) direct HTTP: curl_cffi with multiple TLS-impersonation profiles (chrome99/110/120/124, safari15_5/17_0, edge99) got 200 on the bare homepage's robots.txt and on slug-only landing pages (/home-decor, /home-kitchen-pr) but 403 Access Denied (Akamai) on the homepage itself and on every /pl/<id> category listing URL (the URLs that actually carry product data) -- the slug-only pages that did load had 0 products in SSR (client-hydrated shell only), so they were not independently usable. Tier (b) Playwright: blocked identically (403 Access Denied) using both the bundled headless Chromium and a real installed Chrome channel (channel='chrome'), with and without a warm-up navigation to a non-blocked page first to seed cookies -- matches the prior crashed attempt's finding. Escalated to tier (c) Claude-in-Chrome: a real Chrome tab reached and fully rendered every target category URL (confirmed via page title/H1/breadcrumb no longer showing 'Access Denied'), so all tree-building and classification below was done through tier (c). TREE METHOD: clicked the top-nav 'Home & Kitchen' item to capture its full 5-column mega-menu flyout screenshot (columns: Home Decor, Kitchen & Appliances, Home Textiles, Home Improvement, Furniture; 36 leaf links total, cross-checked against the flat navUrls list embedded in __NEXT_DATA__ on an initial curl_cffi fetch of /home-decor). Visited every leaf node's own listing page in the Chrome tab and read its H1/breadcrumb/meta title/description and product-card sample via get_page_text, plus its in-page Category filter facet chips where present, to decide Textile vs Storage vs neither per textile.md and storage.md. Also fetched sitemap.xml (curl_cffi, 200) and found it is a pure product-detail-page (pdp) sitemap index with no category-level URLs, so it added nothing beyond the mega-menu + per-page verification. QTY METHOD: (a) the rendered 'Showing 1-20 out of N products' header is fabricated/broken sitewide -- it returned the identical bogus figure 303966367 (or a flat, equally implausible 10000) verbatim across numerous unrelated categories tested (Kitchen Utility, Kitchen Storage Organisers, Bedsheets, Kitchen Linen, Carpets & Doormats, Covers, Bathroom Organization, Shoe Racks, Curtain Accessories, Comforter Sets, and the Home Textiles 'View All' page); (b) the FILTERS panel badge caps at '1000+ Products' on every node tested, never showing a smaller exact figure; (c) inspected window.__NEXT_DATA__ / hydrated Redux state via javascript_tool -- plpListing.listing.productsCount held the same corrupted 303966367 value and totalProductsCount only reflected the ~20 items loaded on the current page (not a category total); (d) checked live network requests on a fresh page load -- no client XHR carrying a real listing/count response was observed (only analytics/tracking beacons fired; the product grid itself is server-rendered per request, so there is no client-side count call to intercept). Concluded no exact quantity is obtainable through any accessible means on this site at this time; every row below is qty=null with evidence describing exactly which broken signal was checked, per project rule 3 (null + MANUAL REVIEW is correct; a fabricated number is project-destroying). EXCLUDED and why: Home Decor column - View All (view-all rule), Covers (fridge/washing-machine/AC/TV appliance protective covers -- confirmed via product-card sample; not home textile per textile.md's main groups, not storage per storage.md; excluded from both arrays), Key Holders, Artificial Plants, Pooja Needs, Party Supplies, Wallpapers & Stickers, Showpieces & Idols, Clocks & Wall Decor -- all Decorative Home Accessories/Wall Decor, out of Textile+Storage scope. Kitchen & Appliances column - View All, Cookware, Kitchen Tools, Kitchen Appliances, Dinnerware, Glasses & Barware, Home Appliances -- Kitchen & Dining/Electronics, out of scope. Home Improvement column - All Home Essentials (View All), Cleaning Supplies, Gardening, Home Tools, Insect Protection -- out of scope. Furniture column - Study Tables, Collapsible Wardrobes, Wall Shelves, Home Temple, Hammock Swing -- the website explicitly places these under its own 'Furniture' mega-menu column, so per storage.md Sec21/Sec27 (explicit site hierarchy governs ambiguous storage-furniture boundary items) they are Furniture and skipped; Shoe Racks is the sole exception, kept as Storage because storage.md Sec10 unconditionally names Shoe Racks as Storage ('A shoe rack/cabinet is Storage when its primary purpose is storing shoes') independent of the site's Furniture-column placement -- flagged MEDIUM confidence noting that conflict. Baby Bedding & Accessories (/baby-bedding-sets) exists on the site but lives under the separate Mom & Baby Care vertical, not the Home & Kitchen mega-menu, so it is out of scope for this company row. Two nodes were kept despite mixed content because the site provides no separate URL to isolate the qualifying sub-type: 'Curtains & Accessories' mixes genuine Curtains/Shower Curtains (Textile) with Curtain Rods/Brackets/Rings/Ties/Finials (explicitly excluded hardware per textile.md Sec5) -- kept at LOW confidence, hardware portion excluded from the classification rationale; 'Storage & Organizers' (Kitchen) mixes genuine kitchen storage (racks, jars & containers, spice racks, utensil organizers) with Kitchen & Dining items (water bottles, lunch boxes) that storage.md Sec13 says are NOT automatically Storage -- kept at LOW confidence since the site's own category label is 'Storage & Organizers' matching storage.md Sec3's main storage group names, but the qty/count cannot be isolated to the storage-only subset. Status is 'partial' (not 'ok') solely because exact qty is unrecoverable sitewide; the category tree itself was built and classified with normal confidence.",
+  "textile_rows": [
+    {
+      "category": "Textile",
+      "sub_category": "Home Textiles",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Bedsheets",
+      "qty": null,
+      "link": "https://www.meesho.com/bedsheets/pl/3jm",
+      "is_group": false,
+      "evidence": "Home & Kitchen mega-menu > Home Textiles column, verified live: H1/breadcrumb 'Home / Home & Kitchen / Bedding & Linen / Buy Bedsheets Online', product grid is entirely bedsheets. Displayed 'Showing 1-20 out of 303966367 products' header is a fabricated sitewide figure (identical value seen on multiple unrelated categories); FILTERS badge capped at '1000+ Products'; no genuine exact count obtainable.",
+      "flag": "MANUAL REVIEW: retried via tier c 2026-08-30, still unreliable - page showed 'Showing 1-20 out of 10000 products' (the same flat bogus figure previously identified as fabricated sitewide) and FILTERS badge still capped at '1000+ Products'; left qty=null",
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Curtains & Accessories",
+      "qty": null,
+      "link": "https://www.meesho.com/curtain-accessories/pl/673h",
+      "is_group": false,
+      "evidence": "Home & Kitchen mega-menu > Home Textiles column. Page title 'Curtain Accessories, Knobs & Fittings Online'; in-page Category filter chips: Curtains, Shower Curtains (Textile per textile.md Sec5/Sec9), Curtain Rods & Accessories, Curtain Tie Rope (hardware, excluded per textile.md Sec5). Product grid majority is Curtains-branded cards. No separate URL exists to isolate Curtains-only from the hardware sub-facets.",
+      "flag": "MANUAL REVIEW: node mixes excluded curtain hardware (rods/ties) with genuine textile curtains on one shared URL with no way to isolate; retried via tier c 2026-08-30, page still showed 'Showing 1-20 out of 10000 products' (same flat bogus figure) and FILTERS badge capped at '1000+ Products'; qty left null",
+      "confidence": "LOW"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Doormats & Carpets",
+      "qty": null,
+      "link": "https://www.meesho.com/carpets-doormats/pl/670y",
+      "is_group": false,
+      "evidence": "Home & Kitchen mega-menu > Home Textiles column, verified live: title 'Buy Carpets, Doormats Online', product grid is doormats/carpets/rugs/bath mats/kitchen mats -- fabric floor coverings per textile.md Sec6. No exact qty obtainable (same broken counter).",
+      "flag": "MANUAL REVIEW: retried via tier c 2026-08-30, still unreliable - page showed 'Showing 1-20 out of 303966367 products' (the same fabricated implausible figure previously identified sitewide); left qty=null",
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Pillow, Cushion & Covers",
+      "qty": null,
+      "link": "https://www.meesho.com/bed-pillows-pillow-covers/pl/673p",
+      "is_group": false,
+      "evidence": "Home & Kitchen mega-menu > Home Textiles column, verified live: title 'Bed Pillows & Pillow Covers', product grid is bed pillows, cushion covers, baby pillows -- Textile per textile.md Sec3/Sec4/Sec20. No exact qty obtainable (same broken counter).",
+      "flag": "MANUAL REVIEW: retried via tier c 2026-08-30, still unreliable - page showed 'Showing 1-20 out of 10000 products' (the same flat bogus figure previously identified as fabricated sitewide) and FILTERS badge still capped at '1000+ Products'; left qty=null",
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Blankets & Comforters",
+      "qty": null,
+      "link": "https://www.meesho.com/comforter-sets/pl/9gw",
+      "is_group": false,
+      "evidence": "Home & Kitchen mega-menu > Home Textiles column, verified live: breadcrumb 'Home / Home & Kitchen / Bedding & Linen', in-page Category filter chips: Baby Blankets & Swaddlers, Blankets & Quilts, Comforter Sets, Duvet Covers, Duvet Sets -- all Textile per textile.md Sec3/Sec20. No exact qty obtainable (same broken counter).",
+      "flag": "MANUAL REVIEW: retried via tier c 2026-08-30, still unreliable - page showed 'Showing 1-20 out of 10000 products' (the same flat bogus figure previously identified as fabricated sitewide) and FILTERS badge still capped at '1000+ Products'; left qty=null",
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Kitchen & Appliances",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Kitchen Linen",
+      "qty": null,
+      "link": "https://www.meesho.com/kitchen-linen/pl/671s",
+      "is_group": false,
+      "evidence": "Home & Kitchen mega-menu > Kitchen & Appliances column, verified live: breadcrumb 'Home / Kitchen Utility / Kitchen Linen', in-page Category filter chips: Aprons, Kitchen Linen Sets, Kitchen Napkins, Table Cloths, Table Covers & Mats, Table Napkins, Table Place Mats (Textile per textile.md Sec7/Sec8); Napkin Holders/Napkin Rings/Sinkmats present as facets but are non-textile hardware/accessory items with no separate URL. No exact qty obtainable (same broken counter).",
+      "flag": "MANUAL REVIEW: retried via tier c 2026-08-30, still unreliable - page showed 'Showing 1-20 out of 303966367 products' (the same fabricated implausible figure previously identified sitewide); left qty=null",
+      "confidence": "HIGH"
+    }
+  ],
+  "storage_rows": [
+    {
+      "category": "Storage",
+      "sub_category": "Kitchen & Appliances",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Storage & Organizers",
+      "qty": null,
+      "link": "https://www.meesho.com/kitchen-storage-organisers/pl/672t",
+      "is_group": false,
+      "evidence": "Home & Kitchen mega-menu > Kitchen & Appliances column, node itself titled 'Storage & Organizers' (matches storage.md Sec3 main storage group naming). Page title 'Kitchen Storage Organisers: Shop Racks & Stands Online'; in-page Category filter chips: Kitchen Storage, Racks & Holders, Jars & Containers (genuine storage per storage.md Sec13) alongside Water Bottles, Lunch Boxes, Serveware, Aprons (Kitchen & Dining/Textile, not storage per storage.md Sec13 boundary) on one shared URL with no way to isolate. No exact qty obtainable (same broken counter).",
+      "flag": "MANUAL REVIEW: node mixes non-storage Kitchen & Dining items (water bottles, lunch boxes) with genuine storage items on one shared URL with no way to isolate; retried via tier c 2026-08-30, page still showed 'Showing 1-20 out of 10000 products' (same flat bogus figure) and FILTERS badge capped at '1000+ Products'; qty left null",
+      "confidence": "LOW"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Home Improvement",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Bathroom Accessories",
+      "qty": null,
+      "link": "https://www.meesho.com/bathroom-organization/pl/9jc",
+      "is_group": false,
+      "evidence": "Home & Kitchen mega-menu > Home Improvement column, verified live: breadcrumb 'Home / Home Improvement / Bathroom Accessories', page title 'Bathroom Organization: Buy Holders & Storage Online India', product grid is bathroom shelves, holders, racks, organizers, caddies -- genuine bathroom storage per storage.md Sec14. No exact qty obtainable (same broken counter).",
+      "flag": "MANUAL REVIEW: retried via tier c 2026-08-30, still unreliable - page showed 'Showing 1-20 out of 10000 products' (the same flat bogus figure previously identified as fabricated sitewide) and FILTERS badge still capped at '1000+ Products'; left qty=null",
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Shoe Racks",
+      "qty": null,
+      "link": "https://www.meesho.com/shoe-racks/pl/1w06",
+      "is_group": false,
+      "evidence": "Site's mega-menu places this under its own 'Furniture' column (with Study Tables, Collapsible Wardrobes, Wall Shelves, Home Temple, Hammock Swing, all excluded as Furniture per storage.md Sec21/Sec27). Verified live: H1 'Shoe Racks', product grid entirely 'Collapsible Shoe Racks'. Kept as Storage per storage.md Sec10, which unconditionally names Shoe Racks as Storage ('A shoe rack/cabinet is Storage when its primary purpose is storing shoes') independent of the site's Furniture-column placement. No exact qty obtainable (same broken counter).",
+      "flag": "MANUAL REVIEW: site nav places this node under its own Furniture column, conflicting with storage.md Sec10's explicit Shoe Racks = Storage rule; kept as Storage per the category-specific rule. Retried via tier c 2026-08-30, page still showed 'Showing 1-20 out of 303966367 products' (the same fabricated implausible figure previously identified sitewide); qty left null",
+      "confidence": "MEDIUM"
+    }
+  ]
+}

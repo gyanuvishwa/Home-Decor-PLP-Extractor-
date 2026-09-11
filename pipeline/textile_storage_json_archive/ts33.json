@@ -1,0 +1,284 @@
+{
+ "sr": 33,
+ "company": "Horchow",
+ "brand_site": "horchow.com",
+ "country": "USA",
+ "site_url": "https://www.horchow.com/",
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ACCESS: horchow.com is fully retired - every path redirects to https://www.neimanmarcus.com/c/home-all-home-cat59040731?fromhc=true, so Horchow's catalogue IS the Neiman Marcus Home department (confirmed identically by the prior Furniture worker's f33.json notes, and reconfirmed independently here). Tier (a) direct HTTP: robots.txt and every plain request returned an immediate DataDome captcha-delivery 403 (both curl default headers and a spoofed Chrome UA). Tier (b) Playwright/CDP: both headless and headed Chromium (--disable-blink-features=AutomationControlled) also got the identical DataDome 403 on horchow.com. Per the first-block-stops-you-per-tier rule, escalated to a real Chrome tab (tier c) purely to confirm the redirect target and get past the wall once - the tab loaded neimanmarcus.com/c/home-all-home-cat59040731 successfully. From that point on, all further research reused the plain HTTP tier (a) via curl_cffi impersonate='safari17_0' against neimanmarcus.com directly (the same bypass the Furniture worker documented), which returned clean 200 SSR HTML for every category page fetched (~30 pages) with zero further blocks - Chrome/tier(c) was not needed beyond the one redirect-confirmation load. TREE: built from the union of the Home mega-menu (17 top-level departments: All Home, Fall & Thanksgiving, Christmas, Hanukkah, Gourmet Food & Treats, Home Decor, Furniture, Dining & Entertaining, Bedding, Lighting, Rugs, Bath & Towels, Luggage & Travel, Kitchen, Tech & Games, Outdoor, Storage & Organization) and each department's own left-nav sub-category links (regex-extracted from the SSR HTML), then verified every leaf's own h1/qty header via a direct fetch of that leaf URL (h1 matched the requested node every time). QTY: SSR 'product-list__header__items' field on each category page (e.g. Decorative Pillows -> 338, Table Linens -> 370). Spot-verified by paginating ?page=N to exhaustion and counting unique 'id':'prodNNN' values on the 3 highest-stakes nodes: 8x10 Rugs (5 full pages of 120 + 113 on page 6 = 713, exact), Decorative Pillows (2 full pages + 98 on page 3 = 338, exact), Jewelry & Watch Storage (93 unique ids on its single page = 93, exact) - all matched the header exactly, consistent with the Furniture worker's 17/17 exact-match finding on this same site, so the remaining leaf counts were taken from the header without re-doing full pagination for all of them. TEXTILE INCLUDED: Bedding's 6 children (Blankets & Throws, Quilts & Coverlets, Sheets & Pillowcases, Comforters & Duvet Covers, Bedding Sets, Shams & Bed Skirts) - all genuine bedding textiles; Rugs' 7 by-size children (12x15, 10x14, 9x12, 8x10, 6x9, 5x8, Runners) - the site's rug hierarchy is organized only by size with no type-based subcategories, so these are the deepest valid nodes per the parent-URL rule; Bath & Towels' Towels and Bath Mats children; Home Decor's Decorative Pillows (338, product-checked - genuine throw/lumbar pillows); Home Decor's Curtains & Hardware (11 items - despite the 'Hardware' in the name, all 11 products checked by name were curtain/drapery panels, zero rods/rails/rings found, so kept as Textile, confidence MEDIUM given the ambiguous label); Dining & Entertaining's Table Linens (370, product-checked - tablecloths, placemats, napkins, runners); Christmas's Stockings & Tree Skirts (83, product-checked - fabric/beaded stockings and tree skirts, matches textile.md 15's explicit 'Fabric Christmas Stockings' inclusion). TEXTILE EXCLUDED after product-level inspection: Outdoor's Beach Towels & Pool Accessories (16 items - product-checked, 13 of 16 are inflatable pool floats/loungers and only 3 are actual beach towels, so primary product type of the merchandised node is not textile, same majority-rules logic the Furniture worker used to decide Outdoor Furniture inclusion/exclusion); Outdoor's Outdoor Decor (171 items - product-checked, dominated by fountains, fire screens, faux topiary, wall art and lanterns with only a minority of indoor/outdoor pillows mixed in, no dedicated outdoor-cushion subcategory exists to isolate them); Kitchen's Kitchen Accessories (222 items, product-checked - dominated by canisters, cookie jars, mugs, colanders, napkin holders and cookware, not textile); Luggage & Travel's Luggage (travel suitcases/totes, explicitly excluded per textile.md 19/apparel-adjacent and not a home textile). STORAGE INCLUDED: Storage & Organization's sole child, Jewelry & Watch Storage (93 items, product-checked - jewelry boxes, watch boxes and watch winders; the site itself files this whole department under 'Storage & Organization', and the products match storage.md 7's 'Jewellery Organizers'/'Jewelry Organizers' inclusion; kept as a leaf under a Storage & Organization grouping row per the parent-URL rule since the root (119 items) is not a strict superset-only listing but the child is the only genuine subcategory). STORAGE EXCLUDED: Home Decor's Accents (product-checked - sculptures, decorative bowls, trinket/jewelry boxes marketed as decor, not storage, per storage.md 24 Home Accessories Boundary); Home Decor's Desk & Stationery (product-checked - pens, journals, bookends, letter openers; a couple of items like 'Personalized Leather Pen/Pencil Organizer' are storage-adjacent but the node as a whole is stationery/desk decor, not a dedicated Office Storage category); Bath & Towels' Bath Accessories (90 items, product-checked - pump dispensers, tissue box covers, wastebaskets, vanity trays, soap dishes; purely decorative bathroom accessories, not storage); Kitchen's Kitchen Accessories (same node excluded from Storage as from Textile - decorative kitchenware, no dedicated food-storage-container category exists); Luggage & Travel's Luggage (personal travel bags, not home storage, per storage.md 6). Also excluded wholesale, consistent with both rule files' boundary sections and not individually product-checked because the category names and the Furniture worker's prior pass already establish them as Furniture/Lighting/Kitchen&Dining/Wall-Decor/Decorative-Accessories/food/gift/tech territory: Furniture and all its children; Lighting; Dining & Entertaining's Dinnerware, Drinkware & Barware, Flatware, Serveware, Holiday Entertaining; Gourmet Food & Treats; Home Decor's Wall Art Mirrors & Clocks (product-checked - mirrors/clocks/wall art, no textile wall hangings found), Trays & Vases, Faux Florals Plants & Planters, Picture Frames, Books, Candles & Home Scents, Pet Beds & Accessories (pet products, textile.md 18/storage.md 31 exclusion); Tech & Games; Outdoor's Outdoor Furniture, Melamine Dinnerware, Planters & Garden Accessories; Christmas's Christmas Decor, Ornaments & Tree Decor, Wreaths/Garlands/Ribbons, Christmas Trees, Advent Calendars and the 3 Christmas-trend landing pages (Classic/Gold&Silver/Colorful Christmas - promotional trend pages, not standard subcategories); Fall & Thanksgiving and Hanukkah (both dead-end nav pages with no department-specific children of their own, only the generic Home mega-menu repeated); Home Gifts (no direct category URL found in the mega-menu - a curated gift landing surface, excluded per the Gift Collections rule). No product-detail, search, View All, Collection, sale, or designer-brand URLs were used anywhere.",
+ "textile_rows": [
+  {
+   "category": "Textile",
+   "sub_category": "Bedding",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Blankets & Throws",
+   "qty": 66,
+   "link": "https://www.neimanmarcus.com/c/home-bedding-blankets-throws-cat51710755",
+   "is_group": false,
+   "evidence": "SSR listing header 'product-list__header__items' = 66; h1 'Designer Blankets & Luxury Throws' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Quilts & Coverlets",
+   "qty": 47,
+   "link": "https://www.neimanmarcus.com/c/home-bedding-quilts-coverlets-cat44850734",
+   "is_group": false,
+   "evidence": "SSR listing header 'product-list__header__items' = 47; h1 'Luxury Quilts & Coverlets' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Sheets & Pillowcases",
+   "qty": 21,
+   "link": "https://www.neimanmarcus.com/c/home-bedding-sheets-cat46520817",
+   "is_group": false,
+   "evidence": "SSR listing header 'product-list__header__items' = 21; h1 'Luxury Sheets & Sets' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Comforters & Duvet Covers",
+   "qty": 55,
+   "link": "https://www.neimanmarcus.com/c/home-bedding-comforters-duvet-covers-cat52800731",
+   "is_group": false,
+   "evidence": "SSR listing header 'product-list__header__items' = 55; h1 'Luxury Comforters & Duvet Covers' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Bedding Sets",
+   "qty": 11,
+   "link": "https://www.neimanmarcus.com/c/home-bedding-bedding-sets-cat75490749",
+   "is_group": false,
+   "evidence": "SSR listing header 'product-list__header__items' = 11; h1 'Luxury Bedding Sets & Comforter Sets' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Shams & Bed Skirts",
+   "qty": 275,
+   "link": "https://www.neimanmarcus.com/c/home-bedding-shams-bed-skirts-cat74460731",
+   "is_group": false,
+   "evidence": "SSR listing header 'product-list__header__items' = 275; h1 'Luxury Pillow Shams & Bed Skirts' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Rugs",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "12x15",
+   "qty": 128,
+   "link": "https://www.neimanmarcus.com/c/home-rugs-rugs-by-size-12x15-cat86730755",
+   "is_group": false,
+   "evidence": "SSR listing header 'product-list__header__items' = 128; h1 '12x15 Designer Area Rugs' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "10x14",
+   "qty": 479,
+   "link": "https://www.neimanmarcus.com/c/home-rugs-rugs-by-size-10x14-cat86730740",
+   "is_group": false,
+   "evidence": "SSR listing header 'product-list__header__items' = 479; h1 '10x14 Designer Area Rugs' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "9x12",
+   "qty": 602,
+   "link": "https://www.neimanmarcus.com/c/home-rugs-rugs-by-size-9x12-cat86730738",
+   "is_group": false,
+   "evidence": "SSR listing header 'product-list__header__items' = 602; h1 '9x12 Designer Area Rugs' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "8x10",
+   "qty": 713,
+   "link": "https://www.neimanmarcus.com/c/home-rugs-rugs-by-size-8x10-cat86730737",
+   "is_group": false,
+   "evidence": "SSR listing header 'product-list__header__items' = 713; independently verified by paginating ?page=N to exhaustion (120 tiles/page) and counting unique 'id':'prodNNN' values = 5x120+113 = 713 exact match; h1 '8x10 Designer Area Rugs' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "6x9",
+   "qty": 503,
+   "link": "https://www.neimanmarcus.com/c/home-rugs-rugs-by-size-6x9-cat86730736",
+   "is_group": false,
+   "evidence": "SSR listing header 'product-list__header__items' = 503; h1 '6x9 Designer Area Rugs' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "5x8",
+   "qty": 235,
+   "link": "https://www.neimanmarcus.com/c/home-rugs-rugs-by-size-5x8-cat86730735",
+   "is_group": false,
+   "evidence": "SSR listing header 'product-list__header__items' = 235; h1 '5x8 Designer Area Rugs' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Runners",
+   "qty": 218,
+   "link": "https://www.neimanmarcus.com/c/home-rugs-rugs-by-size-runners-cat86730734",
+   "is_group": false,
+   "evidence": "SSR listing header 'product-list__header__items' = 218; h1 'Designer Runner Rugs' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Bath & Towels",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Towels",
+   "qty": 22,
+   "link": "https://www.neimanmarcus.com/c/home-bath-towels-cat83330746",
+   "is_group": false,
+   "evidence": "SSR listing header 'product-list__header__items' = 22; h1 'Luxury Bath Towels' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Bath Mats",
+   "qty": 17,
+   "link": "https://www.neimanmarcus.com/c/home-bath-towels-bath-mats-cat83330747",
+   "is_group": false,
+   "evidence": "SSR listing header 'product-list__header__items' = 17; h1 'Luxury Bath Mats' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Home Decor",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Decorative Pillows",
+   "qty": 338,
+   "link": "https://www.neimanmarcus.com/c/home-home-decor-decorative-pillows-cat16130901",
+   "is_group": false,
+   "evidence": "SSR listing header 'product-list__header__items' = 338; independently verified by paginating ?page=N to exhaustion (120 tiles/page) and counting unique 'id':'prodNNN' values = 2x120+98 = 338 exact match; h1 'Decorative Throw Pillows' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Curtains & Hardware",
+   "qty": 11,
+   "link": "https://www.neimanmarcus.com/c/home-home-decor-curtains-hardware-cat40790756",
+   "is_group": false,
+   "evidence": "SSR listing header 'product-list__header__items' = 11; h1 'Luxury Curtains & Hardware' matches requested node; product names on the listing checked individually - all 11 are curtain/drapery panels (Radiance Silk Curtain, Camden Light-Filtering Silk Drapery Panel, Emory Curtain Panel, Flutter Sheer Drapery Panel, Harmony Linen Curtain, Rio Curtains, Chloe Drapes Collection, Hampton Curtains) with zero hardware (rods/rails/rings) products found despite the category name",
+   "flag": "category name includes 'Hardware' but all products verified as curtains/drapery - kept as Textile per actual product mix, not the label",
+   "confidence": "MEDIUM"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Dining & Entertaining",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Table Linens",
+   "qty": 370,
+   "link": "https://www.neimanmarcus.com/c/home-kitchen-dining-table-linens-cat40510832",
+   "is_group": false,
+   "evidence": "SSR listing header 'product-list__header__items' = 370; h1 'Luxury Table Linens' matches requested node; product names checked (tablecloths, placemats, napkins, table runners, napkin rings)",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Christmas",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Stockings & Tree Skirts",
+   "qty": 83,
+   "link": "https://www.neimanmarcus.com/c/home-christmas-christmas-decor-stockings-tree-skirts-cat83270752",
+   "is_group": false,
+   "evidence": "SSR listing header 'product-list__header__items' = 83; h1 'Luxury Christmas Stockings & Tree Skirts' matches requested node; product names checked - predominantly fabric/beaded stockings and tree skirts",
+   "flag": null,
+   "confidence": "HIGH"
+  }
+ ],
+ "storage_rows": [
+  {
+   "category": "Storage",
+   "sub_category": "Storage & Organization",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Jewelry & Watch Storage",
+   "qty": 93,
+   "link": "https://www.neimanmarcus.com/c/mens-watches-jewelry-jewelry-watch-storage-cat82360757",
+   "is_group": false,
+   "evidence": "SSR listing header 'product-list__header__items' = 93; independently verified - all 93 unique 'id':'prodNNN' values present on the single page = 93 exact match; h1 \"Men's Jewelry Boxes & Watch Storage Cases\" matches requested node; the site itself files this node under the 'Storage & Organization' department",
+   "flag": null,
+   "confidence": "HIGH"
+  }
+ ]
+}

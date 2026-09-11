@@ -1,0 +1,52 @@
+{
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "Direct HTTP fetch worked throughout (no WAF, matches prior Home-Decor pass note); robots.txt has generic 'User-agent: *' with SEO facet-param Disallow lines but no ClaudeBot/anthropic-ai/Claude-specific disallow -- proceeded. Site nav mega-menu (Huishouden section) has exactly one Pet-labeled branch: 'Huisdierbenodigdheden' (Pet Supplies) -> single link 'Dierenmeubels & accessoires' (Pet Furniture & Accessories), https://www.fonq.nl/collections/dierenmeubels-accessoires, nbResults=32 (evidence: v-text=\"nbResults\">32</span> artikelen, baked into initial HTML, category-id 104085). This page embeds an exhaustive single-valued 'Type Product' facet (each product tagged with exactly one type) whose 4 values sum EXACTLY to 32 with no remainder: Dierenkussen=7, Dierenmand=2, Voer- en/of Drinkbak=11, Voerbak=12 -- used as the true leaf breakdown, parent kept as a grouping row (qty null) to avoid double-counting. 'Voerbak' additionally has its own dedicated crawlable collection page (https://www.fonq.nl/collections/voerbak) whose own nbResults=12 independently matches the facet count exactly, confirmed same product population via title sample (Alessi Tigrito Voerbak Kat, Alessi Lula Hondenvoerbak, Yamazaki Tower Voerbak/Voederbak, Eva Solo Luxe Voerbak) -- used as its link. The other 3 facet values (Dierenkussen, Dierenmand, Voer-en/of-Drinkbak) have no separate crawlable URL: tried ?type_product=<slug> query filtering on the parent URL, confirmed not applied server-side (still returns all 32, same pattern as a known fonQ platform limitation seen in the prior Home-Decor pass for 'lampenkap'), so their link is left null pending a working filter URL rather than pointed at the unfiltered parent. ADDITIONAL DISCOVERY VIA SITEMAP KEYWORD SWEEP (hond/kat/dieren/vogel/voerbak/krabpaal/halsband/aquarium etc. across all 5 sitemap.xml files, ~18M URLs total): found several more candidate SEO landing pages not present in the mega-menu -- hondenmand, hay-hondenmand, kattenbak, kattenmand, krabpaal, vogelvoederhuis, eva-solo-vogelvoederhuis all verified nbResults=0 (genuinely empty at check time, confirmed via the same v-text=\"nbResults\">N</span> pattern) -- dropped per zero-qty rule. EXCLUDED AS WRONG CATEGORY (site's own taxonomy, not Pet Care): vogelhuis (19), vogelvoederhuis-related 'vogelhuisjes-dierenverblijven' (62) -- both confirmed via homepage mobile-menu context to sit under 'Tuininrichting' (Garden Furnishing), sibling to Bloempotten/Buitenverlichting/Buitenkleden/Barbecues/Zwembaden, NOT under Huisdierbenodigdheden; product-title sample (Esschert Design nest boxes for woodpecker/owl/tit, bat house, dovecote) confirms these are wild-garden-bird/bat housing, not owned-pet products -- left in Garden per 'don't steal from other categories'. No pet grooming, walking/leash/collar, training, travel/carrier, clothing, litter (beyond the 0-qty kattenbak), or medical/consumable-food categories found anywhere on the site (targeted sitemap keyword sweep for halsband/hondenriem/hondentuig/kattenkrab/vogelkooi/aquarium/konijnenhok/cavia/hamster/trimsalon returned zero matches). fonQ is a general Dutch home/lifestyle retailer (platform 'Etrias') -- Pet Care is a small, single-branch part of its catalog, consistent with the prior Home-Decor pass's characterization of the site.",
+  "rows": [
+    {
+      "category": "Pet Care",
+      "sub_category": "Pet Furniture & Accessories",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Pet Cushions",
+      "qty": 7,
+      "link": "https://www.fonq.nl/collections/dierenmeubels-accessoires?type_product=dierenkussen",
+      "is_group": false,
+      "evidence": "embedded exhaustive facet on https://www.fonq.nl/collections/dierenmeubels-accessoires: initial-facets JSON, group 'Type Product' (slug type_product), value {\"label\":\"Dierenkussen\",\"slug\":\"dierenkussen\",\"count\":7}; no working dedicated filter URL (?type_product= not applied server-side)",
+      "flag": "MANUAL REVIEW: link uses the site's own ?type_product= facet parameter (user-provided/confirmed 2026-09-02) - a raw HTTP fetch of this URL shows the filter as selected:false in the embedded facet JSON (i.e. not applied server-side), but the user confirmed this URL correctly filters when opened in an actual browser (client-side JS applies the query param on load); qty=7 verified via the embedded exhaustive facet JSON on the parent page (4 values sum exactly to its nbResults=32)"
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Pet Baskets/Beds",
+      "qty": 2,
+      "link": "https://www.fonq.nl/collections/dierenmeubels-accessoires?type_product=dierenmand",
+      "is_group": false,
+      "evidence": "embedded exhaustive facet on https://www.fonq.nl/collections/dierenmeubels-accessoires: initial-facets JSON, group 'Type Product' (slug type_product), value {\"label\":\"Dierenmand\",\"slug\":\"dierenmand\",\"count\":2}; no working dedicated filter URL (?type_product= not applied server-side)",
+      "flag": "MANUAL REVIEW: link uses the site's own ?type_product= facet parameter (user-provided/confirmed 2026-09-02) - a raw HTTP fetch of this URL shows the filter as selected:false in the embedded facet JSON (i.e. not applied server-side), but the user confirmed this URL correctly filters when opened in an actual browser (client-side JS applies the query param on load); qty=2 verified via the embedded exhaustive facet JSON on the parent page (4 values sum exactly to its nbResults=32)"
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Feeding & Drinking Bowls",
+      "qty": 11,
+      "link": "https://www.fonq.nl/collections/dierenmeubels-accessoires?type_product=voer-en-of-drinkbak",
+      "is_group": false,
+      "evidence": "embedded exhaustive facet on https://www.fonq.nl/collections/dierenmeubels-accessoires: initial-facets JSON, group 'Type Product' (slug type_product), value {\"label\":\"Voer- en/of Drinkbak\",\"slug\":\"voer-en-of-drinkbak\",\"count\":11}; no working dedicated filter URL (?type_product= not applied server-side)",
+      "flag": "MANUAL REVIEW: link uses the site's own ?type_product= facet parameter (user-provided/confirmed 2026-09-02) - a raw HTTP fetch of this URL shows the filter as selected:false in the embedded facet JSON (i.e. not applied server-side), but the user confirmed this URL correctly filters when opened in an actual browser (client-side JS applies the query param on load); qty=11 verified via the embedded exhaustive facet JSON on the parent page (4 values sum exactly to its nbResults=32)"
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Feeding Bowls",
+      "qty": 12,
+      "link": "https://www.fonq.nl/collections/voerbak",
+      "is_group": false,
+      "evidence": "listing header on https://www.fonq.nl/collections/voerbak: v-text=\"nbResults\">12</span> artikelen; independently cross-confirmed by embedded 'Type Product' facet on the parent page {\"label\":\"Voerbak\",\"slug\":\"voerbak\",\"count\":12}",
+      "flag": null
+    }
+  ]
+}

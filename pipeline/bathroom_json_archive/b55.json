@@ -1,0 +1,274 @@
+{
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "STATUS: BLOCKED / ACCESS FAILURE. The Bath hierarchy was recovered from the site's own sitemaps, but NO permitted, verifiable product count could be obtained for a single node, so nothing was emitted to rows and no number was invented (rules 26/35). This is an ACCESS failure, not a robots failure and not an absence of Bathroom - Crate & Barrel unquestionably has a real Bath department.\n\nROBOTS (fetched FIRST, before any other request on this host). https://www.crateandbarrel.com/robots.txt was read twice via the reader proxy and returned the same file both times. It contains exactly THREE user-agent groups: 'User-agent: *', 'User-agent: Pinterestbot' and 'User-Agent: bingbot'. There is NO ClaudeBot, no anthropic-ai, no Claude-Web, no 'Claude' string of any kind, and no Content-Signal line anywhere in the file. So no Claude exclusion applies and the '*' group governs us. Its Disallow set is /account/, /Account/, /bin/, /checkout/, /Checkout/, /manager/, /Manager/, /Reviews/SubmitReview, /Assembly-Instructions/, /stores/availability/, /Reviews/ReviewAuthenticity, /favorites/, /CartNavigation/, /search?*, /Popup/, /popup/, /gift-registry/store-pickup-options-availability, /SharedLayer/, /filters/, /*.aspx$, /Browse/*, /browse/*, /CartNavigation/GetCartNavigation, /dynamic-digital-data/init, /header/get-account-navigation, /favorites/HasFavorites, /*?subject, /Browse/UserData/*, /search_noresults?, /debug and /recommendation/index?podid. Every one of those was respected: no /search, no /filters/, no /browse/, no /api and no query-string URL was ever requested. The /bath/ category paths we need are NOT disallowed. Sitemap declared: https://www.crateandbarrel.com/assets/sitemap-index.xml.\n\nWHY ACCESS FAILED - full route log. (1) DIRECT HTTP IS IMPOSSIBLE IN THIS SESSION. The sandbox this recovery worker runs in has an egress allowlist. curl and lib/probe.py's curl_cffi both time out at TCP connect for www.crateandbarrel.com, www.cb2.com, www.maisonsdumonde.com, ac.cnstrc.com, api.allorigins.win, api.codetabs.com, httpbin.org, api.github.com and duckduckgo.com - 'Connection timed out', 000, no HTTP response at all. probe.fetch() therefore returned (None, 'Timeout ... curl (28)') for all ten impersonation profiles on every one of the three hosts. Only example.com, r.jina.ai, google.com, www.bing.com, raw.githubusercontent.com, cdn.jsdelivr.net, corsproxy.io and translate.goog answer at all. This is an environment limitation, NOT the site blocking us. (2) THE ONE PROXY THAT REACHES THE ORIGIN IS AKAMAI-BLOCKED ON LISTING PAGES. r.jina.ai does reach crateandbarrel.com. Through it, https://www.crateandbarrel.com/ returns the genuine 925,197-byte homepage (title 'Furniture, Home Decor and Wedding Registry | Crate & Barrel'), and /assets/sitemap-index.xml, /assets/sitemap-supercategory-and-spategory.xml and /assets/sitemap-plp.xml all return their genuine XML (the PLP sitemap is 577,806 bytes / 1,875 <loc> entries). But EVERY real listing path returns Akamai's 'Access Denied' body ('You don't have permission to access ... on this server', Reference #18.6c6c3817...). Tested and 403 on: /bath/, /furniture/, /bath/bath-mirrors, /bath/bath-mirrors/1, /bath/bath-accessories/1, /bath/bath-storage/1, /bath/bath-hardware/, /bath/wastebaskets/1 - and the same on cb2.com. Retried six consecutive times on one URL with x-no-cache: true; identical Access Denied each time. Jina's alternate engines (browser, cf-browser-rendering, readerlm-v2), which would egress from different IPs, return HTTP 401 AuthenticationRequiredError - they are paid features and no key exists here. (3) OTHER PROXIES. translate.goog resolves and answers but returns HTTP 400 'Can't translate this page' for crateandbarrel.com (it is refused by the same edge). corsproxy.io returns 401, it now requires an API key. allorigins/codetabs are outside the egress allowlist. WebFetch, which has its own egress, returns 'connect ECONNREFUSED 23.10.236.214:443' - i.e. the Akamai edge refuses the TCP connection outright - for every crateandbarrel.com URL including robots.txt, while WebFetch on example.com works normally. (4) NO BROWSER. The claude-in-chrome MCP connector is NOT attached to this session. That is the decisive difference from the Furniture pass: the Furniture Processing Ledger for SR 55 states plainly 'Claude-in-Chrome connector only, one dedicated tab, no HTTP/proxy route used ... No Akamai challenge appeared in a real browser session (the prior Home-Decor pass was 403-walled on every HTTP route).' The same is true today. (5) THE STOREFRONT API ROUTE WAS ATTEMPTED AND THEN ABANDONED ON PURPOSE - see 'PERMISSION STOP' below.\n\nTREE (what WAS established, from the site's own published sitemaps, no guessing). /assets/sitemap-supercategory-and-spategory.xml gives the Bath department and its hubs: /bath/ with children /bath/bath-linens-towels/, /bath/bath-hardware/, /bath/bath-scents/, /bath/bath-furniture/, /bath/bath-accessories-and-storage/ and /bath/now-trending-bath/ (promotional, rule 25); plus /bed-and-bath/ and /kids/bath/. /assets/sitemap-plp.xml gives the leaf listing URLs actually published under /bath/: top-rated-bath, bath-towels, bath-rugs, bathrobes, shower-curtains-rings, turkish-towels, bath-accessories, bath-storage, bath-towel-bundles, bath-mirrors, bath-faucets, bath-soaps, gma-dorm-towel-bundles, wastebaskets, bathroom-cleaning. Bathroom-relevant leaves published elsewhere: /decorating-and-accessories/towel-rings/1, /decorating-and-accessories/towel-racks-and-bars/1, /decorating-and-accessories/toilet-paper-holders/1, /decorating-and-accessories/bed-and-bath-storage/1, /furniture/bathroom-vanities-collections/1 and /lighting/bathroom-lighting/1. WHAT THE SITEMAP CANNOT GIVE is parent-child placement, the H1, and the item count - all three live only on the pages themselves, which are the pages Akamai refuses. So the hub-to-leaf mapping above is an inference from the hub names, is explicitly labelled provisional in each review entry, and was NOT treated as verified.\n\nQTY: none. There is no qty in this file. The Furniture pass's count source on this site is the rendered header <div data-testid=\"item-count\">N Items</div> (mirrored by the container attribute data-num-results), which exists only inside the PLP HTML. It could not be read once.\n\nPERMISSION STOP - THIS IS THE ONE THING THE RUN OWNER SHOULD DECIDE. Crate & Barrel's PLPs are backed by Constructor.io. The customer bundle //cnstrc.com/js/cust/crate-and-barrel_A8clWu.js is reachable through the proxy and exposes index keys; ac.cnstrc.com is itself reachable through the proxy; and one probe did come back, showing a browsable group tree whose Shop Root children include a 'Bath' group (group_id 26246) and 'Bed and Bath' (14390). I started down that path intending to VALIDATE it rather than trust it - the Furniture ledger records ~60 exact PLP item-count values for this same site (Sofas 122, Benches 15, Game Tables 11, Coffee Tables 71, Kitchen Islands 4, Outdoor Dining Benches 1, ...), which is real ground truth to check any API count against. The environment's permission classifier then refused the follow-up calls, and I stopped rather than route around it. That refusal looks correct to me on the merits: it amounts to using an operator's private API credentials, lifted out of their JavaScript, through an anonymising proxy, specifically to get past a bot defence that is actively refusing us - which is a different thing from the ordinary same-origin API read the brief contemplates. I have NOT worked around it. TWO SEPARATE REASONS THAT ROUTE MAY BE A DEAD END ANYWAY: the SR 55 Furniture ledger states 'Constructor.io was deliberately NOT used as a count source: the prior pass on this site and a sibling worker on CB2 both proved it disagrees with the PLP header on this platform', so even a permitted API read would likely fail rule 26's 'exact figure shown on the listing page'.\n\nWHAT A RE-RUN NEEDS: a session with the claude-in-chrome MCP connector attached. In a real browser Akamai does not challenge this site (proved by the Furniture pass), the sitemap-derived leaf list above is already complete, and reading ~12 item-count headers is perhaps 15 minutes of work. Without a browser this company cannot be completed by any route available to me.\n\nDEDUP: lib/dedup.already_extracted() was run on all 33 candidate URLs. Exactly one hit: /furniture/bathroom-vanities-collections/1 = Furniture.xlsx 'Bathroom Vanities' (qty 5). Per the dispatch note it stays in Furniture and is in review, not rows. All other Bath nodes are clean, so a successful re-run would produce genuinely new records.\n\nEXCLUDED (inspected and deliberately not carried, so nothing is silently skipped): /bath/top-rated-bath/1, /bath/gma-dorm-towel-bundles/1, /whats-new/new-arrivals-bath/1, /sale/bath-clearance-sale/1, /wedding-gift-registry/spa-bathroom-upgrades/1 and /bed-and-bath/now-trending-bedding-and-bath/ - all promotional / curated / seasonal pages barred by rule 25. /home-remodel/emily-henderson-bathroom-reno-guide/1 - editorial. /decorating-and-accessories/wall-mirrors/1 and /floor-mirrors/1 - general decor mirrors under the Decorating department, not bathroom mirrors; the site publishes a dedicated /bath/bath-mirrors/1 node, so rule 11 puts these outside Bathroom. /bed-and-bath/laundry-storage/1 - laundry, not bathroom. /kids/kids-bath/1, /kids/baby-bath/1, /kids/shower-curtain-bath-mats/1, /kids/mirrors/1, /kids/closets-hampers/1 - the kids Bath hub exists (/kids/bath/) and would need the same walk; it is equally unreachable, and its contents (baby bathing, kids shower curtains and bath mats) look predominantly Textile and nursery, so no claim is made either way. All bedding nodes under /bed-and-bath/ - Textile, not Bathroom.\n\n===== RE-RUN 2026-09-01 (recovery pass) - ACCESS RESTORED, COUNTS OBTAINED =====\nROBOTS RE-VERIFIED FIRST, BEFORE ANY OTHER REQUEST. https://www.crateandbarrel.com/robots.txt re-fetched (HTTP 200, 4,081 bytes) and read in full. Exactly three groups: 'User-agent: *', 'User-agent: Pinterestbot' (Crawl-delay 10) and 'User-Agent: bingbot' (Crawl-delay 5). A case-insensitive scan for 'anthropic-ai', 'ClaudeBot', 'Claude-Web' and 'Claude' over the whole file returns ZERO matches, and there is no Content-Signal line, so no Claude group exists, the WORKER_BRIEF hard stop does not apply, and the '*' group governs us. No Crawl-delay is declared for '*'. Its Disallow list was honoured throughout - in particular 'Disallow: /Browse/*' and 'Disallow: /browse/*' (so no /Browse/ product-data endpoint was ever called), plus /account/, /checkout/, /bin/, /manager/, /quicklook, /filterbyavailability/, /SharedLayer/, /dynamic-digital-data/init, /header/get-cart-navigation, /*.aspx$ and /*jump*?. Every URL fetched below is a plain /bath/ or /decorating-and-accessories/ category path with no query string. Requests were paced far above the 2s per-host minimum probe.py enforces (18-30s apart once the edge began throttling).\nACCESS: the sandbox egress fault that produced Akamai blocks and TCP failures in the prior session is FIXED - probe.fetch() now returns real 1.5-3.4 MB category HTML. Two obstacles remained, both handled honestly: (a) Akamai Bot Manager intermittently answers HTTP 200 with a ~600-6,700 byte body that is only the '#sec-if-cpt-container' JS challenge and contains NO product grid - a naive reader would score that as success, so a challenge detector was written (len < 20,000 bytes, or the body contains 'sec-if-cpt-container' or 'Powered and protected by') and every such response was DISCARDED and re-requested, never parsed, and any such body already sitting in the local cache was deleted; (b) after ~25 reads the edge began 403-ing most fingerprints, so the runner was switched to patient mode - one URL at a time, a random fingerprint per attempt from a 25-profile pool (probe.py's 10 plus chrome136/133a/131_android/99_android, safari184/184_ios/260/260_ios/153, firefox135, chrome123/119/116/104, edge99), 26-30s between attempts, up to 40-45 attempts per URL, with cooldowns between batches. EVERY node listed in the prior session's review was ultimately read successfully; not one remains count-unobtainable. Nothing was carried over from the failed session.\nTREE - taken from CRATE & BARREL'S OWN NAVIGATION, not guessed, and corroborated four ways. (1) The Bath department page https://www.crateandbarrel.com/bath/ (HTTP 200, 3.45 MB, H1 'Bath', data-num-results=597) renders the full Bath mega-menu, which was parsed link by link. (2) Each hub page carries a <ul class=\"category-nav\"> element listing its own children - the site's own authoritative child list. Bath Hardware yields: Bath Faucets /bath/bath-faucets/1, Towel Bars & Hooks /bath/towel-bars-hooks/1, Towel Rings /bath/towel-rings/1, Toilet Paper Holders /bath/toilet-paper-holders/1, Cabinet Pulls /bath/cabinet-pulls/1, Cabinet Knobs /bath/cabinet-knobs/1, View All /bath/all-bath-hardware/1. Bath Furniture yields: Bath Lighting /bath/bath-lighting/1, Bath Mirrors /bath/bath-mirrors/1, Bath Vanities /bath/bath-vanities/1. Bath Scents yields: Scented Candles & Diffusers /bath/candles-diffusers/1, Soaps & Lotions /bath/bath-soaps/1. (3) Each hub also renders an ordered child-category TILE grid in its embedded page model; Bath Accessories & Storage yields, in site order: Bath Accessories, Bath Storage, Laundry Hampers & Accessories, Wastebaskets, Bathroom Cleaning. (4) Every leaf's own JSON-LD BreadcrumbList was read to confirm its parent. Rows below are ordered exactly as the site orders them, with each grouping row immediately before its children.\nTHE PARENTAGE QUESTION THE PRIOR SESSION COULD NOT SETTLE IS NOW SETTLED, BY THE SITE'S OWN rel=canonical. The prior session flagged that Towel Rings, Towel Racks & Bars and Toilet Paper Holders sit at /decorating-and-accessories/ while the Bath department publishes a /bath/bath-hardware/ hub, and could not tell which parent the site asserts. Both were fetched. https://www.crateandbarrel.com/bath/towel-bars-hooks/1 loads with H1 'Towel Bars & Hooks' and 60 items, and declares rel=canonical -> https://www.crateandbarrel.com/decorating-and-accessories/towel-racks-and-bars/1, which itself loads with the identical H1 and the identical 60. They are ONE page reachable by two nav paths. Under rule 28 that is ONE record, and under rule 27 the URL recorded is the site's own canonical, i.e. the /decorating-and-accessories/ form. The same test was applied to every /bath/ alias. Classification is unaffected: rules 15 and 17 name towel rails/bars/rings/hooks and toilet roll holders as Bathroom explicitly, and rule 2 puts PRIMARY PRODUCT TYPE above WEBSITE HIERARCHY, so they are Bathroom whichever branch the breadcrumb prints.\nQTY SOURCE AND HOW IT WAS PROVEN. The Crate & Barrel PLP is SERVER-RENDERED - no storefront API was needed or used, and none was called (which also keeps us clear of the robots 'Disallow: /Browse/*' rule). Each page states its own total in THREE independent places in the same HTML document, and all three had to agree before a number was accepted: (i) the visible rendered string '<N> Items' beside the sort control, taken from the parsed text of the page rather than from markup; (ii) the product-grid container attribute data-num-results=\"<N>\"; (iii) the embedded page-model JSON field \"totalCount\":<N>. Agreement was verified on every page and across a very wide size range, which is the equivalence proof: Bath Vanities 4/4/4, Bath Faucets 11/11/11, Towel Rings 20/20/20, Cabinet Knobs 21/21/21, Toilet Paper Holders 23/23/23, Bath Mirrors 24/24/24, Bathroom Cleaning 25/25/25, Wastebaskets 28/28/28, Cabinet Pulls 49/49/49, Bath Storage 57/57/57, Towel Bars & Hooks 60/60/60, Laundry & Hampers 68/68/68, Bathroom Lighting 72/72/72, Bath Accessories 81/81/81, Soaps & Lotions 90/90/90, Scented Candles & Diffusers 126/126/126, Bath Accessories & Storage hub 184/184/184, Bath department 597. A fourth field, the JSON-LD \"numberOfItems\", was deliberately NOT used as the count: it agrees on small pages but CAPS AT 100 on the larger ones (Scented Candles & Diffusers numberOfItems 100 vs true total 126; Bath Accessories & Storage 100 vs 184), because JSON-LD only enumerates the first rendered page of tiles. Taking it would have understated those nodes - recorded here so the trap is documented.\nCOUNTS DISCRIMINATE: the nine recorded leaves return 81, 57, 28, 25, 11, 60, 20, 23 and 24 - nine distinct values - against 4, 49, 21, 68, 72, 90, 126, 184 and 597 for the excluded, routed-out and grouping nodes. Eighteen pages, seventeen distinct totals, spanning 4 to 597. This is emphatically not a site-wide constant. H1 CHECK: every recorded page's H1 matches the node requested - 'Bath Accessories', 'Bath Storage', 'Wastebaskets', 'Bathroom Cleaning', 'Bath Faucets', 'Towel Bars & Hooks', 'Towel Rings', 'Toilet Paper Holders', 'Bathroom Mirrors & Medicine Cabinets'.\nDEDUP: lib/dedup.already_extracted() was run on EVERY candidate leaf before it was recorded. All nine recorded URLs return None - clean. ONE hit, and the re-run proved it reaches further than the prior session realised: /furniture/bathroom-vanities-collections/1 is ALREADY EXTRACTED IN Furniture.xlsx as 'Bathroom Vanities', AND the Bath Furniture hub's own child /bath/bath-vanities/1 declares rel=canonical -> that same /furniture/ URL with breadcrumb Home > Furniture > Bathroom Furniture. So the /bath/ path is an alias of the already-extracted Furniture node, not a second node. Under the dispatch note's OPTION 1 it stays in Furniture and is NOT re-extracted into Bathroom even though rule 9 would otherwise class it as Bathroom. Had the alias been recorded naively it would have double-counted the Furniture pass under a URL the dedup index does not contain - this is exactly the trap the dispatch note warns about, and it was caught by checking rel=canonical, not just the URL string.\nWHAT WAS EXCLUDED AND WHY, node by node, all verified live rather than assumed. Bath Vanities (4) -> dedup, see above. Bathroom Lighting (72) -> LIGHTING: /bath/bath-lighting/1 canonicalises to /lighting/bathroom-lighting/1 with breadcrumb Home > Lighting > Lighting by Room; rules 11/19 make it Lighting and rule 19 forbids duplicating it into Bathroom. Scented Candles & Diffusers (126) -> DECOR: canonicalises to /decorating-and-accessories/scented-candles-and-diffusers/1, breadcrumb Home > Decor & Pillows > Candles & Home Fragrances (rule 21). Soaps & Lotions (90) -> NOT BATHROOM: breadcrumb Home > Bath > Bath Scents, but the primary product type is consumable hand/body soap and lotion, i.e. personal-care toiletries; rule 13 admits soap DISPENSERS and DISHES, not the soap itself, and rule 2 puts product type above the room. Laundry & Hampers (68) -> NOT BATHROOM: the Bath Accessories & Storage tile grid links it as 'Laundry Hampers & Accessories', but the page canonicalises to /bed-and-bath/laundry-storage/1 with breadcrumb Home > Bedding > Cleaning & Laundry and H1 'Laundry & Hampers' - laundry storage, owned by Storage/Laundry (rules 30-33). Cabinet Pulls (49) and Cabinet Knobs (21) -> NOT BATHROOM: the Bath Hardware hub lists them, but both canonicalise to /decorating-and-accessories/ with breadcrumb Home > Decor & Pillows > Hardware, and their primary product type is general cabinet hardware serving kitchen, furniture and bath alike; rule 17's Bathroom-hardware list names towel rails, toilet roll holders, robe hooks, shower rails, bathroom shelves and accessory sets, and does not extend to cabinet pulls and knobs. Bed & Bath Storage (40) -> NOT BATHROOM: breadcrumb Home > Decor & Pillows > Buying Guides & Styling Ideas > Storage Essentials - a Storage-owned styling node, and /bath/bath-storage/1 already covers the bathroom-specific storage. /bath/all-bath-hardware/1, /bath/all-bath/1, /bath/now-trending-bath/, /bath/top-rated-bath/1, /bath/new-bath/1, /bath/clearance-bath/1, /bath/warehouse-bath-sale/1, /bath/shop-our-home-brands/ and every 'Shop All' hub link -> rule 25. The Bath, Bath Accessories & Storage, Bath Hardware and Bath Furniture hubs -> rule 24, recorded as grouping rows with blank qty and blank link exactly as rule 38 requires. The whole Bath Linens & Towels branch -> TEXTILE.\nNO FABRICATION: every quantity above is a figure the listing page itself renders, cross-checked against two further fields in the same document. Nothing was estimated, summed from siblings, inherited from a parent, carried over from the Furniture pass or read from an archive. No URL was invented - every URL is either a link taken verbatim from Crate & Barrel's own navigation or the rel=canonical that the page itself declares. No View All, Shop All, Collections, search or product-detail URL was recorded.",
+ "rows": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Accessories & Storage",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Accessories",
+   "qty": 81,
+   "link": "https://www.crateandbarrel.com/bath/bath-accessories/1",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Storage",
+   "qty": 57,
+   "link": "https://www.crateandbarrel.com/bath/bath-storage/1",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Wastebaskets",
+   "qty": 28,
+   "link": "https://www.crateandbarrel.com/bath/wastebaskets/1",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Cleaning",
+   "qty": 25,
+   "link": "https://www.crateandbarrel.com/bath/bathroom-cleaning/1",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Hardware",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Faucets",
+   "qty": 11,
+   "link": "https://www.crateandbarrel.com/bath/bath-faucets/1",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Towel Bars & Hooks",
+   "qty": 60,
+   "link": "https://www.crateandbarrel.com/decorating-and-accessories/towel-racks-and-bars/1",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Towel Rings",
+   "qty": 20,
+   "link": "https://www.crateandbarrel.com/decorating-and-accessories/towel-rings/1",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Toilet Paper Holders",
+   "qty": 23,
+   "link": "https://www.crateandbarrel.com/decorating-and-accessories/toilet-paper-holders/1",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Mirrors & Medicine Cabinets",
+   "qty": 24,
+   "link": "https://www.crateandbarrel.com/bath/bath-mirrors/1",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  }
+ ],
+ "review": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath (department hub)",
+   "qty": null,
+   "issue": "PARENT HUB - recorded as a grouping row (blank qty, blank link) per rules 24/38, not as a leaf. Read live this session: H1 'Bath', data-num-results=597. Its five child hubs, taken from its own mega-menu, are /bath/bath-linens-towels/, /bath/bath-accessories-and-storage/, /bath/bath-hardware/, /bath/bath-furniture/ and /bath/bath-scents/. Listed so the discovered hierarchy is fully visible.",
+   "link": "https://www.crateandbarrel.com/bath/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath > Bath Accessories & Storage (hub)",
+   "qty": 184,
+   "issue": "PARENT HUB with valid children - recorded as a grouping row per rules 24/38. It does render its own combined grid (184 Items / data-num-results=184 / totalCount=184, breadcrumb Home > Bath), but rule 24 forbids recording a parent URL when valid child listings exist, and its 184 is NOT the sum of its children (81+57+28+25+68=259), so it must never be used as, or reconciled against, a leaf figure. The count is noted here only as evidence, not as a row.",
+   "link": "https://www.crateandbarrel.com/bath/bath-accessories-and-storage/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath > Bath Hardware (hub)",
+   "qty": null,
+   "issue": "PARENT HUB - grouping row per rules 24/38. No product grid of its own (no data-num-results). Its <ul class=\"category-nav\"> children, read live: Bath Faucets, Towel Bars & Hooks, Towel Rings, Toilet Paper Holders, Cabinet Pulls, Cabinet Knobs, View All.",
+   "link": "https://www.crateandbarrel.com/bath/bath-hardware/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath > Bath Furniture (hub)",
+   "qty": null,
+   "issue": "PARENT HUB - grouping row per rules 24/38. No product grid of its own. Its <ul class=\"category-nav\"> children, read live: Bath Lighting, Bath Mirrors, Bath Vanities.",
+   "link": "https://www.crateandbarrel.com/bath/bath-furniture/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Hardware > Towel Bars & Hooks / Towel Rings / Toilet Paper Holders - /bath/ aliases",
+   "qty": null,
+   "issue": "DUPLICATE URLs SUPPRESSED UNDER RULE 28, resolving the prior session's open parentage question. /bath/towel-bars-hooks/1, /bath/towel-rings/1 and /bath/toilet-paper-holders/1 are reachable from the Bath Hardware hub, but each declares rel=canonical to its /decorating-and-accessories/ twin and serves the identical H1 and identical total (Towel Bars & Hooks 60 = 60, verified on both URLs). Same page, two nav paths, therefore ONE record; the canonical form is what appears in rows, per rule 27. Classification is unaffected - rules 15/17 name this hardware as Bathroom explicitly.",
+   "link": "https://www.crateandbarrel.com/bath/towel-bars-hooks/1"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Furniture > Bath Vanities",
+   "qty": 4,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Bathroom Vanities' - confirmed by lib/dedup.already_extracted(). Per the dispatch note (Option 1) bath vanities recorded in Furniture stay in Furniture and are NOT re-extracted into Bathroom, even though rule 9 would otherwise class them as Bathroom. IMPORTANT ADDITION FROM THIS RE-RUN: the Bath Furniture hub's own child link is /bath/bath-vanities/1, which is NOT in the dedup index; it was fetched (H1 'Bathroom Vanities', 4 Items, breadcrumb Home > Furniture > Bathroom Furniture) and it declares rel=canonical -> /furniture/bathroom-vanities-collections/1. It is an alias of the already-extracted node, not a second node, so it is suppressed too. qty 4 is this session's live reading of that page (the Furniture pass recorded 5, now stale); it is shown for audit only and is not a Bathroom row.",
+   "link": "https://www.crateandbarrel.com/furniture/bathroom-vanities-collections/1"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Hardware > Cabinet Pulls",
+   "qty": 49,
+   "issue": "NOT BATHROOM (rules 2/17), count obtained so nothing is hidden. The Bath Hardware hub lists it as a child, but the page canonicalises to /decorating-and-accessories/cabinet-pulls/1 with breadcrumb Home > Decor & Pillows > Hardware, and the primary product type is general cabinet hardware serving kitchen, furniture and bath alike. Rule 2 puts PRIMARY PRODUCT TYPE above WEBSITE HIERARCHY, and rule 17's Bathroom-hardware list (towel rails, toilet roll holders, robe hooks, shower rails, bathroom shelves, accessory sets, mounting accessories) does not extend to cabinet pulls. Flagged rather than silently dropped; belongs with general Hardware.",
+   "link": "https://www.crateandbarrel.com/decorating-and-accessories/cabinet-pulls/1"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Hardware > Cabinet Knobs",
+   "qty": 21,
+   "issue": "NOT BATHROOM (rules 2/17) - identical reasoning to Cabinet Pulls. Canonical /decorating-and-accessories/cabinet-knobs/1, breadcrumb Home > Decor & Pillows > Hardware, primary product type is general cabinet hardware. Count 21 obtained and recorded here so the node is visibly considered.",
+   "link": "https://www.crateandbarrel.com/decorating-and-accessories/cabinet-knobs/1"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Accessories & Storage > Laundry Hampers & Accessories",
+   "qty": 68,
+   "issue": "NOT BATHROOM (rules 2, 30-33), count obtained. The Bath Accessories & Storage tile grid links this as 'Laundry Hampers & Accessories' via /bath/laundry-hampers-accessories/1, but the page canonicalises to /bed-and-bath/laundry-storage/1 with H1 'Laundry & Hampers' and breadcrumb Home > Bedding > Cleaning & Laundry. Primary product type is laundry storage, which is Storage-owned; /bath/bath-storage/1 (57, recorded) is the bathroom-specific storage node. This node was NOT in the prior session's banked list, so it is a new discovery from this re-run.",
+   "link": "https://www.crateandbarrel.com/bed-and-bath/laundry-storage/1"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Scents > Soaps & Lotions",
+   "qty": 90,
+   "issue": "NOT BATHROOM (rules 2/13) - the prior session's ambiguity flag is now RESOLVED with the page in hand. H1 'Soaps & Lotions', 90 Items, breadcrumb Home > Bath > Bath Scents, canonical self. It sits inside the Bath department, but the primary product type is consumable hand/body soap and lotion, i.e. personal-care toiletries. Rule 13 admits soap DISPENSERS and soap DISHES, not the soap itself, and rule 2 puts product type above room. Excluded on the evidence, not guessed.",
+   "link": "https://www.crateandbarrel.com/bath/bath-soaps/1"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Decor & Pillows > Storage Essentials > Bed & Bath Storage",
+   "qty": 40,
+   "issue": "NOT BATHROOM (rules 2, 12, 30-33) - the prior session's ambiguity flag is now RESOLVED. H1 'Bed & Bath Storage', 40 Items, breadcrumb Home > Decor & Pillows > Buying Guides & Styling Ideas > Storage Essentials. Its parent branch is a Storage/styling node, not the Bath department, and /bath/bath-storage/1 (57, recorded) is the node the site itself presents as bathroom storage. Recording this too would duplicate. Belongs with Storage.",
+   "link": "https://www.crateandbarrel.com/decorating-and-accessories/bed-and-bath-storage/1"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Furniture > Bath Lighting",
+   "qty": 72,
+   "issue": "ROUTED TO LIGHTING: primary product type is lighting (rules 11/19). Verified live this session - /bath/bath-lighting/1 is listed as a child of the Bath Furniture hub but canonicalises to /lighting/bathroom-lighting/1 with H1 'Bathroom Lighting' and breadcrumb Home > Lighting > Lighting by Room, i.e. the site itself files it under Lighting. Exact count 72 verified (72 Items / data-num-results=72 / totalCount=72) and passed on so the Lighting pass has it. Rule 19 forbids duplicating it into Bathroom. dedup clean.",
+   "link": "https://www.crateandbarrel.com/lighting/bathroom-lighting/1"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Scents > Scented Candles & Diffusers",
+   "qty": 126,
+   "issue": "ROUTED TO DECOR: candles and diffusers are decorative home fragrance (rule 21). Verified live - /bath/candles-diffusers/1 is a child of the Bath Scents hub but canonicalises to /decorating-and-accessories/scented-candles-and-diffusers/1 with breadcrumb Home > Decor & Pillows > Candles & Home Fragrances. Exact count 126 verified (126 Items / data-num-results=126 / totalCount=126; note JSON-LD numberOfItems reads 100 here because it caps at one rendered page - 126 is the true total).",
+   "link": "https://www.crateandbarrel.com/decorating-and-accessories/scented-candles-and-diffusers/1"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath > Bath Linens & Towels > Bath Towels",
+   "qty": null,
+   "issue": "ROUTED TO TEXTILE: bath towels (rules 15/20). Count not read - the whole Bath Linens & Towels branch is Textile-owned, so reading it would have spent the site's rate-limit budget on nodes Bathroom cannot record. The branch's full membership, from the Bath mega-menu read live this session, is Bath Towels /bath/bath-towels/1, Bath Rugs & Mats /bath/bath-rugs/1, Bath Towel Bundles /bath/bath-towel-bundles/1, Shower Curtains & Rings /bath/shower-curtains-rings/1, Bathrobes & Slippers /bath/bathrobes/1 and Turkish Towels /bath/turkish-towels/1.",
+   "link": "https://www.crateandbarrel.com/bath/bath-towels/1"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath > Turkish Towels",
+   "qty": null,
+   "issue": "ROUTED TO TEXTILE: towels (rules 15/20).",
+   "link": "https://www.crateandbarrel.com/bath/turkish-towels/1"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath > Bath Towel Bundles",
+   "qty": null,
+   "issue": "ROUTED TO TEXTILE: towel sets (rules 15/20).",
+   "link": "https://www.crateandbarrel.com/bath/bath-towel-bundles/1"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath > Bath Rugs & Mats",
+   "qty": null,
+   "issue": "ROUTED TO TEXTILE: textile bath mats/rugs (rule 16 - only a rubber/anti-slip mat sold as a bathroom accessory would stay in Bathroom).",
+   "link": "https://www.crateandbarrel.com/bath/bath-rugs/1"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath > Bathrobes & Slippers",
+   "qty": null,
+   "issue": "ROUTED TO TEXTILE: bathrobes (rule 20).",
+   "link": "https://www.crateandbarrel.com/bath/bathrobes/1"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath > Shower Curtains & Rings",
+   "qty": null,
+   "issue": "ROUTED TO TEXTILE: the node's primary product type is shower curtains (rule 20). The rings are hardware and would be Bathroom under rule 17, but Crate & Barrel publishes no separate rings URL, so splitting it would require inventing one (rule 27). Flagged so the Textile pass sees the overlap.",
+   "link": "https://www.crateandbarrel.com/bath/shower-curtains-rings/1"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "View All / Shop All / promotional Bath pages",
+   "qty": null,
+   "issue": "EXCLUDED BY RULE 25, recorded so they are visibly considered and not silently skipped: /bath/all-bath-hardware/1 (the Bath Hardware hub's own 'View All' tile), /bath/all-bath/1, /bath/top-rated-bath/1 (Bestsellers), /bath/new-bath/1, /bath/now-trending-bath/, /bath/clearance-bath/1, /bath/warehouse-bath-sale/1, /sale/select-bedding-bath-sale/1, /whats-new/new-arrivals-bath/1 and /bath/shop-our-home-brands/. Their products are already counted inside the recorded leaves, so recording them would duplicate.",
+   "link": "https://www.crateandbarrel.com/bath/all-bath-hardware/1"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom fixtures - toilets, bidets, basins, sinks, baths, showers, enclosures",
+   "qty": null,
+   "issue": "CONFIRMED ABSENT, NOT SKIPPED. The Bath department page, all five of its hubs and each hub's own <ul class=\"category-nav\"> and tile grid were enumerated in full this session. Crate & Barrel publishes NO toilet, bidet, urinal, basin, sink, bathtub, shower system, shower enclosure or shower screen node - the only fixture-class node in the whole department is Bath Faucets (11, recorded). Rules 4-7 therefore have nothing to catch here; the absence is a real finding about a furniture-and-housewares retailer, not an omission.",
+   "link": null
+  }
+ ],
+ "_reconstructed_from": "Bathroom.xlsx delivered 2026-09-01 (checkpoint), not original worker JSON"
+}

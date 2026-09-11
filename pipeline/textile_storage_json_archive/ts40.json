@@ -1,0 +1,53 @@
+{
+  "sr": 40,
+  "company": "Aerin",
+  "brand_site": "aerin.com",
+  "country": "USA",
+  "site_url": "https://www.aerin.com/home-decor",
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "ACCESS: Tier (a) HTTP direct fetch (requests + curl_cffi chrome124 impersonation) blocked at first request - robots.txt and the target page both returned 403 (PerimeterX px-captcha wall, confirmed by response body/headers). Tier (b) Playwright (headless, then headed with --disable-blink-features=AutomationControlled) also returned 403 with the same PerimeterX px-captcha page. Escalated to tier (c) Claude-in-Chrome (real Chrome tab) which loaded the site normally - used for the full research pass. robots.txt (read via the Chrome tab) has no Anthropic/Claude bot rule and no blanket Disallow: / for the paths used (category pages under /home/ are not disallowed), so tier (c) was permitted. TREE METHOD: union of the site's mega-menu (read via accessibility tree under the 'Home' nav item, which expands to Decor / Tabletop & Bar / Furniture branches) plus sitemap.xml (https://www.aerin.com/media/sitemap/sitemap.xml, 282 URLs) plus each visited category page's own breadcrumb/H1 confirmation. The assigned URL (aerin.com/home-decor) redirects to https://www.aerin.com/home/decor/, the 'Decor' branch of the 'Home' nav; the sibling 'Tabletop & Bar' and 'Furniture' branches were also enumerated since they share the same 'Home' parent. Aerin is a lifestyle/beauty+home brand as expected - the Decor/Tabletop catalog is dominated by decorative accessories, tableware, and fragrance; only two genuine textile leaf categories exist (Throw Blankets; Table Linens & Placemats, which itself splits into Napkins and Placemats sub-pages found only via sitemap.xml, not the mega-menu). No Storage category or genuine storage/organization subcategory exists anywhere in the Home tree. QTY METHOD: read from the Klevu search widget's own analytics beacon (stats.ksearchnet.com/analytics/categoryProductViewTracking, query param klevu_totalResults) captured via read_network_requests while each category page was open - this is the site's own exact per-page count, cross-checked against on-page product-tile counts and pagination. NOTE on Table Linens & Placemats: the parent combined listing page shows klevu_totalResults=80, and its own PRODUCT TYPE filter facet shows Napkins(51)+Placemats(29)=80, but the two dedicated sub-category pages found via sitemap.xml (.../table-linens-placemats/napkins/ and .../table-linens-placemats/placemats/, each with matching H1 and breadcrumb) report klevu_totalResults=35 and 25 respectively via the same Klevu API - a genuine site-side data inconsistency between the facet count and the dedicated category page count, not a bad-slug/wrong-number artifact (both leaf URLs render correctly with matching headers). Per the parent-URL rule I recorded the two deepest valid subcategory pages (Napkins, Placemats) with their own page's klevu_totalResults rather than the parent's aggregate, and flagged both LOW-MEDIUM per the observed discrepancy. EXCLUDED: Picture Frames, Games, Candles & Diffusers, Candle Accessories, Vases & Cachepots, Floral Arrangements, Decorative Trays & Vide Poches, Office Accessories, Stationery, Objects & Books (all Decorative Home Accessories, not Textile/Storage). Bathroom Accessories excluded - page description/products are mirrors, vanity trays, soap dispensers, tissue box covers, jewelry dishes, glass containers - purely decorative bath countertop accents, no bath textiles (towels/robes) or bath storage/organizers found. Jewelry & Decorative Boxes excluded from Storage - products are single decorative accent boxes (Envelope Box, Heart Box, Wood/Lacquer/Brass/Porcelain Box, Shagreen Jewelry Box) explicitly marketed by the site as 'a piece of elegant decor' first; no drawer/compartment organizer-type products found, so treated as Decorative Home Accessories per storage.md SS23-24 rather than forced into Storage. Dinnerware, Serveware & Trays, Flatware, Drinkware, Barware, Antique & Vintage excluded (Kitchen & Dining / Decorative, out of scope). Furniture (/home/furniture-mirrors/) entirely excluded - single undifferentiated 'All Furniture & Mirrors' listing, explicitly the site's own Furniture category (out of scope, handled by Furniture.xlsx). Lighting, Fashion (incl. Weekender Bags, Handbags & Pouches - fashion accessories not home storage), Beauty, Personalization, Collaborations, Gifts nav branches excluded as out of scope/non-home-textile/non-storage per rules. No Storage category, Storage Boxes/Baskets/Organizers, or any genuine storage/organization node exists anywhere on the site - storage_rows is a valid empty result, not a missed search.",
+  "textile_rows": [
+    {
+      "category": "Textile",
+      "sub_category": "Table Linens & Placemats",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Napkins",
+      "qty": 35,
+      "link": "https://www.aerin.com/home/tabletop-bar/table-linens-placemats/napkins/",
+      "is_group": false,
+      "evidence": "Klevu categoryProductViewTracking analytics call on this page: klevu_categoryPath=Home;Tabletop & Bar;Table Linens & Placemats;Napkins, klevu_totalResults=35. Page H1 'Napkins', breadcrumb Home | Home | Tabletop & Bar | Table Linens & Placemats | Napkins, single results page (pagination shows only '1'). Note: the parent category's own PRODUCT TYPE filter facet shows Napkins(51) - differs from this dedicated page's own total (35); used this leaf page's own count per the deepest-valid-subcategory rule.",
+      "flag": "MANUAL REVIEW: qty discrepancy between dedicated /napkins/ page (klevu_totalResults=35) and parent page's PRODUCT TYPE facet count (51) - both are genuine site-reported numbers, used the dedicated leaf page's own total",
+      "confidence": "MEDIUM"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Placemats",
+      "qty": 25,
+      "link": "https://www.aerin.com/home/tabletop-bar/table-linens-placemats/placemats/",
+      "is_group": false,
+      "evidence": "Klevu categoryProductViewTracking analytics call on this page: klevu_categoryPath=Home;Tabletop & Bar;Table Linens & Placemats;Placemats, klevu_totalResults=25. Page H1/title 'Placemats', breadcrumb matches, single results page (pagination shows only '1').",
+      "flag": "MANUAL REVIEW: qty discrepancy between dedicated /placemats/ page (klevu_totalResults=25) and parent page's PRODUCT TYPE facet count (29) - both are genuine site-reported numbers, used the dedicated leaf page's own total",
+      "confidence": "MEDIUM"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Throw Blankets",
+      "qty": 5,
+      "link": "https://www.aerin.com/home/decor/throw-blankets/",
+      "is_group": false,
+      "evidence": "Klevu categoryProductViewTracking analytics call on this page: klevu_categoryPath=Home;Decor;Throw Blankets, klevu_totalResults=5, matching 5 product tiles rendered on the page. Page H1 'Throw Blankets', breadcrumb Home | Home | Decor | Throw Blankets, single results page (pagination shows only '1').",
+      "flag": null,
+      "confidence": "HIGH"
+    }
+  ],
+  "storage_rows": []
+}

@@ -1,0 +1,1353 @@
+{
+ "sr": 107,
+ "company": "IKEA DE",
+ "brand_site": "ikea.com",
+ "country": "Germany",
+ "site_url": "https://www.ikea.com/de/de/",
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ROUTE: Claude-in-Chrome connector only, one dedicated tab. robots.txt (ikea.com/robots.txt) was read in that tab first: no anthropic-ai / ClaudeBot / Claude-Web / Claude-User / Claude-SearchBot block, no blanket Disallow: / for User-agent: *, and none of the 92 Disallow lines covers /de/ or /cat/. Everything after that was done from the loaded page https://www.ikea.com/de/de/cat/moebel-fu001/ - the category tree from that page's own hydration payload and every count from IKEA's own listing backend called same-origin with fetch() via javascript_tool. No curl / requests / WebFetch / proxy was used at any point. TREE SOURCE: the DE mega-menu tree from script[type=text/hydrate] -> data.config.catalogSlim on the /de/de/cat/ page: 964 unique nodes across 22 top-level departments, each node carrying id / name / url / subs. Note the child key on the DE payload is 'subs', not 'subCategories'. As on the UK store, /de/de/cat/moebel-fu001/ ('Moebel') is a marketing Themes hub - its own hierarchyObjs entry has parent='themes' and subCategories:[] - so it is NOT a real department and was not used as the furniture root. Furniture was assembled from the DE store's real departments: fu002 Tische & Stuehle, 700640 Sofas & Sessel, bm001 Betten & Matratzen, st001 Aufbewahrung & Schraenke, fu004 Bueromoebel & Gamingmoebel, ba001 Badmoebel & Badzubehoer, od001 Outdoor Moebel (od003 Gartenmoebel) and bc001 Babys & Kinder. ka001 (fitted kitchens, appliances, worktops, sinks, taps, mini-kitchens) and st007 (organisers, boxes, baskets) were inspected and excluded as kitchen fixtures and standalone storage goods respectively; the two furniture nodes IKEA files inside them (10471 kitchen islands/trolleys, 16200 pantry shelving) are reached through st001 and are included. QTY METHOD: for every leaf the exact total is productListPage.productCount from sik.search.blue.cdtapps.com/de/de/product-list-page?category=<id>, fetched same-origin from the loaded page. Every single one of the 117 leaves was then verified two ways: (1) full enumeration - /product-list-page/more-products?category=<id>&start=0&end=productCount+50 returned exactly productCount tiles with exactly productCount unique itemNo values (unique product IDs, not href counting); (2) boundary test - start=productCount-1 returned exactly 1 item and start=productCount returned 0 items. All 117 passed both checks, 0 failures. RENDERED HEADER vs PRODUCT COUNT - MEASURED, NOT ASSUMED: IKEA's rendered 'N Produkte' listing header (p.plp-filter-information__total-count) folds a non-product PLANNER TOOL tile into the figure. 78 of the 117 leaves have productListPage.plannerCount 1 or 2. Six DE category pages were actually loaded in the tab and their header text read from the live DOM: Couchtische productCount 45 / header '46 Produkte', Esstische 92 / '93', Sofas 274 / '275', Betten 226 / '227' (all plannerCount 1 or 2), versus Wuerfelregale 79 / '79' and Einbaukleiderschraenke 389 / '389' (plannerCount 0). So on the DE store the offset is exactly +1 whenever plannerCount>0 - note it is +1 even where plannerCount=2 (Esstische, Sofas), so the header is NOT productCount+plannerCount. Two further details worth passing on: the server-delivered HTML of a category page carries the un-inflated number (a raw fetch of couchtische-10716 returns '45 Produkte'); the +1 only appears after client-side hydration injects the planner tile, so an HTTP-only reader of this site would never see the inflation at all. qty here is the enumerated/boundary-proven PRODUCT count, and the header figure is stated inside every evidence string so the orchestrator can reconcile this against the opposite call made on West Elm UK. SANITY CHECKS: the API echoed back category.name and category.url for every id and both matched the node taken from catalogSlim, so no id silently served a parent listing; 61 distinct qty values across 117 leaves spanning 1-389, so no site-wide constant and no suspiciously round display cap; a boundary test proves each total is neither truncated nor inflated. STOPPING RULE / EXCLUSIONS: stopped above nodes that only split by seat count, size, material or series - Esstische -> 'fuer 2/4/6/8/10 Personen', Essgruppen -> same, Sofas -> 2er/3er/Ecksofas/Sofa-Elemente, Sessel -> Textil/Leder/Rattan, Schlafsofas -> 2er/3er/L-Form, Hocker -> Stoff/Leder/Rattan, Betten -> Doppel-/Einzel-/Boxspring-/Polsterbetten. The whole named-series layer under st001>46052 (PAX, BESTA, PLATSA, EKET, IVAR, ELVARLI, BROR, BOAXEL, SKYTTA, JONAXEL, JOSTEIN, TROFAST, OMAR, LASTARE, LADMAKARE, GULDDRAGARE), the bathroom series under ba001>700450 (AENGSJOEN, HAVBAECK, ENHET, NYSJOEN, TAENNFORSEN, HEMNES, VIDVESSEL), the desk systems under fu004>47423 (MITTZON, TROTTEN, IDASEN, RELATERA) and the children's SMASTAD/LASTARE systems were all excluded as component listings. Also excluded: mattresses and mattress bases (bm002, 24827 Lattenroste, 45855, 18724), 24825 Bettpodeste (LYNGOER/FOELUNGEN sprung and slatted bed bases - bedding, not furniture), furniture parts and covers (10664 sofa covers, 31785 legs, 31786 sofa sections, 24822 bed feet, 55997 wardrobe sliding doors, 30572 table tops/frames, 34006 chair frames, 25223 chair covers, 57654 stool covers, 16298 handles), textiles (20542 seat pads, 46400 outdoor cushions, tl003, tl004), standalone storage goods (10550 boxes & baskets, 10797, 19059 under-bed boxes, 20479, 20474 toy storage), wall shelving (10398 Wandregale, 20660 Haengeregale, 20481, 20676 kitchen shelves - Wall Decor's job), bathroom fixtures and mirrors (20723 basins, 20724 taps, 40690 showers, 20490 Badspiegel and its mirror children, 10555 accessories), lighting (16283, 42242, 55033, 10736, 18773), appliances and laundry machines (20826, 20608, 24898 grills), and the fitted-kitchen tree ka003/700292/ 700293/22957/700543/700544. OVERLAPS: IKEA's DE tree lists several nodes under two parents (21825 Esstische under both 700417 Esszimmermoebel and 700675 Tische; 22659 Hocker at department level and under 700417; 10412 Sideboards under st003 and 30454; 20656 Nachttische under bm001 and st004; fu006 Sessel under 700676 and 700640; 47386 Gartenbaenke under 700319 and 700350; 20858 Badrollwagen under fu005 and ba001; 21958 under st001 and od001; 18707/18708/24714/24715/45816/20483/37899 under both their type parent and the children's tree). Each such leaf is emitted exactly once, under its most natural parent, so there are no duplicate rows; the grouping rows 700417 Esszimmermoebel and 30454 Sideboards & Beistelltische are therefore not emitted because every child of theirs is placed elsewhere (19145 Essgruppen is emitted directly as 'Dining Sets'). GERMAN-vs-UK DIVERGENCE: the DE department layout differs from the UK store's (DE has 700675 Tische / 700676 Stuehle / 700319 Sitzbaenke / 16244 Bartische & -stuehle where the UK groups differently), and DE carries six nodes the UK tree does not surface as leaves: 47360 Bartische mit Hocker, 56516 Gamingtisch & -stuhl-Sets, 49079 Regalsysteme fuer Kleidung & Schuhe, 20611 Tritthocker & Trittleitern, 24830 Laptoptische & Laptophalter and 24825 Bettpodeste (the last one excluded). All node names here were translated from the DE store's own wording; nothing was copied from the UK labels.",
+ "rows": [
+  {
+   "category": "Furniture",
+   "sub_category": "Tables & Chairs",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Stools",
+   "qty": 23,
+   "link": "https://www.ikea.com/de/de/cat/hocker-22659/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=23 for category=22659 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=73 returned exactly 23 tiles carrying 23 unique itemNo values) and by boundary test (start=22 returned exactly 1 item, start=23 returned 0). plannerCount=0, so the rendered listing header (p.plp-filter-information__total-count) on https://www.ikea.com/de/de/cat/hocker-22659/ also reads '23 Produkte'.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dressing Table Chairs & Stools",
+   "qty": 16,
+   "link": "https://www.ikea.com/de/de/cat/schminktisch-stuehle-hocker-59250/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=16 for category=59250 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=66 returned exactly 16 tiles carrying 16 unique itemNo values) and by boundary test (start=15 returned exactly 1 item, start=16 returned 0). plannerCount=1: IKEA injects a non-product planner-tool tile into the grid, so the rendered listing header (p.plp-filter-information__total-count) on the category page reads '17 Produkte' - one higher than the real product total. This +1 offset was measured directly on four loaded DE category pages (Couchtische 45 products / header 46, Esstische 92 / 93, Sofas 274 / 275, Betten 226 / 227) and on two plannerCount=0 pages where header equals productCount exactly (Wuerfelregale 79 / 79, Einbaukleiderschraenke 389 / 389).",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dining Sets",
+   "qty": 116,
+   "link": "https://www.ikea.com/de/de/cat/essgruppen-19145/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=116 for category=19145 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=166 returned exactly 116 tiles carrying 116 unique itemNo values) and by boundary test (start=115 returned exactly 1 item, start=116 returned 0). plannerCount=2: IKEA injects a non-product planner-tool tile into the grid, so the rendered listing header (p.plp-filter-information__total-count) on the category page reads '117 Produkte' - one higher than the real product total. This +1 offset was measured directly on four loaded DE category pages (Couchtische 45 products / header 46, Esstische 92 / 93, Sofas 274 / 275, Betten 226 / 227) and on two plannerCount=0 pages where header equals productCount exactly (Wuerfelregale 79 / 79, Einbaukleiderschraenke 389 / 389).",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Step Stools & Ladders",
+   "qty": 7,
+   "link": "https://www.ikea.com/de/de/cat/tritthocker-trittleitern-20611/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=7 for category=20611 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=57 returned exactly 7 tiles carrying 7 unique itemNo values) and by boundary test (start=6 returned exactly 1 item, start=7 returned 0). plannerCount=0, so the rendered listing header (p.plp-filter-information__total-count) on https://www.ikea.com/de/de/cat/tritthocker-trittleitern-20611/ also reads '7 Produkte'.",
+   "flag": "MANUAL REVIEW: ambiguous - node is 'Tritthocker & Trittleitern' (step stools & step ladders); all 7 products are step stools, IKEA files the node under the Tables & Chairs furniture department, so it is kept as seating/stool furniture"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Tables",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dining Tables",
+   "qty": 92,
+   "link": "https://www.ikea.com/de/de/cat/esstische-21825/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=92 for category=21825 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=142 returned exactly 92 tiles carrying 92 unique itemNo values) and by boundary test (start=91 returned exactly 1 item, start=92 returned 0). plannerCount=2: IKEA injects a non-product planner-tool tile into the grid, so the rendered listing header (p.plp-filter-information__total-count) on the category page reads '93 Produkte' - one higher than the real product total. This +1 offset was measured directly on four loaded DE category pages (Couchtische 45 products / header 46, Esstische 92 / 93, Sofas 274 / 275, Betten 226 / 227) and on two plannerCount=0 pages where header equals productCount exactly (Wuerfelregale 79 / 79, Einbaukleiderschraenke 389 / 389).",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Folding & Extendable Tables",
+   "qty": 30,
+   "link": "https://www.ikea.com/de/de/cat/klapp-ausziehtische-21829/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=30 for category=21829 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=80 returned exactly 30 tiles carrying 30 unique itemNo values) and by boundary test (start=29 returned exactly 1 item, start=30 returned 0). plannerCount=1: IKEA injects a non-product planner-tool tile into the grid, so the rendered listing header (p.plp-filter-information__total-count) on the category page reads '31 Produkte' - one higher than the real product total. This +1 offset was measured directly on four loaded DE category pages (Couchtische 45 products / header 46, Esstische 92 / 93, Sofas 274 / 275, Betten 226 / 227) and on two plannerCount=0 pages where header equals productCount exactly (Wuerfelregale 79 / 79, Einbaukleiderschraenke 389 / 389).",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Wall-Mounted Tables",
+   "qty": 1,
+   "link": "https://www.ikea.com/de/de/cat/tische-zur-wandmontage-25206/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=1 for category=25206 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=51 returned exactly 1 tiles carrying 1 unique itemNo values) and by boundary test (start=0 returned exactly 1 item, start=1 returned 0). plannerCount=0, so the rendered listing header (p.plp-filter-information__total-count) on https://www.ikea.com/de/de/cat/tische-zur-wandmontage-25206/ also reads '1 Produkte'.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Round Dining Tables",
+   "qty": 13,
+   "link": "https://www.ikea.com/de/de/cat/runde-esstische-59244/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=13 for category=59244 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=63 returned exactly 13 tiles carrying 13 unique itemNo values) and by boundary test (start=12 returned exactly 1 item, start=13 returned 0). plannerCount=1: IKEA injects a non-product planner-tool tile into the grid, so the rendered listing header (p.plp-filter-information__total-count) on the category page reads '14 Produkte' - one higher than the real product total. This +1 offset was measured directly on four loaded DE category pages (Couchtische 45 products / header 46, Esstische 92 / 93, Sofas 274 / 275, Betten 226 / 227) and on two plannerCount=0 pages where header equals productCount exactly (Wuerfelregale 79 / 79, Einbaukleiderschraenke 389 / 389).",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Multifunctional Tables",
+   "qty": 5,
+   "link": "https://www.ikea.com/de/de/cat/multifunktionstische-57537/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=5 for category=57537 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=55 returned exactly 5 tiles carrying 5 unique itemNo values) and by boundary test (start=4 returned exactly 1 item, start=5 returned 0). plannerCount=0, so the rendered listing header (p.plp-filter-information__total-count) on https://www.ikea.com/de/de/cat/multifunktionstische-57537/ also reads '5 Produkte'.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Counters & Bar Tables",
+   "qty": 6,
+   "link": "https://www.ikea.com/de/de/cat/theken-20862/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=6 for category=20862 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=56 returned exactly 6 tiles carrying 6 unique itemNo values) and by boundary test (start=5 returned exactly 1 item, start=6 returned 0). plannerCount=1: IKEA injects a non-product planner-tool tile into the grid, so the rendered listing header (p.plp-filter-information__total-count) on the category page reads '7 Produkte' - one higher than the real product total. This +1 offset was measured directly on four loaded DE category pages (Couchtische 45 products / header 46, Esstische 92 / 93, Sofas 274 / 275, Betten 226 / 227) and on two plannerCount=0 pages where header equals productCount exactly (Wuerfelregale 79 / 79, Einbaukleiderschraenke 389 / 389).",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Cafe Tables",
+   "qty": 4,
+   "link": "https://www.ikea.com/de/de/cat/cafehaustische-19143/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=4 for category=19143 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=54 returned exactly 4 tiles carrying 4 unique itemNo values) and by boundary test (start=3 returned exactly 1 item, start=4 returned 0). plannerCount=1: IKEA injects a non-product planner-tool tile into the grid, so the rendered listing header (p.plp-filter-information__total-count) on the category page reads '5 Produkte' - one higher than the real product total. This +1 offset was measured directly on four loaded DE category pages (Couchtische 45 products / header 46, Esstische 92 / 93, Sofas 274 / 275, Betten 226 / 227) and on two plannerCount=0 pages where header equals productCount exactly (Wuerfelregale 79 / 79, Einbaukleiderschraenke 389 / 389).",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Living Room Tables",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Side Tables",
+   "qty": 72,
+   "link": "https://www.ikea.com/de/de/cat/beistelltische-10717/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=72 for category=10717 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=122 returned exactly 72 tiles carrying 72 unique itemNo values) and by boundary test (start=71 returned exactly 1 item, start=72 returned 0). plannerCount=1: IKEA injects a non-product planner-tool tile into the grid, so the rendered listing header (p.plp-filter-information__total-count) on the category page reads '73 Produkte' - one higher than the real product total. This +1 offset was measured directly on four loaded DE category pages (Couchtische 45 products / header 46, Esstische 92 / 93, Sofas 274 / 275, Betten 226 / 227) and on two plannerCount=0 pages where header equals productCount exactly (Wuerfelregale 79 / 79, Einbaukleiderschraenke 389 / 389).",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Coffee Tables",
+   "qty": 45,
+   "link": "https://www.ikea.com/de/de/cat/couchtische-10716/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=45 for category=10716 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=95 returned exactly 45 tiles carrying 45 unique itemNo values) and by boundary test (start=44 returned exactly 1 item, start=45 returned 0). plannerCount=1: IKEA injects a non-product planner-tool tile into the grid, so the rendered listing header (p.plp-filter-information__total-count) on the category page reads '46 Produkte' - one higher than the real product total. This +1 offset was measured directly on four loaded DE category pages (Couchtische 45 products / header 46, Esstische 92 / 93, Sofas 274 / 275, Betten 226 / 227) and on two plannerCount=0 pages where header equals productCount exactly (Wuerfelregale 79 / 79, Einbaukleiderschraenke 389 / 389).",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Console Tables",
+   "qty": 2,
+   "link": "https://www.ikea.com/de/de/cat/ablagetische-16246/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=2 for category=16246 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=52 returned exactly 2 tiles carrying 2 unique itemNo values) and by boundary test (start=1 returned exactly 1 item, start=2 returned 0). plannerCount=1: IKEA injects a non-product planner-tool tile into the grid, so the rendered listing header (p.plp-filter-information__total-count) on the category page reads '3 Produkte' - one higher than the real product total. This +1 offset was measured directly on four loaded DE category pages (Couchtische 45 products / header 46, Esstische 92 / 93, Sofas 274 / 275, Betten 226 / 227) and on two plannerCount=0 pages where header equals productCount exactly (Wuerfelregale 79 / 79, Einbaukleiderschraenke 389 / 389).",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Nesting Tables",
+   "qty": 7,
+   "link": "https://www.ikea.com/de/de/cat/satztische-57298/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=7 for category=57298 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=57 returned exactly 7 tiles carrying 7 unique itemNo values) and by boundary test (start=6 returned exactly 1 item, start=7 returned 0). plannerCount=1: IKEA injects a non-product planner-tool tile into the grid, so the rendered listing header (p.plp-filter-information__total-count) on the category page reads '8 Produkte' - one higher than the real product total. This +1 offset was measured directly on four loaded DE category pages (Couchtische 45 products / header 46, Esstische 92 / 93, Sofas 274 / 275, Betten 226 / 227) and on two plannerCount=0 pages where header equals productCount exactly (Wuerfelregale 79 / 79, Einbaukleiderschraenke 389 / 389).",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Chairs",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dining Chairs",
+   "qty": 112,
+   "link": "https://www.ikea.com/de/de/cat/essplatzstuehle-25219/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=112 for category=25219 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=162 returned exactly 112 tiles carrying 112 unique itemNo values) and by boundary test (start=111 returned exactly 1 item, start=112 returned 0). plannerCount=1: IKEA injects a non-product planner-tool tile into the grid, so the rendered listing header (p.plp-filter-information__total-count) on the category page reads '113 Produkte' - one higher than the real product total. This +1 offset was measured directly on four loaded DE category pages (Couchtische 45 products / header 46, Esstische 92 / 93, Sofas 274 / 275, Betten 226 / 227) and on two plannerCount=0 pages where header equals productCount exactly (Wuerfelregale 79 / 79, Einbaukleiderschraenke 389 / 389).",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Folding Chairs",
+   "qty": 7,
+   "link": "https://www.ikea.com/de/de/cat/klappstuehle-25222/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=7 for category=25222 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=57 returned exactly 7 tiles carrying 7 unique itemNo values) and by boundary test (start=6 returned exactly 1 item, start=7 returned 0). plannerCount=0, so the rendered listing header (p.plp-filter-information__total-count) on https://www.ikea.com/de/de/cat/klappstuehle-25222/ also reads '7 Produkte'.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bar Stools & Bar Chairs",
+   "qty": 18,
+   "link": "https://www.ikea.com/de/de/cat/barhocker-20864/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=18 for category=20864 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=68 returned exactly 18 tiles carrying 18 unique itemNo values) and by boundary test (start=17 returned exactly 1 item, start=18 returned 0). plannerCount=1: IKEA injects a non-product planner-tool tile into the grid, so the rendered listing header (p.plp-filter-information__total-count) on the category page reads '19 Produkte' - one higher than the real product total. This +1 offset was measured directly on four loaded DE category pages (Couchtische 45 products / header 46, Esstische 92 / 93, Sofas 274 / 275, Betten 226 / 227) and on two plannerCount=0 pages where header equals productCount exactly (Wuerfelregale 79 / 79, Einbaukleiderschraenke 389 / 389).",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bistro & Cafe Chairs",
+   "qty": 6,
+   "link": "https://www.ikea.com/de/de/cat/bistrostuehle-cafehausstuehle-19144/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=6 for category=19144 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=56 returned exactly 6 tiles carrying 6 unique itemNo values) and by boundary test (start=5 returned exactly 1 item, start=6 returned 0). plannerCount=0, so the rendered listing header (p.plp-filter-information__total-count) on https://www.ikea.com/de/de/cat/bistrostuehle-cafehausstuehle-19144/ also reads '6 Produkte'.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bar Tables & Stools",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bar Tables with Stools",
+   "qty": 1,
+   "link": "https://www.ikea.com/de/de/cat/barmoebelgruppen-47360/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=1 for category=47360 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=51 returned exactly 1 tiles carrying 1 unique itemNo values) and by boundary test (start=0 returned exactly 1 item, start=1 returned 0). plannerCount=2: IKEA injects a non-product planner-tool tile into the grid, so the rendered listing header (p.plp-filter-information__total-count) on the category page reads '2 Produkte' - one higher than the real product total. This +1 offset was measured directly on four loaded DE category pages (Couchtische 45 products / header 46, Esstische 92 / 93, Sofas 274 / 275, Betten 226 / 227) and on two plannerCount=0 pages where header equals productCount exactly (Wuerfelregale 79 / 79, Einbaukleiderschraenke 389 / 389).",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Benches",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dining Benches",
+   "qty": 9,
+   "link": "https://www.ikea.com/de/de/cat/esszimmerbaenke-59245/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=9 for category=59245 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=59 returned exactly 9 tiles carrying 9 unique itemNo values) and by boundary test (start=8 returned exactly 1 item, start=9 returned 0). plannerCount=1: IKEA injects a non-product planner-tool tile into the grid, so the rendered listing header (p.plp-filter-information__total-count) on the category page reads '10 Produkte' - one higher than the real product total. This +1 offset was measured directly on four loaded DE category pages (Couchtische 45 products / header 46, Esstische 92 / 93, Sofas 274 / 275, Betten 226 / 227) and on two plannerCount=0 pages where header equals productCount exactly (Wuerfelregale 79 / 79, Einbaukleiderschraenke 389 / 389).",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Hallway Benches",
+   "qty": 32,
+   "link": "https://www.ikea.com/de/de/cat/flurbaenke-59246/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=32 for category=59246 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=82 returned exactly 32 tiles carrying 32 unique itemNo values) and by boundary test (start=31 returned exactly 1 item, start=32 returned 0). plannerCount=0, so the rendered listing header (p.plp-filter-information__total-count) on https://www.ikea.com/de/de/cat/flurbaenke-59246/ also reads '32 Produkte'.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "End of Bed Benches",
+   "qty": 8,
+   "link": "https://www.ikea.com/de/de/cat/bettbaenke-59247/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=8 for category=59247 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=58 returned exactly 8 tiles carrying 8 unique itemNo values) and by boundary test (start=7 returned exactly 1 item, start=8 returned 0). plannerCount=0, so the rendered listing header (p.plp-filter-information__total-count) on https://www.ikea.com/de/de/cat/bettbaenke-59247/ also reads '8 Produkte'.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Storage Benches",
+   "qty": 20,
+   "link": "https://www.ikea.com/de/de/cat/sitzbaenke-mit-stauraum-59248/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=20 for category=59248 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=70 returned exactly 20 tiles carrying 20 unique itemNo values) and by boundary test (start=19 returned exactly 1 item, start=20 returned 0). plannerCount=0, so the rendered listing header (p.plp-filter-information__total-count) on https://www.ikea.com/de/de/cat/sitzbaenke-mit-stauraum-59248/ also reads '20 Produkte'.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sofas & Armchairs",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sofas",
+   "qty": 274,
+   "link": "https://www.ikea.com/de/de/cat/sofas-fu003/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=274 for category=fu003 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=324 returned exactly 274 tiles carrying 274 unique itemNo values) and by boundary test (start=273 returned exactly 1 item, start=274 returned 0). plannerCount=2: IKEA injects a non-product planner-tool tile into the grid, so the rendered listing header (p.plp-filter-information__total-count) on the category page reads '275 Produkte' - one higher than the real product total. This +1 offset was measured directly on four loaded DE category pages (Couchtische 45 products / header 46, Esstische 92 / 93, Sofas 274 / 275, Betten 226 / 227) and on two plannerCount=0 pages where header equals productCount exactly (Wuerfelregale 79 / 79, Einbaukleiderschraenke 389 / 389).",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sofa Beds",
+   "qty": 79,
+   "link": "https://www.ikea.com/de/de/cat/schlafsofas-10663/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=79 for category=10663 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=129 returned exactly 79 tiles carrying 79 unique itemNo values) and by boundary test (start=78 returned exactly 1 item, start=79 returned 0). plannerCount=2: IKEA injects a non-product planner-tool tile into the grid, so the rendered listing header (p.plp-filter-information__total-count) on the category page reads '80 Produkte' - one higher than the real product total. This +1 offset was measured directly on four loaded DE category pages (Couchtische 45 products / header 46, Esstische 92 / 93, Sofas 274 / 275, Betten 226 / 227) and on two plannerCount=0 pages where header equals productCount exactly (Wuerfelregale 79 / 79, Einbaukleiderschraenke 389 / 389).",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Armchairs",
+   "qty": 110,
+   "link": "https://www.ikea.com/de/de/cat/sessel-fu006/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=110 for category=fu006 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=160 returned exactly 110 tiles carrying 110 unique itemNo values) and by boundary test (start=109 returned exactly 1 item, start=110 returned 0). plannerCount=1: IKEA injects a non-product planner-tool tile into the grid, so the rendered listing header (p.plp-filter-information__total-count) on the category page reads '111 Produkte' - one higher than the real product total. This +1 offset was measured directly on four loaded DE category pages (Couchtische 45 products / header 46, Esstische 92 / 93, Sofas 274 / 275, Betten 226 / 227) and on two plannerCount=0 pages where header equals productCount exactly (Wuerfelregale 79 / 79, Einbaukleiderschraenke 389 / 389).",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Chaise Longues",
+   "qty": 16,
+   "link": "https://www.ikea.com/de/de/cat/recamieren-57527/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=16 for category=57527 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=66 returned exactly 16 tiles carrying 16 unique itemNo values) and by boundary test (start=15 returned exactly 1 item, start=16 returned 0). plannerCount=2: IKEA injects a non-product planner-tool tile into the grid, so the rendered listing header (p.plp-filter-information__total-count) on the category page reads '17 Produkte' - one higher than the real product total. This +1 offset was measured directly on four loaded DE category pages (Couchtische 45 products / header 46, Esstische 92 / 93, Sofas 274 / 275, Betten 226 / 227) and on two plannerCount=0 pages where header equals productCount exactly (Wuerfelregale 79 / 79, Einbaukleiderschraenke 389 / 389).",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Ottomans & Footstools",
+   "qty": 56,
+   "link": "https://www.ikea.com/de/de/cat/hocker-fusshocker-20926/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=56 for category=20926 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=106 returned exactly 56 tiles carrying 56 unique itemNo values) and by boundary test (start=55 returned exactly 1 item, start=56 returned 0). plannerCount=1: IKEA injects a non-product planner-tool tile into the grid, so the rendered listing header (p.plp-filter-information__total-count) on the category page reads '57 Produkte' - one higher than the real product total. This +1 offset was measured directly on four loaded DE category pages (Couchtische 45 products / header 46, Esstische 92 / 93, Sofas 274 / 275, Betten 226 / 227) and on two plannerCount=0 pages where header equals productCount exactly (Wuerfelregale 79 / 79, Einbaukleiderschraenke 389 / 389).",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Beds & Mattresses",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Beds",
+   "qty": 226,
+   "link": "https://www.ikea.com/de/de/cat/betten-bm003/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=226 for category=bm003 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=276 returned exactly 226 tiles carrying 226 unique itemNo values) and by boundary test (start=225 returned exactly 1 item, start=226 returned 0). plannerCount=1: IKEA injects a non-product planner-tool tile into the grid, so the rendered listing header (p.plp-filter-information__total-count) on the category page reads '227 Produkte' - one higher than the real product total. This +1 offset was measured directly on four loaded DE category pages (Couchtische 45 products / header 46, Esstische 92 / 93, Sofas 274 / 275, Betten 226 / 227) and on two plannerCount=0 pages where header equals productCount exactly (Wuerfelregale 79 / 79, Einbaukleiderschraenke 389 / 389).",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Headboards",
+   "qty": 5,
+   "link": "https://www.ikea.com/de/de/cat/bett-kopfteile-19064/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=5 for category=19064 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=55 returned exactly 5 tiles carrying 5 unique itemNo values) and by boundary test (start=4 returned exactly 1 item, start=5 returned 0). plannerCount=0, so the rendered listing header (p.plp-filter-information__total-count) on https://www.ikea.com/de/de/cat/bett-kopfteile-19064/ also reads '5 Produkte'.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Beds with Mattresses",
+   "qty": 14,
+   "link": "https://www.ikea.com/de/de/cat/betten-mit-matratzen-700513/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=14 for category=700513 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=64 returned exactly 14 tiles carrying 14 unique itemNo values) and by boundary test (start=13 returned exactly 1 item, start=14 returned 0). plannerCount=1: IKEA injects a non-product planner-tool tile into the grid, so the rendered listing header (p.plp-filter-information__total-count) on the category page reads '15 Produkte' - one higher than the real product total. This +1 offset was measured directly on four loaded DE category pages (Couchtische 45 products / header 46, Esstische 92 / 93, Sofas 274 / 275, Betten 226 / 227) and on two plannerCount=0 pages where header equals productCount exactly (Wuerfelregale 79 / 79, Einbaukleiderschraenke 389 / 389).",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Complete Bedrooms",
+   "qty": 33,
+   "link": "https://www.ikea.com/de/de/cat/komplett-schlafzimmer-54992/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=33 for category=54992 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=83 returned exactly 33 tiles carrying 33 unique itemNo values) and by boundary test (start=32 returned exactly 1 item, start=33 returned 0). plannerCount=1: IKEA injects a non-product planner-tool tile into the grid, so the rendered listing header (p.plp-filter-information__total-count) on the category page reads '34 Produkte' - one higher than the real product total. This +1 offset was measured directly on four loaded DE category pages (Couchtische 45 products / header 46, Esstische 92 / 93, Sofas 274 / 275, Betten 226 / 227) and on two plannerCount=0 pages where header equals productCount exactly (Wuerfelregale 79 / 79, Einbaukleiderschraenke 389 / 389).",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Storage & Cabinets",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Room Dividers",
+   "qty": 15,
+   "link": "https://www.ikea.com/de/de/cat/raumteiler-46080/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=15 for category=46080 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=65 returned exactly 15 tiles carrying 15 unique itemNo values) and by boundary test (start=14 returned exactly 1 item, start=15 returned 0). plannerCount=0, so the rendered listing header (p.plp-filter-information__total-count) on https://www.ikea.com/de/de/cat/raumteiler-46080/ also reads '15 Produkte'.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Hallway Furniture Sets",
+   "qty": 9,
+   "link": "https://www.ikea.com/de/de/cat/flurmoebel-sets-700411/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=9 for category=700411 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=59 returned exactly 9 tiles carrying 9 unique itemNo values) and by boundary test (start=8 returned exactly 1 item, start=9 returned 0). plannerCount=1: IKEA injects a non-product planner-tool tile into the grid, so the rendered listing header (p.plp-filter-information__total-count) on the category page reads '10 Produkte' - one higher than the real product total. This +1 offset was measured directly on four loaded DE category pages (Couchtische 45 products / header 46, Esstische 92 / 93, Sofas 274 / 275, Betten 226 / 227) and on two plannerCount=0 pages where header equals productCount exactly (Wuerfelregale 79 / 79, Einbaukleiderschraenke 389 / 389).",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Shoe Cabinets",
+   "qty": 31,
+   "link": "https://www.ikea.com/de/de/cat/schuhschraenke-10456/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=31 for category=10456 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=81 returned exactly 31 tiles carrying 31 unique itemNo values) and by boundary test (start=30 returned exactly 1 item, start=31 returned 0). plannerCount=1: IKEA injects a non-product planner-tool tile into the grid, so the rendered listing header (p.plp-filter-information__total-count) on the category page reads '32 Produkte' - one higher than the real product total. This +1 offset was measured directly on four loaded DE category pages (Couchtische 45 products / header 46, Esstische 92 / 93, Sofas 274 / 275, Betten 226 / 227) and on two plannerCount=0 pages where header equals productCount exactly (Wuerfelregale 79 / 79, Einbaukleiderschraenke 389 / 389).",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Wardrobes",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Single Wardrobes",
+   "qty": 42,
+   "link": "https://www.ikea.com/de/de/cat/einzelschraenke-43631/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=42 for category=43631 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=92 returned exactly 42 tiles carrying 42 unique itemNo values) and by boundary test (start=41 returned exactly 1 item, start=42 returned 0). plannerCount=1: IKEA injects a non-product planner-tool tile into the grid, so the rendered listing header (p.plp-filter-information__total-count) on the category page reads '43 Produkte' - one higher than the real product total. This +1 offset was measured directly on four loaded DE category pages (Couchtische 45 products / header 46, Esstische 92 / 93, Sofas 274 / 275, Betten 226 / 227) and on two plannerCount=0 pages where header equals productCount exactly (Wuerfelregale 79 / 79, Einbaukleiderschraenke 389 / 389).",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Fitted Wardrobes",
+   "qty": 389,
+   "link": "https://www.ikea.com/de/de/cat/einbaukleiderschraenke-43632/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=389 for category=43632 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=439 returned exactly 389 tiles carrying 389 unique itemNo values) and by boundary test (start=388 returned exactly 1 item, start=389 returned 0). plannerCount=0, so the rendered listing header (p.plp-filter-information__total-count) on https://www.ikea.com/de/de/cat/einbaukleiderschraenke-43632/ also reads '389 Produkte'.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Hinged Door Wardrobes",
+   "qty": 332,
+   "link": "https://www.ikea.com/de/de/cat/drehtuerenschraenke-48005/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=332 for category=48005 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=382 returned exactly 332 tiles carrying 332 unique itemNo values) and by boundary test (start=331 returned exactly 1 item, start=332 returned 0). plannerCount=1: IKEA injects a non-product planner-tool tile into the grid, so the rendered listing header (p.plp-filter-information__total-count) on the category page reads '333 Produkte' - one higher than the real product total. This +1 offset was measured directly on four loaded DE category pages (Couchtische 45 products / header 46, Esstische 92 / 93, Sofas 274 / 275, Betten 226 / 227) and on two plannerCount=0 pages where header equals productCount exactly (Wuerfelregale 79 / 79, Einbaukleiderschraenke 389 / 389).",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sliding Door Wardrobes",
+   "qty": 66,
+   "link": "https://www.ikea.com/de/de/cat/kleiderschraenke-mit-schiebetueren-43635/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=66 for category=43635 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=116 returned exactly 66 tiles carrying 66 unique itemNo values) and by boundary test (start=65 returned exactly 1 item, start=66 returned 0). plannerCount=1: IKEA injects a non-product planner-tool tile into the grid, so the rendered listing header (p.plp-filter-information__total-count) on the category page reads '67 Produkte' - one higher than the real product total. This +1 offset was measured directly on four loaded DE category pages (Couchtische 45 products / header 46, Esstische 92 / 93, Sofas 274 / 275, Betten 226 / 227) and on two plannerCount=0 pages where header equals productCount exactly (Wuerfelregale 79 / 79, Einbaukleiderschraenke 389 / 389).",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Wardrobes for Sloped Ceilings",
+   "qty": 8,
+   "link": "https://www.ikea.com/de/de/cat/kleiderschraenke-fuer-dachschraege-700422/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=8 for category=700422 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=58 returned exactly 8 tiles carrying 8 unique itemNo values) and by boundary test (start=7 returned exactly 1 item, start=8 returned 0). plannerCount=0, so the rendered listing header (p.plp-filter-information__total-count) on https://www.ikea.com/de/de/cat/kleiderschraenke-fuer-dachschraege-700422/ also reads '8 Produkte'.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Open Wardrobe Solutions",
+   "qty": 81,
+   "link": "https://www.ikea.com/de/de/cat/offener-kleiderschrank-loesungen-43634/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=81 for category=43634 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=131 returned exactly 81 tiles carrying 81 unique itemNo values) and by boundary test (start=80 returned exactly 1 item, start=81 returned 0). plannerCount=0, so the rendered listing header (p.plp-filter-information__total-count) on https://www.ikea.com/de/de/cat/offener-kleiderschrank-loesungen-43634/ also reads '81 Produkte'.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Corner Wardrobes",
+   "qty": 16,
+   "link": "https://www.ikea.com/de/de/cat/eckkleiderschraenke-43636/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=16 for category=43636 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=66 returned exactly 16 tiles carrying 16 unique itemNo values) and by boundary test (start=15 returned exactly 1 item, start=16 returned 0). plannerCount=0, so the rendered listing header (p.plp-filter-information__total-count) on https://www.ikea.com/de/de/cat/eckkleiderschraenke-43636/ also reads '16 Produkte'.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Hallway & Cloakroom Wardrobes",
+   "qty": 61,
+   "link": "https://www.ikea.com/de/de/cat/flurschraenke-48007/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=61 for category=48007 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=111 returned exactly 61 tiles carrying 61 unique itemNo values) and by boundary test (start=60 returned exactly 1 item, start=61 returned 0). plannerCount=1: IKEA injects a non-product planner-tool tile into the grid, so the rendered listing header (p.plp-filter-information__total-count) on the category page reads '62 Produkte' - one higher than the real product total. This +1 offset was measured directly on four loaded DE category pages (Couchtische 45 products / header 46, Esstische 92 / 93, Sofas 274 / 275, Betten 226 / 227) and on two plannerCount=0 pages where header equals productCount exactly (Wuerfelregale 79 / 79, Einbaukleiderschraenke 389 / 389).",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Mirrored Wardrobes",
+   "qty": 54,
+   "link": "https://www.ikea.com/de/de/cat/kleiderschraenke-mit-spiegeln-48006/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=54 for category=48006 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=104 returned exactly 54 tiles carrying 54 unique itemNo values) and by boundary test (start=53 returned exactly 1 item, start=54 returned 0). plannerCount=1: IKEA injects a non-product planner-tool tile into the grid, so the rendered listing header (p.plp-filter-information__total-count) on the category page reads '55 Produkte' - one higher than the real product total. This +1 offset was measured directly on four loaded DE category pages (Couchtische 45 products / header 46, Esstische 92 / 93, Sofas 274 / 275, Betten 226 / 227) and on two plannerCount=0 pages where header equals productCount exactly (Wuerfelregale 79 / 79, Einbaukleiderschraenke 389 / 389).",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Walk-In Wardrobes",
+   "qty": 19,
+   "link": "https://www.ikea.com/de/de/cat/begehbare-kleiderschraenke-43633/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=19 for category=43633 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=69 returned exactly 19 tiles carrying 19 unique itemNo values) and by boundary test (start=18 returned exactly 1 item, start=19 returned 0). plannerCount=0, so the rendered listing header (p.plp-filter-information__total-count) on https://www.ikea.com/de/de/cat/begehbare-kleiderschraenke-43633/ also reads '19 Produkte'.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Storage Solutions with Sliding Doors",
+   "qty": 2,
+   "link": "https://www.ikea.com/de/de/cat/schiebetueren-fuer-aufbewahrungsloesung-700441/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=2 for category=700441 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=52 returned exactly 2 tiles carrying 2 unique itemNo values) and by boundary test (start=1 returned exactly 1 item, start=2 returned 0). plannerCount=0, so the rendered listing header (p.plp-filter-information__total-count) on https://www.ikea.com/de/de/cat/schiebetueren-fuer-aufbewahrungsloesung-700441/ also reads '2 Produkte'.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Shelving Systems for Clothes & Shoes",
+   "qty": 41,
+   "link": "https://www.ikea.com/de/de/cat/regalsysteme-fuer-kleidung-schuhe-49079/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=41 for category=49079 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=91 returned exactly 41 tiles carrying 41 unique itemNo values) and by boundary test (start=40 returned exactly 1 item, start=41 returned 0). plannerCount=0, so the rendered listing header (p.plp-filter-information__total-count) on https://www.ikea.com/de/de/cat/regalsysteme-fuer-kleidung-schuhe-49079/ also reads '41 Produkte'.",
+   "flag": "MANUAL REVIEW: ambiguous shelving - 'Regalsysteme fuer Kleidung & Schuhe' lists complete JONAXEL/BOAXEL/ELVARLI wardrobe/shelving combinations sold as finished units, not loose components; kept as storage furniture"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Shelves & Utility Shelving",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Cube Shelving",
+   "qty": 79,
+   "link": "https://www.ikea.com/de/de/cat/wuerfelregale-kombinationen-55012/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=79 for category=55012 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=129 returned exactly 79 tiles carrying 79 unique itemNo values) and by boundary test (start=78 returned exactly 1 item, start=79 returned 0). plannerCount=0, so the rendered listing header (p.plp-filter-information__total-count) on https://www.ikea.com/de/de/cat/wuerfelregale-kombinationen-55012/ also reads '79 Produkte'.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Shelving Units",
+   "qty": 141,
+   "link": "https://www.ikea.com/de/de/cat/standregale-11465/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=141 for category=11465 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=191 returned exactly 141 tiles carrying 141 unique itemNo values) and by boundary test (start=140 returned exactly 1 item, start=141 returned 0). plannerCount=1: IKEA injects a non-product planner-tool tile into the grid, so the rendered listing header (p.plp-filter-information__total-count) on the category page reads '142 Produkte' - one higher than the real product total. This +1 offset was measured directly on four loaded DE category pages (Couchtische 45 products / header 46, Esstische 92 / 93, Sofas 274 / 275, Betten 226 / 227) and on two plannerCount=0 pages where header equals productCount exactly (Wuerfelregale 79 / 79, Einbaukleiderschraenke 389 / 389).",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bookcases",
+   "qty": 154,
+   "link": "https://www.ikea.com/de/de/cat/buecherregale-10382/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=154 for category=10382 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=204 returned exactly 154 tiles carrying 154 unique itemNo values) and by boundary test (start=153 returned exactly 1 item, start=154 returned 0). plannerCount=1: IKEA injects a non-product planner-tool tile into the grid, so the rendered listing header (p.plp-filter-information__total-count) on the category page reads '155 Produkte' - one higher than the real product total. This +1 offset was measured directly on four loaded DE category pages (Couchtische 45 products / header 46, Esstische 92 / 93, Sofas 274 / 275, Betten 226 / 227) and on two plannerCount=0 pages where header equals productCount exactly (Wuerfelregale 79 / 79, Einbaukleiderschraenke 389 / 389).",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Storage Shelving",
+   "qty": 69,
+   "link": "https://www.ikea.com/de/de/cat/aufbewahrungs-und-lagerregale-10397/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=69 for category=10397 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=119 returned exactly 69 tiles carrying 69 unique itemNo values) and by boundary test (start=68 returned exactly 1 item, start=69 returned 0). plannerCount=1: IKEA injects a non-product planner-tool tile into the grid, so the rendered listing header (p.plp-filter-information__total-count) on the category page reads '70 Produkte' - one higher than the real product total. This +1 offset was measured directly on four loaded DE category pages (Couchtische 45 products / header 46, Esstische 92 / 93, Sofas 274 / 275, Betten 226 / 227) and on two plannerCount=0 pages where header equals productCount exactly (Wuerfelregale 79 / 79, Einbaukleiderschraenke 389 / 389).",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Pantry Shelving",
+   "qty": 35,
+   "link": "https://www.ikea.com/de/de/cat/vorratsregale-und-haushaltsregale-16200/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=35 for category=16200 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=85 returned exactly 35 tiles carrying 35 unique itemNo values) and by boundary test (start=34 returned exactly 1 item, start=35 returned 0). plannerCount=1: IKEA injects a non-product planner-tool tile into the grid, so the rendered listing header (p.plp-filter-information__total-count) on the category page reads '36 Produkte' - one higher than the real product total. This +1 offset was measured directly on four loaded DE category pages (Couchtische 45 products / header 46, Esstische 92 / 93, Sofas 274 / 275, Betten 226 / 227) and on two plannerCount=0 pages where header equals productCount exactly (Wuerfelregale 79 / 79, Einbaukleiderschraenke 389 / 389).",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Chests of Drawers & Drawer Cabinets",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Chests of Drawers",
+   "qty": 134,
+   "link": "https://www.ikea.com/de/de/cat/kommoden-10451/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=134 for category=10451 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=184 returned exactly 134 tiles carrying 134 unique itemNo values) and by boundary test (start=133 returned exactly 1 item, start=134 returned 0). plannerCount=1: IKEA injects a non-product planner-tool tile into the grid, so the rendered listing header (p.plp-filter-information__total-count) on the category page reads '135 Produkte' - one higher than the real product total. This +1 offset was measured directly on four loaded DE category pages (Couchtische 45 products / header 46, Esstische 92 / 93, Sofas 274 / 275, Betten 226 / 227) and on two plannerCount=0 pages where header equals productCount exactly (Wuerfelregale 79 / 79, Einbaukleiderschraenke 389 / 389).",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bedside & Side Tables",
+   "qty": 55,
+   "link": "https://www.ikea.com/de/de/cat/nachttische-beistelltische-20656/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=55 for category=20656 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=105 returned exactly 55 tiles carrying 55 unique itemNo values) and by boundary test (start=54 returned exactly 1 item, start=55 returned 0). plannerCount=1: IKEA injects a non-product planner-tool tile into the grid, so the rendered listing header (p.plp-filter-information__total-count) on the category page reads '56 Produkte' - one higher than the real product total. This +1 offset was measured directly on four loaded DE category pages (Couchtische 45 products / header 46, Esstische 92 / 93, Sofas 274 / 275, Betten 226 / 227) and on two plannerCount=0 pages where header equals productCount exactly (Wuerfelregale 79 / 79, Einbaukleiderschraenke 389 / 389).",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dressing Tables",
+   "qty": 16,
+   "link": "https://www.ikea.com/de/de/cat/schminktische-20657/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=16 for category=20657 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=66 returned exactly 16 tiles carrying 16 unique itemNo values) and by boundary test (start=15 returned exactly 1 item, start=16 returned 0). plannerCount=1: IKEA injects a non-product planner-tool tile into the grid, so the rendered listing header (p.plp-filter-information__total-count) on the category page reads '17 Produkte' - one higher than the real product total. This +1 offset was measured directly on four loaded DE category pages (Couchtische 45 products / header 46, Esstische 92 / 93, Sofas 274 / 275, Betten 226 / 227) and on two plannerCount=0 pages where header equals productCount exactly (Wuerfelregale 79 / 79, Einbaukleiderschraenke 389 / 389).",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Storage with Wire Baskets",
+   "qty": 7,
+   "link": "https://www.ikea.com/de/de/cat/drahtkoerbe-46081/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=7 for category=46081 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=57 returned exactly 7 tiles carrying 7 unique itemNo values) and by boundary test (start=6 returned exactly 1 item, start=7 returned 0). plannerCount=0, so the rendered listing header (p.plp-filter-information__total-count) on https://www.ikea.com/de/de/cat/drahtkoerbe-46081/ also reads '7 Produkte'.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Cabinets & Display Cabinets",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Highboards",
+   "qty": 125,
+   "link": "https://www.ikea.com/de/de/cat/schraenke-10409/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=125 for category=10409 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=175 returned exactly 125 tiles carrying 125 unique itemNo values) and by boundary test (start=124 returned exactly 1 item, start=125 returned 0). plannerCount=1: IKEA injects a non-product planner-tool tile into the grid, so the rendered listing header (p.plp-filter-information__total-count) on the category page reads '126 Produkte' - one higher than the real product total. This +1 offset was measured directly on four loaded DE category pages (Couchtische 45 products / header 46, Esstische 92 / 93, Sofas 274 / 275, Betten 226 / 227) and on two plannerCount=0 pages where header equals productCount exactly (Wuerfelregale 79 / 79, Einbaukleiderschraenke 389 / 389).",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sideboards, Buffets & Console Cabinets",
+   "qty": 48,
+   "link": "https://www.ikea.com/de/de/cat/sideboards-buefetts-anrichten-10412/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=48 for category=10412 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=98 returned exactly 48 tiles carrying 48 unique itemNo values) and by boundary test (start=47 returned exactly 1 item, start=48 returned 0). plannerCount=1: IKEA injects a non-product planner-tool tile into the grid, so the rendered listing header (p.plp-filter-information__total-count) on the category page reads '49 Produkte' - one higher than the real product total. This +1 offset was measured directly on four loaded DE category pages (Couchtische 45 products / header 46, Esstische 92 / 93, Sofas 274 / 275, Betten 226 / 227) and on two plannerCount=0 pages where header equals productCount exactly (Wuerfelregale 79 / 79, Einbaukleiderschraenke 389 / 389).",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Display Cabinets",
+   "qty": 85,
+   "link": "https://www.ikea.com/de/de/cat/vitrinen-10410/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=85 for category=10410 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=135 returned exactly 85 tiles carrying 85 unique itemNo values) and by boundary test (start=84 returned exactly 1 item, start=85 returned 0). plannerCount=1: IKEA injects a non-product planner-tool tile into the grid, so the rendered listing header (p.plp-filter-information__total-count) on the category page reads '86 Produkte' - one higher than the real product total. This +1 offset was measured directly on four loaded DE category pages (Couchtische 45 products / header 46, Esstische 92 / 93, Sofas 274 / 275, Betten 226 / 227) and on two plannerCount=0 pages where header equals productCount exactly (Wuerfelregale 79 / 79, Einbaukleiderschraenke 389 / 389).",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "TV Furniture & Storage Combinations",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "TV Storage Combinations",
+   "qty": 70,
+   "link": "https://www.ikea.com/de/de/cat/wohnwaende-14885/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=70 for category=14885 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=120 returned exactly 70 tiles carrying 70 unique itemNo values) and by boundary test (start=69 returned exactly 1 item, start=70 returned 0). plannerCount=1: IKEA injects a non-product planner-tool tile into the grid, so the rendered listing header (p.plp-filter-information__total-count) on the category page reads '71 Produkte' - one higher than the real product total. This +1 offset was measured directly on four loaded DE category pages (Couchtische 45 products / header 46, Esstische 92 / 93, Sofas 274 / 275, Betten 226 / 227) and on two plannerCount=0 pages where header equals productCount exactly (Wuerfelregale 79 / 79, Einbaukleiderschraenke 389 / 389).",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "TV Benches",
+   "qty": 42,
+   "link": "https://www.ikea.com/de/de/cat/tv-baenke-10810/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=42 for category=10810 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=92 returned exactly 42 tiles carrying 42 unique itemNo values) and by boundary test (start=41 returned exactly 1 item, start=42 returned 0). plannerCount=1: IKEA injects a non-product planner-tool tile into the grid, so the rendered listing header (p.plp-filter-information__total-count) on the category page reads '43 Produkte' - one higher than the real product total. This +1 offset was measured directly on four loaded DE category pages (Couchtische 45 products / header 46, Esstische 92 / 93, Sofas 274 / 275, Betten 226 / 227) and on two plannerCount=0 pages where header equals productCount exactly (Wuerfelregale 79 / 79, Einbaukleiderschraenke 389 / 389).",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Serving Trolleys & Carts",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Kitchen Islands & Kitchen Trolleys",
+   "qty": 32,
+   "link": "https://www.ikea.com/de/de/cat/kuecheninseln-servierwagen-10471/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=32 for category=10471 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=82 returned exactly 32 tiles carrying 32 unique itemNo values) and by boundary test (start=31 returned exactly 1 item, start=32 returned 0). plannerCount=0, so the rendered listing header (p.plp-filter-information__total-count) on https://www.ikea.com/de/de/cat/kuecheninseln-servierwagen-10471/ also reads '32 Produkte'.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bathroom Trolleys",
+   "qty": 6,
+   "link": "https://www.ikea.com/de/de/cat/badrollwagen-20858/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=6 for category=20858 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=56 returned exactly 6 tiles carrying 6 unique itemNo values) and by boundary test (start=5 returned exactly 1 item, start=6 returned 0). plannerCount=0, so the rendered listing header (p.plp-filter-information__total-count) on https://www.ikea.com/de/de/cat/badrollwagen-20858/ also reads '6 Produkte'.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Filing & Office Cabinets",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Lockable & Open Office Filing Cabinets",
+   "qty": 31,
+   "link": "https://www.ikea.com/de/de/cat/abschliessbare-aktenschraenke-buero-47084/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=31 for category=47084 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=81 returned exactly 31 tiles carrying 31 unique itemNo values) and by boundary test (start=30 returned exactly 1 item, start=31 returned 0). plannerCount=1: IKEA injects a non-product planner-tool tile into the grid, so the rendered listing header (p.plp-filter-information__total-count) on the category page reads '32 Produkte' - one higher than the real product total. This +1 offset was measured directly on four loaded DE category pages (Couchtische 45 products / header 46, Esstische 92 / 93, Sofas 274 / 275, Betten 226 / 227) and on two plannerCount=0 pages where header equals productCount exactly (Wuerfelregale 79 / 79, Einbaukleiderschraenke 389 / 389).",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Drawer Cabinets & Pedestals",
+   "qty": 32,
+   "link": "https://www.ikea.com/de/de/cat/schubladenelemente-fuers-homeoffice-47081/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=32 for category=47081 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=82 returned exactly 32 tiles carrying 32 unique itemNo values) and by boundary test (start=31 returned exactly 1 item, start=32 returned 0). plannerCount=1: IKEA injects a non-product planner-tool tile into the grid, so the rendered listing header (p.plp-filter-information__total-count) on the category page reads '33 Produkte' - one higher than the real product total. This +1 offset was measured directly on four loaded DE category pages (Couchtische 45 products / header 46, Esstische 92 / 93, Sofas 274 / 275, Betten 226 / 227) and on two plannerCount=0 pages where header equals productCount exactly (Wuerfelregale 79 / 79, Einbaukleiderschraenke 389 / 389).",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Office & Gaming Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Conference Tables",
+   "qty": 10,
+   "link": "https://www.ikea.com/de/de/cat/konferenz-besprechungstische-54173/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=10 for category=54173 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=60 returned exactly 10 tiles carrying 10 unique itemNo values) and by boundary test (start=9 returned exactly 1 item, start=10 returned 0). plannerCount=0, so the rendered listing header (p.plp-filter-information__total-count) on https://www.ikea.com/de/de/cat/konferenz-besprechungstische-54173/ also reads '10 Produkte'.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Conference Table with Chairs Sets",
+   "qty": 2,
+   "link": "https://www.ikea.com/de/de/cat/konferenztisch-mit-stuehlen-sets-700424/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=2 for category=700424 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=52 returned exactly 2 tiles carrying 2 unique itemNo values) and by boundary test (start=1 returned exactly 1 item, start=2 returned 0). plannerCount=0, so the rendered listing header (p.plp-filter-information__total-count) on https://www.ikea.com/de/de/cat/konferenztisch-mit-stuehlen-sets-700424/ also reads '2 Produkte'.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Conference Chairs",
+   "qty": 12,
+   "link": "https://www.ikea.com/de/de/cat/konferenzstuehle-47068/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=12 for category=47068 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=62 returned exactly 12 tiles carrying 12 unique itemNo values) and by boundary test (start=11 returned exactly 1 item, start=12 returned 0). plannerCount=1: IKEA injects a non-product planner-tool tile into the grid, so the rendered listing header (p.plp-filter-information__total-count) on the category page reads '13 Produkte' - one higher than the real product total. This +1 offset was measured directly on four loaded DE category pages (Couchtische 45 products / header 46, Esstische 92 / 93, Sofas 274 / 275, Betten 226 / 227) and on two plannerCount=0 pages where header equals productCount exactly (Wuerfelregale 79 / 79, Einbaukleiderschraenke 389 / 389).",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Office Furniture Sets",
+   "qty": 39,
+   "link": "https://www.ikea.com/de/de/cat/bueromoebel-sets-53249/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=39 for category=53249 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=89 returned exactly 39 tiles carrying 39 unique itemNo values) and by boundary test (start=38 returned exactly 1 item, start=39 returned 0). plannerCount=1: IKEA injects a non-product planner-tool tile into the grid, so the rendered listing header (p.plp-filter-information__total-count) on the category page reads '40 Produkte' - one higher than the real product total. This +1 offset was measured directly on four loaded DE category pages (Couchtische 45 products / header 46, Esstische 92 / 93, Sofas 274 / 275, Betten 226 / 227) and on two plannerCount=0 pages where header equals productCount exactly (Wuerfelregale 79 / 79, Einbaukleiderschraenke 389 / 389).",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Desks & Workspaces",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Height-Adjustable Desks",
+   "qty": 19,
+   "link": "https://www.ikea.com/de/de/cat/hoehenverstellbare-schreibtische-55008/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=19 for category=55008 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=69 returned exactly 19 tiles carrying 19 unique itemNo values) and by boundary test (start=18 returned exactly 1 item, start=19 returned 0). plannerCount=0, so the rendered listing header (p.plp-filter-information__total-count) on https://www.ikea.com/de/de/cat/hoehenverstellbare-schreibtische-55008/ also reads '19 Produkte'.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Computer Desks",
+   "qty": 98,
+   "link": "https://www.ikea.com/de/de/cat/pc-tische-pc-schreibtische-20651/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=98 for category=20651 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=148 returned exactly 98 tiles carrying 98 unique itemNo values) and by boundary test (start=97 returned exactly 1 item, start=98 returned 0). plannerCount=0, so the rendered listing header (p.plp-filter-information__total-count) on https://www.ikea.com/de/de/cat/pc-tische-pc-schreibtische-20651/ also reads '98 Produkte'.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Office Desks",
+   "qty": 22,
+   "link": "https://www.ikea.com/de/de/cat/schreibtische-fuers-buero-47069/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=22 for category=47069 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=72 returned exactly 22 tiles carrying 22 unique itemNo values) and by boundary test (start=21 returned exactly 1 item, start=22 returned 0). plannerCount=1: IKEA injects a non-product planner-tool tile into the grid, so the rendered listing header (p.plp-filter-information__total-count) on the category page reads '23 Produkte' - one higher than the real product total. This +1 offset was measured directly on four loaded DE category pages (Couchtische 45 products / header 46, Esstische 92 / 93, Sofas 274 / 275, Betten 226 / 227) and on two plannerCount=0 pages where header equals productCount exactly (Wuerfelregale 79 / 79, Einbaukleiderschraenke 389 / 389).",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Gaming Desks",
+   "qty": 9,
+   "link": "https://www.ikea.com/de/de/cat/gaming-tische-47070/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=9 for category=47070 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=59 returned exactly 9 tiles carrying 9 unique itemNo values) and by boundary test (start=8 returned exactly 1 item, start=9 returned 0). plannerCount=0, so the rendered listing header (p.plp-filter-information__total-count) on https://www.ikea.com/de/de/cat/gaming-tische-47070/ also reads '9 Produkte'.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Laptop Tables & Laptop Stands",
+   "qty": 14,
+   "link": "https://www.ikea.com/de/de/cat/laptoptische-laptophalter-24830/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=14 for category=24830 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=64 returned exactly 14 tiles carrying 14 unique itemNo values) and by boundary test (start=13 returned exactly 1 item, start=14 returned 0). plannerCount=0, so the rendered listing header (p.plp-filter-information__total-count) on https://www.ikea.com/de/de/cat/laptoptische-laptophalter-24830/ also reads '14 Produkte'.",
+   "flag": "MANUAL REVIEW: mixed node - 'Laptoptische & Laptophalter' contains laptop tables/side tables (furniture) alongside laptop stands, monitor risers and bed trays (accessories); IKEA files it under Office Furniture > Desks & Workspaces"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Desk Chairs & Office Chairs",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Home Office Chairs",
+   "qty": 58,
+   "link": "https://www.ikea.com/de/de/cat/schreibtischstuehle-fuers-homeoffice-20653/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=58 for category=20653 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=108 returned exactly 58 tiles carrying 58 unique itemNo values) and by boundary test (start=57 returned exactly 1 item, start=58 returned 0). plannerCount=1: IKEA injects a non-product planner-tool tile into the grid, so the rendered listing header (p.plp-filter-information__total-count) on the category page reads '59 Produkte' - one higher than the real product total. This +1 offset was measured directly on four loaded DE category pages (Couchtische 45 products / header 46, Esstische 92 / 93, Sofas 274 / 275, Betten 226 / 227) and on two plannerCount=0 pages where header equals productCount exactly (Wuerfelregale 79 / 79, Einbaukleiderschraenke 389 / 389).",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Office Swivel Chairs",
+   "qty": 34,
+   "link": "https://www.ikea.com/de/de/cat/schreibtischstuehle-fuers-buero-20654/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=34 for category=20654 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=84 returned exactly 34 tiles carrying 34 unique itemNo values) and by boundary test (start=33 returned exactly 1 item, start=34 returned 0). plannerCount=1: IKEA injects a non-product planner-tool tile into the grid, so the rendered listing header (p.plp-filter-information__total-count) on the category page reads '35 Produkte' - one higher than the real product total. This +1 offset was measured directly on four loaded DE category pages (Couchtische 45 products / header 46, Esstische 92 / 93, Sofas 274 / 275, Betten 226 / 227) and on two plannerCount=0 pages where header equals productCount exactly (Wuerfelregale 79 / 79, Einbaukleiderschraenke 389 / 389).",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Gaming Chairs",
+   "qty": 9,
+   "link": "https://www.ikea.com/de/de/cat/gaming-stuehle-47067/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=9 for category=47067 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=59 returned exactly 9 tiles carrying 9 unique itemNo values) and by boundary test (start=8 returned exactly 1 item, start=9 returned 0). plannerCount=0, so the rendered listing header (p.plp-filter-information__total-count) on https://www.ikea.com/de/de/cat/gaming-stuehle-47067/ also reads '9 Produkte'.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Gaming Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Gaming Desk & Chair Sets",
+   "qty": 5,
+   "link": "https://www.ikea.com/de/de/cat/gaming-tisch-stuhl-sets-56516/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=5 for category=56516 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=55 returned exactly 5 tiles carrying 5 unique itemNo values) and by boundary test (start=4 returned exactly 1 item, start=5 returned 0). plannerCount=0, so the rendered listing header (p.plp-filter-information__total-count) on https://www.ikea.com/de/de/cat/gaming-tisch-stuhl-sets-56516/ also reads '5 Produkte'.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bathroom Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bathroom Shelves & Tall Cabinets",
+   "qty": 55,
+   "link": "https://www.ikea.com/de/de/cat/badregale-hochschraenke-20804/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=55 for category=20804 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=105 returned exactly 55 tiles carrying 55 unique itemNo values) and by boundary test (start=54 returned exactly 1 item, start=55 returned 0). plannerCount=0, so the rendered listing header (p.plp-filter-information__total-count) on https://www.ikea.com/de/de/cat/badregale-hochschraenke-20804/ also reads '55 Produkte'.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bathroom Wall Cabinets",
+   "qty": 16,
+   "link": "https://www.ikea.com/de/de/cat/oberschraenke-bad-20808/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=16 for category=20808 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=66 returned exactly 16 tiles carrying 16 unique itemNo values) and by boundary test (start=15 returned exactly 1 item, start=16 returned 0). plannerCount=1: IKEA injects a non-product planner-tool tile into the grid, so the rendered listing header (p.plp-filter-information__total-count) on the category page reads '17 Produkte' - one higher than the real product total. This +1 offset was measured directly on four loaded DE category pages (Couchtische 45 products / header 46, Esstische 92 / 93, Sofas 274 / 275, Betten 226 / 227) and on two plannerCount=0 pages where header equals productCount exactly (Wuerfelregale 79 / 79, Einbaukleiderschraenke 389 / 389).",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bathroom Mirror Cabinets",
+   "qty": 11,
+   "link": "https://www.ikea.com/de/de/cat/badezimmer-spiegelschraenke-20500/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=11 for category=20500 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=61 returned exactly 11 tiles carrying 11 unique itemNo values) and by boundary test (start=10 returned exactly 1 item, start=11 returned 0). plannerCount=1: IKEA injects a non-product planner-tool tile into the grid, so the rendered listing header (p.plp-filter-information__total-count) on the category page reads '12 Produkte' - one higher than the real product total. This +1 offset was measured directly on four loaded DE category pages (Couchtische 45 products / header 46, Esstische 92 / 93, Sofas 274 / 275, Betten 226 / 227) and on two plannerCount=0 pages where header equals productCount exactly (Wuerfelregale 79 / 79, Einbaukleiderschraenke 389 / 389).",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bathroom Stools & Benches",
+   "qty": 12,
+   "link": "https://www.ikea.com/de/de/cat/badezimmerhocker-und-baenke-20859/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=12 for category=20859 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=62 returned exactly 12 tiles carrying 12 unique itemNo values) and by boundary test (start=11 returned exactly 1 item, start=12 returned 0). plannerCount=0, so the rendered listing header (p.plp-filter-information__total-count) on https://www.ikea.com/de/de/cat/badezimmerhocker-und-baenke-20859/ also reads '12 Produkte'.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Laundry Cabinets & Laundry Shelves",
+   "qty": 19,
+   "link": "https://www.ikea.com/de/de/cat/waescheschraenke-48925/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=19 for category=48925 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=69 returned exactly 19 tiles carrying 19 unique itemNo values) and by boundary test (start=18 returned exactly 1 item, start=19 returned 0). plannerCount=0, so the rendered listing header (p.plp-filter-information__total-count) on https://www.ikea.com/de/de/cat/waescheschraenke-48925/ also reads '19 Produkte'.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Washstands & Sink Cabinets",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Washstands & Sink Base Cabinets",
+   "qty": 118,
+   "link": "https://www.ikea.com/de/de/cat/waschkommoden-waschbeckenschraenke-20720/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=118 for category=20720 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=168 returned exactly 118 tiles carrying 118 unique itemNo values) and by boundary test (start=117 returned exactly 1 item, start=118 returned 0). plannerCount=1: IKEA injects a non-product planner-tool tile into the grid, so the rendered listing header (p.plp-filter-information__total-count) on the category page reads '119 Produkte' - one higher than the real product total. This +1 offset was measured directly on four loaded DE category pages (Couchtische 45 products / header 46, Esstische 92 / 93, Sofas 274 / 275, Betten 226 / 227) and on two plannerCount=0 pages where header equals productCount exactly (Wuerfelregale 79 / 79, Einbaukleiderschraenke 389 / 389).",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Washstands without Basin",
+   "qty": 18,
+   "link": "https://www.ikea.com/de/de/cat/waschkommode-ohne-waschbecken-54989/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=18 for category=54989 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=68 returned exactly 18 tiles carrying 18 unique itemNo values) and by boundary test (start=17 returned exactly 1 item, start=18 returned 0). plannerCount=0, so the rendered listing header (p.plp-filter-information__total-count) on https://www.ikea.com/de/de/cat/waschkommode-ohne-waschbecken-54989/ also reads '18 Produkte'.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Under-Sink Cabinets",
+   "qty": 10,
+   "link": "https://www.ikea.com/de/de/cat/waschbeckenunterschraenke-20721/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=10 for category=20721 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=60 returned exactly 10 tiles carrying 10 unique itemNo values) and by boundary test (start=9 returned exactly 1 item, start=10 returned 0). plannerCount=1: IKEA injects a non-product planner-tool tile into the grid, so the rendered listing header (p.plp-filter-information__total-count) on the category page reads '11 Produkte' - one higher than the real product total. This +1 offset was measured directly on four loaded DE category pages (Couchtische 45 products / header 46, Esstische 92 / 93, Sofas 274 / 275, Betten 226 / 227) and on two plannerCount=0 pages where header equals productCount exactly (Wuerfelregale 79 / 79, Einbaukleiderschraenke 389 / 389).",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Outdoor Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Garden Loungers, Sun Loungers & Hammocks",
+   "qty": 9,
+   "link": "https://www.ikea.com/de/de/cat/sonnenliegen-haengematten-21963/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=9 for category=21963 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=59 returned exactly 9 tiles carrying 9 unique itemNo values) and by boundary test (start=8 returned exactly 1 item, start=9 returned 0). plannerCount=1: IKEA injects a non-product planner-tool tile into the grid, so the rendered listing header (p.plp-filter-information__total-count) on the category page reads '10 Produkte' - one higher than the real product total. This +1 offset was measured directly on four loaded DE category pages (Couchtische 45 products / header 46, Esstische 92 / 93, Sofas 274 / 275, Betten 226 / 227) and on two plannerCount=0 pages where header equals productCount exactly (Wuerfelregale 79 / 79, Einbaukleiderschraenke 389 / 389).",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Garden Furniture for Children",
+   "qty": 6,
+   "link": "https://www.ikea.com/de/de/cat/gartenmoebel-fuer-kinder-37899/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=6 for category=37899 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=56 returned exactly 6 tiles carrying 6 unique itemNo values) and by boundary test (start=5 returned exactly 1 item, start=6 returned 0). plannerCount=0, so the rendered listing header (p.plp-filter-information__total-count) on https://www.ikea.com/de/de/cat/gartenmoebel-fuer-kinder-37899/ also reads '6 Produkte'.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Garden Cabinets & Cushion Boxes",
+   "qty": 51,
+   "link": "https://www.ikea.com/de/de/cat/gartenschraenke-auflagenboxen-21958/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=51 for category=21958 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=101 returned exactly 51 tiles carrying 51 unique itemNo values) and by boundary test (start=50 returned exactly 1 item, start=51 returned 0). plannerCount=1: IKEA injects a non-product planner-tool tile into the grid, so the rendered listing header (p.plp-filter-information__total-count) on the category page reads '52 Produkte' - one higher than the real product total. This +1 offset was measured directly on four loaded DE category pages (Couchtische 45 products / header 46, Esstische 92 / 93, Sofas 274 / 275, Betten 226 / 227) and on two plannerCount=0 pages where header equals productCount exactly (Wuerfelregale 79 / 79, Einbaukleiderschraenke 389 / 389).",
+   "flag": "MANUAL REVIEW: mixed node - 'Gartenschraenke & Auflagenboxen' contains outdoor cabinets and shelf units (furniture) alongside cushion boxes and lidded storage boxes (standalone storage)"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Outdoor Sofas & Outdoor Armchairs",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Garden Lounge Seating & Loungers",
+   "qty": 38,
+   "link": "https://www.ikea.com/de/de/cat/loungemoebel-gartenlounge-21959/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=38 for category=21959 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=88 returned exactly 38 tiles carrying 38 unique itemNo values) and by boundary test (start=37 returned exactly 1 item, start=38 returned 0). plannerCount=2: IKEA injects a non-product planner-tool tile into the grid, so the rendered listing header (p.plp-filter-information__total-count) on the category page reads '39 Produkte' - one higher than the real product total. This +1 offset was measured directly on four loaded DE category pages (Couchtische 45 products / header 46, Esstische 92 / 93, Sofas 274 / 275, Betten 226 / 227) and on two plannerCount=0 pages where header equals productCount exactly (Wuerfelregale 79 / 79, Einbaukleiderschraenke 389 / 389).",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Garden Lounge Sets",
+   "qty": 19,
+   "link": "https://www.ikea.com/de/de/cat/sitzgruppen-21960/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=19 for category=21960 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=69 returned exactly 19 tiles carrying 19 unique itemNo values) and by boundary test (start=18 returned exactly 1 item, start=19 returned 0). plannerCount=1: IKEA injects a non-product planner-tool tile into the grid, so the rendered listing header (p.plp-filter-information__total-count) on the category page reads '20 Produkte' - one higher than the real product total. This +1 offset was measured directly on four loaded DE category pages (Couchtische 45 products / header 46, Esstische 92 / 93, Sofas 274 / 275, Betten 226 / 227) and on two plannerCount=0 pages where header equals productCount exactly (Wuerfelregale 79 / 79, Einbaukleiderschraenke 389 / 389).",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Outdoor Seating Sections",
+   "qty": 29,
+   "link": "https://www.ikea.com/de/de/cat/outdoor-sitzelemente-21961/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=29 for category=21961 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=79 returned exactly 29 tiles carrying 29 unique itemNo values) and by boundary test (start=28 returned exactly 1 item, start=29 returned 0). plannerCount=2: IKEA injects a non-product planner-tool tile into the grid, so the rendered listing header (p.plp-filter-information__total-count) on the category page reads '30 Produkte' - one higher than the real product total. This +1 offset was measured directly on four loaded DE category pages (Couchtische 45 products / header 46, Esstische 92 / 93, Sofas 274 / 275, Betten 226 / 227) and on two plannerCount=0 pages where header equals productCount exactly (Wuerfelregale 79 / 79, Einbaukleiderschraenke 389 / 389).",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Garden Benches",
+   "qty": 9,
+   "link": "https://www.ikea.com/de/de/cat/gartenbaenke-47386/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=9 for category=47386 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=59 returned exactly 9 tiles carrying 9 unique itemNo values) and by boundary test (start=8 returned exactly 1 item, start=9 returned 0). plannerCount=2: IKEA injects a non-product planner-tool tile into the grid, so the rendered listing header (p.plp-filter-information__total-count) on the category page reads '10 Produkte' - one higher than the real product total. This +1 offset was measured directly on four loaded DE category pages (Couchtische 45 products / header 46, Esstische 92 / 93, Sofas 274 / 275, Betten 226 / 227) and on two plannerCount=0 pages where header equals productCount exactly (Wuerfelregale 79 / 79, Einbaukleiderschraenke 389 / 389).",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Garden & Balcony Chairs",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Garden Armchairs & Chairs",
+   "qty": 19,
+   "link": "https://www.ikea.com/de/de/cat/gartensessel-gartenstuehle-21962/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=19 for category=21962 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=69 returned exactly 19 tiles carrying 19 unique itemNo values) and by boundary test (start=18 returned exactly 1 item, start=19 returned 0). plannerCount=1: IKEA injects a non-product planner-tool tile into the grid, so the rendered listing header (p.plp-filter-information__total-count) on the category page reads '20 Produkte' - one higher than the real product total. This +1 offset was measured directly on four loaded DE category pages (Couchtische 45 products / header 46, Esstische 92 / 93, Sofas 274 / 275, Betten 226 / 227) and on two plannerCount=0 pages where header equals productCount exactly (Wuerfelregale 79 / 79, Einbaukleiderschraenke 389 / 389).",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Garden Dining Chairs",
+   "qty": 38,
+   "link": "https://www.ikea.com/de/de/cat/gartenstuehle-21966/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=38 for category=21966 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=88 returned exactly 38 tiles carrying 38 unique itemNo values) and by boundary test (start=37 returned exactly 1 item, start=38 returned 0). plannerCount=1: IKEA injects a non-product planner-tool tile into the grid, so the rendered listing header (p.plp-filter-information__total-count) on the category page reads '39 Produkte' - one higher than the real product total. This +1 offset was measured directly on four loaded DE category pages (Couchtische 45 products / header 46, Esstische 92 / 93, Sofas 274 / 275, Betten 226 / 227) and on two plannerCount=0 pages where header equals productCount exactly (Wuerfelregale 79 / 79, Einbaukleiderschraenke 389 / 389).",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Outdoor Dining Area",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Garden Furniture Sets",
+   "qty": 35,
+   "link": "https://www.ikea.com/de/de/cat/gartenmoebel-sets-21967/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=35 for category=21967 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=85 returned exactly 35 tiles carrying 35 unique itemNo values) and by boundary test (start=34 returned exactly 1 item, start=35 returned 0). plannerCount=1: IKEA injects a non-product planner-tool tile into the grid, so the rendered listing header (p.plp-filter-information__total-count) on the category page reads '36 Produkte' - one higher than the real product total. This +1 offset was measured directly on four loaded DE category pages (Couchtische 45 products / header 46, Esstische 92 / 93, Sofas 274 / 275, Betten 226 / 227) and on two plannerCount=0 pages where header equals productCount exactly (Wuerfelregale 79 / 79, Einbaukleiderschraenke 389 / 389).",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bistro Tables & Bistro Chairs",
+   "qty": 13,
+   "link": "https://www.ikea.com/de/de/cat/bistro-sets-59249/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=13 for category=59249 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=63 returned exactly 13 tiles carrying 13 unique itemNo values) and by boundary test (start=12 returned exactly 1 item, start=13 returned 0). plannerCount=1: IKEA injects a non-product planner-tool tile into the grid, so the rendered listing header (p.plp-filter-information__total-count) on the category page reads '14 Produkte' - one higher than the real product total. This +1 offset was measured directly on four loaded DE category pages (Couchtische 45 products / header 46, Esstische 92 / 93, Sofas 274 / 275, Betten 226 / 227) and on two plannerCount=0 pages where header equals productCount exactly (Wuerfelregale 79 / 79, Einbaukleiderschraenke 389 / 389).",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Outdoor Tables",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Garden & Balcony Tables",
+   "qty": 35,
+   "link": "https://www.ikea.com/de/de/cat/gartentische-21965/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=35 for category=21965 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=85 returned exactly 35 tiles carrying 35 unique itemNo values) and by boundary test (start=34 returned exactly 1 item, start=35 returned 0). plannerCount=1: IKEA injects a non-product planner-tool tile into the grid, so the rendered listing header (p.plp-filter-information__total-count) on the category page reads '36 Produkte' - one higher than the real product total. This +1 offset was measured directly on four loaded DE category pages (Couchtische 45 products / header 46, Esstische 92 / 93, Sofas 274 / 275, Betten 226 / 227) and on two plannerCount=0 pages where header equals productCount exactly (Wuerfelregale 79 / 79, Einbaukleiderschraenke 389 / 389).",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Outdoor Coffee & Side Tables",
+   "qty": 11,
+   "link": "https://www.ikea.com/de/de/cat/couch-beistelltische-fuer-draussen-700192/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=11 for category=700192 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=61 returned exactly 11 tiles carrying 11 unique itemNo values) and by boundary test (start=10 returned exactly 1 item, start=11 returned 0). plannerCount=1: IKEA injects a non-product planner-tool tile into the grid, so the rendered listing header (p.plp-filter-information__total-count) on the category page reads '12 Produkte' - one higher than the real product total. This +1 offset was measured directly on four loaded DE category pages (Couchtische 45 products / header 46, Esstische 92 / 93, Sofas 274 / 275, Betten 226 / 227) and on two plannerCount=0 pages where header equals productCount exactly (Wuerfelregale 79 / 79, Einbaukleiderschraenke 389 / 389).",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Children's & Baby Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Children's Seating Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Children's Chairs & Benches",
+   "qty": 23,
+   "link": "https://www.ikea.com/de/de/cat/kinderstuehle-kinderbaenke-18769/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=23 for category=18769 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=73 returned exactly 23 tiles carrying 23 unique itemNo values) and by boundary test (start=22 returned exactly 1 item, start=23 returned 0). plannerCount=1: IKEA injects a non-product planner-tool tile into the grid, so the rendered listing header (p.plp-filter-information__total-count) on the category page reads '24 Produkte' - one higher than the real product total. This +1 offset was measured directly on four loaded DE category pages (Couchtische 45 products / header 46, Esstische 92 / 93, Sofas 274 / 275, Betten 226 / 227) and on two plannerCount=0 pages where header equals productCount exactly (Wuerfelregale 79 / 79, Einbaukleiderschraenke 389 / 389).",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Children's Tables",
+   "qty": 11,
+   "link": "https://www.ikea.com/de/de/cat/kindertische-18768/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=11 for category=18768 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=61 returned exactly 11 tiles carrying 11 unique itemNo values) and by boundary test (start=10 returned exactly 1 item, start=11 returned 0). plannerCount=1: IKEA injects a non-product planner-tool tile into the grid, so the rendered listing header (p.plp-filter-information__total-count) on the category page reads '12 Produkte' - one higher than the real product total. This +1 offset was measured directly on four loaded DE category pages (Couchtische 45 products / header 46, Esstische 92 / 93, Sofas 274 / 275, Betten 226 / 227) and on two plannerCount=0 pages where header equals productCount exactly (Wuerfelregale 79 / 79, Einbaukleiderschraenke 389 / 389).",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Children's Stools & Benches",
+   "qty": 13,
+   "link": "https://www.ikea.com/de/de/cat/kinderhocker-badezimmerhocker-45816/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=13 for category=45816 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=63 returned exactly 13 tiles carrying 13 unique itemNo values) and by boundary test (start=12 returned exactly 1 item, start=13 returned 0). plannerCount=1: IKEA injects a non-product planner-tool tile into the grid, so the rendered listing header (p.plp-filter-information__total-count) on the category page reads '14 Produkte' - one higher than the real product total. This +1 offset was measured directly on four loaded DE category pages (Couchtische 45 products / header 46, Esstische 92 / 93, Sofas 274 / 275, Betten 226 / 227) and on two plannerCount=0 pages where header equals productCount exactly (Wuerfelregale 79 / 79, Einbaukleiderschraenke 389 / 389).",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Children's Armchairs",
+   "qty": 6,
+   "link": "https://www.ikea.com/de/de/cat/kindersessel-20483/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=6 for category=20483 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=56 returned exactly 6 tiles carrying 6 unique itemNo values) and by boundary test (start=5 returned exactly 1 item, start=6 returned 0). plannerCount=1: IKEA injects a non-product planner-tool tile into the grid, so the rendered listing header (p.plp-filter-information__total-count) on the category page reads '7 Produkte' - one higher than the real product total. This +1 offset was measured directly on four loaded DE category pages (Couchtische 45 products / header 46, Esstische 92 / 93, Sofas 274 / 275, Betten 226 / 227) and on two plannerCount=0 pages where header equals productCount exactly (Wuerfelregale 79 / 79, Einbaukleiderschraenke 389 / 389).",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Junior Chairs",
+   "qty": 4,
+   "link": "https://www.ikea.com/de/de/cat/juniorstuehle-45815/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=4 for category=45815 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=54 returned exactly 4 tiles carrying 4 unique itemNo values) and by boundary test (start=3 returned exactly 1 item, start=4 returned 0). plannerCount=0, so the rendered listing header (p.plp-filter-information__total-count) on https://www.ikea.com/de/de/cat/juniorstuehle-45815/ also reads '4 Produkte'.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Children's Beds",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Single Beds for Children",
+   "qty": 23,
+   "link": "https://www.ikea.com/de/de/cat/einzelbetten-fuer-kinder-45848/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=23 for category=45848 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=73 returned exactly 23 tiles carrying 23 unique itemNo values) and by boundary test (start=22 returned exactly 1 item, start=23 returned 0). plannerCount=1: IKEA injects a non-product planner-tool tile into the grid, so the rendered listing header (p.plp-filter-information__total-count) on the category page reads '24 Produkte' - one higher than the real product total. This +1 offset was measured directly on four loaded DE category pages (Couchtische 45 products / header 46, Esstische 92 / 93, Sofas 274 / 275, Betten 226 / 227) and on two plannerCount=0 pages where header equals productCount exactly (Wuerfelregale 79 / 79, Einbaukleiderschraenke 389 / 389).",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Extendable & Junior Beds",
+   "qty": 5,
+   "link": "https://www.ikea.com/de/de/cat/mitwachsende-kinderbetten-juniorbetten-45847/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=5 for category=45847 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=55 returned exactly 5 tiles carrying 5 unique itemNo values) and by boundary test (start=4 returned exactly 1 item, start=5 returned 0). plannerCount=1: IKEA injects a non-product planner-tool tile into the grid, so the rendered listing header (p.plp-filter-information__total-count) on the category page reads '6 Produkte' - one higher than the real product total. This +1 offset was measured directly on four loaded DE category pages (Couchtische 45 products / header 46, Esstische 92 / 93, Sofas 274 / 275, Betten 226 / 227) and on two plannerCount=0 pages where header equals productCount exactly (Wuerfelregale 79 / 79, Einbaukleiderschraenke 389 / 389).",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Loft Beds",
+   "qty": 11,
+   "link": "https://www.ikea.com/de/de/cat/hochbetten-19049/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=11 for category=19049 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=61 returned exactly 11 tiles carrying 11 unique itemNo values) and by boundary test (start=10 returned exactly 1 item, start=11 returned 0). plannerCount=1: IKEA injects a non-product planner-tool tile into the grid, so the rendered listing header (p.plp-filter-information__total-count) on the category page reads '12 Produkte' - one higher than the real product total. This +1 offset was measured directly on four loaded DE category pages (Couchtische 45 products / header 46, Esstische 92 / 93, Sofas 274 / 275, Betten 226 / 227) and on two plannerCount=0 pages where header equals productCount exactly (Wuerfelregale 79 / 79, Einbaukleiderschraenke 389 / 389).",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bunk Beds",
+   "qty": 4,
+   "link": "https://www.ikea.com/de/de/cat/etagenbetten-19048/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=4 for category=19048 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=54 returned exactly 4 tiles carrying 4 unique itemNo values) and by boundary test (start=3 returned exactly 1 item, start=4 returned 0). plannerCount=1: IKEA injects a non-product planner-tool tile into the grid, so the rendered listing header (p.plp-filter-information__total-count) on the category page reads '5 Produkte' - one higher than the real product total. This +1 offset was measured directly on four loaded DE category pages (Couchtische 45 products / header 46, Esstische 92 / 93, Sofas 274 / 275, Betten 226 / 227) and on two plannerCount=0 pages where header equals productCount exactly (Wuerfelregale 79 / 79, Einbaukleiderschraenke 389 / 389).",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Learning Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Children's Desks",
+   "qty": 36,
+   "link": "https://www.ikea.com/de/de/cat/kinderschreibtische-24714/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=36 for category=24714 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=86 returned exactly 36 tiles carrying 36 unique itemNo values) and by boundary test (start=35 returned exactly 1 item, start=36 returned 0). plannerCount=0, so the rendered listing header (p.plp-filter-information__total-count) on https://www.ikea.com/de/de/cat/kinderschreibtische-24714/ also reads '36 Produkte'.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Children's Desk Chairs",
+   "qty": 8,
+   "link": "https://www.ikea.com/de/de/cat/kinder-schreibtischstuehle-24715/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=8 for category=24715 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=58 returned exactly 8 tiles carrying 8 unique itemNo values) and by boundary test (start=7 returned exactly 1 item, start=8 returned 0). plannerCount=0, so the rendered listing header (p.plp-filter-information__total-count) on https://www.ikea.com/de/de/cat/kinder-schreibtischstuehle-24715/ also reads '8 Produkte'.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Baby Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Children's Wardrobes",
+   "qty": 12,
+   "link": "https://www.ikea.com/de/de/cat/kinderkleiderschraenke-18707/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=12 for category=18707 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=62 returned exactly 12 tiles carrying 12 unique itemNo values) and by boundary test (start=11 returned exactly 1 item, start=12 returned 0). plannerCount=1: IKEA injects a non-product planner-tool tile into the grid, so the rendered listing header (p.plp-filter-information__total-count) on the category page reads '13 Produkte' - one higher than the real product total. This +1 offset was measured directly on four loaded DE category pages (Couchtische 45 products / header 46, Esstische 92 / 93, Sofas 274 / 275, Betten 226 / 227) and on two plannerCount=0 pages where header equals productCount exactly (Wuerfelregale 79 / 79, Einbaukleiderschraenke 389 / 389).",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Children's Chests of Drawers",
+   "qty": 9,
+   "link": "https://www.ikea.com/de/de/cat/kommoden-fuer-kinder-18708/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=9 for category=18708 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=59 returned exactly 9 tiles carrying 9 unique itemNo values) and by boundary test (start=8 returned exactly 1 item, start=9 returned 0). plannerCount=1: IKEA injects a non-product planner-tool tile into the grid, so the rendered listing header (p.plp-filter-information__total-count) on the category page reads '10 Produkte' - one higher than the real product total. This +1 offset was measured directly on four loaded DE category pages (Couchtische 45 products / header 46, Esstische 92 / 93, Sofas 274 / 275, Betten 226 / 227) and on two plannerCount=0 pages where header equals productCount exactly (Wuerfelregale 79 / 79, Einbaukleiderschraenke 389 / 389).",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Cots & Bassinets",
+   "qty": 11,
+   "link": "https://www.ikea.com/de/de/cat/gitterbetten-45781/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=11 for category=45781 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=61 returned exactly 11 tiles carrying 11 unique itemNo values) and by boundary test (start=10 returned exactly 1 item, start=11 returned 0). plannerCount=1: IKEA injects a non-product planner-tool tile into the grid, so the rendered listing header (p.plp-filter-information__total-count) on the category page reads '12 Produkte' - one higher than the real product total. This +1 offset was measured directly on four loaded DE category pages (Couchtische 45 products / header 46, Esstische 92 / 93, Sofas 274 / 275, Betten 226 / 227) and on two plannerCount=0 pages where header equals productCount exactly (Wuerfelregale 79 / 79, Einbaukleiderschraenke 389 / 389).",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Highchairs",
+   "qty": 12,
+   "link": "https://www.ikea.com/de/de/cat/kinderhochstuehle-45782/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=12 for category=45782 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=62 returned exactly 12 tiles carrying 12 unique itemNo values) and by boundary test (start=11 returned exactly 1 item, start=12 returned 0). plannerCount=1: IKEA injects a non-product planner-tool tile into the grid, so the rendered listing header (p.plp-filter-information__total-count) on the category page reads '13 Produkte' - one higher than the real product total. This +1 offset was measured directly on four loaded DE category pages (Couchtische 45 products / header 46, Esstische 92 / 93, Sofas 274 / 275, Betten 226 / 227) and on two plannerCount=0 pages where header equals productCount exactly (Wuerfelregale 79 / 79, Einbaukleiderschraenke 389 / 389).",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Changing Tables & Changing Units",
+   "qty": 16,
+   "link": "https://www.ikea.com/de/de/cat/wickelkommoden-wickeltische-45783/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=16 for category=45783 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=66 returned exactly 16 tiles carrying 16 unique itemNo values) and by boundary test (start=15 returned exactly 1 item, start=16 returned 0). plannerCount=1: IKEA injects a non-product planner-tool tile into the grid, so the rendered listing header (p.plp-filter-information__total-count) on the category page reads '17 Produkte' - one higher than the real product total. This +1 offset was measured directly on four loaded DE category pages (Couchtische 45 products / header 46, Esstische 92 / 93, Sofas 274 / 275, Betten 226 / 227) and on two plannerCount=0 pages where header equals productCount exactly (Wuerfelregale 79 / 79, Einbaukleiderschraenke 389 / 389).",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Baby Room Sets",
+   "qty": 1,
+   "link": "https://www.ikea.com/de/de/cat/babyzimmer-set-55021/",
+   "is_group": false,
+   "evidence": "IKEA product-list-page API productListPage.productCount=1 for category=55021 (same-origin fetch from the loaded www.ikea.com/de/de page); verified by full enumeration (more-products start=0 end=51 returned exactly 1 tiles carrying 1 unique itemNo values) and by boundary test (start=0 returned exactly 1 item, start=1 returned 0). plannerCount=1: IKEA injects a non-product planner-tool tile into the grid, so the rendered listing header (p.plp-filter-information__total-count) on the category page reads '2 Produkte' - one higher than the real product total. This +1 offset was measured directly on four loaded DE category pages (Couchtische 45 products / header 46, Esstische 92 / 93, Sofas 274 / 275, Betten 226 / 227) and on two plannerCount=0 pages where header equals productCount exactly (Wuerfelregale 79 / 79, Einbaukleiderschraenke 389 / 389).",
+   "flag": null
+  }
+ ]
+}

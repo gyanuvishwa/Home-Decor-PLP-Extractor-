@@ -1,0 +1,1078 @@
+{
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "Access: Cloudflare-protected site; all fetches via curl_cffi impersonate='chrome124' (consistent 200s, no blocks encountered). robots.txt has no Claude-specific disallow. Category discovery: (1) downloaded all 7 product-sitemap shards (sitemap-1..7.xml) and regex-extracted every /pets/ <loc>; (2) since many real category listing pages are NOT present as standalone <loc> entries in the product sitemap (confirmed by probing e.g. cat-beds/, cat-toys/ which 404 as bare URLs despite product URLs like cat-beds/calming-bed existing), built a fuller candidate list by taking the parent directory of every product URL found in the sitemap under /pets/ (223 candidates); (3) fetched all 223 candidate URLs directly, kept the 179 that returned 200 (43 were 404 - guessed/aliased paths that don't exist as real pages, e.g. dog-beds-and-blankets, cat-bowls-and-accessories standalone, dog-training standalone, several fish/aquarium sub-types). Count verification: every category page embeds window.tm.categoryId (rendered client-side, no count is present in the raw SSR HTML - confirmed by searching for totalResults/productCount/numFound in the fetched HTML of several pages, all absent); queried the site's own internal search backend https://search-lon.therange.co.uk/api/productlist?categoryId=<id>&limit=1&offset=0 for the authoritative 'totalResults' for every discovered categoryId (174 unique ids), same method validated by the prior Home-Decor pass on this exact site. Grouping/rollup handling: (a) all species/type hub pages (Dogs=185/5214, Cats=186/2218, Puppy=93515/404, Kitten=93516/89, Birds=189/278, Fish=188/413, Reptiles=191/173, Small Pets=187/703, Horses=3180660/35) are treated as pure is_group rows with qty=null - their own listing totals are never used as a leaf value, consistent with the prior pass's treatment of top nav-hub pages (e.g. 'Lighting > Lighting | qty=None'); (b) mid-tree nodes (dog-food-and-treats, dog-grooming, dog-healthcare, dog-leads-collars-harnesses-and-id-tags, dog-toys, dog-crates-carriers-and-travel-accessories, cat-food-and-treats, cat-healthcare, puppy-food-and-treats, kitten-food-and-treats, guinea-pig/hamster/rabbit-accessories) were checked against their own child sums: in every case children explained 88-101% of the parent total, so per rule 'mixed roll-ups: drop, don't pad' the parent's own qty was dropped in favour of its children (is_group=true). (c) Site-wide cross-species aggregate pages were checked the same way and DROPPED (not emitted at all, to avoid double counting) where children already itemised elsewhere explained the bulk of the total: Pet Food (438012, total=1142) vs sum of all per-species food categories already listed=1117 (98%); Pet Medicine (2699027, total=239) + its child Pet Dental Care (3440836, total=58) vs sum of all per-species healthcare categories already listed=225 (94%); Pet Grooming (437871, total=296) vs sum of per-species grooming categories=393 (site figure is actually smaller than the straight sum, evidence of heavy product overlap with dog/cat/puppy/kitten grooming already listed) - all three dropped as redundant rollups. Pet Housing (2705050, total=1347) was also dropped: dog-crates-carriers-and-travel-accessories (931) + small-animal-housing (497) alone sum to 1428, close to and exceeding the Pet Housing total, strong evidence of the same products being counted under multiple nav paths. By contrast Pet Beds (366626=1503), Pet Bowls (386484=290) and Pet Toys (4950474=772) were KEPT as their own leaves: adult dog/cat beds, bowls and (non-scratcher) cat toys have NO standalone species-level category page on this site (dog-beds-and-blankets, cat-beds, cat-bowls-and-accessories, cat-collars-harnesses-and-tags, cat-litter-trays-and-loos, cat-toys, dog-bowls-and-accessories, dog-clothing-and-accessories all 404 as real pages; only puppy/kitten life-stage variants exist separately and are a small fraction of these totals), so these three ARE the only place those products are counted - kept to avoid under-reporting, with only minor overlap risk vs the puppy/kitten leaves noted here. Excluded as non-category / marketing / off-scope (not emitted): Pets Sale (2481572=105, sale), New In: Pets (2692527=1427, new-in), Pet Brands hub + all 20 individual brand pages (5125850 and children, brand-listing pages, precedent: Home-Decor pass excluded 'Andrew Lee Home and Living' the same way), Pet Memorials & Keepsakes (3232278=27, grief/memorial keepsakes not functional pet care), Pets Camping (4169868=81, thematic lifestyle collection), Rewilding Project + its 4 children (3304790 and subs, garden-wildlife/hedgehog conservation content, not domesticated-pet care), Crufts hub (367478=19, brand/marketing hub) and Crufts Dog Toys (367484=1, trivial redundant subset of Dog Toys) and Dog Agility (367481=0 products, dropped as zero-result), Clever Paws (440913=307, single-brand listing page), 'Essential Shopping List for your New Pet Bird' (4026182, a blog/guide article - confirmed 0 products via the API), Mrs Hinch Pet Cleaning (2506571=6, tiny branded-collab subset fully covered by Pet Cleaning Supplies), Horses > Leather Treatments for Saddles & Bridles (3180666=31, tack/equipment maintenance product, not animal care itself). Zero-result categories dropped per rule: kitten-carriers (0), kitten-wet-food (0), fish/aquarium-kids-kits (0), horses/fly-spray (0), horses/questrian-lotions (0). Kept 'Dog Training' (5 products) sourced from the Crufts-branded section (/pets/crufts/crufts-dog-training/) since /pets/dogs/dog-training/ 404s and this is the only place dog training products exist on the site. Horses is included as a thin branch (only Stable Equipment for Horses, qty=3, survives as genuine pet-care content) because the site's own nav places Horses inside the Pets department; this is a judgement call, flagged here for review rather than as a per-row flag since it doesn't fit the food/medical open-policy gaps. cat-posts-scratchers-and-towers (949) is unusually large relative to sibling cat categories; the count comes from the same authoritative API used throughout and could not be cross-verified against a second source (the rendered HTML has no embedded count, confirmed absent for totalResults/productCount/numFound on several sampled pages - the count is fetched client-side via this exact API), so it is reported as-is per site's own data.",
+  "rows": [
+    {
+      "category": "Pet Care",
+      "sub_category": "Dogs",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Dog Door Flaps, Cages & Kennels",
+      "qty": 63,
+      "link": "https://www.therange.co.uk/pets/dogs/dog-door-flaps-and-kennels/",
+      "is_group": false,
+      "evidence": "search-lon.therange.co.uk/api/productlist?categoryId=93587&limit=1&offset=0 -> totalResults=63",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Dog Food & Treats",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Dry Dog Food",
+      "qty": 181,
+      "link": "https://www.therange.co.uk/pets/dogs/dog-food-and-treats/dog-dry-food/",
+      "is_group": false,
+      "evidence": "search-lon.therange.co.uk/api/productlist?categoryId=93619&limit=1&offset=0 -> totalResults=181",
+      "flag": "MANUAL REVIEW: PET CONSUMABLE - food/treats category, no include/exclude policy yet"
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Dog Treats",
+      "qty": 477,
+      "link": "https://www.therange.co.uk/pets/dogs/dog-food-and-treats/dog-treats/",
+      "is_group": false,
+      "evidence": "search-lon.therange.co.uk/api/productlist?categoryId=93621&limit=1&offset=0 -> totalResults=477",
+      "flag": "MANUAL REVIEW: PET CONSUMABLE - food/treats category, no include/exclude policy yet"
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Wet Dog Food",
+      "qty": 83,
+      "link": "https://www.therange.co.uk/pets/dogs/dog-food-and-treats/dog-wet-food/",
+      "is_group": false,
+      "evidence": "search-lon.therange.co.uk/api/productlist?categoryId=93620&limit=1&offset=0 -> totalResults=83",
+      "flag": "MANUAL REVIEW: PET CONSUMABLE - food/treats category, no include/exclude policy yet"
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Dog Grooming",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Dog Brushes & Combs",
+      "qty": 83,
+      "link": "https://www.therange.co.uk/pets/dogs/dog-grooming/dog-brushes-and-combs/",
+      "is_group": false,
+      "evidence": "search-lon.therange.co.uk/api/productlist?categoryId=93676&limit=1&offset=0 -> totalResults=83",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Dog Scissors & Clippers",
+      "qty": 15,
+      "link": "https://www.therange.co.uk/pets/dogs/dog-grooming/dog-scissors-and-clippers/",
+      "is_group": false,
+      "evidence": "search-lon.therange.co.uk/api/productlist?categoryId=93677&limit=1&offset=0 -> totalResults=15",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Dog Shampoos, Sprays & Towels",
+      "qty": 166,
+      "link": "https://www.therange.co.uk/pets/dogs/dog-grooming/dog-shampoos-sprays-and-towels/",
+      "is_group": false,
+      "evidence": "search-lon.therange.co.uk/api/productlist?categoryId=93678&limit=1&offset=0 -> totalResults=166",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Dog Grooming Tables",
+      "qty": 43,
+      "link": "https://www.therange.co.uk/pets/dogs/dog-grooming/grooming-table/",
+      "is_group": false,
+      "evidence": "search-lon.therange.co.uk/api/productlist?categoryId=3213872&limit=1&offset=0 -> totalResults=43",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Dog Healthcare",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Dog Calming Products",
+      "qty": 17,
+      "link": "https://www.therange.co.uk/pets/dogs/dog-healthcare/dog-calming-products/",
+      "is_group": false,
+      "evidence": "search-lon.therange.co.uk/api/productlist?categoryId=93675&limit=1&offset=0 -> totalResults=17",
+      "flag": "MANUAL REVIEW: PET MEDICAL / VETERINARY CATEGORY - healthcare/treatment product"
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Dog Dental Care",
+      "qty": 62,
+      "link": "https://www.therange.co.uk/pets/dogs/dog-healthcare/dog-dental-care/",
+      "is_group": false,
+      "evidence": "search-lon.therange.co.uk/api/productlist?categoryId=101401&limit=1&offset=0 -> totalResults=62",
+      "flag": "MANUAL REVIEW: PET MEDICAL / VETERINARY CATEGORY - healthcare/treatment product"
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Dog Flea Treatments",
+      "qty": 50,
+      "link": "https://www.therange.co.uk/pets/dogs/dog-healthcare/dog-flea-treatments/",
+      "is_group": false,
+      "evidence": "search-lon.therange.co.uk/api/productlist?categoryId=93682&limit=1&offset=0 -> totalResults=50",
+      "flag": "MANUAL REVIEW: PET MEDICAL / VETERINARY CATEGORY - healthcare/treatment product"
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Dog Supplements",
+      "qty": 11,
+      "link": "https://www.therange.co.uk/pets/dogs/dog-healthcare/dog-supplements/",
+      "is_group": false,
+      "evidence": "search-lon.therange.co.uk/api/productlist?categoryId=93674&limit=1&offset=0 -> totalResults=11",
+      "flag": "MANUAL REVIEW: PET MEDICAL / VETERINARY CATEGORY - healthcare/treatment product"
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Dog Wormers",
+      "qty": 7,
+      "link": "https://www.therange.co.uk/pets/dogs/dog-healthcare/dog-wormers/",
+      "is_group": false,
+      "evidence": "search-lon.therange.co.uk/api/productlist?categoryId=93681&limit=1&offset=0 -> totalResults=7",
+      "flag": "MANUAL REVIEW: PET MEDICAL / VETERINARY CATEGORY - healthcare/treatment product"
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Dog Leads, Collars, Harnesses & ID Tags",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Be Safe, Be Seen - Dog Safety Products",
+      "qty": 8,
+      "link": "https://www.therange.co.uk/pets/dogs/leads-collars-harnesses-and-id-tags/be-safe-be-seen/",
+      "is_group": false,
+      "evidence": "search-lon.therange.co.uk/api/productlist?categoryId=93627&limit=1&offset=0 -> totalResults=8",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Dog Collars",
+      "qty": 186,
+      "link": "https://www.therange.co.uk/pets/dogs/leads-collars-harnesses-and-id-tags/dog-collars/",
+      "is_group": false,
+      "evidence": "search-lon.therange.co.uk/api/productlist?categoryId=93622&limit=1&offset=0 -> totalResults=186",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Dog Harnesses",
+      "qty": 254,
+      "link": "https://www.therange.co.uk/pets/dogs/leads-collars-harnesses-and-id-tags/dog-harnesses/",
+      "is_group": false,
+      "evidence": "search-lon.therange.co.uk/api/productlist?categoryId=93624&limit=1&offset=0 -> totalResults=254",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Dog Leads",
+      "qty": 242,
+      "link": "https://www.therange.co.uk/pets/dogs/leads-collars-harnesses-and-id-tags/dog-leads/",
+      "is_group": false,
+      "evidence": "search-lon.therange.co.uk/api/productlist?categoryId=93623&limit=1&offset=0 -> totalResults=242",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Dog Tags & Accessories",
+      "qty": 19,
+      "link": "https://www.therange.co.uk/pets/dogs/leads-collars-harnesses-and-id-tags/dog-tags-and-accessories/",
+      "is_group": false,
+      "evidence": "search-lon.therange.co.uk/api/productlist?categoryId=93626&limit=1&offset=0 -> totalResults=19",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Retractable Dog Leads",
+      "qty": 37,
+      "link": "https://www.therange.co.uk/pets/dogs/leads-collars-harnesses-and-id-tags/retractable-dog-leads/",
+      "is_group": false,
+      "evidence": "search-lon.therange.co.uk/api/productlist?categoryId=93625&limit=1&offset=0 -> totalResults=37",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Dog Toys",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Dog Plush & Rope Toys",
+      "qty": 358,
+      "link": "https://www.therange.co.uk/pets/dogs/dog-toys/dog-plush-and-rope/",
+      "is_group": false,
+      "evidence": "search-lon.therange.co.uk/api/productlist?categoryId=93628&limit=1&offset=0 -> totalResults=358",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Dog Rubber, Vinyl & Latex Toys",
+      "qty": 413,
+      "link": "https://www.therange.co.uk/pets/dogs/dog-toys/dog-rubber-vinyl-and-latex/",
+      "is_group": false,
+      "evidence": "search-lon.therange.co.uk/api/productlist?categoryId=93629&limit=1&offset=0 -> totalResults=413",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Nylabone Dog Toys",
+      "qty": 20,
+      "link": "https://www.therange.co.uk/pets/dogs/dog-toys/nylabone/",
+      "is_group": false,
+      "evidence": "search-lon.therange.co.uk/api/productlist?categoryId=93631&limit=1&offset=0 -> totalResults=20",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Dog Crates, Carriers & Travel Accessories",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Dog Carriers, Strollers & Trailers",
+      "qty": 389,
+      "link": "https://www.therange.co.uk/pets/dogs/crates-carriers-and-travel-accessories/dog-carriers/",
+      "is_group": false,
+      "evidence": "search-lon.therange.co.uk/api/productlist?categoryId=93633&limit=1&offset=0 -> totalResults=389",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Dog Crates & Cages",
+      "qty": 535,
+      "link": "https://www.therange.co.uk/pets/dogs/crates-carriers-and-travel-accessories/dog-crates/",
+      "is_group": false,
+      "evidence": "search-lon.therange.co.uk/api/productlist?categoryId=93632&limit=1&offset=0 -> totalResults=535",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Dog Travel Accessories",
+      "qty": 13,
+      "link": "https://www.therange.co.uk/pets/dogs/crates-carriers-and-travel-accessories/dog-travel-accessories/",
+      "is_group": false,
+      "evidence": "search-lon.therange.co.uk/api/productlist?categoryId=93634&limit=1&offset=0 -> totalResults=13",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Dog Training",
+      "qty": 5,
+      "link": "https://www.therange.co.uk/pets/crufts/crufts-dog-training/",
+      "is_group": false,
+      "evidence": "search-lon.therange.co.uk/api/productlist?categoryId=367487&limit=1&offset=0 -> totalResults=5",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Cats",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Cat Carriers",
+      "qty": 31,
+      "link": "https://www.therange.co.uk/pets/cats/cat-carriers/",
+      "is_group": false,
+      "evidence": "search-lon.therange.co.uk/api/productlist?categoryId=108835&limit=1&offset=0 -> totalResults=31",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Cat Food & Treats",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Dry Cat Food",
+      "qty": 38,
+      "link": "https://www.therange.co.uk/pets/cats/cat-food-and-treats/cat-dry-food/",
+      "is_group": false,
+      "evidence": "search-lon.therange.co.uk/api/productlist?categoryId=93777&limit=1&offset=0 -> totalResults=38",
+      "flag": "MANUAL REVIEW: PET CONSUMABLE - food/treats category, no include/exclude policy yet"
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Cat Treats",
+      "qty": 83,
+      "link": "https://www.therange.co.uk/pets/cats/cat-food-and-treats/cat-treats/",
+      "is_group": false,
+      "evidence": "search-lon.therange.co.uk/api/productlist?categoryId=93779&limit=1&offset=0 -> totalResults=83",
+      "flag": "MANUAL REVIEW: PET CONSUMABLE - food/treats category, no include/exclude policy yet"
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Wet Cat Food",
+      "qty": 150,
+      "link": "https://www.therange.co.uk/pets/cats/cat-food-and-treats/cat-wet-food/",
+      "is_group": false,
+      "evidence": "search-lon.therange.co.uk/api/productlist?categoryId=93778&limit=1&offset=0 -> totalResults=150",
+      "flag": "MANUAL REVIEW: PET CONSUMABLE - food/treats category, no include/exclude policy yet"
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Cat Grooming",
+      "qty": 33,
+      "link": "https://www.therange.co.uk/pets/cats/cat-grooming/",
+      "is_group": false,
+      "evidence": "search-lon.therange.co.uk/api/productlist?categoryId=93774&limit=1&offset=0 -> totalResults=33",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Cat Healthcare",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Cat Calming Products",
+      "qty": 11,
+      "link": "https://www.therange.co.uk/pets/cats/cat-healthcare/cat-calming/",
+      "is_group": false,
+      "evidence": "search-lon.therange.co.uk/api/productlist?categoryId=93780&limit=1&offset=0 -> totalResults=11",
+      "flag": "MANUAL REVIEW: PET MEDICAL / VETERINARY CATEGORY - healthcare/treatment product"
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Cat Dental Care",
+      "qty": 5,
+      "link": "https://www.therange.co.uk/pets/cats/cat-healthcare/cat-dental-care/",
+      "is_group": false,
+      "evidence": "search-lon.therange.co.uk/api/productlist?categoryId=93782&limit=1&offset=0 -> totalResults=5",
+      "flag": "MANUAL REVIEW: PET MEDICAL / VETERINARY CATEGORY - healthcare/treatment product"
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Cat Flea Treatment",
+      "qty": 29,
+      "link": "https://www.therange.co.uk/pets/cats/cat-healthcare/cat-flea-treatment/",
+      "is_group": false,
+      "evidence": "search-lon.therange.co.uk/api/productlist?categoryId=93784&limit=1&offset=0 -> totalResults=29",
+      "flag": "MANUAL REVIEW: PET MEDICAL / VETERINARY CATEGORY - healthcare/treatment product"
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Cat Health Supplements",
+      "qty": 2,
+      "link": "https://www.therange.co.uk/pets/cats/cat-healthcare/cat-supplements/",
+      "is_group": false,
+      "evidence": "search-lon.therange.co.uk/api/productlist?categoryId=93781&limit=1&offset=0 -> totalResults=2",
+      "flag": "MANUAL REVIEW: PET MEDICAL / VETERINARY CATEGORY - healthcare/treatment product"
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Cat Posts, Scratchers & Towers",
+      "qty": 949,
+      "link": "https://www.therange.co.uk/pets/cats/cat-posts-scratchers-and-towers/",
+      "is_group": false,
+      "evidence": "search-lon.therange.co.uk/api/productlist?categoryId=93785&limit=1&offset=0 -> totalResults=949",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Puppy",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Puppy Beds & Blankets",
+      "qty": 250,
+      "link": "https://www.therange.co.uk/pets/puppy/puppy-beds-and-blankets/",
+      "is_group": false,
+      "evidence": "search-lon.therange.co.uk/api/productlist?categoryId=93711&limit=1&offset=0 -> totalResults=250",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Puppy Bowls & Accessories",
+      "qty": 15,
+      "link": "https://www.therange.co.uk/pets/puppy/puppy-bowls-and-accessories/",
+      "is_group": false,
+      "evidence": "search-lon.therange.co.uk/api/productlist?categoryId=93716&limit=1&offset=0 -> totalResults=15",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Puppy Clothing & Accessories",
+      "qty": 4,
+      "link": "https://www.therange.co.uk/pets/puppy/puppy-clothing-and-accessories/",
+      "is_group": false,
+      "evidence": "search-lon.therange.co.uk/api/productlist?categoryId=93713&limit=1&offset=0 -> totalResults=4",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Puppy Collars, Leads & Tags",
+      "qty": 17,
+      "link": "https://www.therange.co.uk/pets/puppy/puppy-collars-leads-and-tags/",
+      "is_group": false,
+      "evidence": "search-lon.therange.co.uk/api/productlist?categoryId=93715&limit=1&offset=0 -> totalResults=17",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Puppy Essentials",
+      "qty": 11,
+      "link": "https://www.therange.co.uk/pets/puppy/puppy-essentials/",
+      "is_group": false,
+      "evidence": "search-lon.therange.co.uk/api/productlist?categoryId=472463&limit=1&offset=0 -> totalResults=11",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Puppy Food & Treats",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Dry Puppy Food",
+      "qty": 17,
+      "link": "https://www.therange.co.uk/pets/puppy/puppy-food-and-treats/puppy-dry-food/",
+      "is_group": false,
+      "evidence": "search-lon.therange.co.uk/api/productlist?categoryId=93718&limit=1&offset=0 -> totalResults=17",
+      "flag": "MANUAL REVIEW: PET CONSUMABLE - food/treats category, no include/exclude policy yet"
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Puppy Treats",
+      "qty": 8,
+      "link": "https://www.therange.co.uk/pets/puppy/puppy-food-and-treats/puppy-treats/",
+      "is_group": false,
+      "evidence": "search-lon.therange.co.uk/api/productlist?categoryId=93720&limit=1&offset=0 -> totalResults=8",
+      "flag": "MANUAL REVIEW: PET CONSUMABLE - food/treats category, no include/exclude policy yet"
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Wet Puppy Food",
+      "qty": 5,
+      "link": "https://www.therange.co.uk/pets/puppy/puppy-food-and-treats/puppy-wet-food/",
+      "is_group": false,
+      "evidence": "search-lon.therange.co.uk/api/productlist?categoryId=93719&limit=1&offset=0 -> totalResults=5",
+      "flag": "MANUAL REVIEW: PET CONSUMABLE - food/treats category, no include/exclude policy yet"
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Puppy Grooming",
+      "qty": 24,
+      "link": "https://www.therange.co.uk/pets/puppy/puppy-grooming/",
+      "is_group": false,
+      "evidence": "search-lon.therange.co.uk/api/productlist?categoryId=93709&limit=1&offset=0 -> totalResults=24",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Puppy Healthcare",
+      "qty": 6,
+      "link": "https://www.therange.co.uk/pets/puppy/puppy-healthcare/",
+      "is_group": false,
+      "evidence": "search-lon.therange.co.uk/api/productlist?categoryId=93710&limit=1&offset=0 -> totalResults=6",
+      "flag": "MANUAL REVIEW: PET MEDICAL / VETERINARY CATEGORY - healthcare/treatment product"
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Puppy Toys",
+      "qty": 37,
+      "link": "https://www.therange.co.uk/pets/puppy/puppy-toys/",
+      "is_group": false,
+      "evidence": "search-lon.therange.co.uk/api/productlist?categoryId=93712&limit=1&offset=0 -> totalResults=37",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Puppy Training",
+      "qty": 16,
+      "link": "https://www.therange.co.uk/pets/puppy/puppy-training/",
+      "is_group": false,
+      "evidence": "search-lon.therange.co.uk/api/productlist?categoryId=93714&limit=1&offset=0 -> totalResults=16",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Kitten",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Kitten Beds, Posts & Scratchers",
+      "qty": 5,
+      "link": "https://www.therange.co.uk/pets/kitten/kitten-beds-posts-and-scratchers/",
+      "is_group": false,
+      "evidence": "search-lon.therange.co.uk/api/productlist?categoryId=93748&limit=1&offset=0 -> totalResults=5",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Kitten Bowls & Accessories",
+      "qty": 17,
+      "link": "https://www.therange.co.uk/pets/kitten/kitten-bowls-and-accessories/",
+      "is_group": false,
+      "evidence": "search-lon.therange.co.uk/api/productlist?categoryId=93721&limit=1&offset=0 -> totalResults=17",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Kitten Collars, Harnesses & ID Tags",
+      "qty": 3,
+      "link": "https://www.therange.co.uk/pets/kitten/kitten-collars-harnesses-and-id-tags/",
+      "is_group": false,
+      "evidence": "search-lon.therange.co.uk/api/productlist?categoryId=93746&limit=1&offset=0 -> totalResults=3",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Kitten Food & Treats",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Dry Kitten Food",
+      "qty": 7,
+      "link": "https://www.therange.co.uk/pets/kitten/kitten-food-and-treats/kitten-dry-food/",
+      "is_group": false,
+      "evidence": "search-lon.therange.co.uk/api/productlist?categoryId=93753&limit=1&offset=0 -> totalResults=7",
+      "flag": "MANUAL REVIEW: PET CONSUMABLE - food/treats category, no include/exclude policy yet"
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Kitten Treats",
+      "qty": 1,
+      "link": "https://www.therange.co.uk/pets/kitten/kitten-food-and-treats/kitten-treats/",
+      "is_group": false,
+      "evidence": "search-lon.therange.co.uk/api/productlist?categoryId=93755&limit=1&offset=0 -> totalResults=1",
+      "flag": "MANUAL REVIEW: PET CONSUMABLE - food/treats category, no include/exclude policy yet"
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Kitten Grooming",
+      "qty": 29,
+      "link": "https://www.therange.co.uk/pets/kitten/kitten-grooming/",
+      "is_group": false,
+      "evidence": "search-lon.therange.co.uk/api/productlist?categoryId=93751&limit=1&offset=0 -> totalResults=29",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Kitten Healthcare & Supplements",
+      "qty": 10,
+      "link": "https://www.therange.co.uk/pets/kitten/kitten-healthcare/",
+      "is_group": false,
+      "evidence": "search-lon.therange.co.uk/api/productlist?categoryId=93745&limit=1&offset=0 -> totalResults=10",
+      "flag": "MANUAL REVIEW: PET MEDICAL / VETERINARY CATEGORY - healthcare/treatment product"
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Kitten Litter, Trays & Loos",
+      "qty": 8,
+      "link": "https://www.therange.co.uk/pets/kitten/kitten-litter-trays-and-loos/",
+      "is_group": false,
+      "evidence": "search-lon.therange.co.uk/api/productlist?categoryId=93749&limit=1&offset=0 -> totalResults=8",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Kitten Toys",
+      "qty": 8,
+      "link": "https://www.therange.co.uk/pets/kitten/kitten-toys/",
+      "is_group": false,
+      "evidence": "search-lon.therange.co.uk/api/productlist?categoryId=93747&limit=1&offset=0 -> totalResults=8",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Birds",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Bird Healthcare Products",
+      "qty": 10,
+      "link": "https://www.therange.co.uk/pets/birds/bird-healthcare/",
+      "is_group": false,
+      "evidence": "search-lon.therange.co.uk/api/productlist?categoryId=93879&limit=1&offset=0 -> totalResults=10",
+      "flag": "MANUAL REVIEW: PET MEDICAL / VETERINARY CATEGORY - healthcare/treatment product"
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Bird Toys",
+      "qty": 41,
+      "link": "https://www.therange.co.uk/pets/birds/bird-toys/",
+      "is_group": false,
+      "evidence": "search-lon.therange.co.uk/api/productlist?categoryId=93877&limit=1&offset=0 -> totalResults=41",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Chicken Care",
+      "qty": 34,
+      "link": "https://www.therange.co.uk/pets/birds/chicken-care/",
+      "is_group": false,
+      "evidence": "search-lon.therange.co.uk/api/productlist?categoryId=93880&limit=1&offset=0 -> totalResults=34",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Fish / Aquatics",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Aquarium Filters",
+      "qty": 54,
+      "link": "https://www.therange.co.uk/pets/fish/aquarium-filters/",
+      "is_group": false,
+      "evidence": "search-lon.therange.co.uk/api/productlist?categoryId=93839&limit=1&offset=0 -> totalResults=54",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Aquarium Heaters",
+      "qty": 8,
+      "link": "https://www.therange.co.uk/pets/fish/aquarium-heaters/",
+      "is_group": false,
+      "evidence": "search-lon.therange.co.uk/api/productlist?categoryId=93840&limit=1&offset=0 -> totalResults=8",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Aquarium Lighting",
+      "qty": 1,
+      "link": "https://www.therange.co.uk/pets/fish/aquarium-lighting/",
+      "is_group": false,
+      "evidence": "search-lon.therange.co.uk/api/productlist?categoryId=93837&limit=1&offset=0 -> totalResults=1",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Aquarium Pumps",
+      "qty": 11,
+      "link": "https://www.therange.co.uk/pets/fish/aquarium-pumps/",
+      "is_group": false,
+      "evidence": "search-lon.therange.co.uk/api/productlist?categoryId=93838&limit=1&offset=0 -> totalResults=11",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Aquarium Treatments & Fish Healthcare",
+      "qty": 57,
+      "link": "https://www.therange.co.uk/pets/fish/aquarium-treatments-and-fish-healthcare/",
+      "is_group": false,
+      "evidence": "search-lon.therange.co.uk/api/productlist?categoryId=93867&limit=1&offset=0 -> totalResults=57",
+      "flag": "MANUAL REVIEW: PET MEDICAL / VETERINARY CATEGORY - healthcare/treatment product"
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Garden Ponds",
+      "qty": 113,
+      "link": "https://www.therange.co.uk/pets/fish/garden-ponds/",
+      "is_group": false,
+      "evidence": "search-lon.therange.co.uk/api/productlist?categoryId=93868&limit=1&offset=0 -> totalResults=113",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Reptiles",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Reptile Food & Supplements",
+      "qty": 12,
+      "link": "https://www.therange.co.uk/pets/reptiles/reptile-food-and-supplements/",
+      "is_group": false,
+      "evidence": "search-lon.therange.co.uk/api/productlist?categoryId=93874&limit=1&offset=0 -> totalResults=12",
+      "flag": "MANUAL REVIEW: PET CONSUMABLE - food/treats category, no include/exclude policy yet"
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Reptile Health & Hygiene",
+      "qty": 4,
+      "link": "https://www.therange.co.uk/pets/reptiles/reptile-health-and-hygiene/",
+      "is_group": false,
+      "evidence": "search-lon.therange.co.uk/api/productlist?categoryId=3838035&limit=1&offset=0 -> totalResults=4",
+      "flag": "MANUAL REVIEW: PET MEDICAL / VETERINARY CATEGORY - healthcare/treatment product"
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Reptile & Amphibian Humidity Products",
+      "qty": 7,
+      "link": "https://www.therange.co.uk/pets/reptiles/reptile-humidity/",
+      "is_group": false,
+      "evidence": "search-lon.therange.co.uk/api/productlist?categoryId=3838032&limit=1&offset=0 -> totalResults=7",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Reptile Starter Kits",
+      "qty": 16,
+      "link": "https://www.therange.co.uk/pets/reptiles/reptile-starter-kits/",
+      "is_group": false,
+      "evidence": "search-lon.therange.co.uk/api/productlist?categoryId=3838041&limit=1&offset=0 -> totalResults=16",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Vivarium Decorations",
+      "qty": 28,
+      "link": "https://www.therange.co.uk/pets/reptiles/vivarium-decorations/",
+      "is_group": false,
+      "evidence": "search-lon.therange.co.uk/api/productlist?categoryId=326573&limit=1&offset=0 -> totalResults=28",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Vivarium Heat Lamps & Mats",
+      "qty": 28,
+      "link": "https://www.therange.co.uk/pets/reptiles/vivarium-heat-lamps-and-mats/",
+      "is_group": false,
+      "evidence": "search-lon.therange.co.uk/api/productlist?categoryId=326576&limit=1&offset=0 -> totalResults=28",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Vivarium Terrain",
+      "qty": 8,
+      "link": "https://www.therange.co.uk/pets/reptiles/vivarium-terrain/",
+      "is_group": false,
+      "evidence": "search-lon.therange.co.uk/api/productlist?categoryId=326582&limit=1&offset=0 -> totalResults=8",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Vivarium Thermostats & Hygrometers",
+      "qty": 9,
+      "link": "https://www.therange.co.uk/pets/reptiles/vivarium-thermostats-and-hygrometers/",
+      "is_group": false,
+      "evidence": "search-lon.therange.co.uk/api/productlist?categoryId=326579&limit=1&offset=0 -> totalResults=9",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Small Pets",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Guinea Pig",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Guinea Pig Accessories",
+      "qty": 22,
+      "link": "https://www.therange.co.uk/pets/small-pets/guinea-pig/guinea-pig-accessories/",
+      "is_group": false,
+      "evidence": "search-lon.therange.co.uk/api/productlist?categoryId=93833&limit=1&offset=0 -> totalResults=22",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Guinea Pig Food & Treats",
+      "qty": 25,
+      "link": "https://www.therange.co.uk/pets/small-pets/guinea-pig/guinea-pig-food-and-treats/",
+      "is_group": false,
+      "evidence": "search-lon.therange.co.uk/api/productlist?categoryId=93832&limit=1&offset=0 -> totalResults=25",
+      "flag": "MANUAL REVIEW: PET CONSUMABLE - food/treats category, no include/exclude policy yet"
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Hamster",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Hamster Toys, Bedding & More",
+      "qty": 24,
+      "link": "https://www.therange.co.uk/pets/small-pets/hamster/hamster-accessories/",
+      "is_group": false,
+      "evidence": "search-lon.therange.co.uk/api/productlist?categoryId=93831&limit=1&offset=0 -> totalResults=24",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Hamster Food & Treats",
+      "qty": 29,
+      "link": "https://www.therange.co.uk/pets/small-pets/hamster/hamster-food-and-treats/",
+      "is_group": false,
+      "evidence": "search-lon.therange.co.uk/api/productlist?categoryId=93830&limit=1&offset=0 -> totalResults=29",
+      "flag": "MANUAL REVIEW: PET CONSUMABLE - food/treats category, no include/exclude policy yet"
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Rabbit",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Rabbit Accessories",
+      "qty": 29,
+      "link": "https://www.therange.co.uk/pets/small-pets/rabbit/rabbit-accessories/",
+      "is_group": false,
+      "evidence": "search-lon.therange.co.uk/api/productlist?categoryId=93835&limit=1&offset=0 -> totalResults=29",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Rabbit Food & Treats",
+      "qty": 43,
+      "link": "https://www.therange.co.uk/pets/small-pets/rabbit/rabbit-food-and-treats/",
+      "is_group": false,
+      "evidence": "search-lon.therange.co.uk/api/productlist?categoryId=93834&limit=1&offset=0 -> totalResults=43",
+      "flag": "MANUAL REVIEW: PET CONSUMABLE - food/treats category, no include/exclude policy yet"
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Rat, Mouse & Ferret Products",
+      "qty": 15,
+      "link": "https://www.therange.co.uk/pets/small-pets/rat-mouse-and-ferret/",
+      "is_group": false,
+      "evidence": "search-lon.therange.co.uk/api/productlist?categoryId=93826&limit=1&offset=0 -> totalResults=15",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Small Animal Housing",
+      "qty": 497,
+      "link": "https://www.therange.co.uk/pets/small-pets/small-animal-housing/",
+      "is_group": false,
+      "evidence": "search-lon.therange.co.uk/api/productlist?categoryId=2512111&limit=1&offset=0 -> totalResults=497",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Small Pet Accessories",
+      "qty": 32,
+      "link": "https://www.therange.co.uk/pets/small-pets/small-pet-accessories/",
+      "is_group": false,
+      "evidence": "search-lon.therange.co.uk/api/productlist?categoryId=93827&limit=1&offset=0 -> totalResults=32",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Small Pet Food",
+      "qty": 55,
+      "link": "https://www.therange.co.uk/pets/small-pets/small-pet-food/",
+      "is_group": false,
+      "evidence": "search-lon.therange.co.uk/api/productlist?categoryId=127996&limit=1&offset=0 -> totalResults=55",
+      "flag": "MANUAL REVIEW: PET CONSUMABLE - food/treats category, no include/exclude policy yet"
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Small Pet Healthcare",
+      "qty": 11,
+      "link": "https://www.therange.co.uk/pets/small-pets/small-pet-healthcare/",
+      "is_group": false,
+      "evidence": "search-lon.therange.co.uk/api/productlist?categoryId=93829&limit=1&offset=0 -> totalResults=11",
+      "flag": "MANUAL REVIEW: PET MEDICAL / VETERINARY CATEGORY - healthcare/treatment product"
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Small Pet Toys",
+      "qty": 47,
+      "link": "https://www.therange.co.uk/pets/small-pets/small-pet-toys/",
+      "is_group": false,
+      "evidence": "search-lon.therange.co.uk/api/productlist?categoryId=93828&limit=1&offset=0 -> totalResults=47",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Horses",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Stable Equipment for Horses",
+      "qty": 3,
+      "link": "https://www.therange.co.uk/pets/horses/stable-equipment/",
+      "is_group": false,
+      "evidence": "search-lon.therange.co.uk/api/productlist?categoryId=4935277&limit=1&offset=0 -> totalResults=3",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Pet Beds",
+      "qty": 1503,
+      "link": "https://www.therange.co.uk/pets/pet-beds/",
+      "is_group": false,
+      "evidence": "search-lon.therange.co.uk/api/productlist?categoryId=366626&limit=1&offset=0 -> totalResults=1503",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Pet Bowls",
+      "qty": 290,
+      "link": "https://www.therange.co.uk/pets/pet-bowls/",
+      "is_group": false,
+      "evidence": "search-lon.therange.co.uk/api/productlist?categoryId=386484&limit=1&offset=0 -> totalResults=290",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Pet Cooling",
+      "qty": 137,
+      "link": "https://www.therange.co.uk/pets/pet-cooling/",
+      "is_group": false,
+      "evidence": "search-lon.therange.co.uk/api/productlist?categoryId=3231219&limit=1&offset=0 -> totalResults=137",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Pet Gates & Doors",
+      "qty": 449,
+      "link": "https://www.therange.co.uk/pets/pet-gates/",
+      "is_group": false,
+      "evidence": "search-lon.therange.co.uk/api/productlist?categoryId=2761418&limit=1&offset=0 -> totalResults=449",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Pet Cleaning Supplies",
+      "qty": 123,
+      "link": "https://www.therange.co.uk/pets/pet-home-cleaning/",
+      "is_group": false,
+      "evidence": "search-lon.therange.co.uk/api/productlist?categoryId=2629890&limit=1&offset=0 -> totalResults=123",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Pet Ramps & Stairs",
+      "qty": 127,
+      "link": "https://www.therange.co.uk/pets/pet-ramps-and-stairs/",
+      "is_group": false,
+      "evidence": "search-lon.therange.co.uk/api/productlist?categoryId=2761415&limit=1&offset=0 -> totalResults=127",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Pet Storage",
+      "qty": 46,
+      "link": "https://www.therange.co.uk/pets/pet-storage/",
+      "is_group": false,
+      "evidence": "search-lon.therange.co.uk/api/productlist?categoryId=4169867&limit=1&offset=0 -> totalResults=46",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Pet Toys",
+      "qty": 772,
+      "link": "https://www.therange.co.uk/pets/pet-toys/",
+      "is_group": false,
+      "evidence": "search-lon.therange.co.uk/api/productlist?categoryId=4950474&limit=1&offset=0 -> totalResults=772",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Pet Travel Essentials",
+      "qty": 6,
+      "link": "https://www.therange.co.uk/pets/pet-travel-essentials/",
+      "is_group": false,
+      "evidence": "search-lon.therange.co.uk/api/productlist?categoryId=403488&limit=1&offset=0 -> totalResults=6",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "High Visibility Pets",
+      "qty": 31,
+      "link": "https://www.therange.co.uk/pets/high-visibility-pets/",
+      "is_group": false,
+      "evidence": "search-lon.therange.co.uk/api/productlist?categoryId=3747420&limit=1&offset=0 -> totalResults=31",
+      "flag": null
+    }
+  ]
+}

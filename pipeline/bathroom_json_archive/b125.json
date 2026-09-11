@@ -1,0 +1,134 @@
+{
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ROBOTS: https://www.fenwick.co.uk/robots.txt fetched FIRST, before any other request on the host - HTTP 200, 3,618 bytes, profile chrome131. It is a Shopify storefront file ('# Shopify storefront. Public product, collection, page, blog, policy, cart, and localized HTML is crawlable.'). It names NO Claude agent anywhere - a regex sweep for claude / claudebot / claude-web / claude-user / anthropic returned ZERO matches - so there is no named-agent group and no hard stop. Only two groups exist: 'User-agent: *' which opens with 'Allow: /', and 'User-agent: adsbot-google'. We fall under '*'. Its Disallow list is private/transactional and crawl-trap paths: /admin, /cart/, /checkout, /checkouts/, /orders, /account, /85707063630, /cdn/wpm/*.js, /services, /sf_*, /cart.js, /recommendations/products, plus the filter/sort traps 'Disallow: /collections/*sort_by*', 'Disallow: /collections/*+*' (and %2B/%2b forms), 'Disallow: /collections/*filter*&*filter*', 'Disallow: /*?*ls=*&ls=*', '/*?*oseid=*', '/*?*preview_theme_id=*', '/*?*preview_script_id=*'. COMPLIANCE: every URL touched this session is a bare /collections/<handle> path or that same path with '?view=fallback' and/or '&page=N' - no sort_by, no '+', no filter parameter at all (never mind two), no oseid/preview/ls param, and the site's internal /search was never used. No Crawl-delay is declared for any user-agent; probe.py's 2 s per-host gap was honoured throughout. ACCESS: plain direct probe.py curl_cffi fetches (chrome131, edge101, safari17_0, safari17_2_ios, safari18_0, safari18_0_ios) - no proxy, no r.jina.ai, no campaign parameter, no browser automation, zero 403s and no WAF challenge at any point. TREE SOURCE - the site's OWN navigation, not guessed patterns, corroborated three ways: (a) the homepage/PLP mega-menu, whose Home & Tech column ends 'Bathroom | Towels | Bathroom Accessories | Bathmats'; (b) each PLP's own child carousel, div.collection-sub-navigation, which is what recovered the THIRD level the mega-menu truncates - Bathroom Accessories' carousel yields Laundry Baskets, Bathroom Bins, Soap Dispensers and Towels' yields Bath Towels, Hand Towels, Face Towels; (c) https://fenwick.co.uk/sitemap.xml -> sitemap_collections_1.xml + sitemap_collections_2.xml, 3,181 collection URLs, swept with the regex bath|shower|toilet|soap|basin|sink|tap|faucet|vanity|mirror|towel|wash|dispenser|toothbrush|sanitar|bidet|robe|wc|tumbler|caddy|hamper -> 85 hits, every one of which was triaged. The sitemap sweep is what surfaced the two unlinked collections reported in review (bath-robes, kids-nursery bathroom-accessories) and confirmed there is no hidden sanitaryware, tap, shower or bathroom-furniture branch: Fenwick is a department store whose bathroom offer is towels, bathmats and small accessories only. The 85 hits break down as ~40 Beauty 'Bath & Body' brand/skincare collections (bath soaks, shower gels, hand washes - toiletries, not bathroom fittings), plus womenswear robes/nightwear, wardrobes, hampers, washbags, eau de toilette, 'Robert' brand names and 'tapered' jeans - all keyword false positives, none opened as bathroom nodes. RESULTING HIERARCHY: Home & Tech > Bathroom (342) > { Towels (256) > Bath Towels 119 / Hand Towels 57 / Face Towels 42 ; Bathroom Accessories (41) > Laundry Baskets 16 / Bathroom Bins 7 / Soap Dispensers 5 ; Bathmats (34) }. QTY SOURCE AND HOW IT WAS OBTAINED: Fenwick's default PLP grid is client-rendered by Nosto (div#product-grid-ajax, data-product-grid-nosto, data-results-per-page='20'), and the server HTML of the default view carries only an 8-tile SEO skeleton and NO total - so no number was taken from it. The site itself exposes a server-rendered fallback listing view, discovered from Fenwick's own markup (a pagination anchor in the shipped HTML reads '/collections/sale-kids?view=fallback&...&page=1'), and every count here is the exact total printed on that page by the site, verbatim '342 products', '256 products', '41 products', etc. The '?view=fallback&page=N' parameters are a FETCH DETAIL ONLY: they are not robots-disallowed, and every URL written into rows[] and review[] is the clean canonical /collections/<handle> form. Equivalence is not assumed - each fallback page declares <link rel=canonical> pointing at exactly that clean URL, and its H1 and breadcrumb match the requested node ('Bathroom', 'Luxury Bathroom Accessories', 'Bathmats', 'Bath Towels', ...). VERIFICATION - the header was proved to be a true paginated total, not a page-size echo, in two independent ways. (1) FULL ENUMERATION OF THE LARGEST NODE: the Bathroom parent was walked page 1..8 at 50 tiles per page - 50/50/50/50/50/50/42/0 - giving exactly 342 unique /products/ handles, identical to the '342 products' header, with page 8 empty. (2) SINGLE-PAGE EXHAUSTION on every small node, where tiles rendered == header exactly: Bathroom Accessories 41/41 (page 2 empty), Bathmats 34/34, Bath Robes 14/14, Laundry Baskets 16/16, Bathroom Bins 7/7, Soap Dispensers 5/5, Kid's Nursery Bathroom Accessories 3/3, Heal's Bathroom 9/9. All three recorded leaves are therefore complete enumerations well under the 50 page cap, not first-page artifacts. DISCRIMINATION: the counts differ per node across the 16 collections fetched (3, 5, 6, 7, 8, 9, 14, 16, 34, 41, 42, 56, 57, 74, 83, 115, 119, 256, 342) - no site-wide constant. MEMBERSHIP CROSS-CHECK: product handles were set-differenced to confirm the tree is real - Bathroom Bins (7/7) and Soap Dispensers (5/5) are strict subsets of Bathroom Accessories, while Laundry Baskets shares ZERO products with it (16 Joseph Joseph Tota/Hold-All baskets and Bag-all wash bags), which is why the parent's 41 does not equal the sum of its children and why nothing was ever summed. WHAT WAS EXCLUDED AND WHY: the Bathroom and Bathroom Accessories parents under rule 24 (both in review with their exact totals and, for Accessories, a full handle-level list of the 29 products no child covers - among them Fenwick's only 4 true bathroom mirrors); Towels + its 3 children, Bathmats and Bath Robes to Textile under rules 15/16/20; Home Furnishings > Mirrors (74) to Decor under rule 2 after inspection; /collections/sale-home-and-tech-bathroom and /collections/sale-beauty-bath-and-body as promotional sale pages (rule 25, never recorded, never counted); /collections/heals-bathroom (9 - a Heal's brand edit, all waffle towels/bath sheets, no breadcrumb parent, textile anyway), /collections/towel-sets (83), /collections/fenwick-at-home-towels (6) and /collections/fenwick-at-home-bath-robes (8) as brand/edit collections rather than category nodes and textile in content; the ~40 Beauty 'Bath & Body' collections as toiletries/cosmetics, which are not bathroom fittings under rules 2/3; /collections/home-and-tech-travel-washbags and /collections/home-and-tech-dining-glassware-tumblers as keyword false positives (luggage and drinking glassware); Home & Tech > Lighting and its 5 children were checked and contain no bathroom/vanity light node, so rule 19 produced nothing to route. DEDUP: dedup.already_extracted() was run on every candidate leaf, every review node and every canonical URL returned by rel=canonical - ZERO hits. The exclusion index holds 25 fenwick.co.uk URLs, all from Furniture.xlsx and all in the separate 'Furniture & Outdoor' / 'Luxury and Designer' tree (sofas, armchairs, coffee/console/side tables, sideboards, display cabinets, dining tables and chairs, desks, bookcases, bed frames, bedside tables, wardrobes, chest of drawers, dressing tables, garden furniture, nursery furniture) - not one is under /collections/home-and-tech-bathroom*, so no Option-1 vanity/cabinet suppression applies here and nothing recorded overlaps the Furniture pass. NOT PRESENT ON THIS SITE (established by the 3,181-URL sitemap sweep plus the full mega-menu walk, not assumed): no sanitaryware, basins, sinks, toilets or bidets; no baths or bathtubs; no showers, shower systems or shower accessories; no shower enclosures, screens or doors; no bathroom taps, mixers or faucets; no bathroom furniture, vanity units or bathroom cabinets; no bathroom mirror category; no towel rails, rings or robe hooks; no toilet-roll-holder or toothbrush-holder collection (those products exist only as loose SKUs inside Bathroom Accessories). RESULT: 2 grouping rows + 3 leaf rows (16 / 7 / 5), 10 review entries.",
+ "rows": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Accessories",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Laundry Baskets",
+   "qty": 16,
+   "link": "https://www.fenwick.co.uk/collections/home-and-tech-bathroom-bathroom-accessories-laundry-baskets",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Bins",
+   "qty": 7,
+   "link": "https://www.fenwick.co.uk/collections/home-and-tech-bathroom-bathroom-accessories-bathroom-bins",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Soap Dispensers",
+   "qty": 5,
+   "link": "https://www.fenwick.co.uk/collections/home-and-tech-bathroom-bathroom-accessories-soap-dispensers",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Accessories (other)",
+   "qty": 17,
+   "link": "https://www.fenwick.co.uk/collections/home-and-tech-bathroom-bathroom-accessories",
+   "is_group": false,
+   "evidence": "RULE-24 RESIDUE, PROVEN BY PRODUCT-ID CONTAINMENT (live re-check 2026-09-05). Parent 'Luxury Bathroom Accessories' (home-and-tech-bathroom-bathroom-accessories) still shows exactly 41 products - confirmed two independent ways: (a) Shopify /collections/<handle>/products.json full pagination returned exactly 41 unique product IDs; (b) the site's own rendered fallback-view header read verbatim '41 products' (title 'Luxury Bathroom Hardware and Accessories'). Its three sibling children were re-enumerated the same way and set-differenced against the parent's 41 IDs: Bathroom Bins (7 IDs) and Soap Dispensers (5 IDs) are a complete, exact subset of the parent - 12 of 12 IDs match, zero IDs outside the parent. Laundry Baskets (16 IDs) shares ZERO IDs with the parent - a fully disjoint sibling branch that is not part of the parent's 41 and is not subtracted from it. Parent 41 minus the 12 contained IDs (bins+soap) leaves an exact, fully-enumerated residue of 29 product IDs with no child collection of their own. Of those 29, 12 are 'The Silk Collection' items (silk eye masks, pillowcases, hair bonnets, scrunchies) - beauty/sleepwear products merchandised inside this collection but not bathroom fixtures or accessories under rules 2/29, so they are excluded and NOT counted in this row. The remaining 17 are genuine, uncovered bathroom accessories with no deeper site collection of their own: 4 bathroom mirrors (Andrea House gold magnifying stand mirror, Andrea House suction-cup mirror, Seletti Toiletpaper Mirror Drill, Seletti Toiletpaper Mirror Sea Girl - kept per rule 10, mirrors must never be skipped), 2 Andrea House gold toilet roll holders, 1 Andrea House brass toilet brush holder, 1 Andrea House brass toothbrush holder, 4 Zone Nova toilet brushes (white/grey x2/black), 2 Zone Nova toothbrush mugs/holders, 1 Andrea House beige resin toilet brush, 1 Andrea House marble tray, 1 Andrea House gold tissue box (same Andrea House ensemble as the toilet roll holder/toothbrush holder) - all rule-13/14 bathroom accessories with no recordable leaf of their own on this site. 41 (parent) - 12 (bins+soap, contained) - 12 (Silk Collection, excluded non-bathroom) = 17. Recorded against the parent's own URL under rule 24 because it is residue with no deeper valid listing, mirroring the SR176 Kmart precedent. Full product-ID lists for parent/children/residue held in session workpapers.",
+   "flag": null
+  }
+ ],
+ "review": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom (Home & Tech > Bathroom)",
+   "qty": 342,
+   "issue": "EXCLUDED AS PARENT URL (rule 24). H1 'Bathroom', breadcrumb 'Home > Home & Tech > Bathroom'. It is the top of Fenwick's own Bathroom tree and has three live children in its own .collection-sub-navigation carousel (Towels 256, Bathroom Accessories 41, Bathmats 34), so its own URL is never recorded and its 342 is never aggregated. Its 342 products were fully enumerated across 7 pages: 256 towels + 34 bathmats + 41 accessories + a 20-product residue that is 14 bath robes, 4 loose towels/bath sheets and 2 hanging wash bags - i.e. entirely textile/travel, no unlisted bathroom hardware hiding in the parent. FOLLOW-UP 2026-09-05: re-fetched live via Shopify /products.json full pagination. Parent total unchanged at exactly 342 unique product IDs. Re-enumerated all six current descendant leaves (Bath Towels, Hand Towels, Face Towels, Bathmats, Bathroom Accessories, Bath Robes) by product ID and found the parent is NOT a clean superset: 23 IDs across Bath Towels (17) and Hand Towels (6) sit in those child collections but are NOT tagged into the Bathroom parent collection at all (a live example of the known 'parent totals are not always supersets of children' trap - products get multi-tagged inconsistently on this storefront). Overlap between parent and the union of children is 277 IDs; the parent-only residue is now 65 IDs (grown from the 20 recorded at the original pass, reflecting new SKUs added since: Ralph Lauren Polo Player guest towels/face cloths, Dock Bay beach towels, Christy Supreme Hygro/Antalya/Cabana/Scallop Edge items, Murmur sculpted towels, Landshore towels, Fenwick at Home Claygate towel collection, and 2 hanging wash bags). Every one of the 65 residue titles was inspected by name and is textile/travel (towels, guest towels, face cloths, beach towels, wash bags) - ZERO bathroom hardware or fixtures among them, confirming the original finding still holds. Because the parent-child relationship is not a clean, provable subset (children include IDs outside the parent), this residue is NOT recorded as a Bathroom leaf under rule 24/26 (no combining unrelated/uncertain quantities); it remains documented here only, and would route to Textile in content anyway (rules 15/20) even if it were countable.",
+   "link": "https://www.fenwick.co.uk/collections/home-and-tech-bathroom"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathroom Accessories",
+   "qty": 41,
+   "issue": "EXCLUDED AS PARENT URL (rule 24) - recorded as a grouping row instead. H1 'Luxury Bathroom Accessories', breadcrumb 'Home > Home & Tech > Bathroom > Bathroom Accessories'. Its own sub-navigation carousel offers three children, all recorded as leaves above. RESIDUE DISCLOSED, NOT SILENTLY DROPPED: only 12 of its 41 products sit in a child (7 bins + 5 soap dispensers; the 16 laundry baskets are a disjoint set, zero overlap). The 29 uncovered products, enumerated by handle from the rendered grid, are: 3 Andrea House toilet brush / toilet brush holder, 2 toilet roll holders, 1 toothbrush holder, 2 Zone Nova toothbrush mugs, 3 Zone toilet brushes, 1 marble tray, 1 tissue box, 4 mirrors (Andrea House gold metal stand mirror, Andrea House suction-cup magnifying mirror, Seletti Toiletpaper Mirror Drill, Seletti Toiletpaper Mirror Sea Girl) and 12 The Silk Collection items (silk eye masks, pillowcases, hair bonnets, scrunchies - not bathroom at all). Fenwick publishes no deeper collection for toilet-roll holders, toilet brushes, toothbrush holders or bathroom mirrors, so under rule 24 these 29 have no recordable leaf of their own. FOLLOW-UP 2026-09-05: re-fetched live, parent total unchanged at 41 (products.json 41/41 IDs, fallback-view header '41 products'). Product-ID diff against the three current children reproduced the identical 29-ID residue. Of the 29, 17 are genuine bathroom accessories (4 mirrors, 2 toilet roll holders, 1 toilet brush holder, 1 toothbrush holder, 4 toilet brushes, 2 toothbrush mugs, 1 resin toilet brush, 1 marble tray, 1 tissue box) - promoted to a new leaf row 'Bathroom Accessories (other)' (qty 17) per the SR176 Kmart precedent, since containment was cleanly provable by product ID (bins/soap = exact subset, laundry baskets = fully disjoint, no partial overlaps). The other 12 (The Silk Collection silk eye masks/ pillowcases/hair bonnets/scrunchies) remain excluded as non-bathroom and are NOT part of the new row's qty.",
+   "link": "https://www.fenwick.co.uk/collections/home-and-tech-bathroom-bathroom-accessories"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Towels",
+   "qty": 256,
+   "issue": "ROUTED TO TEXTILE (rules 15/20): bath, hand and face towels. H1 'Towels', breadcrumb 'Home > Home & Tech > Bathroom > Towels'. Grouping node with three children, all routed the same way below. No towel rail/bar/ring/hook node exists anywhere on the site, so nothing of the rule-15/17 hardware half is lost here.",
+   "link": "https://www.fenwick.co.uk/collections/home-and-tech-bathroom-towels"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Towels > Bath Towels",
+   "qty": 119,
+   "issue": "ROUTED TO TEXTILE (rules 15/20): woven cotton bath towels and bath sheets.",
+   "link": "https://www.fenwick.co.uk/collections/home-and-tech-bathroom-towels-bath-towels"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Towels > Hand Towels",
+   "qty": 57,
+   "issue": "ROUTED TO TEXTILE (rules 15/20): woven cotton hand towels.",
+   "link": "https://www.fenwick.co.uk/collections/home-and-tech-bathroom-towels-hand-towels"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Towels > Face Towels",
+   "qty": 42,
+   "issue": "ROUTED TO TEXTILE (rules 15/20): face cloths / flannels.",
+   "link": "https://www.fenwick.co.uk/collections/home-and-tech-bathroom-towels-face-towels"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathmats",
+   "qty": 34,
+   "issue": "ROUTED TO TEXTILE (rule 16). Opened and all 34 products enumerated by handle rather than assumed: every tile is a woven textile mat - Christy Supreme Hygro bath mats, Christy Supreme Reversible bath and pedestal mats, Christy Serene bath mat and 24 Ralph Lauren Polo Player / plain cotton bath mats. Rule 16 puts a textile bath mat in Textile; there is NOT ONE rubber or anti-slip mat in the node, so no part of it stays in Bathroom.",
+   "link": "https://www.fenwick.co.uk/collections/home-and-tech-bathroom-bathmats"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Robes",
+   "qty": 14,
+   "issue": "ROUTED TO TEXTILE (rule 20): bathrobes. Also an ORPHAN NODE - live at 14 products with H1 'Bath Robes', but its breadcrumb is only 'Home > Bath Robes' and it appears in neither the Home & Tech mega-menu nor the Bathroom PLP's own child carousel. Found via the collections sitemap; all 14 of its products are inside the Bathroom parent collection, so it is a real but unlinked node. Textile either way.",
+   "link": "https://www.fenwick.co.uk/collections/home-and-tech-bathroom-bath-robes"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Home Furnishings & Accessories > Mirrors",
+   "qty": 74,
+   "issue": "ROUTED TO DECOR / HOME FURNISHINGS (rules 2/29) - inspected under rule 10 rather than skipped, because 'mirror' must never be dismissed on the word alone. H1 'Designer Mirrors', breadcrumb 'Home > Home & Tech > Home Furnishings & Accessories > Mirrors' - Fenwick files it under Home Furnishings & Accessories alongside Wall Art, Clocks and Decorative Accessories, NOT under Bathroom. The rendered grid is decorative wall, arch, over-mantle, gallery, full-length and floor mirrors from Barker & Stonehouse, Heal's, Libra Interiors and Ferm Living, plus dressing-table mirrors. No bathroom, LED/illuminated, demister, shaving or mirrored-cabinet product line and no bathroom sub-node. Website hierarchy decides (rule 2), so it is not Bathroom. Fenwick's only genuinely bathroom mirrors are the 4 loose SKUs inside Bathroom Accessories noted above.",
+   "link": "https://www.fenwick.co.uk/collections/home-and-tech-home-furnishings-and-accessories-mirrors"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Kid's Nursery Bathroom Accessories",
+   "qty": 3,
+   "issue": "LOW CONFIDENCE / ORPHAN NODE - not recorded (rule 29). H1 \"Kid's Nursery Bathroom Accessories\" and the name is a rule-13 match, so it was opened. Breadcrumb is only 'Home > Kid's Nursery Bathroom Accessories'; the live Kids > Nursery > Bathing & Changing page's own sub-navigation lists Bathing & Changing, Furniture & Accessories, Bedding, Feeding & Healthcare and Toys & Gifts and does NOT link it, so it is an unlinked sitemap-only collection outside the site's real nav. Its 3 products are a Mamas & Papas collapsible baby bath, a nappy caddy and a Trixie hooded towel - a nursery bathing/changing mix, not bathroom fixtures or accessories. Sent to review rather than guessed.",
+   "link": "https://www.fenwick.co.uk/collections/kids-nursery-bathing-and-changing-bathroom-accessories"
+  }
+ ],
+ "_reconstructed_from": "Bathroom.xlsx delivered 2026-09-01 (checkpoint), not original worker JSON"
+}

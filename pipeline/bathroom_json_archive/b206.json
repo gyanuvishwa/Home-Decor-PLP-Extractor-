@@ -1,0 +1,76 @@
+{
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "Access: direct HTTP GET (Shopify storefront), no block encountered, tier-1 sufficient throughout. robots.txt fetched and scanned for ClaudeBot/Claude-Web/anthropic-ai/Claude-User/Claude-SearchBot: none present (standard Shopify boilerplate only, disallows admin/cart/checkout/search paths, no Claude-specific group) -> not blocked, proceeded. Tree source: enumerated the full collection catalogue via /collections.json?limit=250 (page1=250, page2=125, total=375) and cross-verified against /sitemap_collections_1.xml (also exactly 375 <loc> entries, identical set) -> complete coverage confirmed, no missed collections. Filtered all 375 for bath/shower/toilet/vanity/faucet/sink/basin/bidet/tub/mirror keywords: Bouclair is a Canadian home-decor/textile retailer and sells NO plumbing fixtures (no toilets, sinks, tubs, faucets, basins) and no bathroom-specific mirror collection (its mirror collections are general wall-decor-and-mirrors, junior/nursery variants, unrelated to bathroom). Candidate bath collections found: bath-mats, bath-towels, bathroom-accessories, bathroom-decor, bathroom-furniture, bathroom-wall-decor, shower-curtains, newest-bath-accessories, bed-and-bath, plus promo/sale pages (bed-bath-sale, obp-bed-bath, bed-bath-storage-25-off, bedding-bath-and-storage, view-all-bed-and-bath) excluded as promotional/View-All per rule 25. Qty verification: rendered-HTML embedded 'theme.stores.totalCount' was checked first but returned the identical value (52) on every single collection page regardless of actual contents -> identified as a fixed per-page grid-size setting, not a real count, and discarded. Used /collections/<handle>/products.json paginated (limit=250) counting unique product IDs instead, which varied correctly per collection and matched canonical/h1 verification on each page (page is client-rendered with no static Enumerable is data + no product cards in raw HTML, confirming products.json as the only reliable source here). Classification per bathroom.md: bathroom-accessories (7: storage tray, ceramic soap dispenser, rubber-coated tumbler, extendable bath caddy, toilet brush) and bathroom-furniture (9: towel holders, toilet paper holders, towel racks, stool) are clean, genuinely bathroom-hardware/furniture listings -> recorded as rows. Exclusions/routing: bath-mats (6, all fabric/tufted/braided mats, no rubber/anti-slip), bath-towels (25), and shower-curtains (2) are textile-primary per rules 15/16/20 -> checked cross_category_url_index.json, all 3 already recorded in Textile.xlsx -> routed to review as ALREADY EXTRACTED. bathroom-wall-decor (3: 'Set of 3 Wall Hooks on Plaque', 'Man & Woman Silhouette Bathroom Shadow Box', 'Get Naked Printed Canvas') is majority wall-art per rule 21 (2 of 3 are art/shadow-box pieces); not found in Wall_Decor.xlsx's index -> sent to review for adjudication rather than guessed. bathroom-decor (117) inspected product-by-product via products.json titles: a mixed merchandising collection combining Storage-owned items (baskets/trays/waste bins/hampers/trunks, ~half the list), Textile-owned items (hand/bath towels, washcloths, bath mats), and genuine Bathroom items (soap dispensers, toilet brush, wall hooks, shower liner) under one flat URL with no further site subcategorization -> per rules 29/30-33 (ambiguity + no crossover re-extraction + no aggregation) this is not a clean single-category leaf, sent to review flagged MIXED rather than recorded wholesale or partially estimated. newest-bath-accessories (21, 'Newest Bathroom Accessories') is a New-Arrivals filtered feed duplicating bathroom-accessories/bathroom-decor content -> excluded as promotional per rule 25, noted in review. bed-and-bath (148) is the broad parent Bed+Bath landing collection, a superset of the above -> excluded per rule 24 (never record parent when subcategories exist), noted in review. Dedup: 3 URLs (bath-mats, bath-towels, shower-curtains) matched Textile.xlsx via cross_category_url_index.json.",
+  "rows": [
+    {
+      "category": "Bathroom",
+      "sub_category": "Bathroom Accessories",
+      "qty": 7,
+      "link": "https://www.bouclair.com/collections/bathroom-accessories",
+      "is_group": false,
+      "evidence": "Shopify products.json full pagination (limit=250, single page, 7 unique product IDs); canonical + h1 both confirm 'Bathroom Accessories'; products are Storage Tray, Ceramic Soap Dispenser with Typography, Storage Tray, Rubber-Coated Tumbler, Extendable Bath Caddy, Ceramic Storage Tray, Black Toilet Brush with French Typography - genuine bathroom accessories/hardware per rules 13/14/17.",
+      "flag": null
+    },
+    {
+      "category": "Bathroom",
+      "sub_category": "Bathroom Furniture",
+      "qty": 9,
+      "link": "https://www.bouclair.com/collections/bathroom-furniture",
+      "is_group": false,
+      "evidence": "Shopify products.json full pagination (limit=250, single page, 9 unique product IDs); canonical + h1 both confirm 'Bathroom Furniture'; products are Black Metal Ladder Towel Holder, Standing Toilet Paper Holder, Black Wood Stool, Black Towel Holder, Ovaltik Toilet Paper Holder, Flag Satin Towel Rack, Bruce Satin Toilet Paper Holder, Ovaltik Black Towel Rack, Dalton Natural Wood Toilet Paper Holder - genuine bathroom furniture/hardware per rules 9/17.",
+      "flag": null
+    }
+  ],
+  "review": [
+    {
+      "category": "Bathroom",
+      "sub_category": "Bath Mats",
+      "qty": 6,
+      "issue": "ALREADY EXTRACTED IN Textile.xlsx (cross_category_url_index.json hit); textile-fabric bath mats (Textured Boho, Tufted, Braided) per rule 16, no rubber/anti-slip items present",
+      "link": "https://www.bouclair.com/collections/bath-mats"
+    },
+    {
+      "category": "Bathroom",
+      "sub_category": "Bath Towels",
+      "qty": 25,
+      "issue": "ALREADY EXTRACTED IN Textile.xlsx (cross_category_url_index.json hit); towels are always Textile per rule 15",
+      "link": "https://www.bouclair.com/collections/bath-towels"
+    },
+    {
+      "category": "Bathroom",
+      "sub_category": "Shower Curtains",
+      "qty": 2,
+      "issue": "ALREADY EXTRACTED IN Textile.xlsx (cross_category_url_index.json hit); shower curtains are always Textile per rule 20",
+      "link": "https://www.bouclair.com/collections/shower-curtains"
+    },
+    {
+      "category": "Bathroom",
+      "sub_category": "Bathroom Wall Decor",
+      "qty": 3,
+      "issue": "ROUTED TO WALL DECOR: majority wall art per rule 21 ('Man & Woman Silhouette Bathroom Shadow Box', 'Get Naked Printed Canvas'); includes 1 hardware item ('Set of 3 Wall Hooks on Plaque') that arguably belongs to Bathroom per rule 17. Not found in Wall_Decor.xlsx cross-category index (not yet captured there either) - needs human adjudication, not recorded here to avoid guessing per rule 29.",
+      "link": "https://www.bouclair.com/collections/bathroom-wall-decor"
+    },
+    {
+      "category": "Bathroom",
+      "sub_category": "Bathroom Decor",
+      "qty": 117,
+      "issue": "MIXED CATEGORY - not a clean Bathroom leaf. Product-by-product title inspection via products.json shows this flat collection combines Storage-owned items (Water Hyacinth Baskets, Storage Trays, Waste Bins, Hampers, Storage Trunks - roughly half the list), Textile-owned items (Waffle/Cognac Hand and Bath Towels, Washcloths, Bath Mats), and genuine Bathroom items (Ceramic Soap Dispensers, Ribbed Toilet Brush, Wall Hooks, Shower Liner) under one URL with no site subcategorization. Recording the full 117 as Bathroom would misclassify Storage/Textile-owned majority; recording a hand-picked subset would violate the exact-qty/no-inference rule. Needs human adjudication per rules 29/30-33.",
+      "link": "https://www.bouclair.com/collections/bathroom-decor"
+    },
+    {
+      "category": "Bathroom",
+      "sub_category": "Newest Bathroom Accessories",
+      "qty": 21,
+      "issue": "Excluded as promotional 'New Arrivals' filtered feed (duplicate/overlapping content with bathroom-accessories and bathroom-decor, not a genuine distinct taxonomy node) per rule 25.",
+      "link": "https://www.bouclair.com/collections/newest-bath-accessories"
+    },
+    {
+      "category": "Bathroom",
+      "sub_category": "Bed & Bath",
+      "qty": 148,
+      "issue": "Excluded per rule 24 - broad parent landing page superset of Bedroom Decor + Bathroom Decor + other bed/bath subcategories; valid deeper subcategories exist and were recorded/reviewed separately.",
+      "link": "https://www.bouclair.com/collections/bed-and-bath"
+    }
+  ]
+}

@@ -1,0 +1,426 @@
+{
+ "sr": 59,
+ "company": "US",
+ "brand_site": "cb2.com",
+ "country": "USA",
+ "site_url": "https://www.cb2.com/",
+ "failure_reason": null,
+ "notes": "ROSTER NAME ERROR: the company cell reads only 'US'. Copied verbatim so the merge matches, but the site is CB2 (Crate & Barrel's modern sibling brand, cb2.com). Please correct in the source spreadsheet. ACCESS: www.cb2.com is behind Akamai Bot Manager. Desktop curl_cffi profiles get a hard 'Access Denied' 403; only mobile profiles pass, and the single profile that returned real HTML was safari17_2_ios. That route delivered ~20 full pages (2.3-3.0 MB each) before Akamai escalated the whole listing-path space to a 'sec-if-cpt' behavioural interstitial for this IP; from then on every mobile profile got the 2,365-byte challenge page and every desktop profile a 403. translate.goog returns HTTP 400 for this domain, r.jina.ai was itself sitting behind a Cloudflare challenge for the whole session, WebFetch is 403'd, allorigins/codetabs/corsproxy all failed, HTTP/1.1-2-3 and Googlebot/Bingbot/Pinterest UA spoofs made no difference, and fetching the Akamai challenge scripts to seed _abck did not clear it. Static assets (/dist/js/*), robots.txt and the sitemaps stayed open throughout. STRUCTURE: taken from https://www.cb2.com/assets/sitemap-index.xml (sitemap-supercategory-and-spategory.xml + sitemap-plp.xml, 425 category URLs) and cross-checked against the nav model embedded in the landing pages captured before the block. COUNT METHOD: CB2 renders an exact 'N Items' header (div class='item-count' data-testid='item-count'), mirrored by data-num-results on the browse container; on Table Lamps both read 74 and JSON-LD ItemList numberOfItems also read 74. PLATFORM FINDING (transferable to S.N. 58 Crate & Barrel, same platform): CB2 runs Constructor.io under the shared Crate & Barrel account - the customisation bundle is https://cnstrc.com/js/cust/crate-and-barrel_A8clWu.js and it carries four API keys, of which key_1qj3cmoSsCMSrGDA is the live CB2 index. https://ac.cnstrc.com/browse/group_id/<id>?key=key_1qj3cmoSsCMSrGDA is NOT behind Akamai and returns the full category tree with ids, counts and product titles - it is how the taxonomy and every scope decision here was made. BUT its total_num_results is NOT the site's number: it matched the rendered header on 6 of 13 nodes tested and diverged on the other 7 (Dining 752 vs 732, Accessories 1273 vs 1137, Bed & Bath 565 vs 525, Outdoor 610 vs 591, Decorative Accessories 454 vs 432, Drinkware & Bar 289 vs 279, Serveware 124 vs 122), and the divergence is not explained by duplicates - enumerating Dining to exhaustion gave 750 unique product ids against a 732 header, and Dinnerware went the other way (224 unique vs a 225 header). So Constructor totals were used for structure and titles only, never as qty. Any leaf whose rendered header could not be read is left qty null with a flag rather than back-filled from the API. RULE 0 GAIN: Bathroom Lighting (/bed-and-bath/bathroom-lighting/1) and Bath Mirrors (/bed-and-bath/bath-mirrors/1) both live under Bed & Bath > Bath on CB2 and would have been dropped as 'bathroom' under the old rules; Outdoor Lighting and Outdoor Planters likewise kept under Rule 0.5. RULE 0.6 OVERLAP: Outdoor Planters (Outdoor > Outdoor Decor) shares 36 of its 37 products with Decor > Planters; both are emitted and the overlap is flagged. Also deduplicated as identical listings at the same level: Picture Frames [13466] == Frames [593] (12/12 identical ids, one kept); Curtain Hardware [13014] == Curtain Rods Hardware [11997] (10/10 identical, one kept); Shelves and Wall Hooks [12619] is a 28-item subset of Shelves Wall Hooks [11132] (31), superset kept. EXCLUDED after reading actual product titles via the Constructor API: Candles & Home Fragrances [12002] (scented/fragrance) while its unscented sibling Taper & Pillar Candles [13481] was kept - all 17 are tapers, pillars, tealights and explicitly 'Unscented' candle bowls; Botanicals [584] (faux/dried stems); Modern Wallpaper; Bath Accessories [11099] (24 items: soap pumps, toilet brush, wastebaskets, laundry hampers, towel racks, bathroom stools - predominantly bathroom utility, only ~5 decorative vanity trays); Outdoor Accessories [12099] (39 items mixing lanterns and candle holders with fire tables, umbrella bases, teak cleaners and lawn games); Fireplace Accessories [12090] (screens, andirons, tool sets - hearth hardware); Office Accessories [11989] (bookends and marble boxes mixed with letter trays, wastebaskets and coffee-table books); Decorative Storage [13826] and its children Baskets [12001] and Display Jewelry Boxes [12092] (storage); Cabinet Hardware and all bathroom/cabinet hardware collections; Flatware; Bar Tools & Accessories; Kitchen Storage & Tools; Kitchen & Table Linens, Pillows & Throws, Curtains, Bedding, Bath Towels & Mats, Shower Curtains, Rugs (textiles); all Furniture and Outdoor Furniture; Music, Games & Books; Halloween/Christmas/Holiday and all Gifts nodes; Designers/Collections, Best Sellers, New, Sale, View All and Inspiration nodes (navigation, not categories). Outdoor Entertaining [820] was KEPT and filed under Kitchen & Dining - its 114 products are overwhelmingly outdoor tabletop (acrylic and melamine glasses, plates, bowls, serving trays and platters, decanters).",
+ "status": "partial",
+ "rows": [
+  {
+   "category": "Lighting",
+   "sub_category": "Lighting",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Pendant Lights & Chandeliers",
+   "parent": false,
+   "qty": 105,
+   "link": "https://www.cb2.com/lighting/pendant-lights/1",
+   "evidence": "rendered listing header \"105 Items\"; data-num-results=105; JSON-LD ItemList numberOfItems=100",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Table Lamps",
+   "parent": false,
+   "qty": 74,
+   "link": "https://www.cb2.com/lighting/table-lamps/1",
+   "evidence": "rendered listing header 'item-count' = '74 Items'; corroborated by data-num-results=74, JSON-LD ItemList numberOfItems=74 and Constructor.io browse total_num_results=74 for group_id 11084",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Floor Lamps",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.cb2.com/lighting/floor-lamps/1",
+   "evidence": null,
+   "flag": "MANUAL REVIEW: Akamai bot-manager interstitial blocked the listing page; no rendered 'N Items' header could be read. Constructor.io browse total for group_id 11085 was ?, but that API total was proven inflated vs the rendered header on 7 of 13 CB2 nodes, so it is not used as qty."
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Wall Sconces",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.cb2.com/lighting/wall-sconces/1",
+   "evidence": null,
+   "flag": "MANUAL REVIEW: Akamai bot-manager interstitial blocked the listing page; no rendered 'N Items' header could be read. Constructor.io browse total for group_id 11862 was ?, but that API total was proven inflated vs the rendered header on 7 of 13 CB2 nodes, so it is not used as qty."
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Flush Mounts",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.cb2.com/lighting/flush-mounts/1",
+   "evidence": null,
+   "flag": "MANUAL REVIEW: Akamai bot-manager interstitial blocked the listing page; no rendered 'N Items' header could be read. Constructor.io browse total for group_id 11987 was ?, but that API total was proven inflated vs the rendered header on 7 of 13 CB2 nodes, so it is not used as qty."
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Outdoor Lighting",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.cb2.com/lighting/outdoor-lighting/1",
+   "evidence": null,
+   "flag": "MANUAL REVIEW: Akamai bot-manager interstitial blocked the listing page; no rendered 'N Items' header could be read. Constructor.io browse total for group_id 12595 was ?, but that API total was proven inflated vs the rendered header on 7 of 13 CB2 nodes, so it is not used as qty."
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Bathroom Lighting",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.cb2.com/bed-and-bath/bathroom-lighting/1",
+   "evidence": null,
+   "flag": "MANUAL REVIEW: Akamai bot-manager interstitial blocked the listing page; no rendered 'N Items' header could be read. Constructor.io browse total for group_id 13581 was ?, but that API total was proven inflated vs the rendered header on 7 of 13 CB2 nodes, so it is not used as qty."
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Mirrors & Wall Decor",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Wall Mirrors",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.cb2.com/accessories/wall-mirrors/1",
+   "evidence": null,
+   "flag": "MANUAL REVIEW: Akamai bot-manager interstitial blocked the listing page; no rendered 'N Items' header could be read. Constructor.io browse total for group_id 12084 was ?, but that API total was proven inflated vs the rendered header on 7 of 13 CB2 nodes, so it is not used as qty."
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Floor Mirrors",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.cb2.com/accessories/floor-mirrors/1",
+   "evidence": null,
+   "flag": "MANUAL REVIEW: Akamai bot-manager interstitial blocked the listing page; no rendered 'N Items' header could be read. Constructor.io browse total for group_id 11949 was ?, but that API total was proven inflated vs the rendered header on 7 of 13 CB2 nodes, so it is not used as qty."
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Bath Mirrors",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.cb2.com/bed-and-bath/bath-mirrors/1",
+   "evidence": null,
+   "flag": "MANUAL REVIEW: Akamai bot-manager interstitial blocked the listing page; no rendered 'N Items' header could be read. Constructor.io browse total for group_id 11096 was ?, but that API total was proven inflated vs the rendered header on 7 of 13 CB2 nodes, so it is not used as qty."
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Wall Art",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.cb2.com/accessories/wall-art/1",
+   "evidence": null,
+   "flag": "MANUAL REVIEW: Akamai bot-manager interstitial blocked the listing page; no rendered 'N Items' header could be read. Constructor.io browse total for group_id 12611 was ?, but that API total was proven inflated vs the rendered header on 7 of 13 CB2 nodes, so it is not used as qty."
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Picture Frames",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.cb2.com/accessories/frames/1",
+   "evidence": null,
+   "flag": "MANUAL REVIEW: Akamai bot-manager interstitial blocked the listing page; no rendered 'N Items' header could be read. Constructor.io browse total for group_id 593 was ?, but that API total was proven inflated vs the rendered header on 7 of 13 CB2 nodes, so it is not used as qty."
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Wall Shelves & Hooks",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.cb2.com/accessories/shelves-wall-hooks/1",
+   "evidence": null,
+   "flag": "MANUAL REVIEW: Akamai bot-manager interstitial blocked the listing page; no rendered 'N Items' header could be read. Constructor.io browse total for group_id 11132 was ?, but that API total was proven inflated vs the rendered header on 7 of 13 CB2 nodes, so it is not used as qty."
+  },
+  {
+   "category": "Home Accessories",
+   "sub_category": "Decorative Accents",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Home Accessories",
+   "sub_category": "Decorative Bowls",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.cb2.com/accessories/decorative-bowls/1",
+   "evidence": null,
+   "flag": "MANUAL REVIEW: Akamai bot-manager interstitial blocked the listing page; no rendered 'N Items' header could be read. Constructor.io browse total for group_id 12432 was ?, but that API total was proven inflated vs the rendered header on 7 of 13 CB2 nodes, so it is not used as qty."
+  },
+  {
+   "category": "Home Accessories",
+   "sub_category": "Decorative Objects",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.cb2.com/accessories/decorative-objects/1",
+   "evidence": null,
+   "flag": "MANUAL REVIEW: Akamai bot-manager interstitial blocked the listing page; no rendered 'N Items' header could be read. Constructor.io browse total for group_id 527 was ?, but that API total was proven inflated vs the rendered header on 7 of 13 CB2 nodes, so it is not used as qty."
+  },
+  {
+   "category": "Home Accessories",
+   "sub_category": "Trays",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.cb2.com/accessories/trays/1",
+   "evidence": null,
+   "flag": "MANUAL REVIEW: Akamai bot-manager interstitial blocked the listing page; no rendered 'N Items' header could be read. Constructor.io browse total for group_id 11988 was ?, but that API total was proven inflated vs the rendered header on 7 of 13 CB2 nodes, so it is not used as qty."
+  },
+  {
+   "category": "Home Accessories",
+   "sub_category": "Vases, Planters & Botanicals",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Home Accessories",
+   "sub_category": "Vases",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.cb2.com/accessories/vases/1",
+   "evidence": null,
+   "flag": "MANUAL REVIEW: Akamai bot-manager interstitial blocked the listing page; no rendered 'N Items' header could be read. Constructor.io browse total for group_id 583 was ?, but that API total was proven inflated vs the rendered header on 7 of 13 CB2 nodes, so it is not used as qty."
+  },
+  {
+   "category": "Home Accessories",
+   "sub_category": "Planters",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.cb2.com/accessories/planters/1",
+   "evidence": null,
+   "flag": "MANUAL REVIEW: Akamai bot-manager interstitial blocked the listing page; no rendered 'N Items' header could be read. Constructor.io browse total for group_id 11735 was ?, but that API total was proven inflated vs the rendered header on 7 of 13 CB2 nodes, so it is not used as qty."
+  },
+  {
+   "category": "Home Accessories",
+   "sub_category": "Candlelight",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Home Accessories",
+   "sub_category": "Candle Holders",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.cb2.com/accessories/candle-holders/1",
+   "evidence": null,
+   "flag": "MANUAL REVIEW: Akamai bot-manager interstitial blocked the listing page; no rendered 'N Items' header could be read. Constructor.io browse total for group_id 585 was ?, but that API total was proven inflated vs the rendered header on 7 of 13 CB2 nodes, so it is not used as qty."
+  },
+  {
+   "category": "Home Accessories",
+   "sub_category": "Taper & Pillar Candles",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.cb2.com/accessories/taper-pillar-candles/1",
+   "evidence": null,
+   "flag": "MANUAL REVIEW: Akamai bot-manager interstitial blocked the listing page; no rendered 'N Items' header could be read. Constructor.io browse total for group_id 13481 was ?, but that API total was proven inflated vs the rendered header on 7 of 13 CB2 nodes, so it is not used as qty."
+  },
+  {
+   "category": "Home Accessories",
+   "sub_category": "Curtain Rods & Hardware",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.cb2.com/accessories/curtain-rods-hardware/1",
+   "evidence": null,
+   "flag": "MANUAL REVIEW: Akamai bot-manager interstitial blocked the listing page; no rendered 'N Items' header could be read. Constructor.io browse total for group_id 11997 was ?, but that API total was proven inflated vs the rendered header on 7 of 13 CB2 nodes, so it is not used as qty."
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Dinnerware",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Dinnerware Sets",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.cb2.com/dining/dinnerware-collections/1",
+   "evidence": null,
+   "flag": "MANUAL REVIEW: Akamai bot-manager interstitial blocked the listing page; no rendered 'N Items' header could be read. Constructor.io browse total for group_id 222 was ?, but that API total was proven inflated vs the rendered header on 7 of 13 CB2 nodes, so it is not used as qty."
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Dinner Plates",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.cb2.com/dining/dinner-plates/1",
+   "evidence": null,
+   "flag": "MANUAL REVIEW: Akamai bot-manager interstitial blocked the listing page; no rendered 'N Items' header could be read. Constructor.io browse total for group_id 13498 was ?, but that API total was proven inflated vs the rendered header on 7 of 13 CB2 nodes, so it is not used as qty."
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Salad & Appetizer Plates",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.cb2.com/dining/plates/1",
+   "evidence": null,
+   "flag": "MANUAL REVIEW: Akamai bot-manager interstitial blocked the listing page; no rendered 'N Items' header could be read. Constructor.io browse total for group_id 12108 was ?, but that API total was proven inflated vs the rendered header on 7 of 13 CB2 nodes, so it is not used as qty."
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Pasta & Soup Bowls",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.cb2.com/dining/bowls/1",
+   "evidence": null,
+   "flag": "MANUAL REVIEW: Akamai bot-manager interstitial blocked the listing page; no rendered 'N Items' header could be read. Constructor.io browse total for group_id 12109 was ?, but that API total was proven inflated vs the rendered header on 7 of 13 CB2 nodes, so it is not used as qty."
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Drinkware & Bar",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Drinkware Sets",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.cb2.com/dining/drinkware-sets/1",
+   "evidence": null,
+   "flag": "MANUAL REVIEW: Akamai bot-manager interstitial blocked the listing page; no rendered 'N Items' header could be read. Constructor.io browse total for group_id 13206 was ?, but that API total was proven inflated vs the rendered header on 7 of 13 CB2 nodes, so it is not used as qty."
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Drinking Glasses",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.cb2.com/dining/drinking-glasses/1",
+   "evidence": null,
+   "flag": "MANUAL REVIEW: Akamai bot-manager interstitial blocked the listing page; no rendered 'N Items' header could be read. Constructor.io browse total for group_id 232 was ?, but that API total was proven inflated vs the rendered header on 7 of 13 CB2 nodes, so it is not used as qty."
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Wine & Champagne Glasses",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.cb2.com/dining/wine-glasses/1",
+   "evidence": null,
+   "flag": "MANUAL REVIEW: Akamai bot-manager interstitial blocked the listing page; no rendered 'N Items' header could be read. Constructor.io browse total for group_id 11938 was ?, but that API total was proven inflated vs the rendered header on 7 of 13 CB2 nodes, so it is not used as qty."
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Cocktail Glasses",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.cb2.com/dining/cocktail-glasses/1",
+   "evidence": null,
+   "flag": "MANUAL REVIEW: Akamai bot-manager interstitial blocked the listing page; no rendered 'N Items' header could be read. Constructor.io browse total for group_id 12111 was ?, but that API total was proven inflated vs the rendered header on 7 of 13 CB2 nodes, so it is not used as qty."
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Coffee Mugs & Tea Sets",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.cb2.com/dining/tea-coffee-mugs/1",
+   "evidence": null,
+   "flag": "MANUAL REVIEW: Akamai bot-manager interstitial blocked the listing page; no rendered 'N Items' header could be read. Constructor.io browse total for group_id 11937 was ?, but that API total was proven inflated vs the rendered header on 7 of 13 CB2 nodes, so it is not used as qty."
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Decanters, Pitchers & Dispensers",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.cb2.com/dining/pitchers-dispensers/1",
+   "evidence": null,
+   "flag": "MANUAL REVIEW: Akamai bot-manager interstitial blocked the listing page; no rendered 'N Items' header could be read. Constructor.io browse total for group_id 11936 was ?, but that API total was proven inflated vs the rendered header on 7 of 13 CB2 nodes, so it is not used as qty."
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Serveware",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Serving Bowls & Baskets",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.cb2.com/dining/serving-bowls/1",
+   "evidence": null,
+   "flag": "MANUAL REVIEW: Akamai bot-manager interstitial blocked the listing page; no rendered 'N Items' header could be read. Constructor.io browse total for group_id 11993 was ?, but that API total was proven inflated vs the rendered header on 7 of 13 CB2 nodes, so it is not used as qty."
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Serving Trays & Platters",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.cb2.com/dining/platters/1",
+   "evidence": null,
+   "flag": "MANUAL REVIEW: Akamai bot-manager interstitial blocked the listing page; no rendered 'N Items' header could be read. Constructor.io browse total for group_id 12114 was ?, but that API total was proven inflated vs the rendered header on 7 of 13 CB2 nodes, so it is not used as qty."
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Cheese Boards & Knives",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.cb2.com/dining/cheese-boards-knives/1",
+   "evidence": null,
+   "flag": "MANUAL REVIEW: Akamai bot-manager interstitial blocked the listing page; no rendered 'N Items' header could be read. Constructor.io browse total for group_id 12116 was ?, but that API total was proven inflated vs the rendered header on 7 of 13 CB2 nodes, so it is not used as qty."
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Cake Stands & Servers",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.cb2.com/dining/cake-stands/1",
+   "evidence": null,
+   "flag": "MANUAL REVIEW: Akamai bot-manager interstitial blocked the listing page; no rendered 'N Items' header could be read. Constructor.io browse total for group_id 12711 was ?, but that API total was proven inflated vs the rendered header on 7 of 13 CB2 nodes, so it is not used as qty."
+  },
+  {
+   "category": "Home Accessories",
+   "sub_category": "Outdoor Decor",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Home Accessories",
+   "sub_category": "Outdoor Planters",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.cb2.com/outdoor/outdoor-planters/1",
+   "evidence": null,
+   "flag": "MANUAL REVIEW: Akamai bot-manager interstitial blocked the listing page; no rendered 'N Items' header could be read. Constructor.io browse total for group_id 11734 was ?, but that API total was proven inflated vs the rendered header on 7 of 13 CB2 nodes, so it is not used as qty. | NOTE: 36 of its 37 products also appear in Decor > Planters (documented room/type overlap, Rule 0.6)"
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Outdoor Entertaining",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.cb2.com/outdoor/outdoor-entertaining/1",
+   "evidence": null,
+   "flag": "MANUAL REVIEW: Akamai bot-manager interstitial blocked the listing page; no rendered 'N Items' header could be read. Constructor.io browse total for group_id 820 was ?, but that API total was proven inflated vs the rendered header on 7 of 13 CB2 nodes, so it is not used as qty."
+  }
+ ]
+}

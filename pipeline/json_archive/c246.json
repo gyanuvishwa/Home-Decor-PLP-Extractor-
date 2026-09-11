@@ -1,0 +1,813 @@
+{
+ "sr": 246,
+ "company": "Shades of Light",
+ "brand_site": "shadesoflight.com",
+ "country": "USA",
+ "site_url": "https://www.shadesoflight.com/",
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ACCESS ROUTE: direct fetch throughout, no WAF/bypass needed. robots.txt checked FIRST - no Claude-specific disallow (only /cart,/checkout,/account,/search,/login and sort/filter query params); it also advertises an LLM index at /llms.txt, which was read and used to confirm the top-level catalogue shape. Site is a Next.js App Router storefront on commercetools Frontend (Frontastic) with Amplience content - the PLP product grid and its product count are rendered entirely client-side, so there is no static 'N Results' string in the HTML. CATEGORY TREE: taken from the site's own taxonomy service, not guessed - /frontastic/action/product/queryCategories on the SDK endpoint found in the JS bundle (https://storefront-solstorefront.frontastic.live/frontastic, requires a Frontastic-Locale: en_US header) returned all 4192 categories with parentId/depth/slug/showOnSite; this was cross-checked against the desktop mega-nav parsed out of the homepage HTML and against the /pages/* landing pages. In-scope roots traversed with no depth limit: CHANDELIERS & PENDANTS, BATH & WALL LIGHTS, CEILING LIGHTS, OUTDOOR LIGHTS, LAMPS & SHADES, MIRRORS & HOME DECOR. QTY VERIFICATION (Rule 1): every qty is the site's own listing total from /frontastic/action/search/productSearch?categorySlug=<slug> (the identical call the PLP makes to render its grid, page size 54), and EVERY ONE of the 73 leaf categories was then exhaustion-checked by paginating that listing to its end and counting distinct products. 69 of 73 matched the reported total exactly on the first pass; the other 4 came back exactly 1 short, and re-running all-bath-lighting under three different sort orders produced a DIFFERENT 1-2 item shortfall each time (price asc 1147, price desc 1147, newest 1148 out of 1149), proving the gap is tie-order jitter at page boundaries, not real duplication - the reported totals are exact. Note the generic /frontastic/action/product/query catalogue-wide endpoint reports total=8005 but is NOT usable for counts (unstable relevance ordering returns duplicates across offsets: 8100 fetched rows yielded only 6563 distinct products) - the per-category productSearch totals used here are a different, stable code path and were each proven by exhaustion. RULE 0 GAINS: kept the whole Bathroom Lighting branch (All Bathroom Lights 1149, Bathroom Sconces 588, Bathroom Vanity Lights 637) and Bathroom & Vanity Mirrors (123), LED Mirrors and Medicine Cabinet Mirrors despite the room word; kept Kitchen Lanterns (149), Foyer Chandeliers (301), Foyer Lanterns (230), Island & Billiard Chandeliers (148), Kids Ceiling Lights (20); kept the entire Outdoor Lights branch (All Outdoor 503, Outdoor Wall 416, Outdoor Ceiling 14, Outdoor Chandeliers 1, Outdoor Hanging 35, Outdoor Post 33, Outdoor Table & Floor Lamps 12, Dark Sky 27, Marine Grade 61) plus Outdoor Lanterns (1) under Hanging Lanterns. RULE 0.6 / ROOM TREE: the site does have a room tree (NEW & INSPIRING > SHOP BY ROOM: Bathroom 1286, Bedroom, Dining Room, Kitchen 1561, Living Room 3352, Office, Outdoor Rooms). It was DROPPED, not emitted, because sampling its actual product titles shows it is not a lighting-by-room tree at all but a whole-catalogue-by-room merchandising roll-up: shop-by-room-living-room's first page is ceramic pots, pampas grass, cheeseboards, seagrass baskets and throw pillows, and each room node also sweeps in furniture and rugs. That is a mixed roll-up ('drop, don't pad'), same call as S.N. 199 Tanagra's Shop by Room; contrast S.N. 204 Beacon Lighting, whose room tree was lighting-only and therefore emitted. OVERLAPS WITHIN WHAT IS EMITTED: 'All X' nodes are the parent category's own listing and overlap their siblings (e.g. All Chandeliers 897 covers Crystal/Drum/Flush Mount/Foyer/Glass/ Island/Mini Chandeliers; All Bathroom Lights 1149 covers Bathroom Sconces 588 + Bathroom Vanity Lights 637; All Decor 213 covers Decorative Accessories 169 + Wall Decor 42 + Wall Clocks 4); Cordless Wall Lights (13) is a strict subset of Cordless Lighting (62); Outdoor Lanterns (1) also sits inside the Outdoor Lights branch; Bathroom Sconces overlaps All Sconces. Emitted as the site presents them, not deduplicated across rows. DROPPED AS PROVEN FACET RE-CUTS (counts compared, not names - the PLP's own facet rail on each parent exposes Style / Color / Material / Size / Number of Lights): every style-named node matches its parent's Style facet bucket exactly or within a couple of items - Modern & Contemporary Chandeliers 505 = all-chandeliers Style 'Modern & Contemporary' 505, Traditional Chandeliers 186 = 186, Transitional Chandeliers 345 = 345, Modern & Contemporary Pendants 634 = 634, Rustic Pendants 115 = 115, Modern & Contemporary Lanterns 55 = 55, Nautical & Coastal Lanterns 19 = 19, Rustic Lanterns 21 = 21, Industrial Lanterns 17 = 17, Modern & Contemporary Bath Lighting 805 = 805, Industrial Sconces 112 = 112, Rustic Sconces 44 = 44, Modern & Contemporary Ceiling Lights 375 = 375, Modern & Contemporary Floor Lamps 59 = 59, Nautical & Coastal Floor Lamps 13 = 13, Modern & Contemporary Table Lamps 216 = 216, Nautical Table Lamps 30 = 30, Rustic Table Lamps 22 = 22, Industrial Table Lamps 18 = 18, Modern & Contemporary Mirrors 182 = 182, Nautical & Coastal Mirrors 47 = 47. So all Modern & Contemporary / Transitional / Traditional / Antique & Vintage Inspired / Mid Century & Retro / Rustic / Industrial / Nautical & Coastal / Minimalist / Industrial Chic nodes were dropped across every branch, as was 'Traditional Lamps & Lamp Shades' (229) and 'Traditional & Transitional Lanterns/Mirrors'. Colour nodes dropped the same way: Black Chandeliers 341 = the Color facet's 'Black' bucket 341 exactly; Colorful Table Lamps (76) and Colorful Pendants (107) dropped as colour re-cuts by the same principle (Pooky S.N. 139 precedent). KEPT DESPITE SIMILAR NAMES, because the count comparison PROVES they are not facet re-cuts: Mini Chandeliers 42 vs Size facet 'Mini less than 13\"' 5; Large Pendant Lighting 165 vs Size 'Large 31\" or Larger' 16; Large Ceiling Lights 146; Oversized Wall Sconces 83; Mini Table Lamps 51; Crystal Chandeliers 56 vs Material 'Crystal' 47; Glass Chandeliers 267 vs Material 'Glass' 201 - these are curated fixture categories, consistent with Pooky's kept shape/material lampshade branches. OTHER EXCLUSIONS: whole CEILING FANS root (14 nodes) and Outdoor Ceiling Fans - ceiling fans out of scope; 'Marine & Coastal Lighting and Fans' (69) dropped as a mixed lighting+fan roll-up (titles confirm ceiling fans and fan light kits inside). All 'Light Bulbs' nodes (light-bulbs, light-bulbs-1..4, and the whole LIGHT BULBS hidden header with 9 children) - bulbs. 'Chandelier Accessories' (4) dropped - two clip-on bulb adapters plus two faux drip candle bulb covers, i.e. bulb accessories. Whole FURNITURE root (20 nodes incl. Bathroom Vanity Cabinets, Bookcases, Desks, Coffee/Console/Side Tables, Stools, Dressers) and whole RUGS root (22 nodes) - furniture and textiles. Accent Pillows & Throws and Outdoor Pillows & Poufs - textiles (both also currently return 0). NEW & INSPIRING root - New Arrivals, Shop By Style, Designer Collections (Erin & Ben, Chris Loves Julia, Young House Love, Magnolia Home, Drew & Jonathan, Colonial Metalcrafts), Inspiration/blogs, Shop by Trend - all on the NEVER EXTRACT list. Every 'Clearance Sale <X>' node (11 of them) and every 'Exclusive <X>' node (7 of them) - sale and brand-exclusive listings. Every 'FEATURED' node and its FAQ/guide children. 'Shop All Hanging Lights' (2007) - a literal Shop All roll-up of Chandeliers 897 + Pendants 991 + Lanterns 182. The hidden buckets under HIDDEN (Collections with 3576 collection-name children, OTHER / Other Three / Nautical & Coastal with ~150 style, designer, rattan-material, Young House Love and seasonal/Cyber Sale re-cuts) - not part of the presented nav taxonomy, and material/style/designer re-cuts. Empty nodes dropped: Transitional Bath Lighting 0, Alabaster Sconces 0 (also showOnSite=false), CEILING LIGHTS & FIXTURES 0. SCOPE CAVEAT: Decorative Accessories (169) and therefore All Decor (213) include roughly 29 throw pillows/throws and 3 faux or preserved botanical stems that are out of scope; the site does not expose a decor listing without them (its own Accent Pillows & Throws node is empty), so the exact site figure is reported with this documented contamination rather than an estimated subtraction.",
+ "rows": [
+  {
+   "category": "Lighting",
+   "sub_category": "Chandeliers & Pendants",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Chandeliers",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "All Chandeliers",
+   "parent": false,
+   "qty": 897,
+   "link": "https://www.shadesoflight.com/categories/all-chandeliers",
+   "evidence": "site's own listing total for this category (search/productSearch total, the exact value the PLP renders its product grid from), exhaustively verified: paginated the listing to the end and counted 897 distinct products",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Crystal Chandeliers",
+   "parent": false,
+   "qty": 56,
+   "link": "https://www.shadesoflight.com/categories/crystal-chandeliers",
+   "evidence": "site's own listing total for this category (search/productSearch total, the exact value the PLP renders its product grid from), exhaustively verified: paginated the listing to the end and counted 56 distinct products",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Drum Chandeliers",
+   "parent": false,
+   "qty": 103,
+   "link": "https://www.shadesoflight.com/categories/drum-chandeliers",
+   "evidence": "site's own listing total for this category (search/productSearch total, the exact value the PLP renders its product grid from), exhaustively verified: paginated the listing to the end and counted 103 distinct products",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Flush Mount Chandeliers",
+   "parent": false,
+   "qty": 28,
+   "link": "https://www.shadesoflight.com/categories/flush-mount-chandeliers",
+   "evidence": "site's own listing total for this category (search/productSearch total, the exact value the PLP renders its product grid from), exhaustively verified: paginated the listing to the end and counted 28 distinct products",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Foyer Chandeliers",
+   "parent": false,
+   "qty": 301,
+   "link": "https://www.shadesoflight.com/categories/foyer-chandeliers",
+   "evidence": "site's own listing total for this category (search/productSearch total, the exact value the PLP renders its product grid from), exhaustively verified: paginated the listing to the end and counted 301 distinct products",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Glass Chandeliers",
+   "parent": false,
+   "qty": 267,
+   "link": "https://www.shadesoflight.com/categories/glass-chandeliers",
+   "evidence": "site's own listing total for this category (search/productSearch total, the exact value the PLP renders its product grid from), exhaustively verified: paginated the listing to the end and counted 267 distinct products",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Island and Billiard Chandeliers",
+   "parent": false,
+   "qty": 148,
+   "link": "https://www.shadesoflight.com/categories/island-billiard-chandeliers",
+   "evidence": "site's own listing total for this category (search/productSearch total, the exact value the PLP renders its product grid from), exhaustively verified: paginated the listing to the end and counted 148 distinct products",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Mini Chandeliers",
+   "parent": false,
+   "qty": 42,
+   "link": "https://www.shadesoflight.com/categories/mini-chandeliers",
+   "evidence": "site's own listing total for this category (search/productSearch total, the exact value the PLP renders its product grid from), exhaustively verified: paginated the listing to the end and counted 42 distinct products",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Pendant Lighting",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "All Pendants",
+   "parent": false,
+   "qty": 991,
+   "link": "https://www.shadesoflight.com/categories/all-pendants",
+   "evidence": "site's own listing total for this category (search/productSearch total, the exact value the PLP renders its product grid from), exhaustively verified: paginated the listing to the end and counted 991 distinct products",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Art Glass Pendant Lights",
+   "parent": false,
+   "qty": 46,
+   "link": "https://www.shadesoflight.com/categories/art-glass-pendants",
+   "evidence": "site's own listing total for this category (search/productSearch total, the exact value the PLP renders its product grid from), exhaustively verified: paginated the listing to the end and counted 46 distinct products",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Drum Shade Pendants",
+   "parent": false,
+   "qty": 55,
+   "link": "https://www.shadesoflight.com/categories/drum-shade-pendants",
+   "evidence": "site's own listing total for this category (search/productSearch total, the exact value the PLP renders its product grid from), exhaustively verified: paginated the listing to the end and counted 55 distinct products",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Glass Pendant Lighting",
+   "parent": false,
+   "qty": 282,
+   "link": "https://www.shadesoflight.com/categories/glass-pendant-lights",
+   "evidence": "site's own listing total for this category (search/productSearch total, the exact value the PLP renders its product grid from), exhaustively verified: paginated the listing to the end and counted 282 distinct products",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Globe Pendants",
+   "parent": false,
+   "qty": 103,
+   "link": "https://www.shadesoflight.com/categories/globe-pendant-lighting",
+   "evidence": "site's own listing total for this category (search/productSearch total, the exact value the PLP renders its product grid from), exhaustively verified: paginated the listing to the end and counted 103 distinct products",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Large Pendant Lighting",
+   "parent": false,
+   "qty": 165,
+   "link": "https://www.shadesoflight.com/categories/large-pendants",
+   "evidence": "site's own listing total for this category (search/productSearch total, the exact value the PLP renders its product grid from), exhaustively verified: paginated the listing to the end and counted 165 distinct products",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Pendant Light Hardware",
+   "parent": false,
+   "qty": 12,
+   "link": "https://www.shadesoflight.com/categories/pendant-accessories",
+   "evidence": "site's own listing total for this category (search/productSearch total, the exact value the PLP renders its product grid from), exhaustively verified: paginated the listing to the end and counted 12 distinct products; titles checked: pendant cord/socket/canopy hardware kits, downrods, multi-port canopies and sloped-ceiling kits - sellable light-fixture components, kept per the Pooky (S.N. 139) 'Ceiling Fittings' precedent, not loose wiring",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Hanging Lanterns",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "All Hanging Lanterns",
+   "parent": false,
+   "qty": 182,
+   "link": "https://www.shadesoflight.com/categories/all-hanging-lanterns",
+   "evidence": "site's own listing total for this category (search/productSearch total, the exact value the PLP renders its product grid from), exhaustively verified: paginated the listing to the end and counted 182 distinct products",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Foyer Lanterns",
+   "parent": false,
+   "qty": 230,
+   "link": "https://www.shadesoflight.com/categories/lantern-foyer-lighting",
+   "evidence": "site's own listing total for this category (search/productSearch total, the exact value the PLP renders its product grid from), exhaustively verified: paginated the listing to the end and counted 230 distinct products",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Kitchen Lanterns",
+   "parent": false,
+   "qty": 149,
+   "link": "https://www.shadesoflight.com/categories/kitchen-island-lantern-hanging-lights",
+   "evidence": "site's own listing total for this category (search/productSearch total, the exact value the PLP renders its product grid from), exhaustively verified: paginated the listing to the end and counted 149 distinct products; Rule 0.1 room-named lighting node, kept",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Outdoor Lanterns",
+   "parent": false,
+   "qty": 1,
+   "link": "https://www.shadesoflight.com/categories/outdoor-lanterns",
+   "evidence": "site's own listing total for this category (search/productSearch total, the exact value the PLP renders its product grid from), exhaustively verified: paginated the listing to the end and counted 1 distinct products",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Bath and Wall Lights",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Cordless Wall Lights",
+   "parent": false,
+   "qty": 13,
+   "link": "https://www.shadesoflight.com/categories/wireless-wall-lights",
+   "evidence": "site's own listing total for this category (search/productSearch total, the exact value the PLP renders its product grid from), exhaustively verified: paginated the listing to the end and counted 13 distinct products; 13 battery/rechargeable wall sconces and picture lights; product set is a subset of Lamps and Shades > Cordless Lighting (62), overlap documented in notes",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Bathroom Lighting",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "All Bathroom Lights",
+   "parent": false,
+   "qty": 1149,
+   "link": "https://www.shadesoflight.com/categories/all-bath-lighting",
+   "evidence": "site's own listing total for this category (search/productSearch total, the exact value the PLP renders its product grid from), exhaustively verified: paginated the listing to the end and counted 1149 distinct products; Rule 0.1/0.4 room-named lighting branch, kept; three separate exhaustion passes (price asc, price desc, newest) each enumerated 1147-1148 distinct keys with a different 1-2 item pagination-tie jitter, confirming the reported 1149 rather than a real duplicate",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Bathroom Sconces",
+   "parent": false,
+   "qty": 588,
+   "link": "https://www.shadesoflight.com/categories/bath-sconces",
+   "evidence": "site's own listing total for this category (search/productSearch total, the exact value the PLP renders its product grid from), exhaustively verified: paginated the listing to the end and counted 588 distinct products",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Bathroom Vanity Lights",
+   "parent": false,
+   "qty": 637,
+   "link": "https://www.shadesoflight.com/categories/vanity-lighting",
+   "evidence": "site's own listing total for this category (search/productSearch total, the exact value the PLP renders its product grid from), exhaustively verified: paginated the listing to the end and counted 637 distinct products",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Wall Sconces",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "All Sconces",
+   "parent": false,
+   "qty": 949,
+   "link": "https://www.shadesoflight.com/categories/wall-sconces",
+   "evidence": "site's own listing total for this category (search/productSearch total, the exact value the PLP renders its product grid from), exhaustively verified: paginated the listing to the end and counted 949 distinct products",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Crystal and Glass Sconces",
+   "parent": false,
+   "qty": 438,
+   "link": "https://www.shadesoflight.com/categories/crystal-glass-sconces",
+   "evidence": "site's own listing total for this category (search/productSearch total, the exact value the PLP renders its product grid from), exhaustively verified: paginated the listing to the end and counted 438 distinct products",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Oversized Wall Sconces",
+   "parent": false,
+   "qty": 83,
+   "link": "https://www.shadesoflight.com/categories/large-wall-sconces",
+   "evidence": "site's own listing total for this category (search/productSearch total, the exact value the PLP renders its product grid from), exhaustively verified: paginated the listing to the end and counted 83 distinct products",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Wall Lamps",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Picture Lights",
+   "parent": false,
+   "qty": 69,
+   "link": "https://www.shadesoflight.com/categories/picture-lights",
+   "evidence": "site's own listing total for this category (search/productSearch total, the exact value the PLP renders its product grid from), exhaustively verified: paginated the listing to the end and counted 69 distinct products",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Plug In Wall Sconces",
+   "parent": false,
+   "qty": 72,
+   "link": "https://www.shadesoflight.com/categories/plug-in-wall-sconces",
+   "evidence": "site's own listing total for this category (search/productSearch total, the exact value the PLP renders its product grid from), exhaustively verified: paginated the listing to the end and counted 72 distinct products",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Swing Arm Wall Lamps",
+   "parent": false,
+   "qty": 131,
+   "link": "https://www.shadesoflight.com/categories/swing-arm-wall-lamps",
+   "evidence": "site's own listing total for this category (search/productSearch total, the exact value the PLP renders its product grid from), exhaustively verified: paginated the listing to the end and counted 131 distinct products",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Ceiling Lights",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "All Ceiling Lights",
+   "parent": false,
+   "qty": 601,
+   "link": "https://www.shadesoflight.com/categories/all-ceiling-lights",
+   "evidence": "site's own listing total for this category (search/productSearch total, the exact value the PLP renders its product grid from), exhaustively verified: paginated the listing to the end and counted 601 distinct products",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Crystal Ceiling Lights",
+   "parent": false,
+   "qty": 30,
+   "link": "https://www.shadesoflight.com/categories/crystal-ceiling-lights",
+   "evidence": "site's own listing total for this category (search/productSearch total, the exact value the PLP renders its product grid from), exhaustively verified: paginated the listing to the end and counted 30 distinct products",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Drum Shade Ceiling Lights",
+   "parent": false,
+   "qty": 85,
+   "link": "https://www.shadesoflight.com/categories/drum-shade-ceiling-lights",
+   "evidence": "site's own listing total for this category (search/productSearch total, the exact value the PLP renders its product grid from), exhaustively verified: paginated the listing to the end and counted 85 distinct products",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Flush Mount Ceiling Lights",
+   "parent": false,
+   "qty": 292,
+   "link": "https://www.shadesoflight.com/categories/flush-mount-ceiling-lights",
+   "evidence": "site's own listing total for this category (search/productSearch total, the exact value the PLP renders its product grid from), exhaustively verified: paginated the listing to the end and counted 292 distinct products",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Semi Flush Mount Ceiling Lights",
+   "parent": false,
+   "qty": 329,
+   "link": "https://www.shadesoflight.com/categories/semi-flush-mount-ceiling-lights",
+   "evidence": "site's own listing total for this category (search/productSearch total, the exact value the PLP renders its product grid from), exhaustively verified: paginated the listing to the end and counted 329 distinct products",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Kids Ceiling Lights",
+   "parent": false,
+   "qty": 20,
+   "link": "https://www.shadesoflight.com/categories/kids-ceiling-lights",
+   "evidence": "site's own listing total for this category (search/productSearch total, the exact value the PLP renders its product grid from), exhaustively verified: paginated the listing to the end and counted 20 distinct products",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Large Ceiling Lights",
+   "parent": false,
+   "qty": 146,
+   "link": "https://www.shadesoflight.com/categories/large-ceiling-lights",
+   "evidence": "site's own listing total for this category (search/productSearch total, the exact value the PLP renders its product grid from), exhaustively verified: paginated the listing to the end and counted 146 distinct products",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Outdoor Lights",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "All Outdoor Lighting",
+   "parent": false,
+   "qty": 503,
+   "link": "https://www.shadesoflight.com/categories/all-outdoor-lighting",
+   "evidence": "site's own listing total for this category (search/productSearch total, the exact value the PLP renders its product grid from), exhaustively verified: paginated the listing to the end and counted 503 distinct products; Rule 0.5 outdoor branch, kept",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Outdoor Wall Lights and Sconces",
+   "parent": false,
+   "qty": 416,
+   "link": "https://www.shadesoflight.com/categories/outdoor-wall-lights",
+   "evidence": "site's own listing total for this category (search/productSearch total, the exact value the PLP renders its product grid from), exhaustively verified: paginated the listing to the end and counted 416 distinct products",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Outdoor Ceiling Lights",
+   "parent": false,
+   "qty": 14,
+   "link": "https://www.shadesoflight.com/categories/outdoor-ceiling-lights",
+   "evidence": "site's own listing total for this category (search/productSearch total, the exact value the PLP renders its product grid from), exhaustively verified: paginated the listing to the end and counted 14 distinct products",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Outdoor Chandeliers",
+   "parent": false,
+   "qty": 1,
+   "link": "https://www.shadesoflight.com/categories/outdoor-chandeliers",
+   "evidence": "site's own listing total for this category (search/productSearch total, the exact value the PLP renders its product grid from), exhaustively verified: paginated the listing to the end and counted 1 distinct products",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Outdoor Hanging Lanterns and Pendant Lights",
+   "parent": false,
+   "qty": 35,
+   "link": "https://www.shadesoflight.com/categories/outdoor-hanging-lights",
+   "evidence": "site's own listing total for this category (search/productSearch total, the exact value the PLP renders its product grid from), exhaustively verified: paginated the listing to the end and counted 35 distinct products",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Outdoor Post Lights",
+   "parent": false,
+   "qty": 33,
+   "link": "https://www.shadesoflight.com/categories/outdoor-post-lights",
+   "evidence": "site's own listing total for this category (search/productSearch total, the exact value the PLP renders its product grid from), exhaustively verified: paginated the listing to the end and counted 33 distinct products",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Outdoor Table and Floor Lamps",
+   "parent": false,
+   "qty": 12,
+   "link": "https://www.shadesoflight.com/categories/outdoor-table-floor-lamps",
+   "evidence": "site's own listing total for this category (search/productSearch total, the exact value the PLP renders its product grid from), exhaustively verified: paginated the listing to the end and counted 12 distinct products",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Dark Sky Lighting",
+   "parent": false,
+   "qty": 27,
+   "link": "https://www.shadesoflight.com/categories/dark-sky-lighting",
+   "evidence": "site's own listing total for this category (search/productSearch total, the exact value the PLP renders its product grid from), exhaustively verified: paginated the listing to the end and counted 27 distinct products; titles checked: 27 dark-sky-compliant outdoor sconces/ceiling lights - a certification-based nav category, kept per the Beacon Lighting (S.N. 204) rating-based-category precedent",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Marine Grade Outdoor Lighting",
+   "parent": false,
+   "qty": 61,
+   "link": "https://www.shadesoflight.com/categories/marine-grade-nautical-outdoor-lighting",
+   "evidence": "site's own listing total for this category (search/productSearch total, the exact value the PLP renders its product grid from), exhaustively verified: paginated the listing to the end and counted 61 distinct products; titles checked: marine-grade outdoor sconces only, no fans",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Lamps and Shades",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Lamp Finials",
+   "parent": false,
+   "qty": 65,
+   "link": "https://www.shadesoflight.com/categories/lamp-finials",
+   "evidence": "site's own listing total for this category (search/productSearch total, the exact value the PLP renders its product grid from), exhaustively verified: paginated the listing to the end and counted 65 distinct products; titles checked: decorative lamp finials in brass, crystal, porcelain, stone, wood and ceramic",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Table Lamps",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "All Table Lamps",
+   "parent": false,
+   "qty": 359,
+   "link": "https://www.shadesoflight.com/categories/all-table-lamps",
+   "evidence": "site's own listing total for this category (search/productSearch total, the exact value the PLP renders its product grid from), exhaustively verified: paginated the listing to the end and counted 359 distinct products",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Buffet Lamps",
+   "parent": false,
+   "qty": 31,
+   "link": "https://www.shadesoflight.com/categories/buffet-lamps",
+   "evidence": "site's own listing total for this category (search/productSearch total, the exact value the PLP renders its product grid from), exhaustively verified: paginated the listing to the end and counted 31 distinct products",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Cordless Lighting",
+   "parent": false,
+   "qty": 62,
+   "link": "https://www.shadesoflight.com/categories/cordless-lamps",
+   "evidence": "site's own listing total for this category (search/productSearch total, the exact value the PLP renders its product grid from), exhaustively verified: paginated the listing to the end and counted 62 distinct products; cordless/rechargeable table lamps, buffet lamps, sconces and picture lights; overlaps the 13 items in Bath and Wall Lights > Cordless Wall Lights, both are distinct nav nodes",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Desk Lamps",
+   "parent": false,
+   "qty": 41,
+   "link": "https://www.shadesoflight.com/categories/desk-lamps",
+   "evidence": "site's own listing total for this category (search/productSearch total, the exact value the PLP renders its product grid from), exhaustively verified: paginated the listing to the end and counted 41 distinct products",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Mini Table Lamps",
+   "parent": false,
+   "qty": 51,
+   "link": "https://www.shadesoflight.com/categories/small-table-lamps",
+   "evidence": "site's own listing total for this category (search/productSearch total, the exact value the PLP renders its product grid from), exhaustively verified: paginated the listing to the end and counted 51 distinct products",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Floor Lamps",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "All Floor Lamps",
+   "parent": false,
+   "qty": 96,
+   "link": "https://www.shadesoflight.com/categories/all-floor-lamps",
+   "evidence": "site's own listing total for this category (search/productSearch total, the exact value the PLP renders its product grid from), exhaustively verified: paginated the listing to the end and counted 96 distinct products",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Reading Floor Lamps",
+   "parent": false,
+   "qty": 20,
+   "link": "https://www.shadesoflight.com/categories/reading-floor-lamps",
+   "evidence": "site's own listing total for this category (search/productSearch total, the exact value the PLP renders its product grid from), exhaustively verified: paginated the listing to the end and counted 20 distinct products",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Storage and Space Saver Floor Lamps",
+   "parent": false,
+   "qty": 9,
+   "link": "https://www.shadesoflight.com/categories/small-space-saving-floor-lamps",
+   "evidence": "site's own listing total for this category (search/productSearch total, the exact value the PLP renders its product grid from), exhaustively verified: paginated the listing to the end and counted 9 distinct products",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Lamp Shades",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "All Lamp Shades",
+   "parent": false,
+   "qty": 137,
+   "link": "https://www.shadesoflight.com/categories/all-lamp-shades",
+   "evidence": "site's own listing total for this category (search/productSearch total, the exact value the PLP renders its product grid from), exhaustively verified: paginated the listing to the end and counted 137 distinct products",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Chandelier and Sconce Shades",
+   "parent": false,
+   "qty": 43,
+   "link": "https://www.shadesoflight.com/categories/chandelier-shades",
+   "evidence": "site's own listing total for this category (search/productSearch total, the exact value the PLP renders its product grid from), exhaustively verified: paginated the listing to the end and counted 43 distinct products",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Drum Shades",
+   "parent": false,
+   "qty": 61,
+   "link": "https://www.shadesoflight.com/categories/drum-lamp-shades",
+   "evidence": "site's own listing total for this category (search/productSearch total, the exact value the PLP renders its product grid from), exhaustively verified: paginated the listing to the end and counted 61 distinct products",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Floor Lamp Shades",
+   "parent": false,
+   "qty": 50,
+   "link": "https://www.shadesoflight.com/categories/floor-lamp-shades",
+   "evidence": "site's own listing total for this category (search/productSearch total, the exact value the PLP renders its product grid from), exhaustively verified: paginated the listing to the end and counted 50 distinct products",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Table Lamp Shades",
+   "parent": false,
+   "qty": 69,
+   "link": "https://www.shadesoflight.com/categories/table-lamp-shades",
+   "evidence": "site's own listing total for this category (search/productSearch total, the exact value the PLP renders its product grid from), exhaustively verified: paginated the listing to the end and counted 69 distinct products",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Wall Lamp Shades and Buffet Shades",
+   "parent": false,
+   "qty": 24,
+   "link": "https://www.shadesoflight.com/categories/swing-arm-buffet-lamp-shades",
+   "evidence": "site's own listing total for this category (search/productSearch total, the exact value the PLP renders its product grid from), exhaustively verified: paginated the listing to the end and counted 24 distinct products",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Mirrors",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "All Mirrors",
+   "parent": false,
+   "qty": 357,
+   "link": "https://www.shadesoflight.com/categories/all-mirrors",
+   "evidence": "site's own listing total for this category (search/productSearch total, the exact value the PLP renders its product grid from), exhaustively verified: paginated the listing to the end and counted 357 distinct products",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Bathroom and Vanity Mirrors",
+   "parent": false,
+   "qty": 123,
+   "link": "https://www.shadesoflight.com/categories/bathroom-vanity-mirrors",
+   "evidence": "site's own listing total for this category (search/productSearch total, the exact value the PLP renders its product grid from), exhaustively verified: paginated the listing to the end and counted 123 distinct products; Rule 0.3/0.4 - all mirrors in scope, room word ignored",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Circle and Oval Mirrors",
+   "parent": false,
+   "qty": 107,
+   "link": "https://www.shadesoflight.com/categories/round-circle-oval-mirrors",
+   "evidence": "site's own listing total for this category (search/productSearch total, the exact value the PLP renders its product grid from), exhaustively verified: paginated the listing to the end and counted 107 distinct products",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Full Length and Leaner Mirrors",
+   "parent": false,
+   "qty": 54,
+   "link": "https://www.shadesoflight.com/categories/leaner-full-length-mirrors",
+   "evidence": "site's own listing total for this category (search/productSearch total, the exact value the PLP renders its product grid from), exhaustively verified: paginated the listing to the end and counted 54 distinct products",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "LED Mirrors",
+   "parent": false,
+   "qty": 42,
+   "link": "https://www.shadesoflight.com/categories/led-integrated-mirrors",
+   "evidence": "site's own listing total for this category (search/productSearch total, the exact value the PLP renders its product grid from), exhaustively verified: paginated the listing to the end and counted 42 distinct products",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Rectangle and Square Mirrors",
+   "parent": false,
+   "qty": 136,
+   "link": "https://www.shadesoflight.com/categories/square-rectangle-mirrors",
+   "evidence": "site's own listing total for this category (search/productSearch total, the exact value the PLP renders its product grid from), exhaustively verified: paginated the listing to the end and counted 136 distinct products",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Unique Shape Mirrors",
+   "parent": false,
+   "qty": 131,
+   "link": "https://www.shadesoflight.com/categories/unique-cool-shape-mirrors",
+   "evidence": "site's own listing total for this category (search/productSearch total, the exact value the PLP renders its product grid from), exhaustively verified: paginated the listing to the end and counted 131 distinct products",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Wood Framed Mirrors",
+   "parent": false,
+   "qty": 52,
+   "link": "https://www.shadesoflight.com/categories/wood-mirrors",
+   "evidence": "site's own listing total for this category (search/productSearch total, the exact value the PLP renders its product grid from), exhaustively verified: paginated the listing to the end and counted 52 distinct products",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Medicine Cabinet Mirrors",
+   "parent": false,
+   "qty": 12,
+   "link": "https://www.shadesoflight.com/categories/medicine-cabinets",
+   "evidence": "site's own listing total for this category (search/productSearch total, the exact value the PLP renders its product grid from), exhaustively verified: paginated the listing to the end and counted 12 distinct products; all 12 titles are literally '<name> Medicine Cabinet Mirror' - mirrored bathroom cabinets, kept under Rule 0.3 (all mirrors in scope) rather than dropped as bathroom storage",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Wall Art and Wall Decor",
+   "parent": false,
+   "qty": 42,
+   "link": "https://www.shadesoflight.com/categories/wall-decor",
+   "evidence": "site's own listing total for this category (search/productSearch total, the exact value the PLP renders its product grid from), exhaustively verified: paginated the listing to the end and counted 42 distinct products; titles checked: framed prints, wall art panels, wall sculptures, wall hooks - no textiles, no wallpaper",
+   "flag": null
+  },
+  {
+   "category": "Home Accessories",
+   "sub_category": "Decor",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Home Accessories",
+   "sub_category": "All Decor",
+   "parent": false,
+   "qty": 213,
+   "link": "https://www.shadesoflight.com/categories/all-decor",
+   "evidence": "site's own listing total for this category (search/productSearch total, the exact value the PLP renders its product grid from), exhaustively verified: paginated the listing to the end and counted 213 distinct products; site roll-up of Decorative Accessories + Wall Decor + Wall Clocks (169+42+4=215, 213 after the site's own de-overlap); kept as the category's own first-class 'All Decor' nav listing",
+   "flag": null
+  },
+  {
+   "category": "Home Accessories",
+   "sub_category": "Decorative Accessories",
+   "parent": false,
+   "qty": 169,
+   "link": "https://www.shadesoflight.com/categories/decorative-home-accents",
+   "evidence": "site's own listing total for this category (search/productSearch total, the exact value the PLP renders its product grid from), exhaustively verified: paginated the listing to the end and counted 169 distinct products; all 169 titles inspected: predominantly vases, bowls, trays, sculptures, candle holders, planters, decorative boxes, bookends, baskets and centerpieces; the site's own count also includes ~29 throw pillows/throws and 3 faux/preserved botanicals which are out of scope - reported as the site's exact figure, contamination documented in notes",
+   "flag": null
+  },
+  {
+   "category": "Home Accessories",
+   "sub_category": "Wall Clocks",
+   "parent": false,
+   "qty": 4,
+   "link": "https://www.shadesoflight.com/categories/wall-clocks",
+   "evidence": "site's own listing total for this category (search/productSearch total, the exact value the PLP renders its product grid from), exhaustively verified: paginated the listing to the end and counted 4 distinct products",
+   "flag": null
+  }
+ ]
+}

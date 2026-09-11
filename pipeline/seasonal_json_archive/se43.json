@@ -1,0 +1,39 @@
+{
+  "sr": 43,
+  "company": "Nordstrom Home",
+  "brand_site": "nordstrom.com",
+  "country": "USA",
+  "site_url": "https://www.nordstrom.com/browse/home",
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "Checked robots.txt (no Claude-specific disallow, /browse/ allowed). Direct HTTP fetch (curl) only returns an Akamai/bot-manager JS-challenge shell for every URL (no real content, no discrimination between valid/invalid slugs) -> escalated to browser rendering. Rendered the full Home mega-menu via Playwright (comprehensive __NEXT_DATA__-backed nav: Bath, Bedding, Home Decor, Candles & Diffusers, Tabletop & Dining, Dorm Room Essentials, Electronics & Speakers, Fall Home, Halloween Decor, Healthy Living, Kitchen, Luggage & Travel Bags, Outdoor Living, Pantry Food & Candy, Pet Accessories, Travel Essentials, Water Bottles & Tumblers, Home Gifts, Nordstrom Made, Home Sale, New Arrivals, Under $100) -> only Fall Home and Halloween Decor are seasonal in the live nav. Repeated automated Playwright requests tripped Nordstrom's bot-detection (redirects to siteclosed.nordstrom.com) partway through discovery; finished discovery via the Claude-in-Chrome connector (tier 3, permitted per robots.txt), which was not blocked. Also scanned the sitemap index (content-sitemap.xml + all 24 navigation-filter-sitemap-N.xml files) for /browse/home seasonal slugs: the only seasonal-looking hits were brand-filter facets (Mr. Christmas, Mr. Halloween, Frances Valentine, Winterborne Decor, Eastern Woven) on ordinary categories, not distinct seasonal category pages -- excluded as brand facets, not categories. Guessed and checked additional candidate slugs: /browse/home/christmas, /browse/home/holiday, /browse/home/holiday-shop, /browse/home/thanksgiving all resolve to a real (non-blocked) but empty/no-content page (just a charity banner, no H1, no product grid, no breadcrumb) -- treated as not real categories, i.e. absent. /browse/home/valentine, /browse/home/easter, /browse/home/new-year return true HTTP 404. /browse/home/holiday-decor DOES resolve to a genuine, fully populated Category-template PLP (breadcrumb Home/Home/Holiday Decor, page title 'Holiday and Christmas Decor | Nordstrom', product grid exclusively Christmas trees/ornaments/stockings/wreaths) even though it is not currently one of the tabs in the live Home sub-nav strip (likely pre-season, not yet promoted into nav) -- included per Task criteria (genuine PLP, own URL, site names it 'Holiday Decor' which is an explicit Christmas discovery term in the ruleset). No Diwali/Eid/Holi/other South-Asian festival categories exist anywhere in Home nav (expected for a US department store; not fabricated). No Thanksgiving, Valentine's Day, Easter, New Year, or generic 'Holiday Shop' category currently exists under Home. Left-nav/facet inspection on Holiday Decor and Halloween Decor showed only generic Product Type / Brand / Price / Color / Size facets (Candle Holders, Decorative Accents, Lighting, etc.) -- these are filter facets, not separate PLP sub-categories, so not extracted as separate rows.",
+  "rows": [
+    {
+      "category": "Fall",
+      "sub_category": "Fall Home",
+      "qty": 1384,
+      "link": "https://www.nordstrom.com/browse/home/fall-harvest",
+      "is_group": false,
+      "evidence": "1384 items (rendered PLP header, breadcrumb Home/Home/Fall Home)",
+      "flag": null
+    },
+    {
+      "category": "Halloween",
+      "sub_category": "Halloween Decor",
+      "qty": 634,
+      "link": "https://www.nordstrom.com/browse/home/halloween-decor",
+      "is_group": false,
+      "evidence": "634 items (rendered PLP header, breadcrumb Home/Home/Halloween Decor)",
+      "flag": null
+    },
+    {
+      "category": "Christmas",
+      "sub_category": "Holiday Decor",
+      "qty": 2861,
+      "link": "https://www.nordstrom.com/browse/home/holiday-decor",
+      "is_group": false,
+      "evidence": "2861 items (rendered PLP header, breadcrumb Home/Home/Holiday Decor; page title 'Holiday and Christmas Decor')",
+      "flag": null
+    }
+  ]
+}

@@ -1,0 +1,75 @@
+{
+  "sr": 71,
+  "company": "TJ Maxx Home",
+  "brand_site": "tjmaxx.tjx.com",
+  "country": "USA",
+  "site_url": "https://tjmaxx.tjx.com/store/index.jsp",
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "ACCESS: direct HTTP (curl_cffi, chrome120/chrome124) hit the Akamai /securityfailover 'Something went wrong' bot-block deny shell on every attempt (200 status but block content, cookies show Akamai Bot Manager _abck/bm_s/bm_sz). Headless Playwright (with --disable-blink-features=AutomationControlled and navigator.webdriver spoofed) hit the identical deny shell. Claude-in-Chrome tabs in this shared browser session were being concurrently hijacked/reused by other parallel worker agents (tab content kept switching to unrelated sites - Urban Outfitters, Lowe's, Container Store - mid-task), so that tier was abandoned as unusable for this run. Fell back to the working route from this same company's prior Furniture/Pet-Care passes (see f71.json/pc71.json in furniture_json_archive/pet_care_json_archive): curl_cffi impersonate=safari17_2_ios reaches https://tjmaxx.tjx.com/store/sitewide/json/navMenuData.jsp (HTTP 200, 673KB, full navigationHierarchy with itemCount per node) and impersonate=safari18_0_ios reaches individual rendered category PLPs. robots.txt (HTTP 200) has no anthropic-ai/ClaudeBot/Claude-Web/Claude-User/Claude-SearchBot directive anywhere - only blanket User-agent:* rules disallowing /store/browse/, /store/search/, /store/account/, /store/checkout/ and a list of specific N-code shop URLs (none of the 7 node IDs used in this extraction appear on that list) - so no policy opt-out. DISCOVERY: dumped the full Home > Shop by Category subtree (93 unique node names) from navMenuData.jsp and regex-scanned the whole tree for christmas/xmas/halloween/holiday/festive/thanksgiving/easter/valentine/diwali/hanukkah/new year/fall/autumn/harvest/season/etc. Exactly 3 genuine seasonal category names exist under Home > Shop by Category: 'fall decor' (172), 'halloween' (689, with 4 named children), 'holiday decor' (281, flat leaf). SCOPE: restricted to the Home department only, consistent with this company's established scope in the Furniture (f71.json) and Pet Care (pc71.json) passes on this same site, which both explicitly limited extraction to Home > Shop by Category and excluded Gifts/Kids/Apparel/Beauty departments. Under that scope, excluded: 'kids & baby > shops > kids' halloween' (91 items - Halloween costumes/apparel, Kids dept not Home); 'gifts > gifts by occasion > easter gifts' (998) and 'valentine's day gifts' (1186) (Gifts dept, not home-product-typed, generic cross-category gift bundles); 'trending now > suede season' (188) - false positive on the word 'season', a suede-clothing fashion trend, not a holiday/seasonal event. Also excluded 'back to campus' (1530 items, itemCount, with sub-children baskets & storage/bath/bedding/furniture & lighting/kitchen & dining/pillows & decor): investigated as a possible 'Back to School' seasonal category per rules Sec.3, but its bath (280) and bedding (930) children and all 5 of bedding's sub-facets (blankets & throws 203, comforters & quilts 213, duvet covers 72, pillows & bedding essentials 135, sheets 327) are byte-identical in count to the general Bed & Bath category's same children at the same level - a pure re-cut/overlap of the general catalog under Rule 0.6, not an independently curated seasonal assortment; this matches the Furniture pass's explicit prior finding on this exact node ('Back to Campus > Furniture & Lighting excluded as a seasonal promotional collection and a re-cut of the same items'). Excluded new-arrivals and clearance state-filtered mirrors of halloween/fall decor/holiday decor (e.g. 'new arrivals > home > shop by category > halloween' itemCount=45, 'clearance > home > shop by category > halloween' itemCount=78) as the same underlying listings under a state filter, per the overlap rule - not separate categories. QTY: all 7 rows three-way validated - navMenuData.jsp itemCount, fetched twice (byte-identical), matched exactly against the rendered on-page header ('N items') on the live desktop PLP for every single row (fall decor 172=172, halloween view-all 689=689, halloween/bed & bath 71=71, halloween/decor 302=302, halloween/kitchen & entertaining 126=126, halloween/pillows & throws 104=104, holiday decor 281=281). No qty was accepted on itemCount alone this run - every row's rendered header was independently fetched and confirmed. HOLIDAY CLASSIFICATION FOR 'HOLIDAY DECOR': sampled the page's own product alt-text (193 items) and ran a keyword sweep of the full rendered HTML - overwhelmingly Christmas: 123 'christmas', 141 'tree', 155 'ornament', 59 'stocking', 40 'santa', 35 'reindeer', 10 'wreath', 10 'snowman', vs only scattered outlier mentions (14 valentine, 22 easter, 41 halloween - page chrome/nav/footer/cross-sell noise, not product titles) and 0 thanksgiving/hanukkah/new year. Sampled product titles are almost entirely Christmas (nutcrackers, gingerbread houses, ornaments, stockings, advent calendars, Christmas trees, Santa figures) with one incidental Star-of-David ornament. Classified as Christmas, matching the identical 'Holiday Decor'->Christmas classification made on Marshalls (SR24, se24.json), the sibling TJX brand on the same platform. FALL DECOR: sampled product titles are pumpkins, harvest, turkey, acorn, autumn leaves themed - a genuine Fall/Autumn seasonal category, kept the site's own 'Fall Decor' naming as sub_category per rules Sec.19 (do not invent a more specific name than the site provides). HALLOWEEN STRUCTURE: 'halloween' is a real parent (689 items on its own 'view all' PLP, itemCount identical to the parent node) with 4 named children (Bed & Bath 71, Decor 302, Kitchen & Entertaining 126, Pillows & Throws 104, summing to 603 of the 689 - the remaining ~86 items are Halloween-tagged products outside those 4 facets, same pattern documented on Marshalls) - emitted as a group row carrying the parent's own real View All total (matching the se24.json Marshalls precedent of putting the aggregate PLP's own qty+link+evidence on the is_group row rather than nulling it, since a genuine numbered PLP exists for the parent itself, not just an abstract label).",
+  "rows": [
+    {
+      "category": "Halloween",
+      "sub_category": "Halloween",
+      "qty": 689,
+      "link": "https://tjmaxx.tjx.com/store/shop/home-shop-by-category-halloween/_/N-4017726405+0",
+      "is_group": true,
+      "evidence": "rendered listing header '689 items' on the live PLP (h1 'halloween'), identical to navMenuData.jsp node nValue=4017726405 itemCount=689 (fetched twice, byte-identical)",
+      "flag": null
+    },
+    {
+      "category": "Halloween",
+      "sub_category": "Bed & Bath",
+      "qty": 71,
+      "link": "https://tjmaxx.tjx.com/store/shop/home-shop-by-category-halloween-bed-bath/_/N-2768463751",
+      "is_group": false,
+      "evidence": "rendered listing header '71 items' (h1 'bed & bath'), identical to navMenuData.jsp itemCount=71",
+      "flag": null
+    },
+    {
+      "category": "Halloween",
+      "sub_category": "Decor",
+      "qty": 302,
+      "link": "https://tjmaxx.tjx.com/store/shop/home-shop-by-category-halloween-decor/_/N-3440840649",
+      "is_group": false,
+      "evidence": "rendered listing header '302 items' (h1 'decor'), identical to navMenuData.jsp itemCount=302",
+      "flag": null
+    },
+    {
+      "category": "Halloween",
+      "sub_category": "Kitchen & Entertaining",
+      "qty": 126,
+      "link": "https://tjmaxx.tjx.com/store/shop/home-shop-by-category-halloween-kitchen-entertaining/_/N-2379823897",
+      "is_group": false,
+      "evidence": "rendered listing header '126 items' (h1 'kitchen & entertaining'), identical to navMenuData.jsp itemCount=126",
+      "flag": null
+    },
+    {
+      "category": "Halloween",
+      "sub_category": "Pillows & Throws",
+      "qty": 104,
+      "link": "https://tjmaxx.tjx.com/store/shop/home-shop-by-category-halloween-pillows-throws/_/N-4227494641",
+      "is_group": false,
+      "evidence": "rendered listing header '104 items' (h1 'pillows & throws'), identical to navMenuData.jsp itemCount=104",
+      "flag": null
+    },
+    {
+      "category": "Fall Decor",
+      "sub_category": "Fall Decor",
+      "qty": 172,
+      "link": "https://tjmaxx.tjx.com/store/shop/home-shop-by-category-fall-decor/_/N-3719131807",
+      "is_group": false,
+      "evidence": "rendered listing header '172 items' (h1 'fall decor'), identical to navMenuData.jsp itemCount=172; sampled product titles are pumpkins/harvest/turkey/acorn/autumn-leaf themed",
+      "flag": null
+    },
+    {
+      "category": "Christmas",
+      "sub_category": "Holiday Decor",
+      "qty": 281,
+      "link": "https://tjmaxx.tjx.com/store/shop/home-shop-by-category-holiday-decor/_/N-3441218044",
+      "is_group": false,
+      "evidence": "rendered listing header '281 items' (h1 'holiday decor'), identical to navMenuData.jsp itemCount=281; site labels the node 'Holiday Decor' but sampled content is overwhelmingly Christmas-themed (123 'christmas', 141 'tree', 155 'ornament', 59 'stocking', 40 'santa', 35 'reindeer' mentions; product titles are nutcrackers, gingerbread houses, ornaments, stockings, advent calendars, Christmas trees, Santa figures)",
+      "flag": null
+    }
+  ]
+}

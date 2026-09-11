@@ -1,0 +1,135 @@
+{
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ACCESS: robots.txt fetched FIRST from https://www.crateandbarrel.me/robots.txt - this is a DIFFERENT HOST from crateandbarrel.com (SR 55), so it was checked independently and none of the US site's permissions were assumed. NO Claude / ClaudeBot / anthropic-ai / Claude-Web user-agent group exists; there is a single '*' group. Its binding constraints, all honoured: 'Disallow: /*?' means NO query-string URL may be requested on this host, so ?page= pagination and every ?specialOffers= / ?allCategories= facet link seen in the mega-menu were never fetched and never recorded; '*/search/*' rules out internal search; '*/ar-ae*' rules out the Arabic UAE locale, which was therefore never requested. Also disallowed and avoided: */root-0*, */shop-root-1*, */crateandkids*, */baby-kids-19171*, */gift-codeeas-2000*, */holcodeays-gifts-18634*. Note the Crate & Kids node recorded in review sits at /crate-and-kids/ (hyphenated), which is NOT matched by the literal 'crateandkids' pattern - checked character by character before fetching, per BATCH_BRIEF s1's rule that a string resemblance is not a directive. All page fetches returned HTTP 200 through probe.fetch() fingerprint rotation - no bot wall, no 403, no reader, no proxy, no campaign parameter. TREE: the PLP is a Next.js App-Router page that renders ZERO products server-side (no product links, no JSON-LD, no data-num-results, no 'N Items' string anywhere in the 1.7 MB document), so the tree came from three server-side sources instead: (a) the mega-menu links in the homepage and department HTML, (b) the XML sitemap chain https://www.crateandbarrel.me/en-ae/sitemap -> Category-en-AED-14003025520802673865 (504 category URLs) + CategoryLanding-en-AED-13324106868254931039 (32), and (c) the storefront's own Algolia allCategories facet pulled with maxValuesPerFacet=1000, which enumerates all 531 live category codes with counts and is the only source that could prove nothing was hidden. All three agree. Recovered tree: Bedding & Bath (632) > Bath (242) > {Hand & Bath Towels 102, Bath Accessories 84, Bath Storage 20, Bath Rugs & Mats 16, Bath Towel Bundles 13, Laundry Hampers 12, Bathrobes 11}; plus Furniture > Bathroom Furniture (6) and Crate & Kids > Storage & Gear > Gear > Kids Bath (37). No deeper level exists - neither the sitemap nor the facet holds any child of Bath Accessories or Bath Storage. QTY SOURCE AND PROOF: because nothing is server-rendered, counts come from the storefront's OWN product API - the Algolia index the PLP itself renders from. Credentials and index were read out of the site's own JS bundle (/_next/static/chunks/709-*.js: appId H7KKDOMM0D, search-only apiKey, index p1_cab_ae_en), and the category page's own flight payload proves the query shape: categoryPageIdentifier 'allCategories', categoryCode 'bath-14482', defaultIndex 'p1_cab_ae_en', and NO base filters string - so facetFilters [[allCategories:<code>]] on that index is EXACTLY what the PLP asks for, not an approximation of it. Robots for the API host was checked separately per BATCH_BRIEF s1.3: h7kkdomm0d-dsn.algolia.net, h7kkdomm0d.algolia.net and h7kkdomm0d-1.algolianet.com all return HTTP 404 for /robots.txt, i.e. no directives, no exclusion - and no disallowed host was reached directly or through a reader. Rather than trust nbHits, every single node was ENUMERATED TO EXHAUSTION: hitsPerPage=1000, distinct objectIDs counted, and the count matched nbHits exactly for all ten nodes (242, 102, 84, 20, 16, 13, 12, 11, 6, 37), with exhaustiveNbHits=true on each. Stability was then tested the Sostrene-Grene way, by id-set equality across three different sort indexes - p1_cab_ae_en, p1_cab_ae_en_price_asc and p1_cab_ae_en_new_arrival returned identical counts AND identical objectID sets for bath-14482, bath-accessories-1640, bath-storage-17590 and bathroom-furniture. A third independent check: the parent's own facet breakdown computed inside bath-14482 (a different Algolia code path from a filtered query) reproduces every child's figure exactly. Counts discriminate (6 to 242, no round-number repetition, so nothing resembling the OTTO 500-style cap). The C&B US trap of a JSON-LD numberOfItems capping at 100 does not arise here because this storefront emits no JSON-LD product list at all. Each page's identity was confirmed from its own server-rendered productListTitle and rel=canonical: Bath / Bath Accessories / Bath Storage / Bathroom Furniture, all self-canonical, no alias redirects - so the /bath/bath-vanities/1 canonical-alias trap from the US site has no counterpart here, but rel=canonical was read on every node anyway. DEDUP (OPTION 1) - THE DECISIVE FINDING: already_extracted() was run on every candidate leaf, every review node and every canonical target, across 60 URL variants (en-ae, en-sa, ar-sa, bare host, trailing slash). crateandbarrel.me holds 57 URLs in exclusion_index.json, and ONE of them is a direct hit: https://www.crateandbarrel.me/en-ae/c/furniture-4/bathroom-furniture is ALREADY EXTRACTED in Furniture.xlsx as 'Bathroom Furniture' for this very company. Under the run owner's OPTION 1 it stays in Furniture and is in review[], NOT rows[] - exactly the bath-furniture collision the brief warned about. Every other bath URL is a clean miss. Locale blind spots (b)/(c) checked, not assumed: robots.txt itself declares the locales (/en-ae/, /en-sa/, /ar-sa/ sitemaps) and disallows */ar-ae*; there is no separate .ae or .com host for this franchise (crateandbarrel.com is the SEPARATE US company, SR 55, and its URLs are not interchangeable), so the cross-host alternate case does not arise, but the en-sa and ar-sa forms of every candidate were dedup-checked regardless. All miss. ROWS: only 2 leaves, and that is the correct answer for this storefront. Bath Accessories (84) is the core rule 13/14 node - soap pumps and dishes, vanity trays, ceramic canisters, toothbrush holders, tissue box covers, bathroom trash cans, a toilet brush, a towel ladder. Bath Storage (20) is rule 12 bathroom storage - bathroom trash cans, waste baskets, lidded totes, canisters and a towel ladder. Both minority contaminations are disclosed in review rather than hidden: 6 of the 84 accessories are shower curtains/liner (Textile under rule 20, but unsplittable without inventing a URL), and Bath Storage overlaps Bath Accessories by 13 objectIDs so the two figures must never be added. EXCLUDED and why: Bathroom Furniture -> already in Furniture.xlsx (OPTION 1); Hand & Bath Towels 102, Bath Towel Bundles 13, Bathrobes 11, Bath Rugs & Mats 16 and Kids Bath 37 -> Textile (rules 15/16/20); Laundry Hampers 12 -> Storage/Laundry (rules 2/30-33), matching SR 55's call on the US site; Decor > Mirrors 59 (Floor 21, Wall 38) and Decor > Organization & Hardware 46 -> not bathroom-presented; Bedding & Bath Clearance 189 -> rule 25 sale re-cut. Absence of sanitaryware, taps, toilets, baths, showers, enclosures, towel bars and bathroom mirrors is evidenced by both a 531-code taxonomy sweep and product-level full-text searches, per rule 36. Nothing was estimated; no URL, count or category was invented.",
+ "rows": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Accessories",
+   "qty": 84,
+   "link": "https://www.crateandbarrel.me/en-ae/c/bed-bath-14390/bath-14482/bath-accessories-1640",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Storage",
+   "qty": 20,
+   "link": "https://www.crateandbarrel.me/en-ae/c/bed-bath-14390/bath-14482/bath-storage-17590",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  }
+ ],
+ "review": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bedding & Bath > Bath (department hub)",
+   "qty": 242,
+   "issue": "PARENT HUB with valid children - grouping row per rules 24/38, blank qty and blank link. Self-canonical, the page model's own productListTitle is 'Bath', categoryCode 'bath-14482'. Algolia nbHits 242, enumerated to exhaustion (242 distinct objectIDs). Its SEVEN children exactly cover it - the union of their objectID sets is 242 with ZERO products uncovered - but they OVERLAP (their counts sum to 258), so no figure here may ever be summed. Children: Hand & Bath Towels 102, Bath Accessories 84, Bath Storage 20, Bath Rugs & Mats 16, Bath Towel Bundles 13, Laundry Hampers 12, Bathrobes 11.",
+   "link": "https://www.crateandbarrel.me/en-ae/c/bed-bath-14390/bath-14482"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Furniture > Bathroom Furniture",
+   "qty": 6,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Bathroom Furniture' (same company, Crate & Barrel UAE, identical URL) - OPTION 1 applies, it STAYS in Furniture and must NOT be re-extracted into Bathroom, even though rules 9/12 would otherwise class it as Bathroom. already_extracted() returns the exact record. Verified live anyway so the gap is documented: page is self-canonical, productListTitle 'Bathroom Furniture', 6 products enumerated to exhaustion - Batten 16\" White Oak Wood and Marble Bath Storage Tower and Panel Set with Shelf, Batten White Oak Wood 39\" Bath Wall Panel with 3 Bath Wall Shelves, Batten 16\" White Oak Wood Bath Wall Shelf, Batten 39\" White Oak Wood Bath Wall Panel, Batten White Oak Wood and Marble Bath Storage Tower with 3 Drawers, Tate Walnut Wood Bathroom Storage Tower. Four of the six are also inside bath-14482.",
+   "link": "https://www.crateandbarrel.me/en-ae/c/furniture-4/bathroom-furniture"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath > Hand & Bath Towels",
+   "qty": 102,
+   "issue": "ROUTED TO TEXTILE (rules 15, 20): bath towels, hand towels, bath sheets and washcloths. Algolia nbHits 102, enumerated to 102 distinct objectIDs.",
+   "link": "https://www.crateandbarrel.me/en-ae/c/bed-bath-14390/bath-14482/bath-towels-1630"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath > Bath Towel Bundles",
+   "qty": 13,
+   "issue": "ROUTED TO TEXTILE (rule 15): towel bundles/sets. nbHits 13, enumerated to 13. Its objectID set is DISJOINT from Hand & Bath Towels (intersection 0), so it is a genuine sibling and not a re-cut of it.",
+   "link": "https://www.crateandbarrel.me/en-ae/c/bed-bath-14390/bath-14482/bath-towel-bundles"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath > Bathrobes",
+   "qty": 11,
+   "issue": "ROUTED TO TEXTILE (rule 20): bathrobes. nbHits 11, enumerated to 11.",
+   "link": "https://www.crateandbarrel.me/en-ae/c/bed-bath-14390/bath-14482/bathrobes"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath > Bath Rugs & Mats",
+   "qty": 16,
+   "issue": "ROUTED TO TEXTILE (rule 16): textile bath rugs and mats (organic cotton / tufted). nbHits 16, enumerated to 16. No rubber or anti-slip bathroom-accessory mat node exists on this storefront, so rule 16's Bathroom branch never triggers.",
+   "link": "https://www.crateandbarrel.me/en-ae/c/bed-bath-14390/bath-14482/bath-rugs-mats-1610"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath > Laundry Hampers",
+   "qty": 12,
+   "issue": "ROUTED TO STORAGE / LAUNDRY (rules 2, 30-33): primary product type is a laundry hamper. Consistent with this run's standing treatment of laundry hampers (SR 4, 21, 48, 55, 89, 92, 111, 133, 135) - note SR 55 Crate & Barrel US routed its own 'Laundry Hampers & Accessories' out the same way, so the franchise is handled consistently with the parent brand. nbHits 12, enumerated to 12.",
+   "link": "https://www.crateandbarrel.me/en-ae/c/bed-bath-14390/bath-14482/laundry-hampers"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Crate & Kids > Storage & Gear > Gear > Kids Bath",
+   "qty": 37,
+   "issue": "ROUTED TO TEXTILE (rules 15, 16, 20): enumerated to exhaustion, 37 of 37 objectIDs retrieved and read. 36 are textiles - hooded baby/kids towels, washcloths, bath towels, organic baby bath robes and one Kupla grey bath rug - and the single non-textile is 'Boon Blue Naked Collapsible Baby Bathtub'. One baby bathtub does not make the node's PRIMARY product type a bath fixture (rule 2), so it is routed out whole rather than split; flagged here so the single tub is not silently lost. Discovered from the Category sitemap and the Algolia allCategories facet, not from the mega-menu.",
+   "link": "https://www.crateandbarrel.me/en-ae/c/crate-and-kids/storage-gear-19288/gear-19178/kids-bath-19258"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Decor > Wall Decor & Mirrors > Mirrors",
+   "qty": 59,
+   "issue": "NOT BATHROOM - checked explicitly because rule 10 forbids skipping bathroom mirrors. This node and its two children (Floor Mirrors 21, Wall Mirrors 38) sit under Decor > Wall Decor & Mirrors, NOT under Bath, and the Algolia allCategories facet computed INSIDE bath-14482 does not list mirrors-14986 at all - i.e. not one of the 242 Bath products is a mirror. A full-text search of the storefront index for 'bath mirror' and 'vanity mirror' returns no bathroom or vanity mirror product (top hits are wall mirrors, mirror-finish flatware and mirror ice tongs). Crate & Barrel UAE therefore sells NO bathroom/vanity mirror; these are decorative wall and floor mirrors and belong to Decor.",
+   "link": "https://www.crateandbarrel.me/en-ae/c/decor-5/wall-decor-mirrors-16388/mirrors-14986"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Decor > Organization & Hardware",
+   "qty": 46,
+   "issue": "NOT BATHROOM (rules 2, 30-33): a general Decor > Organization & Hardware department (children Baskets 11, Coat Racks & Wall Hooks). Inspected because rule 17 puts bathroom hardware in Bathroom, but this node is whole-home organisation, not bathroom-presented; the Bath department has no hardware child of its own.",
+   "link": "https://www.crateandbarrel.me/en-ae/c/decor-5/organization-hardware-21901"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Sale > Clearance Outlet > Bedding & Bath Clearance",
+   "qty": 189,
+   "issue": "EXCLUDED - CLEARANCE / SALE PAGE (rule 25). A price-driven re-cut of the Bedding & Bath department, not a taxonomy node; 11 of its products are also inside bath-14482, so recording it would duplicate under rule 28.",
+   "link": "https://www.crateandbarrel.me/en-ae/c/sale-7/clearance-outlet-15029/bedding-bath-clearance-19706"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Accessories - textile minority, disclosed",
+   "qty": null,
+   "issue": "DISCLOSURE, NOT A SEPARATE RECORD (rule 20 vs rule 2). The recorded Bath Accessories leaf holds 84 products, all enumerated. FIVE are fabric shower curtains (Organic Cotton Waffle White, Organic Cotton Pebble Matelasse White, Merrow Stitch Black & White, Grey Organic Waffle) plus one 'White Shower Curtain Liner with Magnets', which rule 20 would send to Textile; the 'Shower Curtain Roller Rings Matte Nickel, Set of 12' is hardware and stays. Crate & Barrel UAE publishes NO separate shower-curtain URL, so splitting the leaf would require inventing one (rule 27). 6 of 84 is a clear minority, so the node's primary product type is bathroom accessories - soap pumps, soap dishes, vanity trays, ceramic canisters, toothbrush holders, tissue box covers, bathroom trash cans, towel ladder - and it is recorded in Bathroom. Same reasoning as SR 55/56 but the opposite outcome, because there the curtains were the node's majority.",
+   "link": "https://www.crateandbarrel.me/en-ae/c/bed-bath-14390/bath-14482/bath-accessories-1640"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Storage - overlap with Bath Accessories, disclosed",
+   "qty": null,
+   "issue": "DISCLOSURE, NOT A SEPARATE RECORD. Bath Storage (20) and Bath Accessories (84) are separate site nodes with genuinely different URLs, so rule 28 makes them separate records, but their objectID sets OVERLAP BY 13 products (Eli White Bathroom Trash Can, Jackson Black Towel Ladder, the Ribbed Black Glass canisters/toothbrush holder/soap pump, Dixon Bamboo Hamper with Liner and others). Neither figure may be summed with the other or with the parent's 242. Also noted: 2 of the 20 lean to Storage/Laundry ('Sedona Grey Under Bed Storage Basket', 'Laundry Basket Liner'), a small minority against 18 clear bathroom bins, totes, canisters and a towel ladder, so the node is kept in Bathroom under rule 12 (the site presents it as Bath > Bath Storage).",
+   "link": "https://www.crateandbarrel.me/en-ae/c/bed-bath-14390/bath-14482/bath-storage-17590"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "CONFIRMED ABSENCES (rule 36 evidence)",
+   "qty": null,
+   "issue": "EVIDENCED ABSENCE, recorded so 'nothing found' is auditable. The full Algolia allCategories facet was pulled with maxValuesPerFacet=1000 over the whole 8,558-product AE index and every one of its 531 category codes was swept for bath/shower/toilet/basin/sanitary/vanity/mirror/towel/soap/robe/hamper/laundry/organiser/hardware. The ONLY bath-owned codes that exist are bath-14482 and its seven children, plus bathroom-furniture and kids-bath-19258. Full-text index searches confirm the product-level absence: 'toilet' returns exactly 1 product (Bleecker Black Marble Toilet Brush, already inside Bath Accessories), 'faucet' returns 3 and none is a tap (vases and a floral stem), 'towel bar' and 'towel ring' return only kitchen dish towels and a paper-towel holder, and 'vanity' returns 5 vanity TRAYS. Crate & Barrel UAE sells NO sanitaryware, toilets, bidets, basins, baths, showers, enclosures, taps/faucets, towel bars/rings/rails or bathroom mirrors.",
+   "link": "https://www.crateandbarrel.me/en-ae/c/bed-bath-14390/bath-14482"
+  }
+ ],
+ "_reconstructed_from": "Bathroom.xlsx delivered 2026-09-01 (checkpoint), not original worker JSON"
+}

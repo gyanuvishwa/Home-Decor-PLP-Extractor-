@@ -1,0 +1,339 @@
+{
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ACCESS: robots.txt fetched FIRST (https://www.fonq.nl/robots.txt, 200, 17900 bytes). NO Claude agent named anywhere - the full file was grepped for 'claude|anthropic': zero hits. There is exactly ONE user-agent group in the entire file, 'User-agent: *', carrying 'Crawl-delay: 3' and no blanket Disallow (verified: no bare 'Disallow: /' line exists). CRAWL-DELAY HONOURED: probe.MIN_GAP was raised from 2.0 to 3.5 s per host for every fonQ request in this run. The file explicitly Allows '/*?p=' and '/*?page='; it Disallows internal search and all facet/sort parameters - /*q=, /*dir=, /*limit=, /*mode=, /*order=, /*options=, /*?page=*&, /*page=1$ and ~200 attribute params including /*type_product=. I therefore requested ONLY bare /collections/<slug>, /pages/<slug> and /shop/sitemap URLs - no facet URL, no ?dir=, no ?q=, no /search. (The site's own body copy links a /search?query=handdoekrek; that link was NOT followed.) There is also a '#LLM: /llms.txt' pointer comment in the '*' group. All requests HTTP 200 via probe.fetch() (curl_cffi, safari18_0_ios and rotation).\nTREE (three independent site-owned sources, cross-checked): (1) The homepage's server-rendered mega-menu, present twice in the DOM - a mobile tree (mobilemenu__menuhead/menulink with explicit level-1..level-4 classes) and a desktop tree (mega-menu__group-header / mega-menu__group-link). Parsed the whole thing: 290 nodes. Under L1 'Producten' the L2 node 'Badkamer' -> https://www.fonq.nl/pages/badkamer has EXACTLY three L3 children: Badkameraccessoires (/collections/badkameraccessoires), Toiletaccessoires (/collections/toiletaccessoires), Badtextiel (/collections/badtextiel). Both menu renderings agree and both truncate each branch at ten items with a 'Meer >' link that points back at the parent - a View All, never recorded (rule 25). (2) The /pages/badkamer room page, which adds the sixth Badtextiel child Gastendoekje. (3) The site's own HTML sitemap https://www.fonq.nl/shop/sitemap (200, 924548 bytes, 1981 distinct collection slugs) which recovers the children the menu hides behind 'Meer >': Planchet, Badkamerspiegel, Handdoekhaak, Badkamerprullenbak, Zeepschaaltje, Toiletzitting, Tissue box, Wastafel, Badkameropberger, Badkamerkast, Badkamermeubels, Toiletmat. Those same slugs also appear as real links in the Badkameraccessoires / Toiletaccessoires PLPs' own on-page related-category block, so none of them is a guessed URL pattern. The 1981-slug list was swept for every bathroom term I could think of (bad*, douche*, wc, toilet*, wastafel, sanitair, zeep*, spiegel, handdoek*, tandenborstel, scheer, antislip, gordijnstang, badplank, badkussen, weegschaal, tissue, prullenbak, wandbeugel) - no further non-brand bathroom category exists. Brand-scoped collections (aquanova-*, blomus-*, brabantia-*, tiger-*, zack-*, zone-denmark-*, sealskin-*, yamazaki-* etc) are brand filters, not categories, and were excluded.\nQTY SOURCE + PROOF: every fonQ PLP renders its own exact total server-side in <div class=\"product-overview__productcount\"><span v-text=\"nbResults\">N</span> artikelen</div>. That figure was read from the rendered DOM for all 35 listings visited. INDEPENDENT PROOF #1 - PAGINATION: fonQ paginates at 60 products/page and prints the last page number in its pager. ceil(N/60) equals the printed last page for every single listing checked, across three orders of magnitude: badkameraccessoireset 20 -> no pager; toiletzitting 30 -> no pager; wastafel 36 -> no pager; badkamerwisser 73 -> 2; toiletbutler 80 -> 2; planchet 89 -> 2; badkamermeubels 107 -> 2; douchegordijn 116 -> 2; doucherek 149 -> 3; badkamerverlichting 152 -> 3; tandenborstelhouder 198 -> 4; wasmanden 202 -> 4; badkamerspiegel 232 -> 4; toiletrolhouder 320 -> 6; zeepschaaltje 409 -> 7; badkamerprullenbak 426 -> 8; washand 490 -> 9; badjas 488 -> 9; zeepdispenser 523 -> 9; toiletborstel 530 -> 9; handdoekhouder 544 -> 10; handdoekhaak 570 -> 10; badmat 733 -> 13; gastendoekje 843 -> 15; handdoek 911 -> 16; afvalemmers 956 -> 16; zeepschaaltjes-zeepdispensers 932 -> 16; badkameropberger 2731 -> 46; badtextiel 3738 -> 63; badkameraccessoires 5046 -> 85; badkamer 11979 -> 200. INDEPENDENT PROOF #2 - FACET IDENTITY: the parent PLPs render a 'Type Product' facet with per-type counts, and the child collection totals reproduce them exactly: Planchet 89=89, Doucherek 149=149, Tandenborstelhouder 198=198, Zeepdispenser 523=523, Make-up spiegel 232 = badkamerspiegel 232, Haakje 570 = handdoekhaak 570, Handdoekenrek 518 + Handdoekring 26 = handdoekhouder 544, Raamwisser 68 + Vloerwisser 5 = badkamerwisser 73, Zeepschaal 344 + Zeephouder 65 = zeepschaaltje 409, WC borstel 530 = toiletborstel 530, WC rolhouder 320 = toiletrolhouder 320, WC bril 30 = toiletzitting 30, WC Mat 56 = toiletmat 56, Tissuebox 125 = tissue-box 125, Badkamerlamp 152 = badkamerverlichting 152, Toiletbutler 80 = 80, Badkamer accessoireset 20 = 20. (Read from the rendered facet labels only - no facet URL was ever requested, they are robots-disallowed.) Counts plainly discriminate and every page's H1 matched the node requested.\nDEDUP: already_extracted() run on all 33 candidate URLs including the three parents. Exactly two hits, both Furniture.xlsx: /collections/badkamerkast -> 'Bathroom Cabinets' and /collections/badkamermeubels -> 'Bathroom Vanity Units'. Both moved to review[] under OPTION 1 and kept out of rows[]. Nothing else was already extracted.\nJUDGEMENT CALLS: Wastafel (36) is recorded as Bathroom on primary product type - the listing is freestanding washbasins (e.g. 'Kave Home Vrijstaande wastafel Delina wit terrazzo 40 cm'), rule 4, which outranks the fact that fonQ does not surface it in the Badkamer menu. Tissue box (125) is recorded because its 125 is exactly the Tissuebox type-count INSIDE fonQ's own /collections/badkamer, i.e. fonQ itself classifies the whole set as Badkamer. Zeepschaaltjes & zeepdispensers is treated as a grouping row because 523 + 409 = 932 exactly. Badkameropberger, Wasmanden and Afvalemmers were deliberately NOT recorded - reasons in review[]. EXCLUDED: 'Meer >' View-All links, /collections/outlet-badkamer (promotional), all brand-scoped collections, and the -1 suffixed alias URLs (handdoekhaak-1, toiletmatten, verlichting-voor-de-badkamer, zeepdispenser-1) which re-render sets already recorded. No parent URL recorded where children exist; no quantity summed, estimated or inherited.",
+ "rows": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Badkamer",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Badkamer > Badkameraccessoires",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Badkamerwisser",
+   "qty": 73,
+   "link": "https://www.fonq.nl/collections/badkamerwisser",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Badkameraccessoireset",
+   "qty": 20,
+   "link": "https://www.fonq.nl/collections/badkameraccessoireset",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Doucherek",
+   "qty": 149,
+   "link": "https://www.fonq.nl/collections/doucherek",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Handdoekhouder",
+   "qty": 544,
+   "link": "https://www.fonq.nl/collections/handdoekhouder",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Handdoekhaak",
+   "qty": 570,
+   "link": "https://www.fonq.nl/collections/handdoekhaak",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Tandenborstelhouder",
+   "qty": 198,
+   "link": "https://www.fonq.nl/collections/tandenborstelhouder",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Badkameraccessoires > Zeepschaaltjes & zeepdispensers",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Zeepdispenser",
+   "qty": 523,
+   "link": "https://www.fonq.nl/collections/zeepdispenser",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Zeepschaaltje",
+   "qty": 409,
+   "link": "https://www.fonq.nl/collections/zeepschaaltje",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Planchet",
+   "qty": 89,
+   "link": "https://www.fonq.nl/collections/planchet",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Badkamerspiegel",
+   "qty": 232,
+   "link": "https://www.fonq.nl/collections/badkamerspiegel",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Badkamerprullenbak",
+   "qty": 426,
+   "link": "https://www.fonq.nl/collections/badkamerprullenbak",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Tissue box",
+   "qty": 125,
+   "link": "https://www.fonq.nl/collections/tissue-box",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Wastafel",
+   "qty": 36,
+   "link": "https://www.fonq.nl/collections/wastafel",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Badkamer > Toiletaccessoires",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Toiletborstel",
+   "qty": 530,
+   "link": "https://www.fonq.nl/collections/toiletborstel",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Toiletbutler",
+   "qty": 80,
+   "link": "https://www.fonq.nl/collections/toiletbutler",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Toiletrolhouder",
+   "qty": 320,
+   "link": "https://www.fonq.nl/collections/toiletrolhouder",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Toiletzitting",
+   "qty": 30,
+   "link": "https://www.fonq.nl/collections/toiletzitting",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  }
+ ],
+ "review": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Badkamer > Badkameraccessoires > Badkamerverlichting",
+   "qty": 152,
+   "issue": "ROUTED TO LIGHTING: primary product type is a bathroom lamp (rules 11, 19). fonQ itself files it under Verlichting > Type verlichting as well as under Badkameraccessoires. Its own Type-Product facet on the parent reads 'Badkamerlamp (152)', matching exactly.",
+   "link": "https://www.fonq.nl/collections/badkamerverlichting"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Verlichting voor de badkamer (alias of Badkamerverlichting)",
+   "qty": 152,
+   "issue": "ROUTED TO LIGHTING + DUPLICATE ALIAS: separate collection URL rendering the identical set - same count 152, same 3-page pagination - as /collections/badkamerverlichting. Not recorded twice (rule 28).",
+   "link": "https://www.fonq.nl/collections/verlichting-voor-de-badkamer"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Badkamer > Badkameraccessoires > Douchegordijn",
+   "qty": 116,
+   "issue": "ROUTED TO TEXTILE: shower curtains are explicitly Textile (rule 20).",
+   "link": "https://www.fonq.nl/collections/douchegordijn"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Badkamer > Badtextiel",
+   "qty": 3738,
+   "issue": "ROUTED TO TEXTILE: entire node is bath linen (rules 15, 20). Third of the three L3 children of Badkamer in fonQ's own mega-menu. Its six children are listed individually below so nothing is silently skipped; the parent is not recorded (rule 24) and its number is not reused or summed.",
+   "link": "https://www.fonq.nl/collections/badtextiel"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Badtextiel > Handdoek",
+   "qty": 911,
+   "issue": "ROUTED TO TEXTILE: bath/hand towels (rule 15).",
+   "link": "https://www.fonq.nl/collections/handdoek"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Badtextiel > Badmat",
+   "qty": 733,
+   "issue": "ROUTED TO TEXTILE: textile bath mats (rule 16 - textile bath mat goes to Textile; only rubber/anti-slip mats sold as bathroom accessories would stay). fonQ files it under Badtextiel, which decides it.",
+   "link": "https://www.fonq.nl/collections/badmat"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Badtextiel > Washand",
+   "qty": 490,
+   "issue": "ROUTED TO TEXTILE: washcloths (rule 15).",
+   "link": "https://www.fonq.nl/collections/washand"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Badtextiel > Strandlaken",
+   "qty": 68,
+   "issue": "ROUTED TO TEXTILE: beach towels (rule 15).",
+   "link": "https://www.fonq.nl/collections/strandlaken"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Badtextiel > Badjas",
+   "qty": 488,
+   "issue": "ROUTED TO TEXTILE: bathrobes (rule 20).",
+   "link": "https://www.fonq.nl/collections/badjas"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Badtextiel > Gastendoekje",
+   "qty": 843,
+   "issue": "ROUTED TO TEXTILE: guest towels (rule 15). Sixth Badtextiel child - exposed by the /pages/badkamer room page, not by the mega-menu, which truncates each branch at 10 items behind a 'Meer >' link.",
+   "link": "https://www.fonq.nl/collections/gastendoekje"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Toiletaccessoires > Toiletmat",
+   "qty": 56,
+   "issue": "ROUTED TO TEXTILE: textile toilet mat (rules 16, 20). Matches the parent's 'WC Mat (56)' Type-Product facet exactly. /collections/toiletmatten is a duplicate alias of the same 56 and is not counted twice.",
+   "link": "https://www.fonq.nl/collections/toiletmat"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Badkamerkast (Bathroom Cabinets)",
+   "qty": 6,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Bathroom Cabinets'. OPTION 1: stays in Furniture, not re-extracted into Bathroom.",
+   "link": "https://www.fonq.nl/collections/badkamerkast"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Badkamermeubels (Bathroom Vanity Units)",
+   "qty": 107,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Bathroom Vanity Units'. OPTION 1: stays in Furniture, not re-extracted into Bathroom.",
+   "link": "https://www.fonq.nl/collections/badkamermeubels"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Badkameropberger (Bathroom Storage/Organisers)",
+   "qty": 2731,
+   "issue": "NOT RECORDED - OVERLAPPING AGGREGATE NODE, not a leaf. Bathroom storage would qualify under rule 12, but this collection is a roll-up: its own Type-Product facet list is Haakje 570 + Handdoekenrek 518 + Handdoekring 26 + WC rolhouder 320 + Tandenborstelhouder 198 + Doucherek 149 + Planchet 89 + Zeepschaal 344 + Zeephouder 65 etc - i.e. it re-contains leaves already recorded individually (Handdoekhaak, Handdoekhouder, Toiletrolhouder, Tandenborstelhouder, Doucherek, Planchet, Zeepschaaltje). Recording it as well would double-count roughly 2,000 products. It appears nowhere in the mega-menu; only as an SEO body link. Flagged LOW confidence per rule 29 rather than guessed into rows.",
+   "link": "https://www.fonq.nl/collections/badkameropberger"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Zeepschaaltjes & zeepdispensers (parent of the two soap leaves)",
+   "qty": 932,
+   "issue": "NOT RECORDED AS A LEAF - it is the grouping node for Zeepdispenser (523) and Zeepschaaltje (409); 523 + 409 = 932 exactly, so it is recorded in rows[] as a grouping row with blank qty and blank link (rule 24/38) and its two children carry the numbers. Logged here with its own rendered figure purely as the proof of that identity.",
+   "link": "https://www.fonq.nl/collections/zeepschaaltjes-zeepdispensers"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Badkamer > Badkameraccessoires > Wasmanden (Laundry Baskets)",
+   "qty": 202,
+   "issue": "NOT RECORDED - primary product type is a laundry basket and its primary home in fonQ's own tree is Huishouden > Wassen & drogen > Wasmanden; it is only cross-listed into the Badkameraccessoires menu. Laundry/household storage, not bathroom-specific (rules 2, 30-33). LOW confidence, sent to review rather than guessed (rule 29).",
+   "link": "https://www.fonq.nl/collections/wasmanden"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Badkamer > Badkameraccessoires > Afvalemmers (Waste Bins)",
+   "qty": 956,
+   "issue": "NOT RECORDED - general household waste bins. Its primary home is Huishouden > Afvalemmers, where it is itself an L3 node with five children (Afval scheiden, Pedaalemmers, Touch, Inbouw, Sensor); it is merely cross-listed into the Badkameraccessoires menu. The genuinely bathroom-scoped subset IS recorded, as Badkamerprullenbak (426). Recording both would double-count.",
+   "link": "https://www.fonq.nl/collections/afvalemmers"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Handdoekhaak (alias URL)",
+   "qty": 570,
+   "issue": "DUPLICATE ALIAS: /collections/handdoekhaak-1 renders the identical listing as /collections/handdoekhaak - same H1 'Handdoekhaak', same total 570, same 10-page pagination - under a second URL that /pages/badkamer happens to link to. Only the un-suffixed URL is recorded (rule 28).",
+   "link": "https://www.fonq.nl/collections/handdoekhaak-1"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Badkamer (top Bathroom collection)",
+   "qty": 11979,
+   "issue": "PARENT NOT RECORDED (rule 24) - fonQ's own top-level Bathroom listing. Valid children exist, so it is carried as the grouping row. Logged here with its rendered total as evidence of the branch's scale; its number is not reused for any child and no siblings were summed.",
+   "link": "https://www.fonq.nl/collections/badkamer"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Outlet badkamer",
+   "qty": 5041,
+   "issue": "EXCLUDED - outlet/promotional listing, not a category (rule 25).",
+   "link": "https://www.fonq.nl/collections/outlet-badkamer"
+  }
+ ],
+ "_reconstructed_from": "Bathroom.xlsx delivered 2026-09-01 (checkpoint), not original worker JSON"
+}

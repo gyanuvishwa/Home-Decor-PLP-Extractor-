@@ -1,0 +1,210 @@
+{
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ACCESS: https://www.jcpenney.com/ reached directly with probe.fetch()/curl_cffi - HTTP 200 on the homepage, sitemap.xml, all 51 non-product sitemap files, every /g/ gallery page and the storefront's own product API. No proxy, no reader, no browser automation, no campaign parameter used. ROBOTS: https://www.jcpenney.com/robots.txt fetched FIRST (HTTP 200). NO ClaudeBot / anthropic-ai / Claude-Web directive exists - the named groups are only Robozilla, psbot, asterias, baiduspider, yahoo-mmcrawler and yahoo-blogs/v3.9, all Disallow: /, none of which is us. No Crawl-delay. The governing 'User-agent: *' group disallows /jsp/browse/pp/print/, /jsp/profile/, /dotcom/jsp/profile/, /5705/, /cam/, /dotcom/jsp/cart, /dotcom/jsp/checkout, /expcom-api/j/, /s/, /l/productcompare, /jsp/result.jsp, /gallery/search, plus a second '*' group disallowing two /content-aggregator/ zones. NONE of those was requested: no internal search (/s/ or /gallery/search) was touched at any point. SECOND HOST CHECKED SEPARATELY (batch brief s1.3): the gallery's data host is search-api.jcpenney.com. https://search-api.jcpenney.com/robots.txt was fetched on its own and returns the SAME file - '*' group, no Claude directive, and the endpoint actually used, /v1/search-service/g?id=<catId>, is NOT under any disallowed prefix (the disallowed API-ish prefixes there are /gallery/search, /s/ and /expcom-api/j/). The endpoint path was not guessed: it was read out of JCPenney's own gallery bundle https://www.static-jcpenney.com/prod5/yoda-gallery/app/dll/scripts/app.46677459c385b67bfe05.js, which builds `/v1/search-service/${e}?id=${catId}`. Pagination uses &page=N, also not disallowed. TREE SOURCE: (1) https://www.jcpenney.com/sitemap.xml -> 51 non-productDetail sitemaps incl. globalnav.xml (666 URLs - JCPenney's own published global navigation), category-home.xml (22), category-for-the-home.xml (162); 100,221 URLs harvested in total, of which 1,334 are clean category URLs of the form /g/<path>?id=cat|dept<N>. (2) The sitemaps do NOT publish the third-level bath categories, so the deeper tree was recovered from each gallery page's OWN server-rendered window.__PRELOADED_STATE__ irisData visual-nav module - i.e. the site's own on-page navigation - plus each node's own breadcrumbInfo. (3) Parentage was taken from the page's own JSON-LD-equivalent breadcrumb and from the API's pageCanonicalURL, NOT from URL shape: 'Toothbrush Holders' is served at /g/home/all-bath/shower-curtains-accessories/toothbrush-holders but both its breadCrumbInfo and its canonical place it under Bathroom Accessories & Sets, and it is recorded there. THE BATH TREE AS THE SITE STATES IT: Home > 'view all bath' (cat100290078, 3597) has exactly four real children - Bath Towels 1536 (children Bath Towel Sets 539, Beach Towels 53), Bath Mats Rugs & Sets 560 (children Bath Mat & Rug Sets 125, Bathtub Mats 28, Bath Runners 16), Shower Curtains & Accessories 546 (child Shower Curtains 414) and Bathroom Accessories & Sets 953 (children Accessory Sets 43, Dispensers 134, Toilet Accessories 61, Toothbrush Holders 174). 1536+560+546+953 = 3595 of the parent's 3597, confirming the four children partition the department. Everything else offered on those pages is an item_type/brand/feature FACET refinement, not a category, and was deliberately not recorded (rule 27; Nordic Nest facet-overlap precedent). Two further bathroom nodes sit outside the Bath department: For The Home > Storage & Organization > Bath Storage (215) and For The Home > Furniture > Bathroom Furniture (179). QTY SOURCE AND PROOF: organicZoneInfo.totalNumRecs from the storefront's own gallery API - the exact payload the PLP renders from (the HTML ships countOfSearchResults=0 and no product grid, so there is no rendered total to read). Three independent proofs it is a true count and not a cap: (a) the Price Range facet's value counts sum to EXACTLY totalNumRecs on every node checked (953=953, 3597=3597, 1536, 560, 546, 215, 179, 154, 218, 414, 539, 125, 28, 16, 53); (b) the Accessory Type facet of Bathroom Accessories decomposes cleanly into the child categories - soap dispensers 132 + shower dispensers 2 = Dispensers 134; toothbrush holders 92 + tumblers 82 = Toothbrush Holders 174; bath accessory sets 43 = Accessory Sets 43; the seven toilet-* item types sum to 60 against Toilet Accessories 61; (c) EVERY recorded leaf was ENUMERATED TO EXHAUSTION over &page=N and the unique ppId count equalled the stated total exactly: Accessory Sets 43/43, Dispensers 134/134, Toilet Accessories 61/61, Toothbrush Holders 174/174, Bathtub Mats 28/28, Bath Storage 215/215. Page 2 was verified to return a disjoint id set from page 1 (0 overlap), so this is real pagination, not the IKEA re-serve trap. Counts discriminate per category (16, 28, 43, 61, 134, 174, 215, 414, 539, 560, 953, 1536) - no round-number repetition, no site-wide constant. OVERLAP DISCLOSED: Bath Storage (215) and Toilet Accessories (61) are separate nav categories in different departments but share 45 products, measured by ppId-set intersection over full enumeration of both. Both are recorded because they are genuinely distinct site categories with distinct URLs (rule 28) and 170 of Bath Storage's products appear in no other recorded node; the run owner should know the 45-product intersection exists. No other pair of recorded leaves overlaps at all (all other pairwise ppId intersections = 0). DEDUP (OPTION 1): already_extracted() was run on every candidate leaf, every review node AND on both URL forms of each node (the /g/home/all-bath/... nav form and the /g/home/view-all-bath/... canonical form) to defeat blind spot (a). Exactly one hit: For The Home > Furniture > Bathroom Furniture (179) is in Furniture.xlsx for 'JCPenney Home' as 'Bathroom Furniture' - it stays in Furniture and is in review[], not rows[]. The Furniture.xlsx index holds 76 jcpenney.com URLs and none of them is Bath Storage, Bathroom Accessories or any of its children. JCPenney is US-only single-locale (no hreflang alternates, one sitemap set), so blind spots (b)/(c) do not apply. URL FORM: recorded links are the site's own pageCanonicalURL as returned by its API. Those canonicals carry 'view-all-bath' as an INTERMEDIATE path segment; the recorded nodes are NOT View All pages - each is a distinct leaf category with its own catId, H1 and product set (same shape as the John Lewis /view-all-bathroom-accessories/soap-dish/ precedent). The actual View All node (cat100290078) is in review[] and was not recorded. EXCLUDED / NOT BATHROOM: all towel, bath rug/mat, bath runner and shower curtain nodes routed to Textile; For The Home > Home Decor > Mirrors (154) rejected on primary product type - its own facet is wall mirrors 150 / floor mirrors 4, decorative wall decor, no bathroom or vanity mirror; Personal Care (784) rejected as beauty/personal-care appliances; Dorm & Apartment Bath (218) withheld as an overlapping shop-by-room re-cut; Bed & Bath (6698) and view all bath (3597) withheld as parent roll-ups. CONFIRMED ABSENCES: JCPenney sells NO bathroom fixtures, sanitaryware, baths, showers, enclosures, taps or faucets. Evidence: the Bath department's own Item Type facet enumerates all 64 product types it contains and there is no basin, sink, toilet, bidet, bathtub, shower system, shower enclosure, tap or faucet among them; and the 1,334 clean category URLs harvested from all 51 sitemaps contain no such node either. The bathroom assortment is accessories, storage, bath textiles and (already-extracted) bath furniture only. | FOLLOW-UP 2026-09-05 (targeted re-check of the rule-24 residue on Bathroom Accessories & Sets): Re-fetched cat1002610003 live via search-api.jcpenney.com (same HTTP-first access as original run, no proxy/browser needed) - totalNumRecs now 1007 (was 953). Re-downloaded and re-grepped the FULL sitemap set (sitemap.xml index of 68 files, category-home.xml, category-for-the-home.xml, globalnav.xml, facet-home.xml, facet-for-the-home.xml, facet-for-the-home1.xml) for any sibling path under /g/home/view-all-bath/bathroom-accessories-sets/ - found none beyond the 4 already-recorded children. Confirmed visNavExist=False on the parent AND on all 4 children (no visual-nav subcategory tiles exist site-side to discover). Every one of the parent facet sidebar item_type values (32 total: bath accessory sets, soap dispensers, toothbrush holders, trash cans, soap dishes, tumblers, tissue box covers, vanity trays, bathroom canisters, makeup mirrors, shower caddies, bathtub mats, toilet bowl brushes, bathroom organizers, toilet brush holders, bathroom scales, towel warmers, toilet lid covers, bathtub caddies, toilet seat bidets, toilet paper holders, bath pillows, recycle bins, towel hooks, contour rugs, drain hair catchers, rugs, shower mirrors, toilet tank covers, runners, shower dispensers, toilet paper storage) resolves its apiUrl to the SAME id=cat1002610003 as the parent - these are facet refinements, not distinct site categories, so none can be recorded as its own leaf without inventing a URL (rule 27). CONCLUSION: the 541/953 (now 572/1007) gap is genuine parent-only residue, NOT missed subcategories. Containment was proven by product-id SET operations: enumerated all 32 item_type facets to exhaustion, their union = exactly 1007 (== totalNumRecs, proving no product exists outside this facet vocabulary); re-enumerated the 4 children to exhaustion (48/48, 146/146, 62/62, 179/179), proved each a strict subset of that universe and pairwise disjoint (0 overlap every pair); OTHER = 1007 - 435 = 572 by direct set subtraction, not arithmetic. Per the SR176 Kmart precedent this proven residue is now recorded as rows[] leaf \"Bathroom Accessories & Sets (other)\" qty 572 using the parent canonical URL. The 4 children and Bath Storage qty were refreshed to their current live enumerated totals in the same pass (48, 146, 62, 179, and Bath Storage 223 - all catalog growth since the original run, each re-verified by exhaustive enumeration matching totalNumRecs exactly). Overlap check: 82 of the 572 OTHER products and 46 of the 435 known-children products also appear in Bath Storage (cat100440012) - consistent with the pre-existing disclosed overlap; both remain recorded as distinct URLs per rule 28 and must never be summed together.",
+ "rows": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Accessories & Sets",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Accessory Sets",
+   "qty": 48,
+   "link": "https://www.jcpenney.com/g/home/view-all-bath/bathroom-accessories-sets/accessory-sets?id=cat11200000100",
+   "is_group": false,
+   "evidence": "Qty refreshed 2026-09-05 (was 43): re-enumerated to exhaustion over &page=N, 48/48 unique ppId, matches organicZoneInfo.totalNumRecs exactly. Live catalog growth since original run.",
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Dispensers",
+   "qty": 146,
+   "link": "https://www.jcpenney.com/g/home/view-all-bath/bathroom-accessories-sets/dispensers?id=cat11200000131",
+   "is_group": false,
+   "evidence": "Qty refreshed 2026-09-05 (was 134): re-enumerated to exhaustion, 146/146 unique ppId, matches totalNumRecs exactly. Live catalog growth since original run.",
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Toilet Accessories",
+   "qty": 62,
+   "link": "https://www.jcpenney.com/g/home/view-all-bath/bathroom-accessories-sets/toilet-accessories?id=cat1005900028",
+   "is_group": false,
+   "evidence": "Qty refreshed 2026-09-05 (was 61): re-enumerated to exhaustion, 62/62 unique ppId, matches totalNumRecs exactly. Live catalog growth since original run.",
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Toothbrush Holders",
+   "qty": 179,
+   "link": "https://www.jcpenney.com/g/home/view-all-bath/bathroom-accessories-sets/toothbrush-holders?id=cat11200000158",
+   "is_group": false,
+   "evidence": "Qty refreshed 2026-09-05 (was 174): re-enumerated to exhaustion, 179/179 unique ppId, matches totalNumRecs exactly. Live catalog growth since original run.",
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Accessories & Sets (other)",
+   "qty": 572,
+   "link": "https://www.jcpenney.com/g/home/view-all-bath/bathroom-accessories-sets?id=cat1002610003",
+   "is_group": false,
+   "evidence": "TARGETED FOLLOW-UP 2026-09-05 (mirrors SR176 Kmart precedent): after re-fetching the parent live (totalNumRecs now 1007, up from 953 at original extraction) and searching hard for missed subcategories - full sitemap re-check (sitemap.xml's 68 files, category-home.xml, category-for-the-home.xml, globalnav.xml, facet-home.xml, facet-for-the-home.xml, facet-for-the-home1.xml, all re-downloaded and grepped for 'bathroom-accessories-sets'/'view-all-bath' siblings), and the page's own visNavExist flag (False on the parent AND on all 4 recorded children) - NO additional real subcategory with its own catId/URL exists. The parent's 'shop by type' breakdown (soap dishes, shower caddies, trash cans, tissue box covers, vanity trays, bathroom canisters, makeup mirrors, bathroom organizers, bathroom scales, towel warmers, bathtub caddies, bath pillows, recycle bins, towel hooks, contour rugs, drain hair catchers, rugs, shower mirrors, toilet tank covers, runners, toilet paper storage, etc. - 32 item_type values total) is a FACET, not a category: every one of its apiUrls resolves to the SAME id=cat1002610003 as the parent, confirmed by direct inspection, so no dedicated listing URL can be recorded for any of them without inventing one (rule 27). CONTAINMENT PROOF (product-id sets, not arithmetic): enumerated all 32 item_type facet values of the parent to exhaustion; their UNION is exactly 1007 unique ppId, matching the parent's totalNumRecs exactly - proving no product exists outside this known facet vocabulary. Separately re-enumerated the 4 recorded children to exhaustion (48/48, 146/146, 62/62, 179/179) and proved by set operations: each is a STRICT SUBSET of the 1007-item facet-union universe, and the 4 children are pairwise disjoint (0 overlap in every pair). Union of the 4 children = 435 unique products. OTHER = facet-union universe (1007) MINUS union of 4 children (435) = 572, computed by direct set subtraction. This is the exact residue this row records. OVERLAP DISCLOSURE: intersected this 572-product OTHER set against Bath Storage (cat100440012, now 223 products, up from 215) - 82 of Bath Storage's products fall inside this OTHER set (and 46 more fall inside the 4 known children), consistent with the pre-existing disclosed Bath Storage/Toilet Accessories overlap; Bath Storage is still recorded separately because it is a genuinely distinct site category with its own URL (rule 28), and its qty must never be summed with this row.",
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathtub Mats",
+   "qty": 28,
+   "link": "https://www.jcpenney.com/g/home/view-all-bath/bath-mats-rugs-sets/bathtub-mats?id=cat11200000120",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Storage",
+   "qty": 223,
+   "link": "https://www.jcpenney.com/g/home-store/storage-organization/bath-storage?id=cat100440012",
+   "is_group": false,
+   "evidence": "Qty refreshed 2026-09-05 (was 215): re-enumerated to exhaustion, 223/223 unique ppId, matches totalNumRecs exactly. Live catalog growth since original run.",
+   "flag": null
+  }
+ ],
+ "review": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Towels",
+   "qty": 1536,
+   "issue": "ROUTED TO TEXTILE: primary product type is bath/hand/fingertip towels, bath sheets and washcloths (rule 15/20).",
+   "link": "https://www.jcpenney.com/g/home/view-all-bath/bath-towels?id=cat100250084"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Towel Sets",
+   "qty": 539,
+   "issue": "ROUTED TO TEXTILE: child of Bath Towels; towel sets (rule 15/20).",
+   "link": "https://www.jcpenney.com/g/home/view-all-bath/bath-towels/bath-towel-sets?id=cat11200000119"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Beach Towels",
+   "qty": 53,
+   "issue": "ROUTED TO TEXTILE: child of Bath Towels; beach towels are textile and not bathroom-intended (rules 15/20).",
+   "link": "https://www.jcpenney.com/g/home/view-all-bath/bath-towels/beach-towels?id=cat1004990030"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Mats Rugs & Sets",
+   "qty": 560,
+   "issue": "ROUTED TO TEXTILE: primary product type is textile bath rugs/mats (rule 16/20). Its non-textile child Bathtub Mats (28) IS recorded in rows.",
+   "link": "https://www.jcpenney.com/g/home/view-all-bath/bath-mats-rugs-sets?id=cat100250089"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Mat & Rug Sets",
+   "qty": 125,
+   "issue": "ROUTED TO TEXTILE: textile bath rug sets (rule 16/20).",
+   "link": "https://www.jcpenney.com/g/home/view-all-bath/bath-mats-rugs-sets/bath-mat-rug-sets?id=cat11200000102"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Runners",
+   "qty": 16,
+   "issue": "ROUTED TO TEXTILE: textile bath runners (rule 16/20).",
+   "link": "https://www.jcpenney.com/g/home/view-all-bath/bath-mats-rugs-sets/bath-runners?id=cat11200000117"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower Curtains & Accessories",
+   "qty": 546,
+   "issue": "ROUTED TO TEXTILE: node is dominated by shower curtains (410), curtain sets (17) and liners (27) - rule 20. Its non-textile content (shower curtain hooks 69, shower curtain rods 23) exists only as item_type FACETS, not as site subcategories, so no bathroom-hardware leaf can be recorded without inventing a URL.",
+   "link": "https://www.jcpenney.com/g/home/view-all-bath/shower-curtains-accessories?id=cat11200000152"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower Curtains",
+   "qty": 414,
+   "issue": "ROUTED TO TEXTILE: shower curtains (rule 20).",
+   "link": "https://www.jcpenney.com/g/home/view-all-bath/shower-curtains-accessories/shower-curtains?id=cat100250092"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "All Towels",
+   "qty": 1759,
+   "issue": "ROUTED TO TEXTILE: site-wide towel roll-up spanning bath, kitchen and beach towels; textile (rule 15/20) and an overlapping roll-up, not a bath subcategory.",
+   "link": "https://www.jcpenney.com/g/home/all-towels?id=cat11200000101"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Furniture",
+   "qty": 179,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Bathroom Furniture' - stays in Furniture under the OPTION 1 policy; not re-extracted into Bathroom (master guide s13, rule 9).",
+   "link": "https://www.jcpenney.com/g/home-store/furniture-store/bathroom-furniture?id=cat100240130"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Trash Cans & Bags",
+   "qty": 0,
+   "issue": "EMPTY NODE: the category is published in the site's own category-home.xml sitemap but the gallery API returns totalNumRecs=0 and rewrites pageCanonicalURL to id=cat20020570040 (the Home department), i.e. the catId no longer resolves. Real-but-empty node, recorded here rather than as a zero-qty row.",
+   "link": "https://www.jcpenney.com/g/home/household-essentials/all-trash-recycling/bathroom-trash-cans-bags?id=cat11200000113"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Dorm & Apartment Bath",
+   "qty": 218,
+   "issue": "OVERLAPPING SHOP-BY-ROOM RE-CUT, not recorded (rule 28 / batch brief s5): a dorm lifestyle edit whose Item Type facet is entirely bath products already covered by the Bath department (shower curtains 20, shower caddies 15, soap dispensers 15, toothbrush holders 12, bathtub mats 11, towels 3-10 etc.). Recording it would double-count.",
+   "link": "https://www.jcpenney.com/g/home-store/dorm-apartment-living/dorm-apartment-bath?id=cat1008920003"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "For The Home > Home Decor > Mirrors",
+   "qty": 154,
+   "issue": "NOT BATHROOM (rules 11/29): site hierarchy is For The Home > Home Decor; its own Mirror Type facet is wall mirrors 150 / floor mirrors 4 and every sampled product is a decorative wall mirror (Safavieh sunburst, Madison Park scalloped, Northlight round). No bathroom, vanity, LED, illuminated or cabinet mirror. Decorative wall decor, not a bathroom mirror node. already_extracted() = None.",
+   "link": "https://www.jcpenney.com/g/home-store/home-decor/mirrors?id=cat1003990003"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bed & Bath (department roll-up)",
+   "qty": 6698,
+   "issue": "PARENT ROLL-UP NOT RECORDED (rule 24): For The Home > Bed & Bath spans all bedding plus all bath; valid children exist and are recorded/routed individually.",
+   "link": "https://www.jcpenney.com/g/home-store/bed-bath?id=cat100250185"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "View All Bath",
+   "qty": 3597,
+   "issue": "VIEW ALL PAGE - NOT RECORDED (rule 25). This is the Bath department landing node (catId cat100290078, breadcrumb 'view all bath'); its four real children (Bath Towels 1536, Bath Mats Rugs & Sets 560, Shower Curtains & Accessories 546, Bathroom Accessories & Sets 953 = 3595 of 3597) are handled individually.",
+   "link": "https://www.jcpenney.com/g/home/all-bath?id=cat100290078"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Accessories & Sets (rule 24 residue)",
+   "qty": 1007,
+   "issue": "RESOLVED 2026-09-05 - see rows[] 'Bathroom Accessories & Sets (other)' qty 572. Original disclosure (qty 953, residue 541) is superseded: the parent's live total is now 1007 and the 4 children now total 48+146+62+179=435. A genuinely thorough re-search (full sitemap re-check, globalnav.xml, facet sitemaps, visNavExist flag on the parent and all 4 children) found NO additional real subcategory URL - the 'shop by type' breakdown (trash cans, soap dishes, tissue box covers, vanity trays, bathroom canisters, makeup mirrors, shower caddies, bathroom organizers, bathroom scales, towel warmers, bathtub caddies, bath pillows, recycle bins, towel hooks, etc, 32 item_type values in all) remains a FACET of the same catId=cat1002610003, never a distinct category with its own URL, so it still cannot be recorded as separate leaves without inventing URLs (rule 27). Instead, containment was PROVEN by product-id set operations (not arithmetic): the union of all 32 item_type facet enumerations = exactly 1007 (matches parent totalNumRecs exactly, so no product exists outside this known facet vocabulary); the 4 children re-enumerated to exhaustion (48/48, 146/146, 62/62, 179/179) are each a strict subset of that 1007-universe and are pairwise disjoint; OTHER = 1007 - 435 = 572 by direct set subtraction. Per the SR176 Kmart precedent this proven residue is now recorded as a proper leaf row using the parent's own canonical URL (rule 24 exception for a proven, closed residue).",
+   "link": "https://www.jcpenney.com/g/home/view-all-bath/bathroom-accessories-sets?id=cat1002610003"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Personal Care",
+   "qty": 784,
+   "issue": "OUT OF BATHROOM SCOPE: the Bath department's fifth visual-nav tile is a beauty/personal-care node - Category facet = spa & relaxation 208, hair styling tools 184, dental care 89, home health care 72, grooming & shaving 69, humidifiers 56, mirrors 48, nail care 26. Personal-care appliances and toiletries, not bathroom fixtures, furniture, storage or accessories (rule 2: primary product type over room). Its 'mirrors 48' facet is lighted personal-care/makeup mirrors sold as beauty appliances and is a facet, not a category.",
+   "link": "https://www.jcpenney.com/g/bed-and-bath/personal-care?id=cat100300082"
+  }
+ ],
+ "_reconstructed_from": "Bathroom.xlsx delivered 2026-09-01 (checkpoint), not original worker JSON"
+}

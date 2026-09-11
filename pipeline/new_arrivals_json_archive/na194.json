@@ -1,0 +1,34 @@
+{
+  "status": "partial",
+  "failure_reason": "Direct HTTP fetch worked throughout (no WAF/DataDome/CAPTCHA on any real content page). A path-class anti-scan trigger began redirecting /shop/* requests to /blocked?url=... partway through investigation - it hit AFTER the three rows below were already captured cleanly, but before I could probe equivalent per-department New Arrivals URLs for Bath, Bedding, Kitchen & Dining, Patio & Garden, Appliances, Mattresses, Luggage, or Kids' Rooms. Those hub pages were checked for a dept-specific New Arrivals hubspoke/nav link (Bath, Bedding, Kitchen & Dining, Patio & Garden all came back with only irrelevant shared-header Clothing/Toys 'new-arrivals' links, no Home-relevant one), which is reasonable but not fully proven absence given the block cut off direct URL confirmation.",
+  "notes": "SCOPE: Home dept (cat_id 4044) + Furniture + Patio & Garden (5428) + Home Decor (see bs194.json for full scope reasoning). URL-PATTERN OBSERVATION: Walmart exposes New Arrivals at the sub-department level with an inconsistent URL shape per department (/shop/home-decor-new-arrivals for Decor, /shop/home/furniture-new-arrivals for Furniture, /shop/home/storage-new-arrivals for Storage) rather than one unified 'Home New Arrivals' hub - a direct guess at /shop/home/new-arrivals and /shop/all-home/new-arrivals both resolved to the site's own /blocked anti-scan page (not a genuine 404), so no unified parent page could be confirmed to exist or not exist; treated as absent-until-proven and not forced into the output. COLLECTION-PAGE CHECK: all three kept rows were opened and confirmed to be genuine PLPs (product grid with sort/filter, an exact or capped product count in the page's own JSON state), not editorial/lookbook pages - none required an AMBIGUOUS flag. COUNT METHODOLOGY: 'Home Decor New Arrivals' shows an uncapped exact totalItemCountDisplay '(279)' - kept as exact per this company's established convention (uncapped display = trustworthy). 'New Furniture' (2,022) and 'New Storage' (1,949) both show the capped '(1000+)' display, which per this company's prior-pass finding is not exhaustion-checkable and has proven internally inconsistent elsewhere on this site at scale - so both are set to null with a MANUAL REVIEW flag rather than reporting the raw capped-display JSON numbers as fact. Décor hub's 'Currently Trending' module also surfaced several theme/style pages (Dorm Decor, Farmhouse Decor, Boho Decor, Coastal Decor, Arch Mirrors, Tech-Enabled Decor, Botanical Wall Art, LED Mirrors) - these are style/theme category pages, not 'recently added to catalogue' New Arrivals listings, and were excluded (they belong to the separate Home-Decor category-extraction project, not here). No 'New & Trending' page for Furniture could be verified (URL contains a literal '&' that resolved to /blocked on every attempt, both before and after the rate-limit trigger) - excluded as unverifiable rather than guessed.",
+  "rows": [
+    {
+      "category": "Home Decor New Arrivals",
+      "sub_category": "Home Decor New Arrivals",
+      "qty": 279,
+      "link": "https://www.walmart.com/shop/home-decor-new-arrivals",
+      "is_group": false,
+      "evidence": "h1 'Home Decor New Arrivals (279)'; JSON totalItemCount:279, totalItemCountDisplay:\"(279)\" (uncapped/exact)",
+      "flag": null
+    },
+    {
+      "category": "Furniture New Arrivals",
+      "sub_category": "New Furniture",
+      "qty": null,
+      "link": "https://www.walmart.com/shop/home/furniture-new-arrivals",
+      "is_group": false,
+      "evidence": "h1 'New Furniture (1000+)'; JSON totalItemCount:2022, totalItemCountDisplay:\"(1000+)\" (capped)",
+      "flag": "MANUAL REVIEW: totalItemCountDisplay capped '(1000+)'; per this company's prior-pass convention, capped Walmart facet/shelf counts have proven inflated/inconsistent at scale and are not exhaustion-checkable, so the raw 2022 figure is not trusted as exact."
+    },
+    {
+      "category": "Storage & Organization New Arrivals",
+      "sub_category": "New Storage",
+      "qty": null,
+      "link": "https://www.walmart.com/shop/home/storage-new-arrivals",
+      "is_group": false,
+      "evidence": "h1 'New Storage (1000+)'; JSON totalItemCount:1949, totalItemCountDisplay:\"(1000+)\" (capped)",
+      "flag": "MANUAL REVIEW: totalItemCountDisplay capped '(1000+)'; per this company's prior-pass convention, capped Walmart facet/shelf counts have proven inflated/inconsistent at scale and are not exhaustion-checkable, so the raw 1949 figure is not trusted as exact."
+    }
+  ]
+}

@@ -1,0 +1,597 @@
+{
+ "sr": 133,
+ "company": "JYSK Denmark",
+ "brand_site": "jysk.dk",
+ "country": "Denmark",
+ "site_url": "https://jysk.dk/",
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ACCESS: Claude-in-Chrome only. Own tab, navigated to https://jysk.dk/robots.txt and ran every subsequent request as a same-origin fetch() from that page via javascript_tool. No block, challenge, 403 or rate limit at any point (~75 requests, paced ~1.2s apart). robots.txt re-checked live: Disallow /customer/, /checkout/, /b2b/, *filters=*, *sort=*, /search for User-agent: * - no anthropic-ai / ClaudeBot / Claude-User rule, so no opt-out applies; no disallowed path was fetched. TREE: three sources unioned per the mandatory cross-check - (1) https://jysk.dk/sitemap.xml (single file, 6121 URLs; a path is a category iff other URLs sit beneath it), (2) each department landing page's own category-tile block (/stue, /spisestue, /kontor, /entre, /opbevaring, /sovevaerelse, /have, /indretning, /badevaerelse), (3) a per-leaf scan listing every same-branch link on a listing page that is NOT in that page's JSON-LD ItemList, i.e. a subcategory tile rather than a product. The sitemap is stale (lastmod 2025-10): it missed all four Havemoebelsaet children and its product counts are wrong (Spiseborde 59 vs 242 live), so it was used for structure only, never for qty. The /badevaerelse tree was walked in full and is towels, mats, robes, shower curtains and accessories only - JYSK DK sells no bathroom furniture. COUNTS: jysk.dk publishes no rendered 'N products' header anywhere (checked the loaded page's DOM text), so per brief rule 4 the count comes from the page itself: every category page server-renders its complete product grid and qty is the number of product cards in it (data-testid=product-card-title). Proven safe: on /stue/sofaer the SSR HTML and the fully hydrated live DOM both give 123, there is no pagination or load-more control, and the grid is not lazy-loaded. The page's JSON-LD ItemList numberOfItems is quoted alongside in every evidence string; it equals the rendered count on 38 of 42 counted leaves and is higher on four (Sofas 124/123, Continental Beds 102/78 and its storage child 10/7, the Adjustable-Beds parent 42/33), where the surplus are non-rendered variant/configuration articles - the rendered figure was taken and the difference flagged. JYSK QUIRK, documented in every affected flag: sibling categories cross-list. A leaf's grid often contains products whose own category is a sibling or child - Sofas carries Sofa Beds, Dining Tables carries Dining Sets, Desks and Height-Adjustable Desks serve one identical 47-item union, Office Chairs and Gaming Chairs one identical 31-item union, Wardrobes carries wardrobe fittings, Sun Loungers carries sun-lounger cushions, Lounge Sets carries Cafe Sets. qty is the site's own listing for that URL in every case; the own-canonical subset is stated in the flag so the merge can net the overlap. TRAP CONFIRMED: a JYSK slug does not 404, it serves a plausible wrong listing. /have/havemobler/havebaenke (Garden Benches) returns the entire 115-item Garden Furniture rollup with no bench in it, and havemobelsaet-i-trae / -i-metal / -i-nonwood each return the same 3 Cafe Set products. Every recorded leaf was checked against this by confirming its h1 matches the node asked for and that its items are canonical under it. EXCLUDED, with reasons: MATTRESSES - the whole /sovevaerelse/madrasser branch (foam, spring, topper, roll-up, children's) as bedding per the assignment, plus duvets, pillows, bed linen, sheets, pillowcases and bedspreads; Beds and Bed Frames kept. Furniture parts and care: bed legs, bed accessories, slats, elevation-bed components, dining-table extension leaves (/spisestue/tillaegsplader-til-spiseborde, 7), living-room furniture care and accessories, office accessories. /opbevaring/hylder (23) excluded on its own h1 - 'Vaeghylder, svaevehylder og billedhylder' = wall shelves, floating shelves and picture ledges, i.e. Wall Decor, not freestanding shelving. /entre/entremobler/knageraekker (10) excluded as wall-mounted hook rails. Standalone storage goods excluded: storage boxes and baskets, plastic boxes, small storage, hangers, wardrobe interior fittings, and /have/udendorsopbevaring (4) which is cushion boxes. Also excluded: all textiles and rugs, curtains, garden cushions, sun protection (parasols, awnings, pavilions), trampolines, camping (tents, sleeping bags, air mattresses, picnic), garden decoration and pots, outdoor and indoor lighting, mirrors, decoration, kitchen and tableware, pet supplies, and children's rugs (the only child of /indretning/borneartikler). Children's furniture (/indretning/bornemobler, 8) IS included. SANITY CHECKS: counts vary per category (no site-wide constant); no suspiciously round value; every recorded h1 matches the requested node; two reads taken on the large leaves - Dining Tables drifted 246 to 242 within the session and is flagged, while Dining Table Sets 176, Sofas 123 and Wardrobes 77 were stable across reads.",
+ "rows": [
+  {
+   "category": "Furniture",
+   "sub_category": "Living Room",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sofas",
+   "qty": 123,
+   "link": "https://jysk.dk/stue/sofaer",
+   "is_group": false,
+   "evidence": "SSR listing grid enumerated in full: 123 product cards (data-testid=\"product-card-title\"); JSON-LD ItemList numberOfItems=124 on the same page. jysk.dk renders no product-count header anywhere, so the grid itself is the count; SSR card count verified identical to the fully hydrated live DOM on /stue/sofaer (123 = 123) and the grid has no pagination or load-more control.",
+   "flag": "MANUAL REVIEW: the Sofas listing also carries the 24 products whose own category is Sofa Beds (/stue/sovesofaer) - 99 of the 123 tiles are canonical under /stue/sofaer. JSON-LD numberOfItems=124 counts one extra article (a modular-sofa mid-console) that the grid does not render."
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sofa Beds",
+   "qty": 24,
+   "link": "https://jysk.dk/stue/sovesofaer",
+   "is_group": false,
+   "evidence": "SSR listing grid enumerated in full: 24 product cards (data-testid=\"product-card-title\"); JSON-LD ItemList numberOfItems=24 on the same page. jysk.dk renders no product-count header anywhere, so the grid itself is the count; SSR card count verified identical to the fully hydrated live DOM on /stue/sofaer (123 = 123) and the grid has no pagination or load-more control.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Daybeds",
+   "qty": 4,
+   "link": "https://jysk.dk/stue/daybeds",
+   "is_group": false,
+   "evidence": "SSR listing grid enumerated in full: 4 product cards (data-testid=\"product-card-title\"); JSON-LD ItemList numberOfItems=4 on the same page. jysk.dk renders no product-count header anywhere, so the grid itself is the count; SSR card count verified identical to the fully hydrated live DOM on /stue/sofaer (123 = 123) and the grid has no pagination or load-more control.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Armchairs",
+   "qty": 40,
+   "link": "https://jysk.dk/stue/laenestole",
+   "is_group": false,
+   "evidence": "SSR listing grid enumerated in full: 40 product cards (data-testid=\"product-card-title\"); JSON-LD ItemList numberOfItems=40 on the same page. jysk.dk renders no product-count header anywhere, so the grid itself is the count; SSR card count verified identical to the fully hydrated live DOM on /stue/sofaer (123 = 123) and the grid has no pagination or load-more control.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Coffee Tables & Side Tables",
+   "qty": 64,
+   "link": "https://jysk.dk/stue/sofaborde-og-sideborde",
+   "is_group": false,
+   "evidence": "SSR listing grid enumerated in full: 64 product cards (data-testid=\"product-card-title\"); JSON-LD ItemList numberOfItems=64 on the same page. jysk.dk renders no product-count header anywhere, so the grid itself is the count; SSR card count verified identical to the fully hydrated live DOM on /stue/sofaer (123 = 123) and the grid has no pagination or load-more control.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "TV Units",
+   "qty": 23,
+   "link": "https://jysk.dk/stue/tv-borde",
+   "is_group": false,
+   "evidence": "SSR listing grid enumerated in full: 23 product cards (data-testid=\"product-card-title\"); JSON-LD ItemList numberOfItems=23 on the same page. jysk.dk renders no product-count header anywhere, so the grid itself is the count; SSR card count verified identical to the fully hydrated live DOM on /stue/sofaer (123 = 123) and the grid has no pagination or load-more control.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Poufs",
+   "qty": 12,
+   "link": "https://jysk.dk/stue/puffer",
+   "is_group": false,
+   "evidence": "SSR listing grid enumerated in full: 12 product cards (data-testid=\"product-card-title\"); JSON-LD ItemList numberOfItems=12 on the same page. jysk.dk renders no product-count header anywhere, so the grid itself is the count; SSR card count verified identical to the fully hydrated live DOM on /stue/sofaer (123 = 123) and the grid has no pagination or load-more control.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dining Room",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dining Tables",
+   "qty": 242,
+   "link": "https://jysk.dk/spisestue/spiseborde",
+   "is_group": false,
+   "evidence": "SSR listing grid enumerated in full: 242 product cards (data-testid=\"product-card-title\"); JSON-LD ItemList numberOfItems=242 on the same page. jysk.dk renders no product-count header anywhere, so the grid itself is the count; SSR card count verified identical to the fully hydrated live DOM on /stue/sofaer (123 = 123) and the grid has no pagination or load-more control.",
+   "flag": "MANUAL REVIEW: rollup listing - only 59 of the 242 tiles are canonical under /spisestue/spiseborde; 176 belong to Dining Table Sets and 7 to table extension leaves. The count also drifted within the session (246 on the first read, 242 on two later reads)."
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dining Chairs",
+   "qty": 77,
+   "link": "https://jysk.dk/spisestue/spisebordsstole",
+   "is_group": false,
+   "evidence": "SSR listing grid enumerated in full: 77 product cards (data-testid=\"product-card-title\"); JSON-LD ItemList numberOfItems=77 on the same page. jysk.dk renders no product-count header anywhere, so the grid itself is the count; SSR card count verified identical to the fully hydrated live DOM on /stue/sofaer (123 = 123) and the grid has no pagination or load-more control.",
+   "flag": "MANUAL REVIEW: listing includes the 7 products of Folding Chairs & Stools; 70 of the 77 tiles are canonical under /spisestue/spisebordsstole."
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dining Table Sets",
+   "qty": 176,
+   "link": "https://jysk.dk/spisestue/spisebordssaet",
+   "is_group": false,
+   "evidence": "SSR listing grid enumerated in full: 176 product cards (data-testid=\"product-card-title\"); JSON-LD ItemList numberOfItems=176 on the same page. jysk.dk renders no product-count header anywhere, so the grid itself is the count; SSR card count verified identical to the fully hydrated live DOM on /stue/sofaer (123 = 123) and the grid has no pagination or load-more control.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sideboards",
+   "qty": 29,
+   "link": "https://jysk.dk/spisestue/skaenke",
+   "is_group": false,
+   "evidence": "SSR listing grid enumerated in full: 29 product cards (data-testid=\"product-card-title\"); JSON-LD ItemList numberOfItems=29 on the same page. jysk.dk renders no product-count header anywhere, so the grid itself is the count; SSR card count verified identical to the fully hydrated live DOM on /stue/sofaer (123 = 123) and the grid has no pagination or load-more control.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Display Cabinets",
+   "qty": 19,
+   "link": "https://jysk.dk/spisestue/vitrineskabe",
+   "is_group": false,
+   "evidence": "SSR listing grid enumerated in full: 19 product cards (data-testid=\"product-card-title\"); JSON-LD ItemList numberOfItems=19 on the same page. jysk.dk renders no product-count header anywhere, so the grid itself is the count; SSR card count verified identical to the fully hydrated live DOM on /stue/sofaer (123 = 123) and the grid has no pagination or load-more control.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bar Stools & Bar Tables",
+   "qty": 11,
+   "link": "https://jysk.dk/spisestue/barstole-og-barborde",
+   "is_group": false,
+   "evidence": "SSR listing grid enumerated in full: 11 product cards (data-testid=\"product-card-title\"); JSON-LD ItemList numberOfItems=11 on the same page. jysk.dk renders no product-count header anywhere, so the grid itself is the count; SSR card count verified identical to the fully hydrated live DOM on /stue/sofaer (123 = 123) and the grid has no pagination or load-more control.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Console Tables",
+   "qty": 7,
+   "link": "https://jysk.dk/spisestue/konsolborde",
+   "is_group": false,
+   "evidence": "SSR listing grid enumerated in full: 7 product cards (data-testid=\"product-card-title\"); JSON-LD ItemList numberOfItems=7 on the same page. jysk.dk renders no product-count header anywhere, so the grid itself is the count; SSR card count verified identical to the fully hydrated live DOM on /stue/sofaer (123 = 123) and the grid has no pagination or load-more control.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Folding Chairs & Stools",
+   "qty": 7,
+   "link": "https://jysk.dk/spisestue/klapstole-og-taburetter",
+   "is_group": false,
+   "evidence": "SSR listing grid enumerated in full: 7 product cards (data-testid=\"product-card-title\"); JSON-LD ItemList numberOfItems=7 on the same page. jysk.dk renders no product-count header anywhere, so the grid itself is the count; SSR card count verified identical to the fully hydrated live DOM on /stue/sofaer (123 = 123) and the grid has no pagination or load-more control.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Office",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Desks",
+   "qty": 47,
+   "link": "https://jysk.dk/kontor/skriveborde",
+   "is_group": false,
+   "evidence": "SSR listing grid enumerated in full: 47 product cards (data-testid=\"product-card-title\"); JSON-LD ItemList numberOfItems=47 on the same page. jysk.dk renders no product-count header anywhere, so the grid itself is the count; SSR card count verified identical to the fully hydrated live DOM on /stue/sofaer (123 = 123) and the grid has no pagination or load-more control.",
+   "flag": "MANUAL REVIEW: Desks and Height-Adjustable Desks serve the same 47-tile union listing; only 34 tiles are canonical under /kontor/skriveborde."
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Height-Adjustable Desks",
+   "qty": 47,
+   "link": "https://jysk.dk/kontor/haeve-saenkeborde",
+   "is_group": false,
+   "evidence": "SSR listing grid enumerated in full: 47 product cards (data-testid=\"product-card-title\"); JSON-LD ItemList numberOfItems=47 on the same page. jysk.dk renders no product-count header anywhere, so the grid itself is the count; SSR card count verified identical to the fully hydrated live DOM on /stue/sofaer (123 = 123) and the grid has no pagination or load-more control.",
+   "flag": "MANUAL REVIEW: same 47-tile union listing as Desks; only 13 tiles are canonical under /kontor/haeve-saenkeborde."
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Office Chairs",
+   "qty": 31,
+   "link": "https://jysk.dk/kontor/kontorstole",
+   "is_group": false,
+   "evidence": "SSR listing grid enumerated in full: 31 product cards (data-testid=\"product-card-title\"); JSON-LD ItemList numberOfItems=31 on the same page. jysk.dk renders no product-count header anywhere, so the grid itself is the count; SSR card count verified identical to the fully hydrated live DOM on /stue/sofaer (123 = 123) and the grid has no pagination or load-more control.",
+   "flag": "MANUAL REVIEW: Office Chairs and Gaming Chairs serve the same 31-tile union listing; only 21 tiles are canonical under /kontor/kontorstole."
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Gaming Chairs",
+   "qty": 31,
+   "link": "https://jysk.dk/kontor/gamer-stole",
+   "is_group": false,
+   "evidence": "SSR listing grid enumerated in full: 31 product cards (data-testid=\"product-card-title\"); JSON-LD ItemList numberOfItems=31 on the same page. jysk.dk renders no product-count header anywhere, so the grid itself is the count; SSR card count verified identical to the fully hydrated live DOM on /stue/sofaer (123 = 123) and the grid has no pagination or load-more control.",
+   "flag": "MANUAL REVIEW: same 31-tile union listing as Office Chairs; only 10 tiles are canonical under /kontor/gamer-stole."
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Hallway Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Hallway Benches",
+   "qty": 21,
+   "link": "https://jysk.dk/entre/entremobler/entrebaenke",
+   "is_group": false,
+   "evidence": "SSR listing grid enumerated in full: 21 product cards (data-testid=\"product-card-title\"); JSON-LD ItemList numberOfItems=21 on the same page. jysk.dk renders no product-count header anywhere, so the grid itself is the count; SSR card count verified identical to the fully hydrated live DOM on /stue/sofaer (123 = 123) and the grid has no pagination or load-more control.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Coat Stands & Hallway Cabinets",
+   "qty": 9,
+   "link": "https://jysk.dk/entre/entremobler/garderobestativer-skabe-til-entre",
+   "is_group": false,
+   "evidence": "SSR listing grid enumerated in full: 9 product cards (data-testid=\"product-card-title\"); JSON-LD ItemList numberOfItems=9 on the same page. jysk.dk renders no product-count header anywhere, so the grid itself is the count; SSR card count verified identical to the fully hydrated live DOM on /stue/sofaer (123 = 123) and the grid has no pagination or load-more control.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Valet Stands",
+   "qty": 5,
+   "link": "https://jysk.dk/entre/entremobler/stumtjenere",
+   "is_group": false,
+   "evidence": "SSR listing grid enumerated in full: 5 product cards (data-testid=\"product-card-title\"); JSON-LD ItemList numberOfItems=5 on the same page. jysk.dk renders no product-count header anywhere, so the grid itself is the count; SSR card count verified identical to the fully hydrated live DOM on /stue/sofaer (123 = 123) and the grid has no pagination or load-more control.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Storage Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Chests of Drawers",
+   "qty": 45,
+   "link": "https://jysk.dk/opbevaring/kommoder",
+   "is_group": false,
+   "evidence": "SSR listing grid enumerated in full: 45 product cards (data-testid=\"product-card-title\"); JSON-LD ItemList numberOfItems=45 on the same page. jysk.dk renders no product-count header anywhere, so the grid itself is the count; SSR card count verified identical to the fully hydrated live DOM on /stue/sofaer (123 = 123) and the grid has no pagination or load-more control.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Wardrobes",
+   "qty": 77,
+   "link": "https://jysk.dk/opbevaring/garderobeskabe",
+   "is_group": false,
+   "evidence": "SSR listing grid enumerated in full: 77 product cards (data-testid=\"product-card-title\"); JSON-LD ItemList numberOfItems=77 on the same page. jysk.dk renders no product-count header anywhere, so the grid itself is the count; SSR card count verified identical to the fully hydrated live DOM on /stue/sofaer (123 = 123) and the grid has no pagination or load-more control.",
+   "flag": "MANUAL REVIEW: listing includes 23 wardrobe-interior fittings/accessories (/opbevaring/garderobeindretning-og-tilbehor); only 54 of the 77 tiles are wardrobes canonical under /opbevaring/garderobeskabe."
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Shelving Units & Room Dividers",
+   "qty": 50,
+   "link": "https://jysk.dk/opbevaring/reoler-og-rumdelere",
+   "is_group": false,
+   "evidence": "SSR listing grid enumerated in full: 50 product cards (data-testid=\"product-card-title\"); JSON-LD ItemList numberOfItems=50 on the same page. jysk.dk renders no product-count header anywhere, so the grid itself is the count; SSR card count verified identical to the fully hydrated live DOM on /stue/sofaer (123 = 123) and the grid has no pagination or load-more control.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Shoe Storage",
+   "qty": 17,
+   "link": "https://jysk.dk/opbevaring/skoopbevaring",
+   "is_group": false,
+   "evidence": "SSR listing grid enumerated in full: 17 product cards (data-testid=\"product-card-title\"); JSON-LD ItemList numberOfItems=17 on the same page. jysk.dk renders no product-count header anywhere, so the grid itself is the count; SSR card count verified identical to the fully hydrated live DOM on /stue/sofaer (123 = 123) and the grid has no pagination or load-more control.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Clothes Rails",
+   "qty": 11,
+   "link": "https://jysk.dk/opbevaring/tojstativer",
+   "is_group": false,
+   "evidence": "SSR listing grid enumerated in full: 11 product cards (data-testid=\"product-card-title\"); JSON-LD ItemList numberOfItems=11 on the same page. jysk.dk renders no product-count header anywhere, so the grid itself is the count; SSR card count verified identical to the fully hydrated live DOM on /stue/sofaer (123 = 123) and the grid has no pagination or load-more control.",
+   "flag": "MANUAL REVIEW: ambiguous - freestanding garment racks, filed by JYSK under the Storage department; furniture-adjacent rather than a cabinet."
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bedroom",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bedside Tables",
+   "qty": 19,
+   "link": "https://jysk.dk/sovevaerelse/sengeborde",
+   "is_group": false,
+   "evidence": "SSR listing grid enumerated in full: 19 product cards (data-testid=\"product-card-title\"); JSON-LD ItemList numberOfItems=19 on the same page. jysk.dk renders no product-count header anywhere, so the grid itself is the count; SSR card count verified identical to the fully hydrated live DOM on /stue/sofaer (123 = 123) and the grid has no pagination or load-more control.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Beds",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Continental Beds",
+   "qty": 78,
+   "link": "https://jysk.dk/sovevaerelse/senge/kontinentalsenge",
+   "is_group": false,
+   "evidence": "SSR listing grid enumerated in full: 78 product cards (data-testid=\"product-card-title\"); JSON-LD ItemList numberOfItems=102 on the same page. jysk.dk renders no product-count header anywhere, so the grid itself is the count; SSR card count verified identical to the fully hydrated live DOM on /stue/sofaer (123 = 123) and the grid has no pagination or load-more control.",
+   "flag": "MANUAL REVIEW: JSON-LD numberOfItems=102 but the grid renders 78 tiles - the extra 24 are firmness/configuration articles folded into a tile. Recorded as the parent rather than its single child Kontinentalseng med opbevaring (7 tiles, /sovevaerelse/senge/kontinentalsenge/kontinentalseng-med-opbevaring) because that child is a strict subset and recording only it would drop 71 beds."
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Adjustable Beds",
+   "qty": 32,
+   "link": "https://jysk.dk/sovevaerelse/senge/elevationssenge/elevationssenge",
+   "is_group": false,
+   "evidence": "SSR listing grid enumerated in full: 32 product cards (data-testid=\"product-card-title\"); JSON-LD ItemList numberOfItems=32 on the same page. jysk.dk renders no product-count header anywhere, so the grid itself is the count; SSR card count verified identical to the fully hydrated live DOM on /stue/sofaer (123 = 123) and the grid has no pagination or load-more control.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Children's Beds",
+   "qty": 8,
+   "link": "https://jysk.dk/sovevaerelse/senge/bornesenge",
+   "is_group": false,
+   "evidence": "SSR listing grid enumerated in full: 8 product cards (data-testid=\"product-card-title\"); JSON-LD ItemList numberOfItems=8 on the same page. jysk.dk renders no product-count header anywhere, so the grid itself is the count; SSR card count verified identical to the fully hydrated live DOM on /stue/sofaer (123 = 123) and the grid has no pagination or load-more control.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Guest Beds",
+   "qty": 4,
+   "link": "https://jysk.dk/sovevaerelse/senge/gaestesenge",
+   "is_group": false,
+   "evidence": "SSR listing grid enumerated in full: 4 product cards (data-testid=\"product-card-title\"); JSON-LD ItemList numberOfItems=4 on the same page. jysk.dk renders no product-count header anywhere, so the grid itself is the count; SSR card count verified identical to the fully hydrated live DOM on /stue/sofaer (123 = 123) and the grid has no pagination or load-more control.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Headboards",
+   "qty": 14,
+   "link": "https://jysk.dk/sovevaerelse/senge/sengegavle",
+   "is_group": false,
+   "evidence": "SSR listing grid enumerated in full: 14 product cards (data-testid=\"product-card-title\"); JSON-LD ItemList numberOfItems=14 on the same page. jysk.dk renders no product-count header anywhere, so the grid itself is the count; SSR card count verified identical to the fully hydrated live DOM on /stue/sofaer (123 = 123) and the grid has no pagination or load-more control.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bed Frames",
+   "qty": 12,
+   "link": "https://jysk.dk/sovevaerelse/senge/sengerammer-sengebunde-og-lameller/sengerammer",
+   "is_group": false,
+   "evidence": "SSR listing grid enumerated in full: 12 product cards (data-testid=\"product-card-title\"); JSON-LD ItemList numberOfItems=12 on the same page. jysk.dk renders no product-count header anywhere, so the grid itself is the count; SSR card count verified identical to the fully hydrated live DOM on /stue/sofaer (123 = 123) and the grid has no pagination or load-more control.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bed Bases with Storage",
+   "qty": 4,
+   "link": "https://jysk.dk/sovevaerelse/senge/sengerammer-sengebunde-og-lameller/sengebunde-med-opbevaring",
+   "is_group": false,
+   "evidence": "SSR listing grid enumerated in full: 4 product cards (data-testid=\"product-card-title\"); JSON-LD ItemList numberOfItems=4 on the same page. jysk.dk renders no product-count header anywhere, so the grid itself is the count; SSR card count verified identical to the fully hydrated live DOM on /stue/sofaer (123 = 123) and the grid has no pagination or load-more control.",
+   "flag": "MANUAL REVIEW: the h1 reads 'Faa sengerammer med opbevaring hos JYSK' (bed frames with storage) - structural bed furniture, kept in scope."
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bed Bases",
+   "qty": 5,
+   "link": "https://jysk.dk/sovevaerelse/senge/sengerammer-sengebunde-og-lameller/sengebunde",
+   "is_group": false,
+   "evidence": "SSR listing grid enumerated in full: 5 product cards (data-testid=\"product-card-title\"); JSON-LD ItemList numberOfItems=5 on the same page. jysk.dk renders no product-count header anywhere, so the grid itself is the count; SSR card count verified identical to the fully hydrated live DOM on /stue/sofaer (123 = 123) and the grid has no pagination or load-more control.",
+   "flag": "MANUAL REVIEW: ambiguous - slatted bed bases sold as bed components under the Beds branch, not as bedding. Its only child Fast lamelbund lists the identical 5 products, so the parent was recorded once."
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Children's Furniture",
+   "qty": 8,
+   "link": "https://jysk.dk/indretning/bornemobler",
+   "is_group": false,
+   "evidence": "SSR listing grid enumerated in full: 8 product cards (data-testid=\"product-card-title\"); JSON-LD ItemList numberOfItems=8 on the same page. jysk.dk renders no product-count header anywhere, so the grid itself is the count; SSR card count verified identical to the fully hydrated live DOM on /stue/sofaer (123 = 123) and the grid has no pagination or load-more control.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Garden Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Garden Furniture Sets",
+   "qty": 7,
+   "link": "https://jysk.dk/have/havemobler/havemobelsaet",
+   "is_group": false,
+   "evidence": "SSR listing grid enumerated in full: 7 product cards (data-testid=\"product-card-title\"); JSON-LD ItemList numberOfItems=7 on the same page. jysk.dk renders no product-count header anywhere, so the grid itself is the count; SSR card count verified identical to the fully hydrated live DOM on /stue/sofaer (123 = 123) and the grid has no pagination or load-more control.",
+   "flag": "MANUAL REVIEW: recorded as the parent - its only real child Cafesaet (3 tiles) is a strict subset, and its three material sub-nodes (havemobelsaet-i-trae / -i-metal / -i-nonwood) each serve the identical 3 cafe-set products, i.e. a fallback listing rather than their own catalogue."
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Garden Tables",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Cafe Tables",
+   "qty": 13,
+   "link": "https://jysk.dk/have/havemobler/haveborde/cafeborde",
+   "is_group": false,
+   "evidence": "SSR listing grid enumerated in full: 13 product cards (data-testid=\"product-card-title\"); JSON-LD ItemList numberOfItems=13 on the same page. jysk.dk renders no product-count header anywhere, so the grid itself is the count; SSR card count verified identical to the fully hydrated live DOM on /stue/sofaer (123 = 123) and the grid has no pagination or load-more control.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Camping & Folding Tables",
+   "qty": 2,
+   "link": "https://jysk.dk/have/havemobler/haveborde/campingborde-foldeborde",
+   "is_group": false,
+   "evidence": "SSR listing grid enumerated in full: 2 product cards (data-testid=\"product-card-title\"); JSON-LD ItemList numberOfItems=2 on the same page. jysk.dk renders no product-count header anywhere, so the grid itself is the count; SSR card count verified identical to the fully hydrated live DOM on /stue/sofaer (123 = 123) and the grid has no pagination or load-more control.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Garden Tables in Metal",
+   "qty": 6,
+   "link": "https://jysk.dk/have/havemobler/haveborde/haveborde-i-metal",
+   "is_group": false,
+   "evidence": "SSR listing grid enumerated in full: 6 product cards (data-testid=\"product-card-title\"); JSON-LD ItemList numberOfItems=6 on the same page. jysk.dk renders no product-count header anywhere, so the grid itself is the count; SSR card count verified identical to the fully hydrated live DOM on /stue/sofaer (123 = 123) and the grid has no pagination or load-more control.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Garden Tables in Non-Wood",
+   "qty": 13,
+   "link": "https://jysk.dk/have/havemobler/haveborde/haveborde-i-nonwood",
+   "is_group": false,
+   "evidence": "SSR listing grid enumerated in full: 13 product cards (data-testid=\"product-card-title\"); JSON-LD ItemList numberOfItems=13 on the same page. jysk.dk renders no product-count header anywhere, so the grid itself is the count; SSR card count verified identical to the fully hydrated live DOM on /stue/sofaer (123 = 123) and the grid has no pagination or load-more control.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Garden Tables in Wood",
+   "qty": 6,
+   "link": "https://jysk.dk/have/havemobler/haveborde/haveborde-i-trae",
+   "is_group": false,
+   "evidence": "SSR listing grid enumerated in full: 6 product cards (data-testid=\"product-card-title\"); JSON-LD ItemList numberOfItems=6 on the same page. jysk.dk renders no product-count header anywhere, so the grid itself is the count; SSR card count verified identical to the fully hydrated live DOM on /stue/sofaer (123 = 123) and the grid has no pagination or load-more control.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Garden Chairs",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Camping Chairs",
+   "qty": 5,
+   "link": "https://jysk.dk/have/havemobler/havestole/campingstole",
+   "is_group": false,
+   "evidence": "SSR listing grid enumerated in full: 5 product cards (data-testid=\"product-card-title\"); JSON-LD ItemList numberOfItems=5 on the same page. jysk.dk renders no product-count header anywhere, so the grid itself is the count; SSR card count verified identical to the fully hydrated live DOM on /stue/sofaer (123 = 123) and the grid has no pagination or load-more control.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Garden Chairs in Metal & Rattan",
+   "qty": 31,
+   "link": "https://jysk.dk/have/havemobler/havestole/havestole-i-metal-og-flet",
+   "is_group": false,
+   "evidence": "SSR listing grid enumerated in full: 31 product cards (data-testid=\"product-card-title\"); JSON-LD ItemList numberOfItems=31 on the same page. jysk.dk renders no product-count header anywhere, so the grid itself is the count; SSR card count verified identical to the fully hydrated live DOM on /stue/sofaer (123 = 123) and the grid has no pagination or load-more control.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Garden Chairs in Plastic",
+   "qty": 8,
+   "link": "https://jysk.dk/have/havemobler/havestole/havestole-i-plast",
+   "is_group": false,
+   "evidence": "SSR listing grid enumerated in full: 8 product cards (data-testid=\"product-card-title\"); JSON-LD ItemList numberOfItems=8 on the same page. jysk.dk renders no product-count header anywhere, so the grid itself is the count; SSR card count verified identical to the fully hydrated live DOM on /stue/sofaer (123 = 123) and the grid has no pagination or load-more control.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Garden Chairs in Wood",
+   "qty": 1,
+   "link": "https://jysk.dk/have/havemobler/havestole/havestole-i-trae",
+   "is_group": false,
+   "evidence": "SSR listing grid enumerated in full: 1 product cards (data-testid=\"product-card-title\"); JSON-LD ItemList numberOfItems=1 on the same page. jysk.dk renders no product-count header anywhere, so the grid itself is the count; SSR card count verified identical to the fully hydrated live DOM on /stue/sofaer (123 = 123) and the grid has no pagination or load-more control.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Lounge Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Hammocks & Hanging Chairs",
+   "qty": 4,
+   "link": "https://jysk.dk/have/havemobler/loungemobler/haengekojer-og-haengestole",
+   "is_group": false,
+   "evidence": "SSR listing grid enumerated in full: 4 product cards (data-testid=\"product-card-title\"); JSON-LD ItemList numberOfItems=4 on the same page. jysk.dk renders no product-count header anywhere, so the grid itself is the count; SSR card count verified identical to the fully hydrated live DOM on /stue/sofaer (123 = 123) and the grid has no pagination or load-more control.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Lounge Tables",
+   "qty": 3,
+   "link": "https://jysk.dk/have/havemobler/loungemobler/loungeborde",
+   "is_group": false,
+   "evidence": "SSR listing grid enumerated in full: 3 product cards (data-testid=\"product-card-title\"); JSON-LD ItemList numberOfItems=3 on the same page. jysk.dk renders no product-count header anywhere, so the grid itself is the count; SSR card count verified identical to the fully hydrated live DOM on /stue/sofaer (123 = 123) and the grid has no pagination or load-more control.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Lounge Sets",
+   "qty": 7,
+   "link": "https://jysk.dk/have/havemobler/loungemobler/loungesaet",
+   "is_group": false,
+   "evidence": "SSR listing grid enumerated in full: 7 product cards (data-testid=\"product-card-title\"); JSON-LD ItemList numberOfItems=7 on the same page. jysk.dk renders no product-count header anywhere, so the grid itself is the count; SSR card count verified identical to the fully hydrated live DOM on /stue/sofaer (123 = 123) and the grid has no pagination or load-more control.",
+   "flag": "MANUAL REVIEW: listing includes the 3 products of Cafe Sets; only 4 of the 7 tiles are canonical under /have/havemobler/loungemobler/loungesaet."
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Lounge Sofas",
+   "qty": 3,
+   "link": "https://jysk.dk/have/havemobler/loungemobler/loungesofaer",
+   "is_group": false,
+   "evidence": "SSR listing grid enumerated in full: 3 product cards (data-testid=\"product-card-title\"); JSON-LD ItemList numberOfItems=3 on the same page. jysk.dk renders no product-count header anywhere, so the grid itself is the count; SSR card count verified identical to the fully hydrated live DOM on /stue/sofaer (123 = 123) and the grid has no pagination or load-more control.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Lounge Chairs",
+   "qty": 10,
+   "link": "https://jysk.dk/have/havemobler/loungemobler/loungestole",
+   "is_group": false,
+   "evidence": "SSR listing grid enumerated in full: 10 product cards (data-testid=\"product-card-title\"); JSON-LD ItemList numberOfItems=10 on the same page. jysk.dk renders no product-count header anywhere, so the grid itself is the count; SSR card count verified identical to the fully hydrated live DOM on /stue/sofaer (123 = 123) and the grid has no pagination or load-more control.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sun Loungers",
+   "qty": 11,
+   "link": "https://jysk.dk/have/havemobler/solsenge",
+   "is_group": false,
+   "evidence": "SSR listing grid enumerated in full: 11 product cards (data-testid=\"product-card-title\"); JSON-LD ItemList numberOfItems=11 on the same page. jysk.dk renders no product-count header anywhere, so the grid itself is the count; SSR card count verified identical to the fully hydrated live DOM on /stue/sofaer (123 = 123) and the grid has no pagination or load-more control.",
+   "flag": "MANUAL REVIEW: listing includes 5 sun-lounger cushions (/have/havehynder/havehynder-til-solsenge); only 6 of the 11 tiles are sun loungers canonical under /have/havemobler/solsenge."
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Garden Benches",
+   "qty": null,
+   "link": "https://jysk.dk/have/havemobler/havebaenke",
+   "is_group": false,
+   "evidence": null,
+   "flag": "MANUAL REVIEW: live nav node (h1 'En havebaenk til den hyggelige krog') but the page serves the whole Garden Furniture rollup - all 115 JSON-LD items are canonical under other Havemoebler leaves (tables, chairs, lounge, sun loungers, cafe sets) and none is a bench. No own count obtainable, so qty left null rather than recording 115."
+  }
+ ]
+}

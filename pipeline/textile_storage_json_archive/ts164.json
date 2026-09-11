@@ -1,0 +1,1734 @@
+{
+ "sr": 164,
+ "company": "IKEA UAE",
+ "brand_site": "ikea.com",
+ "country": "UAE",
+ "site_url": "https://www.ikea.com/ae/en/",
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ACCESS: Tier (a) direct HTTP only (curl_cffi impersonate=chrome124), no block encountered on any of 138 requests (homepage + robots.txt + 137 leaf category pages, all HTTP 200); Playwright/CDP and Claude-in-Chrome were not needed. robots.txt (https://www.ikea.com/robots.txt; the ae/en path itself 404s and defers to the global file) has no anthropic-ai/ClaudeBot/Claude-Web/Claude-User/Claude-SearchBot entry and no blanket 'User-agent: * / Disallow: /' - only specific query-param/search/cart/checkout/fragment paths are disallowed, none of which were used. TREE: Built from the site's own 'catalogSlim' JSON array embedded inline in the homepage HTML (https://www.ikea.com/ae/en/) - this mirrors the exact IKEA.ae mega-menu, with nested 'subs' arrays down to leaf category pages. This is the same mechanism used for the sibling IKEA storefronts (SR92 UK, SR107 DE) in this project; the AE catalogSlim tree is structurally near-identical to both (same category IDs/slugs almost throughout, e.g. tl001 Textiles & rugs, tl002 Window treatments, st001 Storage & organisation, st007 Small storage & organisers), confirming this is the same global IKEA taxonomy localised for the AE storefront, not independently re-derived. Roots crawled: Textiles & rugs (tl001), Window treatments (tl002), Storage & organisation (st001), Small storage & organisers (st007), plus the storage-relevant subset of Bathroom products (ba001) and Laundry & cleaning (lc001) for bathroom/laundry storage items that only nest under those roots, and the storage-relevant subset of Baby & children (bc001) / Cookware & tableware (kt001) which turned out to be the identical node IDs already reached from st007 (Food storage & organising 15937, Children's storage & organisation 18706) - no new leaves found there, confirming no cross-root duplication was missed. QTY: extracted directly from each category page's rendered result-count element (<p class=\"catalog-product-list__total-count\">Showing N of TOTAL results</p>) via regex - this is the exact total IKEA.ae displays above the product grid (storage.md Sec.36 rule 2 pagination-total pattern), not paginated or estimated. Fetched via 10-way concurrent HTTP requests over the 137 curated leaf node IDs; every single one returned a valid count with HTTP 200, no manual-review fallbacks needed for quantity itself. Every leaf's rendered <h1> and <link rel=canonical> were captured and cross-checked against the requested node - all 137 matched exactly, confirming no leaf silently served a parent/sibling/site-wide total. EFFICIENCY ROLLUPS (matching UK/DE precedent for this very deep IKEA catalog): all 16 named modular storage systems (PAX, BESTA, PLATSA, EKET, SMASTAD, IVAR, BROR, BOAXEL, JONAXEL, JOSTEIN, TROFAST, ELVARLI, OLAUS, LODMAKARE, LASTARE, GULDDRAGARE) recorded at the system level (one row per system) rather than exploding into every combination/frame/door/part sub-page, since all sub-pages describe the same underlying storage-furniture product differing only by module/finish; Wardrobes (19053) similarly kept as one leaf rather than its 11 door/installation-style sub-pages and 3 accessory pages (shelving/lighting/sliding-doors). EXCLUDED (checked, not included): Curtain rods & rails and all curtain hardware (18891/18892/18893/18894/700426 - hardware, not fabric), Sewing accessories (14350, notions/tools not a fabric product), Window films & accessories (700628, adhesive film not textile), Venetian blinds (700599, slat blinds - not fabric/textile), Anti-slip & underlays (10699, rubber/PVC grip accessory not a rug/textile itself), Clothing & accessories (42925, apparel), Brackets (20659, mounting hardware), SKYTTA sliding door system (55984, a wardrobe/room-divider door-hardware system, not itself a storage container - matches SR107 DE's exclusion), BOAXEL system's appearance nested a second time under Wall shelves (47394/47395/47396 - recorded once only, at the Storage solution systems level), Bedside tables (20656) and Dressing tables (20657, surface furniture, not storage - matches SR92 UK exclusion), Sideboards, buffets & console tables (30454, a cross-cutting collection hub duplicating the narrower Sideboards & buffets 10412 plus non-storage Console tables 16246 - matches SR92 UK's exclusion of the equivalent node), TV & media furniture's parent grouping kept but Kitchen islands & trolleys (10471, kitchen serving furniture) excluded from the Trolleys node while Bathroom trolleys (20858) kept, Room dividers (46080) and Hallway furniture sets (700411, mixed furniture sets - both match SR92 UK exclusions), Noticeboards (10574) and Hangers (20618, not a storage container - match SR92 UK exclusions), Recycling bins / waste-paper & pedal bins / bin bags (34470/16215/16214/16213, waste disposal not organisational storage of belongings - matches SR92/SR107 exclusion), personal-carry Bags (Shopping/tote 16295, Backpacks 27821, Travel accessories 16255, Cool bags 46082 - fashion/travel carrying items excluded per storage.md Sec.6, only Bag organisers 47441 kept), Moving supplies (46078, packing materials not home storage), most of Bathroom accessories (Bathroom bins 48940, Soap dispensers & dishes 10656, Toilet brushes 48944, Toothbrush holders 48943 - hygiene fixtures not storage; Shower & bathtub accessories 10658 and Non-drill bathroom accessories 700699 were kept since these are genuine shower/bath caddies, matching SR107 DE's inclusion of the equivalent nodes), Bathroom stools & benches (20859, seating furniture), Drying racks (20602), Washing machines & tumble dryers (20826) and Ironing boards (20608, appliances/tools not storage - explicit storage.md Sec.11 exclusion), Dishwashing accessories (15938, cleaning tools), Cleaning accessories (20609, cleaning tools), Water bottle & travel mugs (700352, drinkware/travel not home storage), essentially all of Bathroom products (ba001) outside the storage-baskets/cabinets/shelving/laundry-storage/shower-caddy subset - mirrors, taps, sinks, showers, vanity units with/without basin, countertops, bathroom systems (HAVBACK/ANGSJON/TONNFORSEN/HEMNES/ENHET/NYSJON/VIDVESSEL), bathroom lighting - all fixtures or non-storage furniture per storage.md Sec.14/28. Duplicate cross-linked nodes (same category ID reachable from more than one menu path - e.g. Children's bed linen/cushions & blankets/wardrobes/chests of drawers appearing under both a top-level group and the Children's textiles/Children's storage & organisation hubs; Wall shelves reachable from both Bookcases & shelving units and Hooks & wall organisation; Laundry baskets/Laundry storage/Laundry accessories reachable from both Bathroom laundry ba003 and Laundry & cleaning lc001; Food storage & organising 15937 reachable from both st007 and Cookware & tableware kt001; Table linen 20538 reachable from both Textiles & rugs and Cookware & tableware) were each recorded exactly once under their single most specific/primary parent, never duplicated - zero duplicate links confirmed programmatically across both arrays. LOW-CONFIDENCE flags (4 total, review-queued per rule): Bathrobes, slippers & spa accessories (700339, mixed category also containing non-textile spa items); Lumbar support (700528, may be a wellness/health product rather than a home-textile cushion - same flag SR107 DE raised); Display shelves & picture ledges (16305, combined node, picture-ledge portion may be Wall Decor rather than Storage); Bathroom shelves & towel rails (20615, combined node, towel-rail portion is hardware not a storage container); Cable management & accessories (16195, borderline storage/organisation utility - same flag SR107 DE raised).",
+ "textile_rows": [
+  {
+   "category": "Textile",
+   "sub_category": "Textiles & rugs",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Bedding",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Bed linen",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Quilt cover sets",
+   "qty": 79,
+   "link": "https://www.ikea.com/ae/en/cat/quilt-cover-sets-10680/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 79 results); h1 confirmed 'Quilt cover sets' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Sheets",
+   "qty": 53,
+   "link": "https://www.ikea.com/ae/en/cat/sheets-10681/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 53 results); h1 confirmed 'Sheets' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Children's bed linen",
+   "qty": 45,
+   "link": "https://www.ikea.com/ae/en/cat/childrens-bed-linen-18776/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 45 results); h1 confirmed 'Children's bed linen' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Pillowcases",
+   "qty": 20,
+   "link": "https://www.ikea.com/ae/en/cat/pillowcases-18890/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 20 results); h1 confirmed 'Pillowcases' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Baby bed linen",
+   "qty": 28,
+   "link": "https://www.ikea.com/ae/en/cat/baby-bed-linen-18692/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 28 results); h1 confirmed 'Baby bed linen' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Cushions & cushion covers",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Cushion covers",
+   "qty": 69,
+   "link": "https://www.ikea.com/ae/en/cat/cushion-covers-18903/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 69 results); h1 confirmed 'Cushion covers' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Cushions",
+   "qty": 11,
+   "link": "https://www.ikea.com/ae/en/cat/cushions-18902/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 11 results); h1 confirmed 'Cushions' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Outdoor pillows",
+   "qty": 7,
+   "link": "https://www.ikea.com/ae/en/cat/outdoor-pillows-46401/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 7 results); h1 confirmed 'Outdoor pillows' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Inner cushions",
+   "qty": 3,
+   "link": "https://www.ikea.com/ae/en/cat/inner-cushions-18904/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 3 results); h1 confirmed 'Inner cushions' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Children's cushions & blankets",
+   "qty": 15,
+   "link": "https://www.ikea.com/ae/en/cat/childrens-cushions-blankets-18777/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 15 results); h1 confirmed 'Children's cushions &amp; blankets' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Duvets",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Polyester duvets",
+   "qty": 11,
+   "link": "https://www.ikea.com/ae/en/cat/polyester-duvets-20530/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 11 results); h1 confirmed 'Polyester duvets' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Natural materials duvets",
+   "qty": 6,
+   "link": "https://www.ikea.com/ae/en/cat/down-feather-duvets-20531/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 6 results); h1 confirmed 'Natural materials duvets' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Baby duvets & pillows",
+   "qty": 3,
+   "link": "https://www.ikea.com/ae/en/cat/baby-duvets-pillows-18694/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 3 results); h1 confirmed 'Baby duvets &amp; pillows' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Blankets & throws",
+   "qty": 23,
+   "link": "https://www.ikea.com/ae/en/cat/blankets-throws-20528/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 23 results); h1 confirmed 'Blankets &amp; throws' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Bedspreads & bed throws",
+   "qty": 24,
+   "link": "https://www.ikea.com/ae/en/cat/bedspreads-20527/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 24 results); h1 confirmed 'Bedspreads &amp; bed throws' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Mattress protectors",
+   "qty": 8,
+   "link": "https://www.ikea.com/ae/en/cat/mattress-pillow-protectors-24824/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 8 results); h1 confirmed 'Mattress protectors' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Pillows",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Polyester pillows",
+   "qty": 13,
+   "link": "https://www.ikea.com/ae/en/cat/polyester-pillows-20534/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 13 results); h1 confirmed 'Polyester pillows' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Down & feather pillows",
+   "qty": 5,
+   "link": "https://www.ikea.com/ae/en/cat/down-feather-pillows-20535/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 5 results); h1 confirmed 'Down &amp; feather pillows' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Ergonomic pillows",
+   "qty": 9,
+   "link": "https://www.ikea.com/ae/en/cat/ergonomic-pillows-46083/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 9 results); h1 confirmed 'Ergonomic pillows' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Memory foam & foam pillows",
+   "qty": 7,
+   "link": "https://www.ikea.com/ae/en/cat/memory-foam-foam-pillows-20536/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 7 results); h1 confirmed 'Memory foam &amp; foam pillows' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Pillow protectors",
+   "qty": 4,
+   "link": "https://www.ikea.com/ae/en/cat/pillow-protectors-700529/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 4 results); h1 confirmed 'Pillow protectors' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Bed & headboard covers",
+   "qty": 5,
+   "link": "https://www.ikea.com/ae/en/cat/bed-headboard-covers-57280/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 5 results); h1 confirmed 'Bed &amp; headboard covers' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Comforters",
+   "qty": 9,
+   "link": "https://www.ikea.com/ae/en/cat/comforters-700553/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 9 results); h1 confirmed 'Comforters' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Children's textiles",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Children's rugs & curtains",
+   "qty": 17,
+   "link": "https://www.ikea.com/ae/en/cat/childrens-rugs-18774/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 17 results); h1 confirmed 'Children's rugs &amp; curtains' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Children's bed accessories & canopies",
+   "qty": 12,
+   "link": "https://www.ikea.com/ae/en/cat/childrens-bed-accessories-canopies-18775/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 12 results); h1 confirmed 'Children's bed accessories &amp; canopies' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Outdoor cushions",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Outdoor seat cushions",
+   "qty": 41,
+   "link": "https://www.ikea.com/ae/en/cat/outdoor-seat-cushions-46400/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 41 results); h1 confirmed 'Outdoor seat cushions' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Table linen",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Table cloths & runners",
+   "qty": 12,
+   "link": "https://www.ikea.com/ae/en/cat/table-cloths-runners-20541/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 12 results); h1 confirmed 'Table cloths &amp; runners' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Place mats & coasters",
+   "qty": 22,
+   "link": "https://www.ikea.com/ae/en/cat/place-mats-coasters-20539/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 22 results); h1 confirmed 'Place mats &amp; coasters' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Napkins",
+   "qty": 14,
+   "link": "https://www.ikea.com/ae/en/cat/napkins-20561/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 14 results); h1 confirmed 'Napkins' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Bath textiles",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Towels",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Bath towels",
+   "qty": 7,
+   "link": "https://www.ikea.com/ae/en/cat/bath-towels-20523/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 7 results); h1 confirmed 'Bath towels' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Hand towels",
+   "qty": 7,
+   "link": "https://www.ikea.com/ae/en/cat/hand-towels-20525/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 7 results); h1 confirmed 'Hand towels' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Bath sheets & beach towels",
+   "qty": 8,
+   "link": "https://www.ikea.com/ae/en/cat/bath-sheets-beach-towels-20524/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 8 results); h1 confirmed 'Bath sheets &amp; beach towels' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Face cloths",
+   "qty": 6,
+   "link": "https://www.ikea.com/ae/en/cat/face-cloths-20521/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 6 results); h1 confirmed 'Face cloths' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Baby & children's towels & washcloths",
+   "qty": 9,
+   "link": "https://www.ikea.com/ae/en/cat/baby-towels-washcloths-18700/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 9 results); h1 confirmed 'Baby &amp; children's towels &amp; washcloths' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Bath mats",
+   "qty": 21,
+   "link": "https://www.ikea.com/ae/en/cat/bath-mats-20519/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 21 results); h1 confirmed 'Bath mats' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Shower curtains",
+   "qty": 16,
+   "link": "https://www.ikea.com/ae/en/cat/shower-curtains-18908/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 16 results); h1 confirmed 'Shower curtains' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Bathrobes, slippers & spa accessories",
+   "qty": 15,
+   "link": "https://www.ikea.com/ae/en/cat/spa-accessories-700339/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 15 results); h1 confirmed 'Bathrobes, slippers &amp; spa accessories' matches requested node",
+   "flag": "MANUAL REVIEW: mixed category, includes non-textile slippers/spa accessories alongside bathrobes",
+   "confidence": "LOW"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Fabrics & sewing",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Fabrics",
+   "qty": 2,
+   "link": "https://www.ikea.com/ae/en/cat/fabrics-14349/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 2 results); h1 confirmed 'Fabrics' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Kitchen textiles",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Tea towels",
+   "qty": 12,
+   "link": "https://www.ikea.com/ae/en/cat/tea-towels-18851/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 12 results); h1 confirmed 'Tea towels' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Aprons",
+   "qty": 4,
+   "link": "https://www.ikea.com/ae/en/cat/aprons-18852/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 4 results); h1 confirmed 'Aprons' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Pot holders & oven gloves",
+   "qty": 8,
+   "link": "https://www.ikea.com/ae/en/cat/pot-holders-oven-gloves-20537/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 8 results); h1 confirmed 'Pot holders &amp; oven gloves' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Baby textiles",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Nursery rugs & curtains",
+   "qty": 3,
+   "link": "https://www.ikea.com/ae/en/cat/nursery-rugs-18699/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 3 results); h1 confirmed 'Nursery rugs &amp; curtains' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Baby blankets & quilts",
+   "qty": 7,
+   "link": "https://www.ikea.com/ae/en/cat/baby-blankets-quilts-18695/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 7 results); h1 confirmed 'Baby blankets &amp; quilts' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Chair pads",
+   "qty": 22,
+   "link": "https://www.ikea.com/ae/en/cat/chair-pads-20542/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 22 results); h1 confirmed 'Chair pads' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Rugs",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Large & medium rugs",
+   "qty": 57,
+   "link": "https://www.ikea.com/ae/en/cat/large-medium-rugs-10692/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 57 results); h1 confirmed 'Large &amp; medium rugs' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Runners & small rugs",
+   "qty": 31,
+   "link": "https://www.ikea.com/ae/en/cat/runners-small-rugs-10689/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 31 results); h1 confirmed 'Runners &amp; small rugs' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Handmade rugs",
+   "qty": 18,
+   "link": "https://www.ikea.com/ae/en/cat/handmade-rugs-39267/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 18 results); h1 confirmed 'Handmade rugs' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Outdoor rugs",
+   "qty": 9,
+   "link": "https://www.ikea.com/ae/en/cat/outdoor-rugs-34204/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 9 results); h1 confirmed 'Outdoor rugs' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Door mats",
+   "qty": 21,
+   "link": "https://www.ikea.com/ae/en/cat/door-mats-10698/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 21 results); h1 confirmed 'Door mats' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Sheepskins & cowhides",
+   "qty": 3,
+   "link": "https://www.ikea.com/ae/en/cat/sheepskins-cowhides-20544/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 3 results); h1 confirmed 'Sheepskins &amp; cowhides' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Round rugs",
+   "qty": 2,
+   "link": "https://www.ikea.com/ae/en/cat/round-rugs-20543/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 2 results); h1 confirmed 'Round rugs' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Lumbar support",
+   "qty": 2,
+   "link": "https://www.ikea.com/ae/en/cat/lumbar-support-700528/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 2 results); h1 confirmed 'Lumbar support' matches requested node",
+   "flag": "MANUAL REVIEW: support/wellness cushion, may be closer to a health product than a home textile",
+   "confidence": "LOW"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Window treatments",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Curtains",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Block-out curtains",
+   "qty": 6,
+   "link": "https://www.ikea.com/ae/en/cat/block-out-curtains-700218/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 6 results); h1 confirmed 'Block-out curtains' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Room darkening curtains",
+   "qty": 10,
+   "link": "https://www.ikea.com/ae/en/cat/room-darkening-curtains-700219/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 10 results); h1 confirmed 'Room darkening curtains' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Light filtering curtains",
+   "qty": 27,
+   "link": "https://www.ikea.com/ae/en/cat/light-filtering-curtains-700220/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 27 results); h1 confirmed 'Light filtering curtains' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Sheer, voile & net curtains",
+   "qty": 14,
+   "link": "https://www.ikea.com/ae/en/cat/net-volie-curtains-700221/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 14 results); h1 confirmed 'Sheer, voile &amp; net curtains' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Blinds",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Block-out blinds",
+   "qty": 27,
+   "link": "https://www.ikea.com/ae/en/cat/block-out-blinds-700222/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 27 results); h1 confirmed 'Block-out blinds' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Roller blinds",
+   "qty": 34,
+   "link": "https://www.ikea.com/ae/en/cat/roller-blind-700223/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 34 results); h1 confirmed 'Roller blinds' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Roman blinds",
+   "qty": 5,
+   "link": "https://www.ikea.com/ae/en/cat/roman-blinds-700224/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 5 results); h1 confirmed 'Roman blinds' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Pleated & cellular blinds",
+   "qty": 15,
+   "link": "https://www.ikea.com/ae/en/cat/pleated-cellular-blinds-700225/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 15 results); h1 confirmed 'Pleated &amp; cellular blinds' matches requested node",
+   "flag": null,
+   "confidence": "MEDIUM"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "No-drill blinds",
+   "qty": 6,
+   "link": "https://www.ikea.com/ae/en/cat/no-drill-blinds-700869/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 6 results); h1 confirmed 'No-drill blinds' matches requested node",
+   "flag": null,
+   "confidence": "MEDIUM"
+  }
+ ],
+ "storage_rows": [
+  {
+   "category": "Storage",
+   "sub_category": "Storage & organisation",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Bookcases & shelving units",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Cube storage",
+   "qty": 73,
+   "link": "https://www.ikea.com/ae/en/cat/cube-storage-55012/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 73 results); h1 confirmed 'Cube storage' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Shelving units",
+   "qty": 132,
+   "link": "https://www.ikea.com/ae/en/cat/shelving-units-11465/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 132 results); h1 confirmed 'Shelving units' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Bookcases",
+   "qty": 138,
+   "link": "https://www.ikea.com/ae/en/cat/bookcases-10382/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 138 results); h1 confirmed 'Bookcases' matches requested node",
+   "flag": null,
+   "confidence": "MEDIUM"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Storage shelves & units",
+   "qty": 56,
+   "link": "https://www.ikea.com/ae/en/cat/storage-shelves-units-10397/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 56 results); h1 confirmed 'Storage shelves &amp; units' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Wall shelves",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Cube wall shelves",
+   "qty": 22,
+   "link": "https://www.ikea.com/ae/en/cat/cube-wall-shelves-55015/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 22 results); h1 confirmed 'Cube wall shelves' matches requested node",
+   "flag": null,
+   "confidence": "MEDIUM"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Floating shelves",
+   "qty": 4,
+   "link": "https://www.ikea.com/ae/en/cat/floating-shelves-55014/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 4 results); h1 confirmed 'Floating shelves' matches requested node",
+   "flag": null,
+   "confidence": "MEDIUM"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Complete wall shelves",
+   "qty": 50,
+   "link": "https://www.ikea.com/ae/en/cat/complete-wall-shelves-20660/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 50 results); h1 confirmed 'Complete wall shelves' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Display shelves & picture ledges",
+   "qty": 15,
+   "link": "https://www.ikea.com/ae/en/cat/display-shelves-picture-ledges-16305/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 15 results); h1 confirmed 'Display shelves &amp; picture ledges' matches requested node",
+   "flag": "MANUAL REVIEW: combined 'display shelves & picture ledges' node, picture-ledge portion may be closer to Wall Decor than Storage",
+   "confidence": "LOW"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Shelves",
+   "qty": 6,
+   "link": "https://www.ikea.com/ae/en/cat/shelves-20658/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 6 results); h1 confirmed 'Shelves' matches requested node",
+   "flag": null,
+   "confidence": "MEDIUM"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Pantry",
+   "qty": 23,
+   "link": "https://www.ikea.com/ae/en/cat/pantry-16200/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 23 results); h1 confirmed 'Pantry' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Storage solution systems",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "PAX system",
+   "qty": 462,
+   "link": "https://www.ikea.com/ae/en/cat/pax-system-19086/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 462 results); h1 confirmed 'PAX system' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "BESTA storage system",
+   "qty": 185,
+   "link": "https://www.ikea.com/ae/en/cat/besta-storage-system-46053/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 185 results); h1 confirmed 'BESTA storage system' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "PLATSA system",
+   "qty": 166,
+   "link": "https://www.ikea.com/ae/en/cat/platsa-system-37894/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 166 results); h1 confirmed 'PLATSA system' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "EKET storage system",
+   "qty": 70,
+   "link": "https://www.ikea.com/ae/en/cat/eket-storage-system-59283/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 70 results); h1 confirmed 'EKET storage system' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "SMASTAD system",
+   "qty": 57,
+   "link": "https://www.ikea.com/ae/en/cat/smastad-system-49140/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 57 results); h1 confirmed 'SMASTAD system' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "IVAR system",
+   "qty": 52,
+   "link": "https://www.ikea.com/ae/en/cat/ivar-system-11703/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 52 results); h1 confirmed 'IVAR system' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "BROR system",
+   "qty": 34,
+   "link": "https://www.ikea.com/ae/en/cat/bror-system-42245/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 34 results); h1 confirmed 'BROR system' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "BOAXEL system",
+   "qty": 31,
+   "link": "https://www.ikea.com/ae/en/cat/boaxel-system-47394/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 31 results); h1 confirmed 'BOAXEL system' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "JONAXEL system",
+   "qty": 32,
+   "link": "https://www.ikea.com/ae/en/cat/jonaxel-system-45730/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 32 results); h1 confirmed 'JONAXEL system' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "JOSTEIN system",
+   "qty": 47,
+   "link": "https://www.ikea.com/ae/en/cat/jostein-system-700331/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 47 results); h1 confirmed 'JOSTEIN system' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "TROFAST system",
+   "qty": 101,
+   "link": "https://www.ikea.com/ae/en/cat/trofast-system-700556/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 101 results); h1 confirmed 'TROFAST system' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "ELVARLI system",
+   "qty": 14,
+   "link": "https://www.ikea.com/ae/en/cat/elvarli-system-35766/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 14 results); h1 confirmed 'ELVARLI system' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "OLAUS system",
+   "qty": 8,
+   "link": "https://www.ikea.com/ae/en/cat/olaus-system-14317/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 8 results); h1 confirmed 'OLAUS system' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "LODMAKARE system",
+   "qty": 15,
+   "link": "https://www.ikea.com/ae/en/cat/ladmakare-system-700715/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 15 results); h1 confirmed 'LADMAKARE system' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "LASTARE storage system",
+   "qty": 181,
+   "link": "https://www.ikea.com/ae/en/cat/lastare-storage-system-700780/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 181 results); h1 confirmed 'LASTARE storage system' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "GULDDRAGARE storage system",
+   "qty": 9,
+   "link": "https://www.ikea.com/ae/en/cat/gulddragare-storage-system-700823/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 9 results); h1 confirmed 'GULDDRAGARE storage system' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Cabinets & cupboards",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Cabinets",
+   "qty": 117,
+   "link": "https://www.ikea.com/ae/en/cat/cabinets-10409/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 117 results); h1 confirmed 'Cabinets' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Sideboards & buffets",
+   "qty": 47,
+   "link": "https://www.ikea.com/ae/en/cat/sideboards-buffets-10412/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 47 results); h1 confirmed 'Sideboards &amp; buffets' matches requested node",
+   "flag": null,
+   "confidence": "MEDIUM"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Display cabinets",
+   "qty": 86,
+   "link": "https://www.ikea.com/ae/en/cat/display-cabinets-10410/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 86 results); h1 confirmed 'Display cabinets' matches requested node",
+   "flag": null,
+   "confidence": "MEDIUM"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "TV & media furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "TV & media storage",
+   "qty": 63,
+   "link": "https://www.ikea.com/ae/en/cat/tv-media-storage-14885/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 63 results); h1 confirmed 'TV &amp; media storage' matches requested node",
+   "flag": null,
+   "confidence": "MEDIUM"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "TV benches",
+   "qty": 38,
+   "link": "https://www.ikea.com/ae/en/cat/tv-benches-10810/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 38 results); h1 confirmed 'TV benches' matches requested node",
+   "flag": null,
+   "confidence": "MEDIUM"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Chests of drawers & drawer units",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Chests of drawers",
+   "qty": 118,
+   "link": "https://www.ikea.com/ae/en/cat/chests-of-drawers-10451/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 118 results); h1 confirmed 'Chests of drawers' matches requested node",
+   "flag": null,
+   "confidence": "MEDIUM"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Children's chests of drawers",
+   "qty": 8,
+   "link": "https://www.ikea.com/ae/en/cat/childrens-chests-of-drawers-18708/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 8 results); h1 confirmed 'Children's chests of drawers' matches requested node",
+   "flag": null,
+   "confidence": "MEDIUM"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Basket drawer units",
+   "qty": 10,
+   "link": "https://www.ikea.com/ae/en/cat/basket-drawer-units-46081/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 10 results); h1 confirmed 'Basket drawer units' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Wardrobes",
+   "qty": 508,
+   "link": "https://www.ikea.com/ae/en/cat/wardrobes-19053/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 508 results); h1 confirmed 'Wardrobes' matches requested node",
+   "flag": "Rolled up: AE site lists 11 wardrobe door/installation-style sub-pages plus 3 wardrobe accessory pages (shelving/lighting/sliding doors) under this node; recorded once at the 'Wardrobes' level since all are the same product type, per efficiency guidance for very deep trees",
+   "confidence": "MEDIUM"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Outdoor storage",
+   "qty": 48,
+   "link": "https://www.ikea.com/ae/en/cat/outdoor-storage-21958/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 48 results); h1 confirmed 'Outdoor storage' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Bathroom trolleys",
+   "qty": 6,
+   "link": "https://www.ikea.com/ae/en/cat/bathroom-trolleys-20858/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 6 results); h1 confirmed 'Bathroom trolleys' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Filing cabinets & storage drawers",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Storage units & cabinets for office",
+   "qty": 26,
+   "link": "https://www.ikea.com/ae/en/cat/storage-units-cabinets-for-office-47084/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 26 results); h1 confirmed 'Storage units &amp; cabinets for office' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Home storage & drawer units",
+   "qty": 30,
+   "link": "https://www.ikea.com/ae/en/cat/drawer-units-for-home-47081/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 30 results); h1 confirmed 'Home storage &amp; drawer units' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Shoe cabinets",
+   "qty": 26,
+   "link": "https://www.ikea.com/ae/en/cat/shoe-cabinets-10456/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 26 results); h1 confirmed 'Shoe cabinets' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Children's storage & organisation",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Toy boxes & shelves",
+   "qty": 7,
+   "link": "https://www.ikea.com/ae/en/cat/toy-boxes-shelves-700560/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 7 results); h1 confirmed 'Toy boxes &amp; shelves' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Children's boxes & baskets",
+   "qty": 44,
+   "link": "https://www.ikea.com/ae/en/cat/childrens-boxes-baskets-20479/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 44 results); h1 confirmed 'Children's boxes &amp; baskets' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Children's hooks & wall organisation",
+   "qty": 12,
+   "link": "https://www.ikea.com/ae/en/cat/childrens-hooks-wall-organisation-20481/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 12 results); h1 confirmed 'Children's hooks &amp; wall organisation' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Children's clothes & shoes organisation",
+   "qty": 7,
+   "link": "https://www.ikea.com/ae/en/cat/childrens-clothes-shoes-organisation-20477/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 7 results); h1 confirmed 'Children's clothes &amp; shoes organisation' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Storage boxes & baskets",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Paper & media boxes",
+   "qty": 82,
+   "link": "https://www.ikea.com/ae/en/cat/paper-media-boxes-16202/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 82 results); h1 confirmed 'Paper &amp; media boxes' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Clothes boxes",
+   "qty": 51,
+   "link": "https://www.ikea.com/ae/en/cat/clothes-boxes-10565/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 51 results); h1 confirmed 'Clothes boxes' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Baskets",
+   "qty": 37,
+   "link": "https://www.ikea.com/ae/en/cat/baskets-16201/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 37 results); h1 confirmed 'Baskets' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Secondary storage boxes",
+   "qty": 53,
+   "link": "https://www.ikea.com/ae/en/cat/secondary-storage-boxes-10797/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 53 results); h1 confirmed 'Secondary storage boxes' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Bathroom storage baskets & make-up organisers",
+   "qty": 33,
+   "link": "https://www.ikea.com/ae/en/cat/bathroom-boxes-baskets-16233/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 33 results); h1 confirmed 'Bathroom storage baskets &amp; make-up organisers' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Paper & media organisers",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Magazine files",
+   "qty": 12,
+   "link": "https://www.ikea.com/ae/en/cat/magazine-files-10567/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 12 results); h1 confirmed 'Magazine files' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Clothes storage & organisers",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Hanging clothes organisers",
+   "qty": 13,
+   "link": "https://www.ikea.com/ae/en/cat/hanging-clothes-organisers-10459/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 13 results); h1 confirmed 'Hanging clothes organisers' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Shoe boxes & organisers",
+   "qty": 7,
+   "link": "https://www.ikea.com/ae/en/cat/shoe-boxes-organisers-47380/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 7 results); h1 confirmed 'Shoe boxes &amp; organisers' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Laundry baskets",
+   "qty": 20,
+   "link": "https://www.ikea.com/ae/en/cat/laundry-baskets-20601/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 20 results); h1 confirmed 'Laundry baskets' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Clothes racks & rails",
+   "qty": 29,
+   "link": "https://www.ikea.com/ae/en/cat/clothes-racks-rails-10455/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 29 results); h1 confirmed 'Clothes racks &amp; rails' matches requested node",
+   "flag": null,
+   "confidence": "MEDIUM"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Shoe racks & stands",
+   "qty": 56,
+   "link": "https://www.ikea.com/ae/en/cat/shoe-racks-stands-10454/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 56 results); h1 confirmed 'Shoe racks &amp; stands' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Cable management & accessories",
+   "qty": 17,
+   "link": "https://www.ikea.com/ae/en/cat/cable-management-accessories-16195/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 17 results); h1 confirmed 'Cable management &amp; accessories' matches requested node",
+   "flag": "MANUAL REVIEW: cable-management workspace accessory, borderline storage/organization utility",
+   "confidence": "LOW"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Desk accessories",
+   "qty": 48,
+   "link": "https://www.ikea.com/ae/en/cat/desk-accessories-10573/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 48 results); h1 confirmed 'Desk accessories' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Hooks & wall organisation",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Hooks",
+   "qty": 47,
+   "link": "https://www.ikea.com/ae/en/cat/hooks-20617/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 47 results); h1 confirmed 'Hooks' matches requested node",
+   "flag": null,
+   "confidence": "MEDIUM"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Wall Storage",
+   "qty": 43,
+   "link": "https://www.ikea.com/ae/en/cat/wall-storage-37900/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 43 results); h1 confirmed 'Wall Storage' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Bags",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Bag organisers",
+   "qty": 5,
+   "link": "https://www.ikea.com/ae/en/cat/bag-organisers-47441/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 5 results); h1 confirmed 'Bag organisers' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Food storage & organising",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Food containers & lids",
+   "qty": 38,
+   "link": "https://www.ikea.com/ae/en/cat/food-containers-20606/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 38 results); h1 confirmed 'Food containers &amp; lids' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Food container sets",
+   "qty": 23,
+   "link": "https://www.ikea.com/ae/en/cat/food-container-sets-700586/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 23 results); h1 confirmed 'Food container sets' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Fridge organisers",
+   "qty": 10,
+   "link": "https://www.ikea.com/ae/en/cat/fridge-organisers-700588/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 10 results); h1 confirmed 'Fridge organisers' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Pantry & worktop organisers",
+   "qty": 56,
+   "link": "https://www.ikea.com/ae/en/cat/pantry-worktop-organisers-700589/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 56 results); h1 confirmed 'Pantry &amp; worktop organisers' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Jars &  tins",
+   "qty": 35,
+   "link": "https://www.ikea.com/ae/en/cat/jars-tins-15950/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 35 results); h1 confirmed 'Jars &amp;  tins' matches requested node",
+   "flag": null,
+   "confidence": "MEDIUM"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Spice & condiment stands",
+   "qty": 30,
+   "link": "https://www.ikea.com/ae/en/cat/spice-condiment-stands-15951/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 30 results); h1 confirmed 'Spice &amp; condiment stands' matches requested node",
+   "flag": null,
+   "confidence": "MEDIUM"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Bottles racks",
+   "qty": 6,
+   "link": "https://www.ikea.com/ae/en/cat/bottles-racks-15952/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 6 results); h1 confirmed 'Bottles racks' matches requested node",
+   "flag": null,
+   "confidence": "MEDIUM"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Mix & match food containers & lids",
+   "qty": 16,
+   "link": "https://www.ikea.com/ae/en/cat/mix-match-food-containers-lids-700610/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 16 results); h1 confirmed 'Mix &amp; match food containers &amp; lids' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Food storage accessories & resealable bags",
+   "qty": 26,
+   "link": "https://www.ikea.com/ae/en/cat/food-storage-accessories-resealable-bags-700611/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 26 results); h1 confirmed 'Food storage accessories &amp; resealable bags' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Bathroom storage",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Bathroom tall cabinets & shelving units",
+   "qty": 59,
+   "link": "https://www.ikea.com/ae/en/cat/bathroom-shelving-units-20804/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 59 results); h1 confirmed 'Bathroom tall cabinets &amp; shelving units' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Bathroom wall cabinets",
+   "qty": 14,
+   "link": "https://www.ikea.com/ae/en/cat/bathroom-wall-cabinets-20808/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 14 results); h1 confirmed 'Bathroom wall cabinets' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Bathroom shelves & towel rails",
+   "qty": 43,
+   "link": "https://www.ikea.com/ae/en/cat/bathroom-shelves-20615/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 43 results); h1 confirmed 'Bathroom shelves &amp; towel rails' matches requested node",
+   "flag": "MANUAL REVIEW: combined 'shelves & towel rails' node; towel-rail portion is hardware, not a storage container",
+   "confidence": "LOW"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Shower & bathtub accessories",
+   "qty": 28,
+   "link": "https://www.ikea.com/ae/en/cat/shower-caddies-10658/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 28 results); h1 confirmed 'Shower &amp; bathtub accessories' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Non-drill bathroom accessories",
+   "qty": 22,
+   "link": "https://www.ikea.com/ae/en/cat/non-drill-bathroom-accessories-700699/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 22 results); h1 confirmed 'Non-drill bathroom accessories' matches requested node",
+   "flag": null,
+   "confidence": "MEDIUM"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Bathroom laundry",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Laundry accessories",
+   "qty": 7,
+   "link": "https://www.ikea.com/ae/en/cat/laundry-accessories-55004/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 7 results); h1 confirmed 'Laundry accessories' matches requested node",
+   "flag": null,
+   "confidence": "MEDIUM"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Laundry storage",
+   "qty": 24,
+   "link": "https://www.ikea.com/ae/en/cat/laundry-cabinets-shelving-48925/",
+   "is_group": false,
+   "evidence": "rendered category page element class='catalog-product-list__total-count' (Showing N of 24 results); h1 confirmed 'Laundry storage' matches requested node",
+   "flag": null,
+   "confidence": "HIGH"
+  }
+ ]
+}

@@ -1,0 +1,29 @@
+{
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "Access: direct HTTP GET (curl_cffi, impersonate=chrome124) succeeded on homepage, robots.txt, sitemap-index.xml, both sitemap-categories XML files, and all candidate category pages (all HTTP 200). No Playwright/Chrome needed. robots.txt checked first: generic 'User-Agent: *' block only (Disallow: /cart, /checkout, /account, /search, /login, sort/filter query params); no ClaudeBot/Claude-Web/anthropic-ai/Claude-User/Claude-SearchBot group present at all, so no Claude-specific opt-out -> proceeded. Tree source: homepage mega-nav (Next.js RSC payload, embedded JSON) unioned with both sitemap-categories-{1,2}.xml files (589+636 URLs), filtered for bath/vanity/toilet/shower/towel/basin/faucet/tap/sink/mirror/medicine/robe/hook/curtain/hardware/accessor/soap/tumbler/rail/hamper keywords. Shades of Light is a lighting+mirrors+furniture retailer; confirmed via full sitemap scan there is NO dedicated bath-accessories/hardware line at all: zero categories for towel bars/rings/hooks, toilet paper holders, soap dishes, shower curtains, bath mats, faucets/taps, tubs, showers, or bathroom storage baskets anywhere in either sitemap-categories file. Exactly 3 nodes on the whole site carry genuine Bathroom-hierarchy identity (not just the word 'bath' from bath-lighting SEO pages, which per rule 19 route to Lighting and were excluded): /categories/bathroom-vanity-mirrors ('Bathroom & Vanity Mirrors', primary type=mirror -> rule 11 Bathroom), /categories/medicine-cabinets ('Medicine Cabinets with Mirrors', mirrored cabinet -> rule 10 Bathroom mirror-cabinet type), /categories/bathroom-vanity-cabinets-sinks ('Bathroom Vanity Cabinets & Sinks', bathroom furniture -> rule 9 Bathroom). All ~60 other bath-matching sitemap URLs are bath/vanity LIGHTING (sconces, vanity lights, bath-light style/finish facets -> Lighting, excluded per rule 19) or general (non-bathroom) mirror style/shape facets (All Mirrors, LED Mirrors, Full Length Mirrors, Circle/Oval Mirrors, style facets -> Wall Decor per SKILL.md Mirrors policy, excluded) or filter/facet query-string variants of the above (excluded per View-All/facet rule). Also found /categories/shop-by-room-bathroom: fetched (200), title tag resolves to 'Bathroom Vanity Mirrors & Lights' -- a promotional cross-category room roundup mixing lighting+mirror products, not a distinct taxonomy node -> excluded per rule 25. Mandatory cross-category dedup run per the merge-time rule: `python -c \"import json; idx=json.load(open('pipeline/bathroom_json_archive/cross_category_url_index.json',encoding='utf-8')); print(idx.get(url))\"` for all 3 candidates returned non-null owners: bathroom-vanity-mirrors -> Wall_Decor.xlsx, medicine-cabinets -> Wall_Decor.xlsx, bathroom-vanity-cabinets-sinks -> Furniture.xlsx. Per the CROSS-CATEGORY DEDUP section of bathroom.md (Option-1 rule), all 3 therefore route to review[] as ALREADY EXTRACTED IN <owner>, never to rows[], regardless that bathroom.md's own rules 9/10/11 would have wanted them in Bathroom.xlsx. Result: no unique-to-Bathroom leaf remains once cross-category dedup is applied; rows=[] is a dedup outcome, not a NO_CATEGORY absence claim (genuine Bathroom-hierarchy content exists on this site, it is simply already captured in Wall_Decor.xlsx and Furniture.xlsx). Exact per-node qty for the 3 dedup hits was not pinned down (product-count/SKU list is client-hydrated JSON not exposed via a simple totalCount/resultCount field in the SSR payload) -- left null since these are routing-only review rows, not Bathroom leaves, so qty precision is not load-bearing here.",
+  "rows": [],
+  "review": [
+    {
+      "category": "Bathroom",
+      "sub_category": "Bathroom and Vanity Mirrors",
+      "qty": null,
+      "issue": "ALREADY EXTRACTED IN Wall_Decor.xlsx",
+      "link": "https://www.shadesoflight.com/categories/bathroom-vanity-mirrors"
+    },
+    {
+      "category": "Bathroom",
+      "sub_category": "Medicine Cabinets",
+      "qty": null,
+      "issue": "ALREADY EXTRACTED IN Wall_Decor.xlsx",
+      "link": "https://www.shadesoflight.com/categories/medicine-cabinets"
+    },
+    {
+      "category": "Bathroom",
+      "sub_category": "Bathroom Vanity Cabinets and Sinks",
+      "qty": null,
+      "issue": "ALREADY EXTRACTED IN Furniture.xlsx",
+      "link": "https://www.shadesoflight.com/categories/bathroom-vanity-cabinets-sinks"
+    }
+  ]
+}

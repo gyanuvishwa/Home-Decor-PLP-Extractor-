@@ -1,0 +1,617 @@
+{
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ACCESS: plain direct fetch via probe.fetch (curl_cffi), HTTP 200 on every one of ~200 requests; no proxy, no r.jina.ai, no rate limiting hit. Next.js SSR storefront, so every PLP ships its full data in <script id=\"__NEXT_DATA__\">. ROBOTS: https://www.danubehome.com/robots.txt EXPLICITLY NAMES CLAUDE AND ALLOWS IT - 'User-agent: anthropic-ai / Allow: /' and 'User-agent: ClaudeBot / Allow: /' (alongside GPTBot, CCBot, PerplexityBot, OAI-SearchBot, ChatGPT-User, Google-Extended, Bingbot, all Allow: /). No Crawl-delay is declared; probe.py's 2s/host gap was applied anyway. The User-agent:* block disallows */danube-deals/*, /my-account/*, /cart/*, /checkout/*, /*catalogsearch, /ae/en/c/search/, /ae/en/c/clearance-sale/, /*categories/, /*?page=1 and a long list of ?filter= query parameters - none of those paths were requested. Paging used ?page=2..N only (never ?page=1, and no disallowed filter parameter), which is outside every Disallow pattern. TREE - THREE INDEPENDENT SOURCES MERGED: (1) the live /ae/en mega-menu parsed off the rendered homepage HTML (Menu_menuSubDiv id=\"Bath\" -> Menu_menuLevelListInner blocks), which gives 13 Bath groups; (2) each PLP's own child-category strip (Plp_plpTopCategoryContainer), recursed top-down from /c/bath; (3) the full category sitemap https://www.danubehome.com/ae/en/sitemap/category_sitemap_ae_en.xml (1,538 category URLs, 89 of them under /c/bath). 95 candidate paths were fetched and each was validated on four signals: HTTP 200, rendered H1, metaDataFromServer.categoryId equal to the requested path (this is how aliases were caught), and a non-zero product total. The Bath department (h1 'Bathware', 825 products) has 13 groups: Mixer 129, Rain Shower 145, Vanity 75, Mirrors & Cabinets 34, Bathtub & Shower Room 26, Valves & Drains 38, Wash Basin 25, Kitchen Sink 29, Water Heater 9, Accessories 213, Ancillaries 22, Shattaf 42, Water Closet 37. A second genuine bathroom node lives outside that department: Laundry & Organizers > Bathroom Accessories (219) with children Accessory Singles 173 and Accessory Sets 46. QTY: the PLP's own rendered listing header, 'N Results for \"<Category>\"' (div Plp_productCountinfo), which is SSR'd from pageProps.totalProductsFromServer in __NEXT_DATA__. Both were read on every node and AGREED ON ALL 95 (e.g. /c/bath renders '825 Results for \"Bathware\"' and totalProductsFromServer = 825), so the structured number is provably the rendered number, not a substitute for it. VERIFICATION: (a) EXHAUSTIVE ENUMERATION - the Mixer, Rain Shower and Accessories subtrees (the three largest and the only ones whose arithmetic did not close on first inspection) were paged to exhaustion via ?page=2..N and their unique SKU sets collected: bath/mixer 129 unique SKUs vs total 129, basin-mixer 38/38, shower-mixer 33/33, sink-mixer 24/24, art-mixer 18/18, complete-set 8/8, rain-shower 145/145, shower-column 13/13, shower-panel 20/20, complete-shower-set 26/26, hand-shower 1/1, head-shower 57/57, concealed-shower-mixer-set 29/29, bath/accessories 213/213 and all 14 of its children - enumerated count equalled the reported total in every single case. (b) SUBSET PROOFS - all 121 Mixer-child SKUs and all 4 Sink Mixer-Wall Mounted SKUs are inside bath/mixer's 129 (4 parent-only orphans remain, all bath/shower mixers); all 208 Accessories-child SKUs are inside bath/accessories' 213 (5 parent-only orphans: 2 Tatay toothbrush holders, 1 Milano side cabinet, 2 towel rings); all 6 Rain Shower children sit inside the parent's 145. (c) EXACT ARITHMETIC CLOSURE on Water Closet 37 = 1+3+9+1+13+10, Wash Basin 25 = 4+14+7, Valves & Drains 38 = 11+27, Shattaf 42 = 8+34, Vanity 75 = 70+4+1, Kitchen Sink 29 = 21+8, Laundry Bathroom Accessories 219 = 173+46, Bath Textiles 2063 = 1340+723, Bathroom Tiles 185 = 125+25+35. (d) COUNTS DISCRIMINATE - 46 leaf values ranging 1 to 173, no repeated site-wide constant. (e) H1/BREADCRUMB MATCH - every recorded leaf's H1 and its products' categoryLevel1>2>3 breadcrumb match the node requested (spot-verified on 10 nodes, e.g. bath/accessories/tumbler-holder products carry 'Bath > Accessories-Bath > Tumbler Holder'). (f) NO CROSS-DEPARTMENT DUPLICATION - bath/accessories (213 SKUs) and laundry-and-organizers/bathroom-accessories (219 SKUs) were set-intersected and share ZERO SKUs, so recording both is not double counting; the first is Milano chrome/metal bathroom hardware, the second is Velora/Adelyn glass, resin and marble bathroom accessory ware. ALIASES CAUGHT AND EXCLUDED AS DUPLICATES (rule 28) - each returned a categoryId different from its own path: /c/bath/accessories/dryer -> bath/accessories/hand-and-hair-dryers; /c/bath/water-closet/wc-accessories -> bath/water-closet/wc-seat-covers (the canonical URL the mega-menu links, recorded); /c/bath/mirrors-cabinets/mirror-cabinet -> bath/bathroom-mirrors-cabinets (renders the parent, 34, NOT a distinct listing); /c/home-decor/home-accessories/bathroom-accessories -> bath/accessories; /c/home-decor/bathroom-accessories -> laundry-and-organizers/bathroom-accessories; /c/bath/bath-laundry -> laundry-and-organizers; /c/bath/bath-laundry/bath-accessories -> laundry-and-organizers/bathroom-accessories; /c/tiles-and-bricks/tiles-by-space-bathroom (185) duplicates Bathroom Tiles. MIRRORS & CABINETS CAVEAT (stated rather than papered over): the group totals 34 and its products' breadcrumbs split into two third-level types, 'LED Mirror' and 'Mirror Cabinet'. Only LED Mirror has a working distinct listing URL (/c/bath/mirrors-cabinets/led-mirror, 29, H1 'LED Mirror'); /c/bath/mirrors-cabinets/mirror-cabinet renders the parent instead. Per rule 24 the parent URL was NOT recorded because a valid child listing exists, so 5 mirror-cabinet products sit under the grouping row with no leaf of their own - no URL was invented for them. These bathroom mirrors ARE included per rule 10/11 (primary type is mirror, incl. LED/illuminated/anti-fog and mirror cabinets); the LED Mirror node also carries magnifying mirrors. EMPTY NODES FOUND AND NOT RECORDED (0 products, verified live, no fake rows): bath/rain-shower/shower-kit 'Hand Shower with Handle' 0; bath/accessories/magnifying-mirror 0 (its magnifying mirrors are merchandised inside LED Mirror); bath/bath-tub-shower-room/luxury-shower-room 0; bath/bath-tub-shower-room/free-standing-bathtub-shower/bathtub-and-dispenser-gift-combo 0 (also a gift combo, rule 25); laundry-and-organizers/laundry-solutions/bathroom-trolley 0. OTHER EXCLUSIONS: bath/mixer/free-standing-shower-mixer (7) is a mislabelled legacy category - all 7 of its products are freestanding BATHTUBS whose own breadcrumb is 'Bath > Bathtub & Shower Room > Free Standing Bathtub & Shower', and SKU intersection shows 0 of its 7 are in bath/mixer; it duplicates the recorded Free Standing Bathtub & Shower leaf (also 7) and is not in the mega-menu or any PLP strip, so it was dropped as a duplicate rather than recorded twice. bath/essential-storage (2) holds Falcon pedal bins whose breadcrumb is 'Laundry And Organizers > Cleaning Tools > Waste Bin' - general cleaning/storage, not bathroom, and not in the nav. bath/bath-laundry/tissues-toilet-paper-and-sprays (1) is a non-navigable legacy node holding one folding commode chair. Promotional / brand-collection pages excluded per rule 25: bath/new-arrivals 181, bath/milano 1602, bath/golden-milano-set 29, bath/ideal-standard-collection 10, bath/emailer-sanitary1 59, bath/sanitary-combo 1, bath/sanitary-super-saver-ae 198, bath/sanitary-super-saver-bh 69 (a Bahrain page on the UAE store), bath/uae-10-percent-off-bathware 825, c/sanitary-sale. Home Decor > Wall Decor > Mirrors (135) and Furniture > Bedroom Storage > Dressing & Mirrors are decorative/bedroom mirrors owned by Home Decor and Furniture respectively (rules 10/11/29) and were not duplicated here. Laundry & Organizers > Cleaning Tools > Waste Bin (150), Cleaning Mops (982 parent) and Laundry Solutions (90) are general household cleaning/laundry, not bathroom. Electronics & Appliances washing machines and dishwashers are appliances. BATHROOM LIGHTING: none exists. The Lights department is Lighting By Type / Shop By Room (Bedroom, Dining, Living, Staircase) / By Material / By Collection / Electricals / Outdoor, and grepping all 1,538 sitemap category URLs under /c/lighting/ for bath|vanity|mirror|shaving|wash returned zero hits - so nothing was routed to Lighting for this company. || CROSS-FILE DEDUP: 3 leaf record(s) removed as already extracted in a prior category workbook. See Review sheet.",
+ "rows": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Mixer",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Basin Mixer",
+   "qty": 38,
+   "link": "https://www.danubehome.com/ae/en/c/bath/mixer/basin-mixer",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower Mixer",
+   "qty": 33,
+   "link": "https://www.danubehome.com/ae/en/c/bath/mixer/shower-mixer",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Tall Mixer",
+   "qty": 18,
+   "link": "https://www.danubehome.com/ae/en/c/bath/mixer/art-mixer",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Complete Set",
+   "qty": 8,
+   "link": "https://www.danubehome.com/ae/en/c/bath/mixer/complete-set",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Rain Shower",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower Column",
+   "qty": 13,
+   "link": "https://www.danubehome.com/ae/en/c/bath/rain-shower/shower-column",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower Panel",
+   "qty": 20,
+   "link": "https://www.danubehome.com/ae/en/c/bath/rain-shower/shower-panel",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Complete Shower Set",
+   "qty": 26,
+   "link": "https://www.danubehome.com/ae/en/c/bath/rain-shower/complete-shower-set",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Hand Shower",
+   "qty": 1,
+   "link": "https://www.danubehome.com/ae/en/c/bath/rain-shower/hand-shower",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Head Shower",
+   "qty": 57,
+   "link": "https://www.danubehome.com/ae/en/c/bath/rain-shower/head-shower",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Concealed Shower Complete Set",
+   "qty": 29,
+   "link": "https://www.danubehome.com/ae/en/c/bath/rain-shower/concealed-shower-mixer-set",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Vanity",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Mirrors & Cabinets",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "LED Mirror",
+   "qty": 29,
+   "link": "https://www.danubehome.com/ae/en/c/bath/mirrors-cabinets/led-mirror",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathtub & Shower Room",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Free Standing Bathtub & Shower",
+   "qty": 7,
+   "link": "https://www.danubehome.com/ae/en/c/bath/bath-tub-shower-room/free-standing-bathtub-shower",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Massage Bathtub",
+   "qty": 6,
+   "link": "https://www.danubehome.com/ae/en/c/bath/bath-tub-shower-room/massage-bathtub",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower Tray and Cubicle",
+   "qty": 14,
+   "link": "https://www.danubehome.com/ae/en/c/bath/bath-tub-shower-room/cubicle-enclosure",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Valves & Drains",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Angle Valve",
+   "qty": 11,
+   "link": "https://www.danubehome.com/ae/en/c/bath/valves-and-drains/angle-valve",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Floor Drain",
+   "qty": 27,
+   "link": "https://www.danubehome.com/ae/en/c/bath/valves-and-drains/floor-drain",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Wash Basin",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Pedestal Wash Basins",
+   "qty": 4,
+   "link": "https://www.danubehome.com/ae/en/c/bath/wash-basin/pedastal",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Wall Hung Wash Basins",
+   "qty": 14,
+   "link": "https://www.danubehome.com/ae/en/c/bath/wash-basin/wall-hung",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Counter Top Wash Basins",
+   "qty": 7,
+   "link": "https://www.danubehome.com/ae/en/c/bath/wash-basin/counter-top-washbasin",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Accessories",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Corner Shelf",
+   "qty": 31,
+   "link": "https://www.danubehome.com/ae/en/c/bath/accessories/corner-shelf",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Full Accessories Set",
+   "qty": 21,
+   "link": "https://www.danubehome.com/ae/en/c/bath/accessories/full-accessories-set",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Glass Shelf",
+   "qty": 1,
+   "link": "https://www.danubehome.com/ae/en/c/bath/accessories/glass-shelf",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Grab Bar",
+   "qty": 6,
+   "link": "https://www.danubehome.com/ae/en/c/bath/accessories/grab-bar",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Paper Holder",
+   "qty": 4,
+   "link": "https://www.danubehome.com/ae/en/c/bath/accessories/paper-holder",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Robe Hook",
+   "qty": 5,
+   "link": "https://www.danubehome.com/ae/en/c/bath/accessories/robe-hook",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Soap Dish",
+   "qty": 28,
+   "link": "https://www.danubehome.com/ae/en/c/bath/accessories/soap-dish",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Soap Dispenser",
+   "qty": 63,
+   "link": "https://www.danubehome.com/ae/en/c/bath/accessories/soap-dispenser",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Tissue Dispenser",
+   "qty": 4,
+   "link": "https://www.danubehome.com/ae/en/c/bath/accessories/tissue-dispenser",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Towel Holder",
+   "qty": 25,
+   "link": "https://www.danubehome.com/ae/en/c/bath/accessories/towel-rail",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Towel Ring",
+   "qty": 1,
+   "link": "https://www.danubehome.com/ae/en/c/bath/accessories/towel-ring",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Tumbler Holder",
+   "qty": 2,
+   "link": "https://www.danubehome.com/ae/en/c/bath/accessories/tumbler-holder",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Touchless Products",
+   "qty": 9,
+   "link": "https://www.danubehome.com/ae/en/c/bath/accessories/touchless-products",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Ancillaries (Hoses & Long Pop Up Waste)",
+   "qty": 22,
+   "link": "https://www.danubehome.com/ae/en/c/bath/ancillaries",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shattaf",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Brass Shattaf",
+   "qty": 8,
+   "link": "https://www.danubehome.com/ae/en/c/bath/shattaf/brass-shattaf",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "PVC Shattaf",
+   "qty": 34,
+   "link": "https://www.danubehome.com/ae/en/c/bath/shattaf/pvc-shattaf",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Water Closet",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Asian WC",
+   "qty": 1,
+   "link": "https://www.danubehome.com/ae/en/c/bath/water-closet/asian-wc",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Flush Mechanism",
+   "qty": 3,
+   "link": "https://www.danubehome.com/ae/en/c/bath/water-closet/flush-mechanism",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "WC Accessories",
+   "qty": 9,
+   "link": "https://www.danubehome.com/ae/en/c/bath/water-closet/wc-seat-covers",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "WC P Trap",
+   "qty": 1,
+   "link": "https://www.danubehome.com/ae/en/c/bath/water-closet/wc-p-trap",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "WC S Trap",
+   "qty": 13,
+   "link": "https://www.danubehome.com/ae/en/c/bath/water-closet/wc-s-trap",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Wall Hung",
+   "qty": 10,
+   "link": "https://www.danubehome.com/ae/en/c/bath/water-closet/wall-hung",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Accessories",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Accessory Singles",
+   "qty": 173,
+   "link": "https://www.danubehome.com/ae/en/c/laundry-and-organizers/bathroom-accessories/accessory-singles",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Accessory Sets",
+   "qty": 46,
+   "link": "https://www.danubehome.com/ae/en/c/laundry-and-organizers/bathroom-accessories/accessory-sets",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  }
+ ],
+ "review": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Kitchen Sink > Single Bowl",
+   "qty": 21,
+   "issue": "ROUTED TO KITCHEN: Danube files Kitchen Sink inside its Bath (Bathware) department, but the primary product type and function are a kitchen sink, and rule 2 puts PRIMARY PRODUCT TYPE and FUNCTION above WEBSITE HIERARCHY. Parent Kitchen Sink node total is 29 (21 Single Bowl + 8 Double Bowl, exact closure). Flagged LOW confidence per rule 29 rather than guessed either way.",
+   "link": "https://www.danubehome.com/ae/en/c/bath/kitchen-sink/single-bowl"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Kitchen Sink > Double Bowl",
+   "qty": 8,
+   "issue": "ROUTED TO KITCHEN: same reasoning as Single Bowl - kitchen sink by primary product type, filed under the Bath department by the site.",
+   "link": "https://www.danubehome.com/ae/en/c/bath/kitchen-sink/double-bowl"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Mixer > Sink Mixer",
+   "qty": 24,
+   "issue": "ROUTED TO KITCHEN: sits in Bath > Mixer but full enumeration of all 24 products shows kitchen sink taps (e.g. 'Milano Moveable Pull Out Kitchen Sink Mixer - Chrome', 'Milano Tina Pullout Kitchen Sink Mixer - Gun Gray', 'Milano Magic Pull Out Sink Mixer'), i.e. the tap for the Kitchen Sink node above. Primary product type is a kitchen tap, so rule 2 outranks the Bath hierarchy. LOW confidence, rule 29 - not recorded in rows, not silently dropped.",
+   "link": "https://www.danubehome.com/ae/en/c/bath/mixer/sink-mixer"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Mixer > Sink Mixer-Wall Mounted",
+   "qty": 4,
+   "issue": "ROUTED TO KITCHEN: 4 wall-mounted sink mixers. Proven by SKU set intersection to be a genuine subset of Bath > Mixer (4/4 inside the parent's 129) and disjoint from Sink Mixer, so it is a real sibling leaf, not a filter - but it is the same kitchen-tap product type as Sink Mixer, so it follows that node's routing. Not present in the mega-menu or the PLP child strip; found in the category sitemap.",
+   "link": "https://www.danubehome.com/ae/en/c/bath/mixer/sink-mixer-wall-mounted"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Water Heater",
+   "qty": 9,
+   "issue": "ROUTED TO APPLIANCES / ELECTRICALS: sits in the Bath department but full enumeration of all 9 products shows they are electric storage water heaters ('Milano Vertical Electric Water Heater - 10/15/30/50/80/100 L', 'Milano Horizontal Electric Water Heater'). Primary product type is an electrical appliance; it appears in none of the Bathroom include lists (rules 4-8, 13-18), and Danube also carries Water Heaters under Electronics & Appliances > Home Appliances. LOW confidence, rule 29.",
+   "link": "https://www.danubehome.com/ae/en/c/bath/water-heater"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Accessories > Hair & Hand Dryer",
+   "qty": 12,
+   "issue": "ROUTED TO APPLIANCES / PERSONAL CARE: sits in Bath > Accessories but full enumeration shows a mixed node - only 3 of 12 are bathroom hand dryers (Milano Hand Dryer Sensor, Milano Hand Dryer, Milano Metal Hand Dryer); the other 9 are personal hair dryers (Carrera CRR633, Krypton KNH6560/KNH6562, Clikon professional/travel hair dryers, 2-in-1 dryer & straightener). Majority primary product type is a personal grooming appliance, so the node was not recorded in rows. Its URL /bath/accessories/dryer is an alias that renders the same category (catid bath/accessories/hand-and-hair-dryers). LOW confidence, rule 29.",
+   "link": "https://www.danubehome.com/ae/en/c/bath/accessories/hand-and-hair-dryers"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Furnishings > Bath Textiles > Towels",
+   "qty": 1340,
+   "issue": "ROUTED TO TEXTILE: bath/hand/face towels and bath sheets, textile towelling (rules 15/20). Parent Bath Textiles totals 2063 = 1340 Towels + 723 Bathrobes exactly.",
+   "link": "https://www.danubehome.com/ae/en/c/furnishings/bath-textiles/towels"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Furnishings > Bath Textiles > Bathrobes",
+   "qty": 723,
+   "issue": "ROUTED TO TEXTILE: bathrobes (rule 20).",
+   "link": "https://www.danubehome.com/ae/en/c/furnishings/bath-textiles/bathrobes"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Furnishings > Floor Covering > Bath Mats & Rugs",
+   "qty": 14,
+   "issue": "ROUTED TO TEXTILE: textile bath mats and rugs sitting in the Furnishings > Carpets & Rugs hierarchy alongside Door Mats and Prayer Mats, not sold as a bathroom hardware accessory (rule 16).",
+   "link": "https://www.danubehome.com/ae/en/c/furnishings/floor-covering/bath-mats-rugs"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Tiles & Flooring > Bathroom Tiles > Wall Tiles",
+   "qty": 125,
+   "issue": "ROUTED TO TILES / BUILDING MATERIALS: ceramic wall tiles. Tiles appear in none of the Bathroom include lists (rules 3-22) - they are a surface-covering building material, not a bathroom fixture, fitting, furniture or accessory. Parent Bathroom Tiles 185 = 125 Wall + 25 Floor + 35 Ceramic, exact.",
+   "link": "https://www.danubehome.com/ae/en/c/tiles-and-bricks/bathroom-tiles/wall-tiles"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Tiles & Flooring > Bathroom Tiles > Floor Tiles",
+   "qty": 25,
+   "issue": "ROUTED TO TILES / BUILDING MATERIALS: same reasoning as Bathroom Wall Tiles.",
+   "link": "https://www.danubehome.com/ae/en/c/tiles-and-bricks/bathroom-tiles/floor-tiles"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Tiles & Flooring > Bathroom Tiles > By Family (Bathroom Ceramic Tiles)",
+   "qty": 35,
+   "issue": "ROUTED TO TILES / BUILDING MATERIALS: same reasoning as Bathroom Wall Tiles.",
+   "link": "https://www.danubehome.com/ae/en/c/tiles-and-bricks/bathroom-tiles/bathroom-ceramic-tiles"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "School > Mother's Choice > Kids Bath Accessories",
+   "qty": 9,
+   "issue": "ROUTED TO BABY / NURSERY: the node is labelled 'Kids Bath Accessories' in the mega-menu but its path and content are potty-training products, sitting under School > Mother's Choice next to diaper bags, car seats, strollers and baby furniture. Primary product type is a baby/nursery product, not bathroom sanitaryware or a bathroom accessory. LOW confidence, rule 29.",
+   "link": "https://www.danubehome.com/ae/en/c/school/mothers-choice/potty-training"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Single Sink Bathroom Vanity",
+   "qty": 70,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Single Sink Bathroom Vanity' - excluded from Bathroom per cross-category dedup (master guide s13)",
+   "link": "https://www.danubehome.com/ae/en/c/bath/vanity/single-bowl-basin"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Double Sink Bathroom Vanity",
+   "qty": 4,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Double Sink Bathroom Vanity' - excluded from Bathroom per cross-category dedup (master guide s13)",
+   "link": "https://www.danubehome.com/ae/en/c/bath/vanity/double-bowl-basin"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Triple Sink Bathroom Vanity",
+   "qty": 1,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Triple Sink Bathroom Vanity' - excluded from Bathroom per cross-category dedup (master guide s13)",
+   "link": "https://www.danubehome.com/ae/en/c/bath/vanity/triple-bowl-basin"
+  }
+ ],
+ "_reconstructed_from": "Bathroom.xlsx delivered 2026-09-01 (checkpoint), not original worker JSON"
+}

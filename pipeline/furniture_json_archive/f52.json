@@ -1,0 +1,336 @@
+{
+ "sr": 52,
+ "company": "Williams Sonoma Home",
+ "brand_site": "williams-sonoma.com",
+ "country": "USA",
+ "site_url": "https://www.williams-sonoma.com/shop/home/",
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ACCESS. williams-sonoma.com is behind Akamai. Direct curl_cffi is throttled rather than uniformly blocked: chrome/edge/firefox profiles always got HTTP 403 'Restricted Access', while safari15_5 / safari17_0 / safari17_2_ios / safari18_0_ios got 200s intermittently (403 bursts clear after a pause, so every fetch retries across those four profiles with backoff). r.jina.ai, which carried the prior Home-Decor pass, is now useless here: jina itself answers 200 but williams-sonoma.com returns 403 to jina's fetcher on every /shop/ path (the homepage still renders through it). translate.goog 408s, Googlebot-UA 403s, WebFetch 403s. robots.txt names no Anthropic/Claude agent and disallows no /shop/ or /api/ path used here. The Chrome extension route was also unavailable: williams-sonoma.com is not in its permitted-site list, so navigation there is refused and JS execution is denied.\n\nTREE. The complete mega-menu came from the site's own nav API, /api/catalog/v1/category/categorytree/shop/data.json (found in header.a021b2ee.js). It types every node - supercat / header (clickableHeader = a menu grouping row) / subcat / topcat / linkcat - and marks hidden nodes secret:true. Furniture lives in exactly two supercats: 'Furniture' (/shop/home-furniture/) with the header groups Living Room Furniture, Dining & Kitchen Furniture, Bedroom Furniture and Home Office, and 'Outdoor' (/shop/home-outdoor/) with the header groups Outdoor Lounge Furniture and Outdoor Dining Furniture. I walked every other supercat too: Bath has no vanities or bath furniture (towels/robes/accessories only); Home Essentials' shelving, cabinet-storage and ladders/step-stools nodes are kitchen storage goods, not furniture; 'Shop Rooms'/'Shop By Room' are shop-the-look room pages; the 1258-URL shop-sitemap turned up no furniture slug outside these two departments.\n\nQTY. Every qty is response.numFound from the PLP's own product feed, /api/catalog/v1/category/products/shop/<cat>/<subcat>/index.json?index=0 - the endpoint the storefront itself calls (WCMProductsEndpoint in shop.cd506c32.js). That is the exact number the rendered header shows: shop.js defines productCount() as state.shop.cat.response.numFound and productCountDisplay.displayText is 'Items', so the header string is literally '<numFound> Items'. The rendered header could not be read directly this session because the count is client-rendered and no JS-rendering route reached the site, so I validated the feed three ways. (1) Against the 2026-08-08 rendered-header values recorded in notes/52.md for 17 Home-Decor categories: 7 exact, the other 10 off by -1 to +4 and in BOTH directions (Floor Lamps 8=8, Mirrors 27=27, Picture Frames 20=20, Chandeliers 42->43, Table Lamps 38->37, Dinner Plates 100->104, Sconces 22->21). Two-directional drift over 11 days is normal catalogue churn - decisively unlike Constructor.io on this property, which the prior pass measured HIGHER on 15 of 15 disagreements. No Constructor number is used anywhere here. (2) Full enumeration: unique pids paged to the end equal numFound exactly on Dining Chairs (69), Chairs (44), Outdoor Chairs & Chaises (52) and Beds & Headboards (38), and 15 further categories returned their whole product set on a single page with docs == numFound. (3) Every count was read twice with identical results, the numbers differ per category (no site-wide constant), and the breadcrumbs API confirmed each URL resolves to the node I intended (no silent parent-serving).\n\nSUM CHECKS. Living Room children 26+26+4+44+26+22+30 = 178 against the site's own 'All Living Room' 179. Dining & Kitchen children 211 against 'All Dining & Kitchen' 214. Bedroom children 77, plus the excluded Mattresses 36 = 113, against 'All Bedroom' 108. Outdoor Lounge children 123 against 'All Outdoor Lounge Furniture' 119; Outdoor Dining children 103 against 'All Outdoor Dining Furniture' 96 (the Sets nodes overlap their component nodes). All consistent.\n\nEXCLUDED, and why. Mattresses (36) - bedding per the brief, and the Beds & Headboards node is kept separately. Dining Seat Cushions, Outdoor Furniture Cushions, Outdoor Furniture Covers - textiles/covers. Desk Accessories - desk objects. Umbrellas (7 nodes) and Umbrella Bases - shade accessories, not furniture. Patio Heaters & Fire Pit Tables - heating appliances. Outdoor Planters, Outdoor Lighting, Outdoor Pillows, Performance Rugs. Every 'All X' roll-up (All Living Room, All Dining & Kitchen, All Bedroom, All Home Office, All Outdoor Lounge Furniture, All Outdoor Dining Furniture, All Outdoor Furniture, All Outdoor Kitchen) per the parent-vs-children rule. All named collection branches (Sofa & Sectional Collections, Dining & Kitchen Furniture Collections, Bedroom Furniture Collections, Outdoor Collections and their ~80 per-collection child pages such as Valencia, Larnaca Teak, Pasadena), Outdoor Kitchens (a /pages/ landing whose children are brand collections), New Arrivals, Featured, Clearance/Sale, Quick Ship and In Stock & Ready to Ship (availability filters), Furniture by Color > Brass Furniture and All Wood Furniture (colour/material filters), Steelcase / Sanderson / Hill House (brand shops), Mondavi and Top-Collections pages, collection guides, design-school and home-tour pages, dining-table tools, and Fabric Swatches / Fabric by the Yard / Wood, Woven & Stone Swatches (materials and parts).\n\nThe whole 'Contract Grade' branch (All Contract Grade, Contract Grade Sectionals / Sofas / Lounge Chairs / Side Tables & Consoles / Dining Tables / Dining Chairs & Banquettes / Bar & Counter Stools / Bedroom / Office / Outdoor, 14 nodes under the editorial 'Design Resources' header) is excluded: these are feature-facet views of the same catalogue - the PLP state exposes the facet literally as features|multi-select|Features:(\"Contract Grade\") - so they are filter pages over the rows already recorded, not separate categories. Flagging here in case the merge wants them.\n\nDEDUPED / HIDDEN NODES. 'Console Tables & Media' in the Living Room column is a linkcat whose heroLink is /shop/home-furniture/sideboard-buffet-table, i.e. the same page as 'Console Tables, Sideboards & Buffets' under Dining - recorded once, under Dining. 'Kitchen Islands & Stools' (24, secret:true) duplicates 'Kitchen Islands & Carts' (22) and is dropped. 'Dining Sets' (/home-furniture/indoor-dining-set-perf-pair, secret:true) returns no product feed at all and is not in the sitemap, so it is dropped; the outdoor equivalent 'Outdoor Dining Sets' is live and is kept. 'All Outdoor Kitchen' (25) and 'Outdoor Combo' are secret:true. The one secret node I did keep is 'Entryway' (17) - it is indexed in the sitemap and has a real breadcrumb - and it carries a MANUAL REVIEW flag because it overlaps the product-type rows.\n\nNAMING. Sub-category names are the site's own mega-menu node names. One variance worth noting: the node the menu calls 'Console Tables, Sideboards & Buffets' is titled 'Console Tables, Sideboards & Media Consoles' in the breadcrumb API; I kept the menu wording.",
+ "rows": [
+  {
+   "category": "Furniture",
+   "sub_category": "Living Room Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sofas",
+   "qty": 26,
+   "link": "https://www.williams-sonoma.com/shop/home-furniture/sofas-loveseats/",
+   "is_group": false,
+   "evidence": "PLP product feed /api/catalog/v1/category/products/shop/home-furniture/sofas-loveseats/index.json -> response.numFound=26 (the field the listing header renders as \"26 Items\": shop.js productCount() = state.shop.cat.response.numFound, productCountDisplay.displayText=\"Items\"); read twice, identical",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sectionals",
+   "qty": 26,
+   "link": "https://www.williams-sonoma.com/shop/home-furniture/all-sectionals/",
+   "is_group": false,
+   "evidence": "PLP product feed /api/catalog/v1/category/products/shop/home-furniture/all-sectionals/index.json -> response.numFound=26 (the field the listing header renders as \"26 Items\": shop.js productCount() = state.shop.cat.response.numFound, productCountDisplay.displayText=\"Items\"); read twice, identical",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sleeper Sofas & Settees",
+   "qty": 4,
+   "link": "https://www.williams-sonoma.com/shop/home-furniture/sleeper-sofas/",
+   "is_group": false,
+   "evidence": "PLP product feed /api/catalog/v1/category/products/shop/home-furniture/sleeper-sofas/index.json -> response.numFound=4 (the field the listing header renders as \"4 Items\": shop.js productCount() = state.shop.cat.response.numFound, productCountDisplay.displayText=\"Items\"); read twice, identical; full enumeration: the feed returned all 4 product docs on one page",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Chairs",
+   "qty": 44,
+   "link": "https://www.williams-sonoma.com/shop/home-furniture/occasional-chairs/",
+   "is_group": false,
+   "evidence": "PLP product feed /api/catalog/v1/category/products/shop/home-furniture/occasional-chairs/index.json -> response.numFound=44 (the field the listing header renders as \"44 Items\": shop.js productCount() = state.shop.cat.response.numFound, productCountDisplay.displayText=\"Items\"); read twice, identical; full enumeration: paged to the end, 44 unique pids == numFound",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Ottomans & Benches",
+   "qty": 26,
+   "link": "https://www.williams-sonoma.com/shop/home-furniture/ottomans-bench-stool/",
+   "is_group": false,
+   "evidence": "PLP product feed /api/catalog/v1/category/products/shop/home-furniture/ottomans-bench-stool/index.json -> response.numFound=26 (the field the listing header renders as \"26 Items\": shop.js productCount() = state.shop.cat.response.numFound, productCountDisplay.displayText=\"Items\"); read twice, identical",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Coffee Tables",
+   "qty": 22,
+   "link": "https://www.williams-sonoma.com/shop/home-furniture/coffee-tables/",
+   "is_group": false,
+   "evidence": "PLP product feed /api/catalog/v1/category/products/shop/home-furniture/coffee-tables/index.json -> response.numFound=22 (the field the listing header renders as \"22 Items\": shop.js productCount() = state.shop.cat.response.numFound, productCountDisplay.displayText=\"Items\"); read twice, identical",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Side & Accent Tables",
+   "qty": 30,
+   "link": "https://www.williams-sonoma.com/shop/home-furniture/side-accent-tables/",
+   "is_group": false,
+   "evidence": "PLP product feed /api/catalog/v1/category/products/shop/home-furniture/side-accent-tables/index.json -> response.numFound=30 (the field the listing header renders as \"30 Items\": shop.js productCount() = state.shop.cat.response.numFound, productCountDisplay.displayText=\"Items\"); read twice, identical",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dining & Kitchen Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dining & Kitchen Tables",
+   "qty": 46,
+   "link": "https://www.williams-sonoma.com/shop/home-furniture/dining-kitchen-tables/",
+   "is_group": false,
+   "evidence": "PLP product feed /api/catalog/v1/category/products/shop/home-furniture/dining-kitchen-tables/index.json -> response.numFound=46 (the field the listing header renders as \"46 Items\": shop.js productCount() = state.shop.cat.response.numFound, productCountDisplay.displayText=\"Items\"); read twice, identical",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dining Chairs",
+   "qty": 69,
+   "link": "https://www.williams-sonoma.com/shop/home-furniture/dining-chairs-casual/",
+   "is_group": false,
+   "evidence": "PLP product feed /api/catalog/v1/category/products/shop/home-furniture/dining-chairs-casual/index.json -> response.numFound=69 (the field the listing header renders as \"69 Items\": shop.js productCount() = state.shop.cat.response.numFound, productCountDisplay.displayText=\"Items\"); read twice, identical; full enumeration: paged to the end, 69 unique pids == numFound",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dining Benches & Banquettes",
+   "qty": 13,
+   "link": "https://www.williams-sonoma.com/shop/home-furniture/dining-benches-banquettes/",
+   "is_group": false,
+   "evidence": "PLP product feed /api/catalog/v1/category/products/shop/home-furniture/dining-benches-banquettes/index.json -> response.numFound=13 (the field the listing header renders as \"13 Items\": shop.js productCount() = state.shop.cat.response.numFound, productCountDisplay.displayText=\"Items\"); read twice, identical; full enumeration: the feed returned all 13 product docs on one page",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bar & Counter Stools",
+   "qty": 38,
+   "link": "https://www.williams-sonoma.com/shop/home-furniture/dining-bars-counter-stools/",
+   "is_group": false,
+   "evidence": "PLP product feed /api/catalog/v1/category/products/shop/home-furniture/dining-bars-counter-stools/index.json -> response.numFound=38 (the field the listing header renders as \"38 Items\": shop.js productCount() = state.shop.cat.response.numFound, productCountDisplay.displayText=\"Items\"); read twice, identical",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Console Tables, Sideboards & Buffets",
+   "qty": 12,
+   "link": "https://www.williams-sonoma.com/shop/home-furniture/sideboard-buffet-table/",
+   "is_group": false,
+   "evidence": "PLP product feed /api/catalog/v1/category/products/shop/home-furniture/sideboard-buffet-table/index.json -> response.numFound=12 (the field the listing header renders as \"12 Items\": shop.js productCount() = state.shop.cat.response.numFound, productCountDisplay.displayText=\"Items\"); read twice, identical; full enumeration: the feed returned all 12 product docs on one page",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bar Carts & Cabinets",
+   "qty": 11,
+   "link": "https://www.williams-sonoma.com/shop/home-furniture/bar-carts-cabinets/",
+   "is_group": false,
+   "evidence": "PLP product feed /api/catalog/v1/category/products/shop/home-furniture/bar-carts-cabinets/index.json -> response.numFound=11 (the field the listing header renders as \"11 Items\": shop.js productCount() = state.shop.cat.response.numFound, productCountDisplay.displayText=\"Items\"); read twice, identical; full enumeration: the feed returned all 11 product docs on one page",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Kitchen Islands & Carts",
+   "qty": 22,
+   "link": "https://www.williams-sonoma.com/shop/home-furniture/kitchen-island-cart/",
+   "is_group": false,
+   "evidence": "PLP product feed /api/catalog/v1/category/products/shop/home-furniture/kitchen-island-cart/index.json -> response.numFound=22 (the field the listing header renders as \"22 Items\": shop.js productCount() = state.shop.cat.response.numFound, productCountDisplay.displayText=\"Items\"); read twice, identical",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bedroom Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Beds & Headboards",
+   "qty": 38,
+   "link": "https://www.williams-sonoma.com/shop/home-furniture/beds-headboards/",
+   "is_group": false,
+   "evidence": "PLP product feed /api/catalog/v1/category/products/shop/home-furniture/beds-headboards/index.json -> response.numFound=38 (the field the listing header renders as \"38 Items\": shop.js productCount() = state.shop.cat.response.numFound, productCountDisplay.displayText=\"Items\"); read twice, identical; full enumeration: paged to the end, 38 unique pids == numFound",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Nightstands",
+   "qty": 18,
+   "link": "https://www.williams-sonoma.com/shop/home-furniture/nightstands-dressers/",
+   "is_group": false,
+   "evidence": "PLP product feed /api/catalog/v1/category/products/shop/home-furniture/nightstands-dressers/index.json -> response.numFound=18 (the field the listing header renders as \"18 Items\": shop.js productCount() = state.shop.cat.response.numFound, productCountDisplay.displayText=\"Items\"); read twice, identical; full enumeration: the feed returned all 18 product docs on one page",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dressers",
+   "qty": 15,
+   "link": "https://www.williams-sonoma.com/shop/home-furniture/dresser/",
+   "is_group": false,
+   "evidence": "PLP product feed /api/catalog/v1/category/products/shop/home-furniture/dresser/index.json -> response.numFound=15 (the field the listing header renders as \"15 Items\": shop.js productCount() = state.shop.cat.response.numFound, productCountDisplay.displayText=\"Items\"); read twice, identical; full enumeration: the feed returned all 15 product docs on one page",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Benches",
+   "qty": 6,
+   "link": "https://www.williams-sonoma.com/shop/home-furniture/benches-bedroom/",
+   "is_group": false,
+   "evidence": "PLP product feed /api/catalog/v1/category/products/shop/home-furniture/benches-bedroom/index.json -> response.numFound=6 (the field the listing header renders as \"6 Items\": shop.js productCount() = state.shop.cat.response.numFound, productCountDisplay.displayText=\"Items\"); read twice, identical; full enumeration: the feed returned all 6 product docs on one page",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Home Office",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Desks & Bookcases",
+   "qty": 9,
+   "link": "https://www.williams-sonoma.com/shop/home-furniture/desks-bookcases-media/",
+   "is_group": false,
+   "evidence": "PLP product feed /api/catalog/v1/category/products/shop/home-furniture/desks-bookcases-media/index.json -> response.numFound=9 (the field the listing header renders as \"9 Items\": shop.js productCount() = state.shop.cat.response.numFound, productCountDisplay.displayText=\"Items\"); read twice, identical; full enumeration: the feed returned all 9 product docs on one page",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Home Office Chairs",
+   "qty": 3,
+   "link": "https://www.williams-sonoma.com/shop/home-furniture/home-office-chairs/",
+   "is_group": false,
+   "evidence": "PLP product feed /api/catalog/v1/category/products/shop/home-furniture/home-office-chairs/index.json -> response.numFound=3 (the field the listing header renders as \"3 Items\": shop.js productCount() = state.shop.cat.response.numFound, productCountDisplay.displayText=\"Items\"); read twice, identical; full enumeration: the feed returned all 3 product docs on one page",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Entryway",
+   "qty": 17,
+   "link": "https://www.williams-sonoma.com/shop/home-furniture/furniture-all-entryway/",
+   "is_group": false,
+   "evidence": "PLP product feed /api/catalog/v1/category/products/shop/home-furniture/furniture-all-entryway/index.json -> response.numFound=17 (the field the listing header renders as \"17 Items\": shop.js productCount() = state.shop.cat.response.numFound, productCountDisplay.displayText=\"Items\"); read twice, identical; full enumeration: the feed returned all 17 product docs on one page",
+   "flag": "MANUAL REVIEW: room roll-up node under the Furniture department (slug furniture-all-entryway, breadcrumb 'Furniture > Entryway'). Its 17 products are entryway consoles/benches/cabinets that also appear in the Living Room and Dining product-type rows, and the node carries secret:true in the site's category tree so it is not shown in the visible mega-menu. Kept because it is an indexed listing page with its own exact count; drop it if overlap is not wanted."
+  },
+  {
+   "category": "Outdoor Furniture",
+   "sub_category": "Outdoor Lounge Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Outdoor Furniture",
+   "sub_category": "Outdoor Sofas",
+   "qty": 18,
+   "link": "https://www.williams-sonoma.com/shop/home-outdoor/outdoor-sofas/",
+   "is_group": false,
+   "evidence": "PLP product feed /api/catalog/v1/category/products/shop/home-outdoor/outdoor-sofas/index.json -> response.numFound=18 (the field the listing header renders as \"18 Items\": shop.js productCount() = state.shop.cat.response.numFound, productCountDisplay.displayText=\"Items\"); read twice, identical; full enumeration: the feed returned all 18 product docs on one page",
+   "flag": null
+  },
+  {
+   "category": "Outdoor Furniture",
+   "sub_category": "Outdoor Chairs & Chaises",
+   "qty": 52,
+   "link": "https://www.williams-sonoma.com/shop/home-outdoor/lounge-patio-furniture/",
+   "is_group": false,
+   "evidence": "PLP product feed /api/catalog/v1/category/products/shop/home-outdoor/lounge-patio-furniture/index.json -> response.numFound=52 (the field the listing header renders as \"52 Items\": shop.js productCount() = state.shop.cat.response.numFound, productCountDisplay.displayText=\"Items\"); read twice, identical; full enumeration: paged to the end, 52 unique pids == numFound",
+   "flag": null
+  },
+  {
+   "category": "Outdoor Furniture",
+   "sub_category": "Outdoor Coffee Tables",
+   "qty": 27,
+   "link": "https://www.williams-sonoma.com/shop/home-outdoor/outdoor-coffee-tables/",
+   "is_group": false,
+   "evidence": "PLP product feed /api/catalog/v1/category/products/shop/home-outdoor/outdoor-coffee-tables/index.json -> response.numFound=27 (the field the listing header renders as \"27 Items\": shop.js productCount() = state.shop.cat.response.numFound, productCountDisplay.displayText=\"Items\"); read twice, identical",
+   "flag": null
+  },
+  {
+   "category": "Outdoor Furniture",
+   "sub_category": "Outdoor Side Tables",
+   "qty": 21,
+   "link": "https://www.williams-sonoma.com/shop/home-outdoor/outdoor-side-tables/",
+   "is_group": false,
+   "evidence": "PLP product feed /api/catalog/v1/category/products/shop/home-outdoor/outdoor-side-tables/index.json -> response.numFound=21 (the field the listing header renders as \"21 Items\": shop.js productCount() = state.shop.cat.response.numFound, productCountDisplay.displayText=\"Items\"); read twice, identical",
+   "flag": null
+  },
+  {
+   "category": "Outdoor Furniture",
+   "sub_category": "Outdoor Lounge Sets",
+   "qty": 5,
+   "link": "https://www.williams-sonoma.com/shop/home-outdoor/outdoor-lounge-sets/",
+   "is_group": false,
+   "evidence": "PLP product feed /api/catalog/v1/category/products/shop/home-outdoor/outdoor-lounge-sets/index.json -> response.numFound=5 (the field the listing header renders as \"5 Items\": shop.js productCount() = state.shop.cat.response.numFound, productCountDisplay.displayText=\"Items\"); read twice, identical; full enumeration: the feed returned all 5 product docs on one page",
+   "flag": null
+  },
+  {
+   "category": "Outdoor Furniture",
+   "sub_category": "Outdoor Dining Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Outdoor Furniture",
+   "sub_category": "Outdoor Dining Tables",
+   "qty": 20,
+   "link": "https://www.williams-sonoma.com/shop/home-outdoor/outdoor-dining-tables/",
+   "is_group": false,
+   "evidence": "PLP product feed /api/catalog/v1/category/products/shop/home-outdoor/outdoor-dining-tables/index.json -> response.numFound=20 (the field the listing header renders as \"20 Items\": shop.js productCount() = state.shop.cat.response.numFound, productCountDisplay.displayText=\"Items\"); read twice, identical; full enumeration: the feed returned all 20 product docs on one page",
+   "flag": null
+  },
+  {
+   "category": "Outdoor Furniture",
+   "sub_category": "Outdoor Dining Chairs & Benches",
+   "qty": 50,
+   "link": "https://www.williams-sonoma.com/shop/home-outdoor/outdoor-dining-chairs-benches/",
+   "is_group": false,
+   "evidence": "PLP product feed /api/catalog/v1/category/products/shop/home-outdoor/outdoor-dining-chairs-benches/index.json -> response.numFound=50 (the field the listing header renders as \"50 Items\": shop.js productCount() = state.shop.cat.response.numFound, productCountDisplay.displayText=\"Items\"); read twice, identical",
+   "flag": null
+  },
+  {
+   "category": "Outdoor Furniture",
+   "sub_category": "Outdoor Dining Sets",
+   "qty": 14,
+   "link": "https://www.williams-sonoma.com/shop/home-outdoor/dining-set-perfect-pairing/",
+   "is_group": false,
+   "evidence": "PLP product feed /api/catalog/v1/category/products/shop/home-outdoor/dining-set-perfect-pairing/index.json -> response.numFound=14 (the field the listing header renders as \"14 Items\": shop.js productCount() = state.shop.cat.response.numFound, productCountDisplay.displayText=\"Items\"); read twice, identical; full enumeration: the feed returned all 14 product docs on one page",
+   "flag": null
+  },
+  {
+   "category": "Outdoor Furniture",
+   "sub_category": "Outdoor Bars & Bar Stools",
+   "qty": 19,
+   "link": "https://www.williams-sonoma.com/shop/home-outdoor/outdoor-bars-and-bar-stools/",
+   "is_group": false,
+   "evidence": "PLP product feed /api/catalog/v1/category/products/shop/home-outdoor/outdoor-bars-and-bar-stools/index.json -> response.numFound=19 (the field the listing header renders as \"19 Items\": shop.js productCount() = state.shop.cat.response.numFound, productCountDisplay.displayText=\"Items\"); read twice, identical; full enumeration: the feed returned all 19 product docs on one page",
+   "flag": null
+  }
+ ]
+}

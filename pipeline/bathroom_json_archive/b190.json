@@ -1,0 +1,140 @@
+{
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ACCESS: reachable, no wall on the pages that matter. probe.fetch() returned HTTP 200 on every /browse/ category page on the first or second fingerprint; ~50 requests over the session with probe.py's 2s/host pacing, no 403 and no 429. TWO exceptions worth recording: https://www.samsclub.com/sitemap.xml serves a \"Let us know you're not a robot\" interstitial (so the sitemap route is walled and was ABANDONED - the tree came from the site's own page payloads instead), and https://www.samsclub.com/b/bath/1444 resolves to an unrelated 'Grocery' page, so the /b/ URL form was not used. MEMBERSHIP: Sam's Club gates purchase and some pricing behind membership, but category browsing and product counts are public - I was never asked to sign in and never hit a paywall.\nROBOTS (https://www.samsclub.com/robots.txt, fetched FIRST, HTTP 200, 448 bytes): a single 'User-agent: *' group. NO ClaudeBot, NO anthropic-ai, NO Claude-Web, NO Claude-SearchBot, and no literal 'Claude' string anywhere (checked per the galerieslafayette lesson). Disallows are *SCDC=1*, /*?bvroute, /lists/, */samsclub/0, /checkout/, /cart, /search, /pharmacy/login/, /tracking, /midas/, /buy-it-again, /account, /orders, /r/, /login, /reviews/write-review; plus 'Allow: /ads.txt'. The /browse/<slug>/<id> category paths I used are NOT disallowed. Compliance record: I requested no /search URL, no SCDC=1, no bvroute, no /r/ short link and no account or checkout path. The only query parameter used was ?page=N, which is not disallowed. No Crawl-delay is declared. Per-host discipline: every request went to www.samsclub.com; no API host, CDN or third party was contacted, because the counts and the tree are both server-rendered into the page's own __NEXT_DATA__.\nTREE: taken from the site's OWN navigation payload, not guessed and not from URL shape. Each /browse/ page embeds a Next.js __NEXT_DATA__ blob whose contentLayout carries the department's child links, so the tree was walked top-down from Home (/browse/Home/1285, 1,889 items) -> Bath (/browse/Bath/10220126, 143). Bath's own payload declares exactly EIGHT children plus a Shop All: Shop All Bath (12170105), Bath Accessories (10270125), Bath Mats (1963), Bath Towels (1438) with its child Beach Towels (4190103), Bath Tubs (13910187), Showers & Bathtubs (1422), Toilets (10220130) and Vanities & Bathroom Furniture (1439). The adjacent departments were then walked to make sure nothing bathroom-shaped was hiding outside Bath: Home Improvement (1390, 1,034) -> Bath & Kitchen Renovation (2360175), Plumbing (1420), Bathroom Lighting (1340147); Home Decor (1358, 238) -> Mirrors (1370); Household Essentials -> Cleaning Supplies -> Bathroom Cleaners (360211). All six were opened and enumerated and all six are in review[] with the reason they are not rows. Sam's Club has NO bathroom mirror node, NO bathroom-storage node, NO basin/sink node beyond one utility sink, and NO standalone taps node - it is a warehouse club with a narrow bathroom range.\nURL FORM AND CANONICALS: Sam's Club resolves a /browse/ URL by its trailing numeric id and treats the slug as cosmetic, so the SAME node answers to several slugs. Every recorded link is the URL the page's own rel=canonical declares: Bath Accessories canonicalises to /browse/bath-accessories-bathroom-accessories/10270125 (not the /Bath-Accessories/ form in the nav) and Showers & Bathtubs canonicalises to /browse/shower-fixtures/1422 (not /Showers-%26-Bathtubs/1422). Both the nav form and the canonical form of every node were run through the dedup index. One genuine oddity is documented in review: node 1963, whose H1 is 'Bath Mats', declares rel=canonical /browse/embroidery/1963 - a wrong slug on Sam's Club's side.\nQTY - SOURCE AND PROOF. Source: searchResult.aggregatedCount in the PLP's own __NEXT_DATA__, which equals itemStacks[0].meta.totalItemCount, equals itemStacks[0].count, and equals the number the site renders in its own H1 (meta.totalItemCountDisplay, e.g. 'Bath(143+)'). The rendered H1 string is LOSSY - it appends a '+' - so the payload figure was used and the H1 is the cross-check, which is the Wayfair situation from BATCH_BRIEF s3 (payload exact, rendered string lossy). PROOF BY ENUMERATION TO EXHAUSTION, run on all 14 nodes touched: each was paginated with ?page=N to its declared paginationV2.maxPage and every product tile's usItemId collected, excluding non-product tiles (MarqueeDisplayAd) and counting sponsored tiles. aggregatedCount was matched EXACTLY by the distinct id count on five nodes - Bath Towels 20/20, Bath Tubs 4/4, Showers & Bathtubs 25/25, Toilets 22/22, Vanities 30/30 - all five being nodes with ZERO sponsored tiles. On the nodes where the enumeration came up short the shortfall tracks the sponsored-tile count exactly: Bath Accessories 23 vs 25 with 2 sponsored, Bath Mats 13 vs 15 with 2 sponsored, Beach Towels 12 vs 13. Sponsored placements displace organic slots in the rendered grid without reducing the catalogue total, which is why aggregatedCount is the right figure and the grid scrape is not. PAGINATION WAS VERIFIED REAL, not the IKEA trap: on the 4-page Bath node pages 1-4 returned 44/47/47/8 products with 44/45/45/6 NEW ids each time, so ?page=N genuinely advances. maxPage also reconciles with the totals (143 over 4 pages, 106 over 3, 58 over 2, everything <=46 over 1). Counts were re-read on separate fetches with separate fingerprints and did not move (143, 25, 25, 22 both times). NO estimate, NO parent figure reused for a child, NO sibling sums.\nVERIFICATION: the three recorded counts discriminate against the wider set actually measured (143 / 106 / 58 / 30 / 25 / 25 / 22 / 20 / 19 / 17 / 15 / 13 / 10 / 4 - no site-wide constant). Bath Accessories and Showers & Bathtubs both happen to be 25, and that was checked rather than assumed: their product-id sets overlap by only 4 of 25, so they are genuinely different nodes that coincidentally have the same size. Every node's H1 was read and matched the node requested. CONTAINMENT was proved by usItemId set for every parent/child claim, not asserted: all eight children are strict subsets of the Bath department, and Bath Tubs is a strict subset of Showers & Bathtubs (4 of 4 in, 0 out), which is why Bath Tubs is withheld.\nROWS AND CLASSIFICATION: three leaves. Bath Accessories (25) is Bathroom under rules 13/17 - internal product types are Shower Curtains & Liners 4, Showerheads & Handheld Showers 4, Towel Warmers 3, Face Mirrors 2, Bath Accessories Sets 2, plus a Faucet, a Bidet, a Toilet Lid & Tank Cover, a Bath Rug, a Towel, a Ventilation Fan, an Air Purifier and a Body Fat Analyzer. DISCLOSED IMPURITY: the air purifier and the body-fat scale are not Bathroom under rule 3, and the 4 shower curtains would be Textile under rule 20 - but they are 6 of 25 in a node whose name, parentage and dominant product type are all bathroom accessories, and the site offers no sub-node to split them, so the node is recorded whole and the mixture is stated. Showers & Bathtubs (25) is Bathroom under rules 5/6/7 - Showerheads & Handheld Showers 7, Shower Doors 4, Shower Bases 4, Bathtubs 3, Shower Enclosures 2, Shower Stalls 2, plus a sink, a faucet and a pet shower attachment. Toilets (22) is Bathroom under rules 4/14 - Bidet Toilet Seats 9, Toilets 2, Bidets 2, Toilet Seats 2, Toilet Brushes & Holders 2, Toilet Paper Holders 1, Bidet Attachments 1, Toilet Lid & Tank Covers 1, plus a faucet and a drain tool. The Bath department node itself is the grouping row with blank qty and blank link under rule 24.\nDEDUP (OPTION 1, URL-exact index): already_extracted() was run on all 20 candidate, canonical, nav-form and id-only URL variants. ONE HIT, and it is the decisive one for this company - /browse/vanities-bathroom-furniture/1439 is in Furniture.xlsx as 'Vanities & Bathroom Furniture', so Sam's Club's 30-product bathroom vanity node (27 of them internally typed 'Bathroom Vanities') STAYS IN FURNITURE and is in review[], never rows[], exactly as the OPTION 1 decision requires. samsclub.com carries 24 Furniture.xlsx records in total; the other 23 are sofas, beds, dressers, dining, office and patio, none bathroom. Final.xlsx does not cover samsclub.com. Blind spots worked: (a) canonicals - both the nav slug and the rel=canonical slug of every node were index-checked separately, and the id-only form /browse/1439 was checked too since Furniture.xlsx itself holds an id-only Sam's Club URL (/browse/1371); (b)/(c) locale - samsclub.com is a single-locale US storefront with no locale prefix and no cross-host hreflang alternate, and Furniture.xlsx used the identical /browse/ form; (d) one page two nav paths - Bath Accessories, Bath Tubs, Showers & Bathtubs, Toilets and Bathroom Lighting are each reachable from BOTH the Home > Bath tree AND the Home Improvement > Bath & Kitchen Renovation tree at identical URLs; each is one record under rule 28 and the Home Improvement roll-up is withheld.\nEXCLUDED and why, in one place: Vanities & Bathroom Furniture -> already extracted (Furniture). Bath Tubs -> proven strict subset of a recorded sibling. Shop All Bath -> rule 25 plus partial roll-up. Bath & Kitchen Renovation -> cross-department roll-up overlapping 49 of the recorded products. Bath Towels, Beach Towels, Bath Mats -> Textile (rules 15/16/20). Bathroom Lighting -> Lighting (rules 11/19). Bathroom Cleaners -> consumable cleaning chemicals under Household Essentials, not bathroom accessories. Home Decor > Mirrors -> decorative and bedroom mirrors, and the site's two lighted vanity mirrors are already inside the recorded Bath Accessories leaf. Plumbing -> water coolers and heaters, not sanitaryware. No empty nodes were found: every node opened returned a populated grid. One structural gap is on the record in review[]: five products (four OVE Decors sliding shower doors and one hair towel) sit in the Bath department under no child and are therefore counted in no row.",
+ "rows": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Accessories",
+   "qty": 25,
+   "link": "https://www.samsclub.com/browse/bath-accessories-bathroom-accessories/10270125",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Showers & Bathtubs",
+   "qty": 25,
+   "link": "https://www.samsclub.com/browse/shower-fixtures/1422",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Toilets",
+   "qty": 22,
+   "link": "https://www.samsclub.com/browse/toilets/10220130",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath (other)",
+   "qty": 4,
+   "link": "https://www.samsclub.com/browse/Bath/10220126",
+   "is_group": false,
+   "evidence": "RULE 24 RESIDUE, promoted to a leaf 2026-09-05 (mirrors the SR176 Kmart '<parent> (other)' run-owner decision). Live re-fetch of the Bath department (https://www.samsclub.com/browse/Bath/10220126, all 4 pages, page=1-4) and all 8 declared children (each paginated to its own maxPage, which is 1 for every child) on 2026-09-05, same fingerprint/session as the rest of this file's original capture, robots.txt re-checked (448 bytes, identical to the original capture, no Claude group, /browse/ and ?page=N both allowed). Department distinct usItemId set = 140 (aggregatedCount reads 141; the 1-unit gap is a single sponsored tile, consistent with the sponsored-tile behavior documented earlier in notes). Union of the 8 children's distinct usItemId sets = 135 (Vanities & Bathroom Furniture 29, Bath Accessories 23, Showers & Bathtubs 26, Toilets 22, Bath Towels 20, Bath Mats 13, Beach Towels 12, Bath Tubs 4 - all individually deduplicated against each other, e.g. Bath Tubs' 4 ids are the same 4 already inside Showers & Bathtubs). Department-set minus union-of-children-set = exactly 5 residue ids, an EXACT reproduction of the original run's finding (same 5 usItemIds, same 5 names, re-identified independently by live set subtraction rather than trusted from the prior note): 4 OVE Decors frameless sliding shower doors (usItemId 18043761120 'Selby 55-1/2-60W x 74H', 18058555320 'Selby 45-1/16-48W x 74H', 18055068798 'Selby 67-1/2-72W x 74H', 18045565583 'Bel 70-3/16-72-3/16W x 78-3/4H Soft-Close'; internal type 'Shower Doors' on all 4) plus 1 'NIGHT Quick Dry Hair Towel' (usItemId 15216571941, internal type 'Towels & Washcloths'). The 4 shower doors sit in the Bath department under no child node and have no listing URL of their own; they are unambiguously Bathroom under rule 7 (Enclosures & Screens - Shower Doors explicitly listed), so this qty=4 leaf carries them, using the department's own URL under the same OPTION applied to Kmart (a '(other)' leaf at the parent URL when genuine residue exists with no deeper listing URL). The 5th residue item, the hair towel, is EXCLUDED from this row's qty: it is Textile (Towels & Washcloths, rule 20), not Bathroom, so it is not fabricated into this count; it remains noted for completeness only. No other candidate URL (product-detail or otherwise) exists for these 4 products, so no separate rows[] URL could be recorded per rule 27 - the department URL is used exactly as the Kmart precedent used its own parent URLs. Cross-checked cross_category_url_index.json for 'shower-door', 'OVE Decors', 'Selby' and 'hair-towel' before recording: only unrelated 'hair-towel' substring hits elsewhere in the index (a different company's URL slug), no samsclub.com hit, so no dedup applies.",
+   "flag": null
+  }
+ ],
+ "review": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Home > Bath > Vanities & Bathroom Furniture",
+   "qty": 30,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Vanities & Bathroom Furniture' - URL-exact index hit on this exact canonical URL, must NOT be re-extracted into Bathroom (master guide s13, OPTION 1 run-owner decision). This is the single biggest thing OPTION 1 removes from this company: the node is 30 products, verified by exhaustive enumeration (aggregatedCount 30 == 30 distinct usItemIds over 1 page, maxPage 1), and 27 of the 30 are of internal type 'Bathroom Vanities' (OVE Decors, Studio Bathe, Becki Owens, Member's Mark freestanding vanities), which rule 9 would otherwise class as Bathroom. It stays in Furniture. The remaining 3 are one Shower Base, one Door Handle Set and one Shelves & Shelf Units item.",
+   "link": "https://www.samsclub.com/browse/vanities-bathroom-furniture/1439"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Home > Bath > Bath Tubs",
+   "qty": 4,
+   "issue": "NOT RECORDED - PROVEN STRICT SUBSET of the recorded 'Showers & Bathtubs' leaf, withheld to avoid double-counting (BATCH_BRIEF s5). Containment proved by product-id set, not by assumption: all 4 of its 4 distinct usItemIds appear inside Showers & Bathtubs (25), 0 outside. Both nodes are linked as siblings from the Bath landing page, but the site's data shows Bath Tubs is wholly inside its sibling, so recording both would count 4 products twice. Showers & Bathtubs is the one recorded because it also holds 21 products Bath Tubs does not. Contents: 3 Bathtubs + 1 Showerhead.",
+   "link": "https://www.samsclub.com/browse/bath-tubs/13910187"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Home > Bath > Shop All Bath",
+   "qty": 106,
+   "issue": "NOT RECORDED - rule 25 (View All / Shop All is never recorded) and a partial roll-up. Verified by enumeration (aggregatedCount 106, 3 pages, 103 distinct usItemIds recovered, 2 sponsored tiles displacing organic slots). It is NOT a clean superset of its siblings - it holds 18 of Bath Towels' 20, 13 of Toilets' 22, 12 of Showers & Bathtubs' 25, 21 of Vanities' 30 - i.e. a curated merchandising cut, not a taxonomy node, which is a second reason not to record it. Every one of its 103 products is inside the Bath department node.",
+   "link": "https://www.samsclub.com/browse/shop-all-bath/12170105"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Home > Bath > Bath Towels",
+   "qty": 20,
+   "issue": "ROUTED TO TEXTILE: bath towels, washcloths and bath sheets are Textile under rules 15/20. Verified exactly: aggregatedCount 20 == 20 distinct usItemIds enumerated, maxPage 1, zero sponsored tiles - one of the five nodes where the payload total and the enumeration agree to the unit. Internal product types: 19 'Towels & Washcloths' + 1 'Towel Warmers'. THAT ONE TOWEL WARMER is Bathroom hardware under rule 17 and is flagged rather than lost; it is also carried inside the recorded Bath Accessories leaf (which holds 3 towel warmers), so it is not actually missing from Bathroom.",
+   "link": "https://www.samsclub.com/browse/bath-towels/1438"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Home > Bath > Bath Towels > Beach Towels",
+   "qty": 13,
+   "issue": "ROUTED TO TEXTILE and, separately, NOT BATHROOM-INTENDED: beach towels are neither bathroom textiles nor bathroom hardware (rule 13's 'bathroom-intended only'). Enumerated: aggregatedCount 13, 12 distinct usItemIds recovered, all of type 'Towels & Washcloths'; proved a strict subset of Shop All Bath (12 of 12 contained). Recorded here so the node is not silently skipped.",
+   "link": "https://www.samsclub.com/browse/beach-towels/4190103"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Home > Bath > Bath Mats",
+   "qty": 15,
+   "issue": "ROUTED TO TEXTILE (rule 16). Enumerated: aggregatedCount 15, 13 distinct usItemIds recovered (2 sponsored tiles displacing organic slots), and EVERY ONE is of internal type 'Bath Rugs' - Member's Mark quick-dry memory-foam bath rugs, cotton bath rugs, microfiber tufted rugs. A textile bath mat is Textile under rule 16. CAVEAT: the Bath department does stock one 'VCNY Home Diatomite Stone Bath Mat', a non-textile stone mat that rule 16 would send to Bathroom; it sits under this node's type bucket and there is no separate node for it. URL NOTE: the site's own rel=canonical for this node id (1963) is https://www.samsclub.com/browse/embroidery/1963 - an evidently wrong slug on Sam's Club's side. The H1 is 'Bath Mats' and the human-facing URL is the one recorded here; the odd canonical is documented so the Textile pass is not confused by it. Both forms index-checked, both miss.",
+   "link": "https://www.samsclub.com/browse/Bath-Mats/1963"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Home Improvement > Bath & Kitchen Renovation",
+   "qty": 58,
+   "issue": "NOT RECORDED - CROSS-DEPARTMENT ROLL-UP that heavily overlaps the recorded leaves, withheld under BATCH_BRIEF s5. Enumerated: aggregatedCount 58, 2 pages, 56 distinct usItemIds. Overlap proved by product-id set against each recorded/reviewed sibling: 25 of Vanities' 30, 12 of Showers & Bathtubs' 25, 9 of Toilets' 22, 2 of Bath Tubs' 4, 1 of Bath Accessories' 23 - 49 of its 56 products are already inside the Bath department node. Recording it alongside the Bath leaves would double-count roughly 46 products. It is also impure for Bathroom: 7 of its items are 'Vanity Lights' (Lighting under rule 19) and one is Tile. Its own bathroom-specific children (bath-tubs, shower-fixtures, bath-accessories, bathroom-lighting) are the SAME URLs already handled under Bath, so this is additionally a rule 28 second nav path to the same pages.",
+   "link": "https://www.samsclub.com/browse/bath-kitchen-renovation/2360175"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Home Improvement > Lighting > Bathroom Lighting",
+   "qty": 19,
+   "issue": "ROUTED TO LIGHTING: primary product type is lighting (rules 11/19) - vanity lights, flush mounts, under-cabinet, recessed, strip and rope lights. Inspected rather than skipped because rule 19 requires bathroom lighting to be looked at, then classified elsewhere; never duplicated into Bathroom. Enumerated: aggregatedCount 19, 16 distinct usItemIds (3 sponsored). One item is a 'Bathroom Linen & Accessory Set' and one a Ventilation Fan, i.e. mis-tagged into a lighting node; both are also carried inside the recorded Bath Accessories leaf.",
+   "link": "https://www.samsclub.com/browse/bathroom-lighting/1340147"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Household Essentials > Cleaning Supplies > Bathroom Cleaners",
+   "qty": 25,
+   "issue": "NOT RECORDED - inspected under rule 3's 'Cleaning Accessories' and rejected on primary product type (rule 2). Its parents are Cleaning Supplies and Household Essentials, not Bath, and its contents are consumable cleaning CHEMICALS (bowl cleaners, disinfectant sprays), not bathroom cleaning accessories such as toilet brushes or squeegees. Sam's Club's actual toilet brushes and holders sit inside the recorded Toilets leaf (2 items of type 'Toilet Brushes & Holders'), where they belong. aggregatedCount 25.",
+   "link": "https://www.samsclub.com/browse/bathroom-cleaners/360211"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Home Decor > Mirrors",
+   "qty": 10,
+   "issue": "NOT RECORDED - inspected specifically because rule 10 forbids skipping bathroom mirrors, and rejected on primary product type plus website hierarchy. It is a Home Decor node, not a Bath node. Enumerated: aggregatedCount 10, 9 distinct usItemIds, internal types Mirrors 4, Face Mirrors 2, Bedroom Furniture Sets 1, Makeup Organizers 1, Dressers 1 - i.e. decorative wall/floor mirrors mixed with bedroom furniture. No bathroom, vanity-unit, LED, illuminated, demister or medicine-cabinet mirror. Sam's Club publishes NO bathroom mirror node at all; the two lighted 'Face Mirrors' it stocks (Thinkspace oval vanity mirror, iHome Hollywood Pro) are already carried inside the recorded Bath Accessories leaf, so no bathroom mirror is lost. Index-checked: miss.",
+   "link": "https://www.samsclub.com/browse/Mirrors/1370"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Home Improvement > Plumbing",
+   "qty": 17,
+   "issue": "NOT RECORDED - inspected because 'Plumbing' is a standard route into sanitaryware, and rejected on contents. Enumerated: aggregatedCount 17, 16 distinct usItemIds; internal types are Water Coolers 5, Ice Makers 2, Water Heaters 2, Water Filtration Pitchers 1, Replacement Water Filters 1, Bottled Drinking Water 1, Organizing Racks 1, an Automotive Radiator part 1, plus exactly ONE Showerhead and ONE Sink. It is a water-dispenser and water-heating node, not a bathroom fixtures node; its one showerhead is already inside the recorded Showers & Bathtubs leaf. Index-checked: miss.",
+   "link": "https://www.samsclub.com/browse/plumbing-plumbing-fixtures/1420"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Home > Bath (department landing) - RULE 24 RESIDUE",
+   "qty": null,
+   "issue": "The Bath department node itself is the grouping row (rule 24: it has 8 children). KNOWN STRUCTURAL GAP, stated rather than hidden (BATCH_BRIEF s5 'rule 24 residue'): the department enumerates to 140 distinct usItemIds while the union of all EIGHT children is 135, so FIVE products sit in the Bath department under no child at all. They were identified individually: 'NIGHT Quick Dry Hair Towel' (Towels & Washcloths - Textile anyway) and FOUR OVE Decors frameless sliding shower doors ('Selby 55-1/2-60\"W', 'Selby 45-1/16-48\"W', 'Selby 67-1/2\"-72\"W', 'Bel 70-3/16-72-3/16\"W'), which ARE Bathroom under rule 7 but have no leaf URL of their own. RESOLVED 2026-09-05: live re-fetch reproduced this exact residue set (same 5 usItemIds and names) precisely, and the run-owner OPTION applied to SR176 Kmart (a '<parent> (other)' leaf at the parent URL) was mirrored here. The 4 shower doors are now a recorded leaf, rows[] 'Bath (other)' qty=4, link = the department URL https://www.samsclub.com/browse/Bath/10220126 (see that row's evidence field for the full re-verification). The hair towel stays excluded from Bathroom (Textile) and is not counted anywhere in Bathroom. Nothing here is fabricated: no product-detail URL was invented, the department URL is reused exactly as Kmart's precedent reused its parent URLs.",
+   "link": "https://www.samsclub.com/browse/Bath/10220126"
+  }
+ ],
+ "_reconstructed_from": "Bathroom.xlsx delivered 2026-09-01 (checkpoint), not original worker JSON",
+ "_followup_2026-09-05": "Targeted follow-up on the rule-24 residue open item. Live HTTP fetch (curl, same UA/robots-compliant approach as the original run; robots.txt re-checked, byte-identical 448 bytes, no Claude group) of https://www.samsclub.com/browse/Bath/10220126 (all 4 pages) and all 8 declared children (each to its own maxPage=1) on 2026-09-05. Department total is now aggregatedCount 141 (was 143 on 2026-09-01, ordinary catalog churn over 4 days); several children shifted by 1-2 units too (e.g. Vanities 29 vs 30, Showers & Bathtubs 26 vs 25) but none of that changes the structural finding. Distinct-id department set (140) minus the union of the 8 children's distinct-id sets (135) again equals exactly 5, and set-subtraction independently re-identified the SAME 5 products by usItemId and name as the original capture: 4 OVE Decors frameless sliding shower doors (Bathroom, rule 7) and 1 'NIGHT Quick Dry Hair Towel' (Textile). Applied the same run-owner OPTION used for SR176 Kmart: added rows[] 'Bath (other)' qty=4, link=the department URL, carrying only the 4 genuinely-Bathroom shower doors (the hair towel is excluded, not fabricated into the count). Checked cross_category_url_index.json for these product names/slugs before adding - no samsclub.com hit, so no dedup applies. All other rows/review entries in this file are untouched."
+}

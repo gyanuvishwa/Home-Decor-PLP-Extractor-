@@ -1,0 +1,16 @@
+{
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "Access: direct HTTP fetch worked throughout (robots.txt on sostrenegrene.com has no Claude-specific disallow; User-agent: * / Allow: /). Site is Umbraco-headless SPA (per prior Home-Decor pass notes for this SR); used the site's own backend API GET https://sostrenegrene.com/umbraco/api/catalog/search?categoryId=<id>&pageSize=500&market=DK&culture=da-DK to get exact counts rather than trusting client-rendered HTML. Found the site's full Danish category tree via sitemap https://sostrenegrene.com/da/sitemap.xml (grepped all /produkter/...-c-NNNN category-page URLs, ~140 leaf/branch categories across Bolig, Accessories, Boern, Fest, Kreativitet, Skonhed, Mobler, Jul, Paske, etc.) -- exactly ONE category matches Pet Care: Accessories > Dyreartikler ('Animal articles/Pet accessories'), https://sostrenegrene.com/da/produkter/accessories/dyreartikler-c-8414, categoryId=66 (read from the page's embedded jsonContent.content.categoryId). No dedicated 'Kaeledyr'/Pets top-level nav node exists; Dyreartikler is a single leaf, no children (sitemap has no sub-c- URLs under it, and its embedded content has no 'children' array). Queried categoryId=66 at pageSize=500 3x in separate calls: total=3 every time (fully stable, no ARRAffinity-replica desync like the Vaser og potter issue noted in the prior pass). The 3 items: Hundesnor (dog leash), Halsbaand til hund (dog collar), Hundetoerklaede (dog bandana/scarf) -- all Tier 1 (walking & clothing). Verified absence of other Pet Care elsewhere: grepped the full sitemap for hund/kat(te)/dyr/kaeledyr/kanin/fugl/foder/kurv-til/snor/halsband keywords; every other hit was either a themed human accessory (Hund-pin = dog-shaped enamel pin for jackets/bags, breadcrumb under generic Accessories not Dyreartikler; rabbit-ear hair elastics, butterfly hair clips/pins, bird ornaments/glass hangers) or unrelated compound-word noise (kategori, katalog, snor used for drawstrings/cords on bags/vases/stickers). No pet food, litter, beds, bowls, crates, carriers, toys, or grooming items found anywhere on the site. No pet-food/consumable or medical/veterinary categories present.",
+  "rows": [
+    {
+      "category": "Pet Care",
+      "sub_category": "Dyreartikler (Pet Accessories)",
+      "qty": 3,
+      "link": "https://sostrenegrene.com/da/produkter/accessories/dyreartikler-c-8414",
+      "is_group": false,
+      "evidence": "GET https://sostrenegrene.com/umbraco/api/catalog/search?categoryId=66&pageSize=500&market=DK&culture=da-DK -> \"total\":3, reproduced identically across 3 separate calls",
+      "flag": null
+    }
+  ]
+}

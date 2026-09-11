@@ -1,0 +1,192 @@
+{
+ "sr": 89,
+ "company": "H&M Home UK",
+ "brand_site": "www2.hm.com/en_gb/home.html",
+ "country": "UK",
+ "site_url": "https://www2.hm.com/en_gb/home.html",
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ROBOTS: www2.hm.com/robots.txt names ClaudeBot / Claude-Web / anthropic-ai, but that UA group ends in 'Allow: /' - H&M explicitly PERMITS Claude. No Claude-specific disallow, so no section-5 stop condition. ACCESS: all HTML page routes are hard-blocked (Akamai Bot Manager behavioural sensor, then outright 403) - curl_cffi safari18_0_ios/chrome, r.jina.ai (403 Access Denied), www2-hm-com.translate.goog (403), WebFetch (403). Two routes ARE open and carried the whole job: (a) the en_gb sitemap set (https://www2.hm.com/en_gb.sitemap.xml -> en_gb.pages.subdepartment.0-31.xml, 3010 URLs, 333 under /en_gb/home) gave the authoritative category tree; (b) the storefront's own Elevate PLP JSON endpoint https://api.hm.com/search-services/v1/en_GB/listing/resultpage?pageSource=PLP&page=1&sort=RELEVANCE&pageId=<path>&page-size=36&touchPoint=DESKTOP&categoryId=x , which is NOT behind Akamai, returns GBP prices and the en_gb assortment, and exposes plpList.numberOfHits - the same field the PLP header renders. SLUG TRAP: the en_gb *URL* branch is /shop-by-product/furniture/... (singular) but the API pageId namespace uses the /shop-by-product/furnitures/... form (the en_us/en_ie slug); 'furniture' returns 0 hits, 'furnitures' returns the real data. Likewise URL leaf tables/side-table.html maps to API pageId tables/side. Every 'link' below is the canonical en_gb origin URL, confirmed live and confirmed to be the right node by its indexed page title (e.g. 'Side Tables | Nesting, Marble, Lamp & End Tables | H&M GB'), never the API path. QTY SOURCE: section-4 method 2 (structured), because the rendered header is unreachable. Sanity checks run: (1) discrimination - bogus pageIds (/home/shop-by-product/thisdoesnotexist12345, .../furnitures/nonsense999) return numberOfHits=0 while real ones vary widely (home=3961, decorations=1042, lighting=167, furnitures=301, ladies/dresses=1354), so the number tracks the category and is not a site-wide constant; (2) the categoryId param is ignored - pageId alone drives the result (5 different categoryIds returned byte-identical responses), so no stale-category risk from it; (3) two reads several minutes apart gave identical values for all 16 counted leaves - no drift; (4) children sum sanely to parents: storage 22+36+3=61 = storage total exactly; tables 6+34+4+32+61=137 vs 138; chairs 14+1+16+15+4+1+9+4=64 vs 74; the three branches 74+138+61=273 vs the Furniture total of 301, i.e. ~28 products (pedestals, footstools, display shelves, media units, a headboard) sit directly on the parent with no child node - no child count is ever above its parent; (5) corroboration with the prior Home-Decor pass: Mirrors was verified at 39 there via __NEXT_DATA__ productListingData.totalHits; this API returns 38 today - same field, ordinary drift. TREE: shop-by-product/furniture is the only furniture department; its three children (Chairs & Seating, Storage, Tables) all have real children, so per section 2 they are grouping rows and only the 17 leaves carry qty+URL. furniture/view-all.html dropped per section 3. ROOM DUPLICATES EXCLUDED (verified by product-ID overlap, not assumed): shop-by-room/livingroom/furniture (203 hits, 170 of its 187 products already inside the shop-by-product furniture catalogue), shop-by-room/outdoor/furniture (19 hits, 18 of 19 already inside it - H&M has no separate outdoor-furniture assortment, just metal/concrete side tables and a deck chair also filed under Tables/Chairs), and shop-by-room/kids-room/furniture-lighting (29 hits, 25 already inside it, and it is an unsplit furniture+lighting roll-up containing 3 lamps). All three would double-count. ALSO EXCLUDED per section 1: shop-by-product/storage/* (baskets, boxes, jars, kitchen storage, laundry baskets, wall-storage = standalone storage goods, not storage furniture), the shop-by-room/*/storage room views (same goods), all lighting, decorations (mirrors, frames, posters, vases, plant pots, trays), textiles, bed-linen, bath-shower, cooking-dining, flowers-plants, home-fragrance, homewear/sleepwear, giftwraps, and every seasonal-trending / holiday / christmas / sale / bestsellers / brands / premium landing page (section 3). H&M Home sells no beds, mattresses or bathroom vanity units.",
+ "rows": [
+  {
+   "category": "Furniture",
+   "sub_category": "Chairs & Seating",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Armchairs",
+   "qty": 14,
+   "link": "https://www2.hm.com/en_gb/home/shop-by-product/furniture/chairs/armchairs.html",
+   "is_group": false,
+   "evidence": "api.hm.com/search-services/v1/en_GB/listing/resultpage?pageId=/home/shop-by-product/furnitures/chairs/armchairs&page-size=36&touchPoint=DESKTOP -> plpList.numberOfHits=14 (Elevate PLP JSON, the source the PLP header renders from; rendered header unobtainable - Akamai 403/behavioural-sensor on every HTML route). Identical on two independent reads.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bean Bags",
+   "qty": 1,
+   "link": "https://www2.hm.com/en_gb/home/shop-by-product/furniture/chairs/bean-bags.html",
+   "is_group": false,
+   "evidence": "api.hm.com/search-services/v1/en_GB/listing/resultpage?pageId=/home/shop-by-product/furnitures/chairs/bean-bags&page-size=36&touchPoint=DESKTOP -> plpList.numberOfHits=1 (Elevate PLP JSON, the source the PLP header renders from; rendered header unobtainable - Akamai 403/behavioural-sensor on every HTML route). Identical on two independent reads.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Benches",
+   "qty": 16,
+   "link": "https://www2.hm.com/en_gb/home/shop-by-product/furniture/chairs/benches.html",
+   "is_group": false,
+   "evidence": "api.hm.com/search-services/v1/en_GB/listing/resultpage?pageId=/home/shop-by-product/furnitures/chairs/benches&page-size=36&touchPoint=DESKTOP -> plpList.numberOfHits=16 (Elevate PLP JSON, the source the PLP header renders from; rendered header unobtainable - Akamai 403/behavioural-sensor on every HTML route). Identical on two independent reads.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dining Chairs",
+   "qty": 15,
+   "link": "https://www2.hm.com/en_gb/home/shop-by-product/furniture/chairs/dining-chairs.html",
+   "is_group": false,
+   "evidence": "api.hm.com/search-services/v1/en_GB/listing/resultpage?pageId=/home/shop-by-product/furnitures/chairs/dining-chairs&page-size=36&touchPoint=DESKTOP -> plpList.numberOfHits=15 (Elevate PLP JSON, the source the PLP header renders from; rendered header unobtainable - Akamai 403/behavioural-sensor on every HTML route). Identical on two independent reads.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Lounge Chairs",
+   "qty": 4,
+   "link": "https://www2.hm.com/en_gb/home/shop-by-product/furniture/chairs/lounge-chairs.html",
+   "is_group": false,
+   "evidence": "api.hm.com/search-services/v1/en_GB/listing/resultpage?pageId=/home/shop-by-product/furnitures/chairs/lounge-chairs&page-size=36&touchPoint=DESKTOP -> plpList.numberOfHits=4 (Elevate PLP JSON, the source the PLP header renders from; rendered header unobtainable - Akamai 403/behavioural-sensor on every HTML route). Identical on two independent reads.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Pouffes",
+   "qty": 1,
+   "link": "https://www2.hm.com/en_gb/home/shop-by-product/furniture/chairs/pouffes.html",
+   "is_group": false,
+   "evidence": "api.hm.com/search-services/v1/en_GB/listing/resultpage?pageId=/home/shop-by-product/furnitures/chairs/pouffes&page-size=36&touchPoint=DESKTOP -> plpList.numberOfHits=1 (Elevate PLP JSON, the source the PLP header renders from; rendered header unobtainable - Akamai 403/behavioural-sensor on every HTML route). Identical on two independent reads.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sofas",
+   "qty": 9,
+   "link": "https://www2.hm.com/en_gb/home/shop-by-product/furniture/chairs/sofas.html",
+   "is_group": false,
+   "evidence": "api.hm.com/search-services/v1/en_GB/listing/resultpage?pageId=/home/shop-by-product/furnitures/chairs/sofas&page-size=36&touchPoint=DESKTOP -> plpList.numberOfHits=9 (Elevate PLP JSON, the source the PLP header renders from; rendered header unobtainable - Akamai 403/behavioural-sensor on every HTML route). Identical on two independent reads.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Stools",
+   "qty": 4,
+   "link": "https://www2.hm.com/en_gb/home/shop-by-product/furniture/chairs/stools.html",
+   "is_group": false,
+   "evidence": "api.hm.com/search-services/v1/en_GB/listing/resultpage?pageId=/home/shop-by-product/furnitures/chairs/stools&page-size=36&touchPoint=DESKTOP -> plpList.numberOfHits=4 (Elevate PLP JSON, the source the PLP header renders from; rendered header unobtainable - Akamai 403/behavioural-sensor on every HTML route). Identical on two independent reads.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Storage",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Cabinets",
+   "qty": 22,
+   "link": "https://www2.hm.com/en_gb/home/shop-by-product/furniture/storage/cabinets.html",
+   "is_group": false,
+   "evidence": "api.hm.com/search-services/v1/en_GB/listing/resultpage?pageId=/home/shop-by-product/furnitures/storage/cabinets&page-size=36&touchPoint=DESKTOP -> plpList.numberOfHits=22 (Elevate PLP JSON, the source the PLP header renders from; rendered header unobtainable - Akamai 403/behavioural-sensor on every HTML route). Identical on two independent reads.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Shelves",
+   "qty": 36,
+   "link": "https://www2.hm.com/en_gb/home/shop-by-product/furniture/storage/shelves.html",
+   "is_group": false,
+   "evidence": "api.hm.com/search-services/v1/en_GB/listing/resultpage?pageId=/home/shop-by-product/furnitures/storage/shelves&page-size=36&touchPoint=DESKTOP -> plpList.numberOfHits=36 (Elevate PLP JSON, the source the PLP header renders from; rendered header unobtainable - Akamai 403/behavioural-sensor on every HTML route). Identical on two independent reads.",
+   "flag": "MANUAL REVIEW: ambiguous shelving - the site files this under Furniture > Storage, but 34 of the 36 listed items are WALL shelves (e.g. 'Wooden wall shelf', 'Floating metal wall shelf', 'Cloud-shaped wall shelf'); only 3 are freestanding floor shelves. May belong to Wall Decor rather than Furniture."
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Wardrobes",
+   "qty": 3,
+   "link": "https://www2.hm.com/en_gb/home/shop-by-product/furniture/storage/wardrobes.html",
+   "is_group": false,
+   "evidence": "api.hm.com/search-services/v1/en_GB/listing/resultpage?pageId=/home/shop-by-product/furnitures/storage/wardrobes&page-size=36&touchPoint=DESKTOP -> plpList.numberOfHits=3 (Elevate PLP JSON, the source the PLP header renders from; rendered header unobtainable - Akamai 403/behavioural-sensor on every HTML route). Identical on two independent reads.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Tables",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bedside Tables",
+   "qty": 6,
+   "link": "https://www2.hm.com/en_gb/home/shop-by-product/furniture/tables/bedside.html",
+   "is_group": false,
+   "evidence": "api.hm.com/search-services/v1/en_GB/listing/resultpage?pageId=/home/shop-by-product/furnitures/tables/bedside&page-size=36&touchPoint=DESKTOP -> plpList.numberOfHits=6 (Elevate PLP JSON, the source the PLP header renders from; rendered header unobtainable - Akamai 403/behavioural-sensor on every HTML route). Identical on two independent reads.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Coffee Tables",
+   "qty": 34,
+   "link": "https://www2.hm.com/en_gb/home/shop-by-product/furniture/tables/coffee.html",
+   "is_group": false,
+   "evidence": "api.hm.com/search-services/v1/en_GB/listing/resultpage?pageId=/home/shop-by-product/furnitures/tables/coffee&page-size=36&touchPoint=DESKTOP -> plpList.numberOfHits=34 (Elevate PLP JSON, the source the PLP header renders from; rendered header unobtainable - Akamai 403/behavioural-sensor on every HTML route). Identical on two independent reads.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Desks",
+   "qty": 4,
+   "link": "https://www2.hm.com/en_gb/home/shop-by-product/furniture/tables/desks.html",
+   "is_group": false,
+   "evidence": "api.hm.com/search-services/v1/en_GB/listing/resultpage?pageId=/home/shop-by-product/furnitures/tables/desks&page-size=36&touchPoint=DESKTOP -> plpList.numberOfHits=4 (Elevate PLP JSON, the source the PLP header renders from; rendered header unobtainable - Akamai 403/behavioural-sensor on every HTML route). Identical on two independent reads.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dining Tables",
+   "qty": 32,
+   "link": "https://www2.hm.com/en_gb/home/shop-by-product/furniture/tables/dining.html",
+   "is_group": false,
+   "evidence": "api.hm.com/search-services/v1/en_GB/listing/resultpage?pageId=/home/shop-by-product/furnitures/tables/dining&page-size=36&touchPoint=DESKTOP -> plpList.numberOfHits=32 (Elevate PLP JSON, the source the PLP header renders from; rendered header unobtainable - Akamai 403/behavioural-sensor on every HTML route). Identical on two independent reads.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Pedestal Tables",
+   "qty": null,
+   "link": "https://www2.hm.com/en_gb/home/shop-by-product/furniture/tables/pedestals.html",
+   "is_group": false,
+   "evidence": null,
+   "flag": "MANUAL REVIEW: no exact count obtainable - the node exists as a live en_gb URL (indexed page title 'Pedestal Tables | Wooden, Round, Coffee & More | H&M GB') and pedestal products are present in the parent Furniture listing ('Metal pedestal' x4, 'Pedestal' x1), but the Elevate PLP API returns numberOfHits=0 for every pageId variant tried (tables/pedestals, tables/pedestal, pedestals, plinths) and all HTML routes are Akamai-blocked, so no site-published number could be verified."
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Side Tables",
+   "qty": 61,
+   "link": "https://www2.hm.com/en_gb/home/shop-by-product/furniture/tables/side-table.html",
+   "is_group": false,
+   "evidence": "api.hm.com/search-services/v1/en_GB/listing/resultpage?pageId=/home/shop-by-product/furnitures/tables/side&page-size=36&touchPoint=DESKTOP -> plpList.numberOfHits=61 (Elevate PLP JSON, the source the PLP header renders from; rendered header unobtainable - Akamai 403/behavioural-sensor on every HTML route). Identical on two independent reads.",
+   "flag": null
+  }
+ ]
+}

@@ -1,0 +1,876 @@
+{
+ "sr": 47,
+ "company": "Bed Bath & Beyond",
+ "brand_site": "bedbathandbeyond.com",
+ "country": "USA",
+ "site_url": "https://www.bedbathandbeyond.com/",
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "WHAT THIS SITE IS TODAY: bedbathandbeyond.com is NOT the original Bed Bath & Beyond retailer, which was liquidated in 2023. The domain is now operated by Beyond Inc. (formerly Overstock.com), which bought the brand and relaunched it on the Overstock e-commerce platform. Confirmed from the origin HTML itself: the page state carries Overstock platform flags (\"isOverstock\":false, \"isBackyard\":false, \"isBuyBuyBaby\":false), product images are served from the Overstock CDN ak1.ostkcdn.com, product URLs use the Overstock /<Dept>/<slug>/<id>/product.html form, footer social links still carry aria-labels reading 'Overstock on Facebook/Instagram/X/Pinterest/YouTube', and the store card is the 'Overstock Mastercard'. The homepage also shows a cross-brand bar linking to containerstore.com, consistent with the group consolidation seen last batch on Kirkland's. So this is a live, very large marketplace-style catalogue - not a retired one - but it is Beyond Inc.'s catalogue wearing the Bed Bath & Beyond name.\n\nACCESS ROUTE: the homepage fetched directly (HTTP 200) but every /c/ category listing was Akamai 403 'Access Denied'. A 13-profile curl_cffi sweep failed - only safari18_0_ios got a 200, and that was an Akamai Bot Manager behavioural interstitial, not content. r.jina.ai was also 403. The route that worked was translate.goog (www-bedbathandbeyond-com.translate.goog/<path>?_x_tr_sl=en&_x_tr_tl=es&_x_tr_hl=en), which returns genuine server-rendered origin HTML including the count header. All link values below are the canonical bedbathandbeyond.com origin URLs.\n\nCOUNTS AND HOW THEY WERE VERIFIED: every category page server-renders three independent count signals - the visible header ('1 - 60 of N Results'), an embedded \"resultCount\":N, and a JSON-LD ItemList \"numberOfItems\":N. All three agreed on every row emitted. Verified empirically by exhaustion on Stained Glass Panels (208): paginating &page=1..4 and collecting unique product IDs out of the JSON-LD product-container gave a union of exactly 208 (60+60+60+28), and &page=5 fell back to page 1. Note each page's JSON-LD carries 81 tiles, not 60 - the extra 21 are a next-page prefetch that overlaps the following page (p1&p2 overlap 21, p1&p3 overlap 0), which is why tile-counting overstates and the reported total is the correct number.\n\nRE-CUTS DROPPED (verified, not assumed): 'Framed Art' (42,542) is a cross-cut, not a branch - 25,730 Framed Canvas + 16,812 Framed Prints = 42,542 exactly, and a page-1 ID sample overlapped Framed Canvas 33/60 and Framed Prints 13/60 with zero overlap against Wrapped Canvas. Dropped. Likewise 'Wall Art Sets' (980) overlapped Framed Canvas Sets 75/135, and the four '...Sets' nodes sit inside their parent types (Canvas Art 62,197 = 36,467 Wrapped + 25,730 Framed exactly; Printed Art 16,948 = 16,812 Framed + 136 Unframed exactly) - all dropped. 'Alarm Clocks' (42) dropped: 861 Wall + 225 Tabletop + 6 Floor = 1,092 = the Clocks parent exactly, and alarm clocks overlapped Tabletop 22/42. 'Kitchen Island Lights' (9,269) dropped as a re-cut of Pendant Lights (25/60 sample overlap). Broad parent roll-ups (Decor, Wall Decor 37,907, Decorative Accessories 21,085, Art 92,906, Ceiling Lights 24,010, Lamps 7,919, Barware and Drinkware 7,995) are emitted as parent grouping rows only, never with a qty. Desk Lamps vs Table Lamps and Mugs vs Drinking Glasses were checked and showed 0% overlap, so both were kept.\n\nDELIBERATELY EXCLUDED: the whole 'Home Fragrances' node (1,376) and its Candles child (1,285) - reading actual product titles showed it is overwhelmingly scented (Yankee Candle jars, WoodWick, wax melts, room sprays, essential oils, reed and oil diffusers). Its unscented siblings were kept instead: Candle Holders (1,666) and Flameless Candles (99), the latter title-checked as LED/battery flameless. Also excluded per scope: Faux Plants & Flowers, Wallpaper, Wall Murals and Wall Decals (wall coverings), Tapestries and Throw Pillows (textiles), Rugs, Window Treatments, Holiday and Gifts, Room Dividers, Coffee Table Books and Record Players (not decor), Photo Albums, Message Boards, all Furniture, Bedding, Bath, Mattresses, Storage, Appliances, Cookware, Flatware/Cutlery, Bar & Wine Tools, Flasks, Travel Mugs and Water Bottles, Serving Utensils, Ceiling Fans, Light Bulbs, and architectural/task lighting (Recessed, Track, Indoor Spotlights, Under Cabinet, Step, and bathroom Vanity Lights).\n\nRULE 0 TOP-UP ADDENDUM (2026-08-10): re-visited the live nav (mega-menu, via the same translate.goog route) specifically for room-based lighting/mirror branches the original pass skipped under 'architectural/task lighting' reasoning. Recovered and verified live via the rendered header + resultCount + JSON-LD numberOfItems triple-check (all three agreed on every row): Recessed Lighting (120), Track Lighting (99), Under Cabinet Lights (90), Bathroom Vanity Lights (4,914), Bathroom Vanity Mirrors (1,021). Also found and added an entire branch the original pass never mentioned at all (not even as excluded) - Outdoor Lighting: Outdoor Wall Lights (2,757), Outdoor Ceiling Lights (1,470), Landscape Lighting (770), Post Lights (392), Outdoor String Lights (121), Security Lighting (99) - all six independently verified the same way. Kitchen Island Lights (flagged 'dropped as a re-cut of Pendant Lights' in the original notes) was re-tested per the brief's specific caution that its ~9,269 figure needed empirical re-verification, not a copy: the live resultCount/numberOfItems both now say 9257, but the page's own RENDERED header refuses to confirm an exact number above 5,000 ('of 5,000+ Results'), and requesting page=85 or page=100 both silently redirect back to page=84, topping out at '4981 - 5040 of 5,000+ Results' - the site will not actually serve or confirm any product past #5040 through pagination. A fresh page-1 product-ID sample also still overlaps Pendant Lights at 39/82 (~48%), consistent with the original 25/60 finding. Because neither 9257 nor the ~5040 pagination cap is independently confirmable as the exact count, this row is recorded qty:null with a MANUAL REVIEW flag rather than being copied or estimated, per THE ONE RULE THAT MATTERS. Indoor Spotlights and Step Lights remain excluded (not room-based, and not named in this top-up's known-loss list); Kitchen-and-Bath and Outdoor lighting facet re-cuts (shape/style query-param variants of the Mirrors category t=28403, e.g. Round/Arched/Rectangle/Full Length/Decorative/Window Pane Mirrors) were checked and confirmed to be pure filter facets of the already-kept 'Mirrors' parent, not separate categories - correctly left out. All new rows fetched via the same translate.goog mirror route as the rest of this file (direct fetch still returns Akamai 403); canonical bedbathandbeyond.com origin URLs are kept in every 'link' field.",
+ "rows": [
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Art",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Canvas Art",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Wrapped Canvas",
+   "parent": false,
+   "qty": 36467,
+   "link": "https://www.bedbathandbeyond.com/c/canvas-art/wrapped-canvas?t=28469",
+   "evidence": "embedded JSON resultCount=36467 ; corroborated by \"resultCount\":36467 and JSON-LD ItemList \"numberOfItems\":36467",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Framed Canvas",
+   "parent": false,
+   "qty": 25730,
+   "link": "https://www.bedbathandbeyond.com/c/canvas-art/framed-canvas?t=28470",
+   "evidence": "embedded JSON resultCount=25730 ; corroborated by \"resultCount\":25730 and JSON-LD ItemList \"numberOfItems\":25730",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Printed Art",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Framed Prints",
+   "parent": false,
+   "qty": 16812,
+   "link": "https://www.bedbathandbeyond.com/c/printed-art/framed-prints?t=28465",
+   "evidence": "embedded JSON resultCount=16812 ; corroborated by \"resultCount\":16812 and JSON-LD ItemList \"numberOfItems\":16812",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Unframed Prints",
+   "parent": false,
+   "qty": 136,
+   "link": "https://www.bedbathandbeyond.com/c/printed-art/unframed-prints?t=28468",
+   "evidence": "rendered listing header 'of 136 Results' ; corroborated by \"resultCount\":136 and JSON-LD ItemList \"numberOfItems\":136",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Wall Accents",
+   "parent": false,
+   "qty": 13750,
+   "link": "https://www.bedbathandbeyond.com/c/art/wall-accents?t=28457",
+   "evidence": "embedded JSON resultCount=13750 ; corroborated by \"resultCount\":13750 and JSON-LD ItemList \"numberOfItems\":13750",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Mirrors",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Wall Mirrors",
+   "parent": false,
+   "qty": 6898,
+   "link": "https://www.bedbathandbeyond.com/c/mirrors/wall-mirrors?t=28409",
+   "evidence": "embedded JSON resultCount=6898 ; corroborated by \"resultCount\":6898 and JSON-LD ItemList \"numberOfItems\":6898",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Floor Mirrors",
+   "parent": false,
+   "qty": 492,
+   "link": "https://www.bedbathandbeyond.com/c/mirrors/floor-mirrors?t=28410",
+   "evidence": "rendered listing header 'of 492 Results' ; corroborated by \"resultCount\":492 and JSON-LD ItemList \"numberOfItems\":492",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Bathroom Vanity Mirrors",
+   "parent": false,
+   "qty": 1021,
+   "link": "https://www.bedbathandbeyond.com/c/bathroom-fixtures/bathroom-vanity-mirrors?t=28425",
+   "evidence": "rendered listing header 'of 1,021 Results' ; corroborated by \"resultCount\":1021 and JSON-LD ItemList \"numberOfItems\":1021 | RULE 0 TOP-UP: room-based mirror branch missed by original pass (nav path bathroom-fixtures/bathroom-vanity-mirrors, listed in BOTH the site's Bath and Decor mega-menu columns under the same t=28425 URL - one category, two nav entries, not a duplicate).",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Stained Glass Panels",
+   "parent": false,
+   "qty": 208,
+   "link": "https://www.bedbathandbeyond.com/c/wall-decor/stained-glass-panels?t=28421",
+   "evidence": "rendered listing header 'of 208 Results' ; corroborated by \"resultCount\":208 and JSON-LD ItemList \"numberOfItems\":208",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Wall Shelves",
+   "parent": false,
+   "qty": 568,
+   "link": "https://www.bedbathandbeyond.com/c/home-decor/wall-shelves?t=28407",
+   "evidence": "rendered listing header 'of 568 Results' ; corroborated by \"resultCount\":568 and JSON-LD ItemList \"numberOfItems\":568",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Wall Hooks",
+   "parent": false,
+   "qty": 1062,
+   "link": "https://www.bedbathandbeyond.com/c/wall-decor/wall-hooks?t=24536",
+   "evidence": "rendered listing header 'of 1,062 Results' ; corroborated by \"resultCount\":1062 and JSON-LD ItemList \"numberOfItems\":1062",
+   "flag": null
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Decorative Accessories",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Decorative Objects",
+   "parent": false,
+   "qty": 13502,
+   "link": "https://www.bedbathandbeyond.com/c/decorative-accessories/decorative-objects?t=28432",
+   "evidence": "embedded JSON resultCount=13502 ; corroborated by \"resultCount\":13502 and JSON-LD ItemList \"numberOfItems\":13502",
+   "flag": "MANUAL REVIEW: broad roll-up - a page-1 product-ID sample overlapped Statues and Sculptures by 29%, so this figure is not fully disjoint from its sibling rows (children sum 27,203 vs parent 21,085)"
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Statues and Sculptures",
+   "parent": false,
+   "qty": 6611,
+   "link": "https://www.bedbathandbeyond.com/c/decorative-accessories/statues-sculptures?t=28444",
+   "evidence": "embedded JSON resultCount=6611 ; corroborated by \"resultCount\":6611 and JSON-LD ItemList \"numberOfItems\":6611",
+   "flag": null
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Vases",
+   "parent": false,
+   "qty": 3826,
+   "link": "https://www.bedbathandbeyond.com/c/decorative-accessories/vases?t=28445",
+   "evidence": "rendered listing header 'of 3,826 Results' ; corroborated by \"resultCount\":3826 and JSON-LD ItemList \"numberOfItems\":3826",
+   "flag": null
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Candle Holders",
+   "parent": false,
+   "qty": 1666,
+   "link": "https://www.bedbathandbeyond.com/c/decorative-accessories/candle-holders?t=28577",
+   "evidence": "rendered listing header 'of 1,666 Results' ; corroborated by \"resultCount\":1666 and JSON-LD ItemList \"numberOfItems\":1666",
+   "flag": null
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Decorative Trays",
+   "parent": false,
+   "qty": 1288,
+   "link": "https://www.bedbathandbeyond.com/c/decorative-accessories/decorative-trays?t=28434",
+   "evidence": "rendered listing header 'of 1,288 Results' ; corroborated by \"resultCount\":1288 and JSON-LD ItemList \"numberOfItems\":1288",
+   "flag": null
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Bookends",
+   "parent": false,
+   "qty": 115,
+   "link": "https://www.bedbathandbeyond.com/c/decorative-accessories/bookends?t=28437",
+   "evidence": "rendered listing header 'of 115 Results' ; corroborated by \"resultCount\":115 and JSON-LD ItemList \"numberOfItems\":115",
+   "flag": null
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Indoor Fountains",
+   "parent": false,
+   "qty": 77,
+   "link": "https://www.bedbathandbeyond.com/c/decorative-accessories/indoor-fountains?t=28442",
+   "evidence": "rendered listing header 'of 77 Results' ; corroborated by \"resultCount\":77 and JSON-LD ItemList \"numberOfItems\":77",
+   "flag": null
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Flameless Candles",
+   "parent": false,
+   "qty": 99,
+   "link": "https://www.bedbathandbeyond.com/c/candles-candle-holders/flameless-candles?t=31044",
+   "evidence": "rendered listing header 'of 99 Results' ; corroborated by \"resultCount\":99 and JSON-LD ItemList \"numberOfItems\":99",
+   "flag": null
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Clocks",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Wall Clocks",
+   "parent": false,
+   "qty": 861,
+   "link": "https://www.bedbathandbeyond.com/c/clocks/wall-clocks?t=28412",
+   "evidence": "rendered listing header 'of 861 Results' ; corroborated by \"resultCount\":861 and JSON-LD ItemList \"numberOfItems\":861",
+   "flag": null
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Tabletop Clocks",
+   "parent": false,
+   "qty": 225,
+   "link": "https://www.bedbathandbeyond.com/c/clocks/tabletop-clocks?t=28415",
+   "evidence": "rendered listing header 'of 225 Results' ; corroborated by \"resultCount\":225 and JSON-LD ItemList \"numberOfItems\":225",
+   "flag": null
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Floor Clocks",
+   "parent": false,
+   "qty": 6,
+   "link": "https://www.bedbathandbeyond.com/c/clocks/floor-clocks?t=28414",
+   "evidence": "rendered listing header 'of 6 Results' ; corroborated by \"resultCount\":6 and JSON-LD ItemList \"numberOfItems\":6",
+   "flag": null
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Photo Frames",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Wall Picture Frames",
+   "parent": false,
+   "qty": 1410,
+   "link": "https://www.bedbathandbeyond.com/c/picture-frames-albums/wall-picture-frames?t=28578",
+   "evidence": "rendered listing header 'of 1,410 Results' ; corroborated by \"resultCount\":1410 and JSON-LD ItemList \"numberOfItems\":1410",
+   "flag": null
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Tabletop Picture Frames",
+   "parent": false,
+   "qty": 354,
+   "link": "https://www.bedbathandbeyond.com/c/picture-frames-albums/tabletop-picture-frames?t=28581",
+   "evidence": "rendered listing header 'of 354 Results' ; corroborated by \"resultCount\":354 and JSON-LD ItemList \"numberOfItems\":354",
+   "flag": null
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Gallery Picture Frames",
+   "parent": false,
+   "qty": 11,
+   "link": "https://www.bedbathandbeyond.com/c/picture-frames-albums/gallery-picture-frames?t=28580",
+   "evidence": "rendered listing header 'of 11 Results' ; corroborated by \"resultCount\":11 and JSON-LD ItemList \"numberOfItems\":11",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Ceiling Lights",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Chandeliers",
+   "parent": false,
+   "qty": 9302,
+   "link": "https://www.bedbathandbeyond.com/c/ceiling-lighting/chandeliers?t=31344",
+   "evidence": "embedded JSON resultCount=9302 ; corroborated by \"resultCount\":9302 and JSON-LD ItemList \"numberOfItems\":9302",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Pendant Lights",
+   "parent": false,
+   "qty": 8773,
+   "link": "https://www.bedbathandbeyond.com/c/ceiling-lighting/pendant-lights?t=31346",
+   "evidence": "embedded JSON resultCount=8773 ; corroborated by \"resultCount\":8773 and JSON-LD ItemList \"numberOfItems\":8773",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Flush Mount Ceiling Lights",
+   "parent": false,
+   "qty": 3352,
+   "link": "https://www.bedbathandbeyond.com/c/ceiling-lighting/flush-mount-ceiling-lights?t=31345",
+   "evidence": "rendered listing header 'of 3,352 Results' ; corroborated by \"resultCount\":3352 and JSON-LD ItemList \"numberOfItems\":3352",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Semi-Flush Mount Ceiling Lights",
+   "parent": false,
+   "qty": 1845,
+   "link": "https://www.bedbathandbeyond.com/c/ceiling-lighting/semi-flush-mount-ceiling-lights?t=31393",
+   "evidence": "rendered listing header 'of 1,845 Results' ; corroborated by \"resultCount\":1845 and JSON-LD ItemList \"numberOfItems\":1845",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Recessed Lighting",
+   "parent": false,
+   "qty": 120,
+   "link": "https://www.bedbathandbeyond.com/c/ceiling-lighting/recessed-lighting?t=31347",
+   "evidence": "rendered listing header 'of 120 Results' ; corroborated by \"resultCount\":120 and JSON-LD ItemList \"numberOfItems\":120 | RULE 0 TOP-UP: previously excluded as 'architectural/task lighting'; recovered per Rule 0 (product type = ceiling light fixture, in scope regardless of the fact it's task-oriented).",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Track Lighting",
+   "parent": false,
+   "qty": 99,
+   "link": "https://www.bedbathandbeyond.com/c/ceiling-lighting/track-lighting?t=31394",
+   "evidence": "rendered listing header 'of 99 Results' ; corroborated by \"resultCount\":99 and JSON-LD ItemList \"numberOfItems\":99 | RULE 0 TOP-UP: previously excluded as 'architectural/task lighting'; recovered per Rule 0.",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Lamps and Lamp Shades",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Table Lamps",
+   "parent": false,
+   "qty": 5474,
+   "link": "https://www.bedbathandbeyond.com/c/lamps/table-lamps?t=31332",
+   "evidence": "embedded JSON resultCount=5474 ; corroborated by \"resultCount\":5474 and JSON-LD ItemList \"numberOfItems\":5474",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Floor Lamps",
+   "parent": false,
+   "qty": 1835,
+   "link": "https://www.bedbathandbeyond.com/c/lamps/floor-lamps?t=31333",
+   "evidence": "rendered listing header 'of 1,835 Results' ; corroborated by \"resultCount\":1835 and JSON-LD ItemList \"numberOfItems\":1835",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Desk Lamps",
+   "parent": false,
+   "qty": 246,
+   "link": "https://www.bedbathandbeyond.com/c/lamps/desk-lamps?t=31334",
+   "evidence": "rendered listing header 'of 246 Results' ; corroborated by \"resultCount\":246 and JSON-LD ItemList \"numberOfItems\":246",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Lamp Sets",
+   "parent": false,
+   "qty": 396,
+   "link": "https://www.bedbathandbeyond.com/c/lamps/lamp-sets?t=60679",
+   "evidence": "rendered listing header 'of 396 Results' ; corroborated by \"resultCount\":396 and JSON-LD ItemList \"numberOfItems\":396",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Lamp Shades",
+   "parent": false,
+   "qty": 330,
+   "link": "https://www.bedbathandbeyond.com/c/lamp-accessories/lamp-shades?t=31331",
+   "evidence": "rendered listing header 'of 330 Results' ; corroborated by \"resultCount\":330 and JSON-LD ItemList \"numberOfItems\":330",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Wall Lighting",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Wall Sconces",
+   "parent": false,
+   "qty": 4368,
+   "link": "https://www.bedbathandbeyond.com/c/wall-lighting/wall-sconces?t=70172",
+   "evidence": "rendered listing header 'of 4,368 Results' ; corroborated by \"resultCount\":4368 and JSON-LD ItemList \"numberOfItems\":4368",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Flush Mount Wall Lights",
+   "parent": false,
+   "qty": 277,
+   "link": "https://www.bedbathandbeyond.com/c/wall-lighting/flush-mount-wall-lights?t=70169",
+   "evidence": "rendered listing header 'of 277 Results' ; corroborated by \"resultCount\":277 and JSON-LD ItemList \"numberOfItems\":277",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Picture Lights",
+   "parent": false,
+   "qty": 72,
+   "link": "https://www.bedbathandbeyond.com/c/wall-lighting/picture-lights?t=70171",
+   "evidence": "rendered listing header 'of 72 Results' ; corroborated by \"resultCount\":72 and JSON-LD ItemList \"numberOfItems\":72",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Swing Arm Lights",
+   "parent": false,
+   "qty": 62,
+   "link": "https://www.bedbathandbeyond.com/c/wall-lighting/swing-arm-lights?t=70174",
+   "evidence": "rendered listing header 'of 62 Results' ; corroborated by \"resultCount\":62 and JSON-LD ItemList \"numberOfItems\":62",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Decorative Lighting",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Indoor String Lights",
+   "parent": false,
+   "qty": 83,
+   "link": "https://www.bedbathandbeyond.com/c/decorative-lighting/indoor-string-lights?t=70191",
+   "evidence": "rendered listing header 'of 83 Results' ; corroborated by \"resultCount\":83 and JSON-LD ItemList \"numberOfItems\":83",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Neon Signs",
+   "parent": false,
+   "qty": 56,
+   "link": "https://www.bedbathandbeyond.com/c/decorative-lighting/neon-signs?t=70189",
+   "evidence": "rendered listing header 'of 56 Results' ; corroborated by \"resultCount\":56 and JSON-LD ItemList \"numberOfItems\":56",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Night Lights",
+   "parent": false,
+   "qty": 39,
+   "link": "https://www.bedbathandbeyond.com/c/decorative-lighting/night-lights?t=70170",
+   "evidence": "rendered listing header 'of 39 Results' ; corroborated by \"resultCount\":39 and JSON-LD ItemList \"numberOfItems\":39",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Marquee Signs",
+   "parent": false,
+   "qty": 34,
+   "link": "https://www.bedbathandbeyond.com/c/decorative-lighting/marquee-signs?t=70193",
+   "evidence": "rendered listing header 'of 34 Results' ; corroborated by \"resultCount\":34 and JSON-LD ItemList \"numberOfItems\":34",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Himalayan Salt Lamps",
+   "parent": false,
+   "qty": 1,
+   "link": "https://www.bedbathandbeyond.com/c/decorative-lighting/himalayan-salt-lamps?t=70190",
+   "evidence": "rendered listing header 'of 1 Results' ; corroborated by \"resultCount\":1",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Kitchen & Bath Lighting",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Kitchen Island Lights",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.bedbathandbeyond.com/c/kitchen-lighting/kitchen-island-lights?t=31210",
+   "evidence": null,
+   "flag": "MANUAL REVIEW: qty NOT verifiable exact, do not copy the embedded number. The page's own resultCount and JSON-LD numberOfItems both report 9257, but the RENDERED header caps at '1 - 60 of 5,000+ Results' (never shows an exact figure), and pagination hard-stops at page 84: requesting &page=85 and &page=100 both silently redirect back to page=84, showing '4981 - 5040 of 5,000+ Results' - the site itself will not serve or confirm any product past #5040. A page-1 product-ID sample also overlapped Pendant Lights 39/82 (~48%), consistent with the original worker's prior finding (25/60 overlap) that this node substantially overlaps the Pendant Lights branch rather than being a fully disjoint category. Recorded qty:null per Rule 1 rather than guessing between 9257 (unverifiable) and ~5040 (pagination cap, also not exact)."
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Under Cabinet Lights",
+   "parent": false,
+   "qty": 90,
+   "link": "https://www.bedbathandbeyond.com/c/kitchen-lighting/under-cabinet-lights?t=31211",
+   "evidence": "rendered listing header 'of 90 Results' ; corroborated by \"resultCount\":90 and JSON-LD ItemList \"numberOfItems\":90 | RULE 0 TOP-UP: previously excluded as 'architectural/task lighting' under a Kitchen room-word path; recovered per Rule 0.",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Bathroom Vanity Lights",
+   "parent": false,
+   "qty": 4914,
+   "link": "https://www.bedbathandbeyond.com/c/bathroom-lighting/vanity-lights?t=31193",
+   "evidence": "rendered listing header 'of 4,914 Results' ; corroborated by \"resultCount\":4914 and JSON-LD ItemList \"numberOfItems\":4914 | RULE 0 TOP-UP: previously excluded as 'bathroom Vanity Lights'; this is exactly the Rule 0 case (room word Bathroom/Vanity does not put a lighting product out of scope). Recovered.",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Outdoor Lighting",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Outdoor Wall Lights",
+   "parent": false,
+   "qty": 2757,
+   "link": "https://www.bedbathandbeyond.com/c/outdoor-lighting/outdoor-wall-lighting?t=70195",
+   "evidence": "rendered listing header 'of 2,757 Results' ; corroborated by \"resultCount\":2757 and JSON-LD ItemList \"numberOfItems\":2757",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Outdoor Ceiling Lights",
+   "parent": false,
+   "qty": 1470,
+   "link": "https://www.bedbathandbeyond.com/c/outdoor-lighting/outdoor-ceiling-lights?t=70165",
+   "evidence": "rendered listing header 'of 1,470 Results' ; corroborated by \"resultCount\":1470 and JSON-LD ItemList \"numberOfItems\":1470",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Landscape Lighting",
+   "parent": false,
+   "qty": 770,
+   "link": "https://www.bedbathandbeyond.com/c/outdoor-lighting/landscape-lighting?t=60698",
+   "evidence": "rendered listing header 'of 770 Results' ; corroborated by \"resultCount\":770 and JSON-LD ItemList \"numberOfItems\":770 | Note: 'Post Lights' below is a nested child of this category's URL path (landscape-lighting/post-lights) and a page-1 ID sample showed partial overlap (23/82, ~28%) with this listing. Not full containment (392 + would exceed disjoint math against 770 only if fully separate), kept both per Rule 0.6 - overlap documented, not dropped.",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Post Lights",
+   "parent": false,
+   "qty": 392,
+   "link": "https://www.bedbathandbeyond.com/c/landscape-lighting/post-lights?t=70176",
+   "evidence": "rendered listing header 'of 392 Results' ; corroborated by \"resultCount\":392 and JSON-LD ItemList \"numberOfItems\":392",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Outdoor String Lights",
+   "parent": false,
+   "qty": 121,
+   "link": "https://www.bedbathandbeyond.com/c/outdoor-decorative-lighting/outdoor-string-lights?t=70184",
+   "evidence": "rendered listing header 'of 121 Results' ; corroborated by \"resultCount\":121 and JSON-LD ItemList \"numberOfItems\":121 | Distinct nav/category path (outdoor-decorative-lighting) from the already-kept 'Indoor String Lights' (decorative-lighting, qty 83) - separate indoor vs outdoor product sets, both genuine per Rule 0.6.",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Security Lighting",
+   "parent": false,
+   "qty": 99,
+   "link": "https://www.bedbathandbeyond.com/c/outdoor-lighting/security-lighting?t=70180",
+   "evidence": "rendered listing header 'of 99 Results' ; corroborated by \"resultCount\":99 and JSON-LD ItemList \"numberOfItems\":99",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Dinnerware",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Dinnerware Sets",
+   "parent": false,
+   "qty": 2517,
+   "link": "https://www.bedbathandbeyond.com/c/dinnerware/dinnerware-sets?t=24805",
+   "evidence": "rendered listing header 'of 2,517 Results' ; corroborated by \"resultCount\":2517 and JSON-LD ItemList \"numberOfItems\":2517",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Plates",
+   "parent": false,
+   "qty": 1320,
+   "link": "https://www.bedbathandbeyond.com/c/dinnerware/plates?t=24810",
+   "evidence": "rendered listing header 'of 1,320 Results' ; corroborated by \"resultCount\":1320 and JSON-LD ItemList \"numberOfItems\":1320",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Dining Bowls",
+   "parent": false,
+   "qty": 900,
+   "link": "https://www.bedbathandbeyond.com/c/dinnerware/dining-bowls?t=24806",
+   "evidence": "rendered listing header 'of 900 Results' ; corroborated by \"resultCount\":900 and JSON-LD ItemList \"numberOfItems\":900",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Formal Dinnerware Sets",
+   "parent": false,
+   "qty": 470,
+   "link": "https://www.bedbathandbeyond.com/c/dinnerware/formal-dinnerware-sets?t=28217",
+   "evidence": "rendered listing header 'of 470 Results' ; corroborated by \"resultCount\":470 and JSON-LD ItemList \"numberOfItems\":470",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Charger Plates",
+   "parent": false,
+   "qty": 134,
+   "link": "https://www.bedbathandbeyond.com/c/dinnerware/charger-plates?t=24807",
+   "evidence": "rendered listing header 'of 134 Results' ; corroborated by \"resultCount\":134 and JSON-LD ItemList \"numberOfItems\":134",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Drinkware",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Mugs",
+   "parent": false,
+   "qty": 1189,
+   "link": "https://www.bedbathandbeyond.com/c/drinkware/mugs?t=24786",
+   "evidence": "rendered listing header 'of 1,189 Results' ; corroborated by \"resultCount\":1189 and JSON-LD ItemList \"numberOfItems\":1189",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Drinking Glasses",
+   "parent": false,
+   "qty": 866,
+   "link": "https://www.bedbathandbeyond.com/c/drinkware/drinking-glasses?t=24783",
+   "evidence": "rendered listing header 'of 866 Results' ; corroborated by \"resultCount\":866 and JSON-LD ItemList \"numberOfItems\":866",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Cup and Saucer Sets",
+   "parent": false,
+   "qty": 361,
+   "link": "https://www.bedbathandbeyond.com/c/drinkware/cup-saucer-sets?t=24787",
+   "evidence": "rendered listing header 'of 361 Results' ; corroborated by \"resultCount\":361 and JSON-LD ItemList \"numberOfItems\":361",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Barware",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Wine Glasses",
+   "parent": false,
+   "qty": 1053,
+   "link": "https://www.bedbathandbeyond.com/c/barware/wine-glasses?t=24778",
+   "evidence": "rendered listing header 'of 1,053 Results' ; corroborated by \"resultCount\":1053 and JSON-LD ItemList \"numberOfItems\":1053",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Whiskey Glasses",
+   "parent": false,
+   "qty": 291,
+   "link": "https://www.bedbathandbeyond.com/c/barware/whiskey-glasses?t=28174",
+   "evidence": "rendered listing header 'of 291 Results' ; corroborated by \"resultCount\":291 and JSON-LD ItemList \"numberOfItems\":291",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Champagne Flutes",
+   "parent": false,
+   "qty": 176,
+   "link": "https://www.bedbathandbeyond.com/c/barware/champagne-flutes?t=24777",
+   "evidence": "rendered listing header 'of 176 Results' ; corroborated by \"resultCount\":176 and JSON-LD ItemList \"numberOfItems\":176",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Cocktail Glasses",
+   "parent": false,
+   "qty": 172,
+   "link": "https://www.bedbathandbeyond.com/c/barware/cocktail-glasses?t=24774",
+   "evidence": "rendered listing header 'of 172 Results' ; corroborated by \"resultCount\":172 and JSON-LD ItemList \"numberOfItems\":172",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Beer Glasses",
+   "parent": false,
+   "qty": 155,
+   "link": "https://www.bedbathandbeyond.com/c/barware/beer-glasses?t=24782",
+   "evidence": "rendered listing header 'of 155 Results' ; corroborated by \"resultCount\":155 and JSON-LD ItemList \"numberOfItems\":155",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Shot Glasses",
+   "parent": false,
+   "qty": 133,
+   "link": "https://www.bedbathandbeyond.com/c/barware/shot-glasses?t=24776",
+   "evidence": "rendered listing header 'of 133 Results' ; corroborated by \"resultCount\":133 and JSON-LD ItemList \"numberOfItems\":133",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Drink Coasters",
+   "parent": false,
+   "qty": 1749,
+   "link": "https://www.bedbathandbeyond.com/c/barware/drink-coasters?t=24780",
+   "evidence": "rendered listing header 'of 1,749 Results' ; corroborated by \"resultCount\":1749 and JSON-LD ItemList \"numberOfItems\":1749",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Serveware",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Serving Platters and Boards",
+   "parent": false,
+   "qty": 2604,
+   "link": "https://www.bedbathandbeyond.com/c/serveware/serving-platters-boards?t=24835",
+   "evidence": "rendered listing header 'of 2,604 Results' ; corroborated by \"resultCount\":2604 and JSON-LD ItemList \"numberOfItems\":2604",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Serving Bowls and Baskets",
+   "parent": false,
+   "qty": 1143,
+   "link": "https://www.bedbathandbeyond.com/c/serveware/serving-bowls-baskets?t=24836",
+   "evidence": "rendered listing header 'of 1,143 Results' ; corroborated by \"resultCount\":1143 and JSON-LD ItemList \"numberOfItems\":1143",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Tableware Completer Pieces",
+   "parent": false,
+   "qty": 980,
+   "link": "https://www.bedbathandbeyond.com/c/serveware/tableware-completer-pieces?t=24860",
+   "evidence": "rendered listing header 'of 980 Results' ; corroborated by \"resultCount\":980 and JSON-LD ItemList \"numberOfItems\":980",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Beverage Servers",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Decanters",
+   "parent": false,
+   "qty": 196,
+   "link": "https://www.bedbathandbeyond.com/c/beverage-servers/decanters?t=24771",
+   "evidence": "rendered listing header 'of 196 Results' ; corroborated by \"resultCount\":196 and JSON-LD ItemList \"numberOfItems\":196",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Drink Pitchers",
+   "parent": false,
+   "qty": 134,
+   "link": "https://www.bedbathandbeyond.com/c/beverage-servers/drink-pitchers?t=24790",
+   "evidence": "rendered listing header 'of 134 Results' ; corroborated by \"resultCount\":134 and JSON-LD ItemList \"numberOfItems\":134",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Teapots",
+   "parent": false,
+   "qty": 110,
+   "link": "https://www.bedbathandbeyond.com/c/beverage-servers/teapots?t=24833",
+   "evidence": "rendered listing header 'of 110 Results' ; corroborated by \"resultCount\":110 and JSON-LD ItemList \"numberOfItems\":110",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Tea and Coffee Sets",
+   "parent": false,
+   "qty": 153,
+   "link": "https://www.bedbathandbeyond.com/c/beverage-servers/tea-coffee-sets?t=24832",
+   "evidence": "rendered listing header 'of 153 Results' ; corroborated by \"resultCount\":153 and JSON-LD ItemList \"numberOfItems\":153",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Beverage Serving Sets",
+   "parent": false,
+   "qty": 172,
+   "link": "https://www.bedbathandbeyond.com/c/beverage-servers/beverage-serving-sets?t=24856",
+   "evidence": "rendered listing header 'of 172 Results' ; corroborated by \"resultCount\":172 and JSON-LD ItemList \"numberOfItems\":172",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Ice Buckets",
+   "parent": false,
+   "qty": 152,
+   "link": "https://www.bedbathandbeyond.com/c/barware/ice-buckets?t=24779",
+   "evidence": "rendered listing header 'of 152 Results' ; corroborated by \"resultCount\":152 and JSON-LD ItemList \"numberOfItems\":152",
+   "flag": null
+  }
+ ]
+}

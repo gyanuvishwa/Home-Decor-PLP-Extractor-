@@ -1,0 +1,122 @@
+{
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ACCESS: robots.txt https://www.muji.com/robots.txt fetched FIRST via probe.fetch (HTTP 200, edge101), 2,004 bytes. It is almost entirely Sitemap: lines (36 of them, one per country storefront) plus a SINGLE 'User-agent: *' group with exactly four Disallow rules: /jp/enquete/, /tw/passport/terms/, /jp/ja/store/cust/favorite/item, /jp/ja/store/cust/mypage. NO Claude / ClaudeBot / anthropic-ai / Claude-Web group and no literal 'Claude' string anywhere in the file (regex-checked). NO Crawl-delay. Nothing I requested is disallowed - all my requests were /jp/ja/store/cmdty/section/<code> and /jp/sitemap_xml/..., never /cust/, never /enquete/, never the internal search. probe.fetch's 2s/host pacing was used for the count-verification requests; for the bulk taxonomy walk I ran a deliberate 0.35s inter-request sleep. Single host throughout: www.muji.com. No bot wall - every page returned 200 first time on ordinary fingerprints; no campaign parameters, no reader, no browser automation, nothing from the ladder in BATCH_BRIEF s2 was needed. LANGUAGE: worked entirely in the ja storefront at the assigned URL https://www.muji.com/jp/ja/store, using the site's OWN Japanese taxonomy. I did NOT use an English mirror of the site at any point, and every recorded link is a /jp/ja/ URL. On the multi-locale dedup blind spots (BATCH_BRIEF s4 (b)/(c)): MUJI runs ~25 country storefronts, but they are all PATH variants on the single host www.muji.com (/us/, /uk/, /de/, /sg/, /ae-en/ ...), not separate domains, so there is no cross-HOST alternate to miss; and both prior workbooks recorded MUJI under the same /jp/ja/store/cmdty/section/ scheme (79 index entries, all in that exact form), so there is no locale-form disagreement to trip over either. TREE: MUJI's PLPs are Next.js App Router pages, so the taxonomy is not in the raw HTML. I found that each section page's React flight payload (self.__next_f) carries, for that section: sectionCode, sectionName, isLeafSection, and the FULL breadcrumb chain as the site itself stores it - which is the authoritative parentage source BATCH_BRIEF s5 asks for (parentage from the page's own data, never from URL shape - and MUJI's codes deliberately do not encode parentage: the Mirror node is S1070111 but its parent is T20008). I also found that requesting a section with an 'RSC: 1' header returns just that payload (~310KB in ~0.9s instead of a ~2MB HTML page). I then did NOT rely on the mega-menu, which only exposes department level and would have truncated exactly as BATCH_BRIEF s5 warns: instead I took MUJI's own declared category sitemap https://www.muji.com/jp/sitemap_xml/sitemap_jp_section_1.xml (from a robots.txt Sitemap: line), 1,484 section codes = the complete server-side taxonomy including any orphan, and WALKED ALL 1,484 via the RSC route, checkpointing to disk and resuming across four passes. Result: 1,484 sections resolved, 0 errors, each with name, isLeafSection and full breadcrumb. That is the complete MUJI Japan category tree, and it is what every statement below is checked against. THE BATHROOM DEPARTMENT: 生活雑貨 (Household Goods) > D00033 タオル・バス・トイレ用品 (Towels, Bath & Toilet Goods), 188 products, isLeafSection false, with exactly two children - T20020 タオル (Towels, 42) and T20035 バス・トイレ用品 (Bath & Toilet Goods, 146). T20035 has exactly four leaves: S1070301 バスルーム用品 (Bathroom Goods, 111), S1070307 トイレ用品 (Toilet Goods, 14), S1070342 フック・クリップ・タオルハンガー (Hooks, Clips & Towel Hangers, 15) and S2002001 バスマット (Bath Mats, 6). The arithmetic closes EXACTLY at both levels and is a strong structural check on the counts: 111+14+15+6 = 146 = T20035, and 42+146 = 188 = D00033. There is therefore NO rule-24 residue anywhere in this department - every product under D00033 is covered by a leaf. QTY SOURCE AND PROOF: MUJI renders its own exact total on every section page in the form 'N件中 X件〜Y件表示' (N items, showing X-Y). I used that rendered figure and then proved it three ways. (1) Page size is 40; on every small node the page renders the entire grid, and I counted the ProductCard entries in the payload against the stated total: Toilet Goods 14 cards / 14 total, Hooks 15/15, Bath Mats 6/6, Toothbrush Stands 9/9, Mirrors 15/15 - full enumeration, exact match. (2) On the large node I paginated: Bathroom Goods page 1 reads '111件中 1件〜40件表示' with 40 cards, page 2 reads '111件中 41件〜80件表示' with 40 cards, and the two card sets have ZERO product overlap - i.e. page N genuinely differs from page 1, which is the explicit IKEA trap check in BATCH_BRIEF s3; enumerating to exhaustion returned exactly 111 distinct product names. (3) The parent/child sums close exactly, as above. Counts discriminate per node (188 / 146 / 111 / 42 / 27 / 17 / 15 / 15 / 14 / 13 / 9 / 8 / 6) - no constant, no round-number cap. VERIFICATION: H1 read on every page opened and matched the requested node (D00033 -> 'タオル・バス・トイレ用品', T20035 -> 'バス・トイレ用品', S1070301 -> 'バスルーム用品', S1070307 -> 'トイレ用品', S1070342 -> 'フック・クリップ・タオルハンガー', S2002001 -> 'バスマット', S1070305 -> '歯ブラシスタンド・コップ', S1070111 -> 'ミラー'), and each page's own breadcrumb chain matched the parentage I recorded. All four recorded leaves report isLeafSection true, so none is a parent masking children (rule 24). COMPOSITION DISCLOSURE - READ THIS BEFORE USING THE 111: I enumerated all 111 products in Bathroom Goods (バスルーム用品) rather than accepting the node on its name. It is a genuinely MIXED node. Roughly 40 items are Bathroom product squarely inside rules 3/13/17: bath stools (Ag+ antibacterial 風呂いす in two seat heights, polypropylene 風呂いす), wash basins and bath buckets (ポリプロピレン片手桶, ポリプロピレン湯桶), EVA hanging bath slippers, four stainless bottle racks and a bottle tray (ステンレスボトルラック slim/small/large, ステンレスボトルトレー), soap dishes (発泡ウレタン石けん置き plus its replacement sponges, ステンレスソープディッシュ), a porcelain tray, two bath clocks (アナログ/デジタルバスクロック), roughly sixteen PET refill bottles in clear and white with foam variants, their pump heads, identification rings and labels, a refill-pouch hanging nozzle, refill jars, and two bottle brushes. The other roughly 70 are consumables and body-care that are NOT Bathroom under rule 2: sensitive-skin body soaps and hand soap and body milk with their refills, body towels and body nets and foaming balls, scalp and shower brushes, a pumice stone, bath-cleaning foam cleaners and dilution sets, and a large bath-additive block (海塩のバスソルト, 薬用炭酸タブレット, 薬用温感入浴剤 in many scents and sizes, plus IDEE aromatic bath salts). I am recording the node because it is MUJI's own deepest Bathroom leaf, it carries no children to descend into, rule 24 forbids inventing a sub-node, and its consumable majority maps to no category in this run (unlike Kmart's bath mats, whose majority mapped to Textile and were therefore routed out) - but the run owner should know that roughly 40 of the 111 are the bathroom hardware. Toilet Goods (14) is mixed in the same way: 5 are rule-14 accessories (卓上用トイレットペーパーケース, トイレブラシ・ケース付, トイレ用替えブラシ, トイレポット) and 9 are consumables (5 toilet-paper SKUs, 4 cleaners and wipes). Hooks, Clips & Towel Hangers (15) is pure hardware - stainless and aluminium S-hooks, anti-swivel hooks, wire clips, over-door hooks, and two aluminium suction TOWEL HANGERS - which rule 17 includes explicitly and rule 22 confirms metal never excludes. RULE 2 CALL ON THE TOOTHBRUSH NODE: 歯ブラシスタンド・コップ (S1070305, 9) sits in the COSMETICS branch (breadcrumb コスメ・ケア用品 > オーラルケア), not the bath branch, so I enumerated it before deciding. All 9 are bathroom accessories, not cosmetics or drinkware: 白磁歯ブラシスタンド 1本用 and 磁器歯ブラシスタンド 1本用 (porcelain toothbrush stands), 白磁洗面コップ and 磁器洗面コップ (porcelain WASHBASIN cups - 洗面 means washbasin), 白磁トレー 小/大 (porcelain trays), アクリルコップ and アクリル手付コップ, and 携帯用シリコーンコップ. Rule 13 lists Toothbrush Holders, Tumbler Holders, Tumblers and Bathroom Trays by name, and rule 2 puts PRIMARY PRODUCT TYPE above WEBSITE CATEGORY HIERARCHY, so it is recorded as Bathroom with the cosmetics hierarchy disclosed here. This is deliberately consistent with SR 187 Francfranc, where 'Toothbrush Holders, Stands & Bathroom Tumblers' was recorded as a Bathroom row. It is also the opposite of the false-positive trap in BATCH_BRIEF s6 (Georg Jensen / Iittala / Tanagra 'tumbler' hits that turned out to be drinking glasses) - I checked the actual products and these are washbasin cups. TAXONOMY SWEEP - what I searched for, over all 1,484 section names (rule 36 evidence): バス 23 hits (the bath department and its nodes, plus 20 false positives from 'バスケット織' polyester basket-weave made-to-order curtain fabrics and a rattan basket storage node); トイレ 3 (the department, T20035, and the Toilet Goods leaf); タオル 16 (the towel branch, the two hooks-and-towel-hanger nodes, two MUJI Labo fragrance/towel apparel nodes and a bulk-buy node); ミラー 1 (S1070111, already extracted); 鏡 0; 洗面 0 as a section name (it appears only inside product names in the toothbrush node); 浴 1 (入浴剤, bath additives, Body Care); 風呂 0; シャワー 0; 石けん/ソープ 1 (ボディソープ・石けん, Body Care consumables); 歯ブラシ 2 (the stands node I recorded and the toothbrush/toothpaste consumables node I did not); フック 2 (the bath one recorded, the kitchen one not); バスマット 1 (routed to Textile). There is NO node anywhere in the 1,484 for basins, taps, faucets, showers, shower enclosures, bathtubs, toilets as fixtures, bidets, vanity units, bathroom cabinets or bathroom mirrors as a distinct node - MUJI Japan is a lifestyle retailer, not a sanitaryware retailer, so the fixtures side of rules 4-8 has nothing to match. ORPHAN CHECK: because I walked the full sitemap rather than the menu, any orphan section would have surfaced with its breadcrumb; none of the 1,484 is a bathroom node outside the tree described above. DEDUP: already_extracted() run on every candidate leaf, every group node and every review node. Exactly ONE hit in the whole bathroom sweep - S1070111 ミラー, Final.xlsx (Home Decor pass) 'Mirrors' - held out of rows[] and banked in review[]. None of the four recorded leaves, and neither grouping node, returns a hit. MUJI has 79 records in the exclusion index (46 Furniture.xlsx sections covering beds, sofas, shelving, chests, tables, chairs and IDEE, and 33 Final.xlsx sections covering lighting, interior accessories, mirrors, frames, fragrance, candles and tableware); not one of them is in the D00033 bath/toilet department, so this is a clean new find and not an OPTION 1 re-extraction. EXCLUDED AND WHY: Towels branch and Bath Mats -> Textile (rules 15/16/20), both in review[] with qty and URLs; 入浴剤 bath additives, ボディソープ・石けん body soap and 歯ブラシ・歯みがき粉 toothbrushes -> consumable toiletries, rule 2; 掃除・洗濯用品 (Cleaning & Laundry, D00034) and its 洗う｜水まわりの掃除に feature node -> general cleaning, rule 32; スリッパ・ルームサンダル (S1070311, 15) -> room slippers under Interior Goods, footwear not bathroom (MUJI's bath slippers are inside the Bathroom Goods node I did record); 収納用品・収納ケース (D00016) and 家具 (D00019) -> general Storage and Furniture, rules 30/31, and largely already in Furniture.xlsx; ラグ・マット > マット (S0280101) -> floor rugs and mats under Interior Goods, not bathroom; まとめ買い / SALE / もったいない市 / 新商品 bulk-buy, sale, outlet and new-arrival nodes -> rule 25, never recorded.",
+ "rows": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Towels, Bath & Toilet Goods",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath & Toilet Goods",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Goods",
+   "qty": 111,
+   "link": "https://www.muji.com/jp/ja/store/cmdty/section/S1070301",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Toilet Goods",
+   "qty": 14,
+   "link": "https://www.muji.com/jp/ja/store/cmdty/section/S1070307",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Hooks, Clips & Towel Hangers",
+   "qty": 15,
+   "link": "https://www.muji.com/jp/ja/store/cmdty/section/S1070342",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Toothbrush Stands & Washbasin Cups",
+   "qty": 9,
+   "link": "https://www.muji.com/jp/ja/store/cmdty/section/S1070305",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  }
+ ],
+ "review": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Towels, Bath & Toilet Goods > Bath & Toilet Goods > Bath Mats",
+   "qty": 6,
+   "issue": "ROUTED TO TEXTILE: rule 16 - I enumerated all 6 and every one is a woven textile bath mat: シェニールバスマット 36x60cm, シェニールバスマット 45x70cm (chenille), 残糸を一部に使った バスマット 36x60cm (made partly from leftover yarn), 綿麻バスマット S/M/L 36x60 / 45x70 / 60x90cm (cotton-linen). No rubber, diatomite or anti-slip mat in the node, so rule 16's second limb never engages. Count = the page's own rendered total '6件中 1件〜6件表示', with all 6 product cards present on page 1 (full enumeration). DEDUP: already_extracted() = no hit.",
+   "link": "https://www.muji.com/jp/ja/store/cmdty/section/S2002001"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Towels, Bath & Toilet Goods > Towels and all its children",
+   "qty": 42,
+   "issue": "ROUTED TO TEXTILE: rule 15/20 - MUJI's entire towel branch. Children, each with its own rendered total and URL: ハンドタオル / Hand Towels 8 (https://www.muji.com/jp/ja/store/cmdty/section/S107030301), フェイスタオル / Face Towels 17 (.../S107030302), バスタオル / Bath Towels 13 (.../S107030305), and a series re-cut シリーズから選ぶ タオル / Choose Towels by Series 27 (.../S107030307) which itself has 5 children - ふっくらパイルタオル (.../S10703030301), やわらか薄手タオル (.../S10703030302), 肌あたりやわらかタオル (.../S10703030303), ワッフルタオル (.../S10703030304) and タオル雑貨（のびのびターバン、タオルポンチョなど）(.../S10703030305). All textile. Note the arithmetic: the three product-type children sum to 38 against a parent of 42, and the 27-product series node overlaps them (it is a re-cut of the same towels by product series, rule 28), so these figures must never be summed. Nothing here is Bathroom hardware - MUJI sells no towel RAIL as such; its towel HANGERS are in the separate hooks node I did record. DEDUP: no hit on the parent or any of the 8 descendants.",
+   "link": "https://www.muji.com/jp/ja/store/cmdty/section/T20020"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Interior Goods > Interior Sundries > Mirrors",
+   "qty": 15,
+   "issue": "ALREADY EXTRACTED IN Final.xlsx (Home Decor pass) as 'Mirrors' - exact URL match on already_extracted(). Checked in full anyway under rules 10/11, because a bathroom or vanity mirror would be Bathroom and rule 10 says DO NOT SKIP. Its breadcrumb (read from the page's own payload) is 生活雑貨 > インテリア用品 (D00020) > インテリア雑貨 (T20008) > ミラー - the INTERIOR branch, not the bath branch. Enumerated all 15: wall-mountable furniture mirrors S/M, rubberwood and pine floor mirrors, steel-pipe stand mirror, aluminium compact tray mirrors S/L, コードレスLEDライト付ミラー 5倍拡大鏡付 (cordless LED-light mirror with 5x magnifier), aluminium folding mirrors S/M/L, styrene folding tri-fold mirror, styrene folding handled mirrors S/L, styrene round compact mirror. Several of these (LED, magnifying, folding vanity) would fall under rule 10 if the node were new, but it is not - it is already in a validated workbook, so under OPTION 1 it stays there and is not re-extracted into Bathroom. Recorded here so the decision is visible rather than silent.",
+   "link": "https://www.muji.com/jp/ja/store/cmdty/section/S1070111"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Kitchen Goods > Cooking Tools > Hooks, Clips & Towel Hangers",
+   "qty": 22,
+   "issue": "NOT RECORDED - out of scope, and flagged only because MUJI runs a NODE OF THE SAME NAME in two departments. This one's breadcrumb is 生活雑貨 > キッチン用品 > 調理小物・キッチンツール, i.e. Kitchen; the one I recorded (S1070342, 15 products) sits under タオル・バス・トイレ用品 > バス・トイレ用品, i.e. the Bath & Toilet department. They are different URLs with different product sets, so under rule 28 they are not one record. I enumerated both and compared: 14 of the 15 bath-branch products also appear in this kitchen node (the shared stainless and aluminium S-hook / clip / suction towel-hanger range), the exception being 'ステンレス 上でも下でも使えるS字フック 2連'; this kitchen node adds 7 kitchen-only items (over-door and sink-door storage hooks with pockets, additional hooks/pockets, 4-gang sink-door hook, stainless kitchen paper holder). Only the bath-branch node is recorded, so no product is double-counted into Bathroom. DEDUP: no hit on either.",
+   "link": "https://www.muji.com/jp/ja/store/cmdty/section/S1070406"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Cosmetics & Care > Body Care > Bath Additives",
+   "qty": null,
+   "issue": "NOT RECORDED - bath salts and bathing tablets are consumable toiletries, not Bathroom product under rule 3 (rule 2, primary product type). Listed so its presence in the taxonomy is accounted for. Note that a large block of the same bath-additive range ALSO appears inside the Bathroom Goods node I recorded - see the composition disclosure in notes.",
+   "link": "https://www.muji.com/jp/ja/store/cmdty/section/S1070302"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Cosmetics & Care > Oral Care > Toothbrushes & Toothpaste",
+   "qty": null,
+   "issue": "NOT RECORDED - toothbrushes and toothpaste are personal-care consumables, not the toothbrush HOLDERS of rule 13. Distinguished deliberately from its sibling 歯ブラシスタンド・コップ (toothbrush STANDS and washbasin cups), which IS rule 13 product and IS recorded in rows[].",
+   "link": "https://www.muji.com/jp/ja/store/cmdty/section/S2020301"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Cleaning & Laundry > Cleaning Goods > Recommended: Washing | For cleaning around water",
+   "qty": 13,
+   "issue": "NOT RECORDED - a 'recommended feature' merchandising node inside the Cleaning & Laundry department (breadcrumb 生活雑貨 > 掃除・洗濯用品 > 掃除用品 > おすすめ特集 > 洗う｜水まわりの掃除に). 'Around water' means kitchen sink, bath and toilet cleaning together; it is general cleaning equipment, which rule 32 says not to re-extract, and it is a promotional feature cut rather than a taxonomy leaf (rule 25). Its bath- and toilet-specific cleaners already appear inside the two Bathroom nodes I recorded, so recording it would double-count.",
+   "link": "https://www.muji.com/jp/ja/store/cmdty/section/S200210111"
+  }
+ ],
+ "_reconstructed_from": "Bathroom.xlsx delivered 2026-09-01 (checkpoint), not original worker JSON"
+}

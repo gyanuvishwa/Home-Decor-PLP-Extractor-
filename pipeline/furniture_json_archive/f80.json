@@ -1,0 +1,615 @@
+{
+ "sr": 80,
+ "company": "HSN Home",
+ "brand_site": "hsn.com",
+ "country": "USA",
+ "site_url": "https://www.hsn.com/shop/home/ho",
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ACCESS: hsn.com sits behind Akamai Bot Manager. Direct HTML fetches of /shop/ pages return 403 'Access Denied' on every desktop curl_cffi profile, while safari/firefox/iOS profiles return HTTP 200 carrying only a ~7KB Akamai sensor interstitial; r.jina.ai returned its own Cloudflare 'Just a moment' challenge; a 23-profile curl_cffi sweep produced exactly one full-content 200 (safari15_3) that proved non-reproducible. WORKING ROUTE (same as the prior Home-Decor pass): translate.goog - https://www-hsn-com.translate.goog/<path>?_x_tr_sl=en&_x_tr_tl=<lang>&_x_tr_hl=en - returns genuine server-rendered origin HTML. It 429s intermittently under the shared worker load; retrying with a rotated _x_tr_tl target language plus backoff cleared it every time. robots.txt was checked first: no anthropic-ai / ClaudeBot / Claude-Web directive and no /shop/ disallow (the disallowed /search and /show-more-products/ endpoints were deliberately not used). Every `link` is a canonical www.hsn.com origin URL, never a proxy URL. TREE SOURCE: https://www.hsn.com/sitemap (the sitemap index) is served unprotected on a plain direct fetch and lists 14 department sitemaps. /sitemap/ho?name=home yielded all 366 Home nodes; the tree was then confirmed node by node from each listing page's own schema.org BreadcrumbList and its 'Departments' filter-group facet, which enumerates a node's children (or, on a terminal node, its sibling set). Home > Furniture (ho0115, 1384 items) has exactly 8 sub-departments, each with 3-9 terminal children; no level-4 furniture node exists in the sitemap or in any facet. QTY METHOD: every listing page carries data-total-products=\"N\" on the product grid div (id=template-product-grid), duplicated as data-cnstrc-num-results (HSN runs Constructor.io). This is the rendered listing total and it was validated three independent ways: (1) it reproduced the prior Home-Decor pass exactly on unchanged categories (Mirrors 93, Wall Art 96); (2) each leaf's own page value equals the count HSN prints beside that node in its parent's Departments facet - true for all 46 leaves; (3) full pagination enumeration on the largest node, Coffee Tables & Accent Tables ho0190, shows five pager links of take=60/60/60/60/57 = 297, exactly matching data-total-products=297. SANITY CHECKS: counts vary per category from 1 to 297, so this is no site-wide constant; no suspiciously round values; every h1 and breadcrumb matched the node requested; a second forced re-read of Sofas, Coffee Tables, Desks and Barstools returned identical numbers (no intra-session drift). CROSS-LISTING: HSN files the same product under several nodes, so sibling counts overlap and do not sum to the parent (the 8 Furniture sub-departments sum to 1479 against the department's own 1384). Verified examples: all 13 Bathroom Stools are also in Barstools; 15 of the 22 Bedroom Benches are also in Living Room Ottomans & Benches. Each row therefore reports the site's own count for that node only - never a sum, never a parent's number. FURNITURE OUTSIDE THE HOME DEPARTMENT: the other 13 department sitemaps were slug-scanned for furniture terms. Real furniture nodes were found and included in Baby (Nursery & Kids Furniture b00013 with its Baby Cribs, Bassinets & Sleepers, Kids Furniture and Toddler Beds children), Kitchen & Food (Kitchen Islands & Carts qc0427) and Crafts & Sewing (Sewing Tables & Cabinets ct0281, Cabinets & Tables ct0160). Home > Bath also carries its own Bathroom Furniture listing (ho0471) separate from Home > Furniture > Bathroom Furniture (ho0138); both are kept and flagged. EXCLUDED, with reasons: Mattresses (ho0194, 59) and Cribs Mattresses (b00060, 23) - bedding per the brief. Slipcovers (ho0208, 2) - furniture covers. Patio Umbrellas & Outdoor Shades (ho0269, 41) - shade structures. The whole Home > Storage & Organization department (ho0299), including Shelving & Racks (ho0313, 124), Storage Carts (ho0549, 28) and Drawer Units (ho0551, 14): tiles were read and they are utility drying/shoe racks, rolling mesh office carts and folding storage chests - standalone storage goods reserved for the future Storage task, and not filed under any Furniture department. Kitchen Shelves & Storage Rack (qc0428, 16) excluded for the same reason. Baby > Feeding > High Chairs (b00004, 1) excluded - its single product is a strap-on 3-in-1 dining booster seat filed under Feeding, an accessory rather than furniture. Also excluded as non-furniture: Hampers, Nursery Decor, Baby/Kids Bedding, Steps & Ladders, Safes, Tool Storage, Pet Crates & Beds, Planters. Lighting, mirrors, rugs, wall decor and home accents were left to their own tasks.",
+ "rows": [
+  {
+   "category": "Furniture",
+   "sub_category": "Bathroom Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bathroom Shelves",
+   "qty": 5,
+   "link": "https://www.hsn.com/shop/bathroom-shelves/ho0142",
+   "is_group": false,
+   "evidence": "listing grid attribute data-total-products=\"5\" on https://www.hsn.com/shop/bathroom-shelves/ho0142 (identical data-cnstrc-num-results=\"5\"); matches the \"Bathroom Shelves (5)\" count HSN prints for this node in the parent listing's Departments filter facet",
+   "flag": "MANUAL REVIEW: ambiguous shelving - all 5 tiles read; 3 are freestanding ladder/tier shelf units (furniture), 2 are wall-mount bathroom cabinets; HSN files the node under Home > Furniture > Bathroom Furniture"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bathroom Stools",
+   "qty": 13,
+   "link": "https://www.hsn.com/shop/bathroom-stools/ho0141",
+   "is_group": false,
+   "evidence": "listing grid attribute data-total-products=\"13\" on https://www.hsn.com/shop/bathroom-stools/ho0141 (identical data-cnstrc-num-results=\"13\"); matches the \"Bathroom Stools (13)\" count HSN prints for this node in the parent listing's Departments filter facet",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bathroom Vanities",
+   "qty": 1,
+   "link": "https://www.hsn.com/shop/bathroom-vanities/ho0143",
+   "is_group": false,
+   "evidence": "listing grid attribute data-total-products=\"1\" on https://www.hsn.com/shop/bathroom-vanities/ho0143 (identical data-cnstrc-num-results=\"1\"); matches the \"Bathroom Vanities (1)\" count HSN prints for this node in the parent listing's Departments filter facet",
+   "flag": "MANUAL REVIEW: the single product is 'Southern Enterprises Wall Mount Ledge with Vanity Mirror' - a wall-mount vanity ledge sold with a mirror, borderline against the mirrors exclusion"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bedroom Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bedroom Vanities",
+   "qty": 2,
+   "link": "https://www.hsn.com/shop/bedroom-vanities/ho0153",
+   "is_group": false,
+   "evidence": "listing grid attribute data-total-products=\"2\" on https://www.hsn.com/shop/bedroom-vanities/ho0153 (identical data-cnstrc-num-results=\"2\"); matches the \"Bedroom Vanities (2)\" count HSN prints for this node in the parent listing's Departments filter facet",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Beds & Bed Frames",
+   "qty": 77,
+   "link": "https://www.hsn.com/shop/beds-and-bed-frames/ho0146",
+   "is_group": false,
+   "evidence": "listing grid attribute data-total-products=\"77\" on https://www.hsn.com/shop/beds-and-bed-frames/ho0146 (identical data-cnstrc-num-results=\"77\"); matches the \"Beds & Bed Frames (77)\" count HSN prints for this node in the parent listing's Departments filter facet",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Daybeds",
+   "qty": 13,
+   "link": "https://www.hsn.com/shop/daybeds/ho0621",
+   "is_group": false,
+   "evidence": "listing grid attribute data-total-products=\"13\" on https://www.hsn.com/shop/daybeds/ho0621 (identical data-cnstrc-num-results=\"13\"); matches the \"Daybeds (13)\" count HSN prints for this node in the parent listing's Departments filter facet",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dressers & Chests",
+   "qty": 54,
+   "link": "https://www.hsn.com/shop/dressers-and-chests/ho0149",
+   "is_group": false,
+   "evidence": "listing grid attribute data-total-products=\"54\" on https://www.hsn.com/shop/dressers-and-chests/ho0149 (identical data-cnstrc-num-results=\"54\"); matches the \"Dressers & Chests (54)\" count HSN prints for this node in the parent listing's Departments filter facet",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Headboards",
+   "qty": 22,
+   "link": "https://www.hsn.com/shop/headboards/ho0150",
+   "is_group": false,
+   "evidence": "listing grid attribute data-total-products=\"22\" on https://www.hsn.com/shop/headboards/ho0150 (identical data-cnstrc-num-results=\"22\"); matches the \"Headboards (22)\" count HSN prints for this node in the parent listing's Departments filter facet",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Nightstands",
+   "qty": 36,
+   "link": "https://www.hsn.com/shop/nightstands/ho0152",
+   "is_group": false,
+   "evidence": "listing grid attribute data-total-products=\"36\" on https://www.hsn.com/shop/nightstands/ho0152 (identical data-cnstrc-num-results=\"36\"); matches the \"Nightstands (36)\" count HSN prints for this node in the parent listing's Departments filter facet",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bedroom Benches",
+   "qty": 22,
+   "link": "https://www.hsn.com/shop/ottomans-and-benches/ho0147",
+   "is_group": false,
+   "evidence": "listing grid attribute data-total-products=\"22\" on https://www.hsn.com/shop/ottomans-and-benches/ho0147 (identical data-cnstrc-num-results=\"22\"); matches the \"Ottomans & Benches (22)\" count HSN prints for this node in the parent listing's Departments filter facet",
+   "flag": "MANUAL REVIEW: the parent facet labels this node 'Ottomans & Benches' but its own page h1 is 'Bedroom Benches'; the h1 name is used here to distinguish it from the Living Room node of the same facet name (ho0188, 120 items) - 15 of these 22 products are cross-listed in both"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Entryway Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Coat Racks & Umbrella Stands",
+   "qty": 32,
+   "link": "https://www.hsn.com/shop/coat-racks-and-umbrella-stands/ho0132",
+   "is_group": false,
+   "evidence": "listing grid attribute data-total-products=\"32\" on https://www.hsn.com/shop/coat-racks-and-umbrella-stands/ho0132 (identical data-cnstrc-num-results=\"32\"); matches the \"Coat Racks & Umbrella Stands (32)\" count HSN prints for this node in the parent listing's Departments filter facet",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Entryway Cabinets & Storage",
+   "qty": 33,
+   "link": "https://www.hsn.com/shop/entryway-cabinets-and-storage/ho0131",
+   "is_group": false,
+   "evidence": "listing grid attribute data-total-products=\"33\" on https://www.hsn.com/shop/entryway-cabinets-and-storage/ho0131 (identical data-cnstrc-num-results=\"33\"); matches the \"Entryway Cabinets & Storage (33)\" count HSN prints for this node in the parent listing's Departments filter facet",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Entryway Tables",
+   "qty": 91,
+   "link": "https://www.hsn.com/shop/entryway-tables/ho0133",
+   "is_group": false,
+   "evidence": "listing grid attribute data-total-products=\"91\" on https://www.hsn.com/shop/entryway-tables/ho0133 (identical data-cnstrc-num-results=\"91\"); matches the \"Entryway Tables (91)\" count HSN prints for this node in the parent listing's Departments filter facet",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Home Bar Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bar Cabinets",
+   "qty": 6,
+   "link": "https://www.hsn.com/shop/bar-cabinets/ho0168",
+   "is_group": false,
+   "evidence": "listing grid attribute data-total-products=\"6\" on https://www.hsn.com/shop/bar-cabinets/ho0168 (identical data-cnstrc-num-results=\"6\"); matches the \"Bar Cabinets (6)\" count HSN prints for this node in the parent listing's Departments filter facet",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Barstools",
+   "qty": 73,
+   "link": "https://www.hsn.com/shop/barstools/ho0167",
+   "is_group": false,
+   "evidence": "listing grid attribute data-total-products=\"73\" on https://www.hsn.com/shop/barstools/ho0167 (identical data-cnstrc-num-results=\"73\"); matches the \"Barstools (73)\" count HSN prints for this node in the parent listing's Departments filter facet",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Pub Tables",
+   "qty": 5,
+   "link": "https://www.hsn.com/shop/pub-tables/ho0170",
+   "is_group": false,
+   "evidence": "listing grid attribute data-total-products=\"5\" on https://www.hsn.com/shop/pub-tables/ho0170 (identical data-cnstrc-num-results=\"5\"); matches the \"Pub Tables (5)\" count HSN prints for this node in the parent listing's Departments filter facet",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Serving Carts",
+   "qty": 19,
+   "link": "https://www.hsn.com/shop/serving-carts/ho0624",
+   "is_group": false,
+   "evidence": "listing grid attribute data-total-products=\"19\" on https://www.hsn.com/shop/serving-carts/ho0624 (identical data-cnstrc-num-results=\"19\"); matches the \"Serving Carts (19)\" count HSN prints for this node in the parent listing's Departments filter facet",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Home Office Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Desk Chairs",
+   "qty": 45,
+   "link": "https://www.hsn.com/shop/desk-chairs/ho0173",
+   "is_group": false,
+   "evidence": "listing grid attribute data-total-products=\"45\" on https://www.hsn.com/shop/desk-chairs/ho0173 (identical data-cnstrc-num-results=\"45\"); matches the \"Desk Chairs (45)\" count HSN prints for this node in the parent listing's Departments filter facet",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Desks",
+   "qty": 120,
+   "link": "https://www.hsn.com/shop/desks/ho0175",
+   "is_group": false,
+   "evidence": "listing grid attribute data-total-products=\"120\" on https://www.hsn.com/shop/desks/ho0175 (identical data-cnstrc-num-results=\"120\"); matches the \"Desks (120)\" count HSN prints for this node in the parent listing's Departments filter facet",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Office Storage",
+   "qty": 17,
+   "link": "https://www.hsn.com/shop/office-storage/ho0174",
+   "is_group": false,
+   "evidence": "listing grid attribute data-total-products=\"17\" on https://www.hsn.com/shop/office-storage/ho0174 (identical data-cnstrc-num-results=\"17\"); matches the \"Office Storage (17)\" count HSN prints for this node in the parent listing's Departments filter facet",
+   "flag": "MANUAL REVIEW: mixed node - all 17 tiles read; about 10 are storage furniture (rolling file cabinet, storage cabinet, wicker storage chests, printer stand, drawer carts) but about 7 are office chair mats and dry-erase boards, which are not furniture"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Kids' Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Kids' Beds",
+   "qty": 3,
+   "link": "https://www.hsn.com/shop/kids-beds/ho0617",
+   "is_group": false,
+   "evidence": "listing grid attribute data-total-products=\"3\" on https://www.hsn.com/shop/kids-beds/ho0617 (identical data-cnstrc-num-results=\"3\"); matches the \"Kids' Beds (3)\" count HSN prints for this node in the parent listing's Departments filter facet",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Kids' Desks",
+   "qty": 2,
+   "link": "https://www.hsn.com/shop/kids-desks/ho0618",
+   "is_group": false,
+   "evidence": "listing grid attribute data-total-products=\"2\" on https://www.hsn.com/shop/kids-desks/ho0618 (identical data-cnstrc-num-results=\"2\"); matches the \"Kids' Desks (2)\" count HSN prints for this node in the parent listing's Departments filter facet",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Kids' Seating",
+   "qty": 3,
+   "link": "https://www.hsn.com/shop/kids-seating/ho0620",
+   "is_group": false,
+   "evidence": "listing grid attribute data-total-products=\"3\" on https://www.hsn.com/shop/kids-seating/ho0620 (identical data-cnstrc-num-results=\"3\"); matches the \"Kids' Seating (3)\" count HSN prints for this node in the parent listing's Departments filter facet",
+   "flag": "MANUAL REVIEW: all 3 tiles read - 2 are furniture (wooden table & chairs set, storage bench) and 1 is a nap mat"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Kitchen & Dining Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bakers' Racks",
+   "qty": 1,
+   "link": "https://www.hsn.com/shop/bakers-racks/ho0622",
+   "is_group": false,
+   "evidence": "listing grid attribute data-total-products=\"1\" on https://www.hsn.com/shop/bakers-racks/ho0622 (identical data-cnstrc-num-results=\"1\"); matches the \"Bakers' Racks (1)\" count HSN prints for this node in the parent listing's Departments filter facet",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dining Room Chairs",
+   "qty": 65,
+   "link": "https://www.hsn.com/shop/dining-room-chairs/ho0181",
+   "is_group": false,
+   "evidence": "listing grid attribute data-total-products=\"65\" on https://www.hsn.com/shop/dining-room-chairs/ho0181 (identical data-cnstrc-num-results=\"65\"); matches the \"Dining Room Chairs (65)\" count HSN prints for this node in the parent listing's Departments filter facet",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dining Sets",
+   "qty": 29,
+   "link": "https://www.hsn.com/shop/dining-sets/ho0182",
+   "is_group": false,
+   "evidence": "listing grid attribute data-total-products=\"29\" on https://www.hsn.com/shop/dining-sets/ho0182 (identical data-cnstrc-num-results=\"29\"); matches the \"Dining Sets (29)\" count HSN prints for this node in the parent listing's Departments filter facet",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Buffets & Hutches",
+   "qty": 16,
+   "link": "https://www.hsn.com/shop/hutches-and-buffets/ho0180",
+   "is_group": false,
+   "evidence": "listing grid attribute data-total-products=\"16\" on https://www.hsn.com/shop/hutches-and-buffets/ho0180 (identical data-cnstrc-num-results=\"16\"); matches the \"Hutches & Buffets (16)\" count HSN prints for this node in the parent listing's Departments filter facet",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Kitchen Islands & Carts",
+   "qty": 17,
+   "link": "https://www.hsn.com/shop/kitchen-islands-and-carts/ho0183",
+   "is_group": false,
+   "evidence": "listing grid attribute data-total-products=\"17\" on https://www.hsn.com/shop/kitchen-islands-and-carts/ho0183 (identical data-cnstrc-num-results=\"17\"); matches the \"Kitchen Islands & Carts (17)\" count HSN prints for this node in the parent listing's Departments filter facet",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dining Tables",
+   "qty": 18,
+   "link": "https://www.hsn.com/shop/dining-tables/ho0184",
+   "is_group": false,
+   "evidence": "listing grid attribute data-total-products=\"18\" on https://www.hsn.com/shop/dining-tables/ho0184 (identical data-cnstrc-num-results=\"18\"); matches the \"Tables (18)\" count HSN prints for this node in the parent listing's Departments filter facet",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Living Room Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bookcases & Shelves",
+   "qty": 53,
+   "link": "https://www.hsn.com/shop/bookcases-and-shelves/ho0623",
+   "is_group": false,
+   "evidence": "listing grid attribute data-total-products=\"53\" on https://www.hsn.com/shop/bookcases-and-shelves/ho0623 (identical data-cnstrc-num-results=\"53\"); matches the \"Bookcases & Shelves (53)\" count HSN prints for this node in the parent listing's Departments filter facet",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Chairs",
+   "qty": 70,
+   "link": "https://www.hsn.com/shop/chairs/ho0186",
+   "is_group": false,
+   "evidence": "listing grid attribute data-total-products=\"70\" on https://www.hsn.com/shop/chairs/ho0186 (identical data-cnstrc-num-results=\"70\"); matches the \"Chairs (70)\" count HSN prints for this node in the parent listing's Departments filter facet",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Electric Fireplaces",
+   "qty": 17,
+   "link": "https://www.hsn.com/shop/electric-fireplaces/ho0162",
+   "is_group": false,
+   "evidence": "listing grid attribute data-total-products=\"17\" on https://www.hsn.com/shop/electric-fireplaces/ho0162 (identical data-cnstrc-num-results=\"17\"); matches the \"Electric Fireplaces (17)\" count HSN prints for this node in the parent listing's Departments filter facet",
+   "flag": "MANUAL REVIEW: mixed node filed by HSN under Living Room Furniture - all 17 tiles read; about 11 are media-console / mantel fireplace furniture (two of them with bookcases) but about 6 are wall-mount electric fireplace heater units, which are appliances rather than furniture"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Entertainment Centers",
+   "qty": 46,
+   "link": "https://www.hsn.com/shop/entertainment-centers/ho0191",
+   "is_group": false,
+   "evidence": "listing grid attribute data-total-products=\"46\" on https://www.hsn.com/shop/entertainment-centers/ho0191 (identical data-cnstrc-num-results=\"46\"); matches the \"Entertainment Centers (46)\" count HSN prints for this node in the parent listing's Departments filter facet",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Ottomans & Benches",
+   "qty": 120,
+   "link": "https://www.hsn.com/shop/ottomans-and-benches/ho0188",
+   "is_group": false,
+   "evidence": "listing grid attribute data-total-products=\"120\" on https://www.hsn.com/shop/ottomans-and-benches/ho0188 (identical data-cnstrc-num-results=\"120\"); matches the \"Ottomans & Benches (120)\" count HSN prints for this node in the parent listing's Departments filter facet",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Room Dividers",
+   "qty": 1,
+   "link": "https://www.hsn.com/shop/room-dividers/ho0083",
+   "is_group": false,
+   "evidence": "listing grid attribute data-total-products=\"1\" on https://www.hsn.com/shop/room-dividers/ho0083 (identical data-cnstrc-num-results=\"1\"); matches the \"Room Dividers (1)\" count HSN prints for this node in the parent listing's Departments filter facet",
+   "flag": "MANUAL REVIEW: single product is a woven folding room divider/screen; a freestanding screen, filed by HSN under Living Room Furniture"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sofas",
+   "qty": 9,
+   "link": "https://www.hsn.com/shop/sofas/ho0189",
+   "is_group": false,
+   "evidence": "listing grid attribute data-total-products=\"9\" on https://www.hsn.com/shop/sofas/ho0189 (identical data-cnstrc-num-results=\"9\"); matches the \"Sofas (9)\" count HSN prints for this node in the parent listing's Departments filter facet",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Coffee Tables & Accent Tables",
+   "qty": 297,
+   "link": "https://www.hsn.com/shop/coffee-tables-and-accent-tables/ho0190",
+   "is_group": false,
+   "evidence": "listing grid attribute data-total-products=\"297\" on https://www.hsn.com/shop/coffee-tables-and-accent-tables/ho0190 (identical data-cnstrc-num-results=\"297\"); matches the \"Tables (297)\" count HSN prints for this node in the parent listing's Departments filter facet",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Patio Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Patio Chairs",
+   "qty": 74,
+   "link": "https://www.hsn.com/shop/patio-chairs/ho0264",
+   "is_group": false,
+   "evidence": "listing grid attribute data-total-products=\"74\" on https://www.hsn.com/shop/patio-chairs/ho0264 (identical data-cnstrc-num-results=\"74\"); matches the \"Chairs (74)\" count HSN prints for this node in the parent listing's Departments filter facet",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Outdoor Chaises",
+   "qty": 6,
+   "link": "https://www.hsn.com/shop/outdoor-chaises/ho0263",
+   "is_group": false,
+   "evidence": "listing grid attribute data-total-products=\"6\" on https://www.hsn.com/shop/outdoor-chaises/ho0263 (identical data-cnstrc-num-results=\"6\"); matches the \"Chaises (6)\" count HSN prints for this node in the parent listing's Departments filter facet",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Garden Stools",
+   "qty": 21,
+   "link": "https://www.hsn.com/shop/garden-stools/ho0608",
+   "is_group": false,
+   "evidence": "listing grid attribute data-total-products=\"21\" on https://www.hsn.com/shop/garden-stools/ho0608 (identical data-cnstrc-num-results=\"21\"); matches the \"Garden Stools (21)\" count HSN prints for this node in the parent listing's Departments filter facet",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Hammocks",
+   "qty": 1,
+   "link": "https://www.hsn.com/shop/hammocks/ho0660",
+   "is_group": false,
+   "evidence": "listing grid attribute data-total-products=\"1\" on https://www.hsn.com/shop/hammocks/ho0660 (identical data-cnstrc-num-results=\"1\"); matches the \"Hammocks (1)\" count HSN prints for this node in the parent listing's Departments filter facet",
+   "flag": "MANUAL REVIEW: single product is a portable hammock with canopy; HSN files it under Garden & Outdoors > Patio Furniture but a hammock is arguably not furniture"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Outdoor Benches",
+   "qty": 18,
+   "link": "https://www.hsn.com/shop/outdoor-benches/ho0593",
+   "is_group": false,
+   "evidence": "listing grid attribute data-total-products=\"18\" on https://www.hsn.com/shop/outdoor-benches/ho0593 (identical data-cnstrc-num-results=\"18\"); matches the \"Outdoor Benches (18)\" count HSN prints for this node in the parent listing's Departments filter facet",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Patio Furniture Sets",
+   "qty": 121,
+   "link": "https://www.hsn.com/shop/patio-furniture-sets/ho0265",
+   "is_group": false,
+   "evidence": "listing grid attribute data-total-products=\"121\" on https://www.hsn.com/shop/patio-furniture-sets/ho0265 (identical data-cnstrc-num-results=\"121\"); matches the \"Patio Furniture Sets (121)\" count HSN prints for this node in the parent listing's Departments filter facet",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Patio Storage",
+   "qty": 9,
+   "link": "https://www.hsn.com/shop/patio-storage/ho0266",
+   "is_group": false,
+   "evidence": "listing grid attribute data-total-products=\"9\" on https://www.hsn.com/shop/patio-storage/ho0266 (identical data-cnstrc-num-results=\"9\"); matches the \"Patio Storage (9)\" count HSN prints for this node in the parent listing's Departments filter facet",
+   "flag": "MANUAL REVIEW: despite the name this node holds no storage containers - all 9 tiles read: 6 freestanding outdoor tier/corner shelf units, 1 storage bench, 1 bar cart, 2 ladder/folding plant stands; kept as freestanding outdoor shelving furniture"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Outdoor Tables",
+   "qty": 41,
+   "link": "https://www.hsn.com/shop/outdoor-tables/ho0267",
+   "is_group": false,
+   "evidence": "listing grid attribute data-total-products=\"41\" on https://www.hsn.com/shop/outdoor-tables/ho0267 (identical data-cnstrc-num-results=\"41\"); matches the \"Tables (41)\" count HSN prints for this node in the parent listing's Departments filter facet",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bath",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bathroom Furniture",
+   "qty": 29,
+   "link": "https://www.hsn.com/shop/bathroom-furniture/ho0471",
+   "is_group": false,
+   "evidence": "listing grid attribute data-total-products=\"29\" on https://www.hsn.com/shop/bathroom-furniture/ho0471 (identical data-cnstrc-num-results=\"29\"); matches the \"Furniture (29)\" count HSN prints for this node in the parent listing's Departments filter facet",
+   "flag": "MANUAL REVIEW: a second, distinct 'Bathroom Furniture' listing, under Home > Bath (the Home > Furniture > Bathroom Furniture node is ho0138, 19 items, whose three children are recorded above). 16 of these 29 product IDs are the same items as those children; the other 13 (folding storage ottomans, portable folding bar stools, Alaterre stools) appear in no other node checked. Kept as a genuinely different listing page per brief section 7"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Nursery & Kids Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Baby Cribs",
+   "qty": 12,
+   "link": "https://www.hsn.com/shop/baby-cribs/b00014",
+   "is_group": false,
+   "evidence": "listing grid attribute data-total-products=\"12\" on https://www.hsn.com/shop/baby-cribs/b00014 (identical data-cnstrc-num-results=\"12\"); matches the \"Baby Cribs (12)\" count HSN prints for this node in the parent listing's Departments filter facet",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bassinets & Sleepers",
+   "qty": 1,
+   "link": "https://www.hsn.com/shop/bassinets-and-sleepers/b00020",
+   "is_group": false,
+   "evidence": "listing grid attribute data-total-products=\"1\" on https://www.hsn.com/shop/bassinets-and-sleepers/b00020 (identical data-cnstrc-num-results=\"1\"); matches the \"Bassinets & Sleepers (1)\" count HSN prints for this node in the parent listing's Departments filter facet",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Kids Furniture",
+   "qty": 10,
+   "link": "https://www.hsn.com/shop/kids-furniture/b00017",
+   "is_group": false,
+   "evidence": "listing grid attribute data-total-products=\"10\" on https://www.hsn.com/shop/kids-furniture/b00017 (identical data-cnstrc-num-results=\"10\"); matches the \"Kids Furniture (10)\" count HSN prints for this node in the parent listing's Departments filter facet",
+   "flag": "MANUAL REVIEW: Baby-department node (breadcrumb Baby > Nursery & Kids Furniture > Kids Furniture); distinct from the Home > Furniture > Kids' Furniture node ho0616 (7 items) - only 3 product IDs overlap. 9 of 10 tiles are furniture (dressers, crib/changer, dressing table, 4-drawer chest, room-in-a-box), 1 is a nap mat"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Toddler Beds",
+   "qty": 8,
+   "link": "https://www.hsn.com/shop/toddler-beds/b00018",
+   "is_group": false,
+   "evidence": "listing grid attribute data-total-products=\"8\" on https://www.hsn.com/shop/toddler-beds/b00018 (identical data-cnstrc-num-results=\"8\"); matches the \"Toddler Beds (8)\" count HSN prints for this node in the parent listing's Departments filter facet",
+   "flag": "MANUAL REVIEW: all 8 tiles read - 4 are toddler / full-size conversion rails (bed parts) rather than complete beds"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Kitchen Storage & Organization",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Kitchen Islands & Carts",
+   "qty": 13,
+   "link": "https://www.hsn.com/shop/kitchen-islands-and-carts/qc0427",
+   "is_group": false,
+   "evidence": "listing grid attribute data-total-products=\"13\" on https://www.hsn.com/shop/kitchen-islands-and-carts/qc0427 (identical data-cnstrc-num-results=\"13\"); matches the \"Kitchen Islands & Carts (13)\" count HSN prints for this node in the parent listing's Departments filter facet",
+   "flag": "MANUAL REVIEW: Kitchen & Food department node (breadcrumb Kitchen & Food > Storage & Organization > Kitchen Islands & Carts); a genuinely different listing page from the Home > Furniture node ho0183 (17 items) - only 5 product IDs overlap. Contents are kitchen carts and bar carts"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Craft Storage",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sewing Tables & Cabinets",
+   "qty": 13,
+   "link": "https://www.hsn.com/shop/sewing-tables-and-cabinets/ct0281",
+   "is_group": false,
+   "evidence": "listing grid attribute data-total-products=\"13\" on https://www.hsn.com/shop/sewing-tables-and-cabinets/ct0281 (identical data-cnstrc-num-results=\"13\"); matches the \"Tables & Cabinets (13)\" count HSN prints for this node in the parent listing's Departments filter facet",
+   "flag": "MANUAL REVIEW: Crafts & Sewing department node (breadcrumb Crafts & Sewing > Craft Storage > Sewing Tables & Cabinets). All 13 tiles read: about 8 are furniture (sewing tables, drafting tables, craft stations, a drafting table & stool set) and about 5 are portable drawing boards, which are not furniture"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sewing & Quilting",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Cabinets & Tables",
+   "qty": 4,
+   "link": "https://www.hsn.com/shop/cabinets-and-tables/ct0160",
+   "is_group": false,
+   "evidence": "listing grid attribute data-total-products=\"4\" on https://www.hsn.com/shop/cabinets-and-tables/ct0160 (identical data-cnstrc-num-results=\"4\"); matches the \"Cabinets & Tables (4)\" count HSN prints for this node in the parent listing's Departments filter facet",
+   "flag": "MANUAL REVIEW: small Crafts & Sewing node (breadcrumb Crafts & Sewing > Sewing & Quilting > Cabinets & Tables); the page h1 is mislabelled 'Sewing Tables & Cabinets'. All 4 tiles read: 2 furniture (a sewing/craft station that is also in ct0281, a standing desk / overbed table), 1 dress form, 1 drawer organizer cart"
+  }
+ ]
+}

@@ -1,0 +1,223 @@
+{
+  "sr": 70,
+  "company": "Lowe's Home Decor",
+  "brand_site": "lowes.com/c/Home-decor",
+  "country": "USA",
+  "site_url": "https://www.lowes.com/c/Home-decor",
+  "status": "partial",
+  "failure_reason": "All live category/listing pages under www.lowes.com (both /c/Home-decor and every /pl/... leaf URL) return an Akamai edge-level 403 'Access Denied' (errors.edgesuite.net reference id), confirmed on this retry across: tier (a) curl_cffi with session warming (homepage GET first, then category GET in the same session) using impersonate profiles chrome120, chrome124, chrome131, safari17_0 (edge101/safari15_5 failed at the TLS/HTTP2 layer before even reaching the server) - homepage returned 200 every time, every /pl/ and /c/Home-decor URL returned 403 every time; tier (b) Playwright headless with mouse-move/scroll simulation before reading content (403 on homepage itself, i.e. headless fingerprint is blocked even harder); tier (b) Playwright headed using a real installed Chrome channel (not bundled Chromium) plus navigator.webdriver spoofing and an explicit Referer header from a previously-loaded homepage - homepage loaded fine (200, real title 'Lowe's Home Improvement') but the category URL still returned 403 in the same browser context. This is a targeted, request-path-based edge rule (blocks /c/ and /pl/ specifically, not the whole site) that no combination of browser fingerprint, TLS impersonation, session/cookie warming, or human-like interaction timing got past. Tier (c) Claude-in-Chrome was confirmed still disconnected before this retry started (list_connected_browsers returned [] both at task start and again mid-task) and was not used, per the worker brief's explicit instruction not to rely on it this time. Because robots.txt, sitemap.xml, and the sitemap/navigation0.xml XML feed (all static, non-listing resources) ARE reachable via tier (a), the full Home-decor department category/subcategory tree (down to leaf slug + numeric id) was confirmed from the site's own official navigation sitemap even though no listing page could be rendered to read a quantity. status is 'partial' rather than 'blocked' because real tree data (not just top-level nav names) was recovered this time, improving on the prior attempt's zero rows - but no qty could be captured on any tier, so every leaf's qty is null with a MANUAL REVIEW flag rather than fabricated.",
+  "notes": "ACCESS: tier (a) HTTP-first. robots.txt (www.lowes.com/robots.txt) fetched OK (curl_cffi impersonate=chrome120) - no anthropic-ai/ClaudeBot/Claude-Web/Claude-User/Claude-SearchBot entry, no blanket Disallow: / (tier c is not robots-blocked, but was unavailable anyway - see failure_reason). robots.txt names Sitemap: https://www.lowes.com/sitemap.xml. Category-page fetches (/c/Home-decor and every /pl/ leaf) 403'd on every impersonation profile tried, with and without homepage session-warming - see failure_reason for the full retry list including tier (b) Playwright headless+headed. Never escalated to tier (c) because it was confirmed disconnected (list_connected_browsers=[]) both before and during this retry, per instruction. TREE METHOD: built from https://www.lowes.com/sitemap/navigation0.xml (linked from the sitemap index at /sitemap.xml, itself linked from robots.txt; this XML feed IS reachable even though rendered /pl/ pages are not - it is the site's own machine-readable full-site nav, not a proxy/cache). Isolated the Home-decor department's node block (all /pl/... urls appearing between the /pl/home-decor/4294935484 department marker and the next department marker /c/Kitchen) and cross-checked it against the prior worker's tier-c-confirmed top-level nav (Area Rugs & Mats, Blinds & Window Treatments, Curtains/Drapes & Drapery Hardware, Bedding & Bath, Home Accents & Decorative Accessories, Wall Decor, Mirrors, Pillows & Throws, Wallpaper & Accessories, Window Treatments, Luggage & Travel) - all 11 groups matched between the two independent sources (site-rendered nav vs. sitemap XML), giving high confidence the tree is complete for this department. Confirmed via the same navigation0.xml file that Storage/Organization (baskets-storage-containers, closet-organization, etc.) sits under a completely separate top-level department elsewhere in the site-wide nav (near sports-equipment/fitness-exercise-equipment, nowhere near /pl/home-decor/...), matching the prior worker's finding that Home-decor has no dedicated Storage department - so storage_rows is legitimately empty for this company, not a coverage gap. QTY METHOD: none obtainable - every listing page 403'd on every tier tried; qty=null + 'MANUAL REVIEW: category page blocked (Akamai 403), quantity not obtainable' on every leaf row. Links are the real sitemap-sourced URLs (verified present in the site's own official navigation0.xml feed, not invented or guessed), used per URL rule #29/#37 which requires actual observed URLs, not requires-a-live-fetch. EXCLUDED and why: entire furniture/... subtree (bedroom-furniture, dining-kitchen-furniture, entryway-furniture, folding-tables-chairs, furniture-parts, kids-furniture, living-room-furniture, office-furniture, incl. storage-flavored furniture items like blanket-ladders-storage, dining-kitchen-storage, wine-storage) - Furniture department, handled in the already-validated Furniture.xlsx, out of scope for both Textile and Storage per storage.md Sec21/27 (site explicitly places these under Furniture). home-accents/... (artificial-plants-flowers, candles-home-fragrances, clocks, decorative-accessories, indoor-fountains, picture-frames) - Decorative Home Accessories category, out of scope. home-decor-collections - a Collections landing page, excluded per View-All/Collections rule (textile.md Sec15/27). luggage-travel/... (bags-backpacks, luggage-luggage-sets) - apparel/travel carrying goods, excluded from Textile (apparel/fashion boundary Sec19) and explicitly excluded from Storage by storage.md Sec6 example 'Travel Bag -> NOT Storage'. mirrors-mirror-accessories/... - Wall Decor/Mirrors category, out of scope. wall-art-decor/... - Wall Decor category, out of scope (no textile-specific items like tapestries present in this subtree). wallpaper-accessories/... - paper-based wall covering, not textile, not storage. area-rugs-mats/rug-pads - excluded from Textile as a rug accessory/underlay (typically felt or rubber padding, not itself a floor-covering textile product), analogous to the hardware exclusion pattern in textile.md Sec5 (curtain rods excluded even though curtain-adjacent) - flagged LOW/manual-review rather than silently dropped is not applicable since it is excluded outright, noted here for transparency. window-treatments/blinds-window-shades/... (blind-window-shade-parts, blinds, window-shades, window-treatment-swatches) and window-treatments/interior-shutters and window-treatments/curtain-rods-hardware/... (curtain-rings, curtain-rod-brackets, curtain-rod-finials, curtain-rods, curtain-tiebacks-holdbacks) and window-treatments/window-film-applicators/... (window-film, window-film-applicators) - all excluded from Textile: blinds/shades/shutters at a home-improvement retailer are predominantly vinyl/wood/faux-wood/aluminum (hard window coverings), not primarily fabric, and textile.md only includes blinds 'when clearly textile/fabric' which Lowe's generic 'Blinds'/'Window Shades' categories do not establish; curtain hardware (rods/rings/brackets/finials/tiebacks) is explicitly excluded hardware per textile.md Sec5; window film is an adhesive glass product, not fabric; swatches are samples, not a genuine product listing. window-treatments/curtains-drapes and window-treatments/valances were the only two Window Treatments leaves kept as Textile. No Storage nodes exist anywhere in the Home-decor department tree (confirmed via the site's own full-site nav XML - the Storage & Organization department is a separate, unrelated top-level department), so storage_rows=[] is a genuine finding, not a gap. Confidence: Bedding/curtain/pillow/towel/rug leaves = HIGH (unambiguous per textile.md's own named examples). Mats and Bed Pillows = HIGH (explicitly named in textile.md Sec6/Sec3 respectively). All qty values are null (blocked) regardless of confidence in the category classification itself.",
+  "textile_rows": [
+    {
+      "category": "Textile",
+      "sub_category": "Area Rugs & Mats",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Rugs",
+      "qty": null,
+      "link": "https://www.lowes.com/pl/area-rugs-mats/rugs/4294410357",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: category page blocked (Akamai 403), quantity not obtainable",
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Mats",
+      "qty": null,
+      "link": "https://www.lowes.com/pl/area-rugs-mats/mats/3764878449",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: category page blocked (Akamai 403), quantity not obtainable",
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Utility Runners (By the Foot)",
+      "qty": null,
+      "link": "https://www.lowes.com/pl/area-rugs-mats/utility-runners-by-the-foot/3508825535",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: category page blocked (Akamai 403), quantity not obtainable",
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Bed & Bath",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Bathroom Rugs & Mats",
+      "qty": null,
+      "link": "https://www.lowes.com/pl/bed-bath/bathroom-rugs-mats/4294737136",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: category page blocked (Akamai 403), quantity not obtainable",
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Bathroom Towels",
+      "qty": null,
+      "link": "https://www.lowes.com/pl/bed-bath/bathroom-towels/4294639621",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: category page blocked (Akamai 403), quantity not obtainable",
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Bed Pillows",
+      "qty": null,
+      "link": "https://www.lowes.com/pl/bed-bath/bed-pillows/4294698959",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: category page blocked (Akamai 403), quantity not obtainable",
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Bed Sheets",
+      "qty": null,
+      "link": "https://www.lowes.com/pl/bed-bath/bed-sheets/4294701437",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: category page blocked (Akamai 403), quantity not obtainable",
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Bed Skirts",
+      "qty": null,
+      "link": "https://www.lowes.com/pl/bed-bath/bed-skirts/4294654481",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: category page blocked (Akamai 403), quantity not obtainable",
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Bedding Sets",
+      "qty": null,
+      "link": "https://www.lowes.com/pl/bed-bath/bedding-sets/4294742226",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: category page blocked (Akamai 403), quantity not obtainable",
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Comforters & Bedspreads",
+      "qty": null,
+      "link": "https://www.lowes.com/pl/bed-bath/comforters-bedspreads/4294653964",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: category page blocked (Akamai 403), quantity not obtainable",
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Mattress Covers & Toppers",
+      "qty": null,
+      "link": "https://www.lowes.com/pl/bed-bath/mattress-covers-toppers/4294742227",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: category page blocked (Akamai 403), quantity not obtainable",
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Pillow Cases",
+      "qty": null,
+      "link": "https://www.lowes.com/pl/bed-bath/pillow-cases/4294654483",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: category page blocked (Akamai 403), quantity not obtainable",
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Pillow Protectors",
+      "qty": null,
+      "link": "https://www.lowes.com/pl/bed-bath/pillow-protectors/4294698958",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: category page blocked (Akamai 403), quantity not obtainable",
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Pillows & Throws",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Blankets & Throws",
+      "qty": null,
+      "link": "https://www.lowes.com/pl/pillows-throws/blankets-throws/4294654482",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: category page blocked (Akamai 403), quantity not obtainable",
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Throw Pillows",
+      "qty": null,
+      "link": "https://www.lowes.com/pl/pillows-throws/throw-pillows/4294794067",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: category page blocked (Akamai 403), quantity not obtainable",
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Window Treatments",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Curtains & Drapes",
+      "qty": null,
+      "link": "https://www.lowes.com/pl/window-treatments/curtains-drapes/4294398489",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: category page blocked (Akamai 403), quantity not obtainable",
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Valances",
+      "qty": null,
+      "link": "https://www.lowes.com/pl/window-treatments/valances/4294398488",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: category page blocked (Akamai 403), quantity not obtainable",
+      "confidence": "HIGH"
+    }
+  ],
+  "storage_rows": []
+}

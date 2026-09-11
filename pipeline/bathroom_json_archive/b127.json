@@ -1,0 +1,112 @@
+{
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ROBOTS: https://www.pooky.com/robots.txt fetched FIRST, before any other request on the host - HTTP 200, 5,818 bytes, profile safari15_5. It opens '# we use Shopify as our ecommerce platform'. It names NO Claude agent anywhere: no ClaudeBot, no Claude-Web, no Claude-User, no Claude-SearchBot, no anthropic-ai - so no named-agent group exists and there is no hard stop. Seven groups are declared: 'User-agent: *' (the one that binds us), adsbot-google, Nutch ('Disallow: /'), AhrefsBot (Crawl-delay 10), AhrefsSiteAudit (Crawl-delay 10), MJ12bot (Crawl-delay 10), Pinterest (Crawl-delay 1) and Pinterestbot ('disallow: /'). The two blanket Disallow: / groups are Nutch and Pinterestbot - NEITHER is us, and a rule under another named bot does not apply, so nothing here blocks this crawl. The '*' group declares NO Crawl-delay, so only probe.py's own 2 s per-host gap applied and it was honoured. The '*' Disallow list is transactional and facet/crawl-trap paths: /admin, /cart, /carts, /account, /orders, /checkout(s), /policies/, /search, /services/login_with_shop, /.well-known/shopify/monorail, /recommendations/products, /cdn/wpm/*.js, /a/products/*, /a/returns/*, plus '/collections/*sort_by*', '/collections/*+*' (and %2B/%2b), '*/collections/*filter*&*filter*', '/*refinementList', '/*sortBy', '/*_pos', '/*pr_prod_strat*', '/?variant=*', '/*?*oseid=*' and the preview_theme_id/preview_script_id traps. COMPLIANCE: every URL touched is a bare /collections/<handle> path, a /collections/<handle>/products.json?limit=250&page=N call, a .atom feed, a sitemap file, or /?section_id=header. Not one Algolia facet URL was requested - no refinementList, no sortBy, no _pos, no filter parameter of any kind - and the site's internal /search was never used. ACCESS: plain direct probe.py curl_cffi fetches (safari15_5, safari17_0, safari18_0, safari18_0_ios, chrome120, chrome124, firefox133) - no proxy, no jina, no campaign parameter, no browser automation, zero 403s, no WAF challenge. TREE SOURCE - Pooky's storefront is a Shopify theme whose category grids and mega-menu are BOTH client-rendered (the raw /collections/<handle> HTML extracts to a 33-character text node: just the <title>), so no tree was ever guessed. Three server-side sources were used instead, all Pooky's own. (1) THE COMPLETE MEGA-MENU: Shopify's section-rendering endpoint https://www.pooky.com/?section_id=header returns the header section, whose <header> element carries data-main-menu-settings as a JSON object. Parsed in full: 6 top-level sections - Lighting, Rechargeables, Lampshades, Sockets & switches, By room, Accessories, plus the 'Last chance' link - and 100+ leaf links. I walked EVERY section: Lighting (All lighting: table/floor/wall/ceiling/rechargeable; Other popular links: chandeliers, pendant lights, outdoor lights, MIRRORS, pendant shades; wall fittings, picture lights, reading lights, bedside table lamps, sockets & switches; BATHROOM LIGHTS, IP-rated lights, lightbulbs), Rechargeables, Lampshades (shape/material/colour/size/style/collections - 40+ links), Sockets & switches (by finish/function/collection/ways), By room (bathroom, kitchen, outdoor, bedroom, hallway, living room, dining, office - all '<room> lights'), and Accessories (Bits and bobs: MIRRORS, lightbulbs, candle holders, candles; e-gift cards, ceiling fittings, flex, spare parts). (2) EACH PLP'S OWN CHILD TREE: every collection page ships a server-side window.childCollections array, which is Pooky's own parent-child map. /collections/bathroom returns exactly 7 children (bathroom-mirrors, bathroom-wall-lights, bathroom-flush-ceiling-lights, bathroom-ip-rated-lights, bathroom-pendant-lighting, bathroom-sconces, bathroom-ceiling-lights); /collections/mirrors returns 15, all attribute facets; /collections/bathroom-mirrors returns an EMPTY array, which is what proves it is a leaf and that rule 24 does not force a descent. (3) THE COLLECTIONS SITEMAP: https://www.pooky.com/sitemap.xml -> sitemap_collections_1.xml, 311 collection URLs, regex-swept for bath|shower|toilet|soap|basin|sink|tap|faucet|vanity|mirror|towel|wash|dispenser|toothbrush|sanitar|bidet|robe. Every hit was triaged; the sweep is what surfaced bathroom-lampshades, an orphan not present in either the mega-menu or any childCollections array. WHAT THE THREE SWEEPS AGREE ON: Pooky sells lighting, lampshades, sockets and switches, lightbulbs, candles, candle holders and MIRRORS. The only non-lighting product family is mirrors, and within it the only bathroom node is /collections/bathroom-mirrors - recorded. QTY SOURCE AND PROOF: because the grid is client-rendered by Algolia and its facet URLs are robots-disallowed, no rendered total exists to read and no Algolia call was made. The count is instead a FULL ENUMERATION TO EXHAUSTION via Shopify's own on-host product API for the collection, /collections/bathroom-mirrors/products.json?limit=250 - one page, 11 products, page 2 empty, so the enumeration is provably complete rather than a first-page artifact (the 250 limit is more than 20x the result). It was then CORROBORATED ON A SECOND INDEPENDENT SERVER-RENDERED SURFACE: Pooky's own Atom feed for the same collection, /collections/bathroom-mirrors.atom - advertised by the page itself via <link rel=alternate type=application/atom+xml> - contains exactly 11 <entry> elements, the same 11 products by title. Two independent Shopify surfaces agreeing at 11 is the evidence for the recorded figure; nothing was estimated and no parent number was reused. CONTENT CHECK ON THE RECORDED LEAF: all 11 products were enumerated and every one carries Shopify product_type 'Mirror' - Baloo mirror (whitewash / ebony / gold), Smaller and Regular Feathers mirror in antiqued gold, Round and Rectangular bevelled Luxor mirror, Flynn mirror (teal / green), Zelda mirror in green glass with gold, Frill mirror in pink and red. Not one is a light fitting. Rule 11 is decisive here: primary product type is mirror, not lighting, so this goes to BATHROOM, and rule 10 forbids letting the word 'Bathroom' exclude it. The collection's own description confirms the intent - 'Upgrade your bathroom with our range of bathroom mirrors... We love placing our IP-rated wall lights on either side'. DISCRIMINATION: counts differ node by node across the 15 collections measured (0, 7, 10, 11, 11, 19, 19, 20, 21, 27, 42, 47, 50, 63, 143) - not a site-wide constant - and each collection's own collectionObject JSON title matched the node requested ('Bathroom mirrors', 'Bathroom lights', 'Mirrors'), as did each canonical link. WHAT WAS EXCLUDED AND WHY: the six bathroom LIGHTING children and the IP-rated node to Lighting under rules 11/19 (never duplicated into Bathroom); bathroom-lampshades as a genuinely empty node; /collections/mirrors and its 15 attribute children to Decor under rules 2/21 after inspection; candles and candle holders to Decor under rule 21; /collections/sale and the 'Last chance' menu link as promotional (rule 25, never recorded). DEDUP: dedup.already_extracted() was run on every candidate leaf and every review URL. ZERO hits - the 12,194-URL exclusion index contains NO pooky.com entry of any kind, so Pooky appears in neither Furniture.xlsx nor Final.xlsx and nothing here was suppressed by a prior pass. NOT FOUND ON THIS SITE - a genuine, checked absence, not an assumption: Pooky is a decorative lighting manufacturer. Across the full mega-menu, the 311-collection sitemap and every childCollections array, there is no sanitaryware, no basins, sinks, toilets or bidets, no baths or bathtubs, no showers, shower systems or shower accessories, no enclosures, screens or doors, no taps, mixers or faucets, no bathroom furniture, vanity units or bathroom cabinets, no bathroom storage, no towel rails, rings or hooks, no toilet-roll holders, soap dispensers or toothbrush holders, no towels, bath mats, shower curtains or robes. The expected outcome for this company was NO BATHROOM FOUND; it is not, solely because rule 11 puts Pooky's genuine 11-product Bathroom mirrors collection in Bathroom rather than Lighting. RESULT: 1 grouping row + 1 leaf row (11), 12 review entries.",
+ "rows": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Mirrors",
+   "qty": 11,
+   "link": "https://www.pooky.com/collections/bathroom-mirrors",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  }
+ ],
+ "review": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom lights (parent)",
+   "qty": 47,
+   "issue": "ROUTED TO LIGHTING (rule 19) AND EXCLUDED AS PARENT URL (rule 24). Its own collectionObject title is 'Bathroom lights' and its description is entirely about wall fittings, flush ceiling lights and IP-rated fittings. It is the parent that carries the recorded Bathroom Mirrors leaf: its window.childCollections array lists exactly seven children - bathroom-mirrors, bathroom-wall-lights, bathroom-flush-ceiling-lights, bathroom-ip-rated-lights, bathroom-pendant-lighting, bathroom-sconces, bathroom-ceiling-lights. Six of the seven are lighting and route out below; the seventh is the mirror node recorded in rows. Its 47 is neither recorded nor aggregated.",
+   "link": "https://www.pooky.com/collections/bathroom"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom lights > Bathroom IP rated lights",
+   "qty": 50,
+   "issue": "ROUTED TO LIGHTING (rules 11/19): primary product type is a light fitting rated for bathroom zones, not a bathroom fixture.",
+   "link": "https://www.pooky.com/collections/bathroom-ip-rated-lights"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom lights > Bathroom wall lights",
+   "qty": 42,
+   "issue": "ROUTED TO LIGHTING (rules 11/19): 'Bathroom Wall Light' is named in rule 11 as the lighting side of the mirror-vs-lighting split.",
+   "link": "https://www.pooky.com/collections/bathroom-wall-lights"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom lights > Bathroom sconces",
+   "qty": 21,
+   "issue": "ROUTED TO LIGHTING (rules 11/19): wall sconces. Checked specifically because a 'vanity sconce' can read as bathroom furniture; primary product type is lighting.",
+   "link": "https://www.pooky.com/collections/bathroom-sconces"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom lights > Bathroom flush ceiling lights",
+   "qty": 20,
+   "issue": "ROUTED TO LIGHTING (rule 19): 'Bathroom Ceiling Light' is named in rule 19.",
+   "link": "https://www.pooky.com/collections/bathroom-flush-ceiling-lights"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom lights > Bathroom ceiling lights",
+   "qty": 19,
+   "issue": "ROUTED TO LIGHTING (rule 19): bathroom ceiling fittings.",
+   "link": "https://www.pooky.com/collections/bathroom-ceiling-lights"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom lights > Bathroom pendant lighting",
+   "qty": 19,
+   "issue": "ROUTED TO LIGHTING (rule 19): 'Bathroom Pendant' is named in rule 19.",
+   "link": "https://www.pooky.com/collections/bathroom-pendant-lighting"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom lampshades",
+   "qty": 0,
+   "issue": "EMPTY NODE, and lighting besides. The collection exists in Pooky's collections sitemap and resolves HTTP 200, but its own products.json returns zero products, so there is no count to record and no row is written (never a zero-qty row, never a fabricated one). Even populated it would route to Lighting under rule 19 - a lampshade's primary product type is lighting. It is not a child of /collections/bathroom in the site's childCollections array and does not appear in the mega-menu, i.e. an orphan sitemap-only collection.",
+   "link": "https://www.pooky.com/collections/bathroom-lampshades"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Mirrors (general decorative)",
+   "qty": 63,
+   "issue": "ROUTED TO DECOR / HOME ACCESSORIES (rules 2/21/29), and it is also a parent (rule 24). Inspected in full rather than dismissed, because rule 10 forbids skipping anything called 'mirror'. This is Pooky's general decorative mirror node, reached from the mega-menu at BOTH 'Lighting > Other popular links > Mirrors' and 'Accessories > Bits and bobs > Mirrors' - the same URL by two nav paths, so ONE node under rule 28, not two. Its own window.childCollections array holds 15 children and every one of them is an attribute facet, not a use or room: round-mirrors (27), rectangular-mirrors, convex-mirrors (11), large-mirrors, small-mirrors, medium-mirrors, brass-mirrors, statement-mirrors, wooden-mirrors, unusual-mirrors, gold-mirrors, metal-mirrors, black-mirrors, metallic-mirrors, white-mirrors. Notably bathroom-mirrors is NOT among them - Pooky files the bathroom mirror node under Bathroom, not under Mirrors, which is precisely why the bathroom node is the one recorded in rows and this one is not. Rule 21 puts a bathroom mirror in Bathroom and leaves general decorative mirrors in Decor, and the previously-validated Home Decor pass treats a general 'Mirrors' node the same way.",
+   "link": "https://www.pooky.com/collections/mirrors"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "IP-rated lights",
+   "qty": 143,
+   "issue": "ROUTED TO LIGHTING (rule 19): checked because IP ratings are a bathroom-zone concept and the Bathroom mirrors page itself cross-links to it. Every product is a light fitting rated for damp locations. Mega-menu path 'Lighting > IP-rated lights'.",
+   "link": "https://www.pooky.com/collections/ip-rated"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Candle holders",
+   "qty": 7,
+   "issue": "ROUTED TO DECOR (rule 21): candle holders. Listed because it is a sibling nav card of Mirrors inside 'Accessories > Bits and bobs' and was inspected in the same pass.",
+   "link": "https://www.pooky.com/collections/candle-holders"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Candles",
+   "qty": 10,
+   "issue": "ROUTED TO DECOR (rule 21): candles. Sibling nav card of Mirrors under 'Accessories > Bits and bobs'; inspected and rejected.",
+   "link": "https://www.pooky.com/collections/candles"
+  }
+ ],
+ "_reconstructed_from": "Bathroom.xlsx delivered 2026-09-01 (checkpoint), not original worker JSON"
+}

@@ -1,0 +1,25 @@
+{
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "Access: direct HTTP fetch worked throughout (Shopify, no WAF), same as prior Home-Decor pass. Discovery: enumerated all 95 entries from /collections.json and keyword-matched title against new/arriv/latest/recent/just in - found handles 'new-arrivals' (title 'New Arrivals', linked 3x from homepage) and 'latest-collection' (title 'Latest Collection', not present anywhere in homepage HTML - found only via the collections.json sitemap enumeration, not via visible nav). Both confirmed as real browsable Shopify collection PLPs via /collections/<handle>/products.json (standard product-grid template, not editorial/lookbook). Overlap check: the 2 products in 'Latest Collection' (ANKUR SLOF DESIGNER WALL LIGHT; ANKUR JASPER GOLDEN CAGE BLACK FINISH METAL AND CONCRETE HANGING) have zero title overlap with the 309 products in 'New Arrivals' - genuinely different listings, kept as separate rows per brief section 3 rather than treating one as an alias. Qty method: raw 'products_count' field on this Shopify site is known-inflated (per prior Home-Decor pass for this company); used exhaustive paging of products.json?limit=250 to exhaustion, deduped by product id, for both. new-arrivals: raw field=328 vs exhaustive=309. latest-collection: raw field=3 vs exhaustive=2 (one id in the raw count did not resolve to an actual returned product on any page). 'Latest Collection' is flagged per the brief's Collection-page rule below - it is a genuine tiny collection (2 SKUs) with generic marketing copy ('Discover the latest lights for your home...') and is not surfaced in the live nav/homepage, so its status as a true 'recently added' feed (vs. a small curated showcase) could not be confirmed with certainty this pass.",
+  "rows": [
+    {
+      "category": "New Arrivals",
+      "sub_category": "New Arrivals",
+      "qty": 309,
+      "link": "https://www.ankurlighting.com/collections/new-arrivals",
+      "is_group": false,
+      "evidence": "Exhaustive paging of /collections/new-arrivals/products.json?limit=250 (309 unique product ids); raw collections/new-arrivals.json 'products_count' field reported 328 (inflated - not used)",
+      "flag": null
+    },
+    {
+      "category": "New Arrivals",
+      "sub_category": "Latest Collection",
+      "qty": 2,
+      "link": "https://www.ankurlighting.com/collections/latest-collection",
+      "is_group": false,
+      "evidence": "Exhaustive paging of /collections/latest-collection/products.json (2 unique product ids: 'ANKUR SLOF DESIGNER WALL LIGHT', 'ANKUR JASPER GOLDEN CAGE BLACK FINISH METAL AND CONCRETE HANGING'); raw products_count field reported 3",
+      "flag": "MANUAL REVIEW: AMBIGUOUS NEW COLLECTION - handle 'latest-collection', og:title 'Latest Collection', generic marketing og:description ('Discover the latest lights for your home or office!...'); confirmed a genuine Shopify collection with real distinct products (zero title overlap with the New Arrivals collection) but not linked anywhere in the live main nav/homepage (found only via the /collections.json sitemap enumeration) and only 2 SKUs - could not confirm it specifically tracks newly-added catalogue items vs. a small manually curated showcase collection."
+    }
+  ]
+}

@@ -1,0 +1,94 @@
+{
+  "sr": 270,
+  "company": "SPIN",
+  "brand_site": "spin.co.in",
+  "country": "India",
+  "site_url": "https://www.madewithspin.com/",
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "ACCESS: roster brand_site spin.co.in returns HTTP 410 Gone (dead domain, verified via curl) - the real live storefront is https://www.madewithspin.com/ (HTTP 200, Shopify store 'Spin - Furniture & Home Decor'), used for all research. robots.txt (www.madewithspin.com/robots.txt) has no Claude-specific rule and no blanket Disallow: / (only /admin and /cgi-bin), so tier (a) HTTP was permitted throughout; site was never blocked. TREE: tier (a) HTTP-first. Fetched sitemap.xml -> sitemap_collections_1.xml (~200 collection URLs) for the raw candidate list, then fetched the homepage HTML (curl) which exposed only a partial static link set. The real mega-menu is rendered by a third-party app (Maker.co / SmartNav / Showside) via a JS widget, so tier (b) Playwright was used to load the homepage and capture the XHR call to https://api.maker.co/api/get_config?config_id=w3uR8lvVC (the live nav-tree JSON, 261 nodes). Parsed that JSON recursively to reconstruct the true current mega-menu hierarchy (Living / Dining / Accessories / Outdoor / Home Office / Bar / Bedroom / Kids top sections), and cross-checked every candidate leaf's canonical URL (all matched the requested slug, no silent-wrong-page cases). Collections present only in the raw XML sitemap but absent from the live get_config nav tree (e.g. /collections/office-storage, /collections/euro-storage, /collections/bar-storage, /collections/bts-storage, /collections/organizers, /collections/office-organisers, /collections/storage-1, /collections/storage-2, /collections/small-storage*, /collections/table-linen accessed directly, /collections/edge-tabel-linen, /collections/bauhaus-table-linen, /collections/storage-pdf) were treated as orphaned/legacy Shopify collections no longer in the live navigation and excluded. QTY: for every included row, qty was cross-verified two ways - the rendered collection page's own 'N products' header text (curl+bs4) AND the Shopify products.json count for the same collection handle (both agreed in every case; used as the evidence). EXCLUDED (checked, not qualifying): 'Drawer Storage' (/collections/drawer-storage, 8 items: sideboards/consoles/bedside-table - primary product type is furniture per storage.md Section 21/17, not organizational storage); 'Small Shelving' (/collections/small-shelving, 15 items: mostly wall shelves/hangers/pegboard - Furniture/Wall Decor boundary, storage.md Section 18); 'Shelves'/'Shelving' (/collections/shelves, 9 items: freestanding pine/native shelf units - furniture bookshelf boundary); 'Entryway Accessories' (/collections/entryway, 18 items: predominantly hooks/hangers/key-holder, only 2 of 18 are genuine storage - not primary Storage classification); 'Bathroom Accessories' (/collections/bathroom-accessories, 23 items: predominantly towel hangers/hooks/mirrors, only 2 of 23 laundry-related - excluded as bathroom hardware/accessories, not Storage); 'Living Accessories' (/collections/living-accessories-1, 28 items: generic mixed decor catch-all - vases/photo frames/lamps plus some duplicate storage boxes already captured under the main Storage collection - excluded as non-distinct); 'Hook' (/collections/hook - hardware, not Storage or Textile); 'Bookends & Magazine Holders' (/collections/bookends-magazine-holders - decorative, not organizational Storage). No Furniture, Lighting, Kitchen & Dining, Wall Decor, Decorative Accessories, or Bathroom-fixture nodes were misclassified into either array. No duplicate URLs recorded (the two 'Fabric Accents' nav entries under Living and Dining both point to the same /collections/textile URL - recorded once).",
+  "textile_rows": [
+    {
+      "category": "Textile",
+      "sub_category": "Fabric Accents",
+      "qty": 7,
+      "link": "https://www.madewithspin.com/collections/textile",
+      "is_group": false,
+      "evidence": "Rendered page H1 'Fabric Accent'; products.json returned 7 products (cushion covers x5, throws x2 - e.g. Converse Cushion Cover, Edge Cushion Cover, Mesh Cushion Cover, Snug Throw, Noche Throw); canonical URL matches. Reached via mega-menu Living > Fabric Accent and Dining > Fabric Accent (same URL, recorded once).",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Table Linen",
+      "qty": 4,
+      "link": "https://www.madewithspin.com/collections/table-linen",
+      "is_group": false,
+      "evidence": "Rendered page H1/title 'Table Linen', explicit '4 products' header text; products.json confirms 4 products (Edge Table Cover, Edge Table Runner, Edge Table Mats Set of 2, Edge Table Napkins Set of 2); canonical URL matches.",
+      "flag": "Mega-menu node (Dining > Dining Accessories > Table Linen / Accessories > Dining Accessories > Table Linen) renders as an in-app SmartNav virtual panel with an embedded curated product list rather than a literal <a href>; URL was cross-matched via the live sitemap and exact title match to the genuine Shopify collection page rather than read directly off a menu anchor.",
+      "confidence": "MEDIUM"
+    }
+  ],
+  "storage_rows": [
+    {
+      "category": "Storage",
+      "sub_category": "Small Storages",
+      "qty": 33,
+      "link": "https://www.madewithspin.com/collections/storage",
+      "is_group": false,
+      "evidence": "Rendered page H1/title 'Small Storages', explicit '33 products' header text; products.json confirms 33 products (storage boxes, crates, toolboxes - e.g. Easy Box, Oakwood Box, Kono Stackable, Intact, Resi Toolbox); canonical URL matches. Reached via mega-menu Accessories > Small Storages.",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Home Office Storage",
+      "qty": 25,
+      "link": "https://www.madewithspin.com/collections/study-storage",
+      "is_group": false,
+      "evidence": "Rendered page title 'Home Office Storage', explicit '25 products' header text; products.json confirms 25 products (storage boxes/crates/lockers - e.g. Busa Storage Box, Euro box series, Eco Storage Locker, Crate Big/Medium); canonical URL matches. Reached via mega-menu Home Office > Storages.",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Wire Baskets",
+      "qty": 8,
+      "link": "https://www.madewithspin.com/collections/wire-baskets",
+      "is_group": false,
+      "evidence": "Rendered page H1/title 'Wire Baskets', explicit '8 products' header text; products.json confirms 8 products (Eden Wire Basket, Mesh Wire Basket, Bauhaus Wire Basket, Vogue Wire Basket Large, etc.); canonical URL matches. Reached via mega-menu Accessories > Wire Baskets.",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Desktop Organiser",
+      "qty": 31,
+      "link": "https://www.madewithspin.com/collections/desktop-organiser",
+      "is_group": false,
+      "evidence": "Rendered page title 'Desktop Organizers Online - Buy Wooden Desk Organisers in India | Spin', explicit '31 products' header text; products.json confirms 31 products (desk trays, pen trays, paper organizers, desk organizer sets); canonical URL matches. Reached via mega-menu Accessories > Desktop Organiser and Home Office > Desktop Organiser (same URL, recorded once).",
+      "flag": "Collection also contains a minority of non-storage desk-decor items (monitor stands, corian vases); category as a whole is a genuine Organizer listing per storage.md Section 7 and Section 15.",
+      "confidence": "MEDIUM"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Bins",
+      "qty": 4,
+      "link": "https://www.madewithspin.com/collections/bins",
+      "is_group": false,
+      "evidence": "Rendered page title 'Buy Dustbin Online - Waste Bin and Trash Bin at Best Prices in India | Spin', explicit '4 products' header text; products.json confirms 4 products (Junk Trash Bin, Tri Bin Eco Waste Set, Compact Wastebin, Cora Wastebin), all tagged product_type=Storage by the site itself; canonical URL matches. Reached via mega-menu Home Office > Bins.",
+      "flag": "Waste/trash bins are a marginal fit for Storage (disposal utility rather than belongings organization); included because the site's own product_type taxonomy classifies them as Storage and the category sits directly among the other Home Office storage nodes - recommend review.",
+      "confidence": "LOW"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Kids Storage",
+      "qty": 33,
+      "link": "https://www.madewithspin.com/collections/kids-storage",
+      "is_group": false,
+      "evidence": "Rendered page title 'Buy Kids Storage Furniture Online at Best Prices in India | Spin', explicit '33 products' header text; products.json confirms 33 products (desk organizers, storage boxes, stackable boxes - e.g. Ridge Organizer, Easy Box, Busa Storage Box); canonical URL matches. Reached via mega-menu Collections > Kids > Kids Accessories (nav label 'Kids Accessories', URL/content is Kids Storage per storage.md Section 32).",
+      "flag": null,
+      "confidence": "MEDIUM"
+    }
+  ]
+}

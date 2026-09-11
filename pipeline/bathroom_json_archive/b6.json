@@ -1,0 +1,499 @@
+{
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ACCESS - MATERIALLY EASIER THAN THE FURNITURE PASS, AND THE METHOD CHANGED. The Furniture ledger recorded that rh.com served an identical ~49.7KB React shell with an EMPTY #apollo-data script for every categoryId, so that pass had to drive a real Chrome browser for the tree and RH's Apollo BFF (rh.com/graphql with header x-apollo-operation-name: Search) for the counts. Both of those statements were re-tested this session and BOTH have changed. (a) The BFF no longer answers: GET https://rh.com/graphql?query=... returns 403 whenever the x-apollo-operation-name header is present, and returns the plain SPA HTML (not JSON) when it is absent - tested across 4 header variants and 6 fingerprints. (b) It is no longer needed, because rh.com now SERVER-RENDERS the full Apollo cache: a PLP fetch returns ~1.2MB containing window.__APOLLO_STATE__ with both the complete catalogNavigation tree and the search() result including totalNumRecs. So everything below came from ordinary HTML fetches of RH's own pages - no browser, no BFF, no proxy. DataDome is still in front of rh.com and is fingerprint- and rate-sensitive. Only the Apple fingerprints pass: safari18_0_ios, safari17_2_ios and safari18_0 got HTTP 200 while chrome131, chrome124, firefox133, safari17_0 and edge101 were 403 on the same URL in the same minute. A burst of rapid requests trips an IP-level block that returns 403 to every profile including robots.txt; the fix that worked was a persistent curl_cffi Session warmed on https://rh.com/us/en/ (which sets the datadome cookie) and then reused, with an ~18s gap between pages and a 5-minute cool-off plus a fresh session on any 403. One important gotcha: the nav's targetUrl values are LOCALE-RELATIVE - '/catalog/category/products.jsp/catNNNN' 403s, 'https://rh.com/us/en' + that path is the URL that works. robots.txt was fetched first, from rhinteriors.rh.com and rhmodern.rh.com (identical content; the apex host 403s it under load). It names NO anthropic-ai / ClaudeBot / Claude-Web agent, so there is no Claude-specific directive. It asks Crawl-delay: 4, which every request here exceeded (18s). Its Disallow list was honoured: nothing under */search/*, */modal/*, /catalog/sale/, */galleryrooms/* or */graphql/* was fetched - note in particular that after the BFF turned out to be dead I did NOT try to work around 'Disallow: */graphql/*'. All /rooms.jsp/ 'Shop By Room' nodes were skipped for the same reason plus rule 25. TREE: taken verbatim from RH's own mega-menu, which is embedded server-side as ROOT_QUERY.catalogNavigation({countryCode:US, locale:en-US, mobile:false, siteId:RH}) inside window.__APOLLO_STATE__ - the exact object the site's own header renders from. Global Nav has 14 departments (Estates, Living, Dining, Bed, Bath, Outdoor, Lighting, Textiles, Rugs, Decor, Baby & Child, Teen, Sale, Interior Design, Trade). Bath is cat160092 and is the only bathroom department. Its children, in the site's own order: Furniture, Vanities, Washstands, Bath Storage, Mirrors & Medicine Cabinets, Bath Towels & Linens, Bath Accessories, Explore Waterworks, Waterworks Faucets, Waterworks Shower Systems, Waterworks Bathtubs & Sinks, Waterworks Accessories, Shop By Room, In Stock, Sale. MAJOR SCOPE CHANGE vs the Furniture pass: RH's Bath department now carries the full WATERWORKS assortment on rh.com URLs and rh.com category ids - real sanitaryware and brassware (bath faucets, tub fillers, handshowers, showerheads, thermostatic systems, valves, bathtubs, lavatory sinks, towel bars, towel warmers, paper holders, grab bars, shower baskets & rods, mirrors & medicine cabinets, vanities & washstands, fittings). The Furniture pass captured only the furniture-shaped part of Bath (cabinets, vanities, washstands, shelving) and none of this. That is why this file has 30 leaves where Furniture.xlsx had 9 bath rows. QTY: every qty is the page's own server-rendered search().resultList.totalNumRecs, read out of window.__APOLLO_STATE__ on that leaf's own URL. RH shows no product count to human visitors, so there is no on-page 'N products' string to prefer - this IS the number the grid is built from. IDENTITY PROOF (no silent parent-serving): every saved page echoes the category it actually queried, e.g. rh_cat1770015.html contains search({\"categoryId\":\"cat1770015\",\"country\":\"US\",...}) and rh_cat11930014.html contains search({\"categoryId\":\"cat11930014\",...}). Each was checked to match the categoryId taken from the nav, 53/53. ARITHMETIC PROOF the numbers are real and not a constant: All Washstands cat25110037 = 230 and its three children are 71 + 114 + 45 = 230 EXACTLY. All Vanities cat24970030 = 469 vs children 143 + 264 + 59 = 466 (3 products sit in no child). All Vanities & Washstands cat27330168 = 699 = 469 + 230 EXACTLY. Counts span 3 to 264 across 53 pages with no repeated site-wide value, and the roll-ups were used ONLY as this cross-check - no roll-up number was ever copied into a leaf and no leaf quantities were summed into a row. CROSS-SESSION PROOF: the Furniture ledger's browser-era numbers for the same RH categories agree with today's server-rendered totalNumRecs - Bath Cabinets 135 = 135, Ottomans & Stools 44 = 44, Open Shelving 64 = 64, Double Washstands 71 = 71, Single Washstands 114 = 114, Powder Washstands 45 = 45, Powder Vanities 59 = 59, with only ordinary drift on Double Vanities 142 -> 143, Single Vanities 265 -> 264 and Medicine Cabinets 12 -> 14. Two independent extraction methods, months apart, landing on the same field is strong evidence totalNumRecs is the exact de-duplicated product count. DUPLICATE RESOLVED (rule 28): Bath Cabinets is exposed twice - cat10250051 under Bath > Furniture and cat1770015 under Bath > Bath Storage. Both return 135 and identical product ids, so it is ONE category behind two ids; it is emitted once at its first site-order position and the alias is logged in review. Vanity Mirrors cat1870002 likewise appears under both Mirrors & Medicine Cabinets and Bath Accessories - same id, same URL, emitted once. Ottomans & Stools cat21720010 also appears under both Furniture and Bath Accessories - one node, and it is routed out entirely (see review). MIRRORS (rule 10, explicitly not skipped): all four RH bath mirror leaves are in rows - Wall Mirrors 89, Vanity Mirrors 15, Pivot & Extension Mirrors 6, Medicine Cabinets 14 - plus Waterworks Mirrors & Medicine Cabinets 27. Decor > Mirrors (cat20033) was deliberately NOT taken: it is a separate Decor-department node for general wall mirrors, not bathroom, and pulling it would be a cross-category re-extraction under rule 30-33. EXCLUDED per rule 25 (View All / All / Collections / promotional / filtered), each verified to exist and deliberately not recorded: All Vanities & Washstands (cat27330168, 699), All Vanities (cat24970030, 469), All Washstands (cat25110037, 230), All Mirrors & Medicine Cabinets (cat11580013, 124), All Sinks (cat32440021, 67), All Bath Lighting (cat4980014), Bath Collections and Bath Towel Collections and the three Waterworks *Collections* nodes (all /collections.jsp), 'Explore Waterworks' (a /waterworks brand landing page, not a listing), the entire 'In Stock' subtree (11 nodes, all just ?filter=instock_i%3A1 re-filters of categories already recorded) and the entire 'Sale' subtree (15 nodes, ?filter=on_sale_i%3A1 re-filters), and Shop By Room > Bath (a /rooms.jsp gallery, also robots-disallowed). ONE GAP, DISCLOSED: 53 of the 54 candidate listing URLs were read. The single page not read is cat4980014 'All Bath Lighting' - the harvester was stopped before it. It is a View-All roll-up inside the Lighting department and would have been excluded under rule 25 regardless, so no recorded row and no routed-out row depends on it. Every URL that appears in rows or review was fetched and parsed this session. || CROSS-FILE DEDUP: 6 leaf record(s) removed as already extracted in a prior category workbook. See Review sheet.",
+ "rows": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Cabinets",
+   "qty": 135,
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat10250051?cellBackground=false",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Vanities",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Powder Vanities",
+   "qty": 59,
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat11930022?cellBackground=false",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Washstands",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Storage",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Open Shelving",
+   "qty": 64,
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat21970043?cellBackground=false",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Mirrors & Medicine Cabinets",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Wall Mirrors",
+   "qty": 89,
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat1639032/rh-wall-mirrors",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Vanity Mirrors",
+   "qty": 15,
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat1870002?cellBackground=false",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Pivot & Extension Mirrors",
+   "qty": 6,
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat3850034/rh-pivot-and-extension-mirrors",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Accessories",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Accessories",
+   "qty": 82,
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat1679022?cellBackground=false",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Floor Accessories & Storage",
+   "qty": 36,
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat3860040/rh-floor-accessories-and-storage",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Cabinet Hardware & Hooks",
+   "qty": 242,
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat11410044?cellBackground=false",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Waterworks Faucets",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Faucets",
+   "qty": 210,
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat32210066?cellBackground=false",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathtub Faucets & Systems",
+   "qty": 147,
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat32210069?cellBackground=false",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Waterworks Shower Systems",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Handshowers & Sprays",
+   "qty": 43,
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat32440017?cellBackground=false",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Showerheads & Arms",
+   "qty": 123,
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat32440018?cellBackground=false",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Exposed Thermostatic Systems",
+   "qty": 24,
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat32440019?cellBackground=false",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Valves",
+   "qty": 28,
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat32210070?cellBackground=false",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Waterworks Bathtubs & Sinks",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathtubs",
+   "qty": 14,
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat32210077?cellBackground=false",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Lavatory Sinks",
+   "qty": 57,
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat32210076?cellBackground=false",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Waterworks Accessories",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Towel Bars, Hooks & Rings",
+   "qty": 116,
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat32210089?cellBackground=false",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Towel Warmers",
+   "qty": 9,
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat32210090?cellBackground=false",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Paper Holders",
+   "qty": 23,
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat32210092?cellBackground=false",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Grab Bars",
+   "qty": 3,
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat32210091?cellBackground=false",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shelves",
+   "qty": 9,
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat32260016?cellBackground=false",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower Baskets & Rods",
+   "qty": 7,
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat32210093?cellBackground=false",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Cabinet Hardware",
+   "qty": 103,
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat32210060?cellBackground=false",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Mirrors & Medicine Cabinets",
+   "qty": 27,
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat32210062?cellBackground=false",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Fittings & Finishing Details",
+   "qty": 31,
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat32440013?cellBackground=false",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Vanities & Washstands",
+   "qty": 32,
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat32210078?cellBackground=false",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  }
+ ],
+ "review": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath > Bath Towels & Linens > Bath Towel Sets",
+   "qty": 4,
+   "issue": "ROUTED TO TEXTILE: bath towel sets (rules 15, 20).",
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat27060007?cellBackground=false"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath > Bath Towels & Linens > Bath Towels",
+   "qty": 82,
+   "issue": "ROUTED TO TEXTILE: bath/hand/face towels and bath sheets (rules 15, 20).",
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat17860005?cellBackground=false"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath > Bath Towels & Linens > Bath Rugs",
+   "qty": 10,
+   "issue": "ROUTED TO TEXTILE: textile bath mats/rugs (rule 16 - textile bath mat -> Textile).",
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat1870029?cellBackground=false"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath > Bath Towels & Linens > Shower Curtains",
+   "qty": 18,
+   "issue": "ROUTED TO TEXTILE: shower curtains (rule 20).",
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat1870030?cellBackground=false"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath > Bath Towels & Linens > Robes & Slippers",
+   "qty": 10,
+   "issue": "ROUTED TO TEXTILE: bathrobes and slippers (rule 20).",
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat17940047?cellBackground=false"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Lighting > Bath > Sconces",
+   "qty": 232,
+   "issue": "ROUTED TO LIGHTING: primary product type is a wall sconce; node lives under RH's Lighting department (Lighting > Bath), not under Bath (rules 11, 19). Not duplicated into Bathroom.",
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat10160027?cellBackground=false"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Lighting > Bath > Ceiling",
+   "qty": 37,
+   "issue": "ROUTED TO LIGHTING: bathroom ceiling lights (rules 11, 19). Its sibling roll-up 'All Bath Lighting' (cat4980014) was excluded as a View-All.",
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat1610004?cellBackground=false"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath > Waterworks Accessories > Bath & Kitchen Lighting",
+   "qty": 45,
+   "issue": "ROUTED TO LIGHTING: Waterworks bath and kitchen light fixtures. Sits inside the Bath department but its primary product type is lighting (rules 11, 19).",
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat32210059?cellBackground=false"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath > Waterworks Faucets > Kitchen Faucets",
+   "qty": 37,
+   "issue": "ROUTED TO KITCHEN: kitchen faucets. Reached only via the Bath > Waterworks Faucets menu, but the primary product function is kitchen, not bathroom (rule 5).",
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat32460006?cellBackground=false"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath > Waterworks Faucets > Pot Fillers",
+   "qty": 7,
+   "issue": "ROUTED TO KITCHEN: pot fillers are kitchen fittings (rule 5).",
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat32210074?cellBackground=false"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath > Waterworks Faucets > Bar Faucets",
+   "qty": 16,
+   "issue": "ROUTED TO KITCHEN: bar/prep faucets (rule 5).",
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat32210073?cellBackground=false"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath > Waterworks Faucets > Water Dispensers",
+   "qty": 6,
+   "issue": "ROUTED TO KITCHEN: instant hot/filtered water dispensers (rule 5).",
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat32210075?cellBackground=false"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath > Waterworks Bathtubs & Sinks > Kitchen Sinks",
+   "qty": 10,
+   "issue": "ROUTED TO KITCHEN: kitchen sinks. Rule 4 includes lavatory/wash basins as Bathroom, which is why Lavatory Sinks IS in rows, but kitchen sinks are not bathroom sanitaryware.",
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat32210080?cellBackground=false"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath > Furniture > Ottomans & Stools",
+   "qty": 44,
+   "issue": "AMBIGUOUS / ALREADY IN FURNITURE: appears under Bath > Furniture and again under Bath > Bath Accessories (same categoryId, one node). Primary product type is an ottoman/stool, which rule 9's Bathroom-Furniture list does not cover, and Furniture.xlsx already carries it as Bath > Ottomans & Stools = 44. Not emitted as Bathroom to avoid a cross-file duplicate.",
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat21720010?cellBackground=false"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath > Bath Storage > Bath Cabinets (alias cat1770015)",
+   "qty": 135,
+   "issue": "DUPLICATE CONTENT, DIFFERENT URL - emitted only ONCE. RH exposes the same Bath Cabinets listing under two nav parents: Bath > Furniture > Bath Cabinets (cat10250051) and Bath > Bath Storage > Bath Cabinets (cat1770015). Both return totalNumRecs=135 and byte-identical first-48 repositoryIds (prod32200694, prod32200695, prod32200696, prod32200697, prod32350551 ...), so they are one category behind two ids. Recorded once in rows at its first site-order position (Bath > Furniture); this alias URL is logged here so the second nav path is not silently dropped.",
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat1770015?cellBackground=false"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Double Vanities",
+   "qty": 143,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Double Vanities' - excluded from Bathroom per cross-category dedup (master guide s13)",
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat11930014/rh-double-vanities"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Single Vanities",
+   "qty": 264,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Single Vanities' - excluded from Bathroom per cross-category dedup (master guide s13)",
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat11930016/rh-single-vanities"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Double Washstands",
+   "qty": 71,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Double Washstands' - excluded from Bathroom per cross-category dedup (master guide s13)",
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat20300009/rh-double-washstands"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Single Washstands",
+   "qty": 114,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Single Washstands' - excluded from Bathroom per cross-category dedup (master guide s13)",
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat20300010/rh-single-washstands"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Powder Washstands",
+   "qty": 45,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Powder Washstands' - excluded from Bathroom per cross-category dedup (master guide s13)",
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat20300008/rh-powder-washstands"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Medicine Cabinets",
+   "qty": 14,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Medicine Cabinets' - excluded from Bathroom per cross-category dedup (master guide s13)",
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat3850033/rh-medicine-cabinets"
+  }
+ ],
+ "_reconstructed_from": "Bathroom.xlsx delivered 2026-09-01 (checkpoint), not original worker JSON"
+}

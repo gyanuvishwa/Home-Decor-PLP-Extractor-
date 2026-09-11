@@ -1,0 +1,102 @@
+{
+  "sr": 144,
+  "company": "BHV Marais Maison",
+  "brand_site": "bhv.fr",
+  "country": "France",
+  "site_url": "https://www.bhv.fr/",
+  "status": "partial",
+  "failure_reason": "Cloudflare rate-limit. Chrome navigation DID clear the site-wide Cloudflare interstitial (contradicting the prior HTTP-only pass, which recorded bhv.fr as permanently blocked), and same-origin fetch() from the loaded page worked for the first ~9 requests (9 department pages at 2.5s spacing, all 200). The next batch of 8 same-origin fetches to /c/maison/mobilier/* all returned HTTP 403 (Cloudflare) at 2.2s spacing. Per the HARD BLOCK RULE all further requests to bhv.fr were stopped immediately - no retries, no backoff. Consequence: the full furniture category TREE was captured and is believed complete, and the department total for Mobilier was captured from the rendered page before the block, but NO per-leaf product counts were obtained. Every leaf row below therefore has qty=null. Specifically unverified: /c/maison/mobilier/canapes-et-fauteuils/fauteuils, /c/maison/mobilier/meubles/etageres, /c/maison/mobilier/tables-et-bureaux/chevets, /c/maison/mobilier/tabourets/tabourets, /c/maison/mobilier/rangement/meubles-ranges-bouteilles, /c/maison/mobilier/rangement/porte-manteau-et-patere.",
+  "notes": "ACCESS: opened only through the Claude-in-Chrome connector in my own tab. https://www.bhv.fr/robots.txt initially served the Cloudflare 'Just a moment...' interstitial, which cleared on its own in the real Chrome session; robots.txt then read normally and names NO AI/Claude agent at all - the only rules are Disallow /ajax, /*?sorting, /search/, wishlist/cart/checkout paths and the /c/*/f|fm|fc|fv|fs|ct|tri/ facet paths. Category listing paths (/c/...) are allowed. TREE: https://www.bhv.fr/sitemap.xml -> /sitemaps/taxons-fr_FR.xml is NOT a category tree - it contains only 9 department roots plus 2241 brand pages (/b/...), so the sitemap cross-check yields nothing extra here. The real tree is the mega-menu, whose full markup (~717 /c/ links covering every department) is present in the HTML of every page; I parsed it locally from a fetched department page. I walked the whole 717-link nav, not just the Maison branch. FURNITURE SCOPE: BHV's only furniture department is Maison > Mobilier. Its rendered listing header reads '55 Produits' (h1 'Mobilier') - the department is genuinely tiny for a Paris department store, which is consistent with the mega-menu exposing only four furniture-typed leaves. Mobilier's children in the nav are: Canapes et fauteuils > Fauteuils; Meubles > Etageres; Tables et bureaux > Chevets; Tabourets > Tabourets; and Rangement (18 leaves that are almost entirely household storage GOODS - soap dispensers, sponge holders, bins, draining racks, drawer organisers, baskets/boxes, magazine racks, market trolleys, spice racks, catch-alls - excluded per the storage-vs-furniture line). Two Rangement leaves are genuinely ambiguous and are emitted with MANUAL REVIEW flags rather than dropped silently: 'Meubles ranges bouteilles' (bottle-rack units - the French word 'meuble' implies a furniture piece, but it sits among kitchen storage goods) and 'Porte-manteau et patere' (coat stands are hall furniture, wall pegs are not; the node mixes both). I could not open either page to look at the product tiles before the block landed. ABSENCE CHECKS (all from the full nav, not from site search): Literie contains only Matelas>Surmatelas, Couettes/couvertures>Couette+Couverture, Oreillers>Oreillers+Traversin, Accessoires>Protege matelas - i.e. bedding only, with NO beds or bed frames node, so nothing from Literie is in scope. There is NO garden/outdoor/jardin department anywhere on the site, so no outdoor furniture. /c/enfant/bebe/puericulture holds only accessoires-sante, biberons-et-accessoires and sacs-a-langer - no cribs, cots or changing tables. /c/loisirs/papeterie/amenagement-de-bureau holds desk organisers, waste baskets, desk pads and desk toys - no desks or office chairs. Bricolage has droguerie, electricite, outillage, quincaillerie and salle-de-bain-et-wc (accessories only) - no bathroom vanity units. Decoration is candles/cushions/wall decor/curtains - no furniture. So the Mobilier branch below is the complete furniture footprint. SANITY: the h1 of the Mobilier page matched the node requested, and the 55 is that page's own rendered count, not a site-wide constant (the same selector on the wider Maison pages was not read, so 55 is recorded in notes only and is NOT used as any row's qty - a parent total is not a child total). DUPLICATE-NODE CHECK: node identity was keyed on slug, not label - relevant here because Tabourets > Tabourets and Meubles are self-similar labels. No cross-listing overlap test was possible without product IDs, but the four furniture leaves are disjoint product types.",
+  "rows": [
+    {
+      "category": "Furniture",
+      "sub_category": "Sofas & Armchairs",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Armchairs",
+      "qty": null,
+      "link": "https://www.bhv.fr/c/maison/mobilier/canapes-et-fauteuils/fauteuils",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: node confirmed in site mega-menu but its listing page could not be opened - Cloudflare 403 rate-limit stopped all further requests before any count was read"
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Furniture Units",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Shelving Units",
+      "qty": null,
+      "link": "https://www.bhv.fr/c/maison/mobilier/meubles/etageres",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: node confirmed in site mega-menu but its listing page could not be opened - Cloudflare 403 rate-limit stopped all further requests before any count was read"
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Tables & Desks",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Bedside Tables",
+      "qty": null,
+      "link": "https://www.bhv.fr/c/maison/mobilier/tables-et-bureaux/chevets",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: node confirmed in site mega-menu but its listing page could not be opened - Cloudflare 403 rate-limit stopped all further requests before any count was read"
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Stools",
+      "qty": null,
+      "link": "https://www.bhv.fr/c/maison/mobilier/tabourets/tabourets",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: node confirmed in site mega-menu but its listing page could not be opened - Cloudflare 403 rate-limit stopped all further requests before any count was read"
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Storage",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Bottle Rack Units",
+      "qty": null,
+      "link": "https://www.bhv.fr/c/maison/mobilier/rangement/meubles-ranges-bouteilles",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: ambiguous - site calls these 'meubles' (furniture pieces) but files them under Rangement alongside household storage goods; product tiles could not be inspected before the Cloudflare 403. Also unverified qty."
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Coat Stands & Wall Hooks",
+      "qty": null,
+      "link": "https://www.bhv.fr/c/maison/mobilier/rangement/porte-manteau-et-patere",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: ambiguous - node mixes freestanding coat stands (hall furniture, in scope) with wall pegs/pateres (not furniture); product tiles could not be inspected before the Cloudflare 403. Also unverified qty."
+    }
+  ]
+}

@@ -1,0 +1,165 @@
+{
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ROBOTS (www2.hm.com): fetched FIRST, before any other request on the host - HTTP 200, 3,874 bytes, profile chrome124/safari18_0_ios. I verified the brief's claim on MY host rather than assuming it, and it holds verbatim. ClaudeBot IS named, in a multi-UA stanza: 'User-agent: GPTBot / User-agent: OAI-SearchBot / User-agent: ChatGPT-User / User-agent: ClaudeBot / User-agent: Claude-Web / User-agent: anthropic-ai / User-agent: Google-Extended / User-agent: Google-CloudVertexBot / User-agent: Gemini-Deep-Research / User-agent: PerplexityBot / User-agent: Perplexity-User / User-agent: Meta-ExternalAgent / User-agent: Bytespider / User-agent: TikTokSpider / User-agent: CCBot / User-agent: Amazonbot / User-agent: Applebot-Extended / User-agent: DuckAssistBot / User-agent: AI21Bot / User-agent: Ai2Bot-Dolma / User-agent: Diffbot / User-agent: ImagesiftBot / User-agent: MistralAI-User / User-agent: iAskBot / User-agent: Qwen-Agent / User-agent: Timpibot' terminated by a single directive: 'Allow: /'. That is an explicit opt-IN for Claude site-wide, not an opt-out - specificity cuts both ways and the most specific matching group for us grants access. There is NO Claude Disallow anywhere in the file, so no section-5 hard stop. Only Baiduspider, Yeti, Daumoa and PetalBot receive 'Disallow: /'. The generic '*' stanza disallows /alive/user, /m/, /*/cart$, /*/checkout$, /*j_spring_security_check, /*login, /*logout, /*minicart, /*my-account, /*password, /*register, /reviews/, /*_ui, /*unsubscribe.html, /*manage-subscription, /en_eur, /en/*, /*.product-article-, */resell/productpage/, */search-results.html*, /assets/ and */index.*.html - none of which was requested; in particular no internal search was used and no product-detail page was fetched. The only Crawl-delay in the file belongs to Pinterestbot; requests were paced by probe.py's 2 s per-host gap regardless. SINGLE HOST: unlike the SR 123 IT pass I did NOT need api.hm.com at all - the fr_fr HTML pages embed the PLP payload server-side - so no second host was contacted and no second robots question arises. No proxy, no r.jina.ai, no browser automation, no campaign parameters. ACCESS: every www2.hm.com/fr_fr/... page fetched cleanly at HTTP 200 through probe.py's curl_cffi rotation (edge101, safari18_0_ios, chrome131, firefox133, safari15_5), 2.1 MB per listing page. TREE SOURCE - the fr_fr sitemap set declared in robots.txt, not guessed URL patterns: https://www2.hm.com/fr_fr.sitemap.xml -> the fr_fr.pages.subdepartment.*.xml and fr_fr.pages.department.*.xml family, 2,672 URLs of which 309 sit under /fr_fr/maison. H&M Home FR runs the SAME two parallel nav axes over one catalogue as the UK and IT storefronts, in French: 'Catalogue par univers' (room: /fr_fr/maison/catalogue-par-univers/salle-de-bain/...) and 'Catalogue par produit' (/fr_fr/maison/catalogue-par-produit/accessoires-salle-bain/...). The room-axis tree was then CONFIRMED against the site's own rendered nav rather than inferred from the sitemap: each PLP embeds its sibling list as JSON, and Salle de Bain's reads, in the site's own order - Serviettes de toilette (home/shop-by-room/bathroom/towels), Tapis de bain (bath-mats), Accessoires (accessories), Rideaux de douche (shower-curtains), Sacs à linge (laundry-bags), Rangement (storage), Distributeurs de Savon (soap-dispensers). SEVEN children, so the menu is not truncating a branch behind a 'plus' link; the sitemap's eighth entry, entretien-maison, has been dropped from the live nav and renders 0 (logged in review as an EMPTY NODE). The product-axis parent's children are: accessoires, serviettes-de-toilette (-> draps-de-bain, serviettes-bain, serviettes-invites, serviettes-plage), tapis-de-bain, rideaux-de-douche, tout-afficher. SIBLING NODES - EXPLICIT, AND PROVEN ON THIS HOST as the brief required: 'Distributeurs de Savon' (8) and 'Accessoires' (88) are SIBLING children of Salle de Bain in H&M's own room nav, not parent and child - both appear side by side in the same rendered sibling list. I did not take the relationship on trust: I enumerated both article-code sets and ALL 8 soap-dispenser codes also sit inside the 88-item accessories set (the accessories grid itself shows 'Distributeur de savon en grès cérame' twice on page 1). They are recorded separately per rule 28 and they MUST NOT be summed - 88 and 8 are each the storefront's own figure for its own node. FR therefore has exactly the shape the brief predicted from UK (86/5) and IT (77/6). QTY SOURCE: the listing page's OWN rendered total - the '<N> produits' string in the sort/filter bar of the served HTML - corroborated on every node by the totalHits value in the same page's embedded productListingData payload, which the grid itself renders from. The two agreed on every single node checked: 361/361, 88/88, 85/85, 25/25, 8/8, 16/16, 42/42, 43/43, 150/150, 181/181, 88/88, 49/49, 30/30, 3/3, 34/34, 325/325, 0/0. No figure comes from JSON-LD numberOfItems, a nav attribute or a meta description - the three traps named in the brief. VERIFICATION - ENUMERATION TO EXHAUSTION on the three recorded leaves and on the product-axis twin, walking ?page=N at 36 tiles per page and collecting unique articleCode values: Accessoires 88 totalHits / 88 unique codes over 3 pages; Rangement 25/25; Distributeurs de Savon 8/8; product-axis Accessoires 85/85. Exact matches with no paging repeats and no shortfall. DISCRIMINATION: the totals vary widely per node - 361 (room parent), 325 (product parent), 181, 150, 88, 88, 85, 49, 43, 42, 34, 30, 25, 16, 16, 8, 3, 0 - so this is no site-wide constant, and each page's h1 matched the node requested ('Accessoires pour la salle de bain', 'RANGEMENT', 'Distributeurs de savon'). ONE CAVEAT RECORDED HONESTLY: a deliberately bogus child URL (.../salle-de-bain/thisdoesnotexist12345.html) does not 404 - it falls back to the PARENT page and returns the parent's 361. So a nonexistent slug cannot be detected by status code alone. That fallback is exactly why every node here was validated by its own h1 AND its own distinct total, and why the empty node is trustworthy: entretien-maison returns 0, not the parent's 361, proving the platform serves a real-but-empty node distinctly rather than blanket-falling-back. CANONICAL-ALIAS AUDIT (the dedup blind spot the brief flags): I read rel=canonical on every bathroom node instead of trusting a dedup miss. Findings, all disclosed: room-axis accessoires -> product-axis accessoires; room-axis rideaux-de-douche -> product-axis rideaux-de-douche; room-axis serviettes-de-toilette -> product-axis serviettes-de-toilette; room-axis sacs-linge -> /catalogue-par-produit/rangements/paniers-linge.html; room-axis tapis-de-bain -> a STALE cross-locale English-slug path /fr_fr/home/shop-by-product/bath-shower/bath-mats.html; product-axis accessoires-salle-bain parent -> its own View All twin. Self-canonical (no alias): the room parent salle-de-bain, distributeurs-savon, rangements, entretien-maison and every product-axis leaf. I ran dedup.already_extracted() on the canonical TARGETS as well as on the recorded URLs, and none of the targets is in the index either, so no recorded row is hiding an already-extracted twin. AXIS CHOICE, stated plainly because it is the one judgement call here: for the three bathroom leaves I recorded the ROOM axis. Two of them (Rangement, Distributeurs de Savon) exist ONLY on the room axis and are self-canonical, so there was no choice to make. For Accessoires the room-axis page canonicalises to the product-axis page, which would argue for recording the product-axis URL at 85; I recorded the room axis at 88 instead because the two are not literally one page (different h1, different totals, three articles present in one set and not the other), because rule 23 points at the node the site itself calls Salle de Bain, and because SR 89 and SR 123 both recorded the room axis and a split would make the H&M family incomparable. The product-axis twin is in review with its own count so the alternative reading is fully recoverable. CONTENT CHECK on the recorded leaves, from the enumerated product titles. Accessoires (88) - 'Distributeur de savon en grès cérame', 'Porte-savon en marbre', 'Gobelet de salle de bain en grès cérame', 'Gobelet de salle de bain en inox', 'Plateau en marbre / en bois / en grès cérame', 'Pot ovale en verre avec couvercle', plus the beauty crossover H&M cross-merchandises into the bathroom ('Lotion pour les mains', 'Savon pour les mains', 'Bougie parfumée', 'Peigne de coiffage', 'Bandeau make-up duveteux'); every tile carries the site's own category tag home_bathshower_accessories_bathroomaccessories, so the node's primary type is bathroom accessories and it is recorded whole at the site's own number - identical treatment to SR 89 and SR 123. Rangement (25) - lidded glass jars, wooden organisers, cotton-bud and cotton-pad dispensers, metal storage boxes, marble and metal jewellery holders, jute/rattan/bamboo storage baskets, laundry boxes, modular makeup organisers, terracotta lidded containers; rule 12 (bathroom storage) puts this in Bathroom, the same call as IT's 'Contenitori' (21). Distributeurs de Savon (8) - all eight are 'Distributeur de savon' in stoneware, marble or stainless steel; rule 13. DEDUP: dedup.already_extracted() was run on all 23 candidate, canonical-target and review URLs. Exactly ONE hit - /catalogue-par-produit/deco/miroirs.html, in Final.xlsx (Home Decor pass) as 'Mirrors' - which is in review, never in rows. ZERO hits on any of the three recorded rows. The index holds 44 www2.hm.com/fr_fr keys: 22 from the Home Decor pass (tableware, deco, luminaires) and 16 from Furniture.xlsx (/catalogue-par-produit/mobilier/*), none of them a bathroom node. LOCALE BLIND SPOT CHECKED: every hm.com key in the index is on the fr_fr locale, the same locale used here, so no recorded URL is a locale variant of an already-extracted one. OPTION 1 does not engage - the Furniture pass took H&M FR's mobilier leaves (sofas, chairs, tables, cabinets, shelves, wardrobes) and H&M sells no bath vanity, vanity unit or medicine cabinet at all. NOT FOUND ON THIS SITE (the whole 309-URL /fr_fr/maison sitemap branch was swept for sanitaire, robinet, douche, lavabo, vasque, WC, baignoire, miroir and cabinet vocabulary - genuinely absent, not skipped): no sanitaryware, no baths, no shower systems or enclosures, no taps or faucets, no toilets, no basins, no vanity units, and no bathroom mirror node of any kind. H&M Home France's bathroom offer is accessories, storage and soap dispensers, with the textiles and the laundry storage routed out. RESULT: 1 grouping row + 3 leaf rows; 16 review entries.",
+ "rows": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Accessories",
+   "qty": 88,
+   "link": "https://www2.hm.com/fr_fr/maison/catalogue-par-univers/salle-de-bain/accessoires.html",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Storage (Bathroom)",
+   "qty": 25,
+   "link": "https://www2.hm.com/fr_fr/maison/catalogue-par-univers/salle-de-bain/rangements.html",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Soap Dispensers",
+   "qty": 8,
+   "link": "https://www2.hm.com/fr_fr/maison/catalogue-par-univers/salle-de-bain/distributeurs-savon.html",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  }
+ ],
+ "review": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom (room-axis parent)",
+   "qty": 361,
+   "issue": "EXCLUDED AS PARENT URL (rule 24): h1 'Déco salle de bain', self-canonical, 361 produits over 11 pages. It has 7 live children in H&M's own room nav (3 recorded above, 4 routed out below) plus one retired empty child. Its 361 is not recorded and never aggregated.",
+   "link": "https://www2.hm.com/fr_fr/maison/catalogue-par-univers/salle-de-bain.html"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Towels",
+   "qty": 150,
+   "issue": "ROUTED TO TEXTILE: bath, hand and guest towels (rules 15/20). Room-axis node; rel=canonical points to the product-axis twin /catalogue-par-produit/accessoires-salle-bain/serviettes-de-toilette.html (181), which is the node that actually carries the four deepest towel leaves listed below.",
+   "link": "https://www2.hm.com/fr_fr/maison/catalogue-par-univers/salle-de-bain/serviettes-de-toilette.html"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bath Mats",
+   "qty": 42,
+   "issue": "ROUTED TO TEXTILE (rule 16): I enumerated the rendered grid rather than judging on the node name and every tile is a textile mat - 'Tapis de bain tufté en forme de fleur', 'Tapis de bain en coton tufté', 'Tapis de bain en coton éponge', 'Tapis de bain en coton', 'Tapis de bain en coton d'Égypte', 'Tapis de bain texturé'. No rubber or anti-slip variant exists in this node or anywhere on the site, so nothing non-textile is being lost. Its rel=canonical is a STALE cross-locale pointer to /fr_fr/home/shop-by-product/bath-shower/bath-mats.html (an English-slug path); flagged, and not used as the recorded link because this node is routed out in any case. Product-axis twin /catalogue-par-produit/accessoires-salle-bain/tapis-de-bain.html carries 43.",
+   "link": "https://www2.hm.com/fr_fr/maison/catalogue-par-univers/salle-de-bain/tapis-de-bain.html"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Shower Curtains",
+   "qty": 16,
+   "issue": "ROUTED TO TEXTILE: shower curtains (rule 20). rel=canonical points to the product-axis twin /catalogue-par-produit/accessoires-salle-bain/rideaux-de-douche.html, which serves the identical 16.",
+   "link": "https://www2.hm.com/fr_fr/maison/catalogue-par-univers/salle-de-bain/rideaux-de-douche.html"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Laundry Bags",
+   "qty": 16,
+   "issue": "ROUTED TO STORAGE: sits under Salle de Bain in the room nav but the enumerated grid is entirely laundry baskets, hampers and laundry bags - 'Panier à linge en jonc de mer', 'Panier à linge en paille', 'Panier à linge en jute', 'Panier à linge en rotin', 'Très grand panier à linge en jonc de mer', 'Sac à linge en lin mélangé', 'Sac à linge suspendu en jute mélangé', 'Bac à linge avec texte'. Rule 12 - clearly-Storage-owned products belong to Storage. PROOF it is the Storage assortment and not a bathroom one, exactly as at SR 89 H&M Home UK and SR 123 H&M Home IT: this node's own rel=canonical is /fr_fr/maison/catalogue-par-produit/rangements/paniers-linge.html (h1 'Paniers à Linge', inside the Rangements storage department) and that node returns the IDENTICAL total of 16.",
+   "link": "https://www2.hm.com/fr_fr/maison/catalogue-par-univers/salle-de-bain/sacs-linge.html"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Home Care Products",
+   "qty": 0,
+   "issue": "EMPTY NODE: present in the fr_fr sitemap and it resolves at HTTP 200 with its own h1 'Produits d'entretien maison' and a self-referential canonical, but it renders '0 produits' and its embedded totalHits is 0, and it has already been dropped from the live room nav (the rendered nav lists 7 children, not 8). No products, so no row - never fabricate. Recorded here so the eighth sitemap child of Salle de Bain is not a silent omission. Same shape as SR 123 H&M Home IT's empty 'Prodotti per la casa'.",
+   "link": "https://www2.hm.com/fr_fr/maison/catalogue-par-univers/salle-de-bain/entretien-maison.html"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Accessories (product-axis parent)",
+   "qty": 325,
+   "issue": "EXCLUDED AS PARENT URL + DUPLICATE NAV PATH (rules 24/25/28): H&M runs two parallel nav axes over one catalogue - 'Catalogue par univers' (room) and 'Catalogue par produit'. This is the product-axis parent of the same bathroom assortment and it has 4 live children. Not recorded, not aggregated. Note it is doubly excluded: its own rel=canonical points at its View All twin /catalogue-par-produit/accessoires-salle-bain/tout-afficher.html, which returns the identical 325 and is banned by rule 25.",
+   "link": "https://www2.hm.com/fr_fr/maison/catalogue-par-produit/accessoires-salle-bain.html"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Accessories (product-axis duplicate path)",
+   "qty": 85,
+   "issue": "DUPLICATE NAV PATH - NOT RECORDED, to avoid double counting the same assortment. Same catalogue node as the recorded room-axis /catalogue-par-univers/salle-de-bain/accessoires.html (88); the 88 vs 85 drift is three items that are room-tagged but not product-tagged. IMPORTANT CANONICAL FINDING, disclosed in full: it is the ROOM-axis page that carries rel=canonical pointing HERE, not the other way round, so H&M itself treats this product-axis URL as the canonical form. I still recorded the room-axis URL, for three reasons: (1) the two are not literally one page - different h1 ('Accessoires pour la salle de bain' vs 'Accessoires de Salle de Bain'), different totals and a three-item difference in the enumerated article sets, so rule 28's 'same page via two paths' tiebreak does not strictly bite; (2) rule 23 says to record the node the site itself presents as Bathroom, and 'Salle de Bain' is that node; (3) consistency with the two already-validated siblings, SR 89 H&M Home UK (86 room / 85 product) and SR 123 H&M Home IT (77 / 75), which both recorded the room axis. I checked the dedup index on BOTH forms and NEITHER is present, so the choice carries no already-extracted risk in either direction.",
+   "link": "https://www2.hm.com/fr_fr/maison/catalogue-par-produit/accessoires-salle-bain/accessoires.html"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower Curtains (product-axis duplicate path)",
+   "qty": 16,
+   "issue": "ROUTED TO TEXTILE + DUPLICATE NAV PATH: product-axis twin of the room-axis shower-curtain node, identical at 16 (rules 20/28).",
+   "link": "https://www2.hm.com/fr_fr/maison/catalogue-par-produit/accessoires-salle-bain/rideaux-de-douche.html"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Mats (product-axis duplicate path)",
+   "qty": 43,
+   "issue": "ROUTED TO TEXTILE + DUPLICATE NAV PATH: product-axis twin of the room-axis bath-mat node (42). Textile either way (rule 16).",
+   "link": "https://www2.hm.com/fr_fr/maison/catalogue-par-produit/accessoires-salle-bain/tapis-de-bain.html"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Towels and Bath Sheets (product-axis parent)",
+   "qty": 181,
+   "issue": "ROUTED TO TEXTILE + EXCLUDED AS PARENT (rules 15/20/24): the product-axis towel parent, which unlike the room-axis towel node does have children. All four are listed below.",
+   "link": "https://www2.hm.com/fr_fr/maison/catalogue-par-produit/accessoires-salle-bain/serviettes-de-toilette.html"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Towels > Bath Sheets",
+   "qty": 88,
+   "issue": "ROUTED TO TEXTILE: bath sheets (rule 15). Deepest towel leaf on the product axis. h1 'BAIN'.",
+   "link": "https://www2.hm.com/fr_fr/maison/catalogue-par-produit/accessoires-salle-bain/serviettes-de-toilette/draps-de-bain.html"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Towels > Bath Towels",
+   "qty": 49,
+   "issue": "ROUTED TO TEXTILE: bath towels (rule 15). Deepest towel leaf.",
+   "link": "https://www2.hm.com/fr_fr/maison/catalogue-par-produit/accessoires-salle-bain/serviettes-de-toilette/serviettes-bain.html"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Towels > Guest Towels",
+   "qty": 30,
+   "issue": "ROUTED TO TEXTILE: guest towels (rule 15). Deepest towel leaf. h1 'INVITÉ'.",
+   "link": "https://www2.hm.com/fr_fr/maison/catalogue-par-produit/accessoires-salle-bain/serviettes-de-toilette/serviettes-invites.html"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Towels > Beach Towels",
+   "qty": 3,
+   "issue": "ROUTED TO TEXTILE: beach towels - textile, and not bathroom at all; listed only because it is the fourth child of the product-axis towel node and would otherwise be a silent skip.",
+   "link": "https://www2.hm.com/fr_fr/maison/catalogue-par-produit/accessoires-salle-bain/serviettes-de-toilette/serviettes-plage.html"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Storage > Laundry Baskets",
+   "qty": 16,
+   "issue": "ROUTED TO STORAGE: the Rangements (storage) department's laundry-basket node, h1 'Paniers à Linge', self-canonical. Recorded here as the evidence that Salle de Bain > Sacs à linge (16) is the same Storage-owned assortment reached through the bathroom room nav - it is that node's declared rel=canonical target and the two counts are identical.",
+   "link": "https://www2.hm.com/fr_fr/maison/catalogue-par-produit/rangements/paniers-linge.html"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Decor > Mirrors",
+   "qty": 34,
+   "issue": "ALREADY EXTRACTED IN Final.xlsx (Home Decor pass) as 'Mirrors'. Inspected in full anyway per rule 10, and Decor on the merits too (rules 2/11/21/29): it sits under Maison > Catalogue par produit > Déco, NOT under Salle de Bain, and the Salle de Bain room nav has no mirror child at all. Enumerated names are decorative wall and table mirrors - 'Miroir en métal', 'Grand miroir en bois de manguier', 'Miroir asymétrique', 'Miroir de table en bois', 'Miroir de table en marbre', 'Miroir Avec Cadre En Bois', 'Grand Miroir Skeppsvik', 'Miroir Mural Uma' - with no bathroom, vanity, LED, illuminated, backlit, demister, magnifying or cabinet mirror among them. Same call as SR 89 H&M Home UK (33) and SR 123 H&M Home IT (21).",
+   "link": "https://www2.hm.com/fr_fr/maison/catalogue-par-produit/deco/miroirs.html"
+  }
+ ],
+ "_reconstructed_from": "Bathroom.xlsx delivered 2026-09-01 (checkpoint), not original worker JSON"
+}

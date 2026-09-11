@@ -1,0 +1,624 @@
+{
+ "sr": 213,
+ "company": "IKEA Japan",
+ "brand_site": "ikea.com",
+ "country": "Japan",
+ "site_url": "https://www.ikea.com/jp/ja/",
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "Independence check vs S.N. 100 IKEA UK (c100.json), S.N. 117/156 IKEA DE (c117.json), S.N. 155 IKEA France (c155.json) and S.N. 190 IKEA UAE (c190.json): confirmed GENUINELY SEPARATE -- the 5th independent country catalogue on IKEA's global platform. Verified via locale path https://www.ikea.com/jp/ja/ (direct fetch HTTP 200, no blocking, no ClaudeBot-specific robots.txt disallow found on ikea.com/robots.txt); embedded page settings confirm marketCode=ja-JP, siteFolder=jp/ja, ecomMarket=true (a genuine live Japan ecommerce storefront, not a redirect/stub). Queried the jp/ja market via the same sik.search.blue.cdtapps.com/jp/ja/search PRIMARY_AREA API used for UK/DE/FR/AE, against the confirmed-global 58-leaf-category ID scheme shared across all five markets. Cross-checked JP qty against all four siblings on every one of the 58 shared category IDs (matching by numeric category ID extracted from each sibling's own link URL): JP matched UK on only 4/58, DE on 10/58, FR on 8/58, AE on 4/58, and there was NOT ONE category where all five markets reported an identical qty simultaneously -- confirming JP runs its own distinct per-market inventory/catalog exactly per the established IKEA per-country pattern. Methodology: reused the sik_lib query/verify harness from the S.N. 155/190 workers pointed at /jp/ja/search; for each of the 58 shared category IDs fetched window=999, used the unique product itemNoGlobal count (not raw metadata.max, which can include a non-product breakout card, per the IKEA France S.N. 155 lesson) as qty, then boundary-tested at offset=qty-1 (returned the final product) and offset=qty (returned an empty PRIMARY_AREA result set), then refetched at the same window to confirm reproducibility (Session-Id pinned per run). All 57 categories the API accepted passed both checks cleanly with a stable qty on refetch. ONE category (24831, Art Cards) returned HTTP 404 'Unknown category key: 24831' from the sik.search API on the jp/ja market specifically -- the exact same single-ID gap already documented on the ae/en market by the S.N. 190 IKEA UAE worker -- even though the category IS live on the JP site (page title translates to 'Art Cards Online Shopping - IKEA', HTTP 200, also absent from the /jp/ja/ mega-nav links same as it's absent from other markets' nav); qty=22 for this one row was instead sourced from the category page's own embedded SSR search-result state (metadata start=0/end=22/max=22/itemsPerType.PRODUCT=22, i.e. the page's own first load already reached the exhaustion boundary with no further pages), reproduced identically across two independent fetches. Category naming: the JP storefront is Japanese-only (siteFolder jp/ja); every leaf category's own live JA page <title> was fetched and translated to English (58/58 titles retrieved) and used as the source-of-truth cross-check against the UK/DE/FR/AE-derived baseline labels reused for the shared numeric IDs -- the great majority translate to the same concept as the baseline label and those rows keep the standing label for cross-market comparability; five rows showed a genuine JP-specific framing divergence and use the JP page's own translated wording instead, matching the same 'site's-own-live-label-as-source-of-truth' practice the S.N. 190 AE worker established: (1) 700512 JA title 'Portable Lamps (Carry-around Lights)' -> recorded as 'Portable Lamps' (matches AE's own label on this ID, diverges from UK's 'Rechargeable Lamps'); (2) 24861 JA title 'Tabletop Mirror' -> recorded as 'Tabletop Mirrors' (diverges from the UK/AE 'Decorative Mirrors' label on this ID, still squarely in-scope under Rule 0.3 'ALL mirrors are IN SCOPE, every type'); (3) 10788 JA title 'Posters & Art Panels' -> recorded as 'Posters & Art Panels' (diverges from UK's 'Framed Pictures & Picture Sets', closer in spirit to AE's 'Ready to Hang Art' relabeling of the same ID -- still decorative framed/mounted wall art either way, in scope); (4) 16308 JA title 'Small-item Trays & Bowls' -> recorded as 'Trays & Bowls' (diverges from UK's 'Decorative Bowls & Dishes', same as AE's own 'Bowls & Dishes' relabeling of this ID -- still decorative bowls/trays, in scope); (5) 22663 JA title 'Alcohol Glasses (Champagne/Beer/Whiskey etc, by-use glassware)' -> recorded as 'Speciality Glasses' (diverges from UK's 'Cocktail Glasses', matches the spirit of AE's own 'Speciality Glassware' relabeling of this same ID -- still decorative/functional glassware, in scope). All other 53 leaf labels kept the standing baseline wording after translation confirmed no material divergence (e.g. 18750 -> 'Ceiling Lighting/Ceiling Lights', 24859 -> 'Full-length Mirror (Large)', 10776 -> 'Vase/Flower Vase', all consistent with the existing 'Ceiling Lights'/'Large Mirrors'/'Vases' labels). Rule 0.2 finding NOT incorporated into this row set (flagged for project awareness only, matching the S.N. 190 AE worker's own instruction not to unilaterally expand scope for this row): independently re-observed the SAME scheme-wide gap the AE worker first flagged -- searched the jp/ja mega-nav for the ten additional lighting-by-room/furniture-integration node IDs the AE worker listed (700821 Cabinet Lighting, 16283 Wardrobe Lighting, 16281 Bookcase Lighting, 16282 Kitchen Lighting hub, 25209 Track Lighting, 18753 Ceiling Spotlights, 20505 Wall Spotlights, 55010 Bathroom Cabinet Lighting, 700620 Pathway Lighting, 700619 Outdoor Light Chains) and found 9 of the 10 present on the JP nav too (25209 Track Lighting not found in the JP nav sweep specifically) -- confirms this is very likely a scheme-wide platform gap affecting all five merged IKEA rows equally, not a JP-specific issue; not acted on unilaterally here for the same reason the AE worker gave (would make this row non-comparable with its four already-merged siblings without a corresponding fix there). Excluded per standing rules and confirmed present on the JP nav during the sweep: LED/smart light bulbs, smart light switches & remote controls (wiring/hardware), furniture-specific accessory lighting parts (fitted lighting for BESTA/PLATSA/METOD/ENHET etc -- functional fitted parts for specific furniture systems, not standalone decor fixtures, same basis as prior IKEA rows), artificial plants/flowers. Rule 0.6 overlap (same pattern as UK/DE/FR/AE): Mirrors presents both a shape/type cross-cut and a room/use cross-cut as separate category IDs; Lighting mixes a fixture-type tree with a room/use tree at the same level; Wall Decor's 'Posters' (10787) and the renamed 'Posters & Art Panels' (10788) are adjacent/overlapping art-print concepts on separate IDs, same disclosure basis as UK/FR's own 'Framed Pictures & Picture Sets' vs 'Posters' pairing; Kitchen & Dining's 'Serving Dishes' (16047, JA title itself opens with 'Cake Stand/Party Plate/Serving Plate') visibly overlaps 'Cake & Serving Stands' (59251, JA title 'Cake Stand') -- both retained as separate IDs with independently verified qty, consistent with how the equivalent pairing was handled on all four sibling markets. All 58 shared category IDs resolved on the JP nav/API (same 57-of-58 direct + 1 page-embedded pattern as AE); no additional JP-exclusive leaf categories were added to keep this row directly comparable to its four siblings. Access route: direct fetch worked throughout for both the site pages and the search API, no WAF/blocking encountered.",
+ "rows": [
+  {
+   "category": "Lighting",
+   "sub_category": "Lighting",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Lamps & Lighting",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Ceiling Lights",
+   "parent": false,
+   "qty": 97,
+   "link": "https://www.ikea.com/jp/ja/cat/ceiling-lights-18750/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (jp/ja market) unique product itemNoGlobal count from a full window=999 fetch = 97; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=97 identically (Session-Id pinned per run). Per IKEA France (S.N. 155) lesson reused on every prior IKEA row: raw metadata.max is not used as the anchor; the itemsPerType.PRODUCT / unique product-ID count is used instead.",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Table Lamps",
+   "parent": false,
+   "qty": 63,
+   "link": "https://www.ikea.com/jp/ja/cat/table-lamps-10732/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (jp/ja market) unique product itemNoGlobal count from a full window=999 fetch = 63; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=63 identically (Session-Id pinned per run). Per IKEA France (S.N. 155) lesson reused on every prior IKEA row: raw metadata.max is not used as the anchor; the itemsPerType.PRODUCT / unique product-ID count is used instead.",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Floor Lamps",
+   "parent": false,
+   "qty": 42,
+   "link": "https://www.ikea.com/jp/ja/cat/floor-lamps-10731/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (jp/ja market) unique product itemNoGlobal count from a full window=999 fetch = 42; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=42 identically (Session-Id pinned per run). Per IKEA France (S.N. 155) lesson reused on every prior IKEA row: raw metadata.max is not used as the anchor; the itemsPerType.PRODUCT / unique product-ID count is used instead.",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Wall Lights",
+   "parent": false,
+   "qty": 33,
+   "link": "https://www.ikea.com/jp/ja/cat/wall-lights-20503/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (jp/ja market) unique product itemNoGlobal count from a full window=999 fetch = 33; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=33 identically (Session-Id pinned per run). Per IKEA France (S.N. 155) lesson reused on every prior IKEA row: raw metadata.max is not used as the anchor; the itemsPerType.PRODUCT / unique product-ID count is used instead.",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Desk Lamps",
+   "parent": false,
+   "qty": 25,
+   "link": "https://www.ikea.com/jp/ja/cat/desk-lamps-20502/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (jp/ja market) unique product itemNoGlobal count from a full window=999 fetch = 25; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=25 identically (Session-Id pinned per run). Per IKEA France (S.N. 155) lesson reused on every prior IKEA row: raw metadata.max is not used as the anchor; the itemsPerType.PRODUCT / unique product-ID count is used instead.",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Children's Lighting",
+   "parent": false,
+   "qty": 23,
+   "link": "https://www.ikea.com/jp/ja/cat/childrens-lighting-18773/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (jp/ja market) unique product itemNoGlobal count from a full window=999 fetch = 23; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=23 identically (Session-Id pinned per run). Per IKEA France (S.N. 155) lesson reused on every prior IKEA row: raw metadata.max is not used as the anchor; the itemsPerType.PRODUCT / unique product-ID count is used instead.",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Spotlights",
+   "parent": false,
+   "qty": 17,
+   "link": "https://www.ikea.com/jp/ja/cat/spotlights-20506/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (jp/ja market) unique product itemNoGlobal count from a full window=999 fetch = 17; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=17 identically (Session-Id pinned per run). Per IKEA France (S.N. 155) lesson reused on every prior IKEA row: raw metadata.max is not used as the anchor; the itemsPerType.PRODUCT / unique product-ID count is used instead.",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Smart Lamps",
+   "parent": false,
+   "qty": 3,
+   "link": "https://www.ikea.com/jp/ja/cat/smart-lamps-59308/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (jp/ja market) unique product itemNoGlobal count from a full window=999 fetch = 3; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=3 identically (Session-Id pinned per run). Per IKEA France (S.N. 155) lesson reused on every prior IKEA row: raw metadata.max is not used as the anchor; the itemsPerType.PRODUCT / unique product-ID count is used instead.",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "LED Lights",
+   "parent": false,
+   "qty": 108,
+   "link": "https://www.ikea.com/jp/ja/cat/led-lights-20515/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (jp/ja market) unique product itemNoGlobal count from a full window=999 fetch = 108; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=108 identically (Session-Id pinned per run). Per IKEA France (S.N. 155) lesson reused on every prior IKEA row: raw metadata.max is not used as the anchor; the itemsPerType.PRODUCT / unique product-ID count is used instead.",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Portable Lamps",
+   "parent": false,
+   "qty": 4,
+   "link": "https://www.ikea.com/jp/ja/cat/portable-lamps-700512/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (jp/ja market) unique product itemNoGlobal count from a full window=999 fetch = 4; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=4 identically (Session-Id pinned per run). Per IKEA France (S.N. 155) lesson reused on every prior IKEA row: raw metadata.max is not used as the anchor; the itemsPerType.PRODUCT / unique product-ID count is used instead.",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Pendant Lights",
+   "parent": false,
+   "qty": 69,
+   "link": "https://www.ikea.com/jp/ja/cat/pendant-lights-18751/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (jp/ja market) unique product itemNoGlobal count from a full window=999 fetch = 69; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=69 identically (Session-Id pinned per run). Per IKEA France (S.N. 155) lesson reused on every prior IKEA row: raw metadata.max is not used as the anchor; the itemsPerType.PRODUCT / unique product-ID count is used instead.",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Decorative Lighting",
+   "parent": false,
+   "qty": 49,
+   "link": "https://www.ikea.com/jp/ja/cat/decorative-lighting-14971/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (jp/ja market) unique product itemNoGlobal count from a full window=999 fetch = 49; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=49 identically (Session-Id pinned per run). Per IKEA France (S.N. 155) lesson reused on every prior IKEA row: raw metadata.max is not used as the anchor; the itemsPerType.PRODUCT / unique product-ID count is used instead.",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Integrated Lighting",
+   "parent": false,
+   "qty": 31,
+   "link": "https://www.ikea.com/jp/ja/cat/integrated-lighting-16280/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (jp/ja market) unique product itemNoGlobal count from a full window=999 fetch = 31; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=31 identically (Session-Id pinned per run). Per IKEA France (S.N. 155) lesson reused on every prior IKEA row: raw metadata.max is not used as the anchor; the itemsPerType.PRODUCT / unique product-ID count is used instead.",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Smart Lighting",
+   "parent": false,
+   "qty": 59,
+   "link": "https://www.ikea.com/jp/ja/cat/smart-lighting-36812/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (jp/ja market) unique product itemNoGlobal count from a full window=999 fetch = 59; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=59 identically (Session-Id pinned per run). Per IKEA France (S.N. 155) lesson reused on every prior IKEA row: raw metadata.max is not used as the anchor; the itemsPerType.PRODUCT / unique product-ID count is used instead.",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Outdoor Lighting",
+   "parent": false,
+   "qty": 25,
+   "link": "https://www.ikea.com/jp/ja/cat/outdoor-lighting-17897/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (jp/ja market) unique product itemNoGlobal count from a full window=999 fetch = 25; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=25 identically (Session-Id pinned per run). Per IKEA France (S.N. 155) lesson reused on every prior IKEA row: raw metadata.max is not used as the anchor; the itemsPerType.PRODUCT / unique product-ID count is used instead.",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Bathroom Lighting",
+   "parent": false,
+   "qty": 24,
+   "link": "https://www.ikea.com/jp/ja/cat/bathroom-lighting-10736/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (jp/ja market) unique product itemNoGlobal count from a full window=999 fetch = 24; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=24 identically (Session-Id pinned per run). Per IKEA France (S.N. 155) lesson reused on every prior IKEA row: raw metadata.max is not used as the anchor; the itemsPerType.PRODUCT / unique product-ID count is used instead.",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Mirrors",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Large Mirrors",
+   "parent": false,
+   "qty": 21,
+   "link": "https://www.ikea.com/jp/ja/cat/large-mirrors-24859/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (jp/ja market) unique product itemNoGlobal count from a full window=999 fetch = 21; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=21 identically (Session-Id pinned per run). Per IKEA France (S.N. 155) lesson reused on every prior IKEA row: raw metadata.max is not used as the anchor; the itemsPerType.PRODUCT / unique product-ID count is used instead.",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Tabletop Mirrors",
+   "parent": false,
+   "qty": 17,
+   "link": "https://www.ikea.com/jp/ja/cat/decorative-mirrors-24861/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (jp/ja market) unique product itemNoGlobal count from a full window=999 fetch = 17; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=17 identically (Session-Id pinned per run). Per IKEA France (S.N. 155) lesson reused on every prior IKEA row: raw metadata.max is not used as the anchor; the itemsPerType.PRODUCT / unique product-ID count is used instead.",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Wall Mirrors",
+   "parent": false,
+   "qty": 48,
+   "link": "https://www.ikea.com/jp/ja/cat/wall-mirrors-24858/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (jp/ja market) unique product itemNoGlobal count from a full window=999 fetch = 48; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=48 identically (Session-Id pinned per run). Per IKEA France (S.N. 155) lesson reused on every prior IKEA row: raw metadata.max is not used as the anchor; the itemsPerType.PRODUCT / unique product-ID count is used instead.",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Round Mirrors",
+   "parent": false,
+   "qty": 14,
+   "link": "https://www.ikea.com/jp/ja/cat/round-mirrors-24860/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (jp/ja market) unique product itemNoGlobal count from a full window=999 fetch = 14; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=14 identically (Session-Id pinned per run). Per IKEA France (S.N. 155) lesson reused on every prior IKEA row: raw metadata.max is not used as the anchor; the itemsPerType.PRODUCT / unique product-ID count is used instead.",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Standing Mirrors",
+   "parent": false,
+   "qty": 9,
+   "link": "https://www.ikea.com/jp/ja/cat/standing-mirrors-49139/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (jp/ja market) unique product itemNoGlobal count from a full window=999 fetch = 9; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=9 identically (Session-Id pinned per run). Per IKEA France (S.N. 155) lesson reused on every prior IKEA row: raw metadata.max is not used as the anchor; the itemsPerType.PRODUCT / unique product-ID count is used instead.",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Vanity Mirrors",
+   "parent": false,
+   "qty": 18,
+   "link": "https://www.ikea.com/jp/ja/cat/vanity-mirrors-20498/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (jp/ja market) unique product itemNoGlobal count from a full window=999 fetch = 18; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=18 identically (Session-Id pinned per run). Per IKEA France (S.N. 155) lesson reused on every prior IKEA row: raw metadata.max is not used as the anchor; the itemsPerType.PRODUCT / unique product-ID count is used instead.",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Bathroom Mirrors",
+   "parent": false,
+   "qty": 28,
+   "link": "https://www.ikea.com/jp/ja/cat/bathroom-mirrors-20490/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (jp/ja market) unique product itemNoGlobal count from a full window=999 fetch = 28; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=28 identically (Session-Id pinned per run). Per IKEA France (S.N. 155) lesson reused on every prior IKEA row: raw metadata.max is not used as the anchor; the itemsPerType.PRODUCT / unique product-ID count is used instead.",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Mirrors with Lights",
+   "parent": false,
+   "qty": 5,
+   "link": "https://www.ikea.com/jp/ja/cat/mirrors-with-lights-49138/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (jp/ja market) unique product itemNoGlobal count from a full window=999 fetch = 5; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=5 identically (Session-Id pinned per run). Per IKEA France (S.N. 155) lesson reused on every prior IKEA row: raw metadata.max is not used as the anchor; the itemsPerType.PRODUCT / unique product-ID count is used instead.",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Makeup & Magnifying Mirrors",
+   "parent": false,
+   "qty": 5,
+   "link": "https://www.ikea.com/jp/ja/cat/makeup-magnifying-mirrors-20499/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (jp/ja market) unique product itemNoGlobal count from a full window=999 fetch = 5; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=5 identically (Session-Id pinned per run). Per IKEA France (S.N. 155) lesson reused on every prior IKEA row: raw metadata.max is not used as the anchor; the itemsPerType.PRODUCT / unique product-ID count is used instead.",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Wall Decor",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Picture & Photo Frames",
+   "parent": false,
+   "qty": 35,
+   "link": "https://www.ikea.com/jp/ja/cat/picture-photo-frames-18746/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (jp/ja market) unique product itemNoGlobal count from a full window=999 fetch = 35; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=35 identically (Session-Id pinned per run). Per IKEA France (S.N. 155) lesson reused on every prior IKEA row: raw metadata.max is not used as the anchor; the itemsPerType.PRODUCT / unique product-ID count is used instead.",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Posters & Art Panels",
+   "parent": false,
+   "qty": 35,
+   "link": "https://www.ikea.com/jp/ja/cat/canvas-wall-art-10788/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (jp/ja market) unique product itemNoGlobal count from a full window=999 fetch = 35; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=35 identically (Session-Id pinned per run). Per IKEA France (S.N. 155) lesson reused on every prior IKEA row: raw metadata.max is not used as the anchor; the itemsPerType.PRODUCT / unique product-ID count is used instead.",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Posters",
+   "parent": false,
+   "qty": 2,
+   "link": "https://www.ikea.com/jp/ja/cat/posters-10787/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (jp/ja market) unique product itemNoGlobal count from a full window=999 fetch = 2; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=2 identically (Session-Id pinned per run). Per IKEA France (S.N. 155) lesson reused on every prior IKEA row: raw metadata.max is not used as the anchor; the itemsPerType.PRODUCT / unique product-ID count is used instead.",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Display Shelves & Picture Ledges",
+   "parent": false,
+   "qty": 16,
+   "link": "https://www.ikea.com/jp/ja/cat/picture-ledges-16305/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (jp/ja market) unique product itemNoGlobal count from a full window=999 fetch = 16; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=16 identically (Session-Id pinned per run). Per IKEA France (S.N. 155) lesson reused on every prior IKEA row: raw metadata.max is not used as the anchor; the itemsPerType.PRODUCT / unique product-ID count is used instead.",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Collage Photo Frames",
+   "parent": false,
+   "qty": 6,
+   "link": "https://www.ikea.com/jp/ja/cat/collage-photo-frames-10789/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (jp/ja market) unique product itemNoGlobal count from a full window=999 fetch = 6; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=6 identically (Session-Id pinned per run). Per IKEA France (S.N. 155) lesson reused on every prior IKEA row: raw metadata.max is not used as the anchor; the itemsPerType.PRODUCT / unique product-ID count is used instead.",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Art Cards",
+   "parent": false,
+   "qty": 22,
+   "link": "https://www.ikea.com/jp/ja/cat/art-cards-24831/",
+   "evidence": "Category page's own embedded SSR search-result state on the jp/ja market (metadata start=0/end=22/max=22/itemsPerType.PRODUCT=22, i.e. first-load window already reached the exhaustion boundary) -- the sik.search PRIMARY_AREA POST API returned HTTP 404 'Unknown category key: 24831' for this ID on jp/ja, same as it did on the ae/en market per the S.N. 190 IKEA UAE precedent, even though the category is live (page title translates to 'Art Cards Online Shopping - IKEA', HTTP 200); reproduced identically across two independent fetches.",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Wall Accents",
+   "parent": false,
+   "qty": 5,
+   "link": "https://www.ikea.com/jp/ja/cat/wall-accents-700425/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (jp/ja market) unique product itemNoGlobal count from a full window=999 fetch = 5; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=5 identically (Session-Id pinned per run). Per IKEA France (S.N. 155) lesson reused on every prior IKEA row: raw metadata.max is not used as the anchor; the itemsPerType.PRODUCT / unique product-ID count is used instead.",
+   "flag": null
+  },
+  {
+   "category": "Home Accessories",
+   "sub_category": "Decorative Accessories",
+   "parent": false,
+   "qty": 14,
+   "link": "https://www.ikea.com/jp/ja/cat/decorative-accessories-24924/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (jp/ja market) unique product itemNoGlobal count from a full window=999 fetch = 14; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=14 identically (Session-Id pinned per run). Per IKEA France (S.N. 155) lesson reused on every prior IKEA row: raw metadata.max is not used as the anchor; the itemsPerType.PRODUCT / unique product-ID count is used instead.",
+   "flag": null
+  },
+  {
+   "category": "Home Accessories",
+   "sub_category": "Vases & Bowls",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Home Accessories",
+   "sub_category": "Vases",
+   "parent": false,
+   "qty": 74,
+   "link": "https://www.ikea.com/jp/ja/cat/vases-10776/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (jp/ja market) unique product itemNoGlobal count from a full window=999 fetch = 74; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=74 identically (Session-Id pinned per run). Per IKEA France (S.N. 155) lesson reused on every prior IKEA row: raw metadata.max is not used as the anchor; the itemsPerType.PRODUCT / unique product-ID count is used instead.",
+   "flag": null
+  },
+  {
+   "category": "Home Accessories",
+   "sub_category": "Trays & Bowls",
+   "parent": false,
+   "qty": 6,
+   "link": "https://www.ikea.com/jp/ja/cat/bowls-dishes-16308/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (jp/ja market) unique product itemNoGlobal count from a full window=999 fetch = 6; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=6 identically (Session-Id pinned per run). Per IKEA France (S.N. 155) lesson reused on every prior IKEA row: raw metadata.max is not used as the anchor; the itemsPerType.PRODUCT / unique product-ID count is used instead.",
+   "flag": null
+  },
+  {
+   "category": "Home Accessories",
+   "sub_category": "Candles and Candle Holders",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Home Accessories",
+   "sub_category": "Unscented Candles",
+   "parent": false,
+   "qty": 11,
+   "link": "https://www.ikea.com/jp/ja/cat/unscented-candles-10782/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (jp/ja market) unique product itemNoGlobal count from a full window=999 fetch = 11; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=11 identically (Session-Id pinned per run). Per IKEA France (S.N. 155) lesson reused on every prior IKEA row: raw metadata.max is not used as the anchor; the itemsPerType.PRODUCT / unique product-ID count is used instead.",
+   "flag": null
+  },
+  {
+   "category": "Home Accessories",
+   "sub_category": "Candle Holders",
+   "parent": false,
+   "qty": 32,
+   "link": "https://www.ikea.com/jp/ja/cat/candle-holders-10784/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (jp/ja market) unique product itemNoGlobal count from a full window=999 fetch = 32; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=32 identically (Session-Id pinned per run). Per IKEA France (S.N. 155) lesson reused on every prior IKEA row: raw metadata.max is not used as the anchor; the itemsPerType.PRODUCT / unique product-ID count is used instead.",
+   "flag": null
+  },
+  {
+   "category": "Home Accessories",
+   "sub_category": "Lanterns",
+   "parent": false,
+   "qty": 12,
+   "link": "https://www.ikea.com/jp/ja/cat/lanterns-20491/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (jp/ja market) unique product itemNoGlobal count from a full window=999 fetch = 12; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=12 identically (Session-Id pinned per run). Per IKEA France (S.N. 155) lesson reused on every prior IKEA row: raw metadata.max is not used as the anchor; the itemsPerType.PRODUCT / unique product-ID count is used instead.",
+   "flag": null
+  },
+  {
+   "category": "Home Accessories",
+   "sub_category": "LED Candles",
+   "parent": false,
+   "qty": 11,
+   "link": "https://www.ikea.com/jp/ja/cat/led-candles-39266/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (jp/ja market) unique product itemNoGlobal count from a full window=999 fetch = 11; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=11 identically (Session-Id pinned per run). Per IKEA France (S.N. 155) lesson reused on every prior IKEA row: raw metadata.max is not used as the anchor; the itemsPerType.PRODUCT / unique product-ID count is used instead.",
+   "flag": null
+  },
+  {
+   "category": "Home Accessories",
+   "sub_category": "Clocks",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Home Accessories",
+   "sub_category": "Wall & Table Clocks",
+   "parent": false,
+   "qty": 27,
+   "link": "https://www.ikea.com/jp/ja/cat/wall-clocks-10785/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (jp/ja market) unique product itemNoGlobal count from a full window=999 fetch = 27; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=27 identically (Session-Id pinned per run). Per IKEA France (S.N. 155) lesson reused on every prior IKEA row: raw metadata.max is not used as the anchor; the itemsPerType.PRODUCT / unique product-ID count is used instead.",
+   "flag": null
+  },
+  {
+   "category": "Home Accessories",
+   "sub_category": "Alarm Clocks",
+   "parent": false,
+   "qty": 23,
+   "link": "https://www.ikea.com/jp/ja/cat/alarm-clocks-10786/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (jp/ja market) unique product itemNoGlobal count from a full window=999 fetch = 23; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=23 identically (Session-Id pinned per run). Per IKEA France (S.N. 155) lesson reused on every prior IKEA row: raw metadata.max is not used as the anchor; the itemsPerType.PRODUCT / unique product-ID count is used instead.",
+   "flag": null
+  },
+  {
+   "category": "Home Accessories",
+   "sub_category": "Flower Pots & Planters",
+   "parent": false,
+   "qty": 114,
+   "link": "https://www.ikea.com/jp/ja/cat/flower-pots-planters-pp004/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (jp/ja market) unique product itemNoGlobal count from a full window=999 fetch = 114; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=114 identically (Session-Id pinned per run). Per IKEA France (S.N. 155) lesson reused on every prior IKEA row: raw metadata.max is not used as the anchor; the itemsPerType.PRODUCT / unique product-ID count is used instead.",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Glassware",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Drinking Glasses",
+   "parent": false,
+   "qty": 32,
+   "link": "https://www.ikea.com/jp/ja/cat/drinking-glasses-18869/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (jp/ja market) unique product itemNoGlobal count from a full window=999 fetch = 32; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=32 identically (Session-Id pinned per run). Per IKEA France (S.N. 155) lesson reused on every prior IKEA row: raw metadata.max is not used as the anchor; the itemsPerType.PRODUCT / unique product-ID count is used instead.",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Wine & Champagne Glasses",
+   "parent": false,
+   "qty": 11,
+   "link": "https://www.ikea.com/jp/ja/cat/wine-glasses-18870/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (jp/ja market) unique product itemNoGlobal count from a full window=999 fetch = 11; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=11 identically (Session-Id pinned per run). Per IKEA France (S.N. 155) lesson reused on every prior IKEA row: raw metadata.max is not used as the anchor; the itemsPerType.PRODUCT / unique product-ID count is used instead.",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Speciality Glasses",
+   "parent": false,
+   "qty": 6,
+   "link": "https://www.ikea.com/jp/ja/cat/bar-cocktail-glasses-22663/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (jp/ja market) unique product itemNoGlobal count from a full window=999 fetch = 6; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=6 identically (Session-Id pinned per run). Per IKEA France (S.N. 155) lesson reused on every prior IKEA row: raw metadata.max is not used as the anchor; the itemsPerType.PRODUCT / unique product-ID count is used instead.",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Jugs, Bottles & Carafes",
+   "parent": false,
+   "qty": 24,
+   "link": "https://www.ikea.com/jp/ja/cat/jugs-bottles-18871/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (jp/ja market) unique product itemNoGlobal count from a full window=999 fetch = 24; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=24 identically (Session-Id pinned per run). Per IKEA France (S.N. 155) lesson reused on every prior IKEA row: raw metadata.max is not used as the anchor; the itemsPerType.PRODUCT / unique product-ID count is used instead.",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Dinnerware",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Dinnerware Sets",
+   "parent": false,
+   "qty": 5,
+   "link": "https://www.ikea.com/jp/ja/cat/dinnerware-sets-31781/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (jp/ja market) unique product itemNoGlobal count from a full window=999 fetch = 5; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=5 identically (Session-Id pinned per run). Per IKEA France (S.N. 155) lesson reused on every prior IKEA row: raw metadata.max is not used as the anchor; the itemsPerType.PRODUCT / unique product-ID count is used instead.",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Plates",
+   "parent": false,
+   "qty": 29,
+   "link": "https://www.ikea.com/jp/ja/cat/plates-18861/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (jp/ja market) unique product itemNoGlobal count from a full window=999 fetch = 29; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=29 identically (Session-Id pinned per run). Per IKEA France (S.N. 155) lesson reused on every prior IKEA row: raw metadata.max is not used as the anchor; the itemsPerType.PRODUCT / unique product-ID count is used instead.",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Side Plates",
+   "parent": false,
+   "qty": 30,
+   "link": "https://www.ikea.com/jp/ja/cat/side-plates-18863/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (jp/ja market) unique product itemNoGlobal count from a full window=999 fetch = 30; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=30 identically (Session-Id pinned per run). Per IKEA France (S.N. 155) lesson reused on every prior IKEA row: raw metadata.max is not used as the anchor; the itemsPerType.PRODUCT / unique product-ID count is used instead.",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Deep Plates",
+   "parent": false,
+   "qty": 19,
+   "link": "https://www.ikea.com/jp/ja/cat/deep-plates-18862/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (jp/ja market) unique product itemNoGlobal count from a full window=999 fetch = 19; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=19 identically (Session-Id pinned per run). Per IKEA France (S.N. 155) lesson reused on every prior IKEA row: raw metadata.max is not used as the anchor; the itemsPerType.PRODUCT / unique product-ID count is used instead.",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Bowls",
+   "parent": false,
+   "qty": 40,
+   "link": "https://www.ikea.com/jp/ja/cat/bowls-18864/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (jp/ja market) unique product itemNoGlobal count from a full window=999 fetch = 40; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=40 identically (Session-Id pinned per run). Per IKEA France (S.N. 155) lesson reused on every prior IKEA row: raw metadata.max is not used as the anchor; the itemsPerType.PRODUCT / unique product-ID count is used instead.",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Serveware",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Trays",
+   "parent": false,
+   "qty": 37,
+   "link": "https://www.ikea.com/jp/ja/cat/trays-16048/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (jp/ja market) unique product itemNoGlobal count from a full window=999 fetch = 37; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=37 identically (Session-Id pinned per run). Per IKEA France (S.N. 155) lesson reused on every prior IKEA row: raw metadata.max is not used as the anchor; the itemsPerType.PRODUCT / unique product-ID count is used instead.",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Serving Bowls",
+   "parent": false,
+   "qty": 21,
+   "link": "https://www.ikea.com/jp/ja/cat/serving-bowls-20619/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (jp/ja market) unique product itemNoGlobal count from a full window=999 fetch = 21; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=21 identically (Session-Id pinned per run). Per IKEA France (S.N. 155) lesson reused on every prior IKEA row: raw metadata.max is not used as the anchor; the itemsPerType.PRODUCT / unique product-ID count is used instead.",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Serving Dishes",
+   "parent": false,
+   "qty": 15,
+   "link": "https://www.ikea.com/jp/ja/cat/serving-dishes-16047/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (jp/ja market) unique product itemNoGlobal count from a full window=999 fetch = 15; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=15 identically (Session-Id pinned per run). Per IKEA France (S.N. 155) lesson reused on every prior IKEA row: raw metadata.max is not used as the anchor; the itemsPerType.PRODUCT / unique product-ID count is used instead.",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Cake & Serving Stands",
+   "parent": false,
+   "qty": 5,
+   "link": "https://www.ikea.com/jp/ja/cat/cake-serving-stands-59251/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (jp/ja market) unique product itemNoGlobal count from a full window=999 fetch = 5; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=5 identically (Session-Id pinned per run). Per IKEA France (S.N. 155) lesson reused on every prior IKEA row: raw metadata.max is not used as the anchor; the itemsPerType.PRODUCT / unique product-ID count is used instead.",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Mugs & Cups",
+   "parent": false,
+   "qty": 37,
+   "link": "https://www.ikea.com/jp/ja/cat/mugs-cups-16045/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (jp/ja market) unique product itemNoGlobal count from a full window=999 fetch = 37; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=37 identically (Session-Id pinned per run). Per IKEA France (S.N. 155) lesson reused on every prior IKEA row: raw metadata.max is not used as the anchor; the itemsPerType.PRODUCT / unique product-ID count is used instead.",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Tea Pots & Accessories",
+   "parent": false,
+   "qty": 11,
+   "link": "https://www.ikea.com/jp/ja/cat/tea-pots-accessories-20621/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (jp/ja market) unique product itemNoGlobal count from a full window=999 fetch = 11; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=11 identically (Session-Id pinned per run). Per IKEA France (S.N. 155) lesson reused on every prior IKEA row: raw metadata.max is not used as the anchor; the itemsPerType.PRODUCT / unique product-ID count is used instead.",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Napkin Holders",
+   "parent": false,
+   "qty": 5,
+   "link": "https://www.ikea.com/jp/ja/cat/napkin-holders-20562/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (jp/ja market) unique product itemNoGlobal count from a full window=999 fetch = 5; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=5 identically (Session-Id pinned per run). Per IKEA France (S.N. 155) lesson reused on every prior IKEA row: raw metadata.max is not used as the anchor; the itemsPerType.PRODUCT / unique product-ID count is used instead.",
+   "flag": null
+  }
+ ]
+}

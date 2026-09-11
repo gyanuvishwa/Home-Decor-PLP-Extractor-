@@ -1,0 +1,1470 @@
+{
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ROBOTS: https://www.castorama.fr/robots.txt fetched FIRST (HTTP 200, 4,937 bytes, profile safari18_0_ios) before any other request on the host, and read end to end. It carries one generic group and roughly 60 named-bot groups. There is NO group naming ClaudeBot, Claude-Web, Claude-User, Claude-SearchBot or anthropic-ai anywhere in the file, and no Content-Signal line, so no Claude opt-out exists and there is no hard stop. The 'Bloquage Robots indesirables' block (adequat, ADmantX, BacklinkCrawler, Corporama, DotBot, ellisphere, EtaoSpider, Fetch, Grapeshot, houzzbot, infoseek, Jetbot, k2spider, leadbox, linkfluence, linko, Mail.Ru, Meltwater, MSIECrawler, NPBot, Nutch, opinion-tracker, proxem, Proximic, rogerbot, SeznamBot, SiteSnagger, spotter, SputnikBot, SurveyBot, Teleport, Updownerbot, verticalsearch, WebCopier, WebReaper, WebStripper, WebZIP, wget, winello, XoviBot, YisouSpider, Zealbot) and the price-scraper block (Net veille, Paarly, SpyCommerce, Pricing Assistant, Price Observatory, Workit, Keox, Pricejet, Prixan) each carry Disallow: / under THEIR OWN user-agent, none of which is us. Crawl-delay: 10 appears only under Baiduspider, YandexBot, archive.org_bot, MJ12bot, AhrefsBot, Soso and Sogou - not under '*' - so no crawl-delay is owed; probe.py's 2 s per-host gap was kept anyway and the run was in practice far slower than that. The '*' group disallows /basket, /checkout/*, /customer/*, /search?*, *Ns=*, *Nrpp=*, *sortByValue=*, *?*page=1&*, *isSearchResult=*, /*/reviews, /*/ratings/*, /*/price-*, /*/livraison-a-domicile/*, /*/en-magasin/*, /*/retrait-en-magasin/*, /product/productcomparison*, /stock-checker/*, *jsessionid*, *skuId*, *_DARGS*, *bvstate*, and a long list of double-facet patterns. NOTHING disallowed was requested: every URL fetched is a bare /.../cat_id_XXXX.cat category path with no query string at all - no Ns=, no Nrpp=, no sortByValue, no page=, no search, no basket/customer/checkout, no reviews/ratings/price/store-fulfilment path. Single host throughout (www.castorama.fr); the declared sitemap https://www.castorama.fr/fstrz/sm/sitemap-index.xml is on the same host, so no second robots.txt was owed. ACCESS: probe.fetch() with rotating curl_cffi fingerprints returned HTTP 200 on all 167 category requests - zero 403, zero 429, zero failures - but Castorama throttles hard: pages are 1.4-1.6 MB server-rendered React and response time degraded from ~4 s to 4-5 minutes per page over the run, which is why the crawl was checkpointed line-by-line to a JSONL file and resumed rather than held in memory. No reader prefix, no campaign parameter, no CORS proxy and no browser automation were used or needed. TREE: built top-down from Castorama's OWN artefacts and cross-checked two ways. (a) The category sitemap declared in robots.txt, https://www.castorama.fr/fstrz/sm/sitemap-cat.xml (4,841 <loc>s), of which 97 are hierarchical /salle-de-bains-et-wc/... category paths - that is the spine. (b) The mega-menu on /salle-de-bains-et-wc/cat_id_3322.cat and every hub page's own 'wcms-grid-category-tile' child strip, which is what recovers the branches the mega-menu TRUNCATES behind 'En voir plus' and the children that exist only as short-form URLs absent from the hierarchical sitemap slice - e.g. the four Porte de douche types (coulissante/pivotante/battante/pliante), the six Receveur de douche types, the four Colonne de douche types, the five Robinet de baignoire types, Vasque à poser/à encastrer/à suspendre, Lavabo suspendu/colonne/lave-mains, Plan simple/double/lave-mains vasque, Baignoire à porte, Baignoire douche, WC PMR, Pack WC suspendu, Ensemble lave-mains and Lot accessoires. 167 category pages were opened in total. PARENTAGE was NOT inferred from URL shape - it is read from each page's own JSON-LD BreadcrumbList, which is why nodes whose URL is a bare short form (e.g. /vasque-a-poser/) are still placed correctly under Salle de bains et WC > Lavabo, vasque et plan vasque. Two nodes are placed by breadcrumb rather than by URL: Serviette de bain (URL under accessoires, breadcrumb under Linge de bain) and Tablette et étagère de salle de bains (breadcrumb under Meuble de salle de bains, URL and children under Accessoires) - the latter is recorded ONCE, as a grouping row above its two children, per rule 28. Three breadcrumb levels have no URL of their own and are emitted as pure grouping rows: Baignoire, Lave-mains and Tablette et étagère. QTY: the listing page's OWN rendered total, read from the element Castorama prints above its grid - <strong data-testid=\"product-count-label\" data-oncrawl-track=\"number-of-products\"> N produits</strong>. Nothing was estimated, no parent number was reused for a child and no siblings were summed. Castorama is a marketplace as well as a DIY chain (its sitemap index carries 15 separate 'newmkp' product sitemaps), which is why absolute counts are large; that is what the page shows and it is what is recorded. VERIFICATION: counts discriminate sharply and are not a site-wide constant - within the Baignoire branch alone: 2,124 / 1,441 / 1,188 / 663 / 174 / 8; within Douche: 6,155 / 4,310 / 2,030 / 953 / 170; and the smallest recorded leaves are 3 (Abattant WC clipsable, Vasque à suspendre), 5 (Pont de baignoire, Support et fixation miroir) and 6 (Porte de douche PMR, Fleur de douche, Armoire à pharmacie). Every recorded page's H1 was read and matches the node - e.g. H1 'Baignoire droite' on cat_id_766, H1 'Miroir lumineux' on cat_id_0001976 - and the products on the sample checked are on-category (Baignoire droite renders Horyn / GoodHome Teesta / Jacob Delafon Sofa straight tubs). Where a hub genuinely renders no grid the page prints no count element at all, which is exactly how the 13 grouping levels were identified rather than assumed. Every recorded link is the page's own rel=canonical string, verified per page, so the canonical-alias dedup blind spot is closed - the short-form URLs were dedup-checked in their canonical form, not in a nav-alias form. DEDUP: already_extracted() was run on all 105 recorded leaves - ZERO hits remain in rows. 13 bathroom-furniture nodes came back as Furniture.xlsx records for this same company (Bathroom Cabinets, Mirror Cabinets, Bathroom Storage Columns, Bathroom Trolleys, Shallow-Depth Bathroom Furniture, Under-Washbasin Units, Under-Basin Units, Single-/Double-Basin Vanity Units, Vanity Units with Countertop, Single-/Double-Basin Bathroom Furniture Sets, Bathroom Furniture Sets with Countertop) and are all in review under OPTION 1. Their two parent roll-ups (Meuble vasque 8,198 and Ensemble meuble de salle de bains 7,386) are NOT emitted even as grouping rows, because their entire subtree is already extracted. RULE 24 / ROLL-UPS: 13 nodes that DO carry their own rendered total are nevertheless emitted as grouping rows with blank qty and blank link because they have valid children - Cabine de douche (own total 6,211), Paroi de douche (8,030), Colonne de douche (2,227), Pommeau de douche/flexible/barre (2,263), Robinet lavabo et vasque (3,988), Robinet de baignoire (1,603), Accessoire de robinet (253), Miroir de salle de bains (4,109), Abattant WC (975), WC suspendu (1,609), Lavabo (663), Plan vasque (787) and Tapis de bain et caillebotis (2,435). Their totals are recorded here, not in rows: a roll-up overlaps its siblings and must never be counted alongside them. INCLUDED / JUDGEMENT CALLS: Tapis de bain et caillebotis is a grouping row only, and the single recorded child under it is Tapis de bain antidérapant (571) - rule 16 sends the rubber anti-slip mat to Bathroom while the textile tapis de bain in the parent stay out, so the parent's 2,435 is deliberately not counted. Panier à linge (689) and Lot accessoires salle de bains et WC (567) are recorded under rule 13 (bathroom baskets/containers, accessory sets). Tabouret de salle de bains (39) is recorded under rule 9. Fleur de douche (6) and Raclette de douche (24) are recorded under rule 6 ('shower-specific accessories when explicitly in the Bathroom/Shower hierarchy') and rule 3 ('Cleaning Accessories'). The whole fixings family - Fixation lavabo, Fixation WC, Pied de baignoire, Pied pour receveur de douche, Pied de meuble, Poignée de meuble, Support et fixation miroir, Joint paroi/porte de douche, Barre de stabilisation - is recorded under rule 17 (mounting accessories). Armoire à pharmacie (6) is recorded because it is NOT in the exclusion index and its canonical is itself; medicine cabinets only stay in Furniture under OPTION 1 when they are already there, and this one is not. The five Miroir de salle de bains leaves (3,269 + 590 + 161 + 84 + 5) are recorded under rules 10/11 - Miroir lumineux is an illuminated MIRROR, not a light, and is by far the largest single Bathroom gain on this site. EXCLUDED: the -dyn.cat pages under /salle-de-bains-et-wc/ (meuble-de-salle-de-bains-60cm/80cm/100cm/120cm/140cm, meuble-sous-vasque-60/80/90/100/120cm, receveur-de-douche-80x80/120x80/120x90/140x90/160x90, porte-de-douche-70/80/90/100/120cm, cabine-de-douche-70x70/80x80/90x90, vasque-a-poser-ronde/carree/ovale/rectangulaire/asymetrique, colonne-de-salle-de-bains-20/25/30/40/60cm, plan-vasque-120cm, demi-paroi-de-douche, porte-de-douche-en-angle, meuble-de-salle-de-bains-suspendu/a-poser, wc-avec-broyeur, broyeur-pour-wc, pompe-de-relevage, pommeau-de-douche-economique/grohe, douchette-1-jet/multi-jets/avec-billes) are dimension and attribute landing pages that re-slice the recorded leaves; none was requested or recorded. The /destockage-et-offres-speciales/..., /braderie/... and /bonnes-affaires/... bathroom mirrors are promotional pages (rule 25) and were excluded. Carrelage/faïence, peinture, mastic, plomberie (alimentation en eau, évacuation des eaux), VMC, lave-linge and 'Economiser l'eau' are cross-linked from the bathroom landing page but belong to other departments by their own breadcrumbs and are not bathroom fittings; they were not recorded. SR130 SIBLING-OVERLAP RE-CHECK (2026-09-05): re-fetched both https://www.castorama.fr/salle-de-bains-et-wc/meuble-de-salle-de-bains/miroir-de-salle-de-bains/miroir-grossissant/cat_id_0001978.cat (Magnifying Mirror) and https://www.castorama.fr/miroir-grossissant-lumineux/cat_id_0004168.cat (Illuminated Magnifying Mirror) live via HTTP GET (curl_cffi/requests, no browser needed, HTTP 200 both, page sizes 1.31MB / 1.62MB). Rendered counts: Magnifying Mirror still 161 produits (no drift); Illuminated Magnifying Mirror now 95 produits (drift +11 from the 84 recorded at original extraction; not updated in rows per no-touch-other-rows scope, drift noted only). JSON-LD BreadcrumbList on both pages places them as SIBLINGS, both direct children of Miroir de salle de bains (cat_id_4082), not one nested inside the other. Partition-sum proof: the parent's own rendered total and the sum of its five recorded leaf children (Illuminated Mirror + Plain Mirror + Magnifying Mirror + Illuminated Magnifying Mirror + Mirror Fixings) match EXACTLY at two points in time despite independent drift in each leaf - at original extraction 3269+590+161+84+5=4109=parent's own total then; live re-check 3334+592+161+95+5=4187=parent's own live total (re-fetched live: parent 4187, Illuminated Mirror 3334, Plain Mirror 592, Mirror Fixings 5, all unchanged breadcrumb parentage). An exact match holding across independent drift in all five numbers is not consistent with any pairwise overlap between siblings - overlap would inflate the child-sum above the parent total. Spot-check: extracted product-detail links (data-testid=product-link) from page 1 of each listing - 48 distinct product URLs/SKU codes under Magnifying Mirror, 51 distinct product URLs/SKU codes under Illuminated Magnifying Mirror, ZERO shared URLs or SKU codes between the two sampled sets. CONCLUSION: zero overlap proven by both the exact partition-sum test and the direct product-link sample; Magnifying Mirror (161) and Illuminated Magnifying Mirror (84, live 95) are genuinely disjoint sibling categories in Castorama's own hierarchy, not a filtered subset relationship. Both rows confirmed correct as recorded; no rows[] or review[] changes made.",
+ "rows": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom & Toilets",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Accessories",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Storage Boxes & Holders",
+   "qty": 739,
+   "link": "https://www.castorama.fr/salle-de-bains-et-wc/accessoires-de-salle-de-bains/boite-et-support-de-rangement-de-salle-de-bains/cat_id_5208.cat",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Soap Dispenser",
+   "qty": 1069,
+   "link": "https://www.castorama.fr/salle-de-bains-et-wc/accessoires-de-salle-de-bains/distributeur-porte-savon-et-gobelet/cat_id_3324.cat",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Tumbler",
+   "qty": 840,
+   "link": "https://www.castorama.fr/salle-de-bains-et-wc/accessoires-de-salle-de-bains/gobelet/cat_id_0001403.cat",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom & Toilet Accessory Sets",
+   "qty": 567,
+   "link": "https://www.castorama.fr/lot-accessoires-salle-de-bains-et-wc/cat_id_0005713.cat",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower Caddy",
+   "qty": 87,
+   "link": "https://www.castorama.fr/panier-de-douche/cat_id_0003318.cat",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Laundry Basket",
+   "qty": 689,
+   "link": "https://www.castorama.fr/salle-de-bains-et-wc/accessoires-de-salle-de-bains/panier-a-linge/cat_id_3337.cat",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Hook",
+   "qty": 433,
+   "link": "https://www.castorama.fr/patere-de-salle-de-bains/cat_id_0003245.cat",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Soap Holder",
+   "qty": 1220,
+   "link": "https://www.castorama.fr/salle-de-bains-et-wc/accessoires-de-salle-de-bains/porte-savon/cat_id_0001402.cat",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Towel Rails",
+   "qty": 1368,
+   "link": "https://www.castorama.fr/salle-de-bains-et-wc/accessoires-de-salle-de-bains/porte-serviettes-et-patere/cat_id_1502.cat",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Bin",
+   "qty": 654,
+   "link": "https://www.castorama.fr/salle-de-bains-et-wc/accessoires-de-salle-de-bains/poubelle-de-salle-de-bains/cat_id_3342.cat",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Shelf & Shelving",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower Shelf",
+   "qty": 693,
+   "link": "https://www.castorama.fr/salle-de-bains-et-wc/accessoires-de-salle-de-bains/tablette-et-etagere-de-salle-de-bains/etagere-de-salle-de-bains/cat_id_0001671.cat",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Shelf",
+   "qty": 304,
+   "link": "https://www.castorama.fr/salle-de-bains-et-wc/accessoires-de-salle-de-bains/tablette-et-etagere-de-salle-de-bains/tablette-de-salle-de-bains/cat_id_0001670.cat",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Stool",
+   "qty": 39,
+   "link": "https://www.castorama.fr/salle-de-bains-et-wc/accessoires-de-salle-de-bains/tabouret-de-salle-de-bains/cat_id_2040.cat",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Mats & Duckboards",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Anti-Slip Bath Mat",
+   "qty": 571,
+   "link": "https://www.castorama.fr/tapis-de-bain-antiderapant/cat_id_0006092.cat",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Accessible Bathroom Fittings",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Grab Bar",
+   "qty": 368,
+   "link": "https://www.castorama.fr/salle-de-bains-et-wc/accessibilite-et-securite-de-la-salle-de-bains/barre-dappui/cat_id_0001528.cat",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Accessible Shower Cabin",
+   "qty": 54,
+   "link": "https://www.castorama.fr/salle-de-bains-et-wc/accessibilite-et-securite-de-la-salle-de-bains/ensemble-de-douche-pmr/cat_id_0001530.cat",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Accessible Shower Door",
+   "qty": 6,
+   "link": "https://www.castorama.fr/salle-de-bains-et-wc/porte-de-douche-pmr/cat_id_0008890.cat",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower Seat",
+   "qty": 132,
+   "link": "https://www.castorama.fr/salle-de-bains-et-wc/accessibilite-et-securite-de-la-salle-de-bains/siege-de-douche/cat_id_0001529.cat",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Accessible Toilet",
+   "qty": 50,
+   "link": "https://www.castorama.fr/wc-pmr/cat_id_0003487.cat",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathtub & Accessories",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathtub Accessories",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Tray",
+   "qty": 5,
+   "link": "https://www.castorama.fr/pont-de-baignoire/cat_id_0003179.cat",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Pillow",
+   "qty": 22,
+   "link": "https://www.castorama.fr/repose-tete/cat_id_0003178.cat",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathtub",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Asymmetric Bathtub",
+   "qty": 663,
+   "link": "https://www.castorama.fr/salle-de-bains-et-wc/baignoire/baignoire-asymetrique/cat_id_0001607.cat",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Whirlpool Bathtub",
+   "qty": 174,
+   "link": "https://www.castorama.fr/salle-de-bains-et-wc/baignoire/baignoire-balneo/cat_id_3913.cat",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Corner Bathtub",
+   "qty": 1441,
+   "link": "https://www.castorama.fr/salle-de-bains-et-wc/baignoire/baignoire-d-angle/cat_id_2418.cat",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Straight Bathtub",
+   "qty": 2124,
+   "link": "https://www.castorama.fr/salle-de-bains-et-wc/baignoire/baignoire-droite/cat_id_766.cat",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Walk-In Bathtub",
+   "qty": 8,
+   "link": "https://www.castorama.fr/baignoire-a-porte/cat_id_0006280.cat",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Freestanding Bathtub",
+   "qty": 1188,
+   "link": "https://www.castorama.fr/salle-de-bains-et-wc/baignoire/baignoire-ilot/cat_id_4018.cat",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath-Shower Combo",
+   "qty": 20,
+   "link": "https://www.castorama.fr/baignoire-douche/cat_id_0007510.cat",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower Column for Bathtub",
+   "qty": 66,
+   "link": "https://www.castorama.fr/salle-de-bains-et-wc/baignoire/colonne-de-douche-pour-baignoire/cat_id_0001929.cat",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Screen",
+   "qty": 883,
+   "link": "https://www.castorama.fr/salle-de-bains-et-wc/baignoire/pare-baignoire/cat_id_3380.cat",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathtub Feet",
+   "qty": 20,
+   "link": "https://www.castorama.fr/salle-de-bains-et-wc/baignoire/pied-de-baignoire/cat_id_0001969.cat",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Panel & Surround",
+   "qty": 111,
+   "link": "https://www.castorama.fr/salle-de-bains-et-wc/baignoire/tablier-et-pied-de-baignoire/cat_id_4358.cat",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower Accessories",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Rain Shower Head",
+   "qty": 6,
+   "link": "https://www.castorama.fr/salle-de-bains-et-wc/fleur-de-douche/cat_id_0003181.cat",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower Squeegee",
+   "qty": 24,
+   "link": "https://www.castorama.fr/raclette-de-douche/cat_id_0003180.cat",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower Screen Stabilizer Bar",
+   "qty": 39,
+   "link": "https://www.castorama.fr/barre-de-stabilisation-paroi-de-douche/cat_id_0006341.cat",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower Cabin",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Hydromassage Shower Cabin",
+   "qty": 170,
+   "link": "https://www.castorama.fr/salle-de-bains-et-wc/douche/cabine-de-douche/cabine-de-douche-hydromassante.cat",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower Column",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Built-In Shower Column",
+   "qty": 367,
+   "link": "https://www.castorama.fr/colonne-de-douche-encastrable/cat_id_0002656.cat",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Hydromassage Shower Column",
+   "qty": 115,
+   "link": "https://www.castorama.fr/salle-de-bains-et-wc/colonne-et-pommeau-de-douche/colonne-de-douche-hydromassante/cat_id_3460.cat",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Manual Shower Column",
+   "qty": 690,
+   "link": "https://www.castorama.fr/colonne-de-douche-mecanique/cat_id_0002654.cat",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower Column Without Fittings",
+   "qty": 187,
+   "link": "https://www.castorama.fr/colonne-de-douche-sans-robinetterie/cat_id_0002655.cat",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Thermostatic Shower Column",
+   "qty": 868,
+   "link": "https://www.castorama.fr/colonne-de-douche-thermostatique/cat_id_0002653.cat",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower Screen Seal",
+   "qty": 1508,
+   "link": "https://www.castorama.fr/joint-paroi-de-douche/cat_id_0003529.cat",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower Door Seal",
+   "qty": 64,
+   "link": "https://www.castorama.fr/joint-porte-de-douche/cat_id_0003530.cat",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Niche",
+   "qty": 186,
+   "link": "https://www.castorama.fr/niche-de-salle-de-bains/cat_id_0005710.cat",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Wall Panel",
+   "qty": 1916,
+   "link": "https://www.castorama.fr/salle-de-bains-et-wc/douche/panneau-mural/cat_id_5425.cat",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower Screen",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Walk-In Shower Screen",
+   "qty": 4310,
+   "link": "https://www.castorama.fr/paroi-de-douche-a-litalienne/cat_id_0003471.cat",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower Head, Hose & Rail",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower Rail",
+   "qty": 182,
+   "link": "https://www.castorama.fr/salle-de-bains-et-wc/colonne-et-pommeau-de-douche/pommeau-de-douche-flexible-et-barre-de-douche/barre-de-douche/cat_id_0001936.cat",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Handheld Shower Set with Hose & Holder",
+   "qty": 479,
+   "link": "https://www.castorama.fr/salle-de-bains-et-wc/colonne-et-pommeau-de-douche/pommeau-de-douche-flexible-et-barre-de-douche/ensemble-douchette-flexible-et-support/cat_id_0001940.cat",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower Hose",
+   "qty": 207,
+   "link": "https://www.castorama.fr/salle-de-bains-et-wc/colonne-et-pommeau-de-douche/pommeau-de-douche-flexible-et-barre-de-douche/flexible-de-douche/cat_id_0001934.cat",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Handheld Shower Head",
+   "qty": 802,
+   "link": "https://www.castorama.fr/salle-de-bains-et-wc/colonne-et-pommeau-de-douche/pommeau-de-douche-flexible-et-barre-de-douche/pommeau-de-douche/cat_id_0001933.cat",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower Head Holder",
+   "qty": 156,
+   "link": "https://www.castorama.fr/salle-de-bains-et-wc/colonne-et-pommeau-de-douche/pommeau-de-douche-flexible-et-barre-de-douche/support-pommeau-de-douche/cat_id_0001935.cat",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Overhead Shower Head",
+   "qty": 437,
+   "link": "https://www.castorama.fr/salle-de-bains-et-wc/colonne-et-pommeau-de-douche/pommeau-de-douche-flexible-et-barre-de-douche/pomme-de-douche/cat_id_0001941.cat",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower Door",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Hinged Shower Door",
+   "qty": 1458,
+   "link": "https://www.castorama.fr/porte-de-douche-battante/cat_id_0003478.cat",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Sliding Shower Door",
+   "qty": 6155,
+   "link": "https://www.castorama.fr/porte-de-douche-coulissante/cat_id_0003476.cat",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Pivot Shower Door",
+   "qty": 2030,
+   "link": "https://www.castorama.fr/porte-de-douche-pivotante/cat_id_0003477.cat",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Folding Shower Door",
+   "qty": 953,
+   "link": "https://www.castorama.fr/porte-de-douche-pliante/cat_id_0003479.cat",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower Tray",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower Tray Feet",
+   "qty": 71,
+   "link": "https://www.castorama.fr/pied-pour-receveur-de-douche/cat_id_0003308.cat",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower Tray & Screen Set",
+   "qty": 78,
+   "link": "https://www.castorama.fr/receveur-de-douche-et-paroi/cat_id_0005385.cat",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower Tray & Door Set",
+   "qty": 272,
+   "link": "https://www.castorama.fr/receveur-de-douche-et-porte/cat_id_0005386.cat",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Tileable Shower Tray",
+   "qty": 570,
+   "link": "https://www.castorama.fr/receveur-de-douche-a-carreler/cat_id_0002652.cat",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Recessed Shower Tray",
+   "qty": 112,
+   "link": "https://www.castorama.fr/receveur-de-douche-a-encastrer/cat_id_0005529.cat",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Washbasin, Countertop Basin & Vanity Top",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Washbasin",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Washbasin Fixings",
+   "qty": 15,
+   "link": "https://www.castorama.fr/fixation-lavabo/cat_id_0004669.cat",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Pedestal Washbasin",
+   "qty": 98,
+   "link": "https://www.castorama.fr/lavabo-colonne/cat_id_0004625.cat",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Cloakroom Washbasin",
+   "qty": 198,
+   "link": "https://www.castorama.fr/lavabo-lave-mains/cat_id_0002838.cat",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Wall-Hung Washbasin",
+   "qty": 350,
+   "link": "https://www.castorama.fr/lavabo-suspendu/cat_id_0004626.cat",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Vanity Top",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Double Vanity Top",
+   "qty": 372,
+   "link": "https://www.castorama.fr/plan-double-vasque/cat_id_0002834.cat",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Single Vanity Top",
+   "qty": 306,
+   "link": "https://www.castorama.fr/plan-simple-vasque/cat_id_0002833.cat",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Cloakroom Vanity Top",
+   "qty": 109,
+   "link": "https://www.castorama.fr/plan-vasque-lave-mains/cat_id_0002835.cat",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Undermount Basin",
+   "qty": 231,
+   "link": "https://www.castorama.fr/vasque-a-encastrer/cat_id_0002837.cat",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Countertop Basin",
+   "qty": 2509,
+   "link": "https://www.castorama.fr/vasque-a-poser/cat_id_0002836.cat",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Wall-Hung Basin",
+   "qty": 3,
+   "link": "https://www.castorama.fr/vasque-a-suspendre/cat_id_0003319.cat",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Medicine Cabinet",
+   "qty": 6,
+   "link": "https://www.castorama.fr/armoire-a-pharmacie/cat_id_0004167.cat",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Mirror",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Magnifying Mirror",
+   "qty": 161,
+   "link": "https://www.castorama.fr/salle-de-bains-et-wc/meuble-de-salle-de-bains/miroir-de-salle-de-bains/miroir-grossissant/cat_id_0001978.cat",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Illuminated Magnifying Mirror",
+   "qty": 84,
+   "link": "https://www.castorama.fr/miroir-grossissant-lumineux/cat_id_0004168.cat",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Illuminated Mirror",
+   "qty": 3269,
+   "link": "https://www.castorama.fr/salle-de-bains-et-wc/meuble-de-salle-de-bains/miroir-de-salle-de-bains/miroir-lumineux/cat_id_0001976.cat",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Plain Mirror",
+   "qty": 590,
+   "link": "https://www.castorama.fr/salle-de-bains-et-wc/meuble-de-salle-de-bains/miroir-de-salle-de-bains/miroir-simple/cat_id_0001977.cat",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Mirror Fixings & Brackets",
+   "qty": 5,
+   "link": "https://www.castorama.fr/salle-de-bains-et-wc/meuble-de-salle-de-bains/miroir-de-salle-de-bains/support-et-fixation-miroir/cat_id_0001979.cat",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Furniture Legs",
+   "qty": 60,
+   "link": "https://www.castorama.fr/pied-de-meuble-de-salle-de-bains/cat_id_0003182.cat",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Worktop",
+   "qty": 403,
+   "link": "https://www.castorama.fr/salle-de-bains-et-wc/meuble-de-salle-de-bains/plan-de-travail-salle-de-bains/cat_id_4184.cat",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Furniture Handle",
+   "qty": 73,
+   "link": "https://www.castorama.fr/poignee-de-meuble-de-salle-de-bains/cat_id_0003897.cat",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Taps & Mixers",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Tap Accessories",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Toilet Hand Shower",
+   "qty": 15,
+   "link": "https://www.castorama.fr/salle-de-bains-et-wc/robinet-de-salle-de-bains/accessoire-robinet-salle-de-bains/douchette-wc/cat_id_0001717.cat",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathtub Tap",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathtub Mixer",
+   "qty": 108,
+   "link": "https://www.castorama.fr/melangeur-de-baignoire/cat_id_0004177.cat",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathtub Tap with Hand Shower",
+   "qty": 429,
+   "link": "https://www.castorama.fr/robinet-de-baignoire-avec-douchette/cat_id_0004827.cat",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Manual Bathtub Tap",
+   "qty": 692,
+   "link": "https://www.castorama.fr/robinet-de-baignoire-mecanique/cat_id_0004176.cat",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Thermostatic Bathtub Tap",
+   "qty": 319,
+   "link": "https://www.castorama.fr/robinet-de-baignoire-thermostatique/cat_id_0004175.cat",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Freestanding Bathtub Tap",
+   "qty": 55,
+   "link": "https://www.castorama.fr/robinet-de-baignoire-ilot/cat_id_0004811.cat",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bidet Tap",
+   "qty": 338,
+   "link": "https://www.castorama.fr/salle-de-bains-et-wc/robinet-de-salle-de-bains/robinet-de-bidet/cat_id_0001716.cat",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower Tap",
+   "qty": 925,
+   "link": "https://www.castorama.fr/salle-de-bains-et-wc/robinet-de-salle-de-bains/robinet-de-douche/cat_id_3425.cat",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Basin Taps",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Automatic Basin Tap",
+   "qty": 13,
+   "link": "https://www.castorama.fr/robinet-automatique-lavabo/cat_id_0005392.cat",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Push-Button Tap",
+   "qty": 44,
+   "link": "https://www.castorama.fr/salle-de-bains-et-wc/robinet-poussoir/cat_id_0008222.cat",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Cloakroom Basin Tap",
+   "qty": 378,
+   "link": "https://www.castorama.fr/salle-de-bains-et-wc/robinet-de-salle-de-bains/robinet-lave-mains/cat_id_5022.cat",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Toilet",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Toilet Seat",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Clip-On Toilet Seat",
+   "qty": 3,
+   "link": "https://www.castorama.fr/salle-de-bains-et-wc/abattant-wc-clipsable/cat_id_0008135.cat",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Soft-Close Toilet Seat",
+   "qty": 55,
+   "link": "https://www.castorama.fr/salle-de-bains-et-wc/abattant-wc-frein-de-chute/cat_id_0008134.cat",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Toilet Accessories",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Toilet Brush",
+   "qty": 1001,
+   "link": "https://www.castorama.fr/salle-de-bains-et-wc/wc-et-lave-mains/abattant-et-accessoire-de-wc/brosse-wc/cat_id_5206.cat",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Toilet Paper Holder",
+   "qty": 856,
+   "link": "https://www.castorama.fr/salle-de-bains-et-wc/wc-et-lave-mains/abattant-et-accessoire-de-wc/porte-papier-toilette/cat_id_3361.cat",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Toilet Roll & Brush Stand",
+   "qty": 78,
+   "link": "https://www.castorama.fr/salle-de-bains-et-wc/wc-et-lave-mains/abattant-et-accessoire-de-wc/serviteur-wc/cat_id_3364.cat",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Toilet Fixings",
+   "qty": 82,
+   "link": "https://www.castorama.fr/salle-de-bains-et-wc/wc-et-lave-mains/fixation-wc/cat_id_4232.cat",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Cloakroom Basin",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Cloakroom Basin Set",
+   "qty": 991,
+   "link": "https://www.castorama.fr/salle-de-bains-et-wc/ensemble-lave-mains/cat_id_0009748.cat",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Cloakroom Basin Unit",
+   "qty": 829,
+   "link": "https://www.castorama.fr/salle-de-bains-et-wc/wc-et-lave-mains/lave-mains/cat_id_1700.cat",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Toilet Cabinet",
+   "qty": 375,
+   "link": "https://www.castorama.fr/salle-de-bains-et-wc/wc-et-lave-mains/abattant-et-accessoire-de-wc/armoire-et-etagere-wc/cat_id_3360.cat",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Chemical Toilets & Macerators",
+   "qty": 246,
+   "link": "https://www.castorama.fr/salle-de-bains-et-wc/wc-et-lave-mains/broyeur-et-wc-chimique/cat_id_3935.cat",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Japanese Toilet",
+   "qty": 146,
+   "link": "https://www.castorama.fr/salle-de-bains-et-wc/wc-et-lave-mains/wc-japonais/cat_id_0002042.cat",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Wall-Hung Toilet",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Wall-Hung Toilet Pack",
+   "qty": 767,
+   "link": "https://www.castorama.fr/pack-wc-suspendu/cat_id_0003610.cat",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Wall-Hung Toilet Flush Plate",
+   "qty": 175,
+   "link": "https://www.castorama.fr/salle-de-bains-et-wc/plaque-de-commande-wc-suspendu/cat_id_0008977.cat",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Close-Coupled Toilet",
+   "qty": 323,
+   "link": "https://www.castorama.fr/salle-de-bains-et-wc/wc-et-lave-mains/wc-a-poser/cat_id_1710.cat",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  }
+ ],
+ "review": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Cabinet",
+   "qty": 2155,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Bathroom Cabinets' (OPTION 1: bath vanities/cabinets already in Furniture stay in Furniture)",
+   "link": "https://www.castorama.fr/salle-de-bains-et-wc/meuble-de-salle-de-bains/colonne-et-armoire-de-salle-de-bains/armoire-de-salle-de-bains/cat_id_0006019.cat"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Mirror Cabinet",
+   "qty": 700,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Mirror Cabinets' (OPTION 1: bath vanities/cabinets already in Furniture stay in Furniture) - rule 10 would otherwise pull mirror cabinets into Bathroom.",
+   "link": "https://www.castorama.fr/salle-de-bains-et-wc/meuble-de-salle-de-bains/armoire-de-toilette/cat_id_4208.cat"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Storage Column",
+   "qty": 1560,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Bathroom Storage Columns' (OPTION 1: bath vanities/cabinets already in Furniture stay in Furniture)",
+   "link": "https://www.castorama.fr/salle-de-bains-et-wc/meuble-de-salle-de-bains/colonne-et-armoire-de-salle-de-bains/colonne-de-salle-de-bains/cat_id_0006020.cat"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Trolley",
+   "qty": 36,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Bathroom Trolleys' (OPTION 1: bath vanities/cabinets already in Furniture stay in Furniture)",
+   "link": "https://www.castorama.fr/desserte-salle-de-bains/cat_id_0005793.cat"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shallow-Depth Bathroom Furniture",
+   "qty": 773,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Shallow-Depth Bathroom Furniture' (OPTION 1: bath vanities/cabinets already in Furniture stay in Furniture)",
+   "link": "https://www.castorama.fr/meuble-de-salle-de-bains-faible-profondeur/cat_id_0003481.cat"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Under-Washbasin Unit",
+   "qty": 730,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Under-Washbasin Units' (OPTION 1: bath vanities/cabinets already in Furniture stay in Furniture)",
+   "link": "https://www.castorama.fr/meuble-sous-lavabo/cat_id_0004515.cat"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Under-Basin Unit",
+   "qty": 2593,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Under-Basin Units' (OPTION 1: bath vanities/cabinets already in Furniture stay in Furniture)",
+   "link": "https://www.castorama.fr/salle-de-bains-et-wc/meuble-de-salle-de-bains/meuble-sous-vasque/cat_id_4210.cat"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Double-Basin Vanity Unit",
+   "qty": 1082,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Double-Basin Vanity Units' (OPTION 1: bath vanities/cabinets already in Furniture stay in Furniture)",
+   "link": "https://www.castorama.fr/salle-de-bains-et-wc/meuble-de-salle-de-bains/meuble-sous-vasque/meuble-double-vasque/cat_id_0001672.cat"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Single-Basin Vanity Unit",
+   "qty": 5311,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Single-Basin Vanity Units' (OPTION 1: bath vanities/cabinets already in Furniture stay in Furniture)",
+   "link": "https://www.castorama.fr/salle-de-bains-et-wc/meuble-de-salle-de-bains/meuble-sous-vasque/meuble-simple-vasque/cat_id_0002037.cat"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Vanity Unit with Countertop",
+   "qty": 1804,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Vanity Units with Countertop' (OPTION 1: bath vanities/cabinets already in Furniture stay in Furniture)",
+   "link": "https://www.castorama.fr/meuble-avec-plan-de-toilette/cat_id_0003855.cat"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Double-Basin Bathroom Furniture Set",
+   "qty": 1403,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Double-Basin Bathroom Furniture Sets' (OPTION 1: bath vanities/cabinets already in Furniture stay in Furniture)",
+   "link": "https://www.castorama.fr/salle-de-bains-et-wc/meuble-de-salle-de-bains/ensemble-meuble-de-salle-de-bains/ensemble-meuble-de-salle-de-bains-double-vasque/cat_id_0001712.cat"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Single-Basin Bathroom Furniture Set",
+   "qty": 5045,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Single-Basin Bathroom Furniture Sets' (OPTION 1: bath vanities/cabinets already in Furniture stay in Furniture)",
+   "link": "https://www.castorama.fr/salle-de-bains-et-wc/meuble-de-salle-de-bains/ensemble-meuble-de-salle-de-bains/ensemble-meuble-de-salle-de-bains-simple-vasque/cat_id_0002038.cat"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Furniture Set with Countertop",
+   "qty": 941,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Bathroom Furniture Sets with Countertop' (OPTION 1: bath vanities/cabinets already in Furniture stay in Furniture)",
+   "link": "https://www.castorama.fr/ensemble-meuble-de-salle-de-bains-avec-plan-de-toilette/cat_id_0003321.cat"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Vanity Unit (parent roll-up)",
+   "qty": 8198,
+   "issue": "PARENT NOT RECORDED (rule 24) AND ENTIRE SUBTREE ALREADY EXTRACTED: its three children (Meuble simple vasque, Meuble double vasque, Meuble avec plan de toilette) are all Furniture.xlsx records for this same company, so the branch stays in Furniture and no grouping row is emitted for it. Own rendered total 8,198.",
+   "link": "https://www.castorama.fr/meuble-vasque/cat_id_0003854.cat"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Furniture Set (parent roll-up)",
+   "qty": 7386,
+   "issue": "PARENT NOT RECORDED (rule 24) AND ENTIRE SUBTREE ALREADY EXTRACTED: its three children (simple vasque, double vasque, avec plan de toilette) are all Furniture.xlsx records. Own rendered total 7,386.",
+   "link": "https://www.castorama.fr/salle-de-bains-et-wc/meuble-de-salle-de-bains/ensemble-meuble-de-salle-de-bains/cat_id_0005988.cat"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Wooden Bathroom Furniture",
+   "qty": 339,
+   "issue": "STYLE RE-CUT, NOT RECORDED: Castorama files Meuble de salle de bains bois / industriel / vintage / moderne as children of Meuble de salle de bains, but they are style facets that re-slice the SAME stock as Meuble vasque, Ensemble meuble de salle de bains, Meuble sous-vasque and Meuble sous lavabo - all of which are already Furniture.xlsx records. Recording them would double-count already-extracted bath furniture, so they are held here (no aggregation, rule 28). Dedup index does not carry these four URLs (its sibling 'faible profondeur' IS carried), so this is a judgement call, flagged deliberately.",
+   "link": "https://www.castorama.fr/meuble-de-salle-de-bains-bois/cat_id_0003258.cat"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Industrial-Style Bathroom Furniture",
+   "qty": 307,
+   "issue": "STYLE RE-CUT, NOT RECORDED - see 'Meuble de salle de bains bois'. Same overlap with already-extracted Furniture nodes.",
+   "link": "https://www.castorama.fr/meuble-de-salle-de-bains-industriel/cat_id_0003259.cat"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Modern Bathroom Furniture",
+   "qty": 633,
+   "issue": "STYLE RE-CUT, NOT RECORDED - see 'Meuble de salle de bains bois'. Same overlap with already-extracted Furniture nodes.",
+   "link": "https://www.castorama.fr/meuble-de-salle-de-bains-moderne/cat_id_0003261.cat"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Vintage Bathroom Furniture",
+   "qty": 76,
+   "issue": "STYLE RE-CUT, NOT RECORDED - see 'Meuble de salle de bains bois'. Same overlap with already-extracted Furniture nodes.",
+   "link": "https://www.castorama.fr/meuble-de-salle-de-bains-vintage/cat_id_0003260.cat"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Splashback",
+   "qty": 201,
+   "issue": "LOW CONFIDENCE - HELD (rule 29): bathroom splashback panels. Primary product type is a wall-surface covering (a building/surfacing material), which no rule 3-22 category names, even though Castorama files it under Meuble de salle de bains. Its nearest recorded neighbour, Panneau mural de salle de bains, IS recorded because rule 7 names shower 'Panels' explicitly; a splashback has no such anchor. Held rather than guessed.",
+   "link": "https://www.castorama.fr/salle-de-bains-et-wc/credence-de-salle-de-bains/cat_id_0008476.cat"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Clothes Airer",
+   "qty": 582,
+   "issue": "NOT BATHROOM - inspected and rejected (rule 2): clothes airers / drying racks. Primary product type and function are laundry drying, which outranks the website hierarchy that files it under Accessoires de salle de bains, and rule 13's accessory list does not name drying racks. Its sibling Panier à linge (laundry basket) IS recorded, because rule 13 does name bathroom baskets/containers.",
+   "link": "https://www.castorama.fr/salle-de-bains-et-wc/accessoires-de-salle-de-bains/sechoir-a-linge/cat_id_3354.cat"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Scale",
+   "qty": 5,
+   "issue": "NOT BATHROOM - inspected and rejected (rules 2/29): bathroom scales. Primary product type is a weighing appliance; rules 3 and 13 do not name scales anywhere. Only 5 products. Held rather than guessed.",
+   "link": "https://www.castorama.fr/salle-de-bains-et-wc/accessoires-de-salle-de-bains/pese-personne/cat_id_0005942.cat"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower Curtain",
+   "qty": 1260,
+   "issue": "ROUTED TO TEXTILE: shower curtains (rule 20). Sits under Douche in Castorama's tree but is textile by primary product type.",
+   "link": "https://www.castorama.fr/salle-de-bains-et-wc/douche/rideau-de-douche/cat_id_3353.cat"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Linen (parent)",
+   "qty": null,
+   "issue": "ROUTED TO TEXTILE: Castorama's own level-2 bath-linen branch under Salle de bains et WC. Hub page with no product grid; its four children are listed below and none is recorded in Bathroom (rules 15/20).",
+   "link": "https://www.castorama.fr/linge-de-bain/cat_id_0006663.cat"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Towel",
+   "qty": 1381,
+   "issue": "ROUTED TO TEXTILE: bath towels/sheets (rule 15). Note the URL sits under accessoires-de-salle-de-bains but the page's own breadcrumb is Salle de bains et WC > Linge de bain > Serviette de bain.",
+   "link": "https://www.castorama.fr/salle-de-bains-et-wc/accessoires-de-salle-de-bains/serviette-de-bain/cat_id_0001326.cat"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Hand Towel",
+   "qty": 412,
+   "issue": "ROUTED TO TEXTILE: hand towels (rule 15).",
+   "link": "https://www.castorama.fr/serviette-de-toilette/cat_id_0006666.cat"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Wash Mitt",
+   "qty": 89,
+   "issue": "ROUTED TO TEXTILE: washcloths/flannels (rule 15).",
+   "link": "https://www.castorama.fr/gant-de-toilette/cat_id_0006665.cat"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathrobe",
+   "qty": 124,
+   "issue": "ROUTED TO TEXTILE: bathrobes (rule 20).",
+   "link": "https://www.castorama.fr/peignoir-de-bain/cat_id_0006664.cat"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Light Fixture",
+   "qty": 1069,
+   "issue": "ROUTED TO LIGHTING: primary product type is lighting (rules 11/19). Breadcrumb is Accueil > Luminaire et éclairage > Luminaire et éclairage intérieur > Luminaire pour salle de bains, i.e. it lives in the Lighting tree, not under Salle de bains et WC; it is only cross-linked from the bathroom landing page.",
+   "link": "https://www.castorama.fr/luminaire-et-eclairage/luminaire-et-eclairage-interieur/luminaire-de-salle-de-bains/cat_id_1344.cat"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Heating / Heated Towel Rail",
+   "qty": null,
+   "issue": "NOT BATHROOM - inspected and rejected (rule 2). Heated towel rails are a heating appliance; the page's own breadcrumb is Accueil > Chauffage, climatisation et ventilation > Chauffage de salle de bain, so the site does not place them under Salle de bains et WC either. Rule 17's 'Towel Rails' means the non-heated bathroom hardware, which IS recorded as Porte-serviettes. Hub page, no own product grid.",
+   "link": "https://www.castorama.fr/chauffage-climatisation-et-ventilation/seche-serviettes/cat_id_333.cat"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Freestanding Shower Tray",
+   "qty": 0,
+   "issue": "EMPTY NODE: real category (H1 'Receveur de douche à poser', reachable from the Receveur de douche hub) but the page renders no product-count label and zero product tiles. No products, so no row - never fabricate a count.",
+   "link": "https://www.castorama.fr/receveur-de-douche-a-poser/cat_id_0002651.cat"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Custom Shower",
+   "qty": 0,
+   "issue": "EMPTY NODE / SERVICE LANDING: appears in the sitemap and in the Douche hub with H1 'Douche sur-mesure', but renders no product-count label, no product tiles and no category tiles except a back-link to Panneau mural, which is recorded separately.",
+   "link": "https://www.castorama.fr/salle-de-bains-et-wc/douche/douche-sur-mesure/cat_id_5057.cat"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Furniture Accessories",
+   "qty": 0,
+   "issue": "HUB WITH NO OWN LISTING: H1 'Accessoire de meuble de salle de bains', breadcrumb Salle de bains et WC > Meuble de salle de bains > Accessoire de meuble de salle de bains, but it renders no product-count label and no product grid. All twelve tiles on it point to nodes recorded elsewhere (Patère, Pied de meuble, Porte-savon, Distributeur de savon, Gobelet, Lot accessoires, Miroir grossissant, Poubelle, Panier à linge, Tablette, Tabouret, Pèse personne), so recording it would duplicate them (rule 28).",
+   "link": "https://www.castorama.fr/accessoire-de-meuble-de-salle-de-bains/cat_id_0003262.cat"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Our Bathroom Collections",
+   "qty": null,
+   "issue": "COLLECTIONS PAGE - NEVER RECORDED (rule 25). Castorama's bathroom landing page promotes this branch plus /collections-douches/, /gamme-elland/, /gamme-koros/, /gamme-addstoris/ and seven /ensemble-robinet-et-colonne-de-douche-<range>/ pages. All are brand/range collections that re-slice recorded categories; none is recorded.",
+   "link": "https://www.castorama.fr/nos-collections/nos-collections-salle-de-bains/cat_id_5513.cat"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "View All Bathtubs",
+   "qty": null,
+   "issue": "VIEW ALL - NEVER RECORDED (rule 25). Linked from the Baignoire hub as 'Voir toutes les baignoires'; it is the see-all page over the six recorded Baignoire leaves.",
+   "link": "https://www.castorama.fr/baignoire/cat_id_0004810.cat"
+  }
+ ],
+ "_reconstructed_from": "Bathroom.xlsx delivered 2026-09-01 (checkpoint), not original worker JSON"
+}

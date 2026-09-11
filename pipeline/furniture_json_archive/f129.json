@@ -1,0 +1,1596 @@
+{
+ "sr": 129,
+ "company": "Moemax Germany",
+ "brand_site": "moemax.de",
+ "country": "Germany",
+ "site_url": "https://www.moemax.de/",
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ACCESS: reached only through the Claude-in-Chrome connector, in my own tab, no HTTP client of any kind. robots.txt read first: a single 'User-agent: *' block with a short path deny-list (/account, /checkout, /cart, /wishlist, /s/, /h/, /orders/, /api/tracking, ...), no Claude/anthropic-ai/ClaudeBot/Claude-User directive and no full-site disallow, so category listings are permitted. No 403, no DataDome/Akamai/Cloudflare challenge and no rate-limit was hit at any point (~700 same-origin requests, paced).\n\nTREE: built from https://www.moemax.de/sitemap-categories.xml, fetched by same-origin fetch() from the loaded page: 3,091 <loc> entries, 660 canonical category URLs after stripping query-string facet variants. Every URL carries a hierarchical breadcrumb code '<slug>-C<id>C<id>...' that decodes directly into the site's own tree; 17 top-level departments were enumerated (C30 Moebel, C31 Heimtextilien, C32 Teppiche, C33 Lampen, C34 Kuechen, C35 Kochen & Essen, C36 Aufbewahrung, C37 Deko, C38 Garderoben, C39 Spiegel, C40 Outdoor-Gartenausstattung, C41 Freizeit, C42 Haushaltsgeraete, C43 Weihnachten, C44 Badzubehoer, C45 Garten & Outdoor, C47 Kuechengeraete) and each was inspected for furniture-typed children. This is the same SAP-Commerce-family platform as XXXLutz DE (SR 105) but with a DIFFERENT category-code space, and unlike XXXLutz it has NO material cross-cut department (no 'Holzmoebel' equivalent) - the material cuts here sit as leaf children inside the normal tree instead.\n\nSITEMAP GAP + NAV CROSS-CHECK (trap 1): the sitemap omits several intermediate nodes. The department pages' own sub-category tile strips were parsed for every furniture parent (C30, C30C1, C30C3, C30C4, C30C5, C30C6, C30C7, C30C8, C30C10, C30C11, C34, C38, C45, C46) and the union taken. That recovered four nodes the sitemap does not list - Chairs (C30C1 alt slug), Benches (C30C2), Sofas & Couches (C30C10) and the Kids Furniture department (C46) - and the only other codes the tile strips added were nodes deliberately excluded anyway (C30C9 Matratzen, C30C11C2 TV-Wandhalterungen, C30C7C4C3 Duschablagen, C38C2 Garderobenhaken, C34C6 Kuechenausstattung, C34C3C2 Kochfelder, C45C15 Gartendeko, C45C16 Sonnen-/Sichtschutz, C46C2 Babyzubehoer) plus material/shape facet children. So no furniture branch is missing.\n\nQTY - HOW IT WAS OBTAINED, AND THE TRAP THAT NEARLY BROKE IT: moemax.de is an SPA behind dynamic rendering. A same-origin fetch() with Accept: text/html returns, for MOST category URLs, a 4.2 KB 'JavaScript is required' shell with no data at all - not a block, a render mode. Retrying the same URL immediately (4x in ~6s) does NOT help. What does work is that the first request warms the edge: request a URL once, come back to it a few minutes later, and the server returns the full ~1.3 MB server-rendered HTML embedding __APOLLO_STATE__ with the listing pagination {pageSize, totalPages, totalResults} AND the rendered header markup 'resultCountContainer data-track-value=\"N\"'. The extraction was therefore run as a multi-round warm-then-collect loop (5 rounds, ~1.5-2.5 s between requests): 191 of 194 nodes returned a real SSR render, 225 requests in total. NEVER was a shell recorded as 0.\n\nqty = totalResults, which on this site is identical to the number the page prints in its own header ('60 von 1074 Artikel angezeigt').\n\nSANITY CHECKS: (a) rendered header vs. embedded JSON - data-track-value == totalResults on ALL 191 nodes, 0 mismatches; (b) exhaustion check ceil(totalResults/pageSize) == totalPages passed on ALL 191 nodes, pageSize stable at 60 everywhere (no page-size A/B drift); (c) an independent third read: 18 nodes were also loaded as fully-rendered pages in a same-origin iframe early on and their live rendered headers were compared to the later SSR numbers - all 18 matched exactly (e.g. Klapphocker 5 '5 von 5 Artikel angezeigt', Buerostuehle 1074, Esszimmerstuehle 4902, Sitzbaenke 635, Moebel 159367); (d) the h1 returned with every fetch was checked against the node requested - it matched in every case, so no bad-slug-serves-the-parent substitution (trap 2); (e) counts discriminate strongly between siblings (Stufenregal 3 vs. Boxspringbetten 33431), so no site-wide constant; (f) no suspiciously round display caps.\n\nHIERARCHY: a parent is emitted as a grouping row (qty/link null) when its children are a genuine taxonomy covering a meaningful share of it - verified numerically, e.g. Kommoden & Schubladenschraenke 13258 vs. children 13266 (100%), Betten 58195 vs. 57621 (99%), Schraenke 23134 vs. 23009 (99%), Badezimmerschraenke 5742 vs. 5684 (99%), Buerostuehle 1074 vs. 1051 (98%), Gartenmoebel 3326 vs. 3215 (97%), Sessel 7455 vs. 7079 (95%), Kleiderschraenke 9906 vs. 7977 (81%), Regale 3275 vs. 2714 (83%), Stuehle 12193 vs. 6868 (56%, but the eight children are eight distinct chair types). Where the site's children are only a thin sliver or an overlapping re-cut of the parent, the PARENT is kept as the leaf and the children dropped - stated with the measured ratio: Esstische 5671 (children 3%), Beistelltische 884 (3%), Schreibtische 1872 (14%), Ecksofas 16632 (1%), Schlafsofas 1937 (2%), Gartenstuehle 806 (3%), TV-Moebel 656 (4%), Schuhschraenke 1035 (35%), Gaestebetten 274 (35%), Wandregale 862 (28%), Babybetten 235 (Gitterbetten 78% is the same product type under another name).\n\nDROPPED AS FACET RE-CUTS (never as categories, per the price/colour/material/shape-filter rule): Couchtische rund/eckig/glas/metall/holz/mit-Stauraum/hoehenverstellbar/mit-Rollen; Beistelltische rund/eckig/glas/holz/metall; Esstische rund/ausziehbar/holz/massivholz; the dining-chair form cuts Drehstuehle/Holzstuehle/Schalenstuehle/Polsterstuehle/Schwingstuehle/Armlehnenstuehle; Kleiderschraenke mit Spiegel; Holzbetten and its massivholz/teilmassiv children; Ledersofas; Rattan-Gartenmoebel; Gartenstuehle stapelbar/Hochlehner/Niedriglehner; Gartentische ausziehbar; kleine and XXL Ecksofas; Buerostuehle ergonomisch; hoehenverstellbare Schreibtische and the other desk children.\n\nEXCLUDED PER RULESET: the entire Matratzen tree (C30C9 - mattresses, toppers, mattress protectors, baby/kids mattresses) and Lattenroste (slatted bases); all lighting (C33) and all mirrors (C39); rugs and doormats (C32); all textiles (C31 incl. outdoor cushions and seat pads); decoration, pictures, frames, wall decor, candles, vases, artificial plants (C37); Christmas (C43); tableware, cookware, glassware, kitchen utensils (C35); kitchen worktops, sinks, taps, built-in bins and all kitchen/household appliances (C34C6C1/C3/C4/C5, C42, C47, C34C3 Kochfelder); bathroom fixtures and accessories (C44 - laundry baskets, towel rails, soap dispensers, WC brushes); standalone storage goods - boxes, baskets, hanging organisers, folding boxes, magazine racks, clothes storage (C36); parts and accessories nodes (Schrank-Zubehoer and its Kleiderstange/Einlegeboeden/Schubladen/Aufsatzschraenke children, Schreibtischzubehoer, Schreibtischaufsaetze, Buerostuhlrollen & Bodenschutzmatten, TV-Wandhaltungen, Duschablagen, Garderobenhaken, Wandhaken); garden sheds, garden storage boxes, raised beds, pools, grills, parasols/gazebos/pergolas/privacy screens, garden decor (C40/C45C15/C45C16); camping chairs and tables (C40C16) as gear rather than furniture; toys, play tables, pet supplies, luggage (C41); baby accessories (C46C2).\n\nOVERLAP NOTES: (1) the Kitchens department's own children overlap each other - Kuechenzeilen 3464 + Eckkuechen 460 + Kuechenbloecke mit 2006 + ohne 1176 + Minikuechen 216 + Schrankkuechen 25 + Kuechenschraenke 1155 = 8502 against a parent of 5206 - so these rows must not be summed; they are emitted as the site presents them and every fitted-kitchen row carries a MANUAL REVIEW flag because whether fitted kitchens belong in Furniture is an open project decision (handled exactly as SR 105 XXXLutz DE did). (2) Wohnzimmertische (Living Room Tables, 637) is a separate nav node whose products overlap Couchtische and Beistelltische. (3) Kindermoebel (C46, 923) is a cross-cut kids department overlapping the kids beds/chairs/wardrobes/shelving/tables rows; flagged. (4) Loungemoebel (C45C1), Balkonmoebel (C45C2) and Gartenmoebel (C45C10) are three sibling outdoor departments on the site whose product sets partly overlap; emitted as presented.\n\nONE NODE COULD NOT BE READ AS A LISTING: alle-schmuckschraenke-C30C6C4 (Jewellery Cabinets) returns HTTP 200 but the browser is redirected straight to a single product detail page, so no listing header ever renders. That is itself the evidence that the node holds exactly one product; it is emitted with qty 1 and a MANUAL REVIEW flag. Two further codes - Benches (C30C2) and Sofas & Couches (C30C10) - also have no listing page of their own; both are grouping rows here, so no qty was needed for either.",
+ "rows": [
+  {
+   "category": "Furniture",
+   "sub_category": "Chairs",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Folding Chairs",
+   "qty": 78,
+   "link": "https://www.moemax.de/alle-klappstuehle-C30C1C3",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"78\" on alle-klappstuehle-C30C1C3, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:2, totalResults:78}; exhaustion check ceil(78/60)==2 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Office Chairs",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Executive Chairs",
+   "qty": 263,
+   "link": "https://www.moemax.de/alle-chefsessel-C30C1C4C1",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"263\" on alle-chefsessel-C30C1C4C1, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:5, totalResults:263}; exhaustion check ceil(263/60)==5 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Gaming Chairs",
+   "qty": 68,
+   "link": "https://www.moemax.de/alle-gamingstuehle-C30C1C4C2",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"68\" on alle-gamingstuehle-C30C1C4C2, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:2, totalResults:68}; exhaustion check ceil(68/60)==2 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Swivel Office Chairs",
+   "qty": 657,
+   "link": "https://www.moemax.de/alle-buerodrehstuehle-C30C1C4C3",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"657\" on alle-buerodrehstuehle-C30C1C4C3, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:11, totalResults:657}; exhaustion check ceil(657/60)==11 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Visitor Chairs",
+   "qty": 63,
+   "link": "https://www.moemax.de/alle-besucherstuehle-C30C1C4C6",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"63\" on alle-besucherstuehle-C30C1C4C6, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:2, totalResults:63}; exhaustion check ceil(63/60)==2 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Kids Chairs",
+   "qty": 24,
+   "link": "https://www.moemax.de/alle-kinderstuehle-C30C1C6",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"24\" on alle-kinderstuehle-C30C1C6, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:1, totalResults:24}; exhaustion check ceil(24/60)==1 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Folding Stools",
+   "qty": 5,
+   "link": "https://www.moemax.de/alle-klapphocker-C30C1C7",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"5\" on alle-klapphocker-C30C1C7, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:1, totalResults:5}; exhaustion check ceil(5/60)==1 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Chair Sets",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dining Chair Sets",
+   "qty": 299,
+   "link": "https://www.moemax.de/alle-esszimmerstuehle-sets-C30C1C11C1",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"299\" on alle-esszimmerstuehle-sets-C30C1C11C1, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:5, totalResults:299}; exhaustion check ceil(299/60)==5 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Kids Table and Chair Sets",
+   "qty": 61,
+   "link": "https://www.moemax.de/alle-kindertische-mit-stuehlen-C30C1C11C2",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"61\" on alle-kindertische-mit-stuehlen-C30C1C11C2, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:2, totalResults:61}; exhaustion check ceil(61/60)==2 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dining Chairs",
+   "qty": 4902,
+   "link": "https://www.moemax.de/alle-esszimmerstuehle-C30C1C12",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"4902\" on alle-esszimmerstuehle-C30C1C12, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:82, totalResults:4902}; exhaustion check ceil(4902/60)==82 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dressing Table Chairs",
+   "qty": 34,
+   "link": "https://www.moemax.de/alle-schminktisch-stuhl-C30C1C13",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"34\" on alle-schminktisch-stuhl-C30C1C13, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:1, totalResults:34}; exhaustion check ceil(34/60)==1 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Kitchen Chairs",
+   "qty": 333,
+   "link": "https://www.moemax.de/alle-kuechenstuehle-C30C1C14",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"333\" on alle-kuechenstuehle-C30C1C14, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:6, totalResults:333}; exhaustion check ceil(333/60)==6 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Benches",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Corner Benches",
+   "qty": 120,
+   "link": "https://www.moemax.de/alle-eckbaenke-C30C2C2",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"120\" on alle-eckbaenke-C30C2C2, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:2, totalResults:120}; exhaustion check ceil(120/60)==2 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Seating Benches",
+   "qty": 635,
+   "link": "https://www.moemax.de/alle-sitzbaenke-C30C2C3",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"635\" on alle-sitzbaenke-C30C2C3, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:11, totalResults:635}; exhaustion check ceil(635/60)==11 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bed Benches",
+   "qty": 41,
+   "link": "https://www.moemax.de/alle-bettbaenke-C30C2C5",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"41\" on alle-bettbaenke-C30C2C5, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:1, totalResults:41}; exhaustion check ceil(41/60)==1 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Armchairs",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Relax Armchairs",
+   "qty": 507,
+   "link": "https://www.moemax.de/alle-relaxsessel-C30C3C1",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"507\" on alle-relaxsessel-C30C3C1, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:9, totalResults:507}; exhaustion check ceil(507/60)==9 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Wing Chairs",
+   "qty": 282,
+   "link": "https://www.moemax.de/alle-ohrensessel-C30C3C2",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"282\" on alle-ohrensessel-C30C3C2, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:5, totalResults:282}; exhaustion check ceil(282/60)==5 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bean Bags",
+   "qty": 82,
+   "link": "https://www.moemax.de/alle-sitzsaecke-C30C3C3",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"82\" on alle-sitzsaecke-C30C3C3, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:2, totalResults:82}; exhaustion check ceil(82/60)==2 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Stools",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bar Stools",
+   "qty": 1726,
+   "link": "https://www.moemax.de/alle-barhocker-C30C3C5C1",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"1726\" on alle-barhocker-C30C3C5C1, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:29, totalResults:1726}; exhaustion check ceil(1726/60)==29 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Poufs",
+   "qty": 443,
+   "link": "https://www.moemax.de/alle-poufs-C30C3C5C2",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"443\" on alle-poufs-C30C3C5C2, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:8, totalResults:443}; exhaustion check ceil(443/60)==8 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Kids Armchairs",
+   "qty": 245,
+   "link": "https://www.moemax.de/alle-kindersessel-C30C3C6",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"245\" on alle-kindersessel-C30C3C6, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:5, totalResults:245}; exhaustion check ceil(245/60)==5 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Upholstered Armchairs",
+   "qty": 2192,
+   "link": "https://www.moemax.de/alle-polstersessel-C30C3C7",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"2192\" on alle-polstersessel-C30C3C7, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:37, totalResults:2192}; exhaustion check ceil(2192/60)==37 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sleeper Armchairs",
+   "qty": 106,
+   "link": "https://www.moemax.de/alle-schlafsessel-C30C3C9",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"106\" on alle-schlafsessel-C30C3C9, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:2, totalResults:106}; exhaustion check ceil(106/60)==2 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "TV Armchairs",
+   "qty": 44,
+   "link": "https://www.moemax.de/fernsehsessel-C30C3C10",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"44\" on fernsehsessel-C30C3C10, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:1, totalResults:44}; exhaustion check ceil(44/60)==1 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Relax Loungers",
+   "qty": 14,
+   "link": "https://www.moemax.de/relaxliegen-C30C3C11",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"14\" on relaxliegen-C30C3C11, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:1, totalResults:14}; exhaustion check ceil(14/60)==1 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Rocking Chairs",
+   "qty": 16,
+   "link": "https://www.moemax.de/alle-schaukelstuehle-C30C3C12",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"16\" on alle-schaukelstuehle-C30C3C12, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:1, totalResults:16}; exhaustion check ceil(16/60)==1 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "XXL Armchairs",
+   "qty": 26,
+   "link": "https://www.moemax.de/xxl-sessel-C30C3C13",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"26\" on xxl-sessel-C30C3C13, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:1, totalResults:26}; exhaustion check ceil(26/60)==1 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Tables",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dining Tables",
+   "qty": 5671,
+   "link": "https://www.moemax.de/alle-esstische-C30C4C1",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"5671\" on alle-esstische-C30C4C1, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:95, totalResults:5671}; exhaustion check ceil(5671/60)==95 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Coffee Tables",
+   "qty": 2528,
+   "link": "https://www.moemax.de/alle-couchtische-C30C4C2",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"2528\" on alle-couchtische-C30C4C2, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:43, totalResults:2528}; exhaustion check ceil(2528/60)==43 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Side Tables",
+   "qty": 884,
+   "link": "https://www.moemax.de/alle-beistelltische-C30C4C3",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"884\" on alle-beistelltische-C30C4C3, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:15, totalResults:884}; exhaustion check ceil(884/60)==15 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Desks",
+   "qty": 1872,
+   "link": "https://www.moemax.de/alle-schreibtische-C30C4C5",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"1872\" on alle-schreibtische-C30C4C5, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:32, totalResults:1872}; exhaustion check ceil(1872/60)==32 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dressing Tables",
+   "qty": 421,
+   "link": "https://www.moemax.de/alle-schminktische-C30C4C8",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"421\" on alle-schminktische-C30C4C8, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:8, totalResults:421}; exhaustion check ceil(421/60)==8 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Kids Tables",
+   "qty": 21,
+   "link": "https://www.moemax.de/alle-kindertische-C30C4C9",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"21\" on alle-kindertische-C30C4C9, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:1, totalResults:21}; exhaustion check ceil(21/60)==1 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bar Tables",
+   "qty": 245,
+   "link": "https://www.moemax.de/alle-bartische-C30C4C10",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"245\" on alle-bartische-C30C4C10, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:5, totalResults:245}; exhaustion check ceil(245/60)==5 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Living Room Tables",
+   "qty": 637,
+   "link": "https://www.moemax.de/alle-wohnzimmertische-C30C4C14",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"637\" on alle-wohnzimmertische-C30C4C14, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:11, totalResults:637}; exhaustion check ceil(637/60)==11 passed",
+   "flag": "MANUAL REVIEW: living-room tables - a separate nav node whose products overlap the Coffee Tables and Side Tables nodes already listed"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Standing Tables",
+   "qty": 317,
+   "link": "https://www.moemax.de/alle-stehtische-C30C4C15",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"317\" on alle-stehtische-C30C4C15, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:6, totalResults:317}; exhaustion check ceil(317/60)==6 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Beds",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Box-Spring Beds",
+   "qty": 33431,
+   "link": "https://www.moemax.de/alle-boxspringbetten-C30C5C1",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"33431\" on alle-boxspringbetten-C30C5C1, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:558, totalResults:33431}; exhaustion check ceil(33431/60)==558 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Upholstered Beds",
+   "qty": 19322,
+   "link": "https://www.moemax.de/alle-polsterbetten-C30C5C2",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"19322\" on alle-polsterbetten-C30C5C2, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:323, totalResults:19322}; exhaustion check ceil(19322/60)==323 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Baby Beds",
+   "qty": 235,
+   "link": "https://www.moemax.de/alle-babybetten-C30C5C3",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"235\" on alle-babybetten-C30C5C3, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:4, totalResults:235}; exhaustion check ceil(235/60)==4 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Kids Beds",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "House Beds",
+   "qty": 217,
+   "link": "https://www.moemax.de/alle-hausbetten-C30C5C4C1",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"217\" on alle-hausbetten-C30C5C4C1, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:4, totalResults:217}; exhaustion check ceil(217/60)==4 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Youth Beds",
+   "qty": 998,
+   "link": "https://www.moemax.de/alle-jugendbetten-C30C5C4C2",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"998\" on alle-jugendbetten-C30C5C4C2, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:17, totalResults:998}; exhaustion check ceil(998/60)==17 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Car Beds",
+   "qty": 11,
+   "link": "https://www.moemax.de/alle-autobetten-C30C5C4C3",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"11\" on alle-autobetten-C30C5C4C3, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:1, totalResults:11}; exhaustion check ceil(11/60)==1 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Play Beds",
+   "qty": 560,
+   "link": "https://www.moemax.de/alle-spielbetten-C30C5C4C4",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"560\" on alle-spielbetten-C30C5C4C4, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:10, totalResults:560}; exhaustion check ceil(560/60)==10 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Trundle Beds",
+   "qty": 75,
+   "link": "https://www.moemax.de/alle-ausziehbetten-C30C5C11",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"75\" on alle-ausziehbetten-C30C5C11, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:2, totalResults:75}; exhaustion check ceil(75/60)==2 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Guest Beds",
+   "qty": 274,
+   "link": "https://www.moemax.de/alle-gaestebetten-C30C5C12",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"274\" on alle-gaestebetten-C30C5C12, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:5, totalResults:274}; exhaustion check ceil(274/60)==5 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Single Beds",
+   "qty": 157,
+   "link": "https://www.moemax.de/alle-einzelbetten-C30C5C13",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"157\" on alle-einzelbetten-C30C5C13, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:3, totalResults:157}; exhaustion check ceil(157/60)==3 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Double Beds",
+   "qty": 520,
+   "link": "https://www.moemax.de/alle-doppelbetten-C30C5C14",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"520\" on alle-doppelbetten-C30C5C14, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:9, totalResults:520}; exhaustion check ceil(520/60)==9 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Loft and Bunk Beds",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Loft Beds",
+   "qty": 341,
+   "link": "https://www.moemax.de/alle-hochbetten-C30C5C15C1",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"341\" on alle-hochbetten-C30C5C15C1, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:6, totalResults:341}; exhaustion check ceil(341/60)==6 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bunk Beds",
+   "qty": 326,
+   "link": "https://www.moemax.de/alle-etagenbetten-C30C5C15C2",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"326\" on alle-etagenbetten-C30C5C15C2, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:6, totalResults:326}; exhaustion check ceil(326/60)==6 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bed Frames",
+   "qty": 145,
+   "link": "https://www.moemax.de/alle-bett-gestelle-C30C5C16",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"145\" on alle-bett-gestelle-C30C5C16, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:3, totalResults:145}; exhaustion check ceil(145/60)==3 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Family Beds",
+   "qty": 72,
+   "link": "https://www.moemax.de/alle-familienbetten-C30C5C17",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"72\" on alle-familienbetten-C30C5C17, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:2, totalResults:72}; exhaustion check ceil(72/60)==2 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Cabinets and Wardrobes",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Wardrobes",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sliding-Door Wardrobes",
+   "qty": 5539,
+   "link": "https://www.moemax.de/alle-schwebetuerenschraenke-C30C6C2C1",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"5539\" on alle-schwebetuerenschraenke-C30C6C2C1, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:93, totalResults:5539}; exhaustion check ceil(5539/60)==93 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Hinged-Door Wardrobes",
+   "qty": 2263,
+   "link": "https://www.moemax.de/alle-drehtuerenschraenke-C30C6C2C2",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"2263\" on alle-drehtuerenschraenke-C30C6C2C2, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:38, totalResults:2263}; exhaustion check ceil(2263/60)==38 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Corner Wardrobes",
+   "qty": 59,
+   "link": "https://www.moemax.de/alle-eckschraenke-C30C6C2C5",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"59\" on alle-eckschraenke-C30C6C2C5, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:1, totalResults:59}; exhaustion check ceil(59/60)==1 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Kids Wardrobes",
+   "qty": 116,
+   "link": "https://www.moemax.de/alle-kinderkleiderschraenke-C30C6C2C6",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"116\" on alle-kinderkleiderschraenke-C30C6C2C6, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:2, totalResults:116}; exhaustion check ceil(116/60)==2 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bathroom Cabinets",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bathroom Tall Cabinets",
+   "qty": 415,
+   "link": "https://www.moemax.de/badezimmer-hochschraenke-C30C6C3C1",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"415\" on badezimmer-hochschraenke-C30C6C3C1, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:7, totalResults:415}; exhaustion check ceil(415/60)==7 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bathroom Base Cabinets",
+   "qty": 661,
+   "link": "https://www.moemax.de/alle-badezimmer-unterschraenke-C30C6C3C2",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"661\" on alle-badezimmer-unterschraenke-C30C6C3C2, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:12, totalResults:661}; exhaustion check ceil(661/60)==12 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bathroom Wall Cabinets",
+   "qty": 84,
+   "link": "https://www.moemax.de/alle-bad-haengeschraenke-C30C6C3C3",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"84\" on alle-bad-haengeschraenke-C30C6C3C3, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:2, totalResults:84}; exhaustion check ceil(84/60)==2 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bathroom Mirror Cabinets",
+   "qty": 331,
+   "link": "https://www.moemax.de/alle-spiegelschraenke-bad-C30C6C3C4",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"331\" on alle-spiegelschraenke-bad-C30C6C3C4, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:6, totalResults:331}; exhaustion check ceil(331/60)==6 passed",
+   "flag": "MANUAL REVIEW: bathroom mirror cabinets - a storage cabinet with a mirrored door; cabinet (furniture) vs. mirror (Wall Decor) is a judgement call"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Washbasin Base Cabinets",
+   "qty": 735,
+   "link": "https://www.moemax.de/alle-waschbeckenunterschraenke-C30C6C3C5",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"735\" on alle-waschbeckenunterschraenke-C30C6C3C5, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:13, totalResults:735}; exhaustion check ceil(735/60)==13 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Vanity Units",
+   "qty": 807,
+   "link": "https://www.moemax.de/alle-waschtische-C30C6C3C6",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"807\" on alle-waschtische-C30C6C3C6, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:14, totalResults:807}; exhaustion check ceil(807/60)==14 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bathroom Furniture Sets",
+   "qty": 2336,
+   "link": "https://www.moemax.de/alle-badmoebel-sets-C30C6C3C7",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"2336\" on alle-badmoebel-sets-C30C6C3C7, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:39, totalResults:2336}; exhaustion check ceil(2336/60)==39 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bathroom Corner Cabinets",
+   "qty": 303,
+   "link": "https://www.moemax.de/alle-badezimmereckschraenke-C30C6C3C8",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"303\" on alle-badezimmereckschraenke-C30C6C3C8, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:6, totalResults:303}; exhaustion check ceil(303/60)==6 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Laundry Cabinets",
+   "qty": 12,
+   "link": "https://www.moemax.de/alle-waescheschrank-C30C6C3C9",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"12\" on alle-waescheschrank-C30C6C3C9, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:1, totalResults:12}; exhaustion check ceil(12/60)==1 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Jewellery Cabinets",
+   "qty": 1,
+   "link": "https://www.moemax.de/alle-schmuckschraenke-C30C6C4",
+   "is_group": false,
+   "evidence": "category URL /alle-schmuckschraenke-C30C6C4 loaded in the browser redirects to the single product detail page /p/moemax-schmuckschrank-viola-naturfarben-schwarz-008103029001 -> exactly 1 product; no listing header renders",
+   "flag": "MANUAL REVIEW: jewellery cabinets - the category URL returns HTTP 200 but the site redirects it straight to the single product detail page (moemax-schmuckschrank-viola-...-008103029001), i.e. the node holds exactly 1 product and never renders a listing header"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Shoe Cabinets",
+   "qty": 1035,
+   "link": "https://www.moemax.de/alle-schuhschraenke-C30C6C5",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"1035\" on alle-schuhschraenke-C30C6C5, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:18, totalResults:1035}; exhaustion check ceil(1035/60)==18 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Hallway Wardrobes",
+   "qty": 1581,
+   "link": "https://www.moemax.de/alle-garderobenschraenke-C30C6C6",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"1581\" on alle-garderobenschraenke-C30C6C6, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:27, totalResults:1581}; exhaustion check ceil(1581/60)==27 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Multipurpose Cabinets",
+   "qty": 106,
+   "link": "https://www.moemax.de/alle-mehrzweckschraenke-C30C6C8",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"106\" on alle-mehrzweckschraenke-C30C6C8, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:2, totalResults:106}; exhaustion check ceil(106/60)==2 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Living Room Cabinets",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Wall Units",
+   "qty": 1243,
+   "link": "https://www.moemax.de/alle-wohnwaende-C30C6C10C1",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"1243\" on alle-wohnwaende-C30C6C10C1, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:21, totalResults:1243}; exhaustion check ceil(1243/60)==21 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Wall-Hung Cabinets",
+   "qty": 484,
+   "link": "https://www.moemax.de/alle-haengeschraenke-C30C6C11",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"484\" on alle-haengeschraenke-C30C6C11, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:9, totalResults:484}; exhaustion check ceil(484/60)==9 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Display Cabinets",
+   "qty": 1239,
+   "link": "https://www.moemax.de/alle-vitrinen-C30C6C12",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"1239\" on alle-vitrinen-C30C6C12, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:21, totalResults:1239}; exhaustion check ceil(1239/60)==21 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Office Cabinets",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Filing Cabinets",
+   "qty": 448,
+   "link": "https://www.moemax.de/alle-aktenschraenke-C30C6C13C1",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"448\" on alle-aktenschraenke-C30C6C13C1, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:8, totalResults:448}; exhaustion check ceil(448/60)==8 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Desk Pedestals",
+   "qty": 190,
+   "link": "https://www.moemax.de/alle-rollcontainer-C30C6C13C2",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"190\" on alle-rollcontainer-C30C6C13C2, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:4, totalResults:190}; exhaustion check ceil(190/60)==4 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Washing Machine Cabinets",
+   "qty": 128,
+   "link": "https://www.moemax.de/alle-waschmaschinenschraenke-C30C6C15",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"128\" on alle-waschmaschinenschraenke-C30C6C15, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:3, totalResults:128}; exhaustion check ceil(128/60)==3 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Shelving",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Wall Shelves",
+   "qty": 862,
+   "link": "https://www.moemax.de/alle-wandregale-C30C7C4",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"862\" on alle-wandregale-C30C7C4, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:15, totalResults:862}; exhaustion check ceil(862/60)==15 passed",
+   "flag": "MANUAL REVIEW: ambiguous shelving - wall-mounted shelves, but the site files them under Furniture > Shelving, not under a wall-decor department"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Freestanding Shelving",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bookcases",
+   "qty": 690,
+   "link": "https://www.moemax.de/alle-buecherregale-C30C7C7C1",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"690\" on alle-buecherregale-C30C7C7C1, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:12, totalResults:690}; exhaustion check ceil(690/60)==12 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Corner Shelf Units",
+   "qty": 42,
+   "link": "https://www.moemax.de/alle-eckregale-C30C7C7C2",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"42\" on alle-eckregale-C30C7C7C2, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:1, totalResults:42}; exhaustion check ceil(42/60)==1 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Ladder Shelves",
+   "qty": 13,
+   "link": "https://www.moemax.de/alle-leiterregale-C30C7C7C3",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"13\" on alle-leiterregale-C30C7C7C3, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:1, totalResults:13}; exhaustion check ceil(13/60)==1 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Room Dividers",
+   "qty": 259,
+   "link": "https://www.moemax.de/alle-raumteiler-C30C7C7C4",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"259\" on alle-raumteiler-C30C7C7C4, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:5, totalResults:259}; exhaustion check ceil(259/60)==5 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Step Shelves",
+   "qty": 3,
+   "link": "https://www.moemax.de/alle-stufenregal-C30C7C7C5",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"3\" on alle-stufenregal-C30C7C7C5, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:1, totalResults:3}; exhaustion check ceil(3/60)==1 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bathroom Shelf Units",
+   "qty": 34,
+   "link": "https://www.moemax.de/alle-badezimmerregale-C30C7C7C7",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"34\" on alle-badezimmerregale-C30C7C7C7, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:1, totalResults:34}; exhaustion check ceil(34/60)==1 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Office Shelving",
+   "qty": 97,
+   "link": "https://www.moemax.de/alle-bueroregale-C30C7C7C8",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"97\" on alle-bueroregale-C30C7C7C8, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:2, totalResults:97}; exhaustion check ceil(97/60)==2 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Kids Shelving",
+   "qty": 337,
+   "link": "https://www.moemax.de/alle-kinderregale-C30C7C8",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"337\" on alle-kinderregale-C30C7C8, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:6, totalResults:337}; exhaustion check ceil(337/60)==6 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Chests of Drawers and Sideboards",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sideboards",
+   "qty": 2635,
+   "link": "https://www.moemax.de/alle-sideboards-C30C8C3",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"2635\" on alle-sideboards-C30C8C3, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:44, totalResults:2635}; exhaustion check ceil(2635/60)==44 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bedside Tables",
+   "qty": 1388,
+   "link": "https://www.moemax.de/alle-nachttische-C30C8C4",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"1388\" on alle-nachttische-C30C8C4, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:24, totalResults:1388}; exhaustion check ceil(1388/60)==24 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Lowboards",
+   "qty": 4377,
+   "link": "https://www.moemax.de/alle-lowboards-C30C8C5",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"4377\" on alle-lowboards-C30C8C5, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:73, totalResults:4377}; exhaustion check ceil(4377/60)==73 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Highboards",
+   "qty": 616,
+   "link": "https://www.moemax.de/alle-highboards-C30C8C6",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"616\" on alle-highboards-C30C8C6, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:11, totalResults:616}; exhaustion check ceil(616/60)==11 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dressers and Credenzas",
+   "qty": 81,
+   "link": "https://www.moemax.de/alle-anrichten-kredenzen-C30C8C7",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"81\" on alle-anrichten-kredenzen-C30C8C7, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:2, totalResults:81}; exhaustion check ceil(81/60)==2 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Console Tables",
+   "qty": 601,
+   "link": "https://www.moemax.de/alle-konsolentische-C30C8C8",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"601\" on alle-konsolentische-C30C8C8, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:11, totalResults:601}; exhaustion check ceil(601/60)==11 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Wall-Hung Units",
+   "qty": 60,
+   "link": "https://www.moemax.de/alle-haengeelemente-C30C8C9",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"60\" on alle-haengeelemente-C30C8C9, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:1, totalResults:60}; exhaustion check ceil(60/60)==1 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Changing Tables",
+   "qty": 137,
+   "link": "https://www.moemax.de/alle-wickelkommoden-C30C8C10",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"137\" on alle-wickelkommoden-C30C8C10, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:3, totalResults:137}; exhaustion check ceil(137/60)==3 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Chests of Drawers",
+   "qty": 3371,
+   "link": "https://www.moemax.de/alle-kommoden-C30C8C11",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"3371\" on alle-kommoden-C30C8C11, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:57, totalResults:3371}; exhaustion check ceil(3371/60)==57 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sofas and Couches",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sofa Suites",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "U-Shaped Sofa Suites",
+   "qty": 3510,
+   "link": "https://www.moemax.de/alle-wohnlandschaften-u-form-C30C10C1C2",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"3510\" on alle-wohnlandschaften-u-form-C30C10C1C2, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:59, totalResults:3510}; exhaustion check ceil(3510/60)==59 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sofa Beds",
+   "qty": 1937,
+   "link": "https://www.moemax.de/alle-schlafsofas-C30C10C4",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"1937\" on alle-schlafsofas-C30C10C4, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:33, totalResults:1937}; exhaustion check ceil(1937/60)==33 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sofas",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Modular Sofas",
+   "qty": 66,
+   "link": "https://www.moemax.de/alle-modularen-sofas-C30C10C5C2",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"66\" on alle-modularen-sofas-C30C10C5C2, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:2, totalResults:66}; exhaustion check ceil(66/60)==2 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "2-Seater Sofas",
+   "qty": 808,
+   "link": "https://www.moemax.de/alle-2-sitzer-sofas-C30C10C5C3",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"808\" on alle-2-sitzer-sofas-C30C10C5C3, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:14, totalResults:808}; exhaustion check ceil(808/60)==14 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "3-Seater Sofas",
+   "qty": 1065,
+   "link": "https://www.moemax.de/alle-3-sitzer-sofas-C30C10C5C4",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"1065\" on alle-3-sitzer-sofas-C30C10C5C4, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:18, totalResults:1065}; exhaustion check ceil(1065/60)==18 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Chaise Longues and Ottomans",
+   "qty": 15,
+   "link": "https://www.moemax.de/alle-recamieren-ottomanen-C30C10C5C5",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"15\" on alle-recamieren-ottomanen-C30C10C5C5, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:1, totalResults:15}; exhaustion check ceil(15/60)==1 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Big Sofas",
+   "qty": 400,
+   "link": "https://www.moemax.de/alle-big-sofas-C30C10C7",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"400\" on alle-big-sofas-C30C10C7, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:7, totalResults:400}; exhaustion check ceil(400/60)==7 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sofa Sets",
+   "qty": 921,
+   "link": "https://www.moemax.de/alle-couchgarnituren-C30C10C9",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"921\" on alle-couchgarnituren-C30C10C9, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:16, totalResults:921}; exhaustion check ceil(921/60)==16 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Corner Sofas",
+   "qty": 16632,
+   "link": "https://www.moemax.de/alle-ecksofas-C30C10C13",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"16632\" on alle-ecksofas-C30C10C13, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:278, totalResults:16632}; exhaustion check ceil(16632/60)==278 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "TV Furniture",
+   "qty": 656,
+   "link": "https://www.moemax.de/alle-tv-moebel-C30C11",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"656\" on alle-tv-moebel-C30C11, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:11, totalResults:656}; exhaustion check ceil(656/60)==11 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Kitchens",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Fitted Kitchens",
+   "qty": 259,
+   "link": "https://www.moemax.de/alle-einbaukuechen-C34C1",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"259\" on alle-einbaukuechen-C34C1, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:5, totalResults:259}; exhaustion check ceil(259/60)==5 passed",
+   "flag": "MANUAL REVIEW: fitted/built-in kitchens - fitted kitchen furniture, include/exclude is a project-level call"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Kitchen Units and Blocks",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Kitchen Units",
+   "qty": 3464,
+   "link": "https://www.moemax.de/alle-kuechenzeilen-C34C2C1",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"3464\" on alle-kuechenzeilen-C34C2C1, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:58, totalResults:3464}; exhaustion check ceil(3464/60)==58 passed",
+   "flag": "MANUAL REVIEW: fitted kitchen runs (Kuechenzeilen) - fitted kitchen furniture, include/exclude is a project-level call; its products also overlap the Kitchen Blocks nodes below"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Corner Kitchens",
+   "qty": 460,
+   "link": "https://www.moemax.de/alle-eckkuechen-C34C2C4",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"460\" on alle-eckkuechen-C34C2C4, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:8, totalResults:460}; exhaustion check ceil(460/60)==8 passed",
+   "flag": "MANUAL REVIEW: fitted corner kitchens - fitted kitchen furniture, include/exclude is a project-level call"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Kitchen Blocks with Appliances",
+   "qty": 2006,
+   "link": "https://www.moemax.de/alle-kuechenbloecke-mit-geraeten-C34C2C5",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"2006\" on alle-kuechenbloecke-mit-geraeten-C34C2C5, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:34, totalResults:2006}; exhaustion check ceil(2006/60)==34 passed",
+   "flag": "MANUAL REVIEW: kitchen blocks sold with built-in appliances - cabinetry-led but bundles appliances"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Kitchen Blocks without Appliances",
+   "qty": 1176,
+   "link": "https://www.moemax.de/alle-kuechenbloecke-ohne-geraete-C34C2C6",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"1176\" on alle-kuechenbloecke-ohne-geraete-C34C2C6, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:20, totalResults:1176}; exhaustion check ceil(1176/60)==20 passed",
+   "flag": "MANUAL REVIEW: kitchen blocks without appliances - fitted kitchen furniture, include/exclude is a project-level call"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Mini Kitchens",
+   "qty": 216,
+   "link": "https://www.moemax.de/alle-minikuechen-C34C2C9",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"216\" on alle-minikuechen-C34C2C9, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:4, totalResults:216}; exhaustion check ceil(216/60)==4 passed",
+   "flag": "MANUAL REVIEW: mini/compact kitchen units - fitted kitchen furniture with integrated appliances"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Cabinet Kitchens",
+   "qty": 25,
+   "link": "https://www.moemax.de/alle-schrankkuechen-C34C2C10",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"25\" on alle-schrankkuechen-C34C2C10, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:1, totalResults:25}; exhaustion check ceil(25/60)==1 passed",
+   "flag": "MANUAL REVIEW: cabinet kitchens - a fitted kitchen concealed behind cupboard doors"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Kitchen Cabinets",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Pull-Out Larder Cabinets",
+   "qty": 69,
+   "link": "https://www.moemax.de/alle-apothekerschraenke-C34C2C11C1",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"69\" on alle-apothekerschraenke-C34C2C11C1, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:2, totalResults:69}; exhaustion check ceil(69/60)==2 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Kitchen Wall Cabinets",
+   "qty": 294,
+   "link": "https://www.moemax.de/alle-kuechenoberschraenke-C34C2C11C2",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"294\" on alle-kuechenoberschraenke-C34C2C11C2, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:5, totalResults:294}; exhaustion check ceil(294/60)==5 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Kitchen Base Cabinets",
+   "qty": 331,
+   "link": "https://www.moemax.de/alle-kuechenunterschraenke-C34C2C11C3",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"331\" on alle-kuechenunterschraenke-C34C2C11C3, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:6, totalResults:331}; exhaustion check ceil(331/60)==6 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Appliance Housing Cabinets",
+   "qty": 358,
+   "link": "https://www.moemax.de/alle-geraeteumbauschraenke-C34C2C11C4",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"358\" on alle-geraeteumbauschraenke-C34C2C11C4, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:6, totalResults:358}; exhaustion check ceil(358/60)==6 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sink Base Cabinets",
+   "qty": 107,
+   "link": "https://www.moemax.de/alle-spuelenunterschraenke-C34C2C11C5",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"107\" on alle-spuelenunterschraenke-C34C2C11C5, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:2, totalResults:107}; exhaustion check ceil(107/60)==2 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Serving Trolleys",
+   "qty": 182,
+   "link": "https://www.moemax.de/alle-servierwaegen-C34C6C8",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"182\" on alle-servierwaegen-C34C6C8, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:4, totalResults:182}; exhaustion check ceil(182/60)==4 passed",
+   "flag": "MANUAL REVIEW: serving trolleys/kitchen carts - freestanding rolling furniture filed by the site under Kitchen Equipment"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Kitchen Shelves",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Wine Racks",
+   "qty": 88,
+   "link": "https://www.moemax.de/alle-weinregale-C34C6C11C2",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"88\" on alle-weinregale-C34C6C11C2, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:2, totalResults:88}; exhaustion check ceil(88/60)==2 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Hallway Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Coat Rack Panels",
+   "qty": 332,
+   "link": "https://www.moemax.de/alle-garderobenpaneele-C38C1",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"332\" on alle-garderobenpaneele-C38C1, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:6, totalResults:332}; exhaustion check ceil(332/60)==6 passed",
+   "flag": "MANUAL REVIEW: coat rack panels - wall-mounted hallway panels/units; furniture vs. wall fitting is a judgement call"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Hallway Benches",
+   "qty": 284,
+   "link": "https://www.moemax.de/alle-garderobenbaenke-C38C3",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"284\" on alle-garderobenbaenke-C38C3, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:5, totalResults:284}; exhaustion check ceil(284/60)==5 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Clothes Stands",
+   "qty": 196,
+   "link": "https://www.moemax.de/alle-kleiderstaender-C38C4",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"196\" on alle-kleiderstaender-C38C4, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:4, totalResults:196}; exhaustion check ceil(196/60)==4 passed",
+   "flag": "MANUAL REVIEW: clothes stands - freestanding garment rails/valet stands filed by the site under Hallway Furniture"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Shoe Racks",
+   "qty": 144,
+   "link": "https://www.moemax.de/alle-schuhregale-C38C6",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"144\" on alle-schuhregale-C38C6, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:3, totalResults:144}; exhaustion check ceil(144/60)==3 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Garden and Outdoor",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Lounge Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Lounge Sets",
+   "qty": 131,
+   "link": "https://www.moemax.de/alle-loungegarnituren-C45C1C1",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"131\" on alle-loungegarnituren-C45C1C1, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:3, totalResults:131}; exhaustion check ceil(131/60)==3 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Lounge Armchairs",
+   "qty": 57,
+   "link": "https://www.moemax.de/alle-loungesessel-C45C1C3",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"57\" on alle-loungesessel-C45C1C3, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:1, totalResults:57}; exhaustion check ceil(57/60)==1 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Outdoor Lounge Tables",
+   "qty": 38,
+   "link": "https://www.moemax.de/alle-loungetische-outdoor-C45C1C4",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"38\" on alle-loungetische-outdoor-C45C1C4, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:1, totalResults:38}; exhaustion check ceil(38/60)==1 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Outdoor Sofas",
+   "qty": 12,
+   "link": "https://www.moemax.de/alle-outdoor-sofas-C45C1C5",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"12\" on alle-outdoor-sofas-C45C1C5, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:1, totalResults:12}; exhaustion check ceil(12/60)==1 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Balcony Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Balcony Furniture Sets",
+   "qty": 183,
+   "link": "https://www.moemax.de/alle-balkonmoebel-sets-C45C2C1",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"183\" on alle-balkonmoebel-sets-C45C2C1, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:4, totalResults:183}; exhaustion check ceil(183/60)==4 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Balcony Tables",
+   "qty": 72,
+   "link": "https://www.moemax.de/alle-balkontische-C45C2C2",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"72\" on alle-balkontische-C45C2C2, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:2, totalResults:72}; exhaustion check ceil(72/60)==2 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Balcony Loungers",
+   "qty": 103,
+   "link": "https://www.moemax.de/alle-balkonliegen-C45C2C3",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"103\" on alle-balkonliegen-C45C2C3, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:2, totalResults:103}; exhaustion check ceil(103/60)==2 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Balcony Chairs",
+   "qty": 277,
+   "link": "https://www.moemax.de/alle-balkonstuehle-C45C2C5",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"277\" on alle-balkonstuehle-C45C2C5, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:5, totalResults:277}; exhaustion check ceil(277/60)==5 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Garden Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Garden Furniture Sets",
+   "qty": 1059,
+   "link": "https://www.moemax.de/alle-gartenmoebel-sets-C45C10C1",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"1059\" on alle-gartenmoebel-sets-C45C10C1, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:18, totalResults:1059}; exhaustion check ceil(1059/60)==18 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Garden Chairs",
+   "qty": 806,
+   "link": "https://www.moemax.de/alle-gartenstuehle-C45C10C2",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"806\" on alle-gartenstuehle-C45C10C2, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:14, totalResults:806}; exhaustion check ceil(806/60)==14 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Garden Tables",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Folding Garden Tables",
+   "qty": 64,
+   "link": "https://www.moemax.de/alle-klapptische-garten-C45C10C3C2",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"64\" on alle-klapptische-garten-C45C10C3C2, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:2, totalResults:64}; exhaustion check ceil(64/60)==2 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Outdoor Side Tables",
+   "qty": 60,
+   "link": "https://www.moemax.de/alle-outdoor-beistelltische-C45C10C3C4",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"60\" on alle-outdoor-beistelltische-C45C10C3C4, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:1, totalResults:60}; exhaustion check ceil(60/60)==1 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Garden Dining Tables",
+   "qty": 229,
+   "link": "https://www.moemax.de/alle-gartenesstische-C45C10C3C5",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"229\" on alle-gartenesstische-C45C10C3C5, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:4, totalResults:229}; exhaustion check ceil(229/60)==4 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Garden Benches",
+   "qty": 203,
+   "link": "https://www.moemax.de/alle-gartenbaenke-C45C10C4",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"203\" on alle-gartenbaenke-C45C10C4, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:4, totalResults:203}; exhaustion check ceil(203/60)==4 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sun Loungers",
+   "qty": 412,
+   "link": "https://www.moemax.de/alle-gartenliegen-C45C10C5",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"412\" on alle-gartenliegen-C45C10C5, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:7, totalResults:412}; exhaustion check ceil(412/60)==7 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Garden Relax Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Hammocks",
+   "qty": 34,
+   "link": "https://www.moemax.de/alle-haengematten-C45C10C13C1",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"34\" on alle-haengematten-C45C10C13C1, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:1, totalResults:34}; exhaustion check ceil(34/60)==1 passed",
+   "flag": "MANUAL REVIEW: hammocks - filed by the site under Garden Relax Furniture; hammock vs. textile is a judgement call"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Hanging Chairs",
+   "qty": 132,
+   "link": "https://www.moemax.de/alle-haengesessel-C45C10C13C2",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"132\" on alle-haengesessel-C45C10C13C2, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:3, totalResults:132}; exhaustion check ceil(132/60)==3 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Swing Seats",
+   "qty": 36,
+   "link": "https://www.moemax.de/alle-hollywoodschaukeln-C45C10C13C3",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"36\" on alle-hollywoodschaukeln-C45C10C13C3, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:1, totalResults:36}; exhaustion check ceil(36/60)==1 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sun Islands",
+   "qty": 12,
+   "link": "https://www.moemax.de/alle-sonneninseln-C45C10C13C4",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"12\" on alle-sonneninseln-C45C10C13C4, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:1, totalResults:12}; exhaustion check ceil(12/60)==1 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Kids Garden Furniture",
+   "qty": 10,
+   "link": "https://www.moemax.de/alle-kinder-gartenmoebel-C45C10C15",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"10\" on alle-kinder-gartenmoebel-C45C10C15, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:1, totalResults:10}; exhaustion check ceil(10/60)==1 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Outdoor Kitchens",
+   "qty": 14,
+   "link": "https://www.moemax.de/alle-outdoor-kuechen-C40C8C6",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"14\" on alle-outdoor-kuechen-C40C8C6, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:1, totalResults:14}; exhaustion check ceil(14/60)==1 passed",
+   "flag": "MANUAL REVIEW: outdoor kitchens - outdoor cabinetry/kitchen units filed by the site under Garden Equipment, not under Garden Furniture"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Garden Cabinets",
+   "qty": 3,
+   "link": "https://www.moemax.de/alle-gartenschraenke-C40C14",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"3\" on alle-gartenschraenke-C40C14, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:1, totalResults:3}; exhaustion check ceil(3/60)==1 passed",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Kids Furniture and More",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Kids Furniture",
+   "qty": 923,
+   "link": "https://www.moemax.de/alle-kindermoebel-C46C1",
+   "is_group": false,
+   "evidence": "rendered listing header element resultCountContainer data-track-value=\"923\" on alle-kindermoebel-C46C1, confirmed by the page's own __APOLLO_STATE__ pagination {pageSize:60, totalPages:16, totalResults:923}; exhaustion check ceil(923/60)==16 passed",
+   "flag": "MANUAL REVIEW: kids furniture is a cross-cut department - its products overlap the Kids Beds, Kids Chairs, Kids Wardrobes, Kids Shelving and Kids Tables nodes already listed"
+  }
+ ]
+}

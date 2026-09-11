@@ -1,0 +1,16 @@
+{
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "Access: direct HTTP (tier 1) hit Cloudflare 'Verifying your connection...' 429 managed-challenge on every endpoint including collections.json, matching the prior Home-Decor pass's notes (translate.goog proxy is now disallowed by this brief, so it was not used). Escalated to Playwright/CDP (tier 2, headless Chromium with a standard desktop UA): loading the homepage first let the JS challenge clear, after which collections.json, /collections/<handle> and /collections/<handle>/products.json all returned normal 200 JSON/HTML through the same page context. Never needed Claude-in-Chrome. robots.txt has no Claude-specific disallow. Discovery: pulled full collections.json (372 listed collections across 2 pages) and grepped titles/handles for best/popular/trending/favourite terms; also checked main nav/header/footer links (437 unique <a> tags) and the homepage HTML source for 'bestsel' mentions. Main nav has NO Bestsellers link at all (only NEW and SALE). However the homepage's predictive-search dropdown widget has a literal 'BestSellers' section (id=best_seller_title_label) linking straight to individual PDPs, not a PLP. Candidates found: (1) /collections/bestsellers - page title 'Curation of our bold & beautiful Bestsellers', H1 'Curated collection of Bestsellers', rendered '101 Products' - a genuine, real PLP with sort/grid; INCLUDED. (2) /collections/best-selling and (3) /collections/best-selling-in - both resolve (200) but each contains exactly ONE product and it is the SAME product in both (id 4118669951075, 'Mustard Yellow Solid Twisted Upholstery Fabric') - stale/duplicate artifact collections, not linked anywhere in nav or on-site UI, not genuine bestseller merchandising listings; EXCLUDED. (4) /collections/globofilter-best-selling-products-index (title 'Smart Products Filter Index - Do Not Delete') and (5) /collections/sparq-bestseller-collection-do-not-delete (title 'Sparq Bestseller Collection - Do Not Delete') both have 250+ products but are explicitly named 'Do Not Delete' backend index collections used by third-party Shopify apps (Globo filter app, Sparq personalization) to power widgets/recommendations - not customer-navigable PLPs; EXCLUDED. No genuine sub-structure (e.g. category-split Bestsellers) exists - only one flat listing.",
+  "rows": [
+    {
+      "category": "Bestsellers",
+      "sub_category": "Bestsellers",
+      "qty": 101,
+      "link": "https://www.freedomtree.in/collections/bestsellers",
+      "is_group": false,
+      "evidence": "Rendered collection page text '101 Products' (page title 'Curation of our bold & beautiful Bestsellers'); confirmed exhaustively via /collections/bestsellers/products.json?limit=250 = 101 unique product IDs on a single page (<250, no further pages).",
+      "flag": null
+    }
+  ]
+}

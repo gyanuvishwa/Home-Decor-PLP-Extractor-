@@ -1,0 +1,296 @@
+{
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ACCESS: potterybarn.com is Akamai-fronted and 403s some fingerprints, but curl_cffi impersonation got HTTP 200 on every page needed this session (winning profiles rotated: chrome124, safari15_5, safari17_0, safari17_2_ios, edge101; chrome131/edge101 intermittently 403 or time out, so a random-profile retry loop was used). r.jina.ai, the route used in the prior Home-Decor pass, is dead for this workstation (403). robots.txt was fetched FIRST: it disallows EasouSpider entirely, gives Pinterestbot crawl-delay 0.2, and its 'User-agent: *' group names no anthropic-ai / ClaudeBot / Claude-Web agent; it disallows /account/, /checkout/, /shoppingcart/, /services/, /shop_g/, /shop_r/, /products_g/, /products_r/, /personalization/, */minipip, */quicklook, /*N= and '/shop/*+*+*' faceted URLs. Every URL emitted is a plain /shop/bath/<node>/ path, so none is disallowed, and no Crawl-delay applies to '*'. probe.py's 2s/host pacing was used. TREE: taken from Pottery Barn's OWN mega-menu payload, https://www.potterybarn.com/api/catalog/v1/category/categorytree/shop/data.json (926 KB). In that payload type='header' nodes are the grouping rows and type='subcat' nodes the leaves; entries carrying secret=true are hidden from the rendered navigation. That mapping was VERIFIED against the live page: the flyout actually rendered on https://www.potterybarn.com/shop/bath/ was scraped and contains exactly the non-secret nodes (31 /shop/bath/ links) - Towels & Linens, Bath Furniture, Mirrors & Medicine Cabinets, Bath Lighting, Bath Hardware, Accessories, In-Stock Bath, Bestselling Bath, Collaborations, Sale - and no secret ones. Cross-checked against the shop sitemap https://www.potterybarn.com/netstorage/sitemaps/shop-sitemap-1.xml.gz (795 URLs) - every link emitted appears there verbatim - and against constructor.io's group tree for group_id=bath (47 child groups, every recorded leaf present with parents=['all','bath'] and children=[], confirming the taxonomy is two levels deep). Each of the six Bath headers was fetched: /shop/bath/pb-bath-furniture/, /shop/bath/pb-mirrors-medicine-cabinets/, /shop/bath/shop-all-bath-accessories/ all resolve to their 'All ...' View-All page and their own group ids return total_num_results=0 in the site's product engine - i.e. they are navigation-only. They are therefore emitted as grouping rows with blank qty and blank link (rule 24), and the 'All ...' destinations are never recorded (rule 25). Vanity Mirrors and Medicine Cabinets are marked secret in the flyout but are real, sitemap-listed, product-bearing child listings of the Mirrors & Medicine Cabinets header, so they - not the header's View-All page - are the recorded leaves. QTY: Pottery Barn's PLP is client-rendered (the served HTML carries the H1 and breadcrumb but no product total), so every number is response.total_num_results from the storefront's OWN product API, https://ac.cnstrc.com/browse/group_id/<slug>?key=key_w3v8XC1kGR9REv46 - the key read live out of the PLP's __INITIAL_STATE__, where constructor.abTestConfig.variant='treatmentSearchEngineConstructor' and enabled=true. VERIFICATION - three independent checks. (1) SOURCE CHAIN, read out of the live WSI storefront bundle dist/shop.cd506c32.js (the same bundle serves PB/PK/PT/WE/WS - it declares POTTERY_BRANDS=['PB','PK','PT']): it assigns 'v.response.numFound = e.response.total_num_results' from this exact browse call, defines productCount() as '(state.shop.cat.response.numFound) || 0', and builds productCountMessage() from productCount + productCountDisplayConfig.displayText; the PB PLP's own __INITIAL_STATE__ sets productCountDisplay={displayText:'Items', isEnabled:true, viewAllProductsJumpLink.enabled={desktop:true,mobile:true}}. So total_num_results IS the number Pottery Barn prints in its 'N Items' / 'View N Items' header. (2) ENUMERATION TO EXHAUSTION on five categories of differing size - bathroom-vanities, bath-storage, towel-ring, cabinet-hardware, bath-accessory-countertop, switch-plates, bathtubs, medicine-cabinets were paged out at 100 results/page and unique product ids counted: 191/191, 73/73, 65/65, 51/51, 27/27, 12/12, 3/3, 13/13 - exact matches. (3) IDENTITY: every recorded leaf URL was fetched and its server-rendered H1 and __INITIAL_STATE__ categoryNames confirmed to be the node requested (e.g. /shop/bath/bath-faucets/ -> H1 'Bathroom Faucets', categoryNames [\"Bath\",\"Bathroom Faucets\"]; /shop/bath/cabinet-hardware/ -> H1 'Cabinet Knobs & Pulls'). Counts discriminate per category (3 to 191) and no filter/store/zip pre_filter_expression was attached to any request. NOTE ON DRIFT: Bath Vanities read 192 on the first pull and 191 twenty minutes later; 191 is the value from the final consistent snapshot in which every number in this file was taken. EXCLUDED: 'All Towels & Linens', 'All Bath Furniture', 'All Mirrors & Medicine Cabinets', 'All Bath Hardware', 'All Bath Accessories', 'All Faucets & Plumbing', 'All Soaps & Home Fragrance', 'All Bath' as View-All (rule 25); 'All In-Stock Bath' and 'Free Shipping Bath' as filters; 'Bestselling Bath', 'Bath Outlet Deals', 'Bath up to 70% off', 'Bath Stocking Stuffers', 'Bathroom Furniture Plant A Tree' and 'All Bath Test' as promotional/test pages; and the three collection groups the nav exposes - Bath Towel Collections (5), Bath Vanity Collections (25 named vanity collections), Bath Hardware & Lighting Collections (16) - plus the Simplehuman brand shop and Bath Swatches, all under rule 25. 'Pajamas' and 'Bath Faucets & Tubs' are dead nodes (0 products in the site's own engine) and are not in the sitemap. ROUTED OUT (recorded in review, not rows): the whole Towels & Linens header plus Rugs > Bathroom Runner Rugs -> Textile; Bath > Bath Lighting -> Lighting; Soaps & Lotions -> bath & body consumables. Also parked in review rather than rows, each with its qty and URL so nothing is silently skipped: Cabinet Knobs, Drawer Pulls and the hidden 'Bath Hardware' aggregate (assortment overlap with recorded leaves - recording them would double count), Vintage Mirrors & Medicine Cabinets (real bathroom mirrors but filed under the Sale header), Storage > Bathroom and Storage > Functional Mirrors (hidden, overlapping), Marble Bath Accessories, and Furniture > Makeup Vanities (a bedroom vanity desk, disambiguated per rule 29). KEPT DELIBERATELY: Bath Vanities and Bath Storage & Shelving as Bathroom Furniture/Storage (rules 9/12 - PB's own hierarchy files them under Bath); Vanity Mirrors and Medicine Cabinets as Bathroom because the primary product type is a mirror / mirrored cabinet (rules 10/11), not Decor and not Lighting; Towel Rings & Hooks, Towel Bars & Warmers and Racks & Hooks as bathroom HARDWARE (rule 15's hardware/textile split - the towels themselves went to Textile); Switch Plates because Pottery Barn sells them as finish-matched parts of its Bath Hardware collections and rule 17 admits mounting accessories with no material restriction; Wastebaskets & Hampers because it sits inside Bath > Accessories and rule 13 covers bathroom containers. || CROSS-FILE DEDUP: 2 leaf record(s) removed as already extracted in a prior category workbook. See Review sheet.",
+ "rows": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Mirrors & Medicine Cabinets",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Vanity Mirrors",
+   "qty": 59,
+   "link": "https://www.potterybarn.com/shop/bath/vanity-mirrors/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Medicine Cabinets",
+   "qty": 13,
+   "link": "https://www.potterybarn.com/shop/bath/medicine-cabinets/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Hardware",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Sink Faucets",
+   "qty": 13,
+   "link": "https://www.potterybarn.com/shop/bath/bath-faucets/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Cabinet Hardware",
+   "qty": 51,
+   "link": "https://www.potterybarn.com/shop/bath/cabinet-hardware/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Towel Rings & Hooks",
+   "qty": 65,
+   "link": "https://www.potterybarn.com/shop/bath/towel-ring/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Towel Bars & Warmers",
+   "qty": 53,
+   "link": "https://www.potterybarn.com/shop/bath/towel-bar-warmers/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Toilet Paper Holders",
+   "qty": 35,
+   "link": "https://www.potterybarn.com/shop/bath/toilet-paper-holders/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Racks & Hooks",
+   "qty": 43,
+   "link": "https://www.potterybarn.com/shop/bath/bath-racks-hooks/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Switch Plates",
+   "qty": 12,
+   "link": "https://www.potterybarn.com/shop/bath/switch-plates/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathtubs",
+   "qty": 3,
+   "link": "https://www.potterybarn.com/shop/bath/bathtubs/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Accessories",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Countertop Accessories",
+   "qty": 27,
+   "link": "https://www.potterybarn.com/shop/bath/bath-accessory-countertop/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Wastebaskets & Hampers",
+   "qty": 16,
+   "link": "https://www.potterybarn.com/shop/bath/bath-hampers-storage/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  }
+ ],
+ "review": [
+  {
+   "category": "Bathroom",
+   "sub_category": "All Bath Lighting (Bath > Bath Lighting)",
+   "qty": 94,
+   "issue": "ROUTED TO LIGHTING: primary product type is lighting (rule 19). This is the only node under Pottery Barn's Bath > Bath Lighting header, so the whole header is routed out.",
+   "link": "https://www.potterybarn.com/shop/bath/bathroom-lighting/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Towels (Bath > Towels & Linens)",
+   "qty": 26,
+   "issue": "ROUTED TO TEXTILE: bath towels (rules 15/20).",
+   "link": "https://www.potterybarn.com/shop/bath/bath-linens/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Mats (Bath > Towels & Linens)",
+   "qty": 11,
+   "issue": "ROUTED TO TEXTILE: textile bath mats (rules 16/20).",
+   "link": "https://www.potterybarn.com/shop/bath/bath-rugs-mats/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Towel Bundles (Bath > Towels & Linens)",
+   "qty": 4,
+   "issue": "ROUTED TO TEXTILE: towel bundles/sets (rules 15/20). Hidden from the desktop flyout (secret=true in the nav payload) but present in the shop sitemap.",
+   "link": "https://www.potterybarn.com/shop/bath/bath-sets/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower Curtains (Bath > Towels & Linens)",
+   "qty": 49,
+   "issue": "ROUTED TO TEXTILE: shower curtains (rule 20).",
+   "link": "https://www.potterybarn.com/shop/bath/shower-curtains/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Robes & Slippers (Bath > Towels & Linens)",
+   "qty": 17,
+   "issue": "ROUTED TO TEXTILE: robes and slippers (rule 20).",
+   "link": "https://www.potterybarn.com/shop/bath/robes/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Beach Towels (Bath > Towels & Linens)",
+   "qty": 3,
+   "issue": "ROUTED TO TEXTILE: beach towels (rules 15/20). Hidden from the desktop flyout but present in the shop sitemap.",
+   "link": "https://www.potterybarn.com/shop/bath/beach-towels-bath/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Runner Rugs (Rugs supercat)",
+   "qty": 5,
+   "issue": "ROUTED TO TEXTILE: textile bathroom runner rugs; the node lives under the Rugs supercat, not under Bath (rules 16/20).",
+   "link": "https://www.potterybarn.com/shop/rugs/bathroom-runner-rugs/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Soaps & Lotions (Bath > Accessories)",
+   "qty": 39,
+   "issue": "ROUTED TO BATH & BODY / CONSUMABLES: primary product type is soap, lotion and hand wash, i.e. a toiletry consumable. Rule 13 admits soap DISPENSERS, dishes and holders (those sit in Countertop Accessories, which IS recorded) but not the soap itself.",
+   "link": "https://www.potterybarn.com/shop/bath/bath-khall-gifts/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Cabinet Knobs (Bath > Bath Hardware)",
+   "qty": 8,
+   "issue": "OVERLAP - NOT RECORDED TO AVOID DOUBLE COUNTING: hidden node (secret=true, absent from the rendered flyout) whose assortment is a subset of the recorded 'Cabinet Hardware' leaf (51). Recording it as well would double count the same products (rule 26).",
+   "link": "https://www.potterybarn.com/shop/bath/cabinet-knobs/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Drawer Pulls (Bath > Bath Hardware)",
+   "qty": 14,
+   "issue": "OVERLAP - NOT RECORDED TO AVOID DOUBLE COUNTING: hidden node whose assortment is a subset of the recorded 'Cabinet Hardware' leaf (51).",
+   "link": "https://www.potterybarn.com/shop/bath/drawer-pulls/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Hardware (bathroom-fixtures-faucets)",
+   "qty": 146,
+   "issue": "OVERLAP - NOT RECORDED: hidden aggregate node (secret=true) that spans the recorded Bath Hardware leaves; recording it would aggregate quantities already captured (rules 24/26).",
+   "link": "https://www.potterybarn.com/shop/bath/bathroom-fixtures-faucets/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Vintage Mirrors & Medicine Cabinets",
+   "qty": 7,
+   "issue": "REVIEW: genuine bathroom mirrors / medicine cabinets by product type, but the node is hidden (secret=true) and Pottery Barn files it under the Bath > SALE header, which rule 25 excludes. Flagged rather than silently dropped.",
+   "link": "https://www.potterybarn.com/shop/bath/vintage-mirrors/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom (Storage supercat > bathroom-solutions)",
+   "qty": 32,
+   "issue": "REVIEW / OVERLAP: hidden node (secret=true) in the Storage supercat holding bathroom organizers that also appear under Bath > Bath Storage & Shelving; not recorded to avoid duplicating the same products under a second URL.",
+   "link": "https://www.potterybarn.com/shop/organization/bathroom-solutions/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Functional Mirrors (Storage supercat)",
+   "qty": 5,
+   "issue": "REVIEW: hidden node (secret=true) under Storage; 'functional mirrors' are magnifying/vanity mirrors, which rule 10 would treat as Bathroom, but Pottery Barn does not file them under Bath. LOW confidence - flagged, not guessed.",
+   "link": "https://www.potterybarn.com/shop/organization/functional-mirrors-shop/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Marble Bath Accessories",
+   "qty": 1,
+   "issue": "REVIEW: hidden single-material sub-shop of Bath Accessories (1 product); reads as a Collections/material page under rule 25 and its product is already inside Countertop Accessories.",
+   "link": "https://www.potterybarn.com/shop/bath/marble-bath-accessories/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Makeup Vanities (Furniture supercat)",
+   "qty": 1,
+   "issue": "NOT BATHROOM: Pottery Barn's 'Makeup Vanities' is a bedroom vanity DESK, filed under the Furniture supercat, not under Bath; disambiguated per rule 29 - it is not a bathroom vanity unit. Recorded in the Furniture pass.",
+   "link": "https://www.potterybarn.com/shop/furniture/makeup-vanities/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Vanities",
+   "qty": 191,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Bath Vanities' - excluded from Bathroom per cross-category dedup (master guide s13)",
+   "link": "https://www.potterybarn.com/shop/bath/bathroom-vanities/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Storage & Shelving",
+   "qty": 73,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Bath Storage & Shelving' - excluded from Bathroom per cross-category dedup (master guide s13)",
+   "link": "https://www.potterybarn.com/shop/bath/bath-storage/"
+  }
+ ],
+ "_reconstructed_from": "Bathroom.xlsx delivered 2026-09-01 (checkpoint), not original worker JSON"
+}

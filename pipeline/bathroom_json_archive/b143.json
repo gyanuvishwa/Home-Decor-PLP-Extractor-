@@ -1,0 +1,209 @@
+{
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ACCESS: robots.txt fetched first at https://www.finnishdesignshop.com/robots.txt via probe.fetch() (HTTP 200). Single 'User-agent: *' group; NO ClaudeBot / anthropic-ai / Claude-Web group anywhere in the file, so there is no robots opt-out. Its Disallow list is /login.php, /password_forgotten.php, /create_account.php, /account, /logoff.php, /shopping_cart.php, /b2b-, '*?*new_layout=*', /checkout, and then ~130 individual locale prefixes (/en-li, /en-al, /es-bo, /en-tr ...). CRITICAL: the locale used here, /en-us, is NOT in that Disallow list, nor are /en-gb, /fi-fi or any locale touched; the disallowed prefixes are the low-traffic shipping destinations only. No Crawl-delay is declared; probe.py's 2s per-host gap was kept. SECOND HOST CHECKED SEPARATELY: the PLP's product data comes from Constructor.io at ac.cnstrc.com; https://ac.cnstrc.com/robots.txt returns HTTP 404, i.e. that host publishes no robots file and imposes no directives - a parent-domain permission was NOT assumed. The Finnish storefront finnishdesignshop.fi was NEVER fetched; the one .fi URL referenced in review was read out of hreflang tags served by finnishdesignshop.com itself. No bot wall was met and no campaign parameters were used. TREE: https://www.finnishdesignshop.com/ carries rel=canonical and hreflang=x-default to https://www.finnishdesignshop.com/en-us/, so /en-us is the site's own default storefront - and it is the same locale Furniture.xlsx used, which keeps this pass URL-comparable with the prior one. The tree was taken three ways and all three agree: (a) the server-rendered mega-menu on the /en-us/ homepage; (b) the site's own category sitemap https://www.finnishdesignshop.com/sitemaps/en-us/categories.xml.gz (368 category URLs), reached from the robots-declared https://www.finnishdesignshop.com/sitemap-index.xml; (c) the window.__SERVER_STATE__ category payload embedded in every PLP, which carries id, cPath and path for the current node's parents, siblings and children. MEGA-MENU TRUNCATION CONFIRMED AND RECOVERED: the homepage mega-menu shows Bathroom with 9 children and NO third level; the category sitemap and the PLP's own child-category carousel both reveal a hidden third level - Bathroom accessories > Toilet brushes / Toilet paper holders, Bathroom mirrors > Bathroom wall mirrors / Standing bathroom mirrors, and six children under Bathroom textiles and five under Hygiene & Cosmetics. Those four grandchildren are recorded as leaves and would have been missed from the mega-menu alone. Full recovered tree: Bathroom (Category:999) > Bathroom textiles (1784) > {shower-curtains 1888, bath-mats-rugs 1886, hand-towels-washcloths 2055, bath-towels 1000, seat-covers 1887, bathrobes 1001}; Bathroom accessories (1003) > {toilet-paper-holders 1890, toilet-brushes 1889}; Sauna accessories (2104); Bathroom hooks (1995); Laundry baskets (1785); Bathroom lighting (1899); Hygiene & Cosmetics (1577) > {home-fragrances 1895, combs-brushes 2086, soaps 1892, toothbrushes-nail-clippers 1806, cosmetics 1893}; Toiletry & Makeup bags (2003); Bathroom mirrors (1786) > {bathroom-wall-mirrors 1990, standing-bathroom-mirrors 1972}. QTY: the PLP is client-rendered and displays NO product total in its served HTML (the main element's text ends at the SEO copy; there is no 'N products' string anywhere and no total in window.__SERVER_STATE__). The storefront's own product API was identified from the page itself: the PLP HTML embeds \"constructorKeysByLanguage\":{...\"en\":\"key_HVBsk8vDh0XKDU0q\"...} and preloads ConstructorBeaconTagger-BlFusLEC.js, i.e. Constructor.io. Counts are response.total_num_results from https://ac.cnstrc.com/browse/group_id/Category%3A<id>, where <id> is the numeric category id taken from Finnish Design Shop's OWN __SERVER_STATE__ / sitemap tree - never guessed. The correct group_id form is 'Category:<id>' (plain '<id>', '999_1003' and slug forms all return total 0, which would have produced a false EMPTY NODE). VERIFICATION (three independent proofs): (1) EXHAUSTIVE ENUMERATION - for all eight recorded leaves, a single request with num_results_per_page=200 returned exactly total_num_results unique product ids (44/35/74/91/17/79/82/79), every one of those results carries the node's own 'Category:<id>' in its group_ids array (in-group = enumerated = total for all eight), and page=2 returned zero results in all eight cases. (2) PAGE-SIZE EQUIVALENCE ON 2-3 PAGES OF DIFFERING SIZE, as the brief requires - Toilet brushes, Bathroom hooks and Bathroom wall mirrors were each fully paginated at num_results_per_page = 12, 20 and 50 (4/3/1 pages, 7/4/2 pages and 8/5/2 pages respectively) and every run reproduced the same unique-id count as total_num_results: 44, 74 and 91. Unlike Søstrene Grene's API, this one is page-size invariant. (3) IDENTITY - Constructor's group objects return display_name and data.path that match Finnish Design Shop's own category names and URL paths exactly (e.g. Category:1990 -> 'Bathroom wall mirrors', /bathroom/bathroom-mirrors/bathroom-wall-mirrors), each PLP's H1 matches the node requested (verified individually: 'Toilet brushes', 'Toilet paper holders', 'Bathroom hooks', 'Bathroom wall mirrors', 'Standing bathroom mirrors', 'Laundry baskets', 'Sauna accessories', 'Toiletry & Makeup bags'), each self-canonicalises, and each product's categories__nameInEnglish array names the node. Counts discriminate strongly (17 to 633), so no site-wide constant. DEDUP: already_extracted() run on every candidate. The index holds 85 finnishdesignshop rows and they are split across TWO hosts and TWO locales - 44 Furniture.xlsx rows on finnishdesignshop.com/en-us/* and 41 Final.xlsx rows on finnishdesignshop.fi/fi-fi/*. None is a bathroom node and none of the eight recorded leaves hits directly. LOCALE/HOST BLIND SPOT WORKED EXPLICITLY: for each of the eight leaves the page's 47 hreflang alternates were extracted and already_extracted() was run against every one (376 checks) - zero hits. The check was validated against a known positive: /en-us/decor/mirrors/wall-mirrors returns None on its own URL but its fi-fi alternate https://www.finnishdesignshop.fi/fi-fi/sisustus/peilit/seinapeilit HITS Final.xlsx as 'Wall Mirrors', proving the method detects exactly the failure mode the brief warned about. That decor node is logged in review and excluded. It is also structurally distinct from the bathroom mirrors: decor/mirrors/wall-mirrors is Category:1896 and decor/mirrors/table-mirrors is Category:1898, versus Category:1990 and 1972 for the two bathroom mirror leaves. EXCLUDED: (1) PARENT NODES not recorded as leaves because valid children exist (rule 24) - Bathroom (Category:999, 1,804 products), Bathroom accessories (1003, 448) and Bathroom mirrors (1786, 142) are grouping rows with blank qty and blank link (rule 38). NOTE ON RESIDUALS: Bathroom accessories holds 448 products against only 79 in its two children, and Bathroom mirrors 142 against 108, so a residual of roughly 369 and 34 products sits on the parent listings alone. Rule 24 is unambiguous that the parent URL must not be recorded when subcategories exist, so those residuals are deliberately not captured; flagging here rather than silently. (2) ROLL-UP OVERLAP - the Bathroom parent's 1,804 total overlaps every child (children sum to 1,879 because products carry multiple category ids), so it is never recorded alongside them and never summed. (3) The Bathroom textiles branch (7 nodes) and both Bathroom lighting nodes route out to Textile and Lighting - see review. (4) Hygiene & Cosmetics under Bathroom (273) and its near-twin /lifestyle-housekeeping/hygiene-cosmetics (Category:1994, 270) are both excluded as personal care. (5) /lifestyle-housekeeping/sauna (Category:2105, 130) is a SEPARATE node from the recorded /bathroom/sauna-accessories (Category:2104, 82) - different ids, different totals, each self-canonical - and is excluded because it sits in the Lifestyle department and mixes sauna heaters and gift sets; only the Bathroom-department node was taken, so no double count. Likewise /lifestyle-housekeeping/bags-cases/toiletry-makeup-bags is a distinct self-canonical node under Bags & Cases and was NOT recorded - only the Bathroom-department /bathroom/toiletry-makeup-bags was, on the strength of its Bathroom hierarchy (rule 13, and consistent with SR 96 Maisons du Monde where 'Trousses de toilette' inside the retailer's own bathroom branch was taken). (6) Decor > Mirrors and its two children are Decor and already extracted. (7) Storage > storage-baskets / jars-boxes and Lifestyle > Housekeeping are general storage and general household cleaning, kept out by rules 30-33. (8) Finnish Design Shop sells NO sanitaryware, baths, toilets, basins, taps or shower enclosures - confirmed by sweeping all 368 en-us category URLs in the site's own category sitemap; the only shower-adjacent node on the entire site is /outdoor/outdoor-showers, reviewed above. (9) No EMPTY NODE: every one of the 8 recorded leaves returns a non-zero enumerated count.\n\nADDENDUM 2026-09-05 (residue follow-up, project's largest flagged gap, ~400 products across the two nodes below): both residuals re-investigated live via curl_cffi against ac.cnstrc.com (key_HVBsk8vDh0XKDU0q), HTTP-first, no browser needed. MEGA-MENU RE-CHECK: re-fetched the category sitemap (https://www.finnishdesignshop.com/sitemaps/en-us/categories.xml.gz, 368 URLs, live) and the live PLP's own window.__SERVER_STATE__ category payload for /bathroom/bathroom-accessories - both agree exactly with the original pass: Category:1003 (Bathroom accessories) has ONLY 2 children (Category:1889 Toilet brushes, Category:1890 Toilet paper holders) and Category:1786 (Bathroom mirrors) has ONLY 2 children (Category:1990 Bathroom wall mirrors, Category:1972 Standing bathroom mirrors). NO hidden third-level grandchild exists under either node - the mega-menu-truncation trap does NOT apply here; this residue is a genuine parent-bucket, not a missed subcategory. LIVE TOTALS: Category:1003=447 (was 448 at original pass, normal stock drift), Category:1889=44, Category:1890=35 (unchanged). Category:1786=142 (unchanged), Category:1990=91, Category:1972=17 (unchanged).\n\nCONTAINMENT PROOF - BATHROOM ACCESSORIES: full product-id enumeration at num_results_per_page=200 (page-size-invariant, same method as original pass) - Category:1003 parent returned exactly 447 unique ids; Category:1889 44 unique ids; Category:1890 35 unique ids. The two children overlap EACH OTHER by 2 ids (59974, 59975 - combo toilet-brush/holder sets tagged into both), so their UNION is 77, not 79. Residue = parent(447) - union(77) = 370, and both children proved a 100% subset of the parent (0 ids outside). Inspected all 370 residue titles/tags: 164 carry ONLY the Bathroom/Bathroom-accessories tag (soap holders, soap/disinfectant dispensers, toothbrush holders/mugs, tissue boxes, shower wipers, bath/shower caddies, apothecary displays, paper dispensers, trays, bath shelves, towel bars, bathroom sets, arm/grab supports - squarely rule 13/17); the remaining 206 additionally carry other departments' tags (Storage/Kids/Home-office/Kitchenware/Furniture/Housekeeping etc, e.g. 'Colour Crate' plastic bins, 'Ume' jars, waste bins, wall shelves) reflecting this site's known multi-category tagging pattern (see this node's own 1,804-vs-1,879 overlap noted above for the top Bathroom node), but every one of the 370 is nonetheless directly presented by the site itself on the /bathroom/bathroom-accessories listing (Category:1003), so rule 12's 'website hierarchy decides' controls. DEDUP: the parent URL is NOT in cross_category_url_index.json (checked live, returns None). RESOLUTION (Kmart SR176 precedent, run-owner decision 2026-09-01 applied identically here): captured as a new leaf row 'Bathroom Accessories (other)' qty 370 using the parent's own URL - rule 24's parent-suppression exists to avoid recording an UNRESOLVED bucket, not to discard a PROVEN, enumerated, dedup-clean residue.\n\nCONTAINMENT PROOF - BATHROOM MIRRORS: full enumeration - Category:1786 parent 142 unique ids, Category:1990 91 unique ids, Category:1972 17 unique ids, ZERO overlap between the two children, union 108, residue = 142-108 = 34, children proved a 100% subset of the parent. UNLIKE Bathroom accessories, this residue is FULLY EXPLAINED and is NOT genuine new Bathroom content: of the 34 residue items, 33 carry the tag chain 'Decor, Mirrors, Wall mirrors' - i.e. they are members of Category:1896 (Decor > Mirrors > Wall mirrors), the EXACT node already logged above in review as 'Wall mirrors (Decor)' / ALREADY EXTRACTED IN Final.xlsx (306 products) - and the 1 remaining item ('Fjord mirror, black') carries 'Decor, Mirrors, Table mirrors' i.e. Category:1898, also Decor and already excluded per item (6) above. Independently confirmed via cross_category_url_index.json: the parent URL https://www.finnishdesignshop.com/en-us/bathroom/bathroom-mirrors itself already resolves to ['Wall_Decor.xlsx'] (checked live) - this exact residue was already flagged as Wall_Decor territory before this investigation began. RESOLUTION: the 34-product residue is 100% Decor-primary product cross-tagged into the Bathroom-mirrors group id, not a distinct Bathroom product type, so NO new leaf is added here - a 'Bathroom Mirrors (other)' row would double-count product already captured in Wall_Decor.xlsx/Final.xlsx. Logged instead as a closed RULE 24 RESIDUE review entry with the exhaustive math, so the ~34 gap is documented as EXPLAINED rather than silently dropped or fabricated.",
+ "rows": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom accessories",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Accessories (other)",
+   "qty": 370,
+   "link": "https://www.finnishdesignshop.com/en-us/bathroom/bathroom-accessories",
+   "is_group": false,
+   "evidence": "RULE 24 RESIDUE, added 2026-09-05 per Kmart SR176 precedent (run-owner decision 2026-09-01). Category:1003 total 447 (live 2026-09-05) minus the union of its two children's product-id sets (Toilet brushes 44 + Toilet paper holders 35, overlapping each other by 2 combo-set products = union 77) = 370; both children proved a 100% subset of the parent by full id enumeration (num_results_per_page=200, page-size invariant). Residue titles inspected: soap holders/dispensers, toothbrush holders/mugs, tissue boxes, shower wipers/caddies, apothecary displays, paper dispensers, trays, bath shelves, towel bars, bathroom sets, grab/arm supports - genuine Bathroom accessories/hardware (rules 13/17) presented directly on this listing by the site's own hierarchy (rule 12). No missed subcategory exists (sitemap + live __SERVER_STATE__ both confirm only 2 children under Category:1003). Parent URL confirmed NOT already recorded elsewhere (cross_category_url_index.json returns None). See notes addendum for full breakdown.",
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Toilet brushes",
+   "qty": 44,
+   "link": "https://www.finnishdesignshop.com/en-us/bathroom/bathroom-accessories/toilet-brushes",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Toilet paper holders",
+   "qty": 35,
+   "link": "https://www.finnishdesignshop.com/en-us/bathroom/bathroom-accessories/toilet-paper-holders",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom hooks",
+   "qty": 74,
+   "link": "https://www.finnishdesignshop.com/en-us/bathroom/bathroom-hooks",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom mirrors",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom wall mirrors",
+   "qty": 91,
+   "link": "https://www.finnishdesignshop.com/en-us/bathroom/bathroom-mirrors/bathroom-wall-mirrors",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Standing bathroom mirrors",
+   "qty": 17,
+   "link": "https://www.finnishdesignshop.com/en-us/bathroom/bathroom-mirrors/standing-bathroom-mirrors",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Laundry baskets",
+   "qty": 79,
+   "link": "https://www.finnishdesignshop.com/en-us/bathroom/laundry-baskets",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Sauna accessories",
+   "qty": 82,
+   "link": "https://www.finnishdesignshop.com/en-us/bathroom/sauna-accessories",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Toiletry & Makeup bags",
+   "qty": 79,
+   "link": "https://www.finnishdesignshop.com/en-us/bathroom/toiletry-makeup-bags",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  }
+ ],
+ "review": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom lighting",
+   "qty": 69,
+   "issue": "ROUTED TO LIGHTING: primary product type is lighting (rules 11/19). Direct child of Bathroom in the site's own tree (Category:1899), H1 'Bathroom lighting'. Count 69 from the storefront's Constructor.io browse total_num_results for group_id Category:1899.",
+   "link": "https://www.finnishdesignshop.com/en-us/bathroom/bathroom-lighting"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom lighting (under Lighting)",
+   "qty": 72,
+   "issue": "ROUTED TO LIGHTING: a SECOND, genuinely distinct bathroom-lighting node. Finnish Design Shop carries the same-named category on both axes with DIFFERENT internal ids and different totals - /bathroom/bathroom-lighting is Category:1899 (69 products) and /lighting/bathroom-lighting is Category:1775 (72 products) - and each page self-canonicalises. Recorded here so the Lighting pass sees both; neither is Bathroom.",
+   "link": "https://www.finnishdesignshop.com/en-us/lighting/bathroom-lighting"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom textiles",
+   "qty": 633,
+   "issue": "ROUTED TO TEXTILE: grouping node over six textile leaves (rules 15/20). Category:1784. Listed for completeness; its children are itemised below.",
+   "link": "https://www.finnishdesignshop.com/en-us/bathroom/bathroom-textiles"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath towels",
+   "qty": 206,
+   "issue": "ROUTED TO TEXTILE: bath towels (rule 15). Category:1000.",
+   "link": "https://www.finnishdesignshop.com/en-us/bathroom/bathroom-textiles/bath-towels"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Hand towels & washcloths",
+   "qty": 237,
+   "issue": "ROUTED TO TEXTILE: hand towels and washcloths (rule 15). Category:2055.",
+   "link": "https://www.finnishdesignshop.com/en-us/bathroom/bathroom-textiles/hand-towels-washcloths"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathrobes",
+   "qty": 68,
+   "issue": "ROUTED TO TEXTILE: bathrobes (rule 20). Category:1001.",
+   "link": "https://www.finnishdesignshop.com/en-us/bathroom/bathroom-textiles/bathrobes"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath mats & rugs",
+   "qty": 65,
+   "issue": "ROUTED TO TEXTILE: textile bath mats and rugs (rules 15/16). The node sits under Bathroom textiles, so the website hierarchy resolves rule 16's ambiguity toward Textile. Category:1886.",
+   "link": "https://www.finnishdesignshop.com/en-us/bathroom/bathroom-textiles/bath-mats-rugs"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower curtains",
+   "qty": 24,
+   "issue": "ROUTED TO TEXTILE: shower curtains (rule 20). Category:1888.",
+   "link": "https://www.finnishdesignshop.com/en-us/bathroom/bathroom-textiles/shower-curtains"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Seat covers",
+   "qty": 55,
+   "issue": "ROUTED TO TEXTILE: sauna/bathroom seat covers, filed by the retailer under Bathroom textiles and made of linen/terry (rule 20). Category:1887.",
+   "link": "https://www.finnishdesignshop.com/en-us/bathroom/bathroom-textiles/seat-covers"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Hygiene & Cosmetics",
+   "qty": 273,
+   "issue": "EXCLUDED (not Bathroom) - logged so it is not silently dropped. Category:1577, a direct child of Bathroom, but its five children are Home fragrances (84), Cosmetics (79), Soaps (70), Combs & Brushes (13) and Toothbrushes & nail clippers (20) - consumable toiletries, cosmetics and personal-care implements. PRIMARY PRODUCT TYPE and FUNCTION are personal care, not bathroom fitment, hardware, storage or accessories, so rule 2's priority order keeps it out of Bathroom even though the room hierarchy is Bathroom (rule 3 covers Soap ACCESSORIES - dispensers and dishes - not the soap itself; those accessories live in the recorded Bathroom accessories branch). Home fragrances would belong to Decor if anything.",
+   "link": "https://www.finnishdesignshop.com/en-us/bathroom/hygiene-cosmetics"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Outdoor showers",
+   "qty": 9,
+   "issue": "LOW CONFIDENCE - SENT TO REVIEW, NOT GUESSED (rule 29). Category:2077 under Outdoor, H1 'Outdoor showers', 9 products (Excel outdoor shower copper, Lagoon outdoor shower stainless steel, Lagoon outdoor shower base teak, Garden outdoor shower, Levantine outdoor shower black/white, Garden towel hanger, plus two Palissade chairs that are mis-tagged into the node). Rule 6 includes showers and shower systems on PRIMARY PRODUCT TYPE, and the FINAL PRINCIPLE forbids skipping a category merely because its name contains 'Outdoor'; but the WEBSITE HIERARCHY files these as garden/patio equipment, not bathroom sanitaryware, and the node is polluted by two dining chairs. Genuinely ambiguous, so it is reviewed rather than recorded. This is the only shower/sanitaryware-adjacent node on the whole site.",
+   "link": "https://www.finnishdesignshop.com/en-us/outdoor/outdoor-showers"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Wall mirrors (Decor)",
+   "qty": 306,
+   "issue": "ALREADY EXTRACTED IN Final.xlsx (Home Decor pass) as 'Wall Mirrors' - found ONLY via the locale blind spot. already_extracted() on the /en-us/ URL returns None because Final.xlsx recorded the Finnish storefront form https://www.finnishdesignshop.fi/fi-fi/sisustus/peilit/seinapeilit (a DIFFERENT HOST as well as a different locale); reading this page's own hreflang alternates gives exactly that URL and already_extracted() on it HITS. Also Decor by primary type, not Bathroom (Category:1896, distinct from the bathroom mirror nodes Category:1990/1972). Recorded here as the audit trail for the locale check, qty 306 from the same Constructor.io browse endpoint (group_id Category:1896).",
+   "link": "https://www.finnishdesignshop.com/en-us/decor/mirrors/wall-mirrors"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "RULE 24 RESIDUE - Bathroom mirrors (parent-only products) - EXPLAINED, NOT ADDED",
+   "qty": 34,
+   "issue": "Investigated 2026-09-05 as the project's largest flagged residue alongside Bathroom accessories. Category:1786 total 142 (live) minus the union of its two children's product-id sets (Bathroom wall mirrors 91 + Standing bathroom mirrors 17, ZERO overlap = 108) = 34; both children proved a 100% subset of the parent by full id enumeration. No missed subcategory exists (sitemap + live __SERVER_STATE__ both confirm only 2 children under Category:1786). UNLIKE the Bathroom accessories residue, this one is fully explained as NOT genuine new Bathroom content: 33 of the 34 residue items carry the tag chain 'Decor, Mirrors, Wall mirrors' (Category:1896) - the SAME node already logged above as 'Wall mirrors (Decor)', ALREADY EXTRACTED IN Final.xlsx - and the last item ('Fjord mirror, black') carries 'Decor, Mirrors, Table mirrors' (Category:1898), also Decor and already excluded (see notes item 6). Independently confirmed via cross_category_url_index.json: the parent URL itself already resolves to ['Wall_Decor.xlsx']. CONCLUSION: no new leaf added - a 'Bathroom Mirrors (other)' row would double-count product already captured in Wall_Decor.xlsx/Final.xlsx. This closes out the ~34 gap as explained, not missing, and not fabricated.",
+   "link": "https://www.finnishdesignshop.com/en-us/bathroom/bathroom-mirrors"
+  }
+ ],
+ "_reconstructed_from": "Bathroom.xlsx delivered 2026-09-01 (checkpoint), not original worker JSON"
+}

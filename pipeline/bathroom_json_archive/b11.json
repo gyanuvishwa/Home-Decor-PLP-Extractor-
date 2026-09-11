@@ -1,0 +1,101 @@
+{
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ACCESS: plain direct fetch via probe.fetch/curl_cffi returned HTTP 200 for every /collections/<handle> page, the /sitemap*.xml files, /collections/<handle>/products.json and the Bloomreach API - no block, no proxy, r.jina.ai not needed. robots.txt names no Claude / anthropic-ai / ClaudeBot agent; it disallows /search, /cart, /checkout, /account, /policies and sort_by / filter-combination query forms on /collections/* - none of which were used (every URL recorded here is a clean, unparameterised /collections/<handle>). TREE SOURCE: two independent in-page nav sources were extracted and reconciled. (1) The DESKTOP mega-menu, server-rendered in the static HTML of every page as ul.main-menu - this is the authoritative and richer source for Bath and was parsed structurally (li.has-drop > div.megamenu__slide > megamenu__label h3 a = sub-department, ul.megamenu__link-list li a = leaf). It gives exactly: Bath (/collections/bath) > Furniture (/collections/bath-furniture) > {Vanities & Washstands, Cabinets & Storage, Discover Arhaus Bath} and Bath > Accents & Decor (/collections/bath-accents-decor) > {Towels & Linens, Hooks & Towel Bars, Accessories, Lighting, Mirrors, Faucets}. (2) The <script type=\\\"application/json\\\"> nav blob (menu > children > grandchildren) that drives the mobile menu, extracted from the same HTML. The mobile blob agrees on the same nine Bath URLs but flattens them differently (it hangs Bath Linens directly off Bath, omits Accessories and Lighting from the Bath tree and instead surfaces them under Decor > Bath Accessories and Lighting > Bath Lighting). The DESKTOP structure was used because it is the deeper and more complete one; the mobile placements are the same URLs reached by a second nav path and are therefore one record each (rule 28). Each page's own h1 and parent_breadcrumb JSON was checked and matched the handle requested in all 11 cases (Bath, Bath Furniture, Vanities & Washstands, Cabinets & Storage, Towels & Linens, Bath Accents & Decor, Hooks & Towel Bars, Bath Mirrors, Faucets, Bath lighting, Bath Accessories). QTY SOURCE: Arhaus is Shopify with a Bloomreach-rendered grid - the static HTML ships an EMPTY grid and no 'N Items' header (verified: the bath-mirrors HTML contains no 'Items' string and no numFound), so counts come from the Bloomreach endpoint the PLP itself renders from: core.dxpapi.com/api/v1/core/ with account_id=7981, domain_key=arhaus_us, request_type=search, search_type=category, q=<collection handle> -> response.numFound, which is the field that populates the PLP's own 'N Items' header. VERIFICATION: (a) every count read TWICE on separate sessions/fingerprints with zero drift (vanities 32/32, cabinets-storage 9/9, hooks-towel-bars 22/22, bath-accessories 11/11, bath-mirrors 9/9, faucets 9/9, towels-linens 16/16, bath-lighting 97/97, bath 101/101, bath-furniture 41/41, bath-accents-decor 124/124). (b) INDEPENDENT cross-check by full paged enumeration of /collections/<handle>/products.json (limit=250) - the enumerated unique-product count matched numFound EXACTLY on all 11 collections, across sizes from 9 to 124, which proves the API equals the storefront's own collection membership. (c) Counts discriminate properly - 32/9/22/11/9/9/16/97 are all different, no site-wide constant, no round display cap. (d) Internal consistency: Bath Furniture 41 = Vanities & Washstands 32 + Cabinets & Storage 9 exactly. PARENT RULE: /collections/bath (101), /collections/bath-furniture (41) and /collections/bath-accents-decor (124) all have valid child listings, so all three are grouping rows with blank qty and blank link (rule 24). Note that Accents & Decor 124 is NOT the sum of its children - it is a mixed roll-up whose non-child remainder is 82 lighting SKUs, 16 textiles and 3 decor items; recording it would have aggregated and double-counted, another reason it is a grouping row only. CONTENT EVIDENCE FOR EACH LEAF: Vanities & Washstands = bathroom vanity units and washstands (rule 9). Cabinets & Storage = 9 products, every one titled 'Bath Cabinet' or bath etagere (Finnley Short/Tall Bath Cabinet, Danny, Malone, Laurent, Calista, Provo Bath Cabinet, Chelsea Short/Tall Etagere) with Shopify product_type 'Bath' - unambiguous bathroom storage under Bath > Furniture (rules 9 and 12). Hooks & Towel Bars = bathroom hardware (rules 15 hardware-split and 17). Accessories = 11 products, all soap pumps, soap dispensers, soap dishes, bath pumps, bath jars and bath tumblers - rule 13 and rule 21 ('Bathroom Soap Dispenser -> Bathroom'). Mirrors = 9 products, every title explicitly 'Bath Wall Mirror' (Pierre, Lira Oval/Rectangular, Monroe Round/Rectangular in brass and nickel) - rule 10, recorded once even though the same URL is also reachable via Art & Mirrors > Mirrors > Bath Mirrors. Faucets = 9 bathroom faucets (Crewe, Lomas in antique brass / bronze / polished nickel) - rule 8, metal finishes explicitly not an exclusion (rule 22). EXCLUDED: /pages/arhaus-bath ('Discover Arhaus Bath') is an editorial landing page with no product grid. /collections/fulton-bath-collection, /collections/liam-bath-collection and /collections/logan-bath-collection (found in sitemap_collections_1.xml) are named product ranges - Collections pages, barred by rule 25 - and their members already sit inside the leaves above. Art & Mirrors > Mirrors > {Floor Mirrors, Wall Mirrors, Decorative Mirrors} are general decorative mirrors, not bathroom (rule 11/29). Decor > Storage & Organization (baskets, boxes, trays) is general Storage, not bathroom (rule 30-33). Outdoor > Beach Towels is outdoor textile. SITEMAP CROSS-CHECK: sitemap_collections_1.xml (523 collection URLs) was regex-swept for bath|vanit|towel|shower|sink|toilet|basin|faucet|bidet|tub|soap|robe|washstand|mirror; every bath-related handle it returned is accounted for above, and there is no shower, bathtub, toilet, bidet or basin-only collection on the site - Arhaus sells bath furniture, hardware, mirrors, faucets and accessories but no sanitaryware. CROSS-FILE NOTE: the prior Furniture pass recorded Vanities & Washstands (32) and Cabinets & Storage (9) into Furniture.xlsx and flagged Cabinets & Storage in its own Review sheet as 'bath cabinets/etageres'. Under the Bathroom rules these belong to Bathroom (rules 9 and 12: website hierarchy decides, and Arhaus files both under Bath > Furniture), so they are recorded here; the duplication is flagged for the merge step, not resolved unilaterally. || CROSS-FILE DEDUP: 2 leaf record(s) removed as already extracted in a prior category workbook. See Review sheet.",
+ "rows": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Accents & Decor",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Hooks & Towel Bars",
+   "qty": 22,
+   "link": "https://www.arhaus.com/collections/hooks-towel-bars",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Accessories",
+   "qty": 11,
+   "link": "https://www.arhaus.com/collections/bath-accessories",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Mirrors",
+   "qty": 9,
+   "link": "https://www.arhaus.com/collections/bath-mirrors",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Faucets",
+   "qty": 9,
+   "link": "https://www.arhaus.com/collections/faucets",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  }
+ ],
+ "review": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Towels & Linens",
+   "qty": 16,
+   "issue": "ROUTED TO TEXTILE: Bath > Accents & Decor > Towels & Linens. All 16 products enumerated via products.json carry Shopify product_type 'Textiles' and are Turkish bath towels, bath sheets, hand towels, washcloths, bath sets and one textile bathmat (Luxe Turkish Bathmat). Rules 15/16/20 send textile towels, bath sheets and textile bath mats to Textile.",
+   "link": "https://www.arhaus.com/collections/towels-linens"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Lighting (Bath Lighting)",
+   "qty": 97,
+   "issue": "ROUTED TO LIGHTING: Bath > Accents & Decor > Lighting (also reachable as Lighting > Bath Lighting - same URL, one record). Products enumerated via products.json are sconces, pendants, chandeliers and flush mounts with product_type 'Lighting'. Primary product type is lighting, so rules 11/19 send it to Lighting and it must NOT be duplicated into Bathroom.",
+   "link": "https://www.arhaus.com/collections/bath-lighting"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Vanities & Washstands",
+   "qty": 32,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Vanities & Washstands' - excluded from Bathroom per cross-category dedup (master guide s13)",
+   "link": "https://www.arhaus.com/collections/vanities-washstands"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Cabinets & Storage",
+   "qty": 9,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Cabinets & Storage' - excluded from Bathroom per cross-category dedup (master guide s13)",
+   "link": "https://www.arhaus.com/collections/cabinets-storage"
+  }
+ ],
+ "_reconstructed_from": "Bathroom.xlsx delivered 2026-09-01 (checkpoint), not original worker JSON"
+}

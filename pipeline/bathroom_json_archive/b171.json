@@ -1,0 +1,56 @@
+{
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ACCESS: robots.txt fetched FIRST at https://www.auraliving.com/robots.txt, HTTP 200 via probe.fetch (firefox133). NO Claude / ClaudeBot / anthropic-ai / Claude-Web group. The file opens 'User-agent: * / Allow: *' and then blanket-disallows only SEO/scraper bots (Yandex, SemrushBot, SemrushBot-SA, MJ12bot, AhrefsBot, BLEXBot, dotbot, Barkrowler, Optimizer, MauiBot, Screaming Frog) - none of which is us. It declares 'Crawl-delay: 10', which I HONOURED by raising probe.MIN_GAP to 10.0 seconds for this host before any category request; every auraliving.com fetch in this session was paced at >=10s. No path-pattern Disallow exists, and I used no query strings at all. Its 'Sitemap:' line points at https://www.leem.com/sitemap.xml, a different brand on the same platform tenant - I did NOT fetch leem.com (a separate host would need its own robots check and it is not this company). auraliving.com/sitemap.xml itself exists (HTTP 200) but is the same stale Leem artefact from 2022-12-14 listing only leem.com locale homepages; /sitemap_index.xml is 404. So NO usable category sitemap exists for this site and the tree had to come from the app payload - see TREE. TREE: the storefront is a Nuxt SPA backed by Storyblok, so the server-rendered HTML exposes only 16 category hrefs and the mega-menu is client-rendered - a mega-menu-only read would have truncated badly. I recovered the COMPLETE navigation from the Nuxt hydration payload embedded in the page (the minified navigationItem tree plus its trailing string table, which resolves the slug and title variables). Full menu: All Furniture [Sofas and Armchairs, Living Room, Dining Room, Bedroom] / All Tableware [Dinnerware, Cutlery, Table Linen, Serveware, Drinkware] / All Bed and Bath [Bed Linen, Bath Linen, BATHROOM ACCESSORIES] / All Decor [Cushions and Throws, Rugs, Decorative Accessories, Flowers and Vases, Mirrors and Wall Decor, All Lighting, Candles and Candle Holders] / Collections [Made-To-Order, all-new-in, all-sale + furniture-sale / tableware-sale / bed-and-bath-sale / decor-sale, dahlia-collection, kiera-collection, rania-collection, silsal, summer-edits]. Bathroom Accessories is a genuine third-level node of the site's own Bed and Bath branch, and it has NO children, so under rule 24 it is itself the deepest valid listing URL and is recorded as the leaf. Its parent 'All Bed and Bath' is withheld (see review). LOCALE / HOST CHECK (blind spots b and c): this brand runs four storefronts off ONE host - /ae (UAE EN, the country assigned here), /sa, /ar/ae and /ar/sa - declared as hreflang alternates on the bathroom PLP itself: en-sa https://www.auraliving.com/sa/c/bathroom-accessories, ar-ae https://www.auraliving.com/ar/ae/c/bathroom-accessories, ar-sa https://www.auraliving.com/ar/sa/c/bathroom-accessories. All alternates are on the SAME host, so no second robots.txt was needed; I nonetheless ran the dedup check against all four URL forms, not just the one I recorded. The page's own <link rel=canonical> is https://www.auraliving.com/ae/c/bathroom-accessories, which is exactly the URL recorded, and /ae is also the locale form Furniture.xlsx used for this brand. QTY: 25, taken from the listing page's own rendered heading, which prints the category name followed by its total - H1 = 'Bathroom Accessories 25'. INDEPENDENTLY CORROBORATED by the same page's Nuxt payload field pagination:{currentPageIndex:1,lastPageIndex:2,limit:24,total:25}, and the internal consistency check holds: ceil(25/24) = 2 = lastPageIndex. I also enumerated page 1 and counted 24 distinct /ae/p/ product URLs, exactly the limit, confirming a second page exists and that 25 is not a capped or rounded figure. EQUIVALENCE PROVED ON THREE PAGES OF DIFFERING SIZE, all in this session: Bathroom Accessories H1 25 / payload total 25 / lastPageIndex 2; Bath Linen H1 8 / payload total 8 / lastPageIndex 1; Bed Linen H1 12 / payload total 12 / lastPageIndex 1. The rendered H1 number and the payload total agree in every case and the figures discriminate per category rather than being a site-wide constant. Further cross-check: the parent All Bed and Bath renders 45, which is exactly 25 + 8 + 12 - the branch is internally consistent and complete. VERIFICATION: H1 and <title> checked on each page and matched the node requested ('Bathroom Accessories | Aura', 'Bath Linen | Aura', 'Bed Linen | Aura'). CONTENT CHECK (rule 2, primary product type): I enumerated the 24 visible products in Bathroom Accessories and they are genuinely bathroom goods, not room-word coincidences - 4 soap dispensers (Esraa Resin, Matilda Ceramic, Rio, Tempest Quartz Effect), 3 bins/waste bins (Lilibet Bubble Ceramic Bin, Matilda Ceramic Bin, Olive Waste Bin), a large run of tissue boxes (Matilda, Rio, Lilibet Bubble, Topaz Confetti and seven Silsal calligraphy/leather boxes) and catchall trays (Matilda Ceramic Tray, Rio Oval Tray, Silsal Hayati / Mashallah / Omri leather catchall trays, Silsal Naseem set of 3). Soap dispensers, bathroom trays and bathroom containers are explicitly Bathroom under rule 13, and rule 22 puts no material restriction on ceramic, resin or leather. DEDUP: already_extracted() returns None for https://www.auraliving.com/ae/c/bathroom-accessories AND for its /sa, /ar/ae and /ar/sa alternates, so the node is free to record. The index does already hold nine Aura nodes, all correctly left alone: /ae/c/sofas-and-armchairs, /living-room, /dining-room, /bedroom, /game-room (Furniture.xlsx) and /candles-and-candle-holders, /decorative-accessories, /flowers-and-vases, /mirrors-and-wall-decor, /all-lighting, /drinkware, /dinnerware, /serveware (Final.xlsx, Home Decor pass). Mirrors and Wall Decor was specifically opened as a rules-10/11 candidate and routed to review[] on the index hit, per OPTION 1. EXCLUDED and why: Bath Linen 8 and Bed Linen 12 (rules 15/20 -> Textile, in review); All Bed and Bath 45 (parent roll-up, rules 24/25, in review); Mirrors and Wall Decor (already extracted, in review); All Lighting (rule 19 -> Lighting, already in Final.xlsx); Cushions and Throws, Rugs, Table Linen (rule 20 -> Textile, and not bathroom textiles); Decorative Accessories and Flowers and Vases (rule 21 -> Decor, already extracted); the whole Furniture branch (already in Furniture.xlsx, no vanity or bathroom-cabinet node exists); all /c/collections/* nodes including the four *-sale and new-in pages (rule 25 bans collection, seasonal and promotional URLs - note bed-and-bath-sale is a promotional re-cut of the same branch, not a subcategory). NO fixtures, baths, showers, enclosures, taps, basins, toilets, toilet accessories, bathroom mirrors, vanity units or dedicated bathroom storage exist in this retailer's taxonomy - Aura Living is a furniture, tableware, bed-and-bath and decor retailer whose bathroom presence is exactly the one accessories node recorded. Every page requested returned HTTP 200; nothing here is an access limitation.",
+ "rows": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bed and Bath",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Accessories",
+   "qty": 25,
+   "link": "https://www.auraliving.com/ae/c/bathroom-accessories",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  }
+ ],
+ "review": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bed and Bath > Bath Linen",
+   "qty": 8,
+   "issue": "ROUTED TO TEXTILE: bath towels / bath linen are Textile under rules 15 and 20, not Bathroom. Count is the node's own rendered figure - H1 reads 'Bath Linen 8' and the Nuxt payload for the same page carries pagination:{currentPageIndex:1,lastPageIndex:1,limit:24,total:8}.",
+   "link": "https://www.auraliving.com/ae/c/bath-linen"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bed and Bath > Bed Linen",
+   "qty": 12,
+   "issue": "ROUTED TO TEXTILE: bedding/duvet sets are Textile (rules 20 and 33), and are bedroom rather than bathroom in any case. Included here only to document the complete Bed and Bath branch and to evidence that the parent roll-up leaves no residue. H1 'Bed Linen 12', payload total:12.",
+   "link": "https://www.auraliving.com/ae/c/bed-linen"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bed and Bath (parent roll-up, 'All Bed and Bath')",
+   "qty": 45,
+   "issue": "NOT RECORDED - parent roll-up withheld under rules 24 and 25. It is the site's own 'All ...' landing page for the branch and it exactly equals its three children (Bathroom Accessories 25 + Bath Linen 8 + Bed Linen 12 = 45, and its own H1 reads 'All Bed and Bath 45'). Recording it alongside the children would double-count. The arithmetic identity also PROVES there is no rule-24 residue: the parent holds no product that a child does not cover, so nothing is lost by dropping it.",
+   "link": "https://www.auraliving.com/ae/c/all-bed-and-bath"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Decor > Mirrors and Wall Decor",
+   "qty": null,
+   "issue": "ALREADY EXTRACTED IN Final.xlsx (Home Decor pass) as 'Mirrors and Wall Decor' - must not be re-extracted (master guide s13 / OPTION 1). Opened as a candidate because rules 10/11 make a mirror Bathroom when its primary product type is a mirror; the URL-exact index hit settles it and it stays in Home Decor. No qty taken, since the node is out of scope for this pass.",
+   "link": "https://www.auraliving.com/ae/c/mirrors-and-wall-decor"
+  }
+ ],
+ "_reconstructed_from": "Bathroom.xlsx delivered 2026-09-01 (checkpoint), not original worker JSON"
+}

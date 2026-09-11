@@ -1,0 +1,106 @@
+{
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ROBOTS - CHECKED ON BOTH HOSTS, because robots is per-host and the sitemap lives on the www host. (a) https://nkuku.com/robots.txt: HTTP 200, 6,957 bytes, profile edge101. (b) https://www.nkuku.com/robots.txt: HTTP 200, byte-identical at 6,957 bytes, profile firefox133. NEITHER names a Claude agent - a regex sweep for claude/anthropic over both files returned ZERO matches - so there is no named-agent Disallow and no hard stop. Both declare the same seven groups: '*', adsbot-google, Nutch ('Disallow: /'), AhrefsBot (Crawl-delay 10), AhrefsSiteAudit (Crawl-delay 10), MJ12bot (Crawl-delay 10) and Pinterest (Crawl-delay 1). The only blanket Disallow: / is under Nutch, which is not us and whose rules therefore do not apply. The '*' group declares NO Crawl-delay, so only probe.py's 2 s per-host gap applied and it was honoured. The '*' Disallow list covers /admin, /cart, /carts, /account, /orders, /checkout(s), /policies/, /search, /services/login_with_shop, /.well-known/shopify/monorail, /recommendations/products, /cdn/wpm/*.js, the sort/filter traps '/collections/*sort_by*', '/collections/*+*' (and %2B/%2b), '*/collections/*filter*&*filter*', the oseid/preview_theme_id/preview_script_id traps, AND - important here - 'Disallow: /*section_id=' and 'Disallow: /id=predictive-search'. COMPLIANCE: because /*section_id= is disallowed on this site, Shopify's section-rendering endpoint was NOT used at any point (it was used on a different company earlier in this batch where robots permitted it; here it is off limits and the mega-menu was taken from the page HTML instead). Every URL touched is a bare /collections/<handle> or /collections/<handle>?page=N, or a sitemap file. No sort_by, no '+', no filter parameter, no internal /search. ACCESS: plain direct probe.py curl_cffi fetches (edge101, firefox133, safari15_5, safari18_0_ios and others) - no proxy, no jina, no campaign parameter, no browser automation, zero 403s, no challenge. TREE SOURCE - three independent surfaces, all Nkuku's own, and the collections sitemap did indeed beat the mega-menu. (1) THE MEGA-MENU, parsed out of the server-rendered page HTML (<details> block): 'Home Accessories > Bathroom' contains exactly Soap Dishes (/collections/soap-dishes), Soap Dispensers (/collections/soap-dispensers), Bathroom Accessories (/collections/bathroom-accessories), Hooks & Rails (/collections/decorative-hooks), Laundry Baskets (/collections/laundry-baskets) and View All (/collections/all-bathroom). Sibling menu sections walked in the same pass: Mirrors (Wall Mirrors, Full Length Mirrors, Round Mirrors, View All), Storage & Utility (Baskets, Storage & Shelving, Hooks & Rails, Coat Hooks, Fireside, Laundry Baskets, Wine Racks), Decorative Accessories, Vases & Planters, Candles & Candle Holders, Home Fragrance, plus the whole Furniture, Sofas, Lighting, Garden and Kitchen & Dining trees. (2) EACH PLP'S OWN CHILD CAROUSEL, div.quick-links__carousel - this is what the mega-menu truncates and it recovered TWO nodes the menu never shows: the All Bathroom page's carousel yields Bathroom Accessories, BATHROOM LIGHTING and BATHROOM STORAGE. (3) THE COLLECTIONS SITEMAP https://www.nkuku.com/sitemap.xml -> sitemap_collections_1.xml, 781 collection URLs, regex-swept for bath|shower|toilet|soap|basin|sink|tap|faucet|vanity|mirror|towel|wash|dispenser|toothbrush|sanitar|bidet|robe|laundry|hook. This recovered the last two bathroom nodes, BOTH of which are unlinked from the mega-menu AND from every quick-links carousel: /collections/bathroom-furniture and /collections/bathroom-mirrors. I verified they are orphans rather than mis-read nav by scanning the raw HTML of all-bathroom, bathroom-accessories, mirrors, all-furniture, all-house-home, storage-shelving and all-storage-utility for a link to either handle - not one of those seven pages references them; only storage-shelving even links bathroom-storage. Both are nonetheless genuine live category pages: HTTP 200, H1 'Bathroom Furniture' and 'Bathroom Mirrors', self-referential rel=canonical, and bathroom-specific product sets. They are recorded, and their orphan status is disclosed here. QTY SOURCE: the exact figure the listing page prints itself, verbatim 'N items' (rendered server-side alongside 'See N items' in the filter panel with 'Clear all' showing, i.e. an unfiltered total). No API, no JSON-LD numberOfItems, no meta-description number, no nav-attribute count - none of the three proven traps. VERIFICATION - EVERY node was reconciled against a direct count of div.product-card elements in the same HTML, paginating where needed. Page size is 36. Exact agreement on all ten bathroom-family nodes: All Bathroom 22 header / 22 cards; Bathroom Accessories 48 header / 36 cards page 1 + 12 cards page 2 = 48; Bathroom Storage 26/26; Bathroom Lighting 7/7; Bathroom Furniture 2/2; Bathroom Mirrors 4/4; Soap Dishes 6/6; Soap Dispensers 5/5; Laundry Baskets 4/4; Wall & Decorative Hooks 20/20. Controls outside the bathroom tree behaved the same way (Wall Mirrors 33/33, Floor Length Mirrors 5/5, Decorative Mirrors 10/10). All five recorded leaves are single-page, so each recorded figure is a complete enumeration, not a first-page artifact - proven by the one node that DOES paginate (Bathroom Accessories) resolving exactly to its header. DISCRIMINATION: counts differ node by node across the 18 collections fetched (2, 4, 4, 5, 5, 6, 7, 10, 20, 22, 26, 33, 39, 42, 48, 54, 195, 298) - no site-wide constant - and each page's H1 and rel=canonical matched the node requested. OVERLAP DISCLOSURE - Nkuku's bathroom collections are overlapping merchandising sets, not a strict tree, so every pairwise overlap was measured by product handle and is stated rather than hidden. Bathroom Accessories (48) strictly CONTAINS Soap Dishes (6/6), Soap Dispensers (5/5), Laundry Baskets (4/4) and Bathroom Furniture (2/2), and holds 24 of Bathroom Storage's 26 - that is why it is excluded as the roll-up. Among the five RECORDED leaves the overlaps are partial, not containment: Bathroom Storage shares 2 products with Soap Dishes, 3 with Soap Dispensers and 2 with Bathroom Furniture; Bathroom Mirrors is disjoint from all four others. These are five distinct, distinctly-titled site categories at five distinct URLs, so under rule 28 they are five records; no quantity is ever summed and no parent number is ever reused. CONTENT CHECKS on the recorded leaves: Bathroom Storage - Olani/Amandi/Mahi toilet roll holders, Olani towel ring, Olani bathroom hooks, Indore wall shelf, Mahi and Sukha storage caddies, Ilcoso and Valeska recycled-glass soap dispensers and storage pots (rules 12/13/14/17 all name these). Bathroom Furniture - Mahi Wall Shelf With Towel Rail and Mahi Wall Mounted Toilet Roll Holder (rule 9). Bathroom Mirrors - Almora Round Mirror large and small, Almora Oval Mirror, Yadur Rectangular Mirror in antique brass; primary product type is mirror, so rule 11 sends it to BATHROOM and rule 10 forbids letting the word 'Bathroom' exclude it. Soap Dishes and Soap Dispensers are rule-13 accessories outright. Material is no bar (rule 22): recycled glass, brass, mango wood, travertine, rattan and iron all qualify. WHAT WAS EXCLUDED AND WHY: All Bathroom as an explicit View All (rule 25); Bathroom Accessories as the overlapping roll-up; Laundry Baskets as fully subsumed and storage-owned (rule 12); Wall & Decorative Hooks as a general storage/decor node; Bathroom Lighting to Lighting (rules 11/19), including the Akurdi Bathroom Mirror Light, which is a LIGHT and not a mirror; the whole general Mirrors family (42, with Wall 33 / Floor 5 / Decorative 10 and the attribute collections round-, arch-, brass-, rectangle-mirrors) to Decor under rule 2; and the sale collections (all-sale, sale-mirrors, mirrors-sale, sale-home-decor, sale-10/20/30/40/50/60-percent-off, christmas-sale) as promotional pages under rule 25 - never recorded, never counted. DEDUP: dedup.already_extracted() was run on every candidate leaf, every review node and every rel=canonical target. ZERO hits on anything bathroom. The exclusion index holds 28 nkuku.com URLs, ALL from Furniture.xlsx and all in the general furniture tree - sofas, armchairs, occasional chairs, dining chairs and benches, bar stools, desks, desk chairs, footstools, side/coffee/console/dining/bedside tables, cabinets & sideboards, chest of drawers, wardrobes, beds & headboards, bedroom and storage benches, freestanding shelves, garden seating and bistro sets. Critically, /collections/bathroom-furniture is NOT among them - the Furniture pass took Nkuku's general furniture tree but never its bathroom-furniture node - so the Option-1 suppression does not bite here and the 2-product Bathroom Furniture leaf is genuinely new. Nkuku's mirror collections are likewise absent from Final.xlsx. NOT PRESENT ON THIS SITE (established by the 781-URL sitemap sweep plus the full mega-menu walk, not assumed): no sanitaryware, basins, sinks, toilets or bidets; no baths or bathtubs; no showers or shower systems; no enclosures, screens or doors; no taps, mixers or faucets; no vanity units; no bath towels, bath mats, shower curtains or robes (Nkuku's textiles are cushions, throws, quilts and bed linen). RESULT: 1 grouping row + 5 leaf rows (6 / 5 / 26 / 2 / 4), 6 review entries.",
+ "rows": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Soap Dishes",
+   "qty": 6,
+   "link": "https://www.nkuku.com/collections/soap-dishes",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Soap Dispensers",
+   "qty": 5,
+   "link": "https://www.nkuku.com/collections/soap-dispensers",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Storage",
+   "qty": 26,
+   "link": "https://www.nkuku.com/collections/bathroom-storage",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Furniture",
+   "qty": 2,
+   "link": "https://www.nkuku.com/collections/bathroom-furniture",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Mirrors",
+   "qty": 4,
+   "link": "https://www.nkuku.com/collections/bathroom-mirrors",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  }
+ ],
+ "review": [
+  {
+   "category": "Bathroom",
+   "sub_category": "All Bathroom",
+   "qty": 22,
+   "issue": "NOT RECORDED - it is the site's own VIEW ALL page (rule 25). Nkuku's mega-menu section 'Home Accessories > Bathroom' ends with a link literally labelled 'View All' pointing at this URL, and its H1 is 'All Bathroom'. Rule 25 bans View All / All Products pages outright. It is also NOT a true parent roll-up and could not stand in for one: it holds 22 curated products against Bathroom Accessories' 48, and shares only 11 of them - the rest are scented candles, reed diffusers, a low stool and a low cabinet merchandised into a bathroom-styling edit. Its own quick-links carousel is what surfaced the Bathroom Accessories / Bathroom Lighting / Bathroom Storage triple, so it was still useful as a tree source.",
+   "link": "https://www.nkuku.com/collections/all-bathroom"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Accessories",
+   "qty": 48,
+   "issue": "EXCLUDED AS AN OVERLAPPING ROLL-UP (rule 24 / roll-up rule) - not recorded alongside its siblings, and its 48 is never aggregated. H1 'Handcrafted Bathroom Accessories'. Product-handle set arithmetic proves it is the container, not a peer: it holds 6 of 6 Soap Dishes, 5 of 5 Soap Dispensers, 4 of 4 Laundry Baskets, 2 of 2 Bathroom Furniture and 24 of 26 Bathroom Storage products (also 13 of 20 Wall & Decorative Hooks). Recording it beside the five recorded leaves would double-count almost the entire node. Everything inside it that is genuinely bathroom is reachable through the recorded leaves.",
+   "link": "https://www.nkuku.com/collections/bathroom-accessories"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Laundry Baskets",
+   "qty": 4,
+   "issue": "NOT RECORDED - fully subsumed AND storage-owned. H1 'Laundry & Washing Baskets'. All 4 of its products (Rohia Laundry Basket, Renu Jute Laundry Basket, Amandi Rattan Laundry Bin, Rammi Rattan Tall Laundry Basket) are already inside the recorded Bathroom Storage node, so recording it too would double-count 4 of that node's 26. Nkuku also files it under 'Home Accessories > Storage & Utility' as well as under Bathroom, and its own quick-links carousel points at Bedroom Storage, Bedroom Benches and Storage & Shelving - i.e. the site treats it as storage. Rule 12: clearly-storage-owned products belong to Storage.",
+   "link": "https://www.nkuku.com/collections/laundry-baskets"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Hooks & Rails / Wall & Decorative Hooks",
+   "qty": 20,
+   "issue": "NOT BATHROOM (rules 2/12/29) - inspected under rule 17 rather than skipped, because bathroom hooks and rails are in scope. H1 is 'Wall & Decorative Hooks', not a bathroom name. Nkuku lists the same URL under BOTH 'Home Accessories > Bathroom' (as 'Hooks & Rails') and 'Home Accessories > Storage & Utility', and its own quick-links carousel points at Storage & Shelving, Cabinets & Sideboards and Home Accessories - the storage side. Only 13 of its 20 products are in the bathroom set at all; it is a general decorative wall-hook and coat-hook node. Its bathroom-specific members (e.g. Olani Bathroom Hooks) are already inside the recorded Bathroom Storage leaf, so nothing bathroom is lost.",
+   "link": "https://www.nkuku.com/collections/decorative-hooks"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Lighting",
+   "qty": 7,
+   "issue": "ROUTED TO LIGHTING (rules 11/19). H1 'Bathroom Lights'; it is one of the three children in the All Bathroom page's own quick-links carousel and also sits in Nkuku's Lighting mega-menu. Its products are wall lamps and mirror lights (Akurdi Bathroom Single Wall Lamp, Akurdi Bathroom Mirror Light, Konnie Bathroom Wall Light). Rule 11 is explicit that a Mirror Light is LIGHTING while a mirror is Bathroom, and rule 19 sends Bathroom Wall Lights to Lighting. Not duplicated into Bathroom.",
+   "link": "https://www.nkuku.com/collections/bathroom-lighting"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Mirrors (general decorative)",
+   "qty": 42,
+   "issue": "ROUTED TO DECOR (rules 2/21/29), and a parent besides (rule 24). Opened under rule 10 rather than dismissed. H1 'Mirrors'; it sits in Nkuku's 'Home Accessories > Mirrors' menu section, not under Bathroom, and its own quick-links carousel gives its three children: Wall Mirrors (33), Floor Length Mirrors (5), Decorative & Ornamental Mirrors (10). These are decorative wall, arch, overmantel and full-length mirrors. Website hierarchy decides (rule 2), so the general mirror family is Decor; the separate bathroom-specific node /collections/bathroom-mirrors is the one recorded in rows. Sibling attribute collections in the sitemap (round-mirrors, arch-mirrors, brass-mirrors, rectangle-mirrors, sale-mirrors, mirrors-sale, murwara-mirrors, almora-mirrors, imoma-iron-* mirrors) route the same way and are facet or range collections, not bathroom nodes.",
+   "link": "https://www.nkuku.com/collections/mirrors"
+  }
+ ],
+ "_reconstructed_from": "Bathroom.xlsx delivered 2026-09-01 (checkpoint), not original worker JSON"
+}

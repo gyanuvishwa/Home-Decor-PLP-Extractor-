@@ -1,0 +1,1092 @@
+{
+ "sr": 282,
+ "company": "Nykaa Fashion Home",
+ "brand_site": "nykaafashion.com",
+ "country": "India",
+ "site_url": "https://www.nykaafashion.com/",
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ACCESS: Akamai WAF blocks direct/curl_cffi requests to any nykaafashion.com page beyond robots.txt/homepage (403 Access Denied on category pages with all curl_cffi impersonation profiles tried: chrome124/131/120/116/safari17_0/edge101/chrome110/chrome99/safari15_5). robots.txt (fetched via curl_cffi chrome124, HTTP 200) has no Claude/Anthropic-specific disallow -- generic 'User-agent: *' with only /ndsxadm/, /catalogsearch/, /widget-listing/, /all-reviews, /gateway-api/, /rest/appapi/V2/ blocked, none of which were needed. Per Rule 2, routed via translate.goog (https://www-nykaafashion-com.translate.goog/<path>?_x_tr_sl=en&_x_tr_tl=hi&_x_tr_hl=en + curl_cffi chrome124 impersonation), which returned HTTP 200 consistently (occasional 429s handled with backoff/retry). r.jina.ai was tried first but is itself behind a Cloudflare challenge page for this target, so translate.goog was the working route for every fetch in this extraction. CATEGORY TREE SOURCE: every React/Redux SSR page embeds a __PRELOADED_STATE__ JSON script tag; listingV2.filters[category_filter].values holds the FULL Home-department category tree with an explicit productCount per node (id, parent_id, name, productCount, children[]) -- this is the site's own live facet count used to render the filter UI, sourced from the main Home department listing page https://www.nykaafashion.com/home/c/8528. Discovered that the site resolves any listing URL purely by its trailing /c/<id> segment regardless of the slug prefix (confirmed: /xyz/c/8599 and /home/decor/mirrors/c/8599 both return identical Mirrors listing with the canonical categoryURL echoed back in listingV2.categoryURL) -- used this to fetch every in-scope leaf category individually (103 categories) via /x/c/<id>, reading listingV2.count (the category's own dedicated listing count) and listingV2.categoryURL (canonical link) as a second, independent signal against the tree's productCount. All 103 leaves matched exactly or within trivial live-inventory drift (<=1%, e.g. Glassware 1512 vs 1517, Soap Dish & Dispenser 489 vs 490, a few minutes apart) -- the fresher per-category page count was used as qty in every case. No null/MANUAL REVIEW rows were needed; this facet-count mechanism is a direct database count (not a rounded/capped marketplace widget), so Rule 1's exhaustion-check is satisfied by the dual-signal agreement instead. SCOPE: Home vertical only (nykaafashion.com/home/c/8528), Fashion/Beauty verticals not touched. Full Home department tree = Decor (40989), Kitchen & Dining (22558), Bedding (20461), Bath (6895), Storage (5111), Home Essentials (1014), Appliances (332). EXCLUDED WHOLESALE: Bedding, Storage, Home Essentials, Appliances (all furniture/textile/appliance/hardware); within Decor: Accent Furniture (furniture), Curtains & Blinds incl. its Curtain Accessories child (title-checked: genuine mix of decorative metal curtain rods/tiebacks AND actual fabric curtains on one URL with no separable count -- mixed roll-up, dropped per 'drop don't pad'), Floor Coverings (textile rugs/mats), Candles & Home Fragrances in full incl. the 'Candles' node itself (title-checked: predominantly scented -- Mustard Oud Pillar Candle, Fragranced Candle, Scented Votive, etc. -- mixed with the occasional unscented item and no separate unscented-only URL, dropped per Home Fragrance rule), Artificial Flora (faux plants), Festive Decor (Xmas/Valentine/Diwali/Easter/Party -- Holiday & Gift), Natural Greens (title-checked: genuine LIVE plants -- Lucky Bamboo, Money Plant, ZZ Plant -- horticulture, not manufactured decor), Magnets (novelty/gift, not a scope category), Wallpapers and Memo Boards (children of Wall Decor); within Kitchen & Dining: Table & Kitchen Linen (textile), Cutlery, Cookware, Food Prep, Bar Essentials, Bakeware, Gas Stove (all explicitly excluded kitchen tools/appliances/cutlery/bar tools); within Drinkware only Glassware was kept, its siblings Tea & Coffee/Bottles & Flasks/Bottles/Flasks & Insulated Tumblers/Jugs/Drink Accessories/Water Dispensers dropped as functional drinkware, not glassware; within Pooja Essentials, Pooja Needs was title-checked and found to mix genuine decorative diyas/oil lamps with actual ritual consumables (e.g. Pavitra Hawan Samagri) -- dropped as a mixed roll-up, while its sibling Religious Idols (pure figurines, no consumables) was kept; Pooja Chowki (furniture) and Incense Stick Holders (fragrance-adjacent) dropped; within Bath, only Bath Accessories & Utilities' decorative children were kept (Soap Dish & Dispenser, Bathroom Accessories Set, Toothbrush Holder, Tissue Holder -- title-checked, dominated by resin/ceramic/stone decorative sets) while its siblings Laundry Basket (storage), Toiler Brush & Holder (fixture/cleaning), Bath Caddy & Shower Caddy (storage), Shower Holder (plumbing fixture) were dropped, and the Bath department's Towels/Bath Mats/Bath Robes/Shower Curtains (all textile) were dropped outright. RULE 0 GAINS: Wall Murals (title-checked: actually framed/unframed wall-art posters and carved corbels, not literal adhesive photo-murals -- kept as wall art despite the 'mural' name) and Wall Stickers (title-checked: wooden wall plaques, wind chimes, decorative wall-art frames, not wallpaper-style decals -- kept as decorative wall pieces) both survived product-type inspection under Rule 0/mixed-roll-up scrutiny where the name alone would suggest exclusion. Shelves & Ledges (title-checked: small decorative wall-mounted floating shelves explicitly marketed 'for wall decor', not bulky storage furniture) kept as decorative wood wall shelving. Bathroom Mirror kept alongside Wall/Table/Decorative/Dressing Mirror per the explicit 'ALL mirrors in scope' rule (Bathroom is not a blanket exclusion). Table Top Accents > Gift Set (20, decor-item bundles e.g. photo-frame-and-candle-holder sets, vase-and-coaster sets -- no occasion/holiday theming) kept as decorative accessories, distinguished from the excluded Holiday & Gift department. DUPLICATE-COMPANY CHECK: no prior Nykaa Fashion / nykaafashion.com entry found among the 260+ already-archived c*.json files in the scratchpad; this is a first extraction for S.N. 282.",
+ "rows": [
+  {
+   "category": "Lighting",
+   "sub_category": "Lighting",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Table Lamp",
+   "parent": false,
+   "qty": 2119,
+   "link": "https://www.nykaafashion.com/home/decor/lighting/table-lamp/c/8632",
+   "evidence": "Category-filter facet productCount=2119 on /home/c/8528 department listing (site's own category tree JSON, __PRELOADED_STATE__.listingV2.filters); cross-checked against the category's own listing page count=2119 (categoryURL=/home/decor/lighting/table-lamp/c/8632) [MATCH]",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Ceiling Lights",
+   "parent": false,
+   "qty": 743,
+   "link": "https://www.nykaafashion.com/home/decor/lighting/ceiling-lights/c/13132",
+   "evidence": "Category-filter facet productCount=743 on /home/c/8528 department listing (site's own category tree JSON, __PRELOADED_STATE__.listingV2.filters); cross-checked against the category's own listing page count=743 (categoryURL=/home/decor/lighting/ceiling-lights/c/13132) [MATCH]",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Wall Lamps",
+   "parent": false,
+   "qty": 459,
+   "link": "https://www.nykaafashion.com/home/decor/lighting/wall-lamps/c/11205",
+   "evidence": "Category-filter facet productCount=459 on /home/c/8528 department listing (site's own category tree JSON, __PRELOADED_STATE__.listingV2.filters); cross-checked against the category's own listing page count=459 (categoryURL=/home/decor/lighting/wall-lamps/c/11205) [MATCH]",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Floor Lamps",
+   "parent": false,
+   "qty": 424,
+   "link": "https://www.nykaafashion.com/home/decor/lighting/floor-lamps/c/8637",
+   "evidence": "Category-filter facet productCount=424 on /home/c/8528 department listing (site's own category tree JSON, __PRELOADED_STATE__.listingV2.filters); cross-checked against the category's own listing page count=424 (categoryURL=/home/decor/lighting/floor-lamps/c/8637) [MATCH]",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Lamp Shade",
+   "parent": false,
+   "qty": 190,
+   "link": "https://www.nykaafashion.com/home/decor/lighting/lamp-shade/c/8635",
+   "evidence": "Category-filter facet productCount=190 on /home/c/8528 department listing (site's own category tree JSON, __PRELOADED_STATE__.listingV2.filters); cross-checked against the category's own listing page count=190 (categoryURL=/home/decor/lighting/lamp-shade/c/8635) [MATCH]",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Pendant Lamps",
+   "parent": false,
+   "qty": 112,
+   "link": "https://www.nykaafashion.com/home/decor/lighting/pendant-lamps/c/12334",
+   "evidence": "Category-filter facet productCount=112 on /home/c/8528 department listing (site's own category tree JSON, __PRELOADED_STATE__.listingV2.filters); cross-checked against the category's own listing page count=112 (categoryURL=/home/decor/lighting/pendant-lamps/c/12334) [MATCH]",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Lanterns",
+   "parent": false,
+   "qty": 84,
+   "link": "https://www.nykaafashion.com/home/decor/lighting/lanterns/c/8638",
+   "evidence": "Category-filter facet productCount=84 on /home/c/8528 department listing (site's own category tree JSON, __PRELOADED_STATE__.listingV2.filters); cross-checked against the category's own listing page count=84 (categoryURL=/home/decor/lighting/lanterns/c/8638) [MATCH]",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Study Lamps",
+   "parent": false,
+   "qty": 18,
+   "link": "https://www.nykaafashion.com/home/decor/lighting/study-lamps/c/8634",
+   "evidence": "Category-filter facet productCount=18 on /home/c/8528 department listing (site's own category tree JSON, __PRELOADED_STATE__.listingV2.filters); cross-checked against the category's own listing page count=18 (categoryURL=/home/decor/lighting/study-lamps/c/8634) [MATCH]",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "LED Decoratives",
+   "parent": false,
+   "qty": 14,
+   "link": "https://www.nykaafashion.com/home/decor/lighting/led-decoratives/c/8639",
+   "evidence": "Category-filter facet productCount=14 on /home/c/8528 department listing (site's own category tree JSON, __PRELOADED_STATE__.listingV2.filters); cross-checked against the category's own listing page count=14 (categoryURL=/home/decor/lighting/led-decoratives/c/8639) [MATCH]",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "String Light",
+   "parent": false,
+   "qty": 12,
+   "link": "https://www.nykaafashion.com/home/decor/lighting/string-light/c/8633",
+   "evidence": "Category-filter facet productCount=12 on /home/c/8528 department listing (site's own category tree JSON, __PRELOADED_STATE__.listingV2.filters); cross-checked against the category's own listing page count=12 (categoryURL=/home/decor/lighting/string-light/c/8633) [MATCH]",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Wall Decor & Mirrors",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Wall Hanging",
+   "parent": false,
+   "qty": 1308,
+   "link": "https://www.nykaafashion.com/home/decor/wall-decor/wall-hanging/c/8606",
+   "evidence": "Category-filter facet productCount=1308 on /home/c/8528 department listing (site's own category tree JSON, __PRELOADED_STATE__.listingV2.filters); cross-checked against the category's own listing page count=1308 (categoryURL=/home/decor/wall-decor/wall-hanging/c/8606) [MATCH]",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Wall Plates",
+   "parent": false,
+   "qty": 448,
+   "link": "https://www.nykaafashion.com/home/decor/wall-decor/wall-plates/c/8603",
+   "evidence": "Category-filter facet productCount=448 on /home/c/8528 department listing (site's own category tree JSON, __PRELOADED_STATE__.listingV2.filters); cross-checked against the category's own listing page count=448 (categoryURL=/home/decor/wall-decor/wall-plates/c/8603) [MATCH]",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Picture Frames",
+   "parent": false,
+   "qty": 283,
+   "link": "https://www.nykaafashion.com/home/decor/wall-decor/picture-frames/c/8600",
+   "evidence": "Category-filter facet productCount=283 on /home/c/8528 department listing (site's own category tree JSON, __PRELOADED_STATE__.listingV2.filters); cross-checked against the category's own listing page count=283 (categoryURL=/home/decor/wall-decor/picture-frames/c/8600) [MATCH]",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Metal Art",
+   "parent": false,
+   "qty": 122,
+   "link": "https://www.nykaafashion.com/home/decor/wall-decor/metal-art/c/8604",
+   "evidence": "Category-filter facet productCount=122 on /home/c/8528 department listing (site's own category tree JSON, __PRELOADED_STATE__.listingV2.filters); cross-checked against the category's own listing page count=122 (categoryURL=/home/decor/wall-decor/metal-art/c/8604) [MATCH]",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Shelves & Ledges",
+   "parent": false,
+   "qty": 78,
+   "link": "https://www.nykaafashion.com/home/decor/wall-decor/shelves-ledges/c/8601",
+   "evidence": "Category-filter facet productCount=78 on /home/c/8528 department listing (site's own category tree JSON, __PRELOADED_STATE__.listingV2.filters); cross-checked against the category's own listing page count=78 (categoryURL=/home/decor/wall-decor/shelves-ledges/c/8601) [MATCH]",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Wind Chimes & Torans",
+   "parent": false,
+   "qty": 63,
+   "link": "https://www.nykaafashion.com/home/decor/wall-decor/wind-chimes-torans/c/8609",
+   "evidence": "Category-filter facet productCount=63 on /home/c/8528 department listing (site's own category tree JSON, __PRELOADED_STATE__.listingV2.filters); cross-checked against the category's own listing page count=63 (categoryURL=/home/decor/wall-decor/wind-chimes-torans/c/8609) [MATCH]",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Wall Murals",
+   "parent": false,
+   "qty": 44,
+   "link": "https://www.nykaafashion.com/home/decor/wall-decor/wall-murals/c/8605",
+   "evidence": "Category-filter facet productCount=44 on /home/c/8528 department listing (site's own category tree JSON, __PRELOADED_STATE__.listingV2.filters); cross-checked against the category's own listing page count=44 (categoryURL=/home/decor/wall-decor/wall-murals/c/8605) [MATCH]",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Wall Stickers",
+   "parent": false,
+   "qty": 29,
+   "link": "https://www.nykaafashion.com/home/decor/wall-decor/wall-stickers/c/8610",
+   "evidence": "Category-filter facet productCount=29 on /home/c/8528 department listing (site's own category tree JSON, __PRELOADED_STATE__.listingV2.filters); cross-checked against the category's own listing page count=29 (categoryURL=/home/decor/wall-decor/wall-stickers/c/8610) [MATCH]",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Wall Mask",
+   "parent": false,
+   "qty": 17,
+   "link": "https://www.nykaafashion.com/home/decor/wall-decor/wall-mask/c/8608",
+   "evidence": "Category-filter facet productCount=17 on /home/c/8528 department listing (site's own category tree JSON, __PRELOADED_STATE__.listingV2.filters); cross-checked against the category's own listing page count=17 (categoryURL=/home/decor/wall-decor/wall-mask/c/8608) [MATCH]",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Hooks",
+   "parent": false,
+   "qty": 4,
+   "link": "https://www.nykaafashion.com/home/decor/wall-decor/hooks/c/8602",
+   "evidence": "Category-filter facet productCount=4 on /home/c/8528 department listing (site's own category tree JSON, __PRELOADED_STATE__.listingV2.filters); cross-checked against the category's own listing page count=4 (categoryURL=/home/decor/wall-decor/hooks/c/8602) [MATCH]",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Mirrors",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Wall Mirror",
+   "parent": false,
+   "qty": 101,
+   "link": "https://www.nykaafashion.com/home/decor/mirrors/wall-mirror/c/99929",
+   "evidence": "Category-filter facet productCount=101 on /home/c/8528 department listing (site's own category tree JSON, __PRELOADED_STATE__.listingV2.filters); cross-checked against the category's own listing page count=101 (categoryURL=/home/decor/mirrors/wall-mirror/c/99929) [MATCH]",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Table Mirror",
+   "parent": false,
+   "qty": 20,
+   "link": "https://www.nykaafashion.com/home/decor/mirrors/table-mirror/c/72093",
+   "evidence": "Category-filter facet productCount=20 on /home/c/8528 department listing (site's own category tree JSON, __PRELOADED_STATE__.listingV2.filters); cross-checked against the category's own listing page count=20 (categoryURL=/home/decor/mirrors/table-mirror/c/72093) [MATCH]",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Decorative Mirror",
+   "parent": false,
+   "qty": 18,
+   "link": "https://www.nykaafashion.com/home/decor/mirrors/decorative-mirror/c/99930",
+   "evidence": "Category-filter facet productCount=18 on /home/c/8528 department listing (site's own category tree JSON, __PRELOADED_STATE__.listingV2.filters); cross-checked against the category's own listing page count=18 (categoryURL=/home/decor/mirrors/decorative-mirror/c/99930) [MATCH]",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Bathroom Mirror",
+   "parent": false,
+   "qty": 10,
+   "link": "https://www.nykaafashion.com/home/decor/mirrors/bathroom-mirror/c/8579",
+   "evidence": "Category-filter facet productCount=10 on /home/c/8528 department listing (site's own category tree JSON, __PRELOADED_STATE__.listingV2.filters); cross-checked against the category's own listing page count=10 (categoryURL=/home/decor/mirrors/bathroom-mirror/c/8579) [MATCH]",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Dressing Mirror",
+   "parent": false,
+   "qty": 6,
+   "link": "https://www.nykaafashion.com/home/decor/mirrors/dressing-mirror/c/8703",
+   "evidence": "Category-filter facet productCount=6 on /home/c/8528 department listing (site's own category tree JSON, __PRELOADED_STATE__.listingV2.filters); cross-checked against the category's own listing page count=6 (categoryURL=/home/decor/mirrors/dressing-mirror/c/8703) [MATCH]",
+   "flag": null
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Home Decor",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Figurines & Sculptures",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Religious",
+   "parent": false,
+   "qty": 751,
+   "link": "https://www.nykaafashion.com/home/decor/figurines-sculptures/religious/c/8680",
+   "evidence": "Category-filter facet productCount=751 on /home/c/8528 department listing (site's own category tree JSON, __PRELOADED_STATE__.listingV2.filters); cross-checked against the category's own listing page count=751 (categoryURL=/home/decor/figurines-sculptures/religious/c/8680) [MATCH]",
+   "flag": null
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Animal & Birds",
+   "parent": false,
+   "qty": 698,
+   "link": "https://www.nykaafashion.com/home/decor/figurines-sculptures/animal-birds/c/8675",
+   "evidence": "Category-filter facet productCount=698 on /home/c/8528 department listing (site's own category tree JSON, __PRELOADED_STATE__.listingV2.filters); cross-checked against the category's own listing page count=698 (categoryURL=/home/decor/figurines-sculptures/animal-birds/c/8675) [MATCH]",
+   "flag": null
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Human",
+   "parent": false,
+   "qty": 530,
+   "link": "https://www.nykaafashion.com/home/decor/figurines-sculptures/human/c/8674",
+   "evidence": "Category-filter facet productCount=530 on /home/c/8528 department listing (site's own category tree JSON, __PRELOADED_STATE__.listingV2.filters); cross-checked against the category's own listing page count=530 (categoryURL=/home/decor/figurines-sculptures/human/c/8674) [MATCH]",
+   "flag": null
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Abstract",
+   "parent": false,
+   "qty": 378,
+   "link": "https://www.nykaafashion.com/home/decor/figurines-sculptures/abstract/c/8678",
+   "evidence": "Category-filter facet productCount=378 on /home/c/8528 department listing (site's own category tree JSON, __PRELOADED_STATE__.listingV2.filters); cross-checked against the category's own listing page count=378 (categoryURL=/home/decor/figurines-sculptures/abstract/c/8678) [MATCH]",
+   "flag": null
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Buddha",
+   "parent": false,
+   "qty": 239,
+   "link": "https://www.nykaafashion.com/home/decor/figurines-sculptures/buddha/c/8679",
+   "evidence": "Category-filter facet productCount=239 on /home/c/8528 department listing (site's own category tree JSON, __PRELOADED_STATE__.listingV2.filters); cross-checked against the category's own listing page count=239 (categoryURL=/home/decor/figurines-sculptures/buddha/c/8679) [MATCH]",
+   "flag": null
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Nature",
+   "parent": false,
+   "qty": 77,
+   "link": "https://www.nykaafashion.com/home/decor/figurines-sculptures/nature/c/8677",
+   "evidence": "Category-filter facet productCount=77 on /home/c/8528 department listing (site's own category tree JSON, __PRELOADED_STATE__.listingV2.filters); cross-checked against the category's own listing page count=77 (categoryURL=/home/decor/figurines-sculptures/nature/c/8677) [MATCH]",
+   "flag": null
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Geometric",
+   "parent": false,
+   "qty": 73,
+   "link": "https://www.nykaafashion.com/home/decor/figurines-sculptures/geometric/c/8676",
+   "evidence": "Category-filter facet productCount=73 on /home/c/8528 department listing (site's own category tree JSON, __PRELOADED_STATE__.listingV2.filters); cross-checked against the category's own listing page count=73 (categoryURL=/home/decor/figurines-sculptures/geometric/c/8676) [MATCH]",
+   "flag": null
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Typography",
+   "parent": false,
+   "qty": 8,
+   "link": "https://www.nykaafashion.com/home/decor/figurines-sculptures/typography/c/8681",
+   "evidence": "Category-filter facet productCount=8 on /home/c/8528 department listing (site's own category tree JSON, __PRELOADED_STATE__.listingV2.filters); cross-checked against the category's own listing page count=8 (categoryURL=/home/decor/figurines-sculptures/typography/c/8681) [MATCH]",
+   "flag": null
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Candle Holders",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Tea Light Holder",
+   "parent": false,
+   "qty": 977,
+   "link": "https://www.nykaafashion.com/home/decor/candle-holders/tea-light-holder/c/8671",
+   "evidence": "Category-filter facet productCount=977 on /home/c/8528 department listing (site's own category tree JSON, __PRELOADED_STATE__.listingV2.filters); cross-checked against the category's own listing page count=977 (categoryURL=/home/decor/candle-holders/tea-light-holder/c/8671) [MATCH]",
+   "flag": null
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Pillar Candle Holder",
+   "parent": false,
+   "qty": 255,
+   "link": "https://www.nykaafashion.com/home/decor/candle-holders/pillar-candle-holder/c/8665",
+   "evidence": "Category-filter facet productCount=255 on /home/c/8528 department listing (site's own category tree JSON, __PRELOADED_STATE__.listingV2.filters); cross-checked against the category's own listing page count=255 (categoryURL=/home/decor/candle-holders/pillar-candle-holder/c/8665) [MATCH]",
+   "flag": null
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Votive Candle Holder",
+   "parent": false,
+   "qty": 154,
+   "link": "https://www.nykaafashion.com/home/decor/candle-holders/votive-candle-holder/c/8666",
+   "evidence": "Category-filter facet productCount=154 on /home/c/8528 department listing (site's own category tree JSON, __PRELOADED_STATE__.listingV2.filters); cross-checked against the category's own listing page count=154 (categoryURL=/home/decor/candle-holders/votive-candle-holder/c/8666) [MATCH]",
+   "flag": null
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Hurricane",
+   "parent": false,
+   "qty": 91,
+   "link": "https://www.nykaafashion.com/home/decor/candle-holders/hurricane/c/8669",
+   "evidence": "Category-filter facet productCount=91 on /home/c/8528 department listing (site's own category tree JSON, __PRELOADED_STATE__.listingV2.filters); cross-checked against the category's own listing page count=91 (categoryURL=/home/decor/candle-holders/hurricane/c/8669) [MATCH]",
+   "flag": null
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Taper Candle Holder",
+   "parent": false,
+   "qty": 90,
+   "link": "https://www.nykaafashion.com/home/decor/candle-holders/taper-candle-holder/c/8668",
+   "evidence": "Category-filter facet productCount=90 on /home/c/8528 department listing (site's own category tree JSON, __PRELOADED_STATE__.listingV2.filters); cross-checked against the category's own listing page count=90 (categoryURL=/home/decor/candle-holders/taper-candle-holder/c/8668) [MATCH]",
+   "flag": null
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Diya",
+   "parent": false,
+   "qty": 87,
+   "link": "https://www.nykaafashion.com/home/decor/candle-holders/diya/c/10311",
+   "evidence": "Category-filter facet productCount=87 on /home/c/8528 department listing (site's own category tree JSON, __PRELOADED_STATE__.listingV2.filters); cross-checked against the category's own listing page count=87 (categoryURL=/home/decor/candle-holders/diya/c/10311) [MATCH]",
+   "flag": null
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Lantern (Candle)",
+   "parent": false,
+   "qty": 49,
+   "link": "https://www.nykaafashion.com/home/decor/candle-holders/lantern/c/8670",
+   "evidence": "Category-filter facet productCount=49 on /home/c/8528 department listing (site's own category tree JSON, __PRELOADED_STATE__.listingV2.filters); cross-checked against the category's own listing page count=49 (categoryURL=/home/decor/candle-holders/lantern/c/8670) [MATCH]",
+   "flag": null
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Incense Holder",
+   "parent": false,
+   "qty": 15,
+   "link": "https://www.nykaafashion.com/home/decor/candle-holders/incense-holder/c/10312",
+   "evidence": "Category-filter facet productCount=15 on /home/c/8528 department listing (site's own category tree JSON, __PRELOADED_STATE__.listingV2.filters); cross-checked against the category's own listing page count=15 (categoryURL=/home/decor/candle-holders/incense-holder/c/10312) [MATCH]",
+   "flag": null
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Candle Plate",
+   "parent": false,
+   "qty": 3,
+   "link": "https://www.nykaafashion.com/home/decor/candle-holders/candle-plate/c/8667",
+   "evidence": "Category-filter facet productCount=3 on /home/c/8528 department listing (site's own category tree JSON, __PRELOADED_STATE__.listingV2.filters); cross-checked against the category's own listing page count=3 (categoryURL=/home/decor/candle-holders/candle-plate/c/8667) [MATCH]",
+   "flag": null
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Wall Sconces",
+   "parent": false,
+   "qty": 2,
+   "link": "https://www.nykaafashion.com/home/decor/candle-holders/wall-sconces/c/8672",
+   "evidence": "Category-filter facet productCount=2 on /home/c/8528 department listing (site's own category tree JSON, __PRELOADED_STATE__.listingV2.filters); cross-checked against the category's own listing page count=2 (categoryURL=/home/decor/candle-holders/wall-sconces/c/8672) [MATCH]",
+   "flag": null
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Clocks",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Wall Clocks",
+   "parent": false,
+   "qty": 1067,
+   "link": "https://www.nykaafashion.com/home/decor/clocks/wall-clocks/c/103842",
+   "evidence": "Category-filter facet productCount=1067 on /home/c/8528 department listing (site's own category tree JSON, __PRELOADED_STATE__.listingV2.filters); cross-checked against the category's own listing page count=1067 (categoryURL=/home/decor/clocks/wall-clocks/c/103842) [MATCH]",
+   "flag": null
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Desk Clocks",
+   "parent": false,
+   "qty": 184,
+   "link": "https://www.nykaafashion.com/home/decor/clocks/desk-clocks/c/10296",
+   "evidence": "Category-filter facet productCount=184 on /home/c/8528 department listing (site's own category tree JSON, __PRELOADED_STATE__.listingV2.filters); cross-checked against the category's own listing page count=184 (categoryURL=/home/decor/clocks/desk-clocks/c/10296) [MATCH]",
+   "flag": null
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Designer Clocks",
+   "parent": false,
+   "qty": 73,
+   "link": "https://www.nykaafashion.com/home/decor/clocks/designer-clocks/c/103843",
+   "evidence": "Category-filter facet productCount=73 on /home/c/8528 department listing (site's own category tree JSON, __PRELOADED_STATE__.listingV2.filters); cross-checked against the category's own listing page count=73 (categoryURL=/home/decor/clocks/designer-clocks/c/103843) [MATCH]",
+   "flag": null
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Planters",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Table Top Planters",
+   "parent": false,
+   "qty": 633,
+   "link": "https://www.nykaafashion.com/home/decor/planters/table-top/c/8658",
+   "evidence": "Category-filter facet productCount=633 on /home/c/8528 department listing (site's own category tree JSON, __PRELOADED_STATE__.listingV2.filters); cross-checked against the category's own listing page count=633 (categoryURL=/home/decor/planters/table-top/c/8658) [MATCH]",
+   "flag": null
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Floor Planters",
+   "parent": false,
+   "qty": 284,
+   "link": "https://www.nykaafashion.com/home/decor/planters/floor-planters/c/8660",
+   "evidence": "Category-filter facet productCount=284 on /home/c/8528 department listing (site's own category tree JSON, __PRELOADED_STATE__.listingV2.filters); cross-checked against the category's own listing page count=284 (categoryURL=/home/decor/planters/floor-planters/c/8660) [MATCH]",
+   "flag": null
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Planter Stands",
+   "parent": false,
+   "qty": 130,
+   "link": "https://www.nykaafashion.com/home/decor/planters/planter-stands/c/8663",
+   "evidence": "Category-filter facet productCount=130 on /home/c/8528 department listing (site's own category tree JSON, __PRELOADED_STATE__.listingV2.filters); cross-checked against the category's own listing page count=130 (categoryURL=/home/decor/planters/planter-stands/c/8663) [MATCH]",
+   "flag": null
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Hanging Planters",
+   "parent": false,
+   "qty": 105,
+   "link": "https://www.nykaafashion.com/home/decor/planters/hanging/c/8659",
+   "evidence": "Category-filter facet productCount=105 on /home/c/8528 department listing (site's own category tree JSON, __PRELOADED_STATE__.listingV2.filters); cross-checked against the category's own listing page count=105 (categoryURL=/home/decor/planters/hanging/c/8659) [MATCH]",
+   "flag": null
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Railing Planters",
+   "parent": false,
+   "qty": 31,
+   "link": "https://www.nykaafashion.com/home/decor/planters/railing-planters/c/8662",
+   "evidence": "Category-filter facet productCount=31 on /home/c/8528 department listing (site's own category tree JSON, __PRELOADED_STATE__.listingV2.filters); cross-checked against the category's own listing page count=31 (categoryURL=/home/decor/planters/railing-planters/c/8662) [MATCH]",
+   "flag": null
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Wall Mount Planters",
+   "parent": false,
+   "qty": 24,
+   "link": "https://www.nykaafashion.com/home/decor/planters/wall-mount-planters/c/8661",
+   "evidence": "Category-filter facet productCount=24 on /home/c/8528 department listing (site's own category tree JSON, __PRELOADED_STATE__.listingV2.filters); cross-checked against the category's own listing page count=24 (categoryURL=/home/decor/planters/wall-mount-planters/c/8661) [MATCH]",
+   "flag": null
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Pooja Essentials",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Religious Idols",
+   "parent": false,
+   "qty": 276,
+   "link": "https://www.nykaafashion.com/home/decor/pooja-essentials/religious-idols/c/14479",
+   "evidence": "Category-filter facet productCount=276 on /home/c/8528 department listing (site's own category tree JSON, __PRELOADED_STATE__.listingV2.filters); cross-checked against the category's own listing page count=276 (categoryURL=/home/decor/pooja-essentials/religious-idols/c/14479) [MATCH]",
+   "flag": null
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Table Top Accents",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Decorative Bowls",
+   "parent": false,
+   "qty": 99,
+   "link": "https://www.nykaafashion.com/home/decor/table-top-accents/decorative-bowls/c/10308",
+   "evidence": "Category-filter facet productCount=99 on /home/c/8528 department listing (site's own category tree JSON, __PRELOADED_STATE__.listingV2.filters); cross-checked against the category's own listing page count=99 (categoryURL=/home/decor/table-top-accents/decorative-bowls/c/10308) [MATCH]",
+   "flag": null
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Decorative Box",
+   "parent": false,
+   "qty": 98,
+   "link": "https://www.nykaafashion.com/home/decor/table-top-accents/decorative-box/c/10303",
+   "evidence": "Category-filter facet productCount=98 on /home/c/8528 department listing (site's own category tree JSON, __PRELOADED_STATE__.listingV2.filters); cross-checked against the category's own listing page count=98 (categoryURL=/home/decor/table-top-accents/decorative-box/c/10303) [MATCH]",
+   "flag": null
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Fountains",
+   "parent": false,
+   "qty": 58,
+   "link": "https://www.nykaafashion.com/home/decor/table-top-accents/fountains/c/10301",
+   "evidence": "Category-filter facet productCount=58 on /home/c/8528 department listing (site's own category tree JSON, __PRELOADED_STATE__.listingV2.filters); cross-checked against the category's own listing page count=58 (categoryURL=/home/decor/table-top-accents/fountains/c/10301) [MATCH]",
+   "flag": null
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Book End",
+   "parent": false,
+   "qty": 47,
+   "link": "https://www.nykaafashion.com/home/decor/table-top-accents/book-end/c/10310",
+   "evidence": "Category-filter facet productCount=47 on /home/c/8528 department listing (site's own category tree JSON, __PRELOADED_STATE__.listingV2.filters); cross-checked against the category's own listing page count=47 (categoryURL=/home/decor/table-top-accents/book-end/c/10310) [MATCH]",
+   "flag": null
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Gift Set",
+   "parent": false,
+   "qty": 20,
+   "link": "https://www.nykaafashion.com/home/decor/table-top-accents/gift-set/c/99968",
+   "evidence": "Category-filter facet productCount=20 on /home/c/8528 department listing (site's own category tree JSON, __PRELOADED_STATE__.listingV2.filters); cross-checked against the category's own listing page count=20 (categoryURL=/home/decor/table-top-accents/gift-set/c/99968) [MATCH]",
+   "flag": null
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Urli",
+   "parent": false,
+   "qty": 18,
+   "link": "https://www.nykaafashion.com/home/decor/table-top-accents/urli/c/99967",
+   "evidence": "Category-filter facet productCount=18 on /home/c/8528 department listing (site's own category tree JSON, __PRELOADED_STATE__.listingV2.filters); cross-checked against the category's own listing page count=18 (categoryURL=/home/decor/table-top-accents/urli/c/99967) [MATCH]",
+   "flag": null
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Globe",
+   "parent": false,
+   "qty": 11,
+   "link": "https://www.nykaafashion.com/home/decor/table-top-accents/globe/c/10295",
+   "evidence": "Category-filter facet productCount=11 on /home/c/8528 department listing (site's own category tree JSON, __PRELOADED_STATE__.listingV2.filters); cross-checked against the category's own listing page count=11 (categoryURL=/home/decor/table-top-accents/globe/c/10295) [MATCH]",
+   "flag": null
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Photo Frames",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Single",
+   "parent": false,
+   "qty": 357,
+   "link": "https://www.nykaafashion.com/home/decor/photo-frames/single/c/8612",
+   "evidence": "Category-filter facet productCount=357 on /home/c/8528 department listing (site's own category tree JSON, __PRELOADED_STATE__.listingV2.filters); cross-checked against the category's own listing page count=357 (categoryURL=/home/decor/photo-frames/single/c/8612) [MATCH]",
+   "flag": null
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Magnets (Photo Frame)",
+   "parent": false,
+   "qty": 8,
+   "link": "https://www.nykaafashion.com/home/decor/photo-frames/magnets/c/9195",
+   "evidence": "Category-filter facet productCount=8 on /home/c/8528 department listing (site's own category tree JSON, __PRELOADED_STATE__.listingV2.filters); cross-checked against the category's own listing page count=8 (categoryURL=/home/decor/photo-frames/magnets/c/9195) [MATCH]",
+   "flag": null
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Double",
+   "parent": false,
+   "qty": 6,
+   "link": "https://www.nykaafashion.com/home/decor/photo-frames/double/c/8613",
+   "evidence": "Category-filter facet productCount=6 on /home/c/8528 department listing (site's own category tree JSON, __PRELOADED_STATE__.listingV2.filters); cross-checked against the category's own listing page count=6 (categoryURL=/home/decor/photo-frames/double/c/8613) [MATCH]",
+   "flag": null
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Set",
+   "parent": false,
+   "qty": 6,
+   "link": "https://www.nykaafashion.com/home/decor/photo-frames/set/c/8615",
+   "evidence": "Category-filter facet productCount=6 on /home/c/8528 department listing (site's own category tree JSON, __PRELOADED_STATE__.listingV2.filters); cross-checked against the category's own listing page count=6 (categoryURL=/home/decor/photo-frames/set/c/8615) [MATCH]",
+   "flag": null
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Collage",
+   "parent": false,
+   "qty": 3,
+   "link": "https://www.nykaafashion.com/home/decor/photo-frames/collage/c/8614",
+   "evidence": "Category-filter facet productCount=3 on /home/c/8528 department listing (site's own category tree JSON, __PRELOADED_STATE__.listingV2.filters); cross-checked against the category's own listing page count=3 (categoryURL=/home/decor/photo-frames/collage/c/8614) [MATCH]",
+   "flag": null
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Paintings",
+   "parent": false,
+   "qty": 8459,
+   "link": "https://www.nykaafashion.com/home/decor/paintings/c/8598",
+   "evidence": "Category-filter facet productCount=8459 on /home/c/8528 department listing (site's own category tree JSON, __PRELOADED_STATE__.listingV2.filters); cross-checked against the category's own listing page count=8459 (categoryURL=/home/decor/paintings/c/8598) [MATCH]",
+   "flag": null
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Vases",
+   "parent": false,
+   "qty": 1244,
+   "link": "https://www.nykaafashion.com/home/decor/vases/c/8617",
+   "evidence": "Category-filter facet productCount=1244 on /home/c/8528 department listing (site's own category tree JSON, __PRELOADED_STATE__.listingV2.filters); cross-checked against the category's own listing page count=1244 (categoryURL=/home/decor/vases/c/8617) [MATCH]",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Kitchen & Dining",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Glassware",
+   "parent": false,
+   "qty": 1517,
+   "link": "https://www.nykaafashion.com/home/kitchen-dining/drinkware/glassware/c/8754",
+   "evidence": "Category-filter facet productCount=1512 on /home/c/8528 department listing (site's own category tree JSON, __PRELOADED_STATE__.listingV2.filters); cross-checked against the category's own listing page count=1517 (categoryURL=/home/kitchen-dining/drinkware/glassware/c/8754) [MINOR-DRIFT]",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Serveware",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Bowls",
+   "parent": false,
+   "qty": 987,
+   "link": "https://www.nykaafashion.com/home/kitchen-dining/serveware/bowls/c/8712",
+   "evidence": "Category-filter facet productCount=987 on /home/c/8528 department listing (site's own category tree JSON, __PRELOADED_STATE__.listingV2.filters); cross-checked against the category's own listing page count=987 (categoryURL=/home/kitchen-dining/serveware/bowls/c/8712) [MATCH]",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Platters",
+   "parent": false,
+   "qty": 825,
+   "link": "https://www.nykaafashion.com/home/kitchen-dining/serveware/platters/c/8710",
+   "evidence": "Category-filter facet productCount=825 on /home/c/8528 department listing (site's own category tree JSON, __PRELOADED_STATE__.listingV2.filters); cross-checked against the category's own listing page count=825 (categoryURL=/home/kitchen-dining/serveware/platters/c/8710) [MATCH]",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Trays",
+   "parent": false,
+   "qty": 684,
+   "link": "https://www.nykaafashion.com/home/kitchen-dining/serveware/trays/c/8709",
+   "evidence": "Category-filter facet productCount=684 on /home/c/8528 department listing (site's own category tree JSON, __PRELOADED_STATE__.listingV2.filters); cross-checked against the category's own listing page count=684 (categoryURL=/home/kitchen-dining/serveware/trays/c/8709) [MATCH]",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Serving Plates",
+   "parent": false,
+   "qty": 370,
+   "link": "https://www.nykaafashion.com/home/kitchen-dining/serveware/serving-plates/c/8718",
+   "evidence": "Category-filter facet productCount=370 on /home/c/8528 department listing (site's own category tree JSON, __PRELOADED_STATE__.listingV2.filters); cross-checked against the category's own listing page count=370 (categoryURL=/home/kitchen-dining/serveware/serving-plates/c/8718) [MATCH]",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Cake Stands",
+   "parent": false,
+   "qty": 247,
+   "link": "https://www.nykaafashion.com/home/kitchen-dining/serveware/cake-stands/c/8714",
+   "evidence": "Category-filter facet productCount=247 on /home/c/8528 department listing (site's own category tree JSON, __PRELOADED_STATE__.listingV2.filters); cross-checked against the category's own listing page count=247 (categoryURL=/home/kitchen-dining/serveware/cake-stands/c/8714) [MATCH]",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Serving Set",
+   "parent": false,
+   "qty": 213,
+   "link": "https://www.nykaafashion.com/home/kitchen-dining/serveware/serving-set/c/8719",
+   "evidence": "Category-filter facet productCount=213 on /home/c/8528 department listing (site's own category tree JSON, __PRELOADED_STATE__.listingV2.filters); cross-checked against the category's own listing page count=213 (categoryURL=/home/kitchen-dining/serveware/serving-set/c/8719) [MATCH]",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Chip & Dip",
+   "parent": false,
+   "qty": 120,
+   "link": "https://www.nykaafashion.com/home/kitchen-dining/serveware/chip-dip/c/8717",
+   "evidence": "Category-filter facet productCount=120 on /home/c/8528 department listing (site's own category tree JSON, __PRELOADED_STATE__.listingV2.filters); cross-checked against the category's own listing page count=120 (categoryURL=/home/kitchen-dining/serveware/chip-dip/c/8717) [MATCH]",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Dip Bowl",
+   "parent": false,
+   "qty": 59,
+   "link": "https://www.nykaafashion.com/home/kitchen-dining/serveware/dip-bowl/c/8720",
+   "evidence": "Category-filter facet productCount=59 on /home/c/8528 department listing (site's own category tree JSON, __PRELOADED_STATE__.listingV2.filters); cross-checked against the category's own listing page count=59 (categoryURL=/home/kitchen-dining/serveware/dip-bowl/c/8720) [MATCH]",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Serving Boards",
+   "parent": false,
+   "qty": 56,
+   "link": "https://www.nykaafashion.com/home/kitchen-dining/serveware/serving-boards/c/8711",
+   "evidence": "Category-filter facet productCount=56 on /home/c/8528 department listing (site's own category tree JSON, __PRELOADED_STATE__.listingV2.filters); cross-checked against the category's own listing page count=56 (categoryURL=/home/kitchen-dining/serveware/serving-boards/c/8711) [MATCH]",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Salad Bowl",
+   "parent": false,
+   "qty": 54,
+   "link": "https://www.nykaafashion.com/home/kitchen-dining/serveware/salad-bowl/c/8997",
+   "evidence": "Category-filter facet productCount=54 on /home/c/8528 department listing (site's own category tree JSON, __PRELOADED_STATE__.listingV2.filters); cross-checked against the category's own listing page count=54 (categoryURL=/home/kitchen-dining/serveware/salad-bowl/c/8997) [MATCH]",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Glass Cloche",
+   "parent": false,
+   "qty": 20,
+   "link": "https://www.nykaafashion.com/home/kitchen-dining/serveware/glass-cloche/c/8716",
+   "evidence": "Category-filter facet productCount=20 on /home/c/8528 department listing (site's own category tree JSON, __PRELOADED_STATE__.listingV2.filters); cross-checked against the category's own listing page count=20 (categoryURL=/home/kitchen-dining/serveware/glass-cloche/c/8716) [MATCH]",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Tureens",
+   "parent": false,
+   "qty": 12,
+   "link": "https://www.nykaafashion.com/home/kitchen-dining/serveware/tureens/c/8713",
+   "evidence": "Category-filter facet productCount=12 on /home/c/8528 department listing (site's own category tree JSON, __PRELOADED_STATE__.listingV2.filters); cross-checked against the category's own listing page count=12 (categoryURL=/home/kitchen-dining/serveware/tureens/c/8713) [MATCH]",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Egg Cup",
+   "parent": false,
+   "qty": 4,
+   "link": "https://www.nykaafashion.com/home/kitchen-dining/serveware/egg-cup/c/8999",
+   "evidence": "Category-filter facet productCount=4 on /home/c/8528 department listing (site's own category tree JSON, __PRELOADED_STATE__.listingV2.filters); cross-checked against the category's own listing page count=4 (categoryURL=/home/kitchen-dining/serveware/egg-cup/c/8999) [MATCH]",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Dinnerware",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Dinner Set",
+   "parent": false,
+   "qty": 502,
+   "link": "https://www.nykaafashion.com/home/kitchen-dining/dinnerware/dinner-set/c/8727",
+   "evidence": "Category-filter facet productCount=502 on /home/c/8528 department listing (site's own category tree JSON, __PRELOADED_STATE__.listingV2.filters); cross-checked against the category's own listing page count=502 (categoryURL=/home/kitchen-dining/dinnerware/dinner-set/c/8727) [MATCH]",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Dinner Plates",
+   "parent": false,
+   "qty": 443,
+   "link": "https://www.nykaafashion.com/home/kitchen-dining/dinnerware/dinner-plates/c/8722",
+   "evidence": "Category-filter facet productCount=443 on /home/c/8528 department listing (site's own category tree JSON, __PRELOADED_STATE__.listingV2.filters); cross-checked against the category's own listing page count=443 (categoryURL=/home/kitchen-dining/dinnerware/dinner-plates/c/8722) [MATCH]",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Serving Bowls",
+   "parent": false,
+   "qty": 422,
+   "link": "https://www.nykaafashion.com/home/kitchen-dining/dinnerware/serving-bowls/c/8726",
+   "evidence": "Category-filter facet productCount=422 on /home/c/8528 department listing (site's own category tree JSON, __PRELOADED_STATE__.listingV2.filters); cross-checked against the category's own listing page count=422 (categoryURL=/home/kitchen-dining/dinnerware/serving-bowls/c/8726) [MATCH]",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Side Plates",
+   "parent": false,
+   "qty": 384,
+   "link": "https://www.nykaafashion.com/home/kitchen-dining/dinnerware/side-plates/c/8723",
+   "evidence": "Category-filter facet productCount=384 on /home/c/8528 department listing (site's own category tree JSON, __PRELOADED_STATE__.listingV2.filters); cross-checked against the category's own listing page count=384 (categoryURL=/home/kitchen-dining/dinnerware/side-plates/c/8723) [MATCH]",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Dessert Plates & Bowls",
+   "parent": false,
+   "qty": 201,
+   "link": "https://www.nykaafashion.com/home/kitchen-dining/dinnerware/dessert-plates-bowls/c/8724",
+   "evidence": "Category-filter facet productCount=201 on /home/c/8528 department listing (site's own category tree JSON, __PRELOADED_STATE__.listingV2.filters); cross-checked against the category's own listing page count=201 (categoryURL=/home/kitchen-dining/dinnerware/dessert-plates-bowls/c/8724) [MATCH]",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Bowls & Katoris",
+   "parent": false,
+   "qty": 193,
+   "link": "https://www.nykaafashion.com/home/kitchen-dining/dinnerware/bowls-katoris/c/8728",
+   "evidence": "Category-filter facet productCount=193 on /home/c/8528 department listing (site's own category tree JSON, __PRELOADED_STATE__.listingV2.filters); cross-checked against the category's own listing page count=193 (categoryURL=/home/kitchen-dining/dinnerware/bowls-katoris/c/8728) [MATCH]",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Soup Bowls",
+   "parent": false,
+   "qty": 182,
+   "link": "https://www.nykaafashion.com/home/kitchen-dining/dinnerware/soup-bowls/c/8725",
+   "evidence": "Category-filter facet productCount=182 on /home/c/8528 department listing (site's own category tree JSON, __PRELOADED_STATE__.listingV2.filters); cross-checked against the category's own listing page count=182 (categoryURL=/home/kitchen-dining/dinnerware/soup-bowls/c/8725) [MATCH]",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Breakfast Set",
+   "parent": false,
+   "qty": 8,
+   "link": "https://www.nykaafashion.com/home/kitchen-dining/dinnerware/breakfast-set/c/8731",
+   "evidence": "Category-filter facet productCount=8 on /home/c/8528 department listing (site's own category tree JSON, __PRELOADED_STATE__.listingV2.filters); cross-checked against the category's own listing page count=8 (categoryURL=/home/kitchen-dining/dinnerware/breakfast-set/c/8731) [MATCH]",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Rice Platter",
+   "parent": false,
+   "qty": 4,
+   "link": "https://www.nykaafashion.com/home/kitchen-dining/dinnerware/rice-platter/c/8730",
+   "evidence": "Category-filter facet productCount=4 on /home/c/8528 department listing (site's own category tree JSON, __PRELOADED_STATE__.listingV2.filters); cross-checked against the category's own listing page count=4 (categoryURL=/home/kitchen-dining/dinnerware/rice-platter/c/8730) [MATCH]",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Soup Spoons",
+   "parent": false,
+   "qty": 3,
+   "link": "https://www.nykaafashion.com/home/kitchen-dining/dinnerware/soup-spoons/c/8729",
+   "evidence": "Category-filter facet productCount=3 on /home/c/8528 department listing (site's own category tree JSON, __PRELOADED_STATE__.listingV2.filters); cross-checked against the category's own listing page count=3 (categoryURL=/home/kitchen-dining/dinnerware/soup-spoons/c/8729) [MATCH]",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Table Accessories",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Coasters",
+   "parent": false,
+   "qty": 472,
+   "link": "https://www.nykaafashion.com/home/kitchen-dining/table-accessories/coasters/c/8740",
+   "evidence": "Category-filter facet productCount=472 on /home/c/8528 department listing (site's own category tree JSON, __PRELOADED_STATE__.listingV2.filters); cross-checked against the category's own listing page count=472 (categoryURL=/home/kitchen-dining/table-accessories/coasters/c/8740) [MATCH]",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Tissue Holders",
+   "parent": false,
+   "qty": 295,
+   "link": "https://www.nykaafashion.com/home/kitchen-dining/table-accessories/tissue-holders/c/8733",
+   "evidence": "Category-filter facet productCount=295 on /home/c/8528 department listing (site's own category tree JSON, __PRELOADED_STATE__.listingV2.filters); cross-checked against the category's own listing page count=295 (categoryURL=/home/kitchen-dining/table-accessories/tissue-holders/c/8733) [MATCH]",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Cutlery Stand",
+   "parent": false,
+   "qty": 151,
+   "link": "https://www.nykaafashion.com/home/kitchen-dining/table-accessories/cutlery-stand/c/8735",
+   "evidence": "Category-filter facet productCount=151 on /home/c/8528 department listing (site's own category tree JSON, __PRELOADED_STATE__.listingV2.filters); cross-checked against the category's own listing page count=151 (categoryURL=/home/kitchen-dining/table-accessories/cutlery-stand/c/8735) [MATCH]",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Salt & Pepper Shakers Mills",
+   "parent": false,
+   "qty": 117,
+   "link": "https://www.nykaafashion.com/home/kitchen-dining/table-accessories/salt-pepper-shakers-mills/c/8736",
+   "evidence": "Category-filter facet productCount=117 on /home/c/8528 department listing (site's own category tree JSON, __PRELOADED_STATE__.listingV2.filters); cross-checked against the category's own listing page count=117 (categoryURL=/home/kitchen-dining/table-accessories/salt-pepper-shakers-mills/c/8736) [MATCH]",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Napkin Rings",
+   "parent": false,
+   "qty": 93,
+   "link": "https://www.nykaafashion.com/home/kitchen-dining/table-accessories/napkin-rings/c/8734",
+   "evidence": "Category-filter facet productCount=93 on /home/c/8528 department listing (site's own category tree JSON, __PRELOADED_STATE__.listingV2.filters); cross-checked against the category's own listing page count=93 (categoryURL=/home/kitchen-dining/table-accessories/napkin-rings/c/8734) [MATCH]",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Trivets",
+   "parent": false,
+   "qty": 82,
+   "link": "https://www.nykaafashion.com/home/kitchen-dining/table-accessories/trivets/c/8738",
+   "evidence": "Category-filter facet productCount=82 on /home/c/8528 department listing (site's own category tree JSON, __PRELOADED_STATE__.listingV2.filters); cross-checked against the category's own listing page count=82 (categoryURL=/home/kitchen-dining/table-accessories/trivets/c/8738) [MATCH]",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Condiment Jars",
+   "parent": false,
+   "qty": 70,
+   "link": "https://www.nykaafashion.com/home/kitchen-dining/table-accessories/condiment-jars/c/8737",
+   "evidence": "Category-filter facet productCount=70 on /home/c/8528 department listing (site's own category tree JSON, __PRELOADED_STATE__.listingV2.filters); cross-checked against the category's own listing page count=70 (categoryURL=/home/kitchen-dining/table-accessories/condiment-jars/c/8737) [MATCH]",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Fruit Bowls & Baskets",
+   "parent": false,
+   "qty": 67,
+   "link": "https://www.nykaafashion.com/home/kitchen-dining/table-accessories/fruit-bowls-baskets/c/8963",
+   "evidence": "Category-filter facet productCount=67 on /home/c/8528 department listing (site's own category tree JSON, __PRELOADED_STATE__.listingV2.filters); cross-checked against the category's own listing page count=67 (categoryURL=/home/kitchen-dining/table-accessories/fruit-bowls-baskets/c/8963) [MATCH]",
+   "flag": null
+  },
+  {
+   "category": "Bath",
+   "sub_category": "Bath",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bath",
+   "sub_category": "Bath Accessories & Utilities",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bath",
+   "sub_category": "Soap Dish & Dispenser",
+   "parent": false,
+   "qty": 490,
+   "link": "https://www.nykaafashion.com/home/bath/bath-accessories-utilities/soap-dish-dispenser/c/8573",
+   "evidence": "Category-filter facet productCount=489 on /home/c/8528 department listing (site's own category tree JSON, __PRELOADED_STATE__.listingV2.filters); cross-checked against the category's own listing page count=490 (categoryURL=/home/bath/bath-accessories-utilities/soap-dish-dispenser/c/8573) [MINOR-DRIFT]",
+   "flag": null
+  },
+  {
+   "category": "Bath",
+   "sub_category": "Bathroom Accessories Set",
+   "parent": false,
+   "qty": 468,
+   "link": "https://www.nykaafashion.com/home/bath/bath-accessories-utilities/bathroom-accessories-set/c/8569",
+   "evidence": "Category-filter facet productCount=468 on /home/c/8528 department listing (site's own category tree JSON, __PRELOADED_STATE__.listingV2.filters); cross-checked against the category's own listing page count=468 (categoryURL=/home/bath/bath-accessories-utilities/bathroom-accessories-set/c/8569) [MATCH]",
+   "flag": null
+  },
+  {
+   "category": "Bath",
+   "sub_category": "Toothbrush Holder",
+   "parent": false,
+   "qty": 70,
+   "link": "https://www.nykaafashion.com/home/bath/bath-accessories-utilities/toothbrush-holder/c/8572",
+   "evidence": "Category-filter facet productCount=70 on /home/c/8528 department listing (site's own category tree JSON, __PRELOADED_STATE__.listingV2.filters); cross-checked against the category's own listing page count=70 (categoryURL=/home/bath/bath-accessories-utilities/toothbrush-holder/c/8572) [MATCH]",
+   "flag": null
+  },
+  {
+   "category": "Bath",
+   "sub_category": "Tissue Holder",
+   "parent": false,
+   "qty": 38,
+   "link": "https://www.nykaafashion.com/home/bath/bath-accessories-utilities/tissue-holder/c/8574",
+   "evidence": "Category-filter facet productCount=38 on /home/c/8528 department listing (site's own category tree JSON, __PRELOADED_STATE__.listingV2.filters); cross-checked against the category's own listing page count=38 (categoryURL=/home/bath/bath-accessories-utilities/tissue-holder/c/8574) [MATCH]",
+   "flag": null
+  }
+ ]
+}

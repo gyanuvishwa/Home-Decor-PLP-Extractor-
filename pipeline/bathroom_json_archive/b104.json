@@ -1,0 +1,303 @@
+{
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ACCESS: clean. probe.fetch() returned HTTP 200 on every request across rotating fingerprints (firefox133, chrome131, safari18_0_ios, safari18_0); no WAF, no challenge, no 403, no 429, no reader prefix or alternate profile set needed. Pages are server-rendered React (0.5-1.0 MB) carrying the full listing payload inline, so no API host and no browser automation were needed. Single host throughout (www.hoeffner.de), so no second robots.txt was owed. ROBOTS: https://www.hoeffner.de/robots.txt fetched FIRST (HTTP 200, firefox133) before any other request and read in full. It is eight lines long and contains exactly ONE user-agent group: 'User-agent: *' with 'Disallow: /warenkorb', 'Disallow: /kundenkonto', 'Disallow: /bestellung', 'Disallow: /newsletter-einstellungen', 'Disallow: /stoffmuster-', 'Disallow: /konfigurator', 'Disallow: /passwort/aendern', 'Disallow: /*.htm$'. There is NO group naming ClaudeBot, Claude-Web, anthropic-ai, Claude-User or Claude-SearchBot anywhere in the file, so no Claude opt-out exists, and there is no Crawl-delay and no Sitemap directive (probe.py's 2 s per-host gap was kept anyway). Category listing pages are bare first-level slugs (/badezimmer, /badaccessoires, /sanitaer-armaturen ...) and none of them ends in .htm, so nothing disallowed was requested: no cart, no account, no order, no newsletter-settings, no fabric-sample, no configurator, no password path, and no .htm URL. Colour and brand facet URLs of the shape /badezimmer__weiss and /badezimmer_joop exist on the site and are technically allowed, but none was requested and none is recorded (rules 25, 27). The only multi-segment URLs touched were plain pagination (/badaccessoires/2) and the series overview /serien/badezimmer. TREE: taken from the site's own navigation, three sources cross-checked. (1) The homepage renders the complete mega-menu server-side; 437 labelled links were extracted, of which the 'Bad' flyout gives the department in the site's own order: Bad (/badezimmer) > Bad-Hochschränke, Bad-Hängeschränke, Badmöbel-Sets, Waschplätze, Spiegelschränke, Waschbeckenunterschränke, Bad-Unterschränke, Badezimmerspiegel, Waschtische, Badregale, Zubehör (/badaccessoires) > WC-Zubehör, Seifenspender, Handtuchhalter, Zahnputzbecher, Seifenschalen, Textilien (/badtextilien) > Handtücher & Badetücher, Handtuch-Sets, Badematten & Badvorleger, Sonstiges. (2) The mega-menu TRUNCATES the Zubehör branch: the /badaccessoires PLP carries its own on-page child carousel which adds two further children the menu omits - Badaccessoire-Sets (/badaccessoire-sets, 1) and Badspiegel (/badspiegel) - plus a Dusch- & Badewannenzubehör entry that turns out to be an alias of the parent. Both genuine additions were followed; Badaccessoire-Sets is recorded and would have been silently lost from the menu alone. (3) The /badezimmer PLP carries a second carousel of six SEO landing pages (Badezimmer Dekoration, -Textilien, -Schränke, -Lampen, -Utensilien, -Regale), every one of which was fetched and adjudicated in review[]; two of them (-Schränke, -Regale) simply serve the Bad department page and two more (-Utensilien, -Textilien) are re-cuts of nodes already recorded or routed. Höffner sells no showers, shower enclosures, screens, bath tubs, WCs or bidets - the mega-menu, the Bad department page and every related-category block were scanned for dusch|wanne|wc|toilette|bidet|armatur|sanitaer and the only hits are WC-Zubehör (WC seats and brush sets, recorded), /sanitaer-armaturen (wash basins, recorded) and the alias above - so rules 5, 6 and 7 have no counterpart in this catalogue and nothing was skipped. QTY: every figure is the listing page's OWN rendered German total, read as '<N> Ergebnisse' in the results bar and independently confirmed by the inline payload's totalCount on the same response; the two agreed on all 30 pages fetched. PAGE SIZE PROVEN AT 72 AND THE TOTALS PROVEN TO BE TRUE TOTALS, three ways: (a) the payload's own numberOfPages is exactly ceil(totalCount/72) on every node checked - Badzubehör 111/2, Badtextilien 579/9, Badschränke 1248/18, Bad 4260/60, Badezimmerspiegel 40/1; (b) page 1 of /badaccessoires renders exactly 72 distinct articleNo values and /badaccessoires/2 renders exactly 39, 72+39 = 111 = the rendered total, i.e. enumerated to exhaustion on a paginated node; (c) every recorded leaf is under 72 and returns numberOfPages 1, so none of the recorded figures can be a page-size artifact. Counts discriminate strongly across the whole tree (1, 2, 5, 6, 8, 11, 12, 17, 22, 32, 40, 46, 47, 67, 74, 78, 83, 111, 130, 149, 152, 237, 250, 262, 482, 570, 579, 955, 1248, 1550, 4260). NOTE ON THE META TAG: each page also carries a meta description of the form 'X Artikel verfügbar im Shop' whose number is consistently HIGHER than the rendered total (Bad 8092 vs 4260, Badspiegel 59 vs 40, Zahnputzbecher 12 vs 11) because it counts variants and out-of-stock articles. It was deliberately NOT used - this is exactly the nav-attribute trap the brief warns about, and every recorded figure comes from the listing's own rendered results bar instead. Every recorded page's H1 was checked against the node requested and matched (Badezimmerspiegel, Waschtische, WC-Zubehör, Seifenspender, Handtuchhalter, Zahnputzbecher, Seifenschalen, Badaccessoire-Sets). No number was estimated, no parent number reused, no siblings summed - note the Badzubehör children total 94 against a parent of 111, which is why the parent is a blank grouping row. CLASSIFICATION CALLS: /sanitaer-armaturen is recorded despite the menu label 'Waschtische' because its six products are ceramic and glass WASH BASINS (Keramik-Doppelwaschtisch Capri, Bad-Keramik-Waschtisch Bodensee, Keramik-Waschbecken Fährsee, Glaswaschtisch Alba) - rule 4 sanitaryware, and a genuinely different node from the already-extracted furniture node Waschplätze (47). /badezimmer-spiegel is recorded as Bathroom, not Lighting, even though several of its mirrors advertise 'inkl. LED-Beleuchtung': primary product type is mirror (rule 11), and the site's separate Badezimmer Lampen node (955) is routed to Lighting. DEDUP: dedup.already_extracted() was run on all 36 candidate and control URLs before anything was recorded. Höffner is very heavily represented in the index (140 hoeffner.de rows, all Furniture.xlsx), and ELEVEN of the hits are bathroom nodes - bad-hochschraenke, bad-midischraenke, bad-unterschraenke, bad-wandschraenke, badezimmer-spiegelschraenke, badhocker, badregale, komplett-badkombinationen, waschbeckenunterschraenke, waschplaetze, waschmaschinenschraenke. Every one of them is in review[] and none is in rows[]: under OPTION 1 the entire Badmöbel half of this department stays in Furniture, which is why only the fixtures, mirrors and accessories come through here. All eight recorded leaves plus both grouping URLs are clean of the index. VERDICT: BATHROOM FOUND - 8 leaves, 100 products, under Bad > (Badezimmerspiegel, Waschtische) and Bad > Badzubehör; bathroom furniture left in Furniture.xlsx, bath textiles routed to Textile, bathroom lighting to Lighting, bathroom decor to Decor.",
+ "rows": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Mirrors",
+   "qty": 40,
+   "link": "https://www.hoeffner.de/badezimmer-spiegel",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Vanity Units",
+   "qty": 6,
+   "link": "https://www.hoeffner.de/sanitaer-armaturen",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Accessories",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Toilet Accessories",
+   "qty": 12,
+   "link": "https://www.hoeffner.de/wc-zubehoer",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Soap Dispensers",
+   "qty": 17,
+   "link": "https://www.hoeffner.de/seifenspender",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Towel Rails",
+   "qty": 5,
+   "link": "https://www.hoeffner.de/handtuchhalter",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Toothbrush Cups",
+   "qty": 11,
+   "link": "https://www.hoeffner.de/zahnputzbecher",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Soap Dishes",
+   "qty": 8,
+   "link": "https://www.hoeffner.de/seifenschalen",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Accessory Sets",
+   "qty": 1,
+   "link": "https://www.hoeffner.de/badaccessoire-sets",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  }
+ ],
+ "review": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom (department parent)",
+   "qty": 4260,
+   "issue": "NOT RECORDED - top of the Bad department and parent of every node below (rule 24). Rendered '4260 Ergebnisse', payload totalCount 4260 / numberOfPages 60. Kept as the blank grouping row only; recording its URL would aggregate the entire bathroom, furniture, textile, lighting and decor assortment into one figure.",
+   "link": "https://www.hoeffner.de/badezimmer"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathroom Accessories (parent)",
+   "qty": 111,
+   "issue": "NOT RECORDED - parent of the six recorded accessory leaves plus Badezimmerspiegel (rule 24). H1 'Badzubehör', rendered '111 Ergebnisse', totalCount 111 over 2 pages (72 + 39 articles, verified by fetching page 2). Kept as the blank grouping row. Its children sum to 94, so 17 products sit directly on the parent with no child node; they are deliberately left uncounted rather than attributed to a leaf or the parent URL recorded.",
+   "link": "https://www.hoeffner.de/badaccessoires"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Accessories > Bathroom Mirrors",
+   "qty": 40,
+   "issue": "DUPLICATE URL, NOT RECORDED SEPARATELY - the same node as the recorded 'Badezimmerspiegel' reached by the Badzubehör child slider instead of the Bad mega-menu. Proven identical, not merely equal: the two pages return the SAME 40 articleNo values (set intersection 40 of 40), both totalCount 40 / 1 page. Recorded once under the mega-menu URL per rule 28.",
+   "link": "https://www.hoeffner.de/badspiegel"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Accessories > Shower & Bathtub Accessories",
+   "qty": 111,
+   "issue": "NOT A DISTINCT NODE - the slug appears in the Badzubehör child slider, but the URL serves the Badzubehör parent page itself (H1 'Badzubehör', identical 877,610-byte response, identical 111 total). There is no separate shower/bath-accessory listing behind it. Recording it would duplicate the parent. Flagged rather than silently dropped because the label is squarely rule-6/rule-13 bathroom vocabulary.",
+   "link": "https://www.hoeffner.de/dusch-badewannenzubehoer"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Utensils",
+   "qty": 32,
+   "issue": "WITHHELD OVERLAP - SEO landing page from the /badezimmer on-page category carousel, not a node in the Bad mega-menu. Its grid is toothbrush holders, soap dispensers and WC sets, i.e. a re-cut of the already-recorded Zahnputzbecher (11), Seifenspender (17) and WC-Zubehör (12) leaves. Recording it alongside them would double-count roughly 32 products (brief s9).",
+   "link": "https://www.hoeffner.de/badezimmer-utensilien"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Shelves / Bathroom Cabinets (SEO aliases)",
+   "qty": null,
+   "issue": "NOT DISTINCT NODES - both slugs appear in the /badezimmer category carousel but each serves the Bad department page itself (H1 'Badezimmer', totalCount 4260, 60 pages). They are aliases, not listings, so neither is recorded and neither counts as an empty node.",
+   "link": "https://www.hoeffner.de/badezimmer-schraenke"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Other (Bathroom Furniture Series)",
+   "qty": null,
+   "issue": "NOT RECORDED - the 'Sonstiges' link in the Bad mega-menu resolves to a series OVERVIEW page, H1 'Alle Badmöbel Serien im Überblick'. It renders no product grid, no 'N Ergebnisse' and no totalCount; it is a collection index. Rule 25 forbids recording collection/overview pages.",
+   "link": "https://www.hoeffner.de/serien/badezimmer"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Furniture > Cabinets > Bathroom Cabinets",
+   "qty": 1248,
+   "issue": "WITHHELD ROLL-UP - H1 'Badschränke', 1248 products over 18 pages. It is the aggregate of the bathroom-cabinet family whose members are all individually in Furniture.xlsx (Bad-Hochschränke 149, Bad-Midischränke 74, Bad-Unterschränke 83, Bad-Hängeschränke 78, Waschbeckenunterschränke 130, Spiegelschränke 152, Badmöbel-Sets 482, Waschplätze 47, Waschmaschinenschränke 67, Badregale 22, Badhocker 2 - 1,286 across the family). The exclusion index has no exact hit on this roll-up URL itself, but recording it would re-import ~1,248 products that Furniture already holds and would aggregate quantities. Withheld deliberately under OPTION 1 and brief s9.",
+   "link": "https://www.hoeffner.de/badschraenke"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathroom Tall Cabinets",
+   "qty": 149,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Tall Bathroom Cabinets' - exact URL hit. Stays in Furniture under OPTION 1.",
+   "link": "https://www.hoeffner.de/bad-hochschraenke"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathroom Wall Cabinets",
+   "qty": 78,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Wall-Mounted Bathroom Cabinets' - exact URL hit.",
+   "link": "https://www.hoeffner.de/bad-wandschraenke"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathroom Base Cabinets",
+   "qty": 83,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Bathroom Base Cabinets' - exact URL hit.",
+   "link": "https://www.hoeffner.de/bad-unterschraenke"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Midi Cabinets",
+   "qty": 74,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Bathroom Midi Cabinets' - exact URL hit. Not in the Bad mega-menu; reached from the Badschränke roll-up.",
+   "link": "https://www.hoeffner.de/bad-midischraenke"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathroom Furniture Sets",
+   "qty": 482,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Bathroom Furniture Sets' - exact URL hit. H1 'Badezimmermöbel Sets'.",
+   "link": "https://www.hoeffner.de/komplett-badkombinationen"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Vanity Units",
+   "qty": 47,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Vanity Units' - exact URL hit. This is the vanity-unit node rule 9 would otherwise class as Bathroom; OPTION 1 leaves it in Furniture. Note it is a DIFFERENT node from the recorded 'Waschtische' (/sanitaer-armaturen, 6), which is ceramic and glass wash basins, not vanity furniture.",
+   "link": "https://www.hoeffner.de/waschplaetze"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Washbasin Base Cabinets",
+   "qty": 130,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Vanity Base Cabinets' - exact URL hit.",
+   "link": "https://www.hoeffner.de/waschbeckenunterschraenke"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Mirror Cabinets",
+   "qty": 152,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Bathroom Mirror Cabinets' - exact URL hit. H1 'Spiegelschrank Bad'. This is the mirror-cabinet node rule 10 would otherwise pull into Bathroom; called out explicitly because it is the single biggest rule-10 item on the site, and it stays in Furniture under OPTION 1.",
+   "link": "https://www.hoeffner.de/badezimmer-spiegelschraenke"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathroom Shelving",
+   "qty": 22,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Bathroom Shelving Units' - exact URL hit.",
+   "link": "https://www.hoeffner.de/badregale"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Stools",
+   "qty": 2,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Bathroom Stools' - exact URL hit.",
+   "link": "https://www.hoeffner.de/badhocker"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Washing Machine Cabinets",
+   "qty": 67,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Washing Machine Cabinets' - exact URL hit.",
+   "link": "https://www.hoeffner.de/waschmaschinenschraenke"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Textiles (Bathroom Textiles, parent)",
+   "qty": 579,
+   "issue": "ROUTED TO TEXTILE: the bath-linen branch of the Bad department (rules 15, 20). Parent URL given for traceability only; its three children follow.",
+   "link": "https://www.hoeffner.de/badtextilien"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Textiles > Towels & Bath Sheets",
+   "qty": 237,
+   "issue": "ROUTED TO TEXTILE: bath and hand towels (rule 15). The corresponding hardware node, Handtuchhalter (5), is recorded in rows[] as Bathroom.",
+   "link": "https://www.hoeffner.de/handtuch"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Textiles > Towel Sets",
+   "qty": 250,
+   "issue": "ROUTED TO TEXTILE: towel sets (rule 15).",
+   "link": "https://www.hoeffner.de/handtuch-sets"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Textiles > Bath Mats & Bath Rugs",
+   "qty": 83,
+   "issue": "ROUTED TO TEXTILE: textile bath mats and bath runners (rule 16 - Höffner sells no rubber/anti-slip bathroom mat node that the rule-16 exception would bring to Bathroom).",
+   "link": "https://www.hoeffner.de/badematten"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Textiles > Towels > Wash Mitts & Flannels",
+   "qty": 46,
+   "issue": "ROUTED TO TEXTILE: washcloths and flannels (rule 15).",
+   "link": "https://www.hoeffner.de/waschhandschuhe"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Textiles > Towels > Shower Towels",
+   "qty": 32,
+   "issue": "ROUTED TO TEXTILE: shower/bath sheets (rule 15).",
+   "link": "https://www.hoeffner.de/duschtuecher"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Textiles",
+   "qty": 570,
+   "issue": "ROUTED TO TEXTILE and in any case a withheld overlap: SEO landing page from the /badezimmer carousel (H1 'Badezimmer Textilien', 570) that re-cuts the same assortment as Badtextilien (579) - its total equals Handtücher 237 + Handtuch-Sets 250 + Badematten 83 = 570 exactly. Not recorded anywhere so nothing is double-counted.",
+   "link": "https://www.hoeffner.de/badezimmer-textilien"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Lamps",
+   "qty": 955,
+   "issue": "ROUTED TO LIGHTING: primary product type is lighting (rule 19), even though the node is named for the bathroom. Not duplicated into Bathroom (rule 19 last sentence).",
+   "link": "https://www.hoeffner.de/badezimmer-lampen"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Decor",
+   "qty": 1550,
+   "issue": "ROUTED TO DECOR: bathroom-themed decorative-accessory roll-up from the /badezimmer carousel (1550 products over 22 pages). Primary product types are decor objects, not bathroom fixtures, accessories or hardware (rules 2, 21). It is also a broad overlap of several other nodes, so it is not recorded on either side.",
+   "link": "https://www.hoeffner.de/badezimmer-dekoration"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Decor > Mirrors",
+   "qty": 262,
+   "issue": "NOT RECORDED - the general decorative mirror node under Deko (H1 'Spiegel'). Its products are wall and floor mirrors for living areas; the bathroom-specific cut is the separately recorded Badezimmerspiegel (40). Recording it would import 222 non-bathroom mirrors and double-count the 40. Checked with dedup.already_extracted(): not in the index.",
+   "link": "https://www.hoeffner.de/spiegel"
+  }
+ ],
+ "_reconstructed_from": "Bathroom.xlsx delivered 2026-09-01 (checkpoint), not original worker JSON"
+}

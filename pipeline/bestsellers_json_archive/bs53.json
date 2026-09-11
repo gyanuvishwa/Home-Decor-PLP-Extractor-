@@ -1,0 +1,16 @@
+{
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "Shopify store, direct HTTP access, no WAF (consistent with prior Home-Decor pass note). Recovered nav from same Builder.io CMS feed used previously (GET https://cdn.builder.io/api/v3/content/nav?apiKey=ffd771d56cde49a3932ba2dc845afab8). Checked: main mega-menu (Bestsellers/Best Sellers appears repeatedly across every department dropdown, always as https://www.the-citizenry.com/collections/all-best-sellers), footer, and grep of the whole nav feed for Bestseller-family terms (Bestsellers, Best Sellers, Top Sellers, Popular, Trending, Customer Favorites). Only one genuine listing found: /collections/all-best-sellers. 'Trending' nav links point to the identical URL https://www.the-citizenry.com/collections/all-best-sellers (verified byte-identical url string in every nav occurrence) - this is a pure alias/duplicate label for the same listing, not a second PLP, so it is not emitted as a separate row. No room-specific Bestseller sub-collections exist anywhere in the nav (unlike Archive Sale, which does have room facets) - single undifferentiated listing only. QTY METHOD: the collection page embeds an analytics blob with 'collection_handle':'all-best-sellers','total_products':50 - but this exact figure (50) is also reported verbatim on two unrelated collections (all-new-arrivals and archive-sale), which is a strong signal it is a capped/generic value from whatever app populates that blob, not the true collection size. Cross-checked with the prior pass's own trusted method - exhaustive enumeration of /collections/all-best-sellers/products.json?limit=250&page=N until an empty/short page, counting unique product ids: page 1 returned 81 unique ids (<250, so exhaustive by definition). Used 81 as the true qty, not the misleading 50 in the analytics blob.",
+  "rows": [
+    {
+      "category": "Bestsellers",
+      "sub_category": "Bestsellers",
+      "qty": 81,
+      "link": "https://www.the-citizenry.com/collections/all-best-sellers",
+      "is_group": false,
+      "evidence": "Exhaustive enumeration of https://www.the-citizenry.com/collections/all-best-sellers/products.json?limit=250&page=1 returned 81 unique product ids on page 1 (< limit of 250, confirming exhaustive/no further pages). Page's own embedded analytics blob shows collection_handle:\"all-best-sellers\",total_products:50, but that figure is discounted as an unreliable app-level cap (identical 50 also appears on two unrelated collections).",
+      "flag": null
+    }
+  ]
+}

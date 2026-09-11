@@ -1,0 +1,119 @@
+{
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ACCESS: PerimeterX fronts containerstore.com and plain requests get a 307 to a px captcha; curl_cffi with rotating desktop Chrome fingerprints (chrome107/110/116/119/120/123/124/131, fresh profile per call, probe.py 2s/host pacing) returned HTTP 200 server-rendered HTML on every one of the ~20 requests made. ROBOTS: fetched FIRST (https://www.containerstore.com/robots.txt, 5525 bytes). It carries an explicitly named group 'User-agent: ClaudeBot' whose first directive is 'Allow: /', with disallows only for /admin/*, /cart/*, /profile/*, /checkout/*, /boutique/workingProducts*, /boutique/miscAccessorySKUs, a PDF, /elfa/instructions/*, '/s/*cq$' and '/s?q=*'. None of those cover /s/bath/*; the internal search endpoint /s?q= was deliberately never used. No Claude exclusion, so processing proceeded. TREE: taken from the site's own mega-nav payload inside <script id=__NEXT_DATA__> at props.pageProps.initialState.categories.data.eCommCategories - 15 L1 departments, 213 L1+L2 nodes, 28 L3 groups; dumped in full to work/w77_80/tcs_nav.txt and read end-to-end, then grepped for bath/shower/toilet/vanity/mirror/sink/towel/soap/makeup/tub so no bathroom node anywhere in the site could be missed. Bath is L1 id 5 (/s/bath/1) and the nav lists exactly 14 children plus a 'Shop All Bath' self-link. This was confirmed independently on the live page: /s/bath/1 returns plp.data.categories with exactly those 14 child ids (93290, 93298, 91812, 91813, 91814, 202, 80937, 206, 80994, 71788, 64473, 92004, 92919, 93165), and every one of the 10 Bath child pages returns plp.data.categories = [] - i.e. no third level exists under Bath, so the L2 nodes ARE the deepest listing grids. Rule-12 case handled as instructed: the site's general Storage department (/s/storage/*: plastic bins, cubes, drawers, toy storage, under-bed, bags & totes) and Closet/Cleaning/Decor departments are NOT Bathroom and were not taken; only the bathroom-specific storage that TCS itself files under Bath was taken. QTY SOURCE: each listing page's own server-rendered results header, e.g. '1 - 62 of 113 results' on Toilet Area, read out of the delivered HTML. VERIFICATION: (a) the rendered header total was compared against plp.data.totalCount in the same page's __NEXT_DATA__ on all 10 Bath child pages and matched exactly on every one across a wide size range - 30, 41, 45, 47, 77, 83, 87, 105, 113, 218; (b) on the four nodes with plp.lastPage = 1 the number of unique product ids actually delivered in initialState.products.ids equals the total (Bathroom Cleaning 30=30, Jewelry Storage 41=41, Racks & Hooks 45=45, Drawer Organizers 47=47) - a genuine single-page exhaustion check; (c) Countertop & Sink and Makeup Organizers & Mirrors were re-read in a second pass and returned 218 and 83 again, no drift; (d) each page's plp.data.breadcrumbs was checked to be ['Bath', '<the node requested>'] so no page was a silent redirect; (e) counts discriminate strongly (30 to 218), they are not a site-wide constant. DEDUP: lib/dedup.already_extracted() was run on all 19 candidate/adjacent URLs (the 10 Bath children, Shop All Bath, Decor>Mirrors, the BEYOND, College, Clearance and Everything-Organizer bath cross-shops and the three simplehuman brand nodes) - ZERO hits, so nothing here was taken by the Furniture or Home-Decor passes. Consistent with the Furniture ledger, which recorded zero Furniture-typed products in the Bath department. EXCLUDED AND WHY: 'Shop All Bath' /s/bath/1 (751) is the parent and is never recorded when children exist (rules 24/25); 'Everything Organizer > Bath' /s/featured/the-everything-organizer/bath/123, 'simplehuman > Bath / Sensor Mirrors / Soap Pumps' /s/featured/simplehuman/*, 'College: Laundry & Bath' /s/the-college-shop/laundry-and-bath/12 and 'Clearance: Laundry & Bath' /s/clearance/clearance-laundry-and-bath/12 are brand, seasonal-shop and clearance collections cross-linked into the Bath menu, barred by rule 25; 'Bathroom Cleaning' appears twice in the nav (Bath id 92004 and Cleaning id 92402) but resolves to one URL and is recorded once (rule 28). INCLUSION CALLS: Bathroom Cleaning (30) was kept in rows, not routed out - rule 3 names Cleaning Accessories as Bathroom, TCS itself names the node 'Bathroom Cleaning' and files it under Bath, and its tiles are bathroom-intended (Koala Eco Multi-Purpose Bathroom Cleaner, Full Circle Micro Manager Grout Brush, Grunge Buster Grout & Tile Brush, iDesign squeegee) even though generic scrubbers sit alongside. Makeup Organizers & Mirrors (83) was kept because rule 10 forbids skipping vanity/LED/sensor mirrors - the grid carries Zadro 9-Bulb Hollywood Vanity Mirror, Zadro 1X/5X LED Oval Vanity Mirror, Zadro LED Reversible 1X/5X Mirror and simplehuman Sensor Mirror alongside bath drawer organizers. Racks & Hooks (45) was kept as bathroom hardware under rule 17 (towel racks, robe/over-door hooks, Yamazaki Tower Rolling Towel Rack); the general Storage > Hooks & Racks node at /s/storage/hooks-racks/12 is a different URL and was left to Storage. No bathroom LIGHTING node exists anywhere in the TCS nav, so nothing was routed to Lighting.",
+ "rows": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Makeup Organizers & Mirrors",
+   "qty": 83,
+   "link": "https://www.containerstore.com/s/bath/makeup-organizers-mirrors/12",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Cabinet Organizers",
+   "qty": 87,
+   "link": "https://www.containerstore.com/s/bath/cabinet-organizers/12",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Countertop & Sink",
+   "qty": 218,
+   "link": "https://www.containerstore.com/s/bath/countertop-sink/12",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower & Bathtub",
+   "qty": 77,
+   "link": "https://www.containerstore.com/s/bath/shower-bathtub/12",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Drawer Organizers",
+   "qty": 47,
+   "link": "https://www.containerstore.com/s/bath/bath-drawer-organizers/12",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Racks & Hooks",
+   "qty": 45,
+   "link": "https://www.containerstore.com/s/bath/racks-hooks/12",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Toilet Area",
+   "qty": 113,
+   "link": "https://www.containerstore.com/s/bath/toilet-area/12",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Cleaning",
+   "qty": 30,
+   "link": "https://www.containerstore.com/s/bath/bathroom-cleaning-solutions/12",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  }
+ ],
+ "review": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath > Jewelry Storage",
+   "qty": 41,
+   "issue": "ROUTED TO STORAGE: sits under the site's Bath department but every tile read (41 of 41, single-page exhaustion) is a jewelry box / jewelry tray / necklace stand / acrylic jewelry drawer system - Stackers Supersized Jewelry Box Collection, Modular Acrylic Linen Jewelry Drawer System, Luxe Acrylic 3-Tier Necklace Stand, Umbra Trigem Necklace Stand. Rule 2 PRIMARY PRODUCT TYPE outranks ROOM/hierarchy; jewelry storage is not a bathroom product type (rules 3/12/13 list no jewelry item).",
+   "link": "https://www.containerstore.com/s/bath/jewelry-storage/12"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath > Hampers & Baskets",
+   "qty": 105,
+   "issue": "ROUTED TO STORAGE: URL slug is literally laundry-hampers-baskets and the tiles are laundry hampers, laundry sorters and rolling laundry carts (TCS Luna Hamper, Poppin Laundry Hamper With Lid, Steele Canvas Double Sorter Laundry Cart, Elfa Graphite & Slate Mesh Laundry Sorter, Water Hyacinth Rolling Laundry Cart). Primary product type = laundry hamper, i.e. general household/laundry storage, not a bathroom accessory (rules 2, 30-33). The same assortment is cross-listed under Cleaning and Closet.",
+   "link": "https://www.containerstore.com/s/bath/laundry-hampers-baskets/12"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Decor > Mirrors",
+   "qty": 8,
+   "issue": "ROUTED TO DECOR: sits under the Decor department, not Bath. All 8 tiles read; 7 are decorative/leaning/over-door wall mirrors (Umbra Hubba Arched Leaning Mirror, Umbra Hub Round Wall Mirror, TCS Overdoor Mirror). Primary type = decorative wall mirror -> Decor (rule 21). The one genuine vanity mirror in it (Zadro 9-Bulb Hollywood Vanity Mirror) is already inside the recorded Bath > Makeup Organizers & Mirrors leaf, so recording this node too would duplicate.",
+   "link": "https://www.containerstore.com/s/home-decor/mirrors/12"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "BEYOND > Bed Bath & Beyond: Bath",
+   "qty": 110,
+   "issue": "EXCLUDED AS BRAND-SHOP COLLECTION (rule 25): the Bed Bath & Beyond banner shop inside containerstore.com, cross-listed into the Bath mega-menu. It is a promotional brand collection, not a category node in the Bath tree, and its assortment is majority bath TEXTILE (Royal Velvet Royal Plush Towel, Truly Soft Quick Dry Towel Set of 6, London Fog Zero Twist Towel Set of 6, Conair Reversible Hair Towel) -> ROUTED TO TEXTILE for the textile portion; the non-textile items (iDesign Toilet Tissue Holder, Nicole Miller Lyra Soap Dish) are already inside the recorded Bath leaves.",
+   "link": "https://www.containerstore.com/s/bed-bath-and-beyond/bath-bed-bath-and-beyond/12"
+  }
+ ],
+ "_reconstructed_from": "Bathroom.xlsx delivered 2026-09-01 (checkpoint), not original worker JSON"
+}

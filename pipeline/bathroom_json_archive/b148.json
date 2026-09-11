@@ -1,0 +1,91 @@
+{
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ROBOTS: https://fermliving.com/robots.txt fetched FIRST, before any other request on the host (HTTP 200, 48 bytes, profile safari15_5). The ENTIRE file is two lines: 'User-agent: *' / 'Disallow: */pages/configurator?*=*'. NO Claude agent is named - no ClaudeBot, no anthropic-ai, no Claude-Web group anywhere - and there is no Content-Signal line and no Crawl-delay. The one disallowed pattern is the sofa configurator query and was never requested. Everything used here (/, /collections/*, /pages/the-bathroom, /sitemap.xml, /sitemap_collections_1.xml) is permitted. probe.py's 2s per-host pacing was left in force. ACCESS: clean, no bot wall. probe.fetch() returned HTTP 200 on the first fingerprint on every request (safari15_5, safari18_0, edge101, firefox133, chrome131 all worked); no 403, no 429, no challenge. STORE IDENTITY: fermliving.com is the DKK/Denmark storefront, which matches the manifest country - the site's own market switcher on this host lists 'Denmark / DKK' pointing at https://fermliving.com/..., with fermliving.us, fermliving.co.uk and fermliving.se as separate hosts and fermliving.dk as the Danish-language alternate (hreflang da-DK). All URLs recorded are the fermliving.com forms the manifest names. TREE: taken from the site's OWN server-rendered mega-menu in the homepage HTML, then completed from the site's OWN published collections sitemap so no branch could be hidden behind a truncated menu. Mega-menu departments: NEW (News, Kids News), KIDS, OUTDOOR LIVING, ACCESSORIES (Mirrors, Hooks and Holders, Vases, Plant Pots, Plant Boxes, Candle Holders, Candles, Small Storage, Bags and Baskets, Wallpaper), FURNITURE, SOFAS, LIGHTING, KITCHEN, TEXTILES (Cushions, Cushion Covers, Bedspreads and Throws, Towels, Shower Curtains), RUGS (Rectangular Rugs, Round Rugs, Mats and Runners), plus a 'shop by room' strip (div.megamenu__room-collection) whose ten entries are The Living Room, The Dining Room, The Kitchen, The Hallway, The Bedroom, THE BATHROOM, The Office, The Green Space, The Kids' Room and Ferm Living Classics - every one of them pointing at a /pages/ inspiration page, not at a listing. THERE IS NO BATHROOM DEPARTMENT IN THE PRODUCT NAVIGATION: Ferm Living merchandises by product type, not by room. The room entry point https://fermliving.com/pages/the-bathroom is a content page (JSON-LD breadcrumb 'Home > The Bathroom', a shoppable hero image and 'Shop Now' tiles to the Towels, Bags and Baskets and Sama collections) with no grid of its own, so it is NOT recordable. The actual bathroom LISTING was recovered from the site's own sitemap: https://fermliving.com/sitemap.xml -> sitemap_collections_1.xml (186 collections, fetched and enumerated in full), which publishes https://fermliving.com/collections/the-bathroom. That page is a real Shopify collection - H1 'The Bathroom', self-canonical, its own sort control (Featured / Price / Newest / Best Selling), a full hreflang set across all eight Ferm Living storefronts, and its own meta description 'A well-decorated bathroom combines functionality with elegant details that reflect your personal lifestyle and interior style.' It has no subcategories, so under rule 24 it may use its own URL, and it is not named View All / Shop All / All Products, so rule 25 does not reach it. I swept all 186 sitemap collections for bath|bad|shower|toilet|soap|mirror|towel|wash|vanity: the only bathroom-designated handles on the whole storefront are 'the-bathroom' (recorded) and 'the-bathroom-see-what-is-coming' (seasonal preview, in review[]). There is no bathroom-furniture, bathroom-accessories, bathroom-storage, basin, tap, shower-fitting or sanitaryware collection - Ferm Living sells no baths, showers, enclosures, taps, basins or toilets, so rules 4-8 have no nodes here. QTY SOURCE AND PROOF: Ferm Living prints NO 'N products' string anywhere - probe.counts_in() returns only cart-badge and carousel-dot noise, there is no JSON-LD numberOfItems and no data-total attribute - so the count is an EXHAUSTIVE ENUMERATION of the collection's own rendered grid, which is the method the brief prescribes when no total is rendered. Method: parse the PLP's own grid container div.collection-products-thumbs, take its DIRECT children that carry a /products/ anchor (this deliberately excludes the Clerk.io recommendation carousels further down the page - on /collections/the-bathroom the raw page contains 68 distinct /products/ hrefs but only 36 are inside the grid), then walk ?page=2,3,... until the grid stops. The theme paginates at 48. Enumerations: the-bathroom [36] = 36; hooks-and-holders [48, 9] = 57; self-care [40] = 40; small-storage [48, 48, 48, 6] = 150; bags-and-baskets [20] = 20; towels [17] = 17; shower-curtains [9] = 9; mats-and-runners [35] = 35; mirrors [29] = 29; wall-decorations [21] = 21; the-bathroom-see-what-is-coming [34] = 34. VERIFICATION: (a) every handle in every enumeration is unique - total == unique on all eleven nodes, so nothing is double-counted; (b) exhaustion was PROVEN, not assumed - requesting one page past the last returns a page with NO div.collection-products-thumbs container at all (checked on hooks-and-holders?page=3, the-bathroom?page=2 and small-storage?page=5), and the multi-page nodes terminate on a short page (9 of 48, 6 of 48); (c) the counts discriminate strongly (9, 17, 20, 21, 29, 34, 35, 36, 40, 57, 150 - no site-wide constant and no page-size artefact, since 36 and 40 are both below the 48 page size); (d) the recorded page's H1 is 'The Bathroom', matching the node requested, and its canonical is exactly the URL recorded. DEDUP: already_extracted() was run on all eleven candidate URLs. One hit: /collections/mirrors -> Final.xlsx 'Ferm Living / Mirrors', an exact URL match, moved to review[]. The other ten returned None. I checked rel=canonical before trusting the miss on the recorded node, per blind spot (a): /collections/the-bathroom is self-canonical, so there is no alias under which it could already sit in the index. Blind spot (b), locale variants, was also checked: the index holds Ferm Living twice, as 'Ferm Living' on fermliving.com (Furniture.xlsx: tables, chairs, lounge chairs, poufs, stools, daybeds, storage, shelves, 2/3/4-seaters, outdoor seating and tables, kids furniture; Final.xlsx: all five lighting nodes, shades, glasses, cups, carafes, plates, bowls, serveware, mirrors, vases, plant pots, plant boxes, candle holders, candles, decorations) and as 'Ferm Living US' on fermliving.us - it holds NO fermliving.dk / .co.uk / .se URLs, and no /collections/the-bathroom on any host, so the recorded node is genuinely unextracted. EXCLUDED AND WHY: /pages/the-bathroom - content page, no listing grid, not recordable (rule 27). The eight sibling '<room>-see-what-is-coming' collections and the ~55 '<name>-collection' / series collections (the-haze-, the-sama-, the-mist-, the-curvature-, the-dora- and so on) are series and seasonal collections and are excluded wholesale under rule 25; note this is where several bathroom products physically live (the Mist bathroom series, the Sama bathroom series), which is exactly why the room node is the only defensible Bathroom listing on this site. /collections/all-products, /collections/bestsellers, /collections/news, /collections/sale* and the gift-guide collections - View All / promotional (rule 25). ROLL-UP OVERLAP (explicitly addressed): The Bathroom is a room roll-up and its 36 products do overlap several product-type siblings - Towels, Shower Curtains, Mats and Runners, Mirrors, Hooks and Holders, Small Storage, Bags and Baskets. NONE of those siblings is recorded in rows[], so there is no double count: three are routed out to Textile, one is a hard dedup hit, and three are excluded as non-bathroom hierarchy. The Bathroom is therefore recorded ALONE, which is what rule 9 of the dispatch requires. HONEST LIMITATION: the recorded node is a curated room edit rather than a pure fittings category. Of its 36 products roughly 27 are bathroom proper (Haze Wall Cabinet, Shard Mirror Cabinet, Pond Mirror XL, Dora Towel Stand, Dora Shelving Unit, Curvature Toilet Paper Holder, Curvature Towel Hanger, Curvature hooks and double hook, Unda Hooks, Hang Rack, Place Rack, Bon Soap Tray, Bon Toothbrush Holder, Bon Petite Tray and Cup, Ceramic Soap Tray, Ceramic Basket, Enkel Bin, Grib Toolbox, Tuck Pot, Staffa Pedestal, Braided Laundry Basket, Pocket Storage Bag and Pouch, Basho trays and wall hanger) and about nine are textile or decor (Organic Hand Towel, Field Robe, two Chambray Shower Curtains, Block Mat, Lay Washable Mat, Way Runner, Ura Scented Candle). The figure 36 is the listing's own exact grid total and has NOT been adjusted, per rule 26; the composition is disclosed here so the run owner can see what it contains. Nothing is estimated, inferred from a parent, or summed from siblings.",
+ "rows": [
+  {
+   "category": "Bathroom",
+   "sub_category": "The Bathroom",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "The Bathroom",
+   "qty": 36,
+   "link": "https://fermliving.com/collections/the-bathroom",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  }
+ ],
+ "review": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Accessories > Mirrors",
+   "qty": 29,
+   "issue": "ALREADY EXTRACTED IN Final.xlsx (Home Decor pass) as 'Mirrors' (company 'Ferm Living'). already_extracted('https://fermliving.com/collections/mirrors') returns an EXACT URL match, so this is a hard dedup hit, not a judgement call. Not re-extracted even though the node contains genuine bathroom mirror products (Shard Mirror Cabinet, Pond Mirror XL, Folia Mirror) alongside decorative wall and table mirrors.",
+   "link": "https://fermliving.com/collections/mirrors"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Accessories > Hooks and Holders",
+   "qty": 57,
+   "issue": "LOW CONFIDENCE - NOT RECORDED (rules 2, 29). This node holds real bathroom hardware under rule 17 - Dora Towel Shelf x3, Dora Toilet Paper Holder Shelf x3, Curvature Towel Hanger x2, Curvature Toilet Paper Holder x2, Hang Rack x2 - but it is not a bathroom node: the site's own meta description for the page reads 'Choose between hooks, knobs, and shelves FOR ALL ROOMS', and the large majority of the 57 products are hallway/coat hardware (Lager Coat Rack x3, Comber hooks x6, Square hooks x4, Mushroom/Lemon/Chanterelle hooks x12, Cairn, Gravel, Unda, Curvature hooks and double hooks, Coat Hanger set, Place Rack x3). It sits in the Accessories department beside Vases and Candle Holders with no bathroom parent. Recording it whole would put 57 mostly-hallway products into Bathroom and rule 26 forbids adjusting the listing's own total; the bathroom-designated subset is already represented in the recorded The Bathroom node (which contains Curvature Toilet Paper Holder, Curvature Towel Hanger, Hang Rack and Place Rack). Left for the run owner.",
+   "link": "https://fermliving.com/collections/hooks-and-holders"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Accessories > Small Storage",
+   "qty": 150,
+   "issue": "NOT BATHROOM - general small storage and decorative tabletop (rules 12, 31/33: clearly-Storage-owned products belong to Storage). It is where Ferm Living files its whole Mist series (Mist Soap Dish x5, Mist Toothbrush Holder single and multi x10, Mist Cotton Pad Holder x5, Mist Tray/Round Tray/Box/Tissue Box/Container), the Bon accessories (Soap Tray, Toothbrush Holder, Petite Cup) and the Ceramic Soap Trays - i.e. the brand's actual bathroom accessories are merchandised inside a general Small Storage node together with Fountain/Bellure/Nium/Santany bowls and centrepieces, Paper Pulp boxes, Port fireplace tools, pencil holders and wall boxes. The site attaches no bathroom parent to it, so under rule 2 the hierarchy evidence is Storage, not Bathroom. Flagged rather than dropped because this is where the soap dishes and toothbrush holders live.",
+   "link": "https://fermliving.com/collections/small-storage"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Self Care",
+   "qty": 40,
+   "issue": "NOT RECORDED - curated wellness/ritual edit, not a product category (rule 25). H1 'Self Care', title 'Self care in everyday rituals', and its own description says it gathers 'trays, candles, towels and small storage'. Its 40 products are a cross-department mix - Haze Wall Cabinet, Pond mirrors, bath and hand towels, Mist soap dishes and toothbrush holders, scented candles, bedspread, throw, wall rug, glassware, teapot and mugs - so it overlaps Textile, Decor, Kitchen and the recorded The Bathroom node simultaneously. Not linked from the product navigation.",
+   "link": "https://fermliving.com/collections/self-care"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "The Bathroom - See what is coming",
+   "qty": 34,
+   "issue": "NOT RECORDED - seasonal preview / promotional page (rule 25). It carries the same H1 'The Bathroom' as the recorded node but is a separate 'see what is coming' collection previewing the incoming season (Sama Toilet Brush x2, Sama Soap Dispenser x2, Sama Toilet Paper Dispenser x2, Sama Bin x2, Dora Towel Ladder x2, Folia Mirror x3, Ekko bath towels and bath mat, Chambray shower curtains, Rylith scented candles, Pyra incense holders). It is one of a whole family of '<room>-see-what-is-coming' preview collections (the-bedroom-, the-kitchen-, the-hallway-, the-office-, the-green-space-, the-kids-room-, the-dining-room-, the-livingroom-). Recording it alongside The Bathroom would also duplicate the same room twice.",
+   "link": "https://fermliving.com/collections/the-bathroom-see-what-is-coming"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Textiles > Towels",
+   "qty": 17,
+   "issue": "ROUTED TO TEXTILE: bath towels, hand towels, a beach towel and two Field Robes (rules 15, 20). Ekko and Organic bath/hand towels x14, Field Robe x2, Ebb Beach Towel x1. No towel rail or other hardware in it.",
+   "link": "https://fermliving.com/collections/towels"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Textiles > Shower Curtains",
+   "qty": 9,
+   "issue": "ROUTED TO TEXTILE: nine Chambray Shower Curtain colourways (rule 20).",
+   "link": "https://fermliving.com/collections/shower-curtains"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Rugs > Mats and Runners",
+   "qty": 35,
+   "issue": "ROUTED TO TEXTILE: textile floor mats and runners, and it is a child of the RUGS department, not of any bathroom node (rule 16 - textile bath mat goes to Textile; only a rubber/anti-slip mat sold as a bathroom accessory would come to Bathroom). It contains exactly one bathroom-named product, the Ekko Bath Mat - Cashmere, which is a woven cotton mat; the other 34 are Kelim/Block/Amass/Athens/Check wool-jute runners, washable Lay mats and a Coir mat.",
+   "link": "https://fermliving.com/collections/mats-and-runners"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Accessories > Bags and Baskets",
+   "qty": 20,
+   "issue": "NOT BATHROOM - general storage and bags (rules 12, 31/33). Fio and Braided laundry baskets and the Herman Laundry Stand sit here alongside tote bags, weekend bags, picnic bags and Verso/Mar/Cala stacking baskets; there is no bathroom parent. Ferm Living's own bathroom edit picks the Braided Laundry Basket out of this node, and that product is already inside the recorded The Bathroom count.",
+   "link": "https://fermliving.com/collections/bags-and-baskets"
+  }
+ ],
+ "_reconstructed_from": "Bathroom.xlsx delivered 2026-09-01 (checkpoint), not original worker JSON"
+}

@@ -1,0 +1,16 @@
+{
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "Access: plain direct HTTP fetch, no WAF/bot-block. Found Clearance nested under Sale in the site's own taxonomy: the /sale/ page's embedded category-tree JSON contains {\"id\":\"cat930424\",\"name\":\"Clearance\", ... \"pageTitle\":\"Clearance | Cookware, Bakeware, Kitchen Tools\", \"parentCategoryTree\":[{\"id\":\"cat2211269\",\"name\":\"Sale\"},{\"id\":\"cat930424\",\"name\":\"Clearance\"}]} - i.e. Clearance is a genuine, permanently-named taxonomy node (not a temporary campaign), satisfying the Clearance-vs-Sale test even though it lives under the /sale/ URL path. Its canonical URL is https://www.surlatable.com/sale/clearance-2/ (react-helmet title 'Clearance | Cookware, Bakeware, Kitchen Tools | Sur La Table'). Three other sitemap URLs - /sale/clearance-1/, /clearance-2/, and /extra-20%25-off-clearance/ - were verified (curl -L) to be 301 redirects to this same canonical page, so they are aliases and not recorded as separate rows. The taxonomy node reports \"onlineSubCategoriesCount\":5, matching the 5 department sub-pages found in the sitemap under /sale/clearance/<dept>/ (linens, coffee-tea, bakeware, everyday-entertaining, tools) - every one of these was fetched and each shows '0 Items' (or a generic placeholder 'Category Search' template with no products), i.e. the genuine sub-structure currently exists but is empty, so per the zero-product rule none of the 5 are recorded as rows. EXCLUDED as generic/promotional Sale, not Clearance, per the brief's core test: /sale/ itself ('Sur La Table Sales & Special Offers'), /sale/sur-la-table-sale/*, /sale/all-sale/, /sale/under-*, /cyber-monday/*, /holidays/thanksgiving/flash-sale/, *-sale/ department pages (cookware-sale, bakeware-sale, etc.), /sale/19.72-specials/, /sale/buy-2-get-1-free-tools-*, /sale/limited-time-offers/, /sale/second-servings-resale-marketplace/ (a resale marketplace concept, not clearance) - all are temporary/seasonal promotional campaigns with no permanence signal in the site's own taxonomy. Site search was not used since robots.txt disallows /search*; the embedded taxonomy JSON was direct, stronger evidence anyway.",
+  "rows": [
+    {
+      "category": "Clearance",
+      "sub_category": "Clearance",
+      "qty": 147,
+      "link": "https://www.surlatable.com/sale/clearance-2/",
+      "is_group": false,
+      "evidence": "data-testid=\"category-product-count\" span reads '147 Items'; data-testid=\"product-grid-footer-pagination-summary\" reads 'Showing 24 of 148' (1-item discrepancy between the two on-page counts).",
+      "flag": "MANUAL REVIEW: page's own '147 Items' header and its own pagination footer 'Showing 24 of 148' disagree by 1 product. Used the rendered category-header count (147) per this project's standing convention of trusting the rendered header, but the 1-item gap could not be resolved without deeper product-level inspection (likely one item missing a facet, matching the pattern seen on other Sur La Table nodes in the prior Home-Decor pass)."
+    }
+  ]
+}

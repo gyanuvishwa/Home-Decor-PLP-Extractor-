@@ -1,0 +1,106 @@
+{
+  "status": "partial",
+  "failure_reason": "6 of 11 discovered New Arrivals PLPs have qty=null: Target's redsky_aggregations plp_search_v2 count API is PerimeterX-protected against direct curl_cffi (403) and headless Playwright (the intercepted live-page XHR itself came back as a PerimeterX captcha challenge JSON, not product data) - the only working access path found was the WebFetch tool hitting the redsky URL directly. For most of these New-Arrivals-family category nodes (as opposed to the Clearance-family nodes, which all worked) the API's raw JSON response is large enough (very large facet_list, apparently because 'new arrival' items span far more distinct brands/subcategories than the narrower Clearance nodes) that WebFetch's own content-size limit truncates the response before reaching the metadata/total_results section, even at count=1. This reproduced consistently across repeated attempts with varied params (count=1/24, dropping optional include_* flags) on each of the 6 affected nodes, so it is recorded as a tooling limitation, not fabricated as a number. All 6 pages were independently confirmed to be genuine live PLPs (not editorial/marketing pages) via direct SSR fetch of __NEXT_DATA__: each has metadata.type='Tag' (Target's standard taxonomy/category node type, same as the working Clearance nodes) with a plain descriptive seo_h1 and no editorial/story content_type.",
+  "notes": "Target Home (SR22). Home department page's own 'New & featured' merchandising module (slot 600, WEB-448235) links a Home-specific New Arrivals PLP: /c/home-new-arrivals/-/N-tnr7v (seo_h1='Home New Arrivals', type=Tag), which is itself nested under the site-wide 'Target New Arrivals' node (/c/what-s-new/-/N-o9rnh) in its breadcrumbs - i.e. Target's own taxonomy already scopes this specific node to Home, exactly mirroring the Home Clearance structure. The site-wide /what-s-new/ node itself was excluded from output as out-of-scope per the task's Home-department scoping rule (it spans Women's/Men's/Kids/Electronics/Grocery/Beauty/etc., not home-relevant). The Home New Arrivals page itself (tnr7v) exposes a genuine on-page 'shop by category' taxonomy_nodes module with 6 real children: Home Decor, Furniture, Kitchen & Dining, Bedding & Bath, Storage & Organization, Patio & Garden - 3 of these (Furniture, Kitchen & Dining, Patio & Garden) are distinct child category node-ids (06r0a / nwgl6 / aglz5, each independently confirmed type=Tag via direct SSR fetch), the other 3 (Home Decor, Bedding & Bath, Storage & Organization) are facet-filtered sub-URLs of the same tnr7v node (Target's normal pattern for narrower listings within one taxonomy node, e.g. N-tnr7vZ3j1ooZk4iqt) rather than separate node-ids, but each still resolves to its own distinct product count and is treated as a genuine leaf per the brief's sub-structure rule. The 'Furniture' child (06r0a, 'New Furniture') itself has 4 further real children in its own server-rendered taxonomy: New Bedroom / New Kitchen & Dining / New Living Room / New Office Furniture - all 4 included as leaves under it. No New Arrivals listing was found for Bath, Rugs, Lighting, Window Treatments, Mattresses, or Home Improvement specifically (not present as their own tiles in any of the checked taxonomy modules); Bath appears bundled into 'Bedding & Bath New Arrivals' above. Checked but not separately itemized: Storage & Organization's URL path is unusually formed (/c/home-new-arrivals/storage-organization/-/N-tnr7vZqoqbd) but resolves 200 and is a genuine listing, not a dead link. For the 5 rows with a real qty, total_pages is capped at 50 (=1200/24) rather than following ceil(total_results/24) once total_results exceeds ~1200 - this is Target's own known offset>1199 pagination-depth cap (already documented and trusted in this project's prior Home-Decor extraction pass for this exact company, e.g. Vanity Lights qty=1200-capped total_pages=50), not a data-quality problem with total_results itself, so these 5 numbers are reported unflagged. Also checked and correctly excluded as non-listings: search suggestion carousels and the site's generic /s search endpoint (client-rendered, not used as a source of PLP counts). robots.txt has no Claude-specific disallow.",
+  "rows": [
+    {
+      "category": "New Arrivals",
+      "sub_category": "Home New Arrivals",
+      "qty": null,
+      "link": "https://www.target.com/c/home-new-arrivals/-/N-tnr7v",
+      "is_group": true,
+      "evidence": "Confirmed genuine PLP via SSR __NEXT_DATA__: metadata.type='Tag', seo_h1='Home New Arrivals', nested under site-wide /c/what-s-new/-/N-o9rnh in breadcrumbs. redsky total_results not retrievable - see failure_reason.",
+      "flag": "MANUAL REVIEW: qty could not be verified - redsky plp_search_v2 response for this node's facet_list is too large for WebFetch to reach the total_results field before truncation; direct HTTP (403 PerimeterX) and Playwright (captcha) are both blocked for this API host"
+    },
+    {
+      "category": "New Arrivals",
+      "sub_category": "Home Decor New Arrivals",
+      "qty": 6028,
+      "link": "https://www.target.com/c/home-new-arrivals/-/N-tnr7vZ3j1ooZk4iqt?type=products",
+      "is_group": false,
+      "evidence": "redsky plp_search_v2 search_response.metadata.total_results=6028, total_pages=50 (1200-item pagination cap, see notes)",
+      "flag": null
+    },
+    {
+      "category": "New Arrivals",
+      "sub_category": "Furniture New Arrivals",
+      "qty": null,
+      "link": "https://www.target.com/c/new-furniture/-/N-06r0a?type=products",
+      "is_group": true,
+      "evidence": "Confirmed genuine PLP via SSR __NEXT_DATA__: metadata.type='Tag', seo_h1='New Furniture', 4 real sub-children present in server taxonomy. redsky total_results not retrievable - see failure_reason.",
+      "flag": "MANUAL REVIEW: qty could not be verified - redsky plp_search_v2 response for this node's facet_list is too large for WebFetch to reach the total_results field before truncation; direct HTTP (403 PerimeterX) and Playwright (captcha) are both blocked for this API host"
+    },
+    {
+      "category": "New Arrivals",
+      "sub_category": "New Bedroom Furniture",
+      "qty": 7405,
+      "link": "https://www.target.com/c/new-bedroom-furniture/-/N-af5sv",
+      "is_group": false,
+      "evidence": "redsky plp_search_v2 search_response.metadata.total_results=7405, total_pages=50 (1200-item pagination cap, see notes)",
+      "flag": null
+    },
+    {
+      "category": "New Arrivals",
+      "sub_category": "New Kitchen & Dining Furniture",
+      "qty": 4790,
+      "link": "https://www.target.com/c/new-kitchen-dining-furniture/-/N-mc112",
+      "is_group": false,
+      "evidence": "redsky plp_search_v2 search_response.metadata.total_results=4790, total_pages=50 (1200-item pagination cap, see notes)",
+      "flag": null
+    },
+    {
+      "category": "New Arrivals",
+      "sub_category": "New Living Room Furniture",
+      "qty": null,
+      "link": "https://www.target.com/c/new-living-room-furniture/-/N-628mo",
+      "is_group": false,
+      "evidence": "Confirmed genuine PLP via SSR __NEXT_DATA__: metadata.type='Tag', seo_h1='New Living Room Furniture'. redsky total_results not retrievable - see failure_reason.",
+      "flag": "MANUAL REVIEW: qty could not be verified - redsky plp_search_v2 response for this node's facet_list is too large for WebFetch to reach the total_results field before truncation; direct HTTP (403 PerimeterX) and Playwright (captcha) are both blocked for this API host"
+    },
+    {
+      "category": "New Arrivals",
+      "sub_category": "New Office Furniture",
+      "qty": 2083,
+      "link": "https://www.target.com/c/new-office-furniture/-/N-dulp",
+      "is_group": false,
+      "evidence": "redsky plp_search_v2 search_response.metadata.total_results=2083, total_pages=50 (1200-item pagination cap, see notes)",
+      "flag": null
+    },
+    {
+      "category": "New Arrivals",
+      "sub_category": "Kitchen & Dining New Arrivals",
+      "qty": null,
+      "link": "https://www.target.com/c/new-kitchen-dining/-/N-nwgl6?type=products",
+      "is_group": false,
+      "evidence": "Confirmed genuine PLP via SSR __NEXT_DATA__: metadata.type='Tag', seo_h1='New Kitchen & Dining'. redsky total_results not retrievable - see failure_reason.",
+      "flag": "MANUAL REVIEW: qty could not be verified - redsky plp_search_v2 response for this node's facet_list is too large for WebFetch to reach the total_results field before truncation; direct HTTP (403 PerimeterX) and Playwright (captcha) are both blocked for this API host"
+    },
+    {
+      "category": "New Arrivals",
+      "sub_category": "Bedding & Bath New Arrivals",
+      "qty": 3684,
+      "link": "https://www.target.com/c/home-new-arrivals/-/N-tnr7vZ7hqg0Zxspa7Znz7uq83voenZnz7uq8b632u?type=products",
+      "is_group": false,
+      "evidence": "redsky plp_search_v2 search_response.metadata.total_results=3684, total_pages=50 (1200-item pagination cap, see notes)",
+      "flag": null
+    },
+    {
+      "category": "New Arrivals",
+      "sub_category": "Storage & Organization New Arrivals",
+      "qty": 4337,
+      "link": "https://www.target.com/c/home-new-arrivals/storage-organization/-/N-tnr7vZqoqbd?type=products",
+      "is_group": false,
+      "evidence": "redsky plp_search_v2 search_response.metadata.total_results=4337, total_pages=50 (1200-item pagination cap, see notes)",
+      "flag": null
+    },
+    {
+      "category": "New Arrivals",
+      "sub_category": "Patio & Garden New Arrivals",
+      "qty": null,
+      "link": "https://www.target.com/c/outdoor-living-garden-new-arrivals/-/N-aglz5?type=products",
+      "is_group": false,
+      "evidence": "Confirmed genuine PLP via SSR __NEXT_DATA__: metadata.type='Tag', seo_h1='Outdoor Living & Garden New Arrivals'. redsky total_results not retrievable - see failure_reason.",
+      "flag": "MANUAL REVIEW: qty could not be verified - redsky plp_search_v2 response for this node's facet_list is too large for WebFetch to reach the total_results field before truncation; direct HTTP (403 PerimeterX) and Playwright (captcha) are both blocked for this API host"
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "Access: direct HTTP GET (curl, tier 1) against www.shoppersstop.com throughout; no browser needed. robots.txt checked first: ClaudeBot/Claude-SearchBot/Claude-User/claude-web all explicitly 'Allow: /' (with only cart/checkout/login/account/orders/payment disallowed) - no block. Tree source: homepage HTML embeds Next.js __NEXT_DATA__ with the Homestop CLP's l2categoryjson, giving the real L2 node for this company's HomeStop private-label hub: Home > Bath & Laundry (/home-bath-laundry/c-1419, numberOfProducts=695, static page, verified 200 + matching count). That page is itself a search-style listing (Unbxd-powered) whose own facets['categoryPath3_uFilter'] give the real L3 breakdown: Towels=373/375, Bath Accessories=295, Laundry=27. Confirmed Bath & Laundry categoryPath3 filter mechanism actually narrows results (695->295 when adding categoryPath3='Bath Accessories', re-verified via a full 10-page pagination scan of all 295 unique uniqueId products, matching the facet count exactly). Towels breakdown (pro_type_uFilter): Bath Towels 166, Hand Towels 130, Towel Sets 55, Face Towels 20, Bath Robes 2 (+2 tagging noise) - pure Textile per rule 15/20, none Bathroom. Laundry categoryPath3-value filter did not actually narrow the query (returned the unfiltered 695) - confirmed via numberOfProducts still 695 - so its exact isolated count is unverifiable via this path; regardless, 'Laundry' (laundry baskets/bags) is out of Bathroom scope per rule 30-33 either way. Bath Accessories (295) is a single site-side merchandising bucket with NO independently browsable/filterable URL for its own children: verified categoryPath4_uFilter and pro_type_uFilter are NOT functional filter keys in this site's 'filter' query param (adding either left numberOfProducts unchanged at 295, and a categoryPath4-filtered fetch for 'Toilet Brush & Tissue Holders' returned products still tagged categoryPath4='Bath Sets', proving the param is ignored/not enforced - the apparent narrowing seen in one earlier probe was actually the q= keyword-relevance search, not a real filter). Full pagination scan of all 295 unique products (10 pages, deduped by uniqueId) gives the true categoryPath4 tag composition: Bath Mats 151 (titles are cotton/polyester/memory-foam textile mats e.g. 'Resort Anti-Slip Cotton Bathmat', 'Solid Dobby 100% Drylon Swift Dry 1800 GSM Bath Mats' - textile material per rule 16, routed to Textile), Shower Curtains 21 (rule 20, routed to Textile), Soap Dishes & Dispensers 43 (genuinely Bathroom, rule 13), Toilet Brush & Tissue Holders 6 (genuinely Bathroom, rule 14), Bath Sets 74 (mixed: steel/ceramic tumblers, polyresin soap dishes, a ceramic 'Luxury Bathroom' set, plus at least one shower-bathmat and one toilet-brush item misfiled here - ambiguous mixed node). Sums to 295 exactly, confirming the tag data is complete and reliable even though it carries no clickable URL. Because no distinct, verifiable listing URL exists for the Bathroom-relevant sub-slice (only a derived tag-count from a live pagination scan, not a page total), and the one real URL that does exist (Bath Accessories, 295) is majority (172/295, 58%) out-of-scope Textile content, recording 295 as a Bathroom leaf would violate the no-unrelated-quantity-aggregation rule, and fabricating a per-tag URL would violate the no-URL-invention rule - so this goes to review rather than rows, per rule 29 (ambiguity -> LOW confidence, do not guess). Attempted the site's dedicated category sitemap (https://api-ssl.shoppersstop.com/sitemap-categorypages.xml) to look for a real static per-subcategory URL; it returned HTTP 503 on both the initial try and one retry with fuller browser headers - treated as a tier-1 block on that specific subdomain per the first-block rule and not chased further, since the main site's own JSON/facet data already gave a complete, verified answer. Cross-category dedup: none of the candidate URLs (the two verified listing URLs cited above) were checked against cross_category_url_index.json since no leaf is being recorded to rows[]; not required by the mandatory-before-recording-a-leaf rule for review-only entries. No Fixtures/Baths/Showers/Enclosures/Taps/Furniture/Mirrors/Ceramics/Storage nodes exist anywhere under HomeStop's Home hub besides Bedding, Living, Dining, Kitchen, Bath & Laundry, Home & Kitchen Appliances, Decor, Pet Care, Music Collections (full l2categoryjson enumerated) - so Bath & Laundry is the sole candidate branch for this category and has been fully investigated.",
+  "rows": [],
+  "review": [
+    {
+      "category": "Bathroom",
+      "sub_category": "Bath Accessories (mixed bucket - Soap Dishes & Dispensers 43, Toilet Brush & Tissue Holders 6, Bath Sets 74 partly Bathroom)",
+      "qty": 295,
+      "issue": "MANUAL REVIEW: this is the only real listing URL at this depth (Home > Bath & Laundry > Bath Accessories) and it mixes genuine Bathroom items with 172/295 (58%) Textile items (Bath Mats 151, Shower Curtains 21) that must route to Textile.xlsx per rules 15/16/20. categoryPath4 tags (Toilet Brush & Tissue Holders=6, Soap Dishes & Dispensers=43, Bath Sets=74) are real and verified via a full 10-page pagination scan (deduped by uniqueId, sums exactly to 295), but the site exposes NO working filter/URL for categoryPath4 or pro_type (confirmed: categoryPath4_uFilter and pro_type_uFilter params are silently ignored, numberOfProducts stays 295 regardless) so no clean per-subcategory link+qty pair can be produced without inventing a URL. Needs a human call on whether to record the mixed 295-count node as-is with a caveat, or accept the tag-derived Bathroom-only estimate (6+43+partial 74=~123) without a matching clickable URL.",
+      "link": "https://www.shoppersstop.com/search/result?q=Bath%20Accessories&filter=categoryPath1_uFilter%3A%22Home%22%23categoryPath2_uFilter%3A%22Bath%20%26%20Laundry%22%23categoryPath3_uFilter%3A%22Bath%20Accessories%22"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Bath & Laundry > Towels (Bath/Hand/Face Towels, Towel Sets, Bath Robes)",
+      "qty": 373,
+      "issue": "ROUTED TO TEXTILE per rule 15/20 (bath/hand/face towels, towel sets, bath robes are Textile, not Bathroom). Not recorded here. Logged for completeness / cross-check against Textile.xlsx.",
+      "link": "https://www.shoppersstop.com/search/result?q=Towels&filter=categoryPath1_uFilter%3A%22Home%22%23categoryPath2_uFilter%3A%22Bath%20%26%20Laundry%22%23categoryPath3_uFilter%3A%22Towels%22"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Bath & Laundry > Bath Mats (textile bath mats within the Bath Accessories bucket)",
+      "qty": 151,
+      "issue": "ROUTED TO TEXTILE per rule 16 - titles confirm cotton/polyester/memory-foam textile construction (e.g. 'Resort Anti-Slip Cotton Bathmat Super Soft & Super Absorbent', 'Solid Dobby 100% Drylon Swift Dry 1800 GSM Bath Mats'), not rubber/plastic bathroom-hardware mats. No independent URL exists (see main Bath Accessories review entry); count is tag-derived from the pagination scan.",
+      "link": null
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Bath & Laundry > Shower Curtains (within the Bath Accessories bucket)",
+      "qty": 21,
+      "issue": "ROUTED TO TEXTILE per rule 20 explicitly (Shower Curtains -> Textile). No independent URL exists; count is tag-derived from the pagination scan.",
+      "link": null
+    },
+    {
+      "category": "Bathroom",
+      "sub_category": "Bath & Laundry > Laundry (laundry baskets/bags)",
+      "qty": 27,
+      "issue": "OUT OF SCOPE - general Laundry category, not Bathroom (rule 30-33, no crossover re-extraction of general storage/laundry items). categoryPath3='Laundry' filter did not actually narrow results server-side (numberOfProducts stayed 695, the site-wide Bath & Laundry total) so an exact isolated count could not be independently re-verified via this path; the 27 figure is the top-level facet's reported value. Not recorded as a row either way since it is out of category.",
+      "link": null
+    }
+  ]
+}

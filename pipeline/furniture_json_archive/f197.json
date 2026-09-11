@@ -1,0 +1,129 @@
+{
+  "sr": 197,
+  "company": "The Home Depot",
+  "brand_site": "homedepot.com",
+  "country": "USA",
+  "site_url": "https://www.homedepot.com/",
+  "status": "partial",
+  "failure_reason": "Akamai Bot Manager began denying every /b/ category request in this Chrome session after roughly 25 successful page loads (~20 minutes of extraction). The block presents as a blank page with only 'Powered and protected by ... Privacy' text (0-length body, hasAkamai/hasSensor markers present in the HTML) - the same fingerprint the prior HTTP-only pass (archive c230) hit on every request. It first appeared on Guest-Office-Chairs and Executive-Chairs, then on the Furniture department root itself in the same tab, confirming it is a session-level block, not a bad URL. A brand-new tab (fresh tabId, same browser/cookie jar) was denied on its very first request to a previously-working URL, proving the block is tied to the shared session/IP, not the tab. Per the HARD BLOCK RULE this worker stopped requesting the target at that point rather than retrying/backing off. Departments never reached because of this: Bedroom Furniture (incl. Bedroom Sets, Beds, Makeup Vanities), Kitchen & Dining Furniture, Living Room Furniture (incl. Living Room Sets, Massage Chairs, TV Stands), Bar Furniture, Baby Furniture, Kids Furniture, Bar Stools, Entryway Furniture. Within Home Office Furniture, File Cabinets and 5 of 6 Office Chairs & Desk Chairs children (Guest Office Chairs, Executive Chairs, Gaming Chairs, Office Stools, Drafting Chairs) were seen listed but never opened.",
+  "notes": "ACCESS: robots.txt (fetched in-tab) has no Claude-specific disallow and does not block /b/ category paths, only checkout/search/facet noise - Chrome-only access was used throughout, no HTTP/curl/proxy route. Chrome initially hit the same Akamai interstitial the prior HTTP pass described, but it cleared as soon as the tab had OS focus (document.hasFocus()==true) - confirming the block was Chrome's own background-tab throttling starving the Akamai challenge script, not a real bot-wall, exactly as flagged in brief section 7c's Cloudflare exception. After that the site rendered normally and the real Furniture taxonomy was walked from the site's own mega-menu link (/b/Furniture/N-5yc1vZc7pc) and each category page's own chip/tile sub-nav strip. CRITICAL STORE-LOCALE BUG: this workstation's IP auto-resolved to a Guam store (Tamuning, zip 96913) via THD_LOCALIZER's LOC_HISTORY_BY_IP workflow, and PLP result counts under that store were unreliable - Floating Desks read 32 on first load then 0 on a same-session reload, and Standing Desks read 0 with a fully-rendered 'no products available' empty state (not a loading race). Fixed by overwriting the DELIVERY_ZIP cookie to a mainland US zip (30301, Atlanta) via javascript_tool (document.cookie) and clearing THD_LOCALIZER, then reloading - all counts became stable mainland-catalog numbers afterward (Computer Desks and Writing Desks, captured before the fix, were re-verified after and were unchanged at 3495/906, so those two are trustworthy; Floating Desks was re-verified at 32 post-fix). QTY METHOD: the badge under the category title (e.g. '1,000+ results') is a display cap, not the real count - the true value is the 'Viewing 1-X of N' pagination line, used for every row below. Nodes with <=~24 products show all items on one page with no 'Viewing' line and no numeric badge different from the visible count (e.g. Secretary Desks showed exactly 4 product tiles, no pagination controls - qty taken as the tile count). TREE DEPTH TRAP CONFIRMED (brief section 1/7b trap #1): the visible chip strip under 'Desks' listed only 6 children in the rendered text, but a full href-scan of the DOM found a 7th, 'Gaming Desks', not shown in the visible chip row - used DOM href scans (not just visible text) for every grouping node to avoid under-counting. 'Office Chairs & Desk Chairs' likewise looked like a leaf from its badge but has 6 real children; only 'Task Chairs' was opened before the session-wide block hit. Excluded per brief section 1: Mattresses (bedding, not furniture - seen listed under Bedroom Furniture but not opened), Furniture Accessories & Replacement Parts (parts, not furniture - seen as a Furniture-department tile, not opened). 'Accent Chairs' appeared as a chip on the Home Office Furniture page but its canonical URL path is under Furniture-Living-Room-Furniture-Chairs-Accent-Chairs, i.e. it is actually a Living Room Furniture > Chairs node cross-listed on the Home Office page - left out of this partial rather than guessing which department it belongs under; Living Room Furniture was never reached to confirm. All qty rows below were captured with the corrected mainland zip (30301).",
+  "rows": [
+    {
+      "category": "Furniture",
+      "sub_category": "Home Office Furniture",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Desks",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Computer Desks",
+      "qty": 3495,
+      "link": "https://www.homedepot.com/b/Furniture-Home-Office-Furniture-Desks-Computer-Desks/N-5yc1vZ2fkouvv",
+      "is_group": false,
+      "evidence": "pagination text 'Viewing 1-24 of 3495' (header badge showed capped '1,000+ results'); re-verified identical after the Guam-zip fix",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Writing Desks",
+      "qty": 906,
+      "link": "https://www.homedepot.com/b/Furniture-Home-Office-Furniture-Desks-Writing-Desks/N-5yc1vZ2fkotym",
+      "is_group": false,
+      "evidence": "pagination text 'Viewing 1-12 of 906'; re-verified identical after the Guam-zip fix",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Floating Desks",
+      "qty": 32,
+      "link": "https://www.homedepot.com/b/Furniture-Home-Office-Furniture-Desks-Floating-Desks/N-5yc1vZ2fkou0u",
+      "is_group": false,
+      "evidence": "pagination text 'Viewing 1-24 of 32', captured after the DELIVERY_ZIP fix to mainland zip 30301 (an earlier read under the mis-detected Guam store zip showed a false 0)",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Standing Desks",
+      "qty": 302,
+      "link": "https://www.homedepot.com/b/Furniture-Home-Office-Furniture-Desks-Standing-Desks/N-5yc1vZ2fkotzc",
+      "is_group": false,
+      "evidence": "pagination text 'Viewing 1-24 of 302', captured after the DELIVERY_ZIP fix to mainland zip 30301 (an earlier read under the mis-detected Guam store zip showed a false 0 with a fully-rendered empty state)",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Secretary Desks",
+      "qty": 4,
+      "link": "https://www.homedepot.com/b/Furniture-Home-Office-Furniture-Desks-Secretary-Desks/N-5yc1vZ2fkoty5",
+      "is_group": false,
+      "evidence": "all 4 product tiles rendered on a single page, no pagination controls",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Executive Desks",
+      "qty": 250,
+      "link": "https://www.homedepot.com/b/Furniture-Home-Office-Furniture-Desks-Executive-Desks/N-5yc1vZ2fkou16",
+      "is_group": false,
+      "evidence": "pagination text 'Viewing 1-24 of 250'",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Gaming Desks",
+      "qty": 72,
+      "link": "https://www.homedepot.com/b/Furniture-Home-Office-Furniture-Desks-Gaming-Desks/N-5yc1vZ2fkpdwc",
+      "is_group": false,
+      "evidence": "pagination text 'Viewing 1-12 of 72'",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Bookcases & Bookshelves",
+      "qty": 2535,
+      "link": "https://www.homedepot.com/b/Furniture-Home-Office-Furniture-Bookcases-Bookshelves/N-5yc1vZc7o5",
+      "is_group": false,
+      "evidence": "pagination text 'Viewing 1-12 of 2535' (header badge showed capped '1,000+ results')",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Office Storage Cabinets",
+      "qty": 3361,
+      "link": "https://www.homedepot.com/b/Furniture-Home-Office-Furniture-Office-Storage-Cabinets/N-5yc1vZcio4",
+      "is_group": false,
+      "evidence": "pagination text 'Viewing 1-24 of 3361' (header badge showed capped '1,000+ results')",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Office Chairs & Desk Chairs",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: only 1 of this node's 6 real children (Task Chairs) was verified before the Akamai session block hit; Guest Office Chairs, Executive Chairs, Gaming Chairs, Office Stools and Drafting Chairs are known to exist (seen via DOM href scan) but were never opened"
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Task Chairs",
+      "qty": 769,
+      "link": "https://www.homedepot.com/b/Furniture-Home-Office-Furniture-Office-Chairs-Desk-Chairs-Task-Chairs/N-5yc1vZ2fkp6c3",
+      "is_group": false,
+      "evidence": "pagination text 'Viewing 1-24 of 769'",
+      "flag": null
+    }
+  ]
+}

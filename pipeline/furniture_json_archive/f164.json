@@ -1,0 +1,1380 @@
+{
+ "sr": 164,
+ "company": "IKEA UAE",
+ "brand_site": "ikea.com",
+ "country": "UAE",
+ "site_url": "https://www.ikea.com/ae/en/",
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ROUTE: Claude-in-Chrome connector only, one dedicated tab (tabId 1961715027), closed at the end. robots.txt was fetched same-origin from the loaded AE page first: 4054 bytes, 93 Disallow lines under User-agent: *, none of them covering /ae/ or /cat/, no blanket Disallow: /, and no mention anywhere of anthropic-ai / ClaudeBot / Claude-Web / Claude-User / Claude-SearchBot. No curl / requests / WebFetch / proxy at any point; every fetch() ran inside the loaded www.ikea.com/ae/en page context. No 403, CAPTCHA, DataDome or rate-limit was seen at any stage - 117 API calls, 12 enumeration+boundary triples, 13 raw page fetches and 3 page loads all returned 200.\n\nTREE SOURCE: script[type=text/hydrate] -> data.config.catalogSlim on https://www.ikea.com/ae/en/cat/furniture-fu001/ (which redirects to /cat/all-furniture-fu001/); the child key is 'subs', as f107 (IKEA DE) established, NOT 'subCategories'. The AE payload has 21 top-level departments and 1579 node instances; 749 of them sit in the eight real furniture departments fu002 Tables & chairs, 700640 Sofas & armchairs, bm001 Beds & mattresses, st001 Storage & organisation, fu004 Desk & desk chairs, ba001 Bathroom products, od001 Outdoor products (od003 Outdoor furniture) and bc001 Baby & children. To satisfy the 'nav under-reports' trap the whole catalogSlim was keyword-swept in English for sofa/armchair/chair/stool/table/desk/bed/wardrobe/cabinet/cupboard/bench/sideboard/shelv/bookcase/dresser/chest/drawer/seat/couch/trolley/vanity/console/nightstand/headboard/ottoman/pouf/futon/daybed; the 40 unique hits outside the eight furniture departments were all table linen (20538, 20541), lamps (10732, 700512, 16281, 700817), clocks (10785), wardrobe scents (58411), fitted-kitchen cabinets, doors and drawer fronts (ka001 METOD / ENHET / KNOXHULT / JAERNBODA), kitchen drawers and drawer organisers (24258, 24257, 700673), kitchen shelves (20678), tablet stands (41068) and desk accessories (10573) - i.e. no furniture node lives outside the eight departments.\n\nQTY METHOD AND THE HEADER CONVENTION - THIS MATCHES f107 (IKEA DE) AND f140 (IKEA FR) DELIBERATELY: for every leaf the figure in qty is productListPage.productCount from sik.search.blue.cdtapps.com/ae/en/product-list-page?category=<id>, fetched from the loaded page. IKEA's rendered listing header is INFLATED BY EXACTLY +1 whenever plannerCount>0, because client-side hydration injects a non-product planner tile. This was MEASURED on the AE store, not assumed: sofas-fu003 productCount 226 / plannerCount 1 / live DOM header '227 items'; vanity-units-20720 productCount 67 / plannerCount 1 / live DOM header '68 items'; control coffee-tables-10716 productCount 44 / plannerCount 0 / live DOM header '44 items'. The server-delivered HTML carries the un-inflated number on both sides of that split: raw same-origin fetches of ten category pages returned p.plp-filter-information__total-count values identical to the API productCount in 10/10 cases, including plannerCount>0 nodes (21959 '30 items', 47386 '10 items'). Only 14 of the 117 AE leaves have plannerCount>0 (versus 82 of 116 on FR), so the AE header differs from qty on 14 rows only. FOLLOWING f107 AND f140 EXPLICITLY: qty is the ENUMERATED PRODUCT COUNT and the header figure is stated inside every evidence string, so whichever convention the orchestrator settles on stays recoverable and IKEA AE is directly comparable with IKEA DE and IKEA FR. The f140 caching caution was watched for and did not recur here: no raw-HTML header disagreed with the API on any of the ten pages checked.\n\nVERIFICATION: (1) full enumeration - /product-list-page/more-products?category=<id>&start=0&end=productCount+30 was run on a 12-leaf sample spanning the whole range (25206=1, 47360=2, 700424=3, 20611=7, 21958=48, 20926=55, 31786=80, 25219=109, 10382=138, fu003=226, 48005=296, 43632=348) and returned exactly productCount tiles with exactly productCount unique itemNoGlobal values in 12/12 cases - unique product IDs, not href counting. (2) boundary test - start=productCount-1 returned exactly 1 item and start=productCount returned 0 items on the same 12 leaves, 12/12 pass, so no total is truncated or padded. The exhaustive 117/117 version of both checks was already run by f107 on the same global platform, so it was sampled here. (3) node identity: unlike the DE/FR responses the AE product-list-page payload does NOT echo category.name/category.url, so identity was confirmed the other way - ten category pages were fetched as raw HTML and their h1 matched the catalogSlim node name exactly in 10/10 cases (all HTTP 200), and the three pages actually loaded in the tab (sofas-fu003 'Sofas', coffee-tables-10716 'Coffee tables', vanity-units-20720 'Vanity units') matched too. No id silently served a parent listing. (4) 63 distinct qty values across 117 leaves spanning 1-348 - no site-wide constant, no suspiciously round display cap. (5) no leaf returned 0.\n\nINDEPENDENCE FROM IKEA DE (f107) AND IKEA FR (f140): IKEA runs one global platform, so 116 of the 117 DE/FR leaf category IDs also resolve on AE; 700441 (Additional wardrobes) is the single sibling node absent from the AE tree, and 31786 Sofa modules is the single AE leaf that neither sibling emits. The AE figures are the AE market's own: Dining Tables DE 92 / FR 86 / AE 61; Sofas DE 274 / FR 227 / AE 226; Beds DE 226 / FR 232 / AE 208; Fitted Wardrobes DE 389 / FR 403 / AE 348; Dining Chairs DE 112 / FR 110 / AE 109; Coffee Tables DE 45 / FR 44 / AE 44. The AE department layout also differs: AE exposes 700417 'Dining furniture', 19141 'Cafe furniture', 30454 'Sideboards, buffets & console tables' and 10705 'Center & end tables' as real hubs, files 20656 Bedside tables under bm001 as well as st004, and puts 48925 Laundry storage under ba003 Bathroom laundry. The AE storefront is English, so every row name below is the AE store's own live label; nothing was translated or copied from the German or French rows. Three AE labels are demonstrably at odds with what the node lists and are flagged individually: 21962 is labelled 'Tables & chairs' but lists outdoor armchairs, 47386 is labelled 'Outdoor sofas' but lists outdoor benches, and 21959 'Lounging & relaxing furniture' lists outdoor sofas. 21967 is labelled just 'Dining sets', identical to the indoor node 19145, so its own slug wording (outdoor-dining-sets) was used for the row name.\n\nSTOPPING RULE: stopped above nodes that only split by seat count, size, material or series - 21825 Dining tables -> 2/4/6/8/10 seater, 19145 Dining sets -> sets up to 2/4/6/10 seats, 25219 Dining chairs -> kitchen chairs / upholstered chairs, fu003 Sofas, fu006 Armchairs, 10663 Sofa-beds, 20926 Footstools & pouffes and bm003 Beds. bm003 is kept as a single leaf exactly as f107 and f140 did, so the 208 figure covers the adult bed range; the children's and baby bed nodes (the 18723 branch, 45781 Cots) are emitted separately under the Baby & children branch.\n\nEXCLUDED, and why: the whole named-series layer (46052 series hub; 42245 BROR, 11703 IVAR, 14317 OLAUS under 700440 Garage storage; 49140 SMASTAD and 700789 LASTARE under 18706; 700561 RELATERA under 700414; 700450 bathroom series; 47423 desk systems and 11811 modular desks) - all component listings. Also excluded: mattresses and bed bases (bm002 and its children, 24825 Mattress bases, 24827 Bed slats, 18724 Children's mattresses, 45855 Cot mattresses); bedding and textiles (tl001, tl004, 18730, 18690, 20542 Chair pads); furniture parts, covers and care (10664 Sofa & armchair covers and its 21 series children, 57536 Sofa & armchair cushions & headrests, 31785 Sofa & armchair legs, 30572 Dining table tops & underframes, 25223 Chair covers, 34006 Dining chair underframes & seat shells, 24822 Bed legs, 57280 bed frame covers, 55997 Sliding wardrobe doors, 18775 Children's bed accessories & canopies); standalone storage goods (st007 Small storage & organisers, 10797 storage boxes, 19059 Under bed storage, 20477 Children's clothes & shoes organisation); wall shelving (10398, 20660, 20481, 20615 - Wall Decor's job); bathroom fixtures and mirrors (20723 sinks, 20724 taps, 40690 showers, 30565 worktops, 10555 accessories, 20490 bathroom mirrors, 20498 / 20499 / 49138 mirrors); laundry goods (55004 Laundry accessories, 20601 Laundry baskets, 20602 Drying racks - only 48925 Laundry storage, a cabinet node, is kept); lighting (li001 and 16283 / 10736 / 18773 / 17897); decoration (de001), tableware (kt001), plants and pots (pp001, 31787), toys (18734, 18716), baby care (18701, 31772), picnic and bags (42924, 16248), outdoor non-furniture (17887 Parasols & gazebos, 700349 Outdoor kitchen, 21957 Outdoor flooring, 55998 grill accessories); and the fitted-kitchen tree (ka001). The two furniture nodes IKEA files inside the kitchen/storage trees - 10471 Kitchen islands & trolleys and 16200 Pantry - are reached through fu005 and st002 and ARE included.\n\nOVERLAPS: the AE tree lists many nodes under two or three parents (21825 / 25219 / 22659 / 59245 / 10412 under both 700417 and 700675 / 700676 / 700319 / 30454; 20862 / 20864 / 19143 / 19144 under both the Tables/Chairs hubs and 16244 / 19141; 47386 under both 700319 Benches and 700350 Outdoor seating; 45816 / 18768 / 18769 / 20483 / 45815 / 45782 under both 18767 and bc004 / fu002; 21966 under both 21964 and 700351; 700192 under both od003 and 700191; 21958 under both st001 and od003; 20858 under both fu005 and ba001; 20656 under both bm001 and st004; fu006 under both 700676 and 700640; 47067 / 47070 under both the desk hubs and 55002 Gaming furniture). Each leaf is emitted exactly once, under its most natural parent, so there are no duplicate rows: 117 leaves, 117 distinct category ids, 117 distinct URLs. Grouping rows whose every child is placed elsewhere are not emitted at all: bc004 Children's chairs, 700440 Garage storage, 18706 Children's storage, bc002 / bc003 and ba003 Bathroom laundry.",
+ "rows": [
+  {
+   "category": "Furniture",
+   "sub_category": "Tables & Chairs",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dining Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dining Tables",
+   "qty": 61,
+   "link": "https://www.ikea.com/ae/en/cat/dining-tables-21825/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=21825 -> productListPage.productCount=61 (AE site node name 'Dining tables', slug dining-tables-21825); plannerCount=0, so the site's hydrated listing header reads '61 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dining Chairs",
+   "qty": 109,
+   "link": "https://www.ikea.com/ae/en/cat/dining-chairs-25219/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=25219 -> productListPage.productCount=109 (AE site node name 'Dining chairs', slug dining-chairs-25219); plannerCount=0, so the site's hydrated listing header reads '109 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dining Sets",
+   "qty": 87,
+   "link": "https://www.ikea.com/ae/en/cat/dining-sets-19145/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=19145 -> productListPage.productCount=87 (AE site node name 'Dining sets', slug dining-sets-19145); plannerCount=0, so the site's hydrated listing header reads '87 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dining Benches",
+   "qty": 7,
+   "link": "https://www.ikea.com/ae/en/cat/dining-benches-59245/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=59245 -> productListPage.productCount=7 (AE site node name 'Dining benches', slug dining-benches-59245); plannerCount=0, so the site's hydrated listing header reads '7 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Tables",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Extendable Tables",
+   "qty": 21,
+   "link": "https://www.ikea.com/ae/en/cat/extendable-tables-21829/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=21829 -> productListPage.productCount=21 (AE site node name 'Extendable tables', slug extendable-tables-21829); plannerCount=0, so the site's hydrated listing header reads '21 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Wall-Mounted Tables",
+   "qty": 1,
+   "link": "https://www.ikea.com/ae/en/cat/wall-mounted-tables-25206/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=25206 -> productListPage.productCount=1 (AE site node name 'Wall-mounted tables', slug wall-mounted-tables-25206); plannerCount=0, so the site's hydrated listing header reads '1 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Round Tables",
+   "qty": 12,
+   "link": "https://www.ikea.com/ae/en/cat/round-tables-59244/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=59244 -> productListPage.productCount=12 (AE site node name 'Round tables', slug round-tables-59244); plannerCount=0, so the site's hydrated listing header reads '12 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Multifunctional Tables",
+   "qty": 5,
+   "link": "https://www.ikea.com/ae/en/cat/multifunctional-tables-57537/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=57537 -> productListPage.productCount=5 (AE site node name 'Multifunctional tables', slug multifunctional-tables-57537); plannerCount=0, so the site's hydrated listing header reads '5 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Center & End Tables",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Coffee Tables",
+   "qty": 44,
+   "link": "https://www.ikea.com/ae/en/cat/coffee-tables-10716/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=10716 -> productListPage.productCount=44 (AE site node name 'Coffee tables', slug coffee-tables-10716); plannerCount=0, rendered listing header on the live page read directly from the DOM: '44 items'; qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Side Tables",
+   "qty": 70,
+   "link": "https://www.ikea.com/ae/en/cat/side-tables-10717/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=10717 -> productListPage.productCount=70 (AE site node name 'Side tables', slug side-tables-10717); plannerCount=0, so the site's hydrated listing header reads '70 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Nesting Tables",
+   "qty": 7,
+   "link": "https://www.ikea.com/ae/en/cat/nesting-tables-57298/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=57298 -> productListPage.productCount=7 (AE site node name 'Nesting tables', slug nesting-tables-57298); plannerCount=0, so the site's hydrated listing header reads '7 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Chairs",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Foldable Chairs",
+   "qty": 7,
+   "link": "https://www.ikea.com/ae/en/cat/foldable-chairs-25222/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=25222 -> productListPage.productCount=7 (AE site node name 'Foldable chairs', slug foldable-chairs-25222); plannerCount=0, so the site's hydrated listing header reads '7 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Stools",
+   "qty": 27,
+   "link": "https://www.ikea.com/ae/en/cat/stools-22659/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=22659 -> productListPage.productCount=27 (AE site node name 'Stools', slug stools-22659); plannerCount=0, so the site's hydrated listing header reads '27 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dressing Table Chairs & Stools",
+   "qty": 15,
+   "link": "https://www.ikea.com/ae/en/cat/dressing-table-chairs-stools-59250/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=59250 -> productListPage.productCount=15 (AE site node name 'Dressing table chairs & stools', slug dressing-table-chairs-stools-59250); plannerCount=0, so the site's hydrated listing header reads '15 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Step Stools & Step Ladders",
+   "qty": 7,
+   "link": "https://www.ikea.com/ae/en/cat/step-stools-step-ladders-20611/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=20611 -> productListPage.productCount=7 (AE site node name 'Step stools & step ladders', slug step-stools-step-ladders-20611); plannerCount=0, so the site's hydrated listing header reads '7 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bar Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bar Stools & Counter Stools",
+   "qty": 11,
+   "link": "https://www.ikea.com/ae/en/cat/bar-stools-chairs-20864/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=20864 -> productListPage.productCount=11 (AE site node name 'Bar stools & counter stools', slug bar-stools-chairs-20864); plannerCount=0, so the site's hydrated listing header reads '11 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bar Tables",
+   "qty": 4,
+   "link": "https://www.ikea.com/ae/en/cat/bar-tables-20862/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=20862 -> productListPage.productCount=4 (AE site node name 'Bar tables', slug bar-tables-20862); plannerCount=0, so the site's hydrated listing header reads '4 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bar Table Sets",
+   "qty": 2,
+   "link": "https://www.ikea.com/ae/en/cat/bar-tables-sets-47360/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=47360 -> productListPage.productCount=2 (AE site node name 'Bar tables sets', slug bar-tables-sets-47360); plannerCount=0, so the site's hydrated listing header reads '2 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Cafe Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Cafe Tables",
+   "qty": 4,
+   "link": "https://www.ikea.com/ae/en/cat/cafe-tables-19143/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=19143 -> productListPage.productCount=4 (AE site node name 'Cafe tables', slug cafe-tables-19143); plannerCount=0, so the site's hydrated listing header reads '4 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Cafe Chairs",
+   "qty": 8,
+   "link": "https://www.ikea.com/ae/en/cat/cafe-chairs-19144/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=19144 -> productListPage.productCount=8 (AE site node name 'Cafe chairs', slug cafe-chairs-19144); plannerCount=0, so the site's hydrated listing header reads '8 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Benches",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Hallway Benches",
+   "qty": 28,
+   "link": "https://www.ikea.com/ae/en/cat/hallway-benches-59246/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=59246 -> productListPage.productCount=28 (AE site node name 'Hallway benches', slug hallway-benches-59246); plannerCount=0, so the site's hydrated listing header reads '28 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "End of Bed Benches",
+   "qty": 7,
+   "link": "https://www.ikea.com/ae/en/cat/end-of-bed-benches-59247/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=59247 -> productListPage.productCount=7 (AE site node name 'End of bed benches', slug end-of-bed-benches-59247); plannerCount=0, so the site's hydrated listing header reads '7 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Storage Benches",
+   "qty": 18,
+   "link": "https://www.ikea.com/ae/en/cat/storage-benches-59248/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=59248 -> productListPage.productCount=18 (AE site node name 'Storage benches', slug storage-benches-59248); plannerCount=0, so the site's hydrated listing header reads '18 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sofas & Armchairs",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sofas",
+   "qty": 226,
+   "link": "https://www.ikea.com/ae/en/cat/sofas-fu003/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=fu003 -> productListPage.productCount=226 (AE site node name 'Sofas', slug sofas-fu003); plannerCount=1, rendered listing header on the live page read directly from the DOM: '227 items'; qty here is the enumerated product count, not the hydrated header figure",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sofa-Beds",
+   "qty": 70,
+   "link": "https://www.ikea.com/ae/en/cat/sofa-beds-10663/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=10663 -> productListPage.productCount=70 (AE site node name 'Sofa-beds', slug sofa-beds-10663); plannerCount=1, so the site's hydrated listing header reads '71 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Armchairs",
+   "qty": 100,
+   "link": "https://www.ikea.com/ae/en/cat/armchairs-chaise-longues-fu006/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=fu006 -> productListPage.productCount=100 (AE site node name 'Armchairs', slug armchairs-chaise-longues-fu006); plannerCount=0, so the site's hydrated listing header reads '100 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); server-delivered HTML of the same URL carries the un-inflated '100 items' and its h1 read 'Armchairs'; qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Chaise Longues",
+   "qty": 15,
+   "link": "https://www.ikea.com/ae/en/cat/chaise-longues-57527/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=57527 -> productListPage.productCount=15 (AE site node name 'Chaise longues', slug chaise-longues-57527); plannerCount=1, so the site's hydrated listing header reads '16 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sofa Modules",
+   "qty": 80,
+   "link": "https://www.ikea.com/ae/en/cat/sofa-modules-31786/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=31786 -> productListPage.productCount=80 (AE site node name 'Sofa modules', slug sofa-modules-31786); plannerCount=0, so the site's hydrated listing header reads '80 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); server-delivered HTML of the same URL carries the un-inflated '80 items' and its h1 read 'Sofa modules'; qty here is the enumerated product count",
+   "flag": "MANUAL REVIEW: AE-only node relative to the IKEA DE (f107) and IKEA FR (f140) sibling row sets, which do not emit id 31786. Listing verified as JAETTEBO / SOEDERHAMN modular sofas and sofa sections - complete modular sofas plus individual seat/armless sections, i.e. it straddles the modular-sofa (in scope) / sofa-component (out of scope) line"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Footstools & Pouffes",
+   "qty": 55,
+   "link": "https://www.ikea.com/ae/en/cat/footstools-pouffes-20926/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=20926 -> productListPage.productCount=55 (AE site node name 'Footstools & pouffes', slug footstools-pouffes-20926); plannerCount=0, so the site's hydrated listing header reads '55 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Beds & Mattresses",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Beds",
+   "qty": 208,
+   "link": "https://www.ikea.com/ae/en/cat/beds-bm003/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=bm003 -> productListPage.productCount=208 (AE site node name 'Beds', slug beds-bm003); plannerCount=0, so the site's hydrated listing header reads '208 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Headboards",
+   "qty": 4,
+   "link": "https://www.ikea.com/ae/en/cat/headboards-19064/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=19064 -> productListPage.productCount=4 (AE site node name 'Headboards', slug headboards-19064); plannerCount=0, so the site's hydrated listing header reads '4 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Beds with Mattresses Included",
+   "qty": 13,
+   "link": "https://www.ikea.com/ae/en/cat/beds-with-mattresses-included-700513/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=700513 -> productListPage.productCount=13 (AE site node name 'Beds with mattresses included', slug beds-with-mattresses-included-700513); plannerCount=0, so the site's hydrated listing header reads '13 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bedroom Furniture Sets",
+   "qty": 29,
+   "link": "https://www.ikea.com/ae/en/cat/bedroom-furniture-sets-54992/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=54992 -> productListPage.productCount=29 (AE site node name 'Bedroom furniture sets', slug bedroom-furniture-sets-54992); plannerCount=0, so the site's hydrated listing header reads '29 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bedside Tables",
+   "qty": 62,
+   "link": "https://www.ikea.com/ae/en/cat/bedside-tables-20656/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=20656 -> productListPage.productCount=62 (AE site node name 'Bedside tables', slug bedside-tables-20656); plannerCount=0, so the site's hydrated listing header reads '62 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Storage & Organisation",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Room Dividers",
+   "qty": 14,
+   "link": "https://www.ikea.com/ae/en/cat/room-dividers-46080/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=46080 -> productListPage.productCount=14 (AE site node name 'Room dividers', slug room-dividers-46080); plannerCount=0, so the site's hydrated listing header reads '14 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Hallway Furniture Sets",
+   "qty": 8,
+   "link": "https://www.ikea.com/ae/en/cat/hallway-furniture-sets-700411/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=700411 -> productListPage.productCount=8 (AE site node name 'Hallway furniture sets', slug hallway-furniture-sets-700411); plannerCount=0, so the site's hydrated listing header reads '8 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Shoe Cabinets",
+   "qty": 26,
+   "link": "https://www.ikea.com/ae/en/cat/shoe-cabinets-10456/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=10456 -> productListPage.productCount=26 (AE site node name 'Shoe cabinets', slug shoe-cabinets-10456); plannerCount=0, so the site's hydrated listing header reads '26 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); qty here is the enumerated product count",
+   "flag": "MANUAL REVIEW: IKEA's own node 'Shoe cabinets' mixes freestanding shoe cabinets with slimmer shoe racks and one shoehorn (MURVEL) seen in the listing; kept whole because the site files it as storage furniture"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Wardrobes",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Fitted Wardrobes",
+   "qty": 348,
+   "link": "https://www.ikea.com/ae/en/cat/fitted-wardrobes-43632/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=43632 -> productListPage.productCount=348 (AE site node name 'Fitted wardrobes', slug fitted-wardrobes-43632); plannerCount=0, so the site's hydrated listing header reads '348 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Hinged Wardrobes",
+   "qty": 296,
+   "link": "https://www.ikea.com/ae/en/cat/hinged-wardrobes-48005/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=48005 -> productListPage.productCount=296 (AE site node name 'Hinged wardrobes', slug hinged-wardrobes-48005); plannerCount=0, so the site's hydrated listing header reads '296 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sliding Wardrobes",
+   "qty": 65,
+   "link": "https://www.ikea.com/ae/en/cat/sliding-wardrobes-43635/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=43635 -> productListPage.productCount=65 (AE site node name 'Sliding wardrobes', slug sliding-wardrobes-43635); plannerCount=0, so the site's hydrated listing header reads '65 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Open Wardrobes",
+   "qty": 63,
+   "link": "https://www.ikea.com/ae/en/cat/open-wardrobes-43634/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=43634 -> productListPage.productCount=63 (AE site node name 'Open wardrobes', slug open-wardrobes-43634); plannerCount=0, so the site's hydrated listing header reads '63 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Hallway Wardrobes",
+   "qty": 58,
+   "link": "https://www.ikea.com/ae/en/cat/hallway-wardrobes-48007/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=48007 -> productListPage.productCount=58 (AE site node name 'Hallway wardrobes', slug hallway-wardrobes-48007); plannerCount=0, so the site's hydrated listing header reads '58 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Mirrored Wardrobes",
+   "qty": 45,
+   "link": "https://www.ikea.com/ae/en/cat/mirrored-wardrobes-48006/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=48006 -> productListPage.productCount=45 (AE site node name 'Mirrored wardrobes', slug mirrored-wardrobes-48006); plannerCount=0, so the site's hydrated listing header reads '45 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Solitaire Wardrobes",
+   "qty": 34,
+   "link": "https://www.ikea.com/ae/en/cat/solitaire-wardrobes-43631/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=43631 -> productListPage.productCount=34 (AE site node name 'Solitaire wardrobes', slug solitaire-wardrobes-43631); plannerCount=0, so the site's hydrated listing header reads '34 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Walk In Wardrobes",
+   "qty": 17,
+   "link": "https://www.ikea.com/ae/en/cat/walk-in-wardrobes-43633/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=43633 -> productListPage.productCount=17 (AE site node name 'Walk in wardrobes', slug walk-in-wardrobes-43633); plannerCount=0, so the site's hydrated listing header reads '17 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Corner Wardrobes",
+   "qty": 12,
+   "link": "https://www.ikea.com/ae/en/cat/corner-wardrobes-43636/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=43636 -> productListPage.productCount=12 (AE site node name 'Corner wardrobes', slug corner-wardrobes-43636); plannerCount=0, so the site's hydrated listing header reads '12 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Wardrobe Shelving",
+   "qty": 23,
+   "link": "https://www.ikea.com/ae/en/cat/wardrobe-shelving-49079/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=49079 -> productListPage.productCount=23 (AE site node name 'Wardrobe shelving', slug wardrobe-shelving-49079); plannerCount=0, so the site's hydrated listing header reads '23 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sloped Ceiling Wardrobes",
+   "qty": 17,
+   "link": "https://www.ikea.com/ae/en/cat/sloped-ceiling-wardrobes-700422/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=700422 -> productListPage.productCount=17 (AE site node name 'Sloped ceiling wardrobes', slug sloped-ceiling-wardrobes-700422); plannerCount=0, so the site's hydrated listing header reads '17 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bookcases & Shelving Units",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Cube Storage",
+   "qty": 73,
+   "link": "https://www.ikea.com/ae/en/cat/cube-storage-55012/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=55012 -> productListPage.productCount=73 (AE site node name 'Cube storage', slug cube-storage-55012); plannerCount=0, so the site's hydrated listing header reads '73 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Shelving Units",
+   "qty": 132,
+   "link": "https://www.ikea.com/ae/en/cat/shelving-units-11465/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=11465 -> productListPage.productCount=132 (AE site node name 'Shelving units', slug shelving-units-11465); plannerCount=0, so the site's hydrated listing header reads '132 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bookcases",
+   "qty": 138,
+   "link": "https://www.ikea.com/ae/en/cat/bookcases-10382/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=10382 -> productListPage.productCount=138 (AE site node name 'Bookcases', slug bookcases-10382); plannerCount=0, so the site's hydrated listing header reads '138 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Pantry",
+   "qty": 23,
+   "link": "https://www.ikea.com/ae/en/cat/pantry-16200/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=16200 -> productListPage.productCount=23 (AE site node name 'Pantry', slug pantry-16200); plannerCount=0, so the site's hydrated listing header reads '23 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Storage Shelves & Units",
+   "qty": 56,
+   "link": "https://www.ikea.com/ae/en/cat/storage-shelves-units-10397/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=10397 -> productListPage.productCount=56 (AE site node name 'Storage shelves & units', slug storage-shelves-units-10397); plannerCount=0, so the site's hydrated listing header reads '56 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); server-delivered HTML of the same URL carries the un-inflated '56 items' and its h1 read 'Storage shelves & units'; qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Chests of Drawers & Drawer Units",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Chests of Drawers",
+   "qty": 118,
+   "link": "https://www.ikea.com/ae/en/cat/chests-of-drawers-10451/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=10451 -> productListPage.productCount=118 (AE site node name 'Chests of drawers', slug chests-of-drawers-10451); plannerCount=0, so the site's hydrated listing header reads '118 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dressing Tables",
+   "qty": 16,
+   "link": "https://www.ikea.com/ae/en/cat/dressing-tables-20657/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=20657 -> productListPage.productCount=16 (AE site node name 'Dressing tables', slug dressing-tables-20657); plannerCount=0, so the site's hydrated listing header reads '16 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Basket Drawer Units",
+   "qty": 10,
+   "link": "https://www.ikea.com/ae/en/cat/basket-drawer-units-46081/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=46081 -> productListPage.productCount=10 (AE site node name 'Basket drawer units', slug basket-drawer-units-46081); plannerCount=0, so the site's hydrated listing header reads '10 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); qty here is the enumerated product count",
+   "flag": "MANUAL REVIEW: ambiguous - IKEA files 'Basket drawer units' under its Chests of drawers & drawer units branch, but the products are JONAXEL wire-basket drawer/mesh units that could read as standalone storage"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Cabinets & Cupboards",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Cabinets",
+   "qty": 117,
+   "link": "https://www.ikea.com/ae/en/cat/cabinets-10409/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=10409 -> productListPage.productCount=117 (AE site node name 'Cabinets', slug cabinets-10409); plannerCount=0, so the site's hydrated listing header reads '117 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Display Cabinets",
+   "qty": 86,
+   "link": "https://www.ikea.com/ae/en/cat/display-cabinets-10410/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=10410 -> productListPage.productCount=86 (AE site node name 'Display cabinets', slug display-cabinets-10410); plannerCount=0, so the site's hydrated listing header reads '86 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sideboards, Buffets & Console Tables",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sideboards & Buffets",
+   "qty": 47,
+   "link": "https://www.ikea.com/ae/en/cat/sideboards-buffets-10412/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=10412 -> productListPage.productCount=47 (AE site node name 'Sideboards & buffets', slug sideboards-buffets-10412); plannerCount=0, so the site's hydrated listing header reads '47 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Console Tables",
+   "qty": 3,
+   "link": "https://www.ikea.com/ae/en/cat/console-tables-16246/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=16246 -> productListPage.productCount=3 (AE site node name 'Console tables', slug console-tables-16246); plannerCount=0, so the site's hydrated listing header reads '3 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "TV & Media Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "TV & Media Storage",
+   "qty": 63,
+   "link": "https://www.ikea.com/ae/en/cat/tv-media-storage-14885/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=14885 -> productListPage.productCount=63 (AE site node name 'TV & media storage', slug tv-media-storage-14885); plannerCount=0, so the site's hydrated listing header reads '63 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "TV Benches",
+   "qty": 38,
+   "link": "https://www.ikea.com/ae/en/cat/tv-benches-10810/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=10810 -> productListPage.productCount=38 (AE site node name 'TV benches', slug tv-benches-10810); plannerCount=0, so the site's hydrated listing header reads '38 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Trolleys",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Kitchen Islands & Trolleys",
+   "qty": 25,
+   "link": "https://www.ikea.com/ae/en/cat/kitchen-islands-trolleys-10471/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=10471 -> productListPage.productCount=25 (AE site node name 'Kitchen islands & trolleys', slug kitchen-islands-trolleys-10471); plannerCount=0, so the site's hydrated listing header reads '25 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bathroom Trolleys",
+   "qty": 6,
+   "link": "https://www.ikea.com/ae/en/cat/bathroom-trolleys-20858/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=20858 -> productListPage.productCount=6 (AE site node name 'Bathroom trolleys', slug bathroom-trolleys-20858); plannerCount=0, so the site's hydrated listing header reads '6 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Filing Cabinets & Storage Drawers",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Storage Units & Cabinets for Office",
+   "qty": 26,
+   "link": "https://www.ikea.com/ae/en/cat/storage-units-cabinets-for-office-47084/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=47084 -> productListPage.productCount=26 (AE site node name 'Storage units & cabinets for office', slug storage-units-cabinets-for-office-47084); plannerCount=1, so the site's hydrated listing header reads '27 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Home Storage & Drawer Units",
+   "qty": 30,
+   "link": "https://www.ikea.com/ae/en/cat/drawer-units-for-home-47081/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=47081 -> productListPage.productCount=30 (AE site node name 'Home storage & drawer units', slug drawer-units-for-home-47081); plannerCount=0, so the site's hydrated listing header reads '30 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); server-delivered HTML of the same URL carries the un-inflated '30 items' and its h1 read 'Home storage & drawer units'; qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Desks & Desk Chairs",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Conference Tables",
+   "qty": 10,
+   "link": "https://www.ikea.com/ae/en/cat/bekant-conference-meeting-tables-54173/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=54173 -> productListPage.productCount=10 (AE site node name 'Conference tables', slug bekant-conference-meeting-tables-54173); plannerCount=0, so the site's hydrated listing header reads '10 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); server-delivered HTML of the same URL carries the un-inflated '10 items' and its h1 read 'Conference tables'; qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Desk & Chair Sets",
+   "qty": 33,
+   "link": "https://www.ikea.com/ae/en/cat/desk-chair-sets-53249/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=53249 -> productListPage.productCount=33 (AE site node name 'Desk & chair sets', slug desk-chair-sets-53249); plannerCount=0, so the site's hydrated listing header reads '33 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Conference Chairs",
+   "qty": 12,
+   "link": "https://www.ikea.com/ae/en/cat/conference-chairs-47068/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=47068 -> productListPage.productCount=12 (AE site node name 'Conference chairs', slug conference-chairs-47068); plannerCount=1, so the site's hydrated listing header reads '13 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Conference Table & Chair Sets",
+   "qty": 3,
+   "link": "https://www.ikea.com/ae/en/cat/conference-table-chair-sets-700424/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=700424 -> productListPage.productCount=3 (AE site node name 'Conference table & chair sets', slug conference-table-chair-sets-700424); plannerCount=0, so the site's hydrated listing header reads '3 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Desks & Computer Desks",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Standing Desks",
+   "qty": 18,
+   "link": "https://www.ikea.com/ae/en/cat/standing-desks-55008/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=55008 -> productListPage.productCount=18 (AE site node name 'Standing desks', slug standing-desks-55008); plannerCount=0, so the site's hydrated listing header reads '18 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Desks for Home",
+   "qty": 87,
+   "link": "https://www.ikea.com/ae/en/cat/desks-for-home-20651/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=20651 -> productListPage.productCount=87 (AE site node name 'Desks for home', slug desks-for-home-20651); plannerCount=0, so the site's hydrated listing header reads '87 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Desks for Office",
+   "qty": 20,
+   "link": "https://www.ikea.com/ae/en/cat/desks-for-office-47069/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=47069 -> productListPage.productCount=20 (AE site node name 'Desks for office', slug desks-for-office-47069); plannerCount=1, so the site's hydrated listing header reads '21 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Desks for Gaming",
+   "qty": 9,
+   "link": "https://www.ikea.com/ae/en/cat/desks-for-gaming-47070/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=47070 -> productListPage.productCount=9 (AE site node name 'Desks for gaming', slug desks-for-gaming-47070); plannerCount=0, so the site's hydrated listing header reads '9 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Laptop Tables",
+   "qty": 14,
+   "link": "https://www.ikea.com/ae/en/cat/laptop-tables-24830/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=24830 -> productListPage.productCount=14 (AE site node name 'Laptop tables', slug laptop-tables-24830); plannerCount=0, so the site's hydrated listing header reads '14 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); qty here is the enumerated product count",
+   "flag": "MANUAL REVIEW: ambiguous - the AE node is named 'Laptop tables'; IKEA files it under Desks & computer desks and the DE store calls the same id 'Laptoptische & Laptophalter', but part of the range is a stand rather than a table"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Desk Chairs",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Desk Chairs for Home",
+   "qty": 54,
+   "link": "https://www.ikea.com/ae/en/cat/desk-chairs-for-home-20653/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=20653 -> productListPage.productCount=54 (AE site node name 'Desk chairs for home', slug desk-chairs-for-home-20653); plannerCount=0, so the site's hydrated listing header reads '54 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Office Chairs",
+   "qty": 26,
+   "link": "https://www.ikea.com/ae/en/cat/office-chairs-20654/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=20654 -> productListPage.productCount=26 (AE site node name 'Office chairs', slug office-chairs-20654); plannerCount=1, so the site's hydrated listing header reads '27 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Gaming Chairs",
+   "qty": 8,
+   "link": "https://www.ikea.com/ae/en/cat/gaming-chairs-47067/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=47067 -> productListPage.productCount=8 (AE site node name 'Gaming chairs', slug gaming-chairs-47067); plannerCount=0, so the site's hydrated listing header reads '8 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Gaming Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Gaming Desk & Chair Sets",
+   "qty": 4,
+   "link": "https://www.ikea.com/ae/en/cat/gaming-desk-chair-sets-56516/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=56516 -> productListPage.productCount=4 (AE site node name 'Gaming desk & chair sets', slug gaming-desk-chair-sets-56516); plannerCount=0, so the site's hydrated listing header reads '4 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bathroom Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bathroom Tall Cabinets & Shelving Units",
+   "qty": 59,
+   "link": "https://www.ikea.com/ae/en/cat/bathroom-shelving-units-20804/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=20804 -> productListPage.productCount=59 (AE site node name 'Bathroom tall cabinets & shelving units', slug bathroom-shelving-units-20804); plannerCount=0, so the site's hydrated listing header reads '59 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bathroom Wall Cabinets",
+   "qty": 14,
+   "link": "https://www.ikea.com/ae/en/cat/bathroom-wall-cabinets-20808/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=20808 -> productListPage.productCount=14 (AE site node name 'Bathroom wall cabinets', slug bathroom-wall-cabinets-20808); plannerCount=1, so the site's hydrated listing header reads '15 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bathroom Stools & Benches",
+   "qty": 12,
+   "link": "https://www.ikea.com/ae/en/cat/bathroom-stools-benches-20859/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=20859 -> productListPage.productCount=12 (AE site node name 'Bathroom stools & benches', slug bathroom-stools-benches-20859); plannerCount=0, so the site's hydrated listing header reads '12 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Mirror Cabinets",
+   "qty": 12,
+   "link": "https://www.ikea.com/ae/en/cat/mirror-cabinets-20500/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=20500 -> productListPage.productCount=12 (AE site node name 'Mirror cabinets', slug mirror-cabinets-20500); plannerCount=1, so the site's hydrated listing header reads '13 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Laundry Storage",
+   "qty": 23,
+   "link": "https://www.ikea.com/ae/en/cat/laundry-cabinets-shelving-48925/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=48925 -> productListPage.productCount=23 (AE site node name 'Laundry storage', slug laundry-cabinets-shelving-48925); plannerCount=0, so the site's hydrated listing header reads '23 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); server-delivered HTML of the same URL carries the un-inflated '23 items' and its h1 read 'Laundry storage'; qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bathroom Vanities",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Vanity Units",
+   "qty": 67,
+   "link": "https://www.ikea.com/ae/en/cat/vanity-units-20720/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=20720 -> productListPage.productCount=67 (AE site node name 'Vanity units', slug vanity-units-20720); plannerCount=1, rendered listing header on the live page read directly from the DOM: '68 items'; qty here is the enumerated product count, not the hydrated header figure",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Vanity Units without Basin",
+   "qty": 16,
+   "link": "https://www.ikea.com/ae/en/cat/vanity-units-without-basin-54989/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=54989 -> productListPage.productCount=16 (AE site node name 'Vanity units without basin', slug vanity-units-without-basin-54989); plannerCount=0, so the site's hydrated listing header reads '16 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Under Sink Cabinets",
+   "qty": 4,
+   "link": "https://www.ikea.com/ae/en/cat/under-sink-cabinets-20721/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=20721 -> productListPage.productCount=4 (AE site node name 'Under sink cabinets', slug under-sink-cabinets-20721); plannerCount=1, so the site's hydrated listing header reads '5 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Outdoor Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Children's Outdoor Furniture",
+   "qty": 7,
+   "link": "https://www.ikea.com/ae/en/cat/childrens-outdoor-furniture-37899/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=37899 -> productListPage.productCount=7 (AE site node name 'Children's outdoor furniture', slug childrens-outdoor-furniture-37899); plannerCount=0, so the site's hydrated listing header reads '7 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sun Loungers & Hammocks",
+   "qty": 8,
+   "link": "https://www.ikea.com/ae/en/cat/sun-loungers-hammocks-21963/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=21963 -> productListPage.productCount=8 (AE site node name 'Sun loungers & hammocks', slug sun-loungers-hammocks-21963); plannerCount=0, so the site's hydrated listing header reads '8 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Outdoor Storage",
+   "qty": 48,
+   "link": "https://www.ikea.com/ae/en/cat/outdoor-storage-21958/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=21958 -> productListPage.productCount=48 (AE site node name 'Outdoor storage', slug outdoor-storage-21958); plannerCount=0, so the site's hydrated listing header reads '48 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); qty here is the enumerated product count",
+   "flag": "MANUAL REVIEW: mixed node - 'Outdoor storage' lists outdoor storage cabinets and benches together with outdoor storage boxes; the boxes end of the range is standalone storage rather than furniture, but IKEA files the whole node under Outdoor furniture"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Outdoor Seating",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Lounging & Relaxing Furniture",
+   "qty": 30,
+   "link": "https://www.ikea.com/ae/en/cat/lounging-relaxing-furniture-21959/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=21959 -> productListPage.productCount=30 (AE site node name 'Lounging & relaxing furniture', slug lounging-relaxing-furniture-21959); plannerCount=1, so the site's hydrated listing header reads '31 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); server-delivered HTML of the same URL carries the un-inflated '30 items' and its h1 read 'Lounging & relaxing furniture'; qty here is the enumerated product count",
+   "flag": "MANUAL REVIEW: the AE label 'Lounging & relaxing furniture' is generic; the listing is outdoor SOFAS (HAVSTEN, JOLPEN, TALLSKAER, BONDHOLMEN verified) and the FR store names the same id 'Canapes de jardin'. Site wording kept verbatim"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Outdoor Sofa Combinations",
+   "qty": 15,
+   "link": "https://www.ikea.com/ae/en/cat/outdoor-sofa-combinations-21960/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=21960 -> productListPage.productCount=15 (AE site node name 'Outdoor sofa combinations', slug outdoor-sofa-combinations-21960); plannerCount=0, so the site's hydrated listing header reads '15 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Outdoor Sofa Sections",
+   "qty": 25,
+   "link": "https://www.ikea.com/ae/en/cat/outdoor-sofa-sections-21961/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=21961 -> productListPage.productCount=25 (AE site node name 'Outdoor sofa sections', slug outdoor-sofa-sections-21961); plannerCount=1, so the site's hydrated listing header reads '26 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Outdoor Benches",
+   "qty": 10,
+   "link": "https://www.ikea.com/ae/en/cat/outdoor-sofas-47386/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=47386 -> productListPage.productCount=10 (AE site node name 'Outdoor sofas', slug outdoor-sofas-47386); plannerCount=1, so the site's hydrated listing header reads '11 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); server-delivered HTML of the same URL carries the un-inflated '10 items' and its h1 read 'Outdoor sofas'; qty here is the enumerated product count",
+   "flag": "MANUAL REVIEW: name divergence - the AE nav label and h1 for this node read 'Outdoor sofas' (slug outdoor-sofas-47386), but the listing is outdoor BENCHES (NAEMMAROE, NORRMANSOE) plus one outdoor storage box; the FR store names the same id 'Bancs d'exterieur' (garden benches). Renamed here to 'Outdoor Benches'; qty and link are the AE node's own"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Garden Chairs",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Outdoor Armchairs",
+   "qty": 17,
+   "link": "https://www.ikea.com/ae/en/cat/tables-chairs-21962/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=21962 -> productListPage.productCount=17 (AE site node name 'Tables & chairs', slug tables-chairs-21962); plannerCount=0, so the site's hydrated listing header reads '17 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); server-delivered HTML of the same URL carries the un-inflated '17 items' and its h1 read 'Tables & chairs'; qty here is the enumerated product count",
+   "flag": "MANUAL REVIEW: name divergence - the AE nav label and h1 for this node read 'Tables & chairs' (slug tables-chairs-21962), but the listing is entirely outdoor armchairs and chairs (SKARPOE, SKOGSOEN, BONDHOLMEN, VIGGSOE, TALLSKAER, RISHOLMEN, SEGEROEN verified); the FR store names the same id 'Fauteuils de jardin'. Renamed here to 'Outdoor Armchairs' so it does not collide with the 'Tables & Chairs' department name; qty and link are the AE node's own"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Outdoor Dining Chairs",
+   "qty": 40,
+   "link": "https://www.ikea.com/ae/en/cat/outdoor-dining-chairs-21966/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=21966 -> productListPage.productCount=40 (AE site node name 'Outdoor dining chairs', slug outdoor-dining-chairs-21966); plannerCount=0, so the site's hydrated listing header reads '40 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Outdoor Dining",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Outdoor Dining Sets",
+   "qty": 38,
+   "link": "https://www.ikea.com/ae/en/cat/outdoor-dining-sets-21967/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=21967 -> productListPage.productCount=38 (AE site node name 'Dining sets', slug outdoor-dining-sets-21967); plannerCount=0, so the site's hydrated listing header reads '38 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); server-delivered HTML of the same URL carries the un-inflated '38 items' and its h1 read 'Dining sets'; qty here is the enumerated product count",
+   "flag": "MANUAL REVIEW: the AE nav label and h1 for this node read just 'Dining sets', identical to the indoor node 19145; the site's own URL slug is outdoor-dining-sets-21967 and it sits under Outdoor dining, so the slug wording was used for the row name to keep the two apart"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bistro Sets",
+   "qty": 14,
+   "link": "https://www.ikea.com/ae/en/cat/bistro-sets-59249/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=59249 -> productListPage.productCount=14 (AE site node name 'Bistro sets', slug bistro-sets-59249); plannerCount=0, so the site's hydrated listing header reads '14 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Outdoor Tables",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Outdoor Dining Tables",
+   "qty": 30,
+   "link": "https://www.ikea.com/ae/en/cat/outdoor-dining-tables-21965/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=21965 -> productListPage.productCount=30 (AE site node name 'Outdoor dining tables', slug outdoor-dining-tables-21965); plannerCount=0, so the site's hydrated listing header reads '30 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Outdoor Coffee & Side Tables",
+   "qty": 10,
+   "link": "https://www.ikea.com/ae/en/cat/outdoor-coffee-side-tables-700192/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=700192 -> productListPage.productCount=10 (AE site node name 'Outdoor coffee & side tables', slug outdoor-coffee-side-tables-700192); plannerCount=0, so the site's hydrated listing header reads '10 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Baby & Children",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Children's Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Small Chairs",
+   "qty": 24,
+   "link": "https://www.ikea.com/ae/en/cat/small-chairs-18769/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=18769 -> productListPage.productCount=24 (AE site node name 'Small chairs', slug small-chairs-18769); plannerCount=0, so the site's hydrated listing header reads '24 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Children's Tables",
+   "qty": 11,
+   "link": "https://www.ikea.com/ae/en/cat/childrens-tables-18768/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=18768 -> productListPage.productCount=11 (AE site node name 'Children's tables', slug childrens-tables-18768); plannerCount=0, so the site's hydrated listing header reads '11 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Children's Stools & Benches",
+   "qty": 14,
+   "link": "https://www.ikea.com/ae/en/cat/childrens-stools-benches-45816/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=45816 -> productListPage.productCount=14 (AE site node name 'Children's stools & benches', slug childrens-stools-benches-45816); plannerCount=0, so the site's hydrated listing header reads '14 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Children's Armchairs",
+   "qty": 7,
+   "link": "https://www.ikea.com/ae/en/cat/childrens-armchairs-20483/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=20483 -> productListPage.productCount=7 (AE site node name 'Children's armchairs', slug childrens-armchairs-20483); plannerCount=0, so the site's hydrated listing header reads '7 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Junior Dining Chairs",
+   "qty": 9,
+   "link": "https://www.ikea.com/ae/en/cat/junior-dining-chairs-45815/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=45815 -> productListPage.productCount=9 (AE site node name 'Junior dining chairs', slug junior-dining-chairs-45815); plannerCount=0, so the site's hydrated listing header reads '9 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Baby Chairs & Highchairs",
+   "qty": 16,
+   "link": "https://www.ikea.com/ae/en/cat/baby-chairs-highchairs-45782/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=45782 -> productListPage.productCount=16 (AE site node name 'Baby chairs & highchairs', slug baby-chairs-highchairs-45782); plannerCount=0, so the site's hydrated listing header reads '16 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Children's Beds",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Children's Single Beds",
+   "qty": 22,
+   "link": "https://www.ikea.com/ae/en/cat/childrens-single-beds-45848/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=45848 -> productListPage.productCount=22 (AE site node name 'Children's single beds', slug childrens-single-beds-45848); plannerCount=0, so the site's hydrated listing header reads '22 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Junior & Extendable Beds",
+   "qty": 9,
+   "link": "https://www.ikea.com/ae/en/cat/junior-extendable-beds-45847/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=45847 -> productListPage.productCount=9 (AE site node name 'Junior & extendable beds', slug junior-extendable-beds-45847); plannerCount=0, so the site's hydrated listing header reads '9 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Loft Beds",
+   "qty": 10,
+   "link": "https://www.ikea.com/ae/en/cat/loft-beds-19049/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=19049 -> productListPage.productCount=10 (AE site node name 'Loft beds', slug loft-beds-19049); plannerCount=0, so the site's hydrated listing header reads '10 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bunk Beds",
+   "qty": 5,
+   "link": "https://www.ikea.com/ae/en/cat/bunk-beds-19048/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=19048 -> productListPage.productCount=5 (AE site node name 'Bunk beds', slug bunk-beds-19048); plannerCount=0, so the site's hydrated listing header reads '5 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Study Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Children's Desks",
+   "qty": 41,
+   "link": "https://www.ikea.com/ae/en/cat/childrens-desks-24714/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=24714 -> productListPage.productCount=41 (AE site node name 'Children's desks', slug childrens-desks-24714); plannerCount=0, so the site's hydrated listing header reads '41 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Children's Desk Chairs",
+   "qty": 6,
+   "link": "https://www.ikea.com/ae/en/cat/childrens-desk-chairs-24715/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=24715 -> productListPage.productCount=6 (AE site node name 'Children's desk chairs', slug childrens-desk-chairs-24715); plannerCount=0, so the site's hydrated listing header reads '6 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Nursery Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Children's Wardrobes",
+   "qty": 13,
+   "link": "https://www.ikea.com/ae/en/cat/childrens-wardrobes-18707/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=18707 -> productListPage.productCount=13 (AE site node name 'Children's wardrobes', slug childrens-wardrobes-18707); plannerCount=0, so the site's hydrated listing header reads '13 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Children's Chests of Drawers",
+   "qty": 8,
+   "link": "https://www.ikea.com/ae/en/cat/childrens-chests-of-drawers-18708/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=18708 -> productListPage.productCount=8 (AE site node name 'Children's chests of drawers', slug childrens-chests-of-drawers-18708); plannerCount=0, so the site's hydrated listing header reads '8 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Cots & Bassinets",
+   "qty": 10,
+   "link": "https://www.ikea.com/ae/en/cat/cots-45781/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=45781 -> productListPage.productCount=10 (AE site node name 'Cots & bassinets', slug cots-45781); plannerCount=0, so the site's hydrated listing header reads '10 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Changing Tables",
+   "qty": 13,
+   "link": "https://www.ikea.com/ae/en/cat/changing-tables-45783/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=45783 -> productListPage.productCount=13 (AE site node name 'Changing tables', slug changing-tables-45783); plannerCount=0, so the site's hydrated listing header reads '13 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); qty here is the enumerated product count",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Nursery Furniture Sets",
+   "qty": 1,
+   "link": "https://www.ikea.com/ae/en/cat/nursery-furniture-sets-55021/",
+   "is_group": false,
+   "evidence": "sik.search.blue.cdtapps.com/ae/en/product-list-page?category=55021 -> productListPage.productCount=1 (AE site node name 'Nursery furniture sets', slug nursery-furniture-sets-55021); plannerCount=0, so the site's hydrated listing header reads '1 items' (+1 planner tile whenever plannerCount>0 - measured on 3 AE pages); qty here is the enumerated product count",
+   "flag": null
+  }
+ ]
+}

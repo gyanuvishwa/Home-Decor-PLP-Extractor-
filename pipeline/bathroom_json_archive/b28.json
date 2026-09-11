@@ -1,0 +1,186 @@
+{
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ACCESS: plain requests return HTTP 403; curl_cffi with impersonate=chrome131 (probe.fetch, profiles pinned to chrome131/chrome124/chrome120) returned 200 on every URL - the same route the prior Furniture and Home-Decor passes on this SR used. No proxy, no WAF workaround. robots.txt names NO Anthropic/Claude/ClaudeBot agent; it disallows /*collection.do*, /*product.do*, /?method*, /*print.do*, /*error, /*reviews/submit.do*, /ajax/modal/, /modal/, /configurator/modal/, /blog/author|category|tag/, /resources/, /sitesearch/, /styleguide/*, /*features/* and /cdn-cgi/ - none of which I touched; every URL below is a plain /catalog/... path. robots.txt declares 'Crawl-delay: 10' for User-Agent: *, so I raised probe.py's default 2s per-host gap to an explicit 8s sleep plus the built-in pacing on every request, and every page was fetched at most twice and then cached locally.\n\nTREE: taken from two independent sources that agree exactly. (1) https://www.roomandboard.com/catalog/sitemap - R&B's own full department -> section -> node listing; its Bath block reads Bath / Furniture (Vanities, Mirrors & Medicine Cabinets, Storage, Benches & Stools) / Lighting (Wall Sconces, Ceiling Lights, Pendant Lights) / Hardware & Organization (Bath Hardware, Organization, Hooks Shelves & Ledges, Cabinet Hardware) / Accessories (Bath Linens, Laundry, Self Care & Wellness, Rugs). (2) The schema.org SiteNavigationElement graph embedded in every page as script.schema-top-menu-data (255 nodes), which lists the same Bath URLs plus the cross-department bath nodes /catalog/storage-and-entryway/bath-storage-and-organization, /catalog/lighting/bath-lighting, /catalog/rugs/bath-rugs, /catalog/made-for-you/custom-bathroom-mirrors and /clearance/bath. I opened every one of those nodes and read its __NEXT_DATA__.\n\nLEVEL DETECTION: R&B's page model self-identifies the level in props.pageProps.documentType. /catalog/bath is CATEGORY (department, no productGroups). /catalog/bath/bath-furniture, /catalog/bath/lighting, /catalog/bath/hardware-and-organization and /catalog/bath/bath-accessories are all INTERMEDIATE_CATEGORY - pure grouping pages carrying NO productGroups array at all - so each is emitted as a grouping row with blank qty and blank link and none of their URLs was recorded (rule 24). Only documentType=STANDARD nodes carry a listing and became leaves. /catalog/storage-and-entryway/bath-storage-and-organization is documentType=EDITORIAL with no productGroups - a curated landing page - and was excluded (rules 25, 27). /catalog/made-for-you/all-custom-mirrors is INTERMEDIATE_CATEGORY with 0 productGroups, so its child /catalog/made-for-you/custom-bathroom-mirrors (STANDARD, 7) is the leaf recorded.\n\nQTY METHOD: Room & Board publishes NO 'N items' header anywhere on a PLP and exposes no count API - the document object's only integer fields are version, id and columnLayout, and there is no total, resultCount, numFound or nbHits anywhere in the payload. Each PLP also server-renders its ENTIRE listing with no pagination: grepping every recorded page for \"pagination\", 'load more' and nextPage returns 0 hits. So every qty is a full enumeration of props.pageProps.document.productGroups. VERIFICATION - two independent measures on every recorded leaf: I counted the productGroups array AND separately counted the distinct rendered anchor hrefs of the form <node-path>/<product-slug> in the HTML. They agreed exactly on all of them: Vanities 14=14, Mirrors & Medicine Cabinets 35=35, Bath Storage 8=8, Bath Hardware 19=19, Bath Organization 42=42, Hooks Shelves & Ledges 36=36, Laundry 7=7, Custom Bathroom Mirrors 7=7. Counts discriminate properly (7 to 42), none is a round display cap, every page's H1 matched the node requested, and no parent number was ever reused for a child - all four intermediate pages carry no number at all, so aggregation was impossible by construction.\n\nCLASSIFICATION LINE USED. I kept a Bath node in rows only when BOTH (a) its __NEXT_DATA__ canonicalUrl points at itself, i.e. R&B genuinely owns it as a Bath node rather than aliasing a node from another department, AND (b) its primary product type appears in the Bathroom rules' own include lists. That produced: Vanities (rule 9 vanity units - all 14 groups are literally named '<name> Bathroom Vanities'); Mirrors & Medicine Cabinets (rule 10, which forbids skipping bathroom/vanity mirrors, and explicitly covers mirrored/medicine cabinets - 14 of the 35 groups are named Bath mirrors, e.g. Industry Bath Wall Mirrors, Infinity Arched Bath Floor Mirrors, Soho Bath Wall Mirrors, plus Bridger/Harlan Medicine Cabinets and Bridger Medicine Cabinet Sets); Bath Storage (rule 12 - Berkeley/Linear Linen Cabinets, Bridger Floating Linen Cabinet, medicine cabinets); Bath Hardware (rule 17 - Bend/Filmore/Hoff/Slim Towel Bars and Toilet Paper Holders, Sawyer Shower Caddies and Shower Shelves, Slim Freestanding Towel Rack); Bath Organization (rules 12/13 - Artemis Soap Dish, Artemis Bathtub Tray, Saco Toothbrush Holder, Saco Tumbler, Saco Soap Trays, Bend Toilet Paper Storage, Paros Tissue Box Covers, Mackey Waste Basket, Sawyer Shower Caddies); Hooks, Shelves & Ledges (rule 17 - Bathroom Hooks and Bathroom Shelves; self-canonical Bath node containing Sawyer Shower Caddies/Shelves and Stowe Wall Shelves with Towel Bar); Laundry (rules 12/13 bathroom baskets and storage - Kori Hampers plus Fletcher/Twain/Zelig/Surjo/Wolof baskets); and Made for You > Bathroom Mirrors (rule 10 - all 7 groups are Custom Bath Wall/Floor Mirrors).\n\nCROSS-LISTING DISCLOSED HONESTLY: R&B merchandises one accessory assortment across several departments, so some products in the kept nodes also appear elsewhere - Hooks, Shelves & Ledges (36) overlaps /catalog/home-decor/shelves-and-ledges (27) and /catalog/storage-and-entryway/coat-racks (16), and Laundry (7) shares 6 of its 7 groups with /catalog/dining-and-kitchen/baskets-and-bins (16). I kept both because each is self-canonical under /catalog/bath/, sits inside R&B's own Bath hierarchy, and its product type is named in rules 12/13/17, which is exactly the case rule 30-33 resolves in favour of Bathroom ('Storage > Storage Baskets = Storage. Bathroom > Bathroom Baskets = Bathroom'). The Bath nodes that FAILED the canonical test or the product-type test were routed out instead and are all in review with their counts and URLs, so nothing is silently skipped. Confidence on Hooks/Shelves & Ledges and Laundry is the lowest of the kept set - flagging that here rather than in review because both are genuine, self-canonical Bath nodes.\n\nDUPLICATES: no URL appears twice. /catalog/rugs/bath-rugs is reached from both Bath > Accessories > Rugs and the Rugs department but is one node, one review record (rule 28). /catalog/bath/cabinet-hardware and /catalog/home-decor/cabinet-hardware are the same 8-product node; only the Bath path is recorded, in review.\n\nALSO EXCLUDED: /clearance/bath (clearance listing, rule 25); /catalog/storage-and-entryway/bath-storage-and-organization (EDITORIAL, no listing); /catalog/made-for-you/custom-mirrors (7 groups - Industry/Infinity/Soho Custom Wall and Floor Mirrors, i.e. the NON-bath variants of the same programmes, a Decor node) and /catalog/made-for-you/all-custom-mirrors (intermediate); /catalog/home-decor/mirrors and /catalog/storage-and-entryway/mirrors (general decorative wall mirrors with no bathroom framing - rule 29 disambiguation, the word 'mirror' alone does not make them Bathroom, and the bath-specific mirrors are already captured by the two nodes above). FIXTURES: Room & Board sells no sanitaryware, baths, bathtubs, showers, enclosures, screens, toilets, bidets, basins or taps - regexing the full 235-link /catalog/sitemap for shower, toilet, sink, basin, faucet, tap, bathtub returns nothing beyond the Sawyer shower caddy/shelf products inside Bath Hardware. || CROSS-FILE DEDUP: 2 leaf record(s) removed as already extracted in a prior category workbook. See Review sheet.",
+ "rows": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Mirrors & Medicine Cabinets",
+   "qty": 35,
+   "link": "https://www.roomandboard.com/catalog/bath/mirrors-and-medicine-cabinets",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Hardware & Organization",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Hardware",
+   "qty": 19,
+   "link": "https://www.roomandboard.com/catalog/bath/bath-hardware",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Organization",
+   "qty": 42,
+   "link": "https://www.roomandboard.com/catalog/bath/bath-organization",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Hooks, Shelves & Ledges",
+   "qty": 36,
+   "link": "https://www.roomandboard.com/catalog/bath/hooks-shelves-and-ledges",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Accessories",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Laundry",
+   "qty": 7,
+   "link": "https://www.roomandboard.com/catalog/bath/laundry",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Made for You",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Mirrors (Custom)",
+   "qty": 7,
+   "link": "https://www.roomandboard.com/catalog/made-for-you/custom-bathroom-mirrors",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  }
+ ],
+ "review": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath > Furniture > Benches & Stools",
+   "qty": 11,
+   "issue": "ROUTED TO FURNITURE: all 11 product groups (Baltic Bench Coat Rack, Collins Bench/Stool with Fabric or Leather Seat, Cooper Benches, Darby Stool, Dell Stool, Ebers Bench, Hanneman Stool, Hollins Stools) are a strict subset of the 54 on /catalog/living/benches-and-stools - a room-based curation of R&B's general bench and stool assortment with no bath-specific product. Rule 2 puts PRIMARY PRODUCT TYPE above ROOM/LOCATION, rule 9's bathroom-furniture list does not include benches or stools, and rule 30-33 forbids re-extracting general Furniture. The Furniture pass already holds this node.",
+   "link": "https://www.roomandboard.com/catalog/bath/benches-and-stools"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath > Lighting > Wall Sconces",
+   "qty": 16,
+   "issue": "ROUTED TO LIGHTING: primary product type is lighting (rules 11, 19)",
+   "link": "https://www.roomandboard.com/catalog/bath/wall-sconces"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath > Lighting > Ceiling Lights",
+   "qty": 7,
+   "issue": "ROUTED TO LIGHTING: primary product type is lighting (rules 11, 19)",
+   "link": "https://www.roomandboard.com/catalog/bath/ceiling-lights"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath > Lighting > Pendant Lights",
+   "qty": 29,
+   "issue": "ROUTED TO LIGHTING: primary product type is lighting (rules 11, 19)",
+   "link": "https://www.roomandboard.com/catalog/bath/pendant-lights"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Lighting > Bath Lighting",
+   "qty": 69,
+   "issue": "ROUTED TO LIGHTING: the Lighting department's own bath node (pendants, sconces, flush mounts, chandeliers). Self-canonical and a genuinely different URL from the three /catalog/bath/ lighting nodes, so it is listed separately rather than merged; note 16+7+29=52 does not equal 69, i.e. these are overlapping curations and NO quantity was aggregated. Primary product type is lighting (rules 11, 19)",
+   "link": "https://www.roomandboard.com/catalog/lighting/bath-lighting"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath > Hardware & Organization > Cabinet Hardware",
+   "qty": 8,
+   "issue": "ROUTED TO DECOR: this Bath nav node is not bath-owned - its __NEXT_DATA__ canonicalUrl is /catalog/home-decor/cabinet-hardware, and that Home Decor page renders the identical 8 product groups (Axton Pulls, Bates Knob, Bexley Pulls, Caufield Knobs, Celia Knobs, Cormac Knob, Fredrik Pulls, Stanwell Knobs). R&B links the same node from Bath, Bedroom and Home Decor (3 Bath links vs 12 Home Decor links on the site-map page). Generic furniture knobs and pulls, not bathroom-specific hardware; recording it here would import a Decor node (rules 28, 29)",
+   "link": "https://www.roomandboard.com/catalog/bath/cabinet-hardware"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath > Accessories > Bath Linens",
+   "qty": 12,
+   "issue": "ROUTED TO TEXTILE: all 12 product groups are towels (Fence, Fendwick, Field, Lawrence, Path towels in various colours). Rules 15 and 20 send bath towels to Textile",
+   "link": "https://www.roomandboard.com/catalog/bath/bath-linens"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath > Accessories > Rugs (Bath Rugs)",
+   "qty": 21,
+   "issue": "ROUTED TO TEXTILE: textile bath rugs and mats, reached from Bath > Accessories > Rugs but living at /catalog/rugs/bath-rugs under the Rugs department. Rules 15 and 16 send textile bath mats/rugs to Textile",
+   "link": "https://www.roomandboard.com/catalog/rugs/bath-rugs"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath > Accessories > Self Care & Wellness",
+   "qty": 8,
+   "issue": "OUT OF SCOPE (partly ROUTED TO DECOR): 8 product groups - Essence One Bar Soap, Body Wash & Lotion Set, Hand & Body Lotion, Hand & Body Wash, Hand Sanitizer, Room Spray, plus Essence One Candle and Gouro Cosmetic Bag. These are consumable personal-care toiletries, not bathroom furniture, fixtures, hardware or accessories, so they fall outside every home-furnishing category; the single candle would be Decorative Home Accessories under rule 21. Rule 13's soap ACCESSORIES (dispensers, dishes, trays) are already captured in Bath Organization",
+   "link": "https://www.roomandboard.com/catalog/bath/self-care-and-wellness"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Vanities",
+   "qty": 14,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Vanities' - excluded from Bathroom per cross-category dedup (master guide s13)",
+   "link": "https://www.roomandboard.com/catalog/bath/vanities"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Storage",
+   "qty": 8,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Bath Storage' - excluded from Bathroom per cross-category dedup (master guide s13)",
+   "link": "https://www.roomandboard.com/catalog/bath/bath-storage"
+  }
+ ],
+ "_reconstructed_from": "Bathroom.xlsx delivered 2026-09-01 (checkpoint), not original worker JSON"
+}

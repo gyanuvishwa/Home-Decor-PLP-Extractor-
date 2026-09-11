@@ -1,0 +1,494 @@
+{
+  "sr": 225,
+  "company": "H&M Home India",
+  "brand_site": "www2.hm.com",
+  "country": "India",
+  "site_url": "https://www2.hm.com/en_in/home.html",
+  "status": "partial",
+  "failure_reason": "Tier (a) direct HTTP fetch (curl_cffi, chrome impersonation) got 403 Access Denied (Akamai bot wall) on every rendered .html page site-wide, though XML sitemaps were fetchable. Tier (b) Playwright headless chromium also got 403 Access Denied on the homepage. Tier (c) claude-in-chrome succeeded initially (homepage and ~14 category pages rendered normally with real product counts) but after roughly 15-20 page loads in the session the same Akamai wall (\"Access Denied\", errors.edgesuite.net reference) started firing on every subsequent URL, including previously-unvisited ones (bath-shower/bathroom-accessories.html, then shop-by-product/storage.html), and did not clear after two retries with 10-20s waits. Per STEP1 rule 4/1, stopped requesting the host once this recurred at tier (c). Also note: the shared Chrome browser used by claude-in-chrome is contended by other concurrent workers in this environment - several of my own tabs were closed/hijacked mid-task by unrelated navigations (Meesho, Nykaa Fashion) - this cost time but is separate from the Akamai wall itself.",
+  "notes": "ACCESS: robots.txt (fetched via tier a, not blocked) explicitly Allow: / for ClaudeBot/Claude-Web/anthropic-ai etc, so tier (c) was permitted. Tier (a) and (b) both blocked (403 Access Denied, Akamai). Tier (c) claude-in-chrome worked for a limited window before the same Akamai wall reappeared session-wide; see failure_reason. TREE METHOD: union of (1) en_in.pages.subdepartment.*.xml sitemaps (fetched successfully via tier a even though HTML pages were blocked) filtered to /en_in/home/ paths, and (2) each live category page's own sub-category chip strip, read via claude-in-chrome for the pages that loaded before the wall returned. The site exposes two parallel navigations: 'shop-by-product' (the true category/sub-category hierarchy - department pages like bed-linen, bath-shower, textiles, storage, cooking-dining, cooking-baking, kids-baby) and 'shop-by-room' (bedroom/livingroom/kitchen/bathroom/etc, a room-based re-slice of the same catalogue). Per textile.md/storage.md 'room name is not the classification', only shop-by-product was used as the primary tree; shop-by-room was treated as a redundant duplicate cross-navigation and excluded to avoid double-counting the same SKUs under a second URL. QTY METHOD: exact 'N Products' header text read directly off each rendered category page (or, for two pages with no product grid at all, treated as a confirmed 0 per storage.md #39 / textile.md zero-product handling). Bed Skirts (bed-linen/bed-skirts.html) and Duvet & Sleep Cushions (bed-linen/duvet-pillows.html) both rendered a valid category shell (h1, breadcrumb, chip nav) with no product grid and no count text at all -> recorded qty=0. Bed Spreads (bed-linen/bed-spreads.html, h1 'Blankets, Bedspreads & Throws', 32 Products) is a distinct URL/count from Blankets & Throws (bed-linen/blankets.html, 12 Products) despite overlapping naming, so both were kept as separate rows per the duplicate rule (different listing URLs = different genuine pages) - confidence MEDIUM on Bed Spreads due to the naming overlap. Bath & Shower > Towels (bath-shower/towels.html) is itself a parent with 4 children (bath, beach, guest, hand) so its own URL was not recorded per the parent-URL rule; only the 4 leaf sub-categories were recorded. EXCLUDED: bath-shower/bathroom-accessories.html (never loaded - blocked before content could be confirmed, and its composition - soap dispensers vs bath caddies vs textiles - could not be verified, so it was left out entirely rather than guessed); furnitures/storage.html and its children cabinets/shelves/wardrobes.html (site explicitly places these under Furnitures, not Storage, per storage.md rule 21/27 - Furniture-task scope, not this task); cooking-dining/coasters-placemats.html (mixed hard-coasters + placemats category, composition unverified, excluded rather than forced into Textile); all of decorations/*, home-fragrance/*, lighting/*, flowers-plants, giftwraps, premium, homewear, sleepwear, and the non-textile/non-storage cooking-dining and cooking-baking sub-nodes (plates, cups, cutlery, glassware, chopping-boards, carafes-jugs, cookbooks, kitchen-utensils, serving-platters-bowls, trays, aprons already covered) - all Kitchen & Dining / Decorative / Lighting / apparel, out of scope for this task. MANUAL REVIEW rows: several sub-categories were confirmed to exist (via live chip-bar sighting on textiles.html, or via the en_in subdepartment sitemap with a recent lastmod) but their live product counts could not be read before the Akamai wall returned mid-session; these are recorded with qty=null, link populated, confidence LOW, and flag='MANUAL REVIEW: site blocked (Access Denied) before quantity could be confirmed' rather than fabricated or omitted. A future re-run of this company should prioritize re-checking: Interior Textiles (curtains, rugs/carpets + 5 shape variants, cushions + 2 variants, seat cushions), the cooking-dining/cooking-baking textile items (napkins, tablecloths-runners, tea-towels, kitchen-towels, aprons), kids-baby textile items (bedding, blankets, carpets, cushions, towels), the entire Storage department (storage.html and its 6 children incl. wicker-baskets), kids-baby/storage.html, and bath-shower/bathmats.html and bathroom-accessories.html.",
+  "textile_rows": [
+    {
+      "category": "Textile",
+      "sub_category": "Bedding",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Duvet Covers",
+      "qty": 130,
+      "link": "https://www2.hm.com/en_in/home/shop-by-product/bed-linen/duvet-cover-sets.html",
+      "is_group": false,
+      "evidence": "'130 Products' header text on live category page, h1 'Duvet Covers'",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Pillowcases",
+      "qty": 58,
+      "link": "https://www2.hm.com/en_in/home/shop-by-product/bed-linen/pillowcases.html",
+      "is_group": false,
+      "evidence": "'58 Products' header text on live category page, h1 'Pillowcases'",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Bed Sheets",
+      "qty": 52,
+      "link": "https://www2.hm.com/en_in/home/shop-by-product/bed-linen/sheets.html",
+      "is_group": false,
+      "evidence": "'52 Products' header text on live category page, h1 'Bed Sheets'",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Bed Skirts",
+      "qty": 0,
+      "link": "https://www2.hm.com/en_in/home/shop-by-product/bed-linen/bed-skirts.html",
+      "is_group": false,
+      "evidence": "Live page rendered h1 'Bed Skirts & Valance Sheets' and breadcrumb HOME/BEDDING/BED SKIRTS with no product grid and no product-count text anywhere on the page",
+      "flag": null,
+      "confidence": "MEDIUM"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Blankets & Throws",
+      "qty": 12,
+      "link": "https://www2.hm.com/en_in/home/shop-by-product/bed-linen/blankets.html",
+      "is_group": false,
+      "evidence": "'12 Products' header text on live category page, h1 'Blankets & Throws'",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Bed Spreads",
+      "qty": 32,
+      "link": "https://www2.hm.com/en_in/home/shop-by-product/bed-linen/bed-spreads.html",
+      "is_group": false,
+      "evidence": "'32 Products' header text on live category page, h1 'Blankets, Bedspreads & Throws' (distinct URL and count from Blankets & Throws)",
+      "flag": null,
+      "confidence": "MEDIUM"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Duvets",
+      "qty": 0,
+      "link": "https://www2.hm.com/en_in/home/shop-by-product/bed-linen/duvet-pillows.html",
+      "is_group": false,
+      "evidence": "Live page rendered h1 'Duvet & Sleep Cushions' and breadcrumb HOME/BEDDING/DUVET & SLEEP CUSHIONS with no product grid and no product-count text",
+      "flag": null,
+      "confidence": "MEDIUM"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Bath & Shower",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Towels",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Bath Towels / Bath Sheets",
+      "qty": 76,
+      "link": "https://www2.hm.com/en_in/home/shop-by-product/bath-shower/towels/bath.html",
+      "is_group": false,
+      "evidence": "'76 Products' header text on live category page, h1 'Bath Towels & Bath Sheets'",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Beach Towels",
+      "qty": 5,
+      "link": "https://www2.hm.com/en_in/home/shop-by-product/bath-shower/towels/beach.html",
+      "is_group": false,
+      "evidence": "'5 Products' header text on live category page, h1 'Beach Towels'",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Guest Towels",
+      "qty": 26,
+      "link": "https://www2.hm.com/en_in/home/shop-by-product/bath-shower/towels/guest.html",
+      "is_group": false,
+      "evidence": "'26 Products' header text on live category page, h1 'Guest Towels'",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Hand Towels",
+      "qty": 51,
+      "link": "https://www2.hm.com/en_in/home/shop-by-product/bath-shower/towels/hand.html",
+      "is_group": false,
+      "evidence": "'51 Products' header text on live category page, h1 'Hand Towels'",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Shower Curtains",
+      "qty": 9,
+      "link": "https://www2.hm.com/en_in/home/shop-by-product/bath-shower/shower-curtains.html",
+      "is_group": false,
+      "evidence": "'9 Products' header text on live category page, h1 'Shower Curtains'",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Bath Mats",
+      "qty": null,
+      "link": "https://www2.hm.com/en_in/home/shop-by-product/bath-shower/bathmats.html",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: URL confirmed via en_in subdepartment sitemap (recent lastmod), category name qualifies as Textile per rules, but live quantity could not be read - site returned Access Denied before this page loaded",
+      "confidence": "LOW"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Interior Textiles",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "MEDIUM"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Curtains",
+      "qty": null,
+      "link": "https://www2.hm.com/en_in/home/shop-by-product/textiles/curtains.html",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: category confirmed live in the Interior Textiles chip-bar navigation, but quantity could not be read before site blocked further requests",
+      "confidence": "LOW"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Rugs",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "MEDIUM"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Rugs - Door Mats",
+      "qty": null,
+      "link": "https://www2.hm.com/en_in/home/shop-by-product/textiles/carpets/door-mats.html",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: URL confirmed via sitemap, quantity not confirmed before site blocked further requests",
+      "confidence": "LOW"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Rugs - Large",
+      "qty": null,
+      "link": "https://www2.hm.com/en_in/home/shop-by-product/textiles/carpets/large.html",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: URL confirmed via sitemap, quantity not confirmed before site blocked further requests",
+      "confidence": "LOW"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Rugs - Round",
+      "qty": null,
+      "link": "https://www2.hm.com/en_in/home/shop-by-product/textiles/carpets/round.html",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: URL confirmed via sitemap, quantity not confirmed before site blocked further requests",
+      "confidence": "LOW"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Rugs - Runners",
+      "qty": null,
+      "link": "https://www2.hm.com/en_in/home/shop-by-product/textiles/carpets/runners.html",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: URL confirmed via sitemap, quantity not confirmed before site blocked further requests",
+      "confidence": "LOW"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Rugs - Small",
+      "qty": null,
+      "link": "https://www2.hm.com/en_in/home/shop-by-product/textiles/carpets/small.html",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: URL confirmed via sitemap, quantity not confirmed before site blocked further requests",
+      "confidence": "LOW"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Cushions",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "MEDIUM"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Cushion Covers",
+      "qty": null,
+      "link": "https://www2.hm.com/en_in/home/shop-by-product/textiles/cushions/cushion-covers.html",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: category confirmed live in the Interior Textiles chip-bar navigation, quantity not confirmed before site blocked further requests",
+      "confidence": "LOW"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Inner Cushions",
+      "qty": null,
+      "link": "https://www2.hm.com/en_in/home/shop-by-product/textiles/cushions/inner-cushions.html",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: URL confirmed via sitemap, quantity not confirmed before site blocked further requests",
+      "confidence": "LOW"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Seat Cushions",
+      "qty": null,
+      "link": "https://www2.hm.com/en_in/home/shop-by-product/textiles/seat-cushions.html",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: category confirmed live in the Interior Textiles chip-bar navigation, quantity not confirmed before site blocked further requests",
+      "confidence": "LOW"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Table Cloths & Runners",
+      "qty": null,
+      "link": "https://www2.hm.com/en_in/home/shop-by-product/cooking-dining/tablecloths-runners.html",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: category confirmed live in the Interior Textiles chip-bar navigation, quantity not confirmed before site blocked further requests",
+      "confidence": "LOW"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Tea Towels",
+      "qty": null,
+      "link": "https://www2.hm.com/en_in/home/shop-by-product/cooking-dining/tea-towels.html",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: category confirmed live in the Interior Textiles chip-bar navigation, quantity not confirmed before site blocked further requests",
+      "confidence": "LOW"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Napkins",
+      "qty": null,
+      "link": "https://www2.hm.com/en_in/home/shop-by-product/cooking-dining/napkins.html",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: category confirmed live in the Interior Textiles chip-bar navigation, quantity not confirmed before site blocked further requests",
+      "confidence": "LOW"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Kitchen Towels",
+      "qty": null,
+      "link": "https://www2.hm.com/en_in/home/shop-by-product/cooking-baking/kitchen-towels.html",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: URL confirmed via sitemap, quantity not confirmed before site blocked further requests",
+      "confidence": "LOW"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Aprons",
+      "qty": null,
+      "link": "https://www2.hm.com/en_in/home/shop-by-product/cooking-baking/aprons.html",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: URL confirmed via sitemap, quantity not confirmed before site blocked further requests",
+      "confidence": "LOW"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Kids & Baby",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "LOW"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Kids Bedding",
+      "qty": null,
+      "link": "https://www2.hm.com/en_in/home/shop-by-product/kids-baby/bedding.html",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: URL confirmed via sitemap, quantity not confirmed before site blocked further requests",
+      "confidence": "LOW"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Kids Blankets",
+      "qty": null,
+      "link": "https://www2.hm.com/en_in/home/shop-by-product/kids-baby/blankets.html",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: URL confirmed via sitemap, quantity not confirmed before site blocked further requests",
+      "confidence": "LOW"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Kids Carpets",
+      "qty": null,
+      "link": "https://www2.hm.com/en_in/home/shop-by-product/kids-baby/carpets.html",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: URL confirmed via sitemap, quantity not confirmed before site blocked further requests",
+      "confidence": "LOW"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Kids Cushions",
+      "qty": null,
+      "link": "https://www2.hm.com/en_in/home/shop-by-product/kids-baby/cushions.html",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: URL confirmed via sitemap, quantity not confirmed before site blocked further requests",
+      "confidence": "LOW"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Kids Towels",
+      "qty": null,
+      "link": "https://www2.hm.com/en_in/home/shop-by-product/kids-baby/towels.html",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: URL confirmed via sitemap, quantity not confirmed before site blocked further requests",
+      "confidence": "LOW"
+    }
+  ],
+  "storage_rows": [
+    {
+      "category": "Storage",
+      "sub_category": "Storage",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "LOW"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Storage Baskets",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "LOW"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Wicker Baskets",
+      "qty": null,
+      "link": "https://www2.hm.com/en_in/home/shop-by-product/storage/baskets/wicker-baskets.html",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: URL confirmed via sitemap, but the whole Storage department was never reached live - site returned Access Denied on the very first Storage department request, before any quantity could be confirmed",
+      "confidence": "LOW"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Storage Boxes",
+      "qty": null,
+      "link": "https://www2.hm.com/en_in/home/shop-by-product/storage/boxes.html",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: URL confirmed via sitemap, but the whole Storage department was never reached live - site returned Access Denied on the very first Storage department request, before any quantity could be confirmed",
+      "confidence": "LOW"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Storage Jars",
+      "qty": null,
+      "link": "https://www2.hm.com/en_in/home/shop-by-product/storage/jars.html",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: URL confirmed via sitemap, but the whole Storage department was never reached live - site returned Access Denied on the very first Storage department request, before any quantity could be confirmed",
+      "confidence": "LOW"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Kitchen Storage",
+      "qty": null,
+      "link": "https://www2.hm.com/en_in/home/shop-by-product/storage/kitchen-storage.html",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: URL confirmed via sitemap, but the whole Storage department was never reached live - site returned Access Denied on the very first Storage department request, before any quantity could be confirmed",
+      "confidence": "LOW"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Laundry Baskets",
+      "qty": null,
+      "link": "https://www2.hm.com/en_in/home/shop-by-product/storage/laundry-baskets.html",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: URL confirmed via sitemap, but the whole Storage department was never reached live - site returned Access Denied on the very first Storage department request, before any quantity could be confirmed",
+      "confidence": "LOW"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Wall Storage",
+      "qty": null,
+      "link": "https://www2.hm.com/en_in/home/shop-by-product/storage/wall-storage.html",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: URL confirmed via sitemap, but the whole Storage department was never reached live - site returned Access Denied on the very first Storage department request, before any quantity could be confirmed",
+      "confidence": "LOW"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Kids Storage",
+      "qty": null,
+      "link": "https://www2.hm.com/en_in/home/shop-by-product/kids-baby/storage.html",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: URL confirmed via sitemap, quantity not confirmed before site blocked further requests",
+      "confidence": "LOW"
+    }
+  ]
+}

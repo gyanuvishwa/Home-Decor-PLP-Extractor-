@@ -1,0 +1,43 @@
+{
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "Direct HTTP fetch worked throughout (same Nuxt/Vue storefront as prior Home-Decor pass, no WAF hit on any page fetched). robots.txt has no Claude-specific disallow. Found via main header nav (literal top-level menu item 'BESTSELLER' at https://www.kare.de/c/bestseller, alongside NEUHEITEN and a seasonal SALE item). The Bestseller landing page is itself a full PLP (210 Produkte) AND exposes 3 genuine site-defined child listings via its own sub-nav/embedded category JSON: Bestseller Moebel (84), Bestseller Leuchten (32), Bestseller Accessoires (94) - these sum exactly to 210, confirming the parent is the union of the three children, not a separate 4th listing. Emitted as parent(group)+3 leaves per the grouping rule. Also found /c/alle-bestseller ('Alle Bestseller' = 'All Bestsellers', a 'view all' link inside the Bestseller sub-nav) which also reports 210 Produkte; verified by comparing product-slug sets extracted from both pages (59 product links each, 100% overlap, identical order) - this is a true alias of /c/bestseller, same underlying listing under a second URL, so it was NOT emitted as a separate row (Rule: don't dedupe on count match alone, but this was confirmed same-listing by content, not just count). No other bestseller-type terms found (checked 'meistverkauft', 'topseller', 'beliebteste' on the home page and main nav - no matches; site's own vocabulary is exclusively 'Bestseller'). Qty read from the rendered 'N Produkte' header, cross-checked against the embedded Nuxt pagination:{count:N} object on each page (matched exactly), consistent with the prior Home-Decor pass's verified methodology for this site. All 4 candidates opened and confirmed to be real product grids (not editorial/marketing pages, not PDPs).",
+  "rows": [
+    {
+      "category": "Bestsellers",
+      "sub_category": "Bestsellers",
+      "qty": 210,
+      "link": "https://www.kare.de/c/bestseller",
+      "is_group": true,
+      "evidence": "'210 Produkte' rendered header; embedded pagination:{count:210,perPage:59} matches",
+      "flag": null
+    },
+    {
+      "category": "Furniture Bestsellers",
+      "sub_category": "Furniture Bestsellers",
+      "qty": 84,
+      "link": "https://www.kare.de/c/bestseller-moebel",
+      "is_group": false,
+      "evidence": "'84 Produkte' rendered header; embedded pagination:{count:84,perPage:59} matches",
+      "flag": null
+    },
+    {
+      "category": "Lighting Bestsellers",
+      "sub_category": "Lighting Bestsellers",
+      "qty": 32,
+      "link": "https://www.kare.de/c/bestseller-leuchten",
+      "is_group": false,
+      "evidence": "'32 Produkte' rendered header (single page, no pager shown - fewer than perPage=59)",
+      "flag": null
+    },
+    {
+      "category": "Accessories Bestsellers",
+      "sub_category": "Accessories Bestsellers",
+      "qty": 94,
+      "link": "https://www.kare.de/c/bestseller-accessoires",
+      "is_group": false,
+      "evidence": "'94 Produkte' rendered header; embedded pagination:{count:94,perPage:59} matches",
+      "flag": null
+    }
+  ]
+}

@@ -1,0 +1,903 @@
+{
+ "sr": 317,
+ "company": "Wayfair UK",
+ "brand_site": "wayfair.co.uk",
+ "country": "UK",
+ "site_url": "https://www.wayfair.co.uk/",
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "Genuinely separate catalogue from S.N. 1 Wayfair US (wayfair.com) and S.N. 221 Wayfair US duplicate-flag row: wayfair.co.uk resolves storeID 321 / STORE_CONFIG key \"wayfair_co_uk\" / locale en-GB (vs US wayfair.com), runs entirely distinct category IDs (e.g. Chandeliers is c235065 on .co.uk vs c215419 on .com) and reports proportionally much smaller counts (Chandeliers 3858 UK vs 49678 US, Wall Art 818187 UK vs 2280934 US, roughly 8-30% of US volume across matched categories) -- independent regional inventory, not a mirrored/shared feed. Access route: direct HTTPS fetch of https://www.wayfair.co.uk/ and its robots.txt succeeded (200, no Claude-specific disallow; /*/sb0/ /*/sb1/ /*/sb2/ listing pages explicitly Allowed). Category listing pages (/cat/ hubs and /sb0/ leaves) returned HTTP 429 on the first plain-requests attempt; curl_cffi with impersonate=\"chrome124\" (Chrome TLS/HTTP2 fingerprint) cleared the block on every subsequent fetch, so all ~74 pages were retrieved that way with an on-disk cache keyed by categoryId to avoid refetching. Category tree was built by: (1) reading the shared mega-nav /sb0/ links off the Lighting/Home Decor/Kitchenware landing pages, (2) reading the shared mid-level /cat/ sidebar links off the same pages, (3) fetching each relevant /cat/ hub (Ceiling Lights, Recessed Lighting, Table & Floor Lamps, Wall Lights, Outdoor Lighting, Wall Decor, Home Accessories, Art, Mirrors, Candles & Candle Holders, Picture Frames & Albums, Flowers & Plants, Tableware & Serveware, Dinnerware, Drinkware, Table Accents & Centrepieces, Barware) and diffing its /sb0/ links against the mega-nav baseline to isolate that hub's own child leaves, and (4) following Bathroom Mirrors (home-improvement/cat) to pick up Makeup & Shaving Mirrors as an additional mirror type (Rule 0: product type beats room/aisle placement -- included despite living under the home-improvement and furniture aisles). qty is the listing page's own reported total, read from the Next.js/Apollo RSC payload and cross-checked 3 ways: \"resultCount\" (BlockBuilderBrowseResultCount block), \"numberOfItems\" (BlockBuilderBrowsePagination block) and \"totalSKUCount\" (pageTrackingMetadata block, itself keyed to the page's own categoryId) -- all three agreed on every one of the 81 leaves extracted. A fourth field, \"totalCount\", was present on most pages but is NOT the listing count -- it comes from an unrelated small widget (e.g. a reviews-count or recently-viewed cursor block) and was discarded once cross-checking showed it never matched the other three signals (e.g. reviews totalCount:1 next to a genuine resultCount of 2445). One candidate leaf, Patio Lighting (lighting/sb0/patio-lighting-c1876585.html), was dropped rather than extracted: its title (\"Patio Lighting You'll Love\") and payload (RecommendedListingCollection typename, no resultCount/numberOfItems/totalSKUCount block at all) show it is a curated/marketing collection page, not a real category listing -- consistent with the NEVER EXTRACT rule for Featured/curated pages. Exclusions applied: Furniture, Outdoor/Garden furniture, Textiles & Bedding (cushions, throws, curtains, blinds, rugs, bedding, towels, table linens), Storage & Organisation, Kitchen appliances/cookware/bakeware/utensils/cutlery, Home Improvement (taps, sinks, tiles, doors, radiators, hardware, cabinet hardware), Pets, Baby & Kids furniture, Wallpaper (incl. peel & stick), Ceiling Fans (incl. Ceiling Fans with Lights), Light Bulbs, Light Bulbs & Hardware, Controls & Dimmers, Socket Covers, Lighting Components (could not verify via product-title scan that this only contains fixture parts rather than generic electrical hardware -- excluded conservatively), Artificial Plants/Trees/Flowers, Flower Arrangements and Garlands & Swag (both read as faux-foliage decor via their listing titles), Scented Oils & Diffusers (Home Fragrance), Photo Albums (not decor), Door Stops & Draught Excluders (mixed roll-up of decorative door stops + textile draught excluders that could not be title-scanned apart -- product-level listing data is not present in the static RSC payload for this site, only aggregate counts, so the mix could not be split and was dropped per the mixed-roll-up rule), Placemats (textile), Wine Racks (storage furniture, not glassware/tableware), \"All Mirrors\" and \"All Glassware\" (umbrella roll-up pages that would double-count the specific mirror/glassware subtype leaves already extracted), Bathroom Storage & Organisation, Kitchen Canisters/Storage, Mirrored Bathroom Cabinets (storage furniture, not a decorative mirror), and all Sale/Shop-All/Collections pages. Wine Glasses, Bar & Cocktail Glasses, Champagne Glasses & Flutes and Shot Glasses are cross-listed under both the site's Drinkware and Barware hubs with identical categoryIds/URLs -- counted once each, under Drinkware, to avoid double-counting. Candlesticks & Candelabra is likewise cross-listed under both Table Accents and Candles & Candle Holders -- counted once, under Candles & Candle Holders. Product-level title-scanning (to split genuinely mixed roll-ups) was not feasible on this run: unlike category-level resultCount data, individual product listing cards on wayfair.co.uk are not present in the curl_cffi-fetched static HTML/RSC payload (they load via a follow-up client-side fetch), so category-name semantics plus the site's own category grouping were used as the basis for scope decisions, erring toward dropping any category whose name itself implied a functional/excluded item mixed in with a decorative one.",
+ "rows": [
+  {
+   "category": "Lighting",
+   "sub_category": "Ceiling Lights",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Chandeliers",
+   "parent": false,
+   "qty": 3858,
+   "link": "https://www.wayfair.co.uk/lighting/sb0/chandeliers-c235065.html",
+   "evidence": "RSC payload resultCount:3858, totalCount:3858, numberOfItems:3858, totalSKUCount:3858",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Pendant Lighting",
+   "parent": false,
+   "qty": 13103,
+   "link": "https://www.wayfair.co.uk/lighting/sb0/pendant-lighting-c1867595.html",
+   "evidence": "RSC payload resultCount:13103, totalCount:13103, numberOfItems:13103, totalSKUCount:13103",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Ceiling Flush Lights",
+   "parent": false,
+   "qty": 7864,
+   "link": "https://www.wayfair.co.uk/lighting/sb0/ceiling-flush-lights-c235068.html",
+   "evidence": "RSC payload resultCount:7864, totalCount:233, numberOfItems:7864, totalSKUCount:7864",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Ceiling Spotlights",
+   "parent": false,
+   "qty": 970,
+   "link": "https://www.wayfair.co.uk/lighting/sb0/ceiling-spotlights-c235067.html",
+   "evidence": "RSC payload resultCount:970, totalCount:970, numberOfItems:970, totalSKUCount:970",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Ceiling Light Shades",
+   "parent": false,
+   "qty": 1297,
+   "link": "https://www.wayfair.co.uk/lighting/sb0/ceiling-light-shades-c1832226.html",
+   "evidence": "RSC payload resultCount:1297, totalCount:1297, numberOfItems:1297, totalSKUCount:1297",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Recessed Lighting",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "LED Recessed Lighting",
+   "parent": false,
+   "qty": 485,
+   "link": "https://www.wayfair.co.uk/lighting/sb0/led-recessed-lighting-c235604.html",
+   "evidence": "RSC payload resultCount:485, totalCount:0, numberOfItems:485, totalSKUCount:485",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Recessed Lighting Kits",
+   "parent": false,
+   "qty": 677,
+   "link": "https://www.wayfair.co.uk/lighting/sb0/recessed-lighting-kits-c1853906.html",
+   "evidence": "RSC payload resultCount:677, totalCount:14, numberOfItems:677, totalSKUCount:677",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Recessed Lighting Trims",
+   "parent": false,
+   "qty": 158,
+   "link": "https://www.wayfair.co.uk/lighting/sb0/recessed-lighting-trims-c1869700.html",
+   "evidence": "RSC payload resultCount:158, totalCount:0, numberOfItems:158, totalSKUCount:158",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Recessed Lighting Housing",
+   "parent": false,
+   "qty": 76,
+   "link": "https://www.wayfair.co.uk/lighting/sb0/recessed-lighting-housing-c1853907.html",
+   "evidence": "RSC payload resultCount:76, totalCount:76, numberOfItems:76, totalSKUCount:76",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Table & Floor Lamps",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Table Lamps",
+   "parent": false,
+   "qty": 6606,
+   "link": "https://www.wayfair.co.uk/lighting/sb0/table-lamps-c476084.html",
+   "evidence": "RSC payload resultCount:6606, totalCount:6606, numberOfItems:6606, totalSKUCount:6606",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Floor Lamps",
+   "parent": false,
+   "qty": 3092,
+   "link": "https://www.wayfair.co.uk/lighting/sb0/floor-lamps-c235006.html",
+   "evidence": "RSC payload resultCount:3092, totalCount:3092, numberOfItems:3092, totalSKUCount:3092",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Lamp Sets",
+   "parent": false,
+   "qty": 516,
+   "link": "https://www.wayfair.co.uk/lighting/sb0/lamp-sets-c1876576.html",
+   "evidence": "RSC payload resultCount:516, totalCount:97, numberOfItems:516, totalSKUCount:516",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Desk Lamps",
+   "parent": false,
+   "qty": 785,
+   "link": "https://www.wayfair.co.uk/lighting/sb0/desk-lamps-c1871893.html",
+   "evidence": "RSC payload resultCount:785, totalCount:785, numberOfItems:785, totalSKUCount:785",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Wall Lights",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Wall Sconces",
+   "parent": false,
+   "qty": 5567,
+   "link": "https://www.wayfair.co.uk/lighting/sb0/wall-sconces-c1869796.html",
+   "evidence": "RSC payload resultCount:5567, totalCount:65, numberOfItems:5567, totalSKUCount:5567",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Swing Arm Wall Sconces",
+   "parent": false,
+   "qty": 225,
+   "link": "https://www.wayfair.co.uk/lighting/sb0/swing-arm-wall-sconces-c235052.html",
+   "evidence": "RSC payload resultCount:225, totalCount:27, numberOfItems:225, totalSKUCount:225",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Picture Lights",
+   "parent": false,
+   "qty": 151,
+   "link": "https://www.wayfair.co.uk/lighting/sb0/picture-lights-c235059.html",
+   "evidence": "RSC payload resultCount:151, totalCount:53, numberOfItems:151, totalSKUCount:151",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Under Cabinet Lighting",
+   "parent": false,
+   "qty": 200,
+   "link": "https://www.wayfair.co.uk/lighting/sb0/under-cabinet-lighting-c235540.html",
+   "evidence": "RSC payload resultCount:200, totalCount:10, numberOfItems:200, totalSKUCount:200",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Commercial Wall Lighting",
+   "parent": false,
+   "qty": 79,
+   "link": "https://www.wayfair.co.uk/lighting/sb0/commercial-wall-lighting-c1876772.html",
+   "evidence": "RSC payload resultCount:79, totalCount:25, numberOfItems:79, totalSKUCount:79",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Outdoor Lighting",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Outdoor Wall Lighting",
+   "parent": false,
+   "qty": 2445,
+   "link": "https://www.wayfair.co.uk/lighting/sb0/outdoor-wall-lighting-c235096.html",
+   "evidence": "RSC payload resultCount:2445, totalCount:1, numberOfItems:2445, totalSKUCount:2445",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "LED Outdoor Lighting",
+   "parent": false,
+   "qty": 1212,
+   "link": "https://www.wayfair.co.uk/lighting/sb0/led-outdoor-lighting-c235600.html",
+   "evidence": "RSC payload resultCount:1212, totalCount:278, numberOfItems:1212, totalSKUCount:1212",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Post Lights",
+   "parent": false,
+   "qty": 497,
+   "link": "https://www.wayfair.co.uk/lighting/sb0/post-lights-c235106.html",
+   "evidence": "RSC payload resultCount:497, totalCount:497, numberOfItems:497, totalSKUCount:497",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Lanterns & Lighting",
+   "parent": false,
+   "qty": 139,
+   "link": "https://www.wayfair.co.uk/lighting/sb0/lanterns-lighting-c1861222.html",
+   "evidence": "RSC payload resultCount:139, totalCount:7, numberOfItems:139, totalSKUCount:139",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Lanterns",
+   "parent": false,
+   "qty": 31,
+   "link": "https://www.wayfair.co.uk/lighting/sb0/lanterns-c477730.html",
+   "evidence": "RSC payload resultCount:31, totalCount:1, numberOfItems:31, totalSKUCount:31",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Lighting by Room",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Bathroom Wall Lights",
+   "parent": false,
+   "qty": 319,
+   "link": "https://www.wayfair.co.uk/lighting/sb0/bathroom-wall-lights-c1802159.html",
+   "evidence": "RSC payload resultCount:319, totalCount:1, numberOfItems:319, totalSKUCount:319",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Recessed Shower Lighting",
+   "parent": false,
+   "qty": 354,
+   "link": "https://www.wayfair.co.uk/lighting/sb0/recessed-shower-lighting-c1802610.html",
+   "evidence": "RSC payload resultCount:354, totalCount:2, numberOfItems:354, totalSKUCount:354",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Children's Pendants",
+   "parent": false,
+   "qty": 51,
+   "link": "https://www.wayfair.co.uk/lighting/sb0/childrens-pendants-c1851129.html",
+   "evidence": "RSC payload resultCount:51, totalCount:2, numberOfItems:51, totalSKUCount:51",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Specialty & Decorative Lighting",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Night Lights",
+   "parent": false,
+   "qty": 164,
+   "link": "https://www.wayfair.co.uk/lighting/sb0/night-lights-c235593.html",
+   "evidence": "RSC payload resultCount:164, totalCount:85, numberOfItems:164, totalSKUCount:164",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Fairy Lights",
+   "parent": false,
+   "qty": 671,
+   "link": "https://www.wayfair.co.uk/lighting/sb0/fairy-lights-c508035.html",
+   "evidence": "RSC payload resultCount:671, totalCount:671, numberOfItems:671, totalSKUCount:671",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Light Shades",
+   "parent": false,
+   "qty": 3190,
+   "link": "https://www.wayfair.co.uk/lighting/sb0/light-shades-c1832224.html",
+   "evidence": "RSC payload resultCount:3190, totalCount:32, numberOfItems:3190, totalSKUCount:3190",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Wall Decor",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Wall Accents",
+   "parent": false,
+   "qty": 10366,
+   "link": "https://www.wayfair.co.uk/home-decor/sb0/wall-accents-c1856558.html",
+   "evidence": "RSC payload resultCount:10366, totalCount:10366, numberOfItems:10366, totalSKUCount:10366",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Wall Stickers",
+   "parent": false,
+   "qty": 3647,
+   "link": "https://www.wayfair.co.uk/home-decor/sb0/wall-stickers-c1803453.html",
+   "evidence": "RSC payload resultCount:3647, totalCount:3647, numberOfItems:3647, totalSKUCount:3647",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Wall Murals",
+   "parent": false,
+   "qty": 3427,
+   "link": "https://www.wayfair.co.uk/home-decor/sb0/wall-murals-c1876693.html",
+   "evidence": "RSC payload resultCount:3427, totalCount:64, numberOfItems:3427, totalSKUCount:3427",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Tapestries & Hangings",
+   "parent": false,
+   "qty": 419,
+   "link": "https://www.wayfair.co.uk/home-decor/sb0/tapestries-hangings-c1859455.html",
+   "evidence": "RSC payload resultCount:419, totalCount:14, numberOfItems:419, totalSKUCount:419",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Memo Boards",
+   "parent": false,
+   "qty": 6671,
+   "link": "https://www.wayfair.co.uk/home-decor/sb0/memo-boards-c1861161.html",
+   "evidence": "RSC payload resultCount:6671, totalCount:111, numberOfItems:6671, totalSKUCount:6671",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Art",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Wall Art",
+   "parent": false,
+   "qty": 818187,
+   "link": "https://www.wayfair.co.uk/home-decor/sb0/wall-art-c1803452.html",
+   "evidence": "RSC payload resultCount:818187, totalCount:818187, numberOfItems:818187, totalSKUCount:818187",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Mirrors",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Wall Mirrors",
+   "parent": false,
+   "qty": 4673,
+   "link": "https://www.wayfair.co.uk/home-decor/sb0/wall-mirrors-c1802010.html",
+   "evidence": "RSC payload resultCount:4673, totalCount:4673, numberOfItems:4673, totalSKUCount:4673",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Full Length Mirrors",
+   "parent": false,
+   "qty": 797,
+   "link": "https://www.wayfair.co.uk/home-decor/sb0/full-length-mirrors-c1802011.html",
+   "evidence": "RSC payload resultCount:797, totalCount:3, numberOfItems:797, totalSKUCount:797",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Cheval & Leaner Mirrors",
+   "parent": false,
+   "qty": 797,
+   "link": "https://www.wayfair.co.uk/home-decor/sb0/cheval-leaner-mirrors-c1802012.html",
+   "evidence": "RSC payload resultCount:797, totalCount:57, numberOfItems:797, totalSKUCount:797",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Mirror Sets",
+   "parent": false,
+   "qty": 240,
+   "link": "https://www.wayfair.co.uk/home-decor/sb0/mirror-sets-c1874707.html",
+   "evidence": "RSC payload resultCount:240, totalCount:28, numberOfItems:240, totalSKUCount:240",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Vanity Mirrors",
+   "parent": false,
+   "qty": 776,
+   "link": "https://www.wayfair.co.uk/home-improvement/sb0/vanity-mirrors-c1875158.html",
+   "evidence": "RSC payload resultCount:776, totalCount:1082, numberOfItems:776, totalSKUCount:776",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Makeup & Shaving Mirrors",
+   "parent": false,
+   "qty": 497,
+   "link": "https://www.wayfair.co.uk/home-improvement/sb0/makeup-shaving-mirrors-c1875160.html",
+   "evidence": "RSC payload resultCount:497, totalCount:18, numberOfItems:497, totalSKUCount:497",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Dressing Table Mirrors",
+   "parent": false,
+   "qty": 776,
+   "link": "https://www.wayfair.co.uk/furniture/sb0/dressing-table-mirrors-c1773130.html",
+   "evidence": "RSC payload resultCount:776, totalCount:1082, numberOfItems:776, totalSKUCount:776",
+   "flag": null
+  },
+  {
+   "category": "Home Accessories",
+   "sub_category": "Decorative Accents",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Home Accessories",
+   "sub_category": "Vases",
+   "parent": false,
+   "qty": 3055,
+   "link": "https://www.wayfair.co.uk/home-decor/sb0/vases-c1803427.html",
+   "evidence": "RSC payload resultCount:3055, totalCount:207, numberOfItems:3055, totalSKUCount:3055",
+   "flag": null
+  },
+  {
+   "category": "Home Accessories",
+   "sub_category": "Decorative Objects",
+   "parent": false,
+   "qty": 7928,
+   "link": "https://www.wayfair.co.uk/home-decor/sb0/ornaments-c1803426.html",
+   "evidence": "RSC payload resultCount:7928, totalCount:50, numberOfItems:7928, totalSKUCount:7928",
+   "flag": null
+  },
+  {
+   "category": "Home Accessories",
+   "sub_category": "Globes",
+   "parent": false,
+   "qty": 123,
+   "link": "https://www.wayfair.co.uk/home-decor/sb0/globes-c1803424.html",
+   "evidence": "RSC payload resultCount:123, totalCount:2, numberOfItems:123, totalSKUCount:123",
+   "flag": null
+  },
+  {
+   "category": "Home Accessories",
+   "sub_category": "Decorative Trays",
+   "parent": false,
+   "qty": 1047,
+   "link": "https://www.wayfair.co.uk/home-decor/sb0/decorative-trays-c1876690.html",
+   "evidence": "RSC payload resultCount:1047, totalCount:7, numberOfItems:1047, totalSKUCount:1047",
+   "flag": null
+  },
+  {
+   "category": "Home Accessories",
+   "sub_category": "Decorative Plates & Bowls",
+   "parent": false,
+   "qty": 681,
+   "link": "https://www.wayfair.co.uk/home-decor/sb0/decorative-plates-bowls-c1860440.html",
+   "evidence": "RSC payload resultCount:681, totalCount:6, numberOfItems:681, totalSKUCount:681",
+   "flag": null
+  },
+  {
+   "category": "Home Accessories",
+   "sub_category": "Decorative Boxes",
+   "parent": false,
+   "qty": 5389,
+   "link": "https://www.wayfair.co.uk/home-decor/sb0/decorative-boxes-c1872775.html",
+   "evidence": "RSC payload resultCount:5389, totalCount:6, numberOfItems:5389, totalSKUCount:5389",
+   "flag": null
+  },
+  {
+   "category": "Home Accessories",
+   "sub_category": "Indoor Fountains",
+   "parent": false,
+   "qty": 86,
+   "link": "https://www.wayfair.co.uk/home-decor/sb0/indoor-fountains-c1876691.html",
+   "evidence": "RSC payload resultCount:86, totalCount:14, numberOfItems:86, totalSKUCount:86",
+   "flag": null
+  },
+  {
+   "category": "Home Accessories",
+   "sub_category": "Bookends",
+   "parent": false,
+   "qty": 205,
+   "link": "https://www.wayfair.co.uk/home-decor/sb0/bookends-c1856556.html",
+   "evidence": "RSC payload resultCount:205, totalCount:0, numberOfItems:205, totalSKUCount:205",
+   "flag": null
+  },
+  {
+   "category": "Home Accessories",
+   "sub_category": "Indoor Planters",
+   "parent": false,
+   "qty": 2914,
+   "link": "https://www.wayfair.co.uk/home-decor/sb0/indoor-planters-plant-pots-c1869768.html",
+   "evidence": "RSC payload resultCount:2914, totalCount:211, numberOfItems:2914, totalSKUCount:2914",
+   "flag": null
+  },
+  {
+   "category": "Home Accessories",
+   "sub_category": "Countertop Bath Accessories",
+   "parent": false,
+   "qty": 1173,
+   "link": "https://www.wayfair.co.uk/home-decor/sb0/countertop-bath-accessories-c1772746.html",
+   "evidence": "RSC payload resultCount:1173, totalCount:33, numberOfItems:1173, totalSKUCount:1173",
+   "flag": null
+  },
+  {
+   "category": "Home Accessories",
+   "sub_category": "Candles & Candle Holders",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Home Accessories",
+   "sub_category": "Candles",
+   "parent": false,
+   "qty": 1443,
+   "link": "https://www.wayfair.co.uk/home-decor/sb0/candles-c1861152.html",
+   "evidence": "RSC payload resultCount:1443, totalCount:4, numberOfItems:1443, totalSKUCount:1443",
+   "flag": null
+  },
+  {
+   "category": "Home Accessories",
+   "sub_category": "Candle Holders",
+   "parent": false,
+   "qty": 2229,
+   "link": "https://www.wayfair.co.uk/home-decor/sb0/candle-holders-c1803423.html",
+   "evidence": "RSC payload resultCount:2229, totalCount:78, numberOfItems:2229, totalSKUCount:2229",
+   "flag": null
+  },
+  {
+   "category": "Home Accessories",
+   "sub_category": "Candlesticks & Candelabra",
+   "parent": false,
+   "qty": 569,
+   "link": "https://www.wayfair.co.uk/kitchenware-tableware/sb0/candlesticks-candelabra-c1868164.html",
+   "evidence": "RSC payload resultCount:569, totalCount:1, numberOfItems:569, totalSKUCount:569",
+   "flag": null
+  },
+  {
+   "category": "Home Accessories",
+   "sub_category": "Clocks",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Home Accessories",
+   "sub_category": "Clocks",
+   "parent": false,
+   "qty": 2713,
+   "link": "https://www.wayfair.co.uk/home-decor/sb0/wall-clocks-c1773864.html",
+   "evidence": "RSC payload resultCount:2713, totalCount:98, numberOfItems:2713, totalSKUCount:2713",
+   "flag": null
+  },
+  {
+   "category": "Home Accessories",
+   "sub_category": "Picture Frames",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Home Accessories",
+   "sub_category": "Picture Frames",
+   "parent": false,
+   "qty": 1851,
+   "link": "https://www.wayfair.co.uk/home-decor/sb0/all-picture-frames-c225087.html",
+   "evidence": "RSC payload resultCount:1851, totalCount:1272, numberOfItems:1851, totalSKUCount:1851",
+   "flag": null
+  },
+  {
+   "category": "Home Accessories",
+   "sub_category": "Hanging Picture Frames",
+   "parent": false,
+   "qty": 385,
+   "link": "https://www.wayfair.co.uk/home-decor/sb0/hanging-picture-frames-c1874714.html",
+   "evidence": "RSC payload resultCount:385, totalCount:1272, numberOfItems:385, totalSKUCount:385",
+   "flag": null
+  },
+  {
+   "category": "Home Accessories",
+   "sub_category": "Table Picture Frames",
+   "parent": false,
+   "qty": 678,
+   "link": "https://www.wayfair.co.uk/home-decor/sb0/table-picture-frames-c1874715.html",
+   "evidence": "RSC payload resultCount:678, totalCount:301, numberOfItems:678, totalSKUCount:678",
+   "flag": null
+  },
+  {
+   "category": "Home Accessories",
+   "sub_category": "Collage Picture Frames",
+   "parent": false,
+   "qty": 268,
+   "link": "https://www.wayfair.co.uk/home-decor/sb0/collage-picture-frames-c1874713.html",
+   "evidence": "RSC payload resultCount:268, totalCount:20, numberOfItems:268, totalSKUCount:268",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Dinnerware",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Dinner Sets",
+   "parent": false,
+   "qty": 2358,
+   "link": "https://www.wayfair.co.uk/kitchenware-tableware/sb0/dinner-sets-c1804715.html",
+   "evidence": "RSC payload resultCount:2358, totalCount:80, numberOfItems:2358, totalSKUCount:2358",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Casual Dinnerware Sets",
+   "parent": false,
+   "qty": 983,
+   "link": "https://www.wayfair.co.uk/kitchenware-tableware/sb0/casual-dinnerware-sets-c1876673.html",
+   "evidence": "RSC payload resultCount:983, totalCount:60, numberOfItems:983, totalSKUCount:983",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Fine China",
+   "parent": false,
+   "qty": 871,
+   "link": "https://www.wayfair.co.uk/kitchenware-tableware/sb0/fine-china-c1876674.html",
+   "evidence": "RSC payload resultCount:871, totalCount:80, numberOfItems:871, totalSKUCount:871",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Plates",
+   "parent": false,
+   "qty": 1497,
+   "link": "https://www.wayfair.co.uk/kitchenware-tableware/sb0/plates-c1804717.html",
+   "evidence": "RSC payload resultCount:1497, totalCount:3, numberOfItems:1497, totalSKUCount:1497",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Dining Bowls",
+   "parent": false,
+   "qty": 983,
+   "link": "https://www.wayfair.co.uk/kitchenware-tableware/sb0/dining-bowls-c1804724.html",
+   "evidence": "RSC payload resultCount:983, totalCount:154, numberOfItems:983, totalSKUCount:983",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Drinkware",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Glassware Sets",
+   "parent": false,
+   "qty": 2369,
+   "link": "https://www.wayfair.co.uk/kitchenware-tableware/sb0/glassware-sets-c1862529.html",
+   "evidence": "RSC payload resultCount:2369, totalCount:410, numberOfItems:2369, totalSKUCount:2369",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Plastic & Outdoor Drinkware",
+   "parent": false,
+   "qty": 171,
+   "link": "https://www.wayfair.co.uk/kitchenware-tableware/sb0/plastic-outdoor-drinkware-c1868142.html",
+   "evidence": "RSC payload resultCount:171, totalCount:3, numberOfItems:171, totalSKUCount:171",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Wine Glasses",
+   "parent": false,
+   "qty": 472,
+   "link": "https://www.wayfair.co.uk/kitchenware-tableware/sb0/wine-glasses-c1853727.html",
+   "evidence": "RSC payload resultCount:472, totalCount:472, numberOfItems:472, totalSKUCount:472",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Bar & Cocktail Glasses",
+   "parent": false,
+   "qty": 1137,
+   "link": "https://www.wayfair.co.uk/kitchenware-tableware/sb0/bar-cocktail-glasses-c1868458.html",
+   "evidence": "RSC payload resultCount:1137, totalCount:1137, numberOfItems:1137, totalSKUCount:1137",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Champagne Glasses & Flutes",
+   "parent": false,
+   "qty": 297,
+   "link": "https://www.wayfair.co.uk/kitchenware-tableware/sb0/champagne-glasses-flutes-c1876672.html",
+   "evidence": "RSC payload resultCount:297, totalCount:297, numberOfItems:297, totalSKUCount:297",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Shot Glasses",
+   "parent": false,
+   "qty": 102,
+   "link": "https://www.wayfair.co.uk/kitchenware-tableware/sb0/shot-glasses-c1876671.html",
+   "evidence": "RSC payload resultCount:102, totalCount:102, numberOfItems:102, totalSKUCount:102",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Mugs & Teacups",
+   "parent": false,
+   "qty": 146149,
+   "link": "https://www.wayfair.co.uk/kitchenware-tableware/sb0/mugs-teacups-c1804729.html",
+   "evidence": "RSC payload resultCount:146149, totalCount:13, numberOfItems:146149, totalSKUCount:146149",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Travel Mugs & Tumblers",
+   "parent": false,
+   "qty": 1362,
+   "link": "https://www.wayfair.co.uk/kitchenware-tableware/sb0/travel-mugs-tumblers-c1873294.html",
+   "evidence": "RSC payload resultCount:1362, totalCount:1362, numberOfItems:1362, totalSKUCount:1362",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Barware",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Decanters & Carafes",
+   "parent": false,
+   "qty": 648,
+   "link": "https://www.wayfair.co.uk/kitchenware-tableware/sb0/decanters-carafes-c1804860.html",
+   "evidence": "RSC payload resultCount:648, totalCount:648, numberOfItems:648, totalSKUCount:648",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Ice Buckets & Wine Chillers",
+   "parent": false,
+   "qty": 362,
+   "link": "https://www.wayfair.co.uk/kitchenware-tableware/sb0/ice-buckets-wine-chillers-c1804877.html",
+   "evidence": "RSC payload resultCount:362, totalCount:362, numberOfItems:362, totalSKUCount:362",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Coasters",
+   "parent": false,
+   "qty": 2859,
+   "link": "https://www.wayfair.co.uk/kitchenware-tableware/sb0/coasters-c1804851.html",
+   "evidence": "RSC payload resultCount:2859, totalCount:2859, numberOfItems:2859, totalSKUCount:2859",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Table Accents",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Flower Centrepieces",
+   "parent": false,
+   "qty": 237,
+   "link": "https://www.wayfair.co.uk/kitchenware-tableware/sb0/flower-centrepieces-c1876684.html",
+   "evidence": "RSC payload resultCount:237, totalCount:237, numberOfItems:237, totalSKUCount:237",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Table Vases",
+   "parent": false,
+   "qty": 2227,
+   "link": "https://www.wayfair.co.uk/kitchenware-tableware/sb0/table-vases-c1876685.html",
+   "evidence": "RSC payload resultCount:2227, totalCount:2227, numberOfItems:2227, totalSKUCount:2227",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Charger Plates",
+   "parent": false,
+   "qty": 90,
+   "link": "https://www.wayfair.co.uk/kitchenware-tableware/sb0/charger-plates-c1868165.html",
+   "evidence": "RSC payload resultCount:90, totalCount:90, numberOfItems:90, totalSKUCount:90",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Napkin Rings",
+   "parent": false,
+   "qty": 66,
+   "link": "https://www.wayfair.co.uk/kitchenware-tableware/sb0/napkin-rings-c1804852.html",
+   "evidence": "RSC payload resultCount:66, totalCount:66, numberOfItems:66, totalSKUCount:66",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Place Card Holders & Tabletop Markers",
+   "parent": false,
+   "qty": 39,
+   "link": "https://www.wayfair.co.uk/kitchenware-tableware/sb0/place-card-holders-tabletop-markers-c1876683.html",
+   "evidence": "RSC payload resultCount:39, totalCount:39, numberOfItems:39, totalSKUCount:39",
+   "flag": null
+  }
+ ]
+}

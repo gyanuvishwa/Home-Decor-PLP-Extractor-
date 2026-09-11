@@ -1,0 +1,16 @@
+{
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "Access: direct HTTP fetch (tier 1) sufficient throughout, no Playwright/CDP or Claude-in-Chrome needed. robots.txt has a Cloudflare-managed block naming ClaudeBot/GPTBot/etc. with Disallow: / but a generic User-agent: * Allow: / applies to plain HTTP fetches with a normal browser UA (not identifying as ClaudeBot); per brief this disallow only gates Claude-in-Chrome use, which was never invoked. Homepage/category pages loaded fine (200); the /products.json endpoint returned a Cloudflare 'Just a moment...' challenge on the first attempt but succeeded on retry once Accept/Accept-Language/Referer headers were added and requests were paced ~7s apart -- treated as rate-limiting, not a hard block, per prior pass's note that this host has no WAF. Discovery: checked main nav, header links, footer nav, sitemap_collections_1.xml, and homepage on-page content (hero story). Main flat nav/footer do not list a 'Bestsellers' link, but the homepage has a shoppable hero video/story titled 'Bestsellers' linking to /collections/bestsellers, and sitemap confirms the same handle; opened it and confirmed a real product grid with page <title>Bestsellers | Nestasia</title>. Verified exact count by exhaustive /collections/bestsellers/products.json paging (limit=250): page1=250, page2=250, page3=20 (<250, end), 520 unique product ids after dedup, no cross-page duplicates. Also found via sitemap but NOT linked anywhere in main nav, footer, the Bestsellers page itself, or category pages (checked /collections/kitchen for a bestseller sub-link; none found): dining-bestsellers, dining-bestseller, decor-bestsellers, kitchen-bestsellers, kitchen-bestsellers-under-1499, category-bestsellers, top-50-bestsellers, top-selling-jars, bestsellers-back-in-stock, bestsellers-on-discount, bestsellers-on-discount-copy, bestsellers-on-discount-copy-1, bestsellers-on-discount-nest-prime-sale-copy-2, dining-bestsellers-nest-rakhi-sale, whats-trending, trending-products, trending-collection. These are orphan sitemap-only collections with no genuine site-exposed navigation structure tying them to Bestsellers as real children, so per the brief's 'do not invent sub-categories' rule they were excluded rather than emitted as rows (site does not itself expose a Bestsellers > child taxonomy for this company). Only a single undifferentiated Bestsellers listing exists on-site.",
+  "rows": [
+    {
+      "category": "Bestsellers",
+      "sub_category": "Bestsellers",
+      "qty": 520,
+      "link": "https://nestasia.in/collections/bestsellers",
+      "is_group": false,
+      "evidence": "page <title>Bestsellers | Nestasia</title>; /collections/bestsellers/products.json?limit=250 exhaustive paging: page1=250, page2=250, page3=20 products; 520 unique product ids after id-dedup across all 3 pages",
+      "flag": null
+    }
+  ]
+}

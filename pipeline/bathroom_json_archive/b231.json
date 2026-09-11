@@ -1,0 +1,50 @@
+{
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "Access: direct HTTP GET (curl, desktop UA), HTTP 200 throughout; no Claude-specific disallow in robots.txt (only generic bad-bot/Scrapy/HTTrack blocks, sitemaps listed). Tree source: mega-menu 'Decor & Furnishing' card on homepage (bathroom-accessories, soap-dispenser-sets links) cross-checked against categories.xml and under-categories.xml sitemaps (grep for bath/vanity/toilet/basin/shower/faucet/tap/towel/soap/sanitary found nothing else bathroom-relevant). Site is a Next.js app; parsed embedded __NEXT_DATA__ JSON (apiResData.data) on each category page for name/parent_name/product_count/breadcrumb/related_cat_info instead of a headless browser. Confirmed tree: Bathroom Accessories (parent, /bathroom-accessories, product_count=16, breadcrumb Home decor > Bathroom accessories) has two live child categories: Soap Dispenser (/soap-dispenser-sets, product_count=3, breadcrumb ...> Bathroom accessories > Soap dispenser) and Bathroom Set (/bathroom-set, product_count=11, breadcrumb ...> Bathroom accessories > Bathroom set). Per rule 24 the parent URL is not recorded since valid subcategories exist (grouping row only). Note: children sum to 14 vs parent's 16 -- inspected product payload, several products (lotion bottles) are multi-tagged into both children while a few (toothbrush holder, tray, waste bin) are parent-only; per rule/trap 'parent totals are not supersets of children' this is expected multi-tagging, not evidence of a missing subcategory, so no parent-level record added. related_cat_info on the bathroom-accessories page also listed 'bathroom-mirrors' (category_id 1108) and 'mirrors' (category_id 1707, general/all mirrors, not bathroom-specific); /bathroom-mirrors returned HTTP 404 (dead/retired slug, excluded), and 'mirrors' is the site's general Wall Decor mirror listing (Wall Mirror appears separately in the Decor&Furnishing and Mirrors nav sections) so excluded here as non-bathroom-specific per rule 11/21 -- not recorded, not a dedup hit (checked, no clash). Qty evidence for both leaves = the site's own product_count field from the category API payload embedded in __NEXT_DATA__, cross-checked against the product array length returned in the same payload (3 and 11 respectively, exact match). No toilets/basins/baths/showers/taps/bathroom furniture/bathroom storage/bathroom hardware categories exist anywhere in the site's category or under-category sitemaps -- WoodenStreet's Bathroom presence is limited to decorative bath accessories. Cross-category dedup: checked bathroom-accessories, soap-dispenser-sets, bathroom-set, bathroom-mirrors against cross_category_url_index.json -- all four returned null (no prior extraction in Furniture/Storage/Wall_Decor/Textile), so nothing routed to review as a dedup hit; the two live leaves went to rows[], the dead bathroom-mirrors slug and the non-bathroom-specific general mirrors category are logged in review[] for transparency.",
+  "rows": [
+    {
+      "category": "Bathroom",
+      "sub_category": "Bathroom Accessories",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": "Grouping node; homepage mega-menu 'Decor & Furnishing' card and __NEXT_DATA__ apiResData.data.name='Bathroom Accessories' at https://www.woodenstreet.com/bathroom-accessories (parent_name='Home Decor', product_count=16). No parent URL recorded per rule 24 since valid subcategories exist.",
+      "flag": null
+    },
+    {
+      "category": "Bathroom",
+      "sub_category": "Bathroom Accessories > Soap Dispenser",
+      "qty": 3,
+      "link": "https://www.woodenstreet.com/soap-dispenser-sets",
+      "is_group": false,
+      "evidence": "__NEXT_DATA__ apiResData.data.product_count=3 on https://www.woodenstreet.com/soap-dispenser-sets; breadcrumb Home decor > Bathroom accessories > Soap dispenser; products array in same payload also length 3 (lotion-bottle-style soap dispensers).",
+      "flag": null
+    },
+    {
+      "category": "Bathroom",
+      "sub_category": "Bathroom Accessories > Bathroom Set",
+      "qty": 11,
+      "link": "https://www.woodenstreet.com/bathroom-set",
+      "is_group": false,
+      "evidence": "__NEXT_DATA__ apiResData.data.product_count=11 on https://www.woodenstreet.com/bathroom-set; breadcrumb Home decor > Bathroom accessories > Bathroom set; products array in same payload also length 11 (soap dish / toothbrush holder / lotion bottle sets).",
+      "flag": null
+    }
+  ],
+  "review": [
+    {
+      "category": "Bathroom",
+      "sub_category": "Bathroom Mirrors",
+      "qty": null,
+      "issue": "Listed as a related category (category_id 1108, keyword 'bathroom-mirrors') in the bathroom-accessories page's related_cat_info, but https://www.woodenstreet.com/bathroom-mirrors returns HTTP 404 -- dead/retired slug, no live listing to record. Not a dedup hit (checked cross_category_url_index.json, null).",
+      "link": "https://www.woodenstreet.com/bathroom-mirrors"
+    },
+    {
+      "category": "Bathroom",
+      "sub_category": "Mirrors (general)",
+      "qty": null,
+      "issue": "Site-wide 'Mirrors' nav category (/mirrors, category_id 1707) also surfaced as a related category on the bathroom-accessories page, but it is the general/all-mirrors listing (co-located with Wall Mirror under the separate 'Mirrors' nav section, not a bathroom-specific node) -- excluded per rule 11/21, primary type/site hierarchy is Wall Decor, not Bathroom. Checked cross_category_url_index.json: null (no prior extraction found either).",
+      "link": "https://www.woodenstreet.com/mirrors"
+    }
+  ]
+}

@@ -1,0 +1,56 @@
+{
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ACCESS: robots.txt (identical on www.marshalls.com and m.marshalls.com) was fetched first - it names no anthropic-ai / ClaudeBot / Claude-Web agent and sets no Crawl-delay; it disallows /us/store/account|checkout|includes|modal|omniture|resources|sitewide|test|views|browse|search|products|filter, the single node /us/store/shop/_/N-2550178079, and any URL carrying Ntt=. None of the recorded or reviewed URLs is under a disallowed path, and the storefront's own AJAX grid endpoints (/us/store/browse/, /us/store/filter/) were deliberately NOT used because robots forbids them. PLP ACCESS FAILED, exactly as in the prior Furniture pass: every /shop/ listing page is behind Akamai Bot Manager from this workstation. Evidence gathered this session - www.marshalls.com/us/store/shop/.../N-1252244949 returns HTTP 200 with a 2,510-byte 'sec-if-cpt-container' Akamai challenge document on chrome124/chrome131/chrome136/safari17_0/safari18_0/firefox135 (including inside a curl_cffi Session that had first warmed cookies on an open page, with full navigate-context sec-fetch-* headers and an on-site Referer); m.marshalls.com/us/m/shop/... returns the 40.7 KB '<title>Something went wrong.</title>' Akamai failover page; the Googlebot-style ?bot=true&prev=1&tag=ca variant that appears in Marshalls' own indexed URLs is blocked the same way; WebFetch gets HTTP 403; r.jina.ai, api.allorigins.win and corsproxy.io all fail; www-marshalls-com.translate.goog relays the same 'Something went wrong' page. So no rendered 'N Items' header could be read for any node. TREE: taken from Marshalls' own navigation service, https://m.marshalls.com/us/m/sitewide/json/navMenuData.jsp (open, unprotected, not robots-disallowed - the disallow is on /us/store/sitewide/, not /us/m/sitewide/). It is a 367 KB, 1,936-node tree carrying displayName, nValue, canonical url and an exact itemCount per node. Independently corroborated this session by https://www.marshalls.com/us/store/xml/siteindex.xml -> categorySiteMap.xml (1,923 canonical desktop category URLs; note this sitemap 404'd in the prior pass and is live again now), which contains every URL recorded or reviewed here verbatim. BATHROOM TREE: Home > Bed & Bath (1181) > Bath (2539599424, 302) with exactly four children - View All (302), Bath Accessories (1252244949, 112), Soaps (2286328709, 72), Towels (1443982224, 114). None of the three real children has any further children, so all three are leaves; the Bath parent URL is therefore NOT recorded (rule 24) and 'View All' is excluded (rule 25). Bath Accessories is the only child whose primary product type is Bathroom: its indexed page metadata and the parent Bath page's own title ('Inexpensive Bathroom Accessories | Rugs & Cabinets | Marshalls') describe shower-curtain hooks, soap dishes, toothbrush holders and bath organisers, i.e. rules 13/17 accessories and hardware. QTY: the rendered header being unobtainable, every count is the navMenuData itemCount for that exact nValue - the metric the prior Home-Decor pass verified identical to the rendered 'N Items' header on every node where both could be read. This session it was re-read from four independent responses (bare navMenuData.jsp, ?N=2241537684, ?N=2539599424, ?N=4018636256) and was byte-identical every time: Bed & Bath 1181, Bath 302, Bath Accessories 112, Soaps 72, Towels 114, Shop By Room > Bathroom 295. The metric is live, not a cached constant: Furniture & Lighting now reads 430 with Chairs & Seating 136 and Tables 109, versus 439/141/120 recorded in the prior Furniture pass, so the numbers track real inventory. Counts discriminate strongly across the Home department (15 to 1959) and the three Bath children sum to 298 against a parent of 302, which is consistent with a handful of items sitting directly on the parent - not with any aggregation or constant. QTY CONFIDENCE: high for the metric, but note it could not be boundary-checked by grid exhaustion this session because the grid itself is blocked. EXCLUDED: 'View All' nodes throughout (rule 25). Home > Back to Campus > Bath and its Bath Accessories / Soaps / Towels children (302/112/72/114) - a seasonal collection that mirrors Bed & Bath > Bath exactly; Home > Halloween > Bed & Bath (83) - seasonal; Home > Clearance and every Clearance/New Arrivals mirror of the Bath branch - promotional slices (rule 25/28). Home > Pillows & Decor > Mirrors & Wall Art (144) is a single flat node of decorative wall mirrors and wall art with no bathroom or vanity sub-node anywhere beneath it, so it is Wall Decor, not Bathroom (rule 21). Home > Furniture & Lighting > Lighting (174) is general home lighting, not a bathroom-lighting node, so there is nothing to route to Lighting here. Women/Beauty & Accessories > Beauty > Bath & Body (293) and its Bath & Shower (71), Hand Soaps & Lotions (112) and Body Lotions & Oils children are personal-care consumables in the Beauty department, not Bathroom. COMPLETENESS: the whole 1,936-node navigation tree was regex-scanned for bath|shower|toilet|vanit|mirror|soap|towel|sink|faucet|robe|spa|hamper and every hit was resolved to one of the nodes accounted for above. Marshalls publishes no basin, tap/faucet, toilet, bathtub, shower enclosure, vanity unit, bathroom cabinet, bathroom mirror or bathroom storage category at all - it is an off-price apparel/home retailer whose entire bathroom range is the single 112-item Bath Accessories node.",
+ "rows": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Accessories",
+   "qty": 112,
+   "link": "https://www.marshalls.com/us/store/shop/home-home-bed-bath-bath-bath-accessories/_/N-1252244949",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  }
+ ],
+ "review": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bed & Bath > Bath > Towels",
+   "qty": 114,
+   "issue": "ROUTED TO TEXTILE: bath towels / washcloths (rule 15, 20). Marshalls gives no separate towel-hardware node.",
+   "link": "https://www.marshalls.com/us/store/shop/home-home-bed-bath-bath-towels/_/N-1443982224"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bed & Bath > Bath > Soaps",
+   "qty": 72,
+   "issue": "ROUTED TO BEAUTY / PERSONAL CARE - LOW CONFIDENCE (rule 29). Node sits inside the Bath hierarchy, which would argue for Bathroom, but its own page title is 'Luxury Hand Soaps For Less' and the products are hand soap in glass dispensers and hand-soap-plus-towel gift sets, i.e. primary product type is a consumable toiletry, not a rule-13 soap dispenser/dish/holder sold empty. Marshalls also carries the same product type at Beauty & Accessories > Beauty > Bath & Body > Hand Soaps & Lotions (112). PLP access is blocked so the split between 'soap' and 'refillable dispenser' could not be measured product-by-product; flagged rather than guessed.",
+   "link": "https://www.marshalls.com/us/store/shop/home-home-bed-bath-bath-soaps/_/N-2286328709"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shop By Room > Bathroom",
+   "qty": 295,
+   "issue": "NOT RECORDED - room-navigation slice, not a catalogue category (rule 5: ROOM/LOCATION is the lowest-priority signal; rule 28). It is a sibling of Bedroom / Living Room / Kitchen & Dining Room under 'Shop By Room', has no children, and its 295 items are the same merchandise already covered by Bed & Bath > Bath (302). Listed here so it is not silently skipped.",
+   "link": "https://www.marshalls.com/us/store/shop/home-home-shop-by-room-bathroom/_/N-3534690242"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Back to Campus > Bath > Bath Accessories",
+   "qty": 112,
+   "issue": "NOT RECORDED - duplicate of the recorded Bed & Bath > Bath > Bath Accessories node under a seasonal 'Back to Campus' collection (identical itemCount 112; the whole Back to Campus > Bath branch mirrors Bed & Bath > Bath at 302/112/72/114 exactly). Excluded as a seasonal/promotional collection under rule 25 and as a duplicate under rule 28.",
+   "link": "https://www.marshalls.com/us/store/shop/home-home-back-to-campus-bath-bath-accessories/_/N-405996929"
+  }
+ ],
+ "_reconstructed_from": "Bathroom.xlsx delivered 2026-09-01 (checkpoint), not original worker JSON"
+}

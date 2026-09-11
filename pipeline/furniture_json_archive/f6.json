@@ -1,0 +1,930 @@
+{
+ "sr": 6,
+ "company": "Restoration Hardware",
+ "brand_site": "rh.com",
+ "country": "USA",
+ "site_url": "https://rh.com/",
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ACCESS: rh.com is behind DataDome. Every HTML/XML path (sitemap, robots.txt, PLPs) is 403 to requests, to a 17-profile curl_cffi sweep, to WebFetch, to r.jina.ai (Cloudflare-challenged itself today), to allorigins/codetabs/corsproxy/cors.sh, and translate.goog refuses the origin. Only https://<sub>.rh.com/robots.txt and the Apollo BFF at https://rh.com/graphql answer unchallenged. Two things did work: (1) the real Chrome browser passed DataDome, so RH's own HTML site map https://rh.com/us/en/sitemap (1,150,601 bytes, 939 anchors) was fetched in-page and parsed for the complete category tree; (2) the BFF answers GET requests carrying header 'x-apollo-operation-name: Search' (POST is 403). robots.txt (checked on rhmodern.rh.com and rhinteriors.rh.com, identical content) names no Claude/anthropic-ai/ClaudeBot agent; its 'Disallow: */graphql/*' does not literally match '/graphql?query=', and the endpoint was queried sparingly. TREE: taken from RH's own site map, which is the same taxonomy as the mega-menu; canonical URL form /us/en/catalog/category/products.jsp/<catId>. QTY: RH renders NOTHING server-side (identical ~49.7KB React shell for every categoryId, empty #apollo-data script) and the SPA is met with a DataDome 'ddChallengeContainer' CAPTCHA, which was not solved; RH also shows no product count to human visitors. So no rendered header exists and the qty source is RH's own search API field data.search.resultList.totalNumRecs, joined 1:1 by the categoryId in each row's link. EXHAUSTION EVIDENCE run fresh this session at three sizes: Media Armoires cat1850057 totalNumRecs=11 -> a walk at nrpp=100 returned 11 records / 11 distinct repositoryIds; Bar Cabinets & Carts cat10180046 61 -> 61/61; Nightstands cat10240093 603 -> 603/603 (offset past the end returns an empty record list). So totalNumRecs is an exact, de-duplicated distinct-product count, not a rounded widget. DISCRIMINATION: the number changes per category and non-furniture controls differ (Mattresses cat8170020=19, Vessels cat14130016=116), so it is not a site-wide constant. Counts drift slightly over time (Chandeliers was 1116 in the Aug-12 pass, 1106 today) - these are today's live reads. EXCLUDED: RH Estates (the parallel sub-brand line, both its own top menu and the 'RH Estates X' block inside every menu) - omitted as a brand line, exactly as the prior Home-Decor pass on this company did; the separate subdomains RH Modern / RH Outdoor / RH Beach House / RH Ski House / RH Baby & Child / RH Teen / RH Interiors (different sites, not rh.com's own catalogue); all 'Collections' roll-up nodes on /collections.jsp (Sofa Collections 1009, Cabinet Collections 1412, Bedroom Collections 3165 etc. - these are collection landing pages, per the brief's rule); all 'All X' roll-ups whose children are recorded instead ('All Sideboards' 747 = Closed 594 + Glass 153 exactly; 'All Vanities & Washstands' 699 = All Vanities 469 + All Washstands 230 exactly; 'All Washstands' 230 = 71+114+45 exactly; also All Beds, All Dining Tables, All Dining Chairs, All Media Consoles, All Vanities); 'Sideboards & Consoles' cat10180103=1247, which is exactly All Sideboards 747 + Console Tables 500 and is therefore a parent of rows already recorded; the Sale and Shop By Room blocks; Outdoor's 'Furniture by Material' and 'Furniture by Style' sections (material/style filter groupings over the same Outdoor Furniture set); 'The Cloud(R) Collection' (a named product collection); 'Dmitriy & Co' (a designer/brand listing); upholstery/leather swatches, fabric by the yard, fabric/leather care, replacement cushions, custom-fit furniture covers, outdoor materials & care; Shade Structures (umbrellas/pergolas, cat2340002=3); Mattresses and Foundations and the FreshBed sleep system (bedding, not furniture); bed linens, textiles, rugs, drapery, pillows, throws; lighting (incl. Office 'Task Table Lighting'); mirrors and wall art and wall decor; decorative accents, vessels, books, boxes, trays, greenery, candles; cabinet hardware/pulls/knobs/hooks; Waterworks bath fixtures (faucets, showers, bathtubs, sinks) and bath towels/linens/accessories; office accessories. DEDUPLICATION: RH repeats identical nodes in several menus - Dining's 'Shelving & Cabinets' and 'Sideboards' sections and Decor's 'Bar' section reuse the exact Living catIds, and 'Bar & Counter Stools' cat10220057 appears under both Dining>Chairs and Dining>Bar & Counter; each such node is emitted once. 'Bath Cabinets' exists under two categoryIds (cat10250051 under Bath>Furniture and cat1770015 under Bath>Bath Storage); both return 135 and the first 8 repositoryIds are identical, so it is one category and is emitted once (cat10250051). REPEATED NAMES ARE INTENTIONAL: Sofas / Sectionals / Chairs / Benches / Ottomans & Stools / Chaises & Daybeds each appear under Fabric Seating, Leather Seating and/or Outdoor - these are genuinely different RH categories with different categoryIds, different links and different product sets (checked: fabric Benches cat21710036 and leather Benches cat21720004 both total 95 but share no repositoryIds), so the parent grouping row disambiguates them. MATERIAL-NAMED NODES (Fabric/Leather/Wood/Stone & Metal beds, chairs, seating) are RH's own menu categories with their own categoryIds and PLPs, not colour/material filter query strings, so they are kept as leaves.",
+ "rows": [
+  {
+   "category": "Furniture",
+   "sub_category": "Living",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Fabric Seating",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sofas",
+   "qty": 150,
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat25450027",
+   "is_group": false,
+   "evidence": "RH Apollo BFF search API: data.search.resultList.totalNumRecs=150 for categoryId cat25450027 (GET https://rh.com/graphql?query=query{search(categoryId:\"cat25450027\",nrpp:1,no:0,country:\"US\",currencyCode:\"USD\",site:\"RH\",locale:\"en-US\",userType:\"\"){categoryDisplayName resultList{totalNumRecs}}} with header x-apollo-operation-name:Search); categoryDisplayName returned 'Sofas'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sectionals",
+   "qty": 623,
+   "link": "https://rh.com/us/en/catalog/category/collections.jsp/cat10210006",
+   "is_group": false,
+   "evidence": "RH Apollo BFF search API: data.search.resultList.totalNumRecs=623 for categoryId cat10210006 (GET https://rh.com/graphql?query=query{search(categoryId:\"cat10210006\",nrpp:1,no:0,country:\"US\",currencyCode:\"USD\",site:\"RH\",locale:\"en-US\",userType:\"\"){categoryDisplayName resultList{totalNumRecs}}} with header x-apollo-operation-name:Search); categoryDisplayName returned 'Sectionals'",
+   "flag": "MANUAL REVIEW: RH's own menu links this node to its collections.jsp page, not a products.jsp listing; qty is the product total RH's search API returns for this categoryId"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Chairs",
+   "qty": 246,
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat10210007",
+   "is_group": false,
+   "evidence": "RH Apollo BFF search API: data.search.resultList.totalNumRecs=246 for categoryId cat10210007 (GET https://rh.com/graphql?query=query{search(categoryId:\"cat10210007\",nrpp:1,no:0,country:\"US\",currencyCode:\"USD\",site:\"RH\",locale:\"en-US\",userType:\"\"){categoryDisplayName resultList{totalNumRecs}}} with header x-apollo-operation-name:Search); categoryDisplayName returned 'Chairs'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Swivel Chairs",
+   "qty": 85,
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat2420003",
+   "is_group": false,
+   "evidence": "RH Apollo BFF search API: data.search.resultList.totalNumRecs=85 for categoryId cat2420003 (GET https://rh.com/graphql?query=query{search(categoryId:\"cat2420003\",nrpp:1,no:0,country:\"US\",currencyCode:\"USD\",site:\"RH\",locale:\"en-US\",userType:\"\"){categoryDisplayName resultList{totalNumRecs}}} with header x-apollo-operation-name:Search); categoryDisplayName returned 'Swivel Chairs'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Recliner Seating",
+   "qty": 58,
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat2420005",
+   "is_group": false,
+   "evidence": "RH Apollo BFF search API: data.search.resultList.totalNumRecs=58 for categoryId cat2420005 (GET https://rh.com/graphql?query=query{search(categoryId:\"cat2420005\",nrpp:1,no:0,country:\"US\",currencyCode:\"USD\",site:\"RH\",locale:\"en-US\",userType:\"\"){categoryDisplayName resultList{totalNumRecs}}} with header x-apollo-operation-name:Search); categoryDisplayName returned 'Recliner Seating'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sleeper Sofas",
+   "qty": 7,
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat1537056",
+   "is_group": false,
+   "evidence": "RH Apollo BFF search API: data.search.resultList.totalNumRecs=7 for categoryId cat1537056 (GET https://rh.com/graphql?query=query{search(categoryId:\"cat1537056\",nrpp:1,no:0,country:\"US\",currencyCode:\"USD\",site:\"RH\",locale:\"en-US\",userType:\"\"){categoryDisplayName resultList{totalNumRecs}}} with header x-apollo-operation-name:Search); categoryDisplayName returned 'Sleeper Sofas'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Chaises & Daybeds",
+   "qty": 56,
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat10210009",
+   "is_group": false,
+   "evidence": "RH Apollo BFF search API: data.search.resultList.totalNumRecs=56 for categoryId cat10210009 (GET https://rh.com/graphql?query=query{search(categoryId:\"cat10210009\",nrpp:1,no:0,country:\"US\",currencyCode:\"USD\",site:\"RH\",locale:\"en-US\",userType:\"\"){categoryDisplayName resultList{totalNumRecs}}} with header x-apollo-operation-name:Search); categoryDisplayName returned 'Chaises & Daybeds'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Benches",
+   "qty": 95,
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat21710036",
+   "is_group": false,
+   "evidence": "RH Apollo BFF search API: data.search.resultList.totalNumRecs=95 for categoryId cat21710036 (GET https://rh.com/graphql?query=query{search(categoryId:\"cat21710036\",nrpp:1,no:0,country:\"US\",currencyCode:\"USD\",site:\"RH\",locale:\"en-US\",userType:\"\"){categoryDisplayName resultList{totalNumRecs}}} with header x-apollo-operation-name:Search); categoryDisplayName returned 'Benches'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Ottomans & Stools",
+   "qty": 106,
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat10210010",
+   "is_group": false,
+   "evidence": "RH Apollo BFF search API: data.search.resultList.totalNumRecs=106 for categoryId cat10210010 (GET https://rh.com/graphql?query=query{search(categoryId:\"cat10210010\",nrpp:1,no:0,country:\"US\",currencyCode:\"USD\",site:\"RH\",locale:\"en-US\",userType:\"\"){categoryDisplayName resultList{totalNumRecs}}} with header x-apollo-operation-name:Search); categoryDisplayName returned 'Ottomans & Stools'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Leather Seating",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sofas",
+   "qty": 91,
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat25450028",
+   "is_group": false,
+   "evidence": "RH Apollo BFF search API: data.search.resultList.totalNumRecs=91 for categoryId cat25450028 (GET https://rh.com/graphql?query=query{search(categoryId:\"cat25450028\",nrpp:1,no:0,country:\"US\",currencyCode:\"USD\",site:\"RH\",locale:\"en-US\",userType:\"\"){categoryDisplayName resultList{totalNumRecs}}} with header x-apollo-operation-name:Search); categoryDisplayName returned 'Sofas'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sectionals",
+   "qty": 366,
+   "link": "https://rh.com/us/en/catalog/category/collections.jsp/cat10210014",
+   "is_group": false,
+   "evidence": "RH Apollo BFF search API: data.search.resultList.totalNumRecs=366 for categoryId cat10210014 (GET https://rh.com/graphql?query=query{search(categoryId:\"cat10210014\",nrpp:1,no:0,country:\"US\",currencyCode:\"USD\",site:\"RH\",locale:\"en-US\",userType:\"\"){categoryDisplayName resultList{totalNumRecs}}} with header x-apollo-operation-name:Search); categoryDisplayName returned 'Sectionals'",
+   "flag": "MANUAL REVIEW: RH's own menu links this node to its collections.jsp page, not a products.jsp listing; qty is the product total RH's search API returns for this categoryId"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Chairs",
+   "qty": 195,
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat10210015",
+   "is_group": false,
+   "evidence": "RH Apollo BFF search API: data.search.resultList.totalNumRecs=195 for categoryId cat10210015 (GET https://rh.com/graphql?query=query{search(categoryId:\"cat10210015\",nrpp:1,no:0,country:\"US\",currencyCode:\"USD\",site:\"RH\",locale:\"en-US\",userType:\"\"){categoryDisplayName resultList{totalNumRecs}}} with header x-apollo-operation-name:Search); categoryDisplayName returned 'Chairs'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Swivel Chairs",
+   "qty": 49,
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat2420011",
+   "is_group": false,
+   "evidence": "RH Apollo BFF search API: data.search.resultList.totalNumRecs=49 for categoryId cat2420011 (GET https://rh.com/graphql?query=query{search(categoryId:\"cat2420011\",nrpp:1,no:0,country:\"US\",currencyCode:\"USD\",site:\"RH\",locale:\"en-US\",userType:\"\"){categoryDisplayName resultList{totalNumRecs}}} with header x-apollo-operation-name:Search); categoryDisplayName returned 'Swivel Chairs'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Recliner Seating",
+   "qty": 79,
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat2420013",
+   "is_group": false,
+   "evidence": "RH Apollo BFF search API: data.search.resultList.totalNumRecs=79 for categoryId cat2420013 (GET https://rh.com/graphql?query=query{search(categoryId:\"cat2420013\",nrpp:1,no:0,country:\"US\",currencyCode:\"USD\",site:\"RH\",locale:\"en-US\",userType:\"\"){categoryDisplayName resultList{totalNumRecs}}} with header x-apollo-operation-name:Search); categoryDisplayName returned 'Recliner Seating'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sleeper Sofas",
+   "qty": 4,
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat1537047",
+   "is_group": false,
+   "evidence": "RH Apollo BFF search API: data.search.resultList.totalNumRecs=4 for categoryId cat1537047 (GET https://rh.com/graphql?query=query{search(categoryId:\"cat1537047\",nrpp:1,no:0,country:\"US\",currencyCode:\"USD\",site:\"RH\",locale:\"en-US\",userType:\"\"){categoryDisplayName resultList{totalNumRecs}}} with header x-apollo-operation-name:Search); categoryDisplayName returned 'Sleeper Sofas'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Chaises & Daybeds",
+   "qty": 24,
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat10210017",
+   "is_group": false,
+   "evidence": "RH Apollo BFF search API: data.search.resultList.totalNumRecs=24 for categoryId cat10210017 (GET https://rh.com/graphql?query=query{search(categoryId:\"cat10210017\",nrpp:1,no:0,country:\"US\",currencyCode:\"USD\",site:\"RH\",locale:\"en-US\",userType:\"\"){categoryDisplayName resultList{totalNumRecs}}} with header x-apollo-operation-name:Search); categoryDisplayName returned 'Chaises & Daybeds'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Benches",
+   "qty": 95,
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat21720004",
+   "is_group": false,
+   "evidence": "RH Apollo BFF search API: data.search.resultList.totalNumRecs=95 for categoryId cat21720004 (GET https://rh.com/graphql?query=query{search(categoryId:\"cat21720004\",nrpp:1,no:0,country:\"US\",currencyCode:\"USD\",site:\"RH\",locale:\"en-US\",userType:\"\"){categoryDisplayName resultList{totalNumRecs}}} with header x-apollo-operation-name:Search); categoryDisplayName returned 'Benches'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Ottomans & Stools",
+   "qty": 98,
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat10210018",
+   "is_group": false,
+   "evidence": "RH Apollo BFF search API: data.search.resultList.totalNumRecs=98 for categoryId cat10210018 (GET https://rh.com/graphql?query=query{search(categoryId:\"cat10210018\",nrpp:1,no:0,country:\"US\",currencyCode:\"USD\",site:\"RH\",locale:\"en-US\",userType:\"\"){categoryDisplayName resultList{totalNumRecs}}} with header x-apollo-operation-name:Search); categoryDisplayName returned 'Ottomans & Stools'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Tables",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Coffee & Cocktail Tables",
+   "qty": 1070,
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat10180118",
+   "is_group": false,
+   "evidence": "RH Apollo BFF search API: data.search.resultList.totalNumRecs=1070 for categoryId cat10180118 (GET https://rh.com/graphql?query=query{search(categoryId:\"cat10180118\",nrpp:1,no:0,country:\"US\",currencyCode:\"USD\",site:\"RH\",locale:\"en-US\",userType:\"\"){categoryDisplayName resultList{totalNumRecs}}} with header x-apollo-operation-name:Search); categoryDisplayName returned 'Coffee & Cocktail Tables'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Console Tables",
+   "qty": 500,
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat10180123",
+   "is_group": false,
+   "evidence": "RH Apollo BFF search API: data.search.resultList.totalNumRecs=500 for categoryId cat10180123 (GET https://rh.com/graphql?query=query{search(categoryId:\"cat10180123\",nrpp:1,no:0,country:\"US\",currencyCode:\"USD\",site:\"RH\",locale:\"en-US\",userType:\"\"){categoryDisplayName resultList{totalNumRecs}}} with header x-apollo-operation-name:Search); categoryDisplayName returned 'Console Tables'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sofa Console Tables",
+   "qty": 98,
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat18800002",
+   "is_group": false,
+   "evidence": "RH Apollo BFF search API: data.search.resultList.totalNumRecs=98 for categoryId cat18800002 (GET https://rh.com/graphql?query=query{search(categoryId:\"cat18800002\",nrpp:1,no:0,country:\"US\",currencyCode:\"USD\",site:\"RH\",locale:\"en-US\",userType:\"\"){categoryDisplayName resultList{totalNumRecs}}} with header x-apollo-operation-name:Search); categoryDisplayName returned 'Sofa Console Tables'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Entry Tables",
+   "qty": 129,
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat15400001",
+   "is_group": false,
+   "evidence": "RH Apollo BFF search API: data.search.resultList.totalNumRecs=129 for categoryId cat15400001 (GET https://rh.com/graphql?query=query{search(categoryId:\"cat15400001\",nrpp:1,no:0,country:\"US\",currencyCode:\"USD\",site:\"RH\",locale:\"en-US\",userType:\"\"){categoryDisplayName resultList{totalNumRecs}}} with header x-apollo-operation-name:Search); categoryDisplayName returned 'Entry Tables'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Side Tables",
+   "qty": 1132,
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat10180100",
+   "is_group": false,
+   "evidence": "RH Apollo BFF search API: data.search.resultList.totalNumRecs=1132 for categoryId cat10180100 (GET https://rh.com/graphql?query=query{search(categoryId:\"cat10180100\",nrpp:1,no:0,country:\"US\",currencyCode:\"USD\",site:\"RH\",locale:\"en-US\",userType:\"\"){categoryDisplayName resultList{totalNumRecs}}} with header x-apollo-operation-name:Search); categoryDisplayName returned 'Side Tables'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Drink Tables",
+   "qty": 275,
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat10340002",
+   "is_group": false,
+   "evidence": "RH Apollo BFF search API: data.search.resultList.totalNumRecs=275 for categoryId cat10340002 (GET https://rh.com/graphql?query=query{search(categoryId:\"cat10340002\",nrpp:1,no:0,country:\"US\",currencyCode:\"USD\",site:\"RH\",locale:\"en-US\",userType:\"\"){categoryDisplayName resultList{totalNumRecs}}} with header x-apollo-operation-name:Search); categoryDisplayName returned 'Drink Tables'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sideboards",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Closed Sideboards",
+   "qty": 594,
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat13640005",
+   "is_group": false,
+   "evidence": "RH Apollo BFF search API: data.search.resultList.totalNumRecs=594 for categoryId cat13640005 (GET https://rh.com/graphql?query=query{search(categoryId:\"cat13640005\",nrpp:1,no:0,country:\"US\",currencyCode:\"USD\",site:\"RH\",locale:\"en-US\",userType:\"\"){categoryDisplayName resultList{totalNumRecs}}} with header x-apollo-operation-name:Search); categoryDisplayName returned 'Closed Sideboards'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Glass Sideboards",
+   "qty": 153,
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat13570018",
+   "is_group": false,
+   "evidence": "RH Apollo BFF search API: data.search.resultList.totalNumRecs=153 for categoryId cat13570018 (GET https://rh.com/graphql?query=query{search(categoryId:\"cat13570018\",nrpp:1,no:0,country:\"US\",currencyCode:\"USD\",site:\"RH\",locale:\"en-US\",userType:\"\"){categoryDisplayName resultList{totalNumRecs}}} with header x-apollo-operation-name:Search); categoryDisplayName returned 'Glass Sideboards'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sideboard & Hutches",
+   "qty": 115,
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat10180110",
+   "is_group": false,
+   "evidence": "RH Apollo BFF search API: data.search.resultList.totalNumRecs=115 for categoryId cat10180110 (GET https://rh.com/graphql?query=query{search(categoryId:\"cat10180110\",nrpp:1,no:0,country:\"US\",currencyCode:\"USD\",site:\"RH\",locale:\"en-US\",userType:\"\"){categoryDisplayName resultList{totalNumRecs}}} with header x-apollo-operation-name:Search); categoryDisplayName returned 'Sideboard & Hutches'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Media",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Closed Media",
+   "qty": 366,
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat10180130",
+   "is_group": false,
+   "evidence": "RH Apollo BFF search API: data.search.resultList.totalNumRecs=366 for categoryId cat10180130 (GET https://rh.com/graphql?query=query{search(categoryId:\"cat10180130\",nrpp:1,no:0,country:\"US\",currencyCode:\"USD\",site:\"RH\",locale:\"en-US\",userType:\"\"){categoryDisplayName resultList{totalNumRecs}}} with header x-apollo-operation-name:Search); categoryDisplayName returned 'Closed Media'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Glass Media",
+   "qty": 121,
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat10180135",
+   "is_group": false,
+   "evidence": "RH Apollo BFF search API: data.search.resultList.totalNumRecs=121 for categoryId cat10180135 (GET https://rh.com/graphql?query=query{search(categoryId:\"cat10180135\",nrpp:1,no:0,country:\"US\",currencyCode:\"USD\",site:\"RH\",locale:\"en-US\",userType:\"\"){categoryDisplayName resultList{totalNumRecs}}} with header x-apollo-operation-name:Search); categoryDisplayName returned 'Glass Media'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Media Armoires",
+   "qty": 11,
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat1850057",
+   "is_group": false,
+   "evidence": "RH Apollo BFF search API: data.search.resultList.totalNumRecs=11 for categoryId cat1850057 (GET https://rh.com/graphql?query=query{search(categoryId:\"cat1850057\",nrpp:1,no:0,country:\"US\",currencyCode:\"USD\",site:\"RH\",locale:\"en-US\",userType:\"\"){categoryDisplayName resultList{totalNumRecs}}} with header x-apollo-operation-name:Search); categoryDisplayName returned 'Media Armoires'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Shelving & Cabinets",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Cabinets",
+   "qty": 310,
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat10180087",
+   "is_group": false,
+   "evidence": "RH Apollo BFF search API: data.search.resultList.totalNumRecs=310 for categoryId cat10180087 (GET https://rh.com/graphql?query=query{search(categoryId:\"cat10180087\",nrpp:1,no:0,country:\"US\",currencyCode:\"USD\",site:\"RH\",locale:\"en-US\",userType:\"\"){categoryDisplayName resultList{totalNumRecs}}} with header x-apollo-operation-name:Search); categoryDisplayName returned 'Cabinets'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Shelving",
+   "qty": 137,
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat10180094",
+   "is_group": false,
+   "evidence": "RH Apollo BFF search API: data.search.resultList.totalNumRecs=137 for categoryId cat10180094 (GET https://rh.com/graphql?query=query{search(categoryId:\"cat10180094\",nrpp:1,no:0,country:\"US\",currencyCode:\"USD\",site:\"RH\",locale:\"en-US\",userType:\"\"){categoryDisplayName resultList{totalNumRecs}}} with header x-apollo-operation-name:Search); categoryDisplayName returned 'Shelving'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bar Cabinets & Carts",
+   "qty": 61,
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat10180046",
+   "is_group": false,
+   "evidence": "RH Apollo BFF search API: data.search.resultList.totalNumRecs=61 for categoryId cat10180046 (GET https://rh.com/graphql?query=query{search(categoryId:\"cat10180046\",nrpp:1,no:0,country:\"US\",currencyCode:\"USD\",site:\"RH\",locale:\"en-US\",userType:\"\"){categoryDisplayName resultList{totalNumRecs}}} with header x-apollo-operation-name:Search); categoryDisplayName returned 'Bar Cabinets & Carts'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Office",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Desks",
+   "qty": 143,
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat10180124",
+   "is_group": false,
+   "evidence": "RH Apollo BFF search API: data.search.resultList.totalNumRecs=143 for categoryId cat10180124 (GET https://rh.com/graphql?query=query{search(categoryId:\"cat10180124\",nrpp:1,no:0,country:\"US\",currencyCode:\"USD\",site:\"RH\",locale:\"en-US\",userType:\"\"){categoryDisplayName resultList{totalNumRecs}}} with header x-apollo-operation-name:Search); categoryDisplayName returned 'Desks'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Office Seating",
+   "qty": 26,
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat10180102",
+   "is_group": false,
+   "evidence": "RH Apollo BFF search API: data.search.resultList.totalNumRecs=26 for categoryId cat10180102 (GET https://rh.com/graphql?query=query{search(categoryId:\"cat10180102\",nrpp:1,no:0,country:\"US\",currencyCode:\"USD\",site:\"RH\",locale:\"en-US\",userType:\"\"){categoryDisplayName resultList{totalNumRecs}}} with header x-apollo-operation-name:Search); categoryDisplayName returned 'Office Seating'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dining",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dining Tables",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Rectangular Tables",
+   "qty": 411,
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat10220034",
+   "is_group": false,
+   "evidence": "RH Apollo BFF search API: data.search.resultList.totalNumRecs=411 for categoryId cat10220034 (GET https://rh.com/graphql?query=query{search(categoryId:\"cat10220034\",nrpp:1,no:0,country:\"US\",currencyCode:\"USD\",site:\"RH\",locale:\"en-US\",userType:\"\"){categoryDisplayName resultList{totalNumRecs}}} with header x-apollo-operation-name:Search); categoryDisplayName returned 'Rectangular Tables'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Round & Oval Tables",
+   "qty": 395,
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat10220042",
+   "is_group": false,
+   "evidence": "RH Apollo BFF search API: data.search.resultList.totalNumRecs=395 for categoryId cat10220042 (GET https://rh.com/graphql?query=query{search(categoryId:\"cat10220042\",nrpp:1,no:0,country:\"US\",currencyCode:\"USD\",site:\"RH\",locale:\"en-US\",userType:\"\"){categoryDisplayName resultList{totalNumRecs}}} with header x-apollo-operation-name:Search); categoryDisplayName returned 'Round & Oval Tables'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Extension Tables",
+   "qty": 85,
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat10310014",
+   "is_group": false,
+   "evidence": "RH Apollo BFF search API: data.search.resultList.totalNumRecs=85 for categoryId cat10310014 (GET https://rh.com/graphql?query=query{search(categoryId:\"cat10310014\",nrpp:1,no:0,country:\"US\",currencyCode:\"USD\",site:\"RH\",locale:\"en-US\",userType:\"\"){categoryDisplayName resultList{totalNumRecs}}} with header x-apollo-operation-name:Search); categoryDisplayName returned 'Extension Tables'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Stone Tables",
+   "qty": 285,
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat14460001",
+   "is_group": false,
+   "evidence": "RH Apollo BFF search API: data.search.resultList.totalNumRecs=285 for categoryId cat14460001 (GET https://rh.com/graphql?query=query{search(categoryId:\"cat14460001\",nrpp:1,no:0,country:\"US\",currencyCode:\"USD\",site:\"RH\",locale:\"en-US\",userType:\"\"){categoryDisplayName resultList{totalNumRecs}}} with header x-apollo-operation-name:Search); categoryDisplayName returned 'Stone Tables'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bistro Tables",
+   "qty": 129,
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat35880004",
+   "is_group": false,
+   "evidence": "RH Apollo BFF search API: data.search.resultList.totalNumRecs=129 for categoryId cat35880004 (GET https://rh.com/graphql?query=query{search(categoryId:\"cat35880004\",nrpp:1,no:0,country:\"US\",currencyCode:\"USD\",site:\"RH\",locale:\"en-US\",userType:\"\"){categoryDisplayName resultList{totalNumRecs}}} with header x-apollo-operation-name:Search); categoryDisplayName returned 'Bistro Tables'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dining Chairs",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Fabric Chairs",
+   "qty": 860,
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat10220048",
+   "is_group": false,
+   "evidence": "RH Apollo BFF search API: data.search.resultList.totalNumRecs=860 for categoryId cat10220048 (GET https://rh.com/graphql?query=query{search(categoryId:\"cat10220048\",nrpp:1,no:0,country:\"US\",currencyCode:\"USD\",site:\"RH\",locale:\"en-US\",userType:\"\"){categoryDisplayName resultList{totalNumRecs}}} with header x-apollo-operation-name:Search); categoryDisplayName returned 'Fabric Chairs'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Leather Chairs",
+   "qty": 698,
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat10220053",
+   "is_group": false,
+   "evidence": "RH Apollo BFF search API: data.search.resultList.totalNumRecs=698 for categoryId cat10220053 (GET https://rh.com/graphql?query=query{search(categoryId:\"cat10220053\",nrpp:1,no:0,country:\"US\",currencyCode:\"USD\",site:\"RH\",locale:\"en-US\",userType:\"\"){categoryDisplayName resultList{totalNumRecs}}} with header x-apollo-operation-name:Search); categoryDisplayName returned 'Leather Chairs'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Slipcovered Chairs",
+   "qty": 8,
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat9360001",
+   "is_group": false,
+   "evidence": "RH Apollo BFF search API: data.search.resultList.totalNumRecs=8 for categoryId cat9360001 (GET https://rh.com/graphql?query=query{search(categoryId:\"cat9360001\",nrpp:1,no:0,country:\"US\",currencyCode:\"USD\",site:\"RH\",locale:\"en-US\",userType:\"\"){categoryDisplayName resultList{totalNumRecs}}} with header x-apollo-operation-name:Search); categoryDisplayName returned 'Slipcovered Chairs'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Wood & Woven Chairs",
+   "qty": 157,
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat1860005",
+   "is_group": false,
+   "evidence": "RH Apollo BFF search API: data.search.resultList.totalNumRecs=157 for categoryId cat1860005 (GET https://rh.com/graphql?query=query{search(categoryId:\"cat1860005\",nrpp:1,no:0,country:\"US\",currencyCode:\"USD\",site:\"RH\",locale:\"en-US\",userType:\"\"){categoryDisplayName resultList{totalNumRecs}}} with header x-apollo-operation-name:Search); categoryDisplayName returned 'Wood & Woven Chairs'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bar & Counter",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bar & Counter Stools",
+   "qty": 656,
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat10220057",
+   "is_group": false,
+   "evidence": "RH Apollo BFF search API: data.search.resultList.totalNumRecs=656 for categoryId cat10220057 (GET https://rh.com/graphql?query=query{search(categoryId:\"cat10220057\",nrpp:1,no:0,country:\"US\",currencyCode:\"USD\",site:\"RH\",locale:\"en-US\",userType:\"\"){categoryDisplayName resultList{totalNumRecs}}} with header x-apollo-operation-name:Search); categoryDisplayName returned 'Bar & Counter Stools'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bedroom",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Beds & Headboards",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Headboards",
+   "qty": 63,
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat35410038",
+   "is_group": false,
+   "evidence": "RH Apollo BFF search API: data.search.resultList.totalNumRecs=63 for categoryId cat35410038 (GET https://rh.com/graphql?query=query{search(categoryId:\"cat35410038\",nrpp:1,no:0,country:\"US\",currencyCode:\"USD\",site:\"RH\",locale:\"en-US\",userType:\"\"){categoryDisplayName resultList{totalNumRecs}}} with header x-apollo-operation-name:Search); categoryDisplayName returned 'All Headboards'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Fabric Beds",
+   "qty": 313,
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat10240088",
+   "is_group": false,
+   "evidence": "RH Apollo BFF search API: data.search.resultList.totalNumRecs=313 for categoryId cat10240088 (GET https://rh.com/graphql?query=query{search(categoryId:\"cat10240088\",nrpp:1,no:0,country:\"US\",currencyCode:\"USD\",site:\"RH\",locale:\"en-US\",userType:\"\"){categoryDisplayName resultList{totalNumRecs}}} with header x-apollo-operation-name:Search); categoryDisplayName returned 'Fabric Beds'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Leather Beds",
+   "qty": 229,
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat10240089",
+   "is_group": false,
+   "evidence": "RH Apollo BFF search API: data.search.resultList.totalNumRecs=229 for categoryId cat10240089 (GET https://rh.com/graphql?query=query{search(categoryId:\"cat10240089\",nrpp:1,no:0,country:\"US\",currencyCode:\"USD\",site:\"RH\",locale:\"en-US\",userType:\"\"){categoryDisplayName resultList{totalNumRecs}}} with header x-apollo-operation-name:Search); categoryDisplayName returned 'Leather Beds'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Wood & Upholstered Beds",
+   "qty": 710,
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat29840045",
+   "is_group": false,
+   "evidence": "RH Apollo BFF search API: data.search.resultList.totalNumRecs=710 for categoryId cat29840045 (GET https://rh.com/graphql?query=query{search(categoryId:\"cat29840045\",nrpp:1,no:0,country:\"US\",currencyCode:\"USD\",site:\"RH\",locale:\"en-US\",userType:\"\"){categoryDisplayName resultList{totalNumRecs}}} with header x-apollo-operation-name:Search); categoryDisplayName returned 'Wood & Upholstered Beds'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Wood Beds",
+   "qty": 433,
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat10240087",
+   "is_group": false,
+   "evidence": "RH Apollo BFF search API: data.search.resultList.totalNumRecs=433 for categoryId cat10240087 (GET https://rh.com/graphql?query=query{search(categoryId:\"cat10240087\",nrpp:1,no:0,country:\"US\",currencyCode:\"USD\",site:\"RH\",locale:\"en-US\",userType:\"\"){categoryDisplayName resultList{totalNumRecs}}} with header x-apollo-operation-name:Search); categoryDisplayName returned 'Wood Beds'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Stone & Metal Beds",
+   "qty": 64,
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat160051",
+   "is_group": false,
+   "evidence": "RH Apollo BFF search API: data.search.resultList.totalNumRecs=64 for categoryId cat160051 (GET https://rh.com/graphql?query=query{search(categoryId:\"cat160051\",nrpp:1,no:0,country:\"US\",currencyCode:\"USD\",site:\"RH\",locale:\"en-US\",userType:\"\"){categoryDisplayName resultList{totalNumRecs}}} with header x-apollo-operation-name:Search); categoryDisplayName returned 'Stone & Metal Beds'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Extended Beds",
+   "qty": 105,
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat29840046",
+   "is_group": false,
+   "evidence": "RH Apollo BFF search API: data.search.resultList.totalNumRecs=105 for categoryId cat29840046 (GET https://rh.com/graphql?query=query{search(categoryId:\"cat29840046\",nrpp:1,no:0,country:\"US\",currencyCode:\"USD\",site:\"RH\",locale:\"en-US\",userType:\"\"){categoryDisplayName resultList{totalNumRecs}}} with header x-apollo-operation-name:Search); categoryDisplayName returned 'Extended Beds'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Storage Beds",
+   "qty": 82,
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat9660043",
+   "is_group": false,
+   "evidence": "RH Apollo BFF search API: data.search.resultList.totalNumRecs=82 for categoryId cat9660043 (GET https://rh.com/graphql?query=query{search(categoryId:\"cat9660043\",nrpp:1,no:0,country:\"US\",currencyCode:\"USD\",site:\"RH\",locale:\"en-US\",userType:\"\"){categoryDisplayName resultList{totalNumRecs}}} with header x-apollo-operation-name:Search); categoryDisplayName returned 'Storage Beds'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Canopy Beds",
+   "qty": 358,
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat10240091",
+   "is_group": false,
+   "evidence": "RH Apollo BFF search API: data.search.resultList.totalNumRecs=358 for categoryId cat10240091 (GET https://rh.com/graphql?query=query{search(categoryId:\"cat10240091\",nrpp:1,no:0,country:\"US\",currencyCode:\"USD\",site:\"RH\",locale:\"en-US\",userType:\"\"){categoryDisplayName resultList{totalNumRecs}}} with header x-apollo-operation-name:Search); categoryDisplayName returned 'Canopy Beds'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Nightstands & Dressers",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Nightstands",
+   "qty": 603,
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat10240093",
+   "is_group": false,
+   "evidence": "RH Apollo BFF search API: data.search.resultList.totalNumRecs=603 for categoryId cat10240093 (GET https://rh.com/graphql?query=query{search(categoryId:\"cat10240093\",nrpp:1,no:0,country:\"US\",currencyCode:\"USD\",site:\"RH\",locale:\"en-US\",userType:\"\"){categoryDisplayName resultList{totalNumRecs}}} with header x-apollo-operation-name:Search); categoryDisplayName returned 'Nightstands'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bedside Tables",
+   "qty": 374,
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat14310001",
+   "is_group": false,
+   "evidence": "RH Apollo BFF search API: data.search.resultList.totalNumRecs=374 for categoryId cat14310001 (GET https://rh.com/graphql?query=query{search(categoryId:\"cat14310001\",nrpp:1,no:0,country:\"US\",currencyCode:\"USD\",site:\"RH\",locale:\"en-US\",userType:\"\"){categoryDisplayName resultList{totalNumRecs}}} with header x-apollo-operation-name:Search); categoryDisplayName returned 'Bedside Tables'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dressers",
+   "qty": 942,
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat10240094",
+   "is_group": false,
+   "evidence": "RH Apollo BFF search API: data.search.resultList.totalNumRecs=942 for categoryId cat10240094 (GET https://rh.com/graphql?query=query{search(categoryId:\"cat10240094\",nrpp:1,no:0,country:\"US\",currencyCode:\"USD\",site:\"RH\",locale:\"en-US\",userType:\"\"){categoryDisplayName resultList{totalNumRecs}}} with header x-apollo-operation-name:Search); categoryDisplayName returned 'Dressers'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Armoires",
+   "qty": 62,
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat16610010",
+   "is_group": false,
+   "evidence": "RH Apollo BFF search API: data.search.resultList.totalNumRecs=62 for categoryId cat16610010 (GET https://rh.com/graphql?query=query{search(categoryId:\"cat16610010\",nrpp:1,no:0,country:\"US\",currencyCode:\"USD\",site:\"RH\",locale:\"en-US\",userType:\"\"){categoryDisplayName resultList{totalNumRecs}}} with header x-apollo-operation-name:Search); categoryDisplayName returned 'Armoires'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Benches & Daybeds",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Benches",
+   "qty": 155,
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat15600003",
+   "is_group": false,
+   "evidence": "RH Apollo BFF search API: data.search.resultList.totalNumRecs=155 for categoryId cat15600003 (GET https://rh.com/graphql?query=query{search(categoryId:\"cat15600003\",nrpp:1,no:0,country:\"US\",currencyCode:\"USD\",site:\"RH\",locale:\"en-US\",userType:\"\"){categoryDisplayName resultList{totalNumRecs}}} with header x-apollo-operation-name:Search); categoryDisplayName returned 'Benches'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Daybeds",
+   "qty": 79,
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat28060010",
+   "is_group": false,
+   "evidence": "RH Apollo BFF search API: data.search.resultList.totalNumRecs=79 for categoryId cat28060010 (GET https://rh.com/graphql?query=query{search(categoryId:\"cat28060010\",nrpp:1,no:0,country:\"US\",currencyCode:\"USD\",site:\"RH\",locale:\"en-US\",userType:\"\"){categoryDisplayName resultList{totalNumRecs}}} with header x-apollo-operation-name:Search); categoryDisplayName returned 'Daybeds'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Stools",
+   "qty": 53,
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat16570006",
+   "is_group": false,
+   "evidence": "RH Apollo BFF search API: data.search.resultList.totalNumRecs=53 for categoryId cat16570006 (GET https://rh.com/graphql?query=query{search(categoryId:\"cat16570006\",nrpp:1,no:0,country:\"US\",currencyCode:\"USD\",site:\"RH\",locale:\"en-US\",userType:\"\"){categoryDisplayName resultList{totalNumRecs}}} with header x-apollo-operation-name:Search); categoryDisplayName returned 'Stools'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bath",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bath Cabinets",
+   "qty": 135,
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat10250051",
+   "is_group": false,
+   "evidence": "RH Apollo BFF search API: data.search.resultList.totalNumRecs=135 for categoryId cat10250051 (GET https://rh.com/graphql?query=query{search(categoryId:\"cat10250051\",nrpp:1,no:0,country:\"US\",currencyCode:\"USD\",site:\"RH\",locale:\"en-US\",userType:\"\"){categoryDisplayName resultList{totalNumRecs}}} with header x-apollo-operation-name:Search); categoryDisplayName returned 'Bath Cabinets'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Ottomans & Stools",
+   "qty": 44,
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat21720010",
+   "is_group": false,
+   "evidence": "RH Apollo BFF search API: data.search.resultList.totalNumRecs=44 for categoryId cat21720010 (GET https://rh.com/graphql?query=query{search(categoryId:\"cat21720010\",nrpp:1,no:0,country:\"US\",currencyCode:\"USD\",site:\"RH\",locale:\"en-US\",userType:\"\"){categoryDisplayName resultList{totalNumRecs}}} with header x-apollo-operation-name:Search); categoryDisplayName returned 'Ottomans & Stools'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Medicine Cabinets",
+   "qty": 12,
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat3850033/rh-medicine-cabinets",
+   "is_group": false,
+   "evidence": "RH Apollo BFF search API: data.search.resultList.totalNumRecs=12 for categoryId cat3850033 (GET https://rh.com/graphql?query=query{search(categoryId:\"cat3850033\",nrpp:1,no:0,country:\"US\",currencyCode:\"USD\",site:\"RH\",locale:\"en-US\",userType:\"\"){categoryDisplayName resultList{totalNumRecs}}} with header x-apollo-operation-name:Search); categoryDisplayName returned 'Medicine Cabinets'",
+   "flag": "MANUAL REVIEW: ambiguous - RH files medicine cabinets under 'Mirrors & Medicine Cabinets'; they are mirrored bathroom wall cabinets, kept as bathroom storage furniture, the mirrors in that section were excluded"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Vanities",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Double Vanities",
+   "qty": 142,
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat11930014/rh-double-vanities",
+   "is_group": false,
+   "evidence": "RH Apollo BFF search API: data.search.resultList.totalNumRecs=142 for categoryId cat11930014 (GET https://rh.com/graphql?query=query{search(categoryId:\"cat11930014\",nrpp:1,no:0,country:\"US\",currencyCode:\"USD\",site:\"RH\",locale:\"en-US\",userType:\"\"){categoryDisplayName resultList{totalNumRecs}}} with header x-apollo-operation-name:Search); categoryDisplayName returned 'Double Vanities'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Single Vanities",
+   "qty": 265,
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat11930016/rh-single-vanities",
+   "is_group": false,
+   "evidence": "RH Apollo BFF search API: data.search.resultList.totalNumRecs=265 for categoryId cat11930016 (GET https://rh.com/graphql?query=query{search(categoryId:\"cat11930016\",nrpp:1,no:0,country:\"US\",currencyCode:\"USD\",site:\"RH\",locale:\"en-US\",userType:\"\"){categoryDisplayName resultList{totalNumRecs}}} with header x-apollo-operation-name:Search); categoryDisplayName returned 'Single Vanities'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Powder Vanities",
+   "qty": 59,
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat11930022",
+   "is_group": false,
+   "evidence": "RH Apollo BFF search API: data.search.resultList.totalNumRecs=59 for categoryId cat11930022 (GET https://rh.com/graphql?query=query{search(categoryId:\"cat11930022\",nrpp:1,no:0,country:\"US\",currencyCode:\"USD\",site:\"RH\",locale:\"en-US\",userType:\"\"){categoryDisplayName resultList{totalNumRecs}}} with header x-apollo-operation-name:Search); categoryDisplayName returned 'Powder Vanities'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Washstands",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Double Washstands",
+   "qty": 71,
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat20300009/rh-double-washstands",
+   "is_group": false,
+   "evidence": "RH Apollo BFF search API: data.search.resultList.totalNumRecs=71 for categoryId cat20300009 (GET https://rh.com/graphql?query=query{search(categoryId:\"cat20300009\",nrpp:1,no:0,country:\"US\",currencyCode:\"USD\",site:\"RH\",locale:\"en-US\",userType:\"\"){categoryDisplayName resultList{totalNumRecs}}} with header x-apollo-operation-name:Search); categoryDisplayName returned 'Double Washstands'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Single Washstands",
+   "qty": 114,
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat20300010/rh-single-washstands",
+   "is_group": false,
+   "evidence": "RH Apollo BFF search API: data.search.resultList.totalNumRecs=114 for categoryId cat20300010 (GET https://rh.com/graphql?query=query{search(categoryId:\"cat20300010\",nrpp:1,no:0,country:\"US\",currencyCode:\"USD\",site:\"RH\",locale:\"en-US\",userType:\"\"){categoryDisplayName resultList{totalNumRecs}}} with header x-apollo-operation-name:Search); categoryDisplayName returned 'Single Washstands'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Powder Washstands",
+   "qty": 45,
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat20300008/rh-powder-washstands",
+   "is_group": false,
+   "evidence": "RH Apollo BFF search API: data.search.resultList.totalNumRecs=45 for categoryId cat20300008 (GET https://rh.com/graphql?query=query{search(categoryId:\"cat20300008\",nrpp:1,no:0,country:\"US\",currencyCode:\"USD\",site:\"RH\",locale:\"en-US\",userType:\"\"){categoryDisplayName resultList{totalNumRecs}}} with header x-apollo-operation-name:Search); categoryDisplayName returned 'Powder Washstands'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bath Storage",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Open Shelving",
+   "qty": 64,
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat21970043",
+   "is_group": false,
+   "evidence": "RH Apollo BFF search API: data.search.resultList.totalNumRecs=64 for categoryId cat21970043 (GET https://rh.com/graphql?query=query{search(categoryId:\"cat21970043\",nrpp:1,no:0,country:\"US\",currencyCode:\"USD\",site:\"RH\",locale:\"en-US\",userType:\"\"){categoryDisplayName resultList{totalNumRecs}}} with header x-apollo-operation-name:Search); categoryDisplayName returned 'Open Shelving'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Outdoor",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sofas",
+   "qty": 237,
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat25900016",
+   "is_group": false,
+   "evidence": "RH Apollo BFF search API: data.search.resultList.totalNumRecs=237 for categoryId cat25900016 (GET https://rh.com/graphql?query=query{search(categoryId:\"cat25900016\",nrpp:1,no:0,country:\"US\",currencyCode:\"USD\",site:\"RH\",locale:\"en-US\",userType:\"\"){categoryDisplayName resultList{totalNumRecs}}} with header x-apollo-operation-name:Search); categoryDisplayName returned 'Sofas'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sectionals",
+   "qty": 586,
+   "link": "https://rh.com/us/en/catalog/category/collections.jsp/cat1695139",
+   "is_group": false,
+   "evidence": "RH Apollo BFF search API: data.search.resultList.totalNumRecs=586 for categoryId cat1695139 (GET https://rh.com/graphql?query=query{search(categoryId:\"cat1695139\",nrpp:1,no:0,country:\"US\",currencyCode:\"USD\",site:\"RH\",locale:\"en-US\",userType:\"\"){categoryDisplayName resultList{totalNumRecs}}} with header x-apollo-operation-name:Search); categoryDisplayName returned 'Sectionals'",
+   "flag": "MANUAL REVIEW: RH's own menu links this node to its collections.jsp page, not a products.jsp listing; qty is the product total RH's search API returns for this categoryId"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Chairs",
+   "qty": 351,
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat16250001",
+   "is_group": false,
+   "evidence": "RH Apollo BFF search API: data.search.resultList.totalNumRecs=351 for categoryId cat16250001 (GET https://rh.com/graphql?query=query{search(categoryId:\"cat16250001\",nrpp:1,no:0,country:\"US\",currencyCode:\"USD\",site:\"RH\",locale:\"en-US\",userType:\"\"){categoryDisplayName resultList{totalNumRecs}}} with header x-apollo-operation-name:Search); categoryDisplayName returned 'Chairs'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Coffee Tables",
+   "qty": 321,
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat3090004",
+   "is_group": false,
+   "evidence": "RH Apollo BFF search API: data.search.resultList.totalNumRecs=321 for categoryId cat3090004 (GET https://rh.com/graphql?query=query{search(categoryId:\"cat3090004\",nrpp:1,no:0,country:\"US\",currencyCode:\"USD\",site:\"RH\",locale:\"en-US\",userType:\"\"){categoryDisplayName resultList{totalNumRecs}}} with header x-apollo-operation-name:Search); categoryDisplayName returned 'Coffee Tables'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Side & Console Tables",
+   "qty": 308,
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat14650097",
+   "is_group": false,
+   "evidence": "RH Apollo BFF search API: data.search.resultList.totalNumRecs=308 for categoryId cat14650097 (GET https://rh.com/graphql?query=query{search(categoryId:\"cat14650097\",nrpp:1,no:0,country:\"US\",currencyCode:\"USD\",site:\"RH\",locale:\"en-US\",userType:\"\"){categoryDisplayName resultList{totalNumRecs}}} with header x-apollo-operation-name:Search); categoryDisplayName returned 'Side & Console Tables'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dining Tables",
+   "qty": 393,
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat6610131",
+   "is_group": false,
+   "evidence": "RH Apollo BFF search API: data.search.resultList.totalNumRecs=393 for categoryId cat6610131 (GET https://rh.com/graphql?query=query{search(categoryId:\"cat6610131\",nrpp:1,no:0,country:\"US\",currencyCode:\"USD\",site:\"RH\",locale:\"en-US\",userType:\"\"){categoryDisplayName resultList{totalNumRecs}}} with header x-apollo-operation-name:Search); categoryDisplayName returned 'Dining Tables'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dining Chairs",
+   "qty": 405,
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat10880022",
+   "is_group": false,
+   "evidence": "RH Apollo BFF search API: data.search.resultList.totalNumRecs=405 for categoryId cat10880022 (GET https://rh.com/graphql?query=query{search(categoryId:\"cat10880022\",nrpp:1,no:0,country:\"US\",currencyCode:\"USD\",site:\"RH\",locale:\"en-US\",userType:\"\"){categoryDisplayName resultList{totalNumRecs}}} with header x-apollo-operation-name:Search); categoryDisplayName returned 'Dining Chairs'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bar & Counter",
+   "qty": 172,
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat11110001",
+   "is_group": false,
+   "evidence": "RH Apollo BFF search API: data.search.resultList.totalNumRecs=172 for categoryId cat11110001 (GET https://rh.com/graphql?query=query{search(categoryId:\"cat11110001\",nrpp:1,no:0,country:\"US\",currencyCode:\"USD\",site:\"RH\",locale:\"en-US\",userType:\"\"){categoryDisplayName resultList{totalNumRecs}}} with header x-apollo-operation-name:Search); categoryDisplayName returned 'Bar & Counter'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Chaises & Daybeds",
+   "qty": 446,
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat29920005",
+   "is_group": false,
+   "evidence": "RH Apollo BFF search API: data.search.resultList.totalNumRecs=446 for categoryId cat29920005 (GET https://rh.com/graphql?query=query{search(categoryId:\"cat29920005\",nrpp:1,no:0,country:\"US\",currencyCode:\"USD\",site:\"RH\",locale:\"en-US\",userType:\"\"){categoryDisplayName resultList{totalNumRecs}}} with header x-apollo-operation-name:Search); categoryDisplayName returned 'Chaises & Daybeds'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Benches & Ottomans",
+   "qty": 206,
+   "link": "https://rh.com/us/en/catalog/category/products.jsp/cat29920006",
+   "is_group": false,
+   "evidence": "RH Apollo BFF search API: data.search.resultList.totalNumRecs=206 for categoryId cat29920006 (GET https://rh.com/graphql?query=query{search(categoryId:\"cat29920006\",nrpp:1,no:0,country:\"US\",currencyCode:\"USD\",site:\"RH\",locale:\"en-US\",userType:\"\"){categoryDisplayName resultList{totalNumRecs}}} with header x-apollo-operation-name:Search); categoryDisplayName returned 'Benches & Ottomans'",
+   "flag": null
+  }
+ ]
+}

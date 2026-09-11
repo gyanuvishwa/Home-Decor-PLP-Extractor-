@@ -1,0 +1,39 @@
+{
+  "sr": 231,
+  "company": "WoodenStreet",
+  "brand_site": "woodenstreet.com",
+  "country": "India",
+  "site_url": "https://www.woodenstreet.com/",
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "Tier 1 (direct HTTP + HTML/JSON parsing) sufficed for the whole pass; no Playwright/Chrome needed. robots.txt has no Claude-specific disallow (only generic bad-bot/scraper blocks) and explicitly lists 6 sitemaps including categories.xml (1693 category URLs) and under-categories.xml (59 URLs), which were pulled and fully keyword-scanned (Christmas/Xmas, Diwali/Deepavali/diya/rangoli/toran/lantern/akhand/deepak, Halloween, Holi, Rakhi/Raksha Bandhan, Eid, Navratri, Dussehra, Ganesh Chaturthi, Janmashtami, Karwa Chauth, Makar Sankranti, Baisakhi, Onam, Pongal, Durga, New Year, Valentine, Easter, Thanksgiving, Mother's/Father's Day, Wedding, Festive/Festival, Black Friday, Independence/Freedom, St. Patrick's, gift, sale/offer, pooja/puja, candle-stand). The site is a Next.js app; every category URL returns embedded __NEXT_DATA__ JSON with category_id/parent_id/parent_name/breadcrumb/product_count/products[] and honest 404s for invalid slugs (verified against a nonsense slug and ~30 plausible-but-absent holiday slugs, e.g. /diwali, /christmas, /holi, /eid, /rakhi, /new-year, /valentines-day, /mothers-day, /easter, /thanksgiving, /navratri, /dussehra, /ganesh-chaturthi, /janmashtami — all 404), confirming the taxonomy is real and not auto-generated aliasing. INCLUDED: Christmas Decorations (own leaf under Home Decor, product_count=2). Festive Decor (Home Decor > Festive Decor, product_count=4) is the direct parent of, and shares 3 of its 4 products with, Diwali Lights Decoration (product_count=3) — treated as a grouping parent (name only) per the shared subset rule, with Diwali Lights Decoration as the leaf; the site's own vocabulary and structure (Festive Decor's only child is Diwali-specific) tie this branch to Diwali. EXCLUDED as duplicate/overlap (identical product_id list [76909,76826], same as Christmas Decorations): Secret Santa Gifts and Secret Santa Gifts For Men (both under generic 'Gift' parent) — kept once as Christmas Decorations per the overlap rule, not re-listed. EXCLUDED as generic storewide sale/clearance pages (same pattern as the site's own explicit exclusion example 'Diwali Offers'): Diwali Offers (parent 'Furniture Sale', 146 generic furniture products, no Diwali-specific curation), Fathers Day Sale (124 generic furniture products — beds, dining sets, office chairs, TV units — zero Father's-Day theming, evaluated genuinely per the Mother's/Father's Day in-scope reminder but fails the genuine-curation test), Gudi Padwa Sale (117 generic furniture products, same catalogue pattern) and Freedom Sale (68 generic furniture products, Independence-Day-adjacent name but no themed curation) — all four are storewide % -off campaigns on ordinary furniture, not seasonal PLPs. AMBIGUOUS, logged not included: Festive Cushion Covers (Cushion Covers > Festive Cushion Covers, product_count=2) sits alongside style/material sub-categories (Printed, Embroidered, Floral, Velvet Cushion Covers) rather than any holiday-named sibling, and its 2 products (ethnic embroidered / beaded velvet cushion covers) show no site-stated tie to a specific festival — 'Festive' reads as a design-style label here, not a holiday association per rules §3/§9's Diwali-ambiguity caveat; flagging for adjudication rather than deciding. EXCLUDED as non-seasonal generic categories (checked, not holiday-specific): candle-stands, pooja-cabinet-designs, pooja-cupboard-designs, pooja-mandir-with-doors, pooja-room-designs, pooja-room-partition, puja-ghar, wall-mounted-pooja-mandir (everyday religious/pooja furniture, not Diwali-specific), all-gifts, anniversary-gifts, birthday-gifts, gifts-for-men, gifts-for-women, home-decor-gifts, marriage-gifts, return-gifts (generic gift occasions, no holiday tie). CONFIRMED ABSENT after real investigation (no matching URL in either category sitemap, and every plausible slug tested 404s): Halloween, Valentine's Day, Easter, Thanksgiving, New Year, Holi, Raksha Bandhan/Rakhi, Eid, Navratri, Dussehra, Ganesh Chaturthi, Janmashtami, Karwa Chauth, Makar Sankranti, Baisakhi, Onam, Pongal, Durga Puja, Mother's Day (no category or sale variant exists, unlike Father's Day), Black Friday, St. Patrick's Day. Also checked the /home-decors landing page's embedded content for seasonal PLP links; the only seasonal-looking hits there ('Diwali Decoration Ideas...', 'Navratri Colors...') are blog posts (blog_id present, href to blog.woodenstreet.com) — excluded as editorial per rules. No mega-menu/header nav JSON was reachable via SSR (client-hydrated separately), so discovery relied on the two category sitemaps plus direct URL/slug verification, which is exhaustive for this site's flat/slug-based category system and was cross-checked with the 404 test to rule out missed branches.",
+  "rows": [
+    {
+      "category": "Diwali",
+      "sub_category": "Festive Decor",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": "Grouping node: Home Decor > Festive Decor (category_id 1622, product_count=4), whose sole child category is Diwali Lights Decoration; 3 of its 4 direct products are the same 3 products listed on the Diwali Lights Decoration child page, so kept as a name-only grouping row per the shared parent/child subset rule rather than double-counting.",
+      "flag": null
+    },
+    {
+      "category": "Diwali",
+      "sub_category": "Diwali Lights Decoration",
+      "qty": 3,
+      "link": "https://www.woodenstreet.com/diwali-lights-decoration",
+      "is_group": false,
+      "evidence": "product_count: 3; 3 products listed on PLP (hand-painted wooden pillar candle stands). Breadcrumb: Home decor > Festive decor > Diwali lights decoration.",
+      "flag": null
+    },
+    {
+      "category": "Christmas",
+      "sub_category": "Christmas Decorations",
+      "qty": 2,
+      "link": "https://www.woodenstreet.com/christmas-decorations",
+      "is_group": false,
+      "evidence": "product_count: 2; 2 products listed on PLP (product_id 76909, 76826). Breadcrumb: Home decor > Christmas decorations. Identical 2-product listing (same product_ids) is also reachable via Secret Santa Gifts and Secret Santa Gifts For Men under the generic Gift category — same underlying listing, kept once here per the overlap rule.",
+      "flag": null
+    }
+  ]
+}

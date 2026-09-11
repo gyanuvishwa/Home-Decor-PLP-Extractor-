@@ -1,0 +1,849 @@
+{
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ACCESS AND ROBOTS - READ THIS FIRST, IT IS A JUDGEMENT CALL AND IT IS DISCLOSED IN FULL. https://www.noon.com/robots.txt was fetched before any other request. It contains SEVEN groups: '*' (Disallow: /_svc/, Disallow: /_vs/, Allow: /), BadBot (Disallow: /), and then GPTBot, ChatGPT-User, ClaudeBot and PerplexityBot, each of which is 'Allow: /' with NO Disallow line at all. The exact ClaudeBot directive is: 'User-agent: ClaudeBot' / 'Allow: /'. Under RFC 9309 s2.2.1 a crawler MUST use the most specific matching group and IGNORE the others, so for us the governing group is ClaudeBot / Allow: / - an explicit, deliberate opt-IN, the same pattern BATCH_BRIEF s1.4 records for H&M, Conforama and Westwing DE ('a site naming Claude and then saying Allow: / is an explicit opt-IN'). Noon has clearly written this file to name AI crawlers individually and admit them while keeping its internal service paths out of general crawlers. On that reading the counts below were taken from www.noon.com/_svc/catalog/api/v3/u/... , the storefront's OWN catalogue service - the one the PLP itself renders from, which WORKER_BRIEF s4 explicitly names as the correct source for a client-rendered listing. If the run owner prefers the stricter reading in which the '*' group's '/_svc/' Disallow is treated as binding on every agent, then every figure in rows[] must be treated as unverified; the independent cross-check described below was run precisely so that judgement can be made without re-crawling. WHAT WAS NOT TOUCHED: api-app.noon.com, the OTHER host the page calls (path prefix /_vs/), was NOT used. Its robots.txt returns HTTP 503 on repeated tries, so its permission is unverifiable, and /_vs/ is disallowed for '*' on the main host; per BATCH_BRIEF s1.3 (robots is per-host) and the SR 145 non-laundering principle, no request was made to it and no reader/proxy was pointed at anything that would fetch it. No browser automation, no third-party CORS proxy, no campaign parameter. All requests went through probe.fetch() fingerprint rotation and returned HTTP 200; there is no bot wall on noon.com. No Crawl-delay is declared; probe.py's 2 s per-host gap was kept throughout. TREE: entry point is Noon's own navigation - homepage > Home & Kitchen > Bath (https://www.noon.com/uae-en/home-and-kitchen/bath-16182/). The listing grid is client-rendered, but the PLP's left-hand Category facet IS server-rendered as a full nested tree, and that is where the hierarchy came from: 86 Bath nodes read straight out of the delivered HTML, cross-checked against the child links on the department pages. Each node's identity was then confirmed from the catalogue payload's own breadcrumbs array and canonical_url - EVERY node is self-canonical (no alias redirects) and every breadcrumb matched the node requested. Recovered tree: Bath > Bathroom Accessories > {Holders & Dispensers (10 children), Toilet Accessories (5), Bathroom Mirrors, Bath Mats & Rugs, Drain Stoppers, Shower Curtain Rods, Bathtub Trays, Bathroom Accessory Sets, Bathtub Mats, Bath Ensembles, Bath Pillows, Bath Stools, Towel Warmers, Hand Dryers}; Bathroom Storage & Organisation (10); Bath Hardware (11); Towels (8); Bath Linen (3); Bathroom Aids & Safety (8); Bathroom Lighting (4); Bathroom Scales (1); Kids Bath Towels / Kids Bathroom Accessories / Kids Bath Rugs. Outside Bath: Furniture > Bathroom Furniture (3), Household Supplies > Household Cleaning > Bathroom Cleaners, Furniture > Bedroom > Vanities & Vanity Benches, Tools & Home Improvement > Rough Plumbing (faucet-parts, toilet-parts). All were walked and are accounted for in rows[] or review[]. THE CAP TRAP, FOUND AND DEFEATED (BATCH_BRIEF s3, the OTTO lesson). Noon's PAGINATION is hard-capped. Probing the public HTML listing with ?page=N shows that page 50 and beyond return a fixed fallback set - pages 50, 200, 1000 and 5000 of Toilet Plungers returned the IDENTICAL 50 SKUs - so the last reachable real page is 49 and any page-walk tops out at 49 x 50 = 2,450. The Bath department itself, which plainly holds far more than 2,450 listings, ends at exactly the same page 49. That is precisely the OTTO signature: a round figure repeated across nodes of visibly different size is a CAP, not a count. The payload confirms it: nbPages is capped at 50 while nbHits is not. Every recorded figure is nbHits, the UNCAPPED field, never nbPages and never a page-walk. QTY PROOF - four independent checks, all passed. (1) nbHits is STABLE ACROSS PAGE SIZES: every one of the 92 nodes was queried twice, at limit=50 and limit=100, and nbHits was identical (this is the Sostrene Grene page-size-dependence test; only one node, Toilet Brush, moved, and only by live churn - see (4)). (2) nbPages == min(50, ceil(nbHits/limit)) holds for BOTH limits on ALL 92 nodes - verified programmatically - which is the lastPage-vs-ceil cross-check the brief demands and which simultaneously proves the 50 is a cap sitting on top of an uncapped nbHits. On Towel Warmers this was walked out explicitly: limit=1 -> nbPages 50 (capped), limit=20 -> 16 = ceil(308/20), limit=50 -> 7 = ceil(308/50), limit=100 -> 4 = ceil(308/100). (3) ENUMERATION TO EXHAUSTION on a node small enough to finish: Towel Warmers paginated through the catalogue service gave six full pages of 50 plus a seventh page of exactly 8 = 308, which equals nbHits exactly. (4) The figures DISCRIMINATE across four orders of magnitude, from 22 (Sitz Bath) to 98,904 (Towel Hooks), with no repeated round number. TWO HONEST CAVEATS ON THE NUMBERS. (a) They are POINT-IN-TIME. Noon is a live marketplace and nbHits drifts by ~0.1% between calls minutes apart (Toothbrush Holders read 78,448 then 78,383; Toilet Paper Holders 37,134 then 37,131). Every recorded value is the figure read in this session. (b) The public HTML page must NOT be scraped for these counts and was not: the rendered grid appends recommendation-carousel products, proved directly - on Towel Warmers page 7 the catalogue service returns the 8 real remaining items while the HTML page yields 32 SKUs, the 8 real ones plus 24 carousel items, which is why a naive HTML page-walk gave a wrong 332 against the true 308. DEDUP (OPTION 1): already_extracted() was run on all 92 nodes and on five URL variants of each (trailing-slash, bare noon.com host, /uae-ar/ Arabic locale, /ae-en/ form) - 460 checks. noon.com IS in exclusion_index.json with 61 URLs from the Final.xlsx Home Decor pass, INCLUDING the whole /home-decor/mirrors-16780/ branch (Mirrors, Wall Mounted Mirrors, Floor Mirrors, Mirror Sets, Tabletop Vanity Mirrors, Vanity Mirrors), which is why no decorative-mirror node is touched here; the Bathroom Mirrors node recorded in rows is a DIFFERENT category under Bath (/bath-16182/bathroom-accessories/bathroom-mirrors/) and is a clean miss. THREE hits were returned, all from Furniture.xlsx and all in the Bathroom Furniture / vanity area exactly as the brief predicted: Bathroom Sets, Medicine Cabinets and Vanities & Vanity Benches. All three are in review[], none in rows[]. Over The Toilet Storage, the third child of Bathroom Furniture, is a clean miss and is therefore the one leaf recorded from that branch. Locale blind spot (b)/(c): Noon runs /uae-en/ and /uae-ar/ on the same host and separate country hosts are separate storefronts; the /uae-ar/ form of every node was dedup-checked and misses, and only /uae-en/ was ever fetched. ROWS: 51 leaves under 8 grouping rows. Bathroom Accessories, Toilet Accessories, Bath Hardware, Bathroom Storage & Organisation and Bathroom Aids & Safety are all core rules 6/13/14/17 content. Bathroom Mirrors is recorded under rule 10/11 (mirror is the primary type; the Vanity Lighting node next door is routed to Lighting). Bathtub Mats is recorded under rule 16's rubber/anti-slip branch while its sibling Bath Mats & Rugs is routed to Textile - a split the site's own taxonomy makes for us. Bathroom Aids & Safety is included as bathroom-specific safety fittings (grab bars, non-slip shower strips, shower chairs, toilet frames, elevated toilet seats - the last squarely inside rule 14's Toilet Seats - bathtub lifts, sitz baths, shower thermometers/alarms). THREE DUPLICATE NAV PATHS WERE COLLAPSED (rule 28 / BATCH_BRIEF s4d), proved by identical 50-SKU page-1 sets and lock-step totals: Toothbrush Holders, Toilet Paper Holders and Toilet Brush Holders each exist under both Bathroom Accessories and Bathroom Storage & Organisation. One record each; the alias is in review[]. A fourth, Holders & Dispensers > Toilet Paper Holders (23,556), overlaps the recorded node by 35 of 50 page-1 SKUs but carries a different total, so it too was withheld rather than double-counted, and is disclosed with its figure. MARKETPLACE CONTAMINATION, DISCLOSED: because Noon is a third-party marketplace, some category grids carry seller mis-listings (the Canisters grid surfaces sitz baths and hair oil; Kids Bathroom Accessories surfaces water balloons and baby ear stickers). The recorded numbers are Noon's own totals for its own category URLs, obtained from the payload its PLP renders from; they are not a claim that every listing inside is correctly categorised by the seller. Bath Ensembles was withheld entirely on these grounds (rule 29) because its majority content is laundry and washing-machine storage. EXCLUDED and why: Towels branch (176,877 with 8 children) + Bath Linen (55,927 with Shower Curtains 46,831, Bath Slippers 8,231, Bath Robes 505) + Bath Mats & Rugs 46,570 + Kids Bath Towels 3,586 + Kids Bath Rugs 1,743 -> Textile (rules 15/16/20); Bathroom Lighting 12,312 with its 4 children -> Lighting (rules 11/19, no duplication into Bathroom); Hamper 1,616 -> Storage/Laundry; Bathroom Scales 6,490 and Digital Scales 5 -> measuring appliances, not Bathroom (rule 2, as SR 15); Bathroom Cleaners 16,663 -> cleaning chemicals (as SR 80); Bath Ensembles 8,585 -> LOW confidence mixed node; Bathroom Sets, Medicine Cabinets, Vanities & Vanity Benches -> already in Furniture.xlsx; Faucet Parts 40,328 and Toilet Parts 35,134 -> plumbing spares in the Tools department. All parent hubs are grouping rows with blank qty and blank link (rules 24/38) and their figures appear in review[] as evidence only - they overlap their children and must never be summed or reconciled. Nothing was estimated; no URL, count or category was invented.",
+ "rows": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Accessories",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Holders & Dispensers",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Toothbrush Holders",
+   "qty": 78448,
+   "link": "https://www.noon.com/uae-en/home-and-kitchen/bath-16182/bathroom-accessories/holders-and-dispensers/bathroom-toothbrush-holders/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Tissue Holders",
+   "qty": 79034,
+   "link": "https://www.noon.com/uae-en/home-and-kitchen/bath-16182/bathroom-accessories/holders-and-dispensers/tissue-holders/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Canisters",
+   "qty": 37921,
+   "link": "https://www.noon.com/uae-en/home-and-kitchen/bath-16182/bathroom-accessories/holders-and-dispensers/canisters/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower Chamber Dispensers",
+   "qty": 29585,
+   "link": "https://www.noon.com/uae-en/home-and-kitchen/bath-16182/bathroom-accessories/holders-and-dispensers/shower-chamber-dispensers/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Countertop Soap Dispensers",
+   "qty": 30057,
+   "link": "https://www.noon.com/uae-en/home-and-kitchen/bath-16182/bathroom-accessories/holders-and-dispensers/countertop-soap-dispenser/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Brush Holders",
+   "qty": 3726,
+   "link": "https://www.noon.com/uae-en/home-and-kitchen/bath-16182/bathroom-accessories/holders-and-dispensers/brush-holders/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Soap Dispensers",
+   "qty": 2741,
+   "link": "https://www.noon.com/uae-en/home-and-kitchen/bath-16182/bathroom-accessories/holders-and-dispensers/soap-dispensers/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Tube Squeezers",
+   "qty": 607,
+   "link": "https://www.noon.com/uae-en/home-and-kitchen/bath-16182/bathroom-accessories/holders-and-dispensers/tube-squeezer/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Lotion Dispensers",
+   "qty": 118,
+   "link": "https://www.noon.com/uae-en/home-and-kitchen/bath-16182/bathroom-accessories/holders-and-dispensers/bathroom-lotion-dispensers/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Toilet Accessories",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Toilet Paper Holders",
+   "qty": 37134,
+   "link": "https://www.noon.com/uae-en/home-and-kitchen/bath-16182/bathroom-accessories/toilet-accessories/toilet-paper-holders/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Toilet Brush Holders",
+   "qty": 28050,
+   "link": "https://www.noon.com/uae-en/home-and-kitchen/bath-16182/bathroom-accessories/toilet-accessories/toilet-brush-holders/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Toilet Lid & Tank Covers",
+   "qty": 29962,
+   "link": "https://www.noon.com/uae-en/home-and-kitchen/bath-16182/bathroom-accessories/toilet-accessories/toilet-lid-and-tank-covers/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Toilet Brush",
+   "qty": 3953,
+   "link": "https://www.noon.com/uae-en/home-and-kitchen/bath-16182/bathroom-accessories/toilet-accessories/toilet-brush/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Toilet Plungers",
+   "qty": 3203,
+   "link": "https://www.noon.com/uae-en/home-and-kitchen/bath-16182/bathroom-accessories/toilet-accessories/toilet-plungers/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Mirrors",
+   "qty": 87831,
+   "link": "https://www.noon.com/uae-en/home-and-kitchen/bath-16182/bathroom-accessories/bathroom-mirrors/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Drain Stoppers",
+   "qty": 37697,
+   "link": "https://www.noon.com/uae-en/home-and-kitchen/bath-16182/bathroom-accessories/drain-stoppers/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower Curtain Rods",
+   "qty": 24372,
+   "link": "https://www.noon.com/uae-en/home-and-kitchen/bath-16182/bathroom-accessories/shower-curtain-rods/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathtub Trays",
+   "qty": 14263,
+   "link": "https://www.noon.com/uae-en/home-and-kitchen/bath-16182/bathroom-accessories/bathtub-trays/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathtub Mats",
+   "qty": 10126,
+   "link": "https://www.noon.com/uae-en/home-and-kitchen/bath-16182/bathroom-accessories/bathtub-mats/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Accessory Sets",
+   "qty": 9157,
+   "link": "https://www.noon.com/uae-en/home-and-kitchen/bath-16182/bathroom-accessories/bathroom-accessory-sets/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Pillows",
+   "qty": 7818,
+   "link": "https://www.noon.com/uae-en/home-and-kitchen/bath-16182/bathroom-accessories/bath-pillows-19365/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Stools",
+   "qty": 5076,
+   "link": "https://www.noon.com/uae-en/home-and-kitchen/bath-16182/bathroom-accessories/bath-stools/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Towel Warmers",
+   "qty": 308,
+   "link": "https://www.noon.com/uae-en/home-and-kitchen/bath-16182/bathroom-accessories/towel-warmers/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Hand Dryers",
+   "qty": 80,
+   "link": "https://www.noon.com/uae-en/home-and-kitchen/bath-16182/bathroom-accessories/hand-dryers/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Storage & Organisation",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Soap Dishes",
+   "qty": 77381,
+   "link": "https://www.noon.com/uae-en/home-and-kitchen/bath-16182/bathroom-storage-and-organisation/soap-dishes/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Storage Boxes",
+   "qty": 57766,
+   "link": "https://www.noon.com/uae-en/home-and-kitchen/bath-16182/bathroom-storage-and-organisation/bath-storage-boxes/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower Caddies & Shelves",
+   "qty": 14898,
+   "link": "https://www.noon.com/uae-en/home-and-kitchen/bath-16182/bathroom-storage-and-organisation/shower-caddies-shelves/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Tumblers",
+   "qty": 7071,
+   "link": "https://www.noon.com/uae-en/home-and-kitchen/bath-16182/bathroom-storage-and-organisation/tumblers-24983/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Organizers",
+   "qty": 1106,
+   "link": "https://www.noon.com/uae-en/home-and-kitchen/bath-16182/bathroom-storage-and-organisation/bath_organizers/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Dispensers",
+   "qty": 315,
+   "link": "https://www.noon.com/uae-en/home-and-kitchen/bath-16182/bathroom-storage-and-organisation/dispensers/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Hardware",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Towel Hooks",
+   "qty": 98904,
+   "link": "https://www.noon.com/uae-en/home-and-kitchen/bath-16182/bath-hardware/towel-hooks/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Showerheads",
+   "qty": 29713,
+   "link": "https://www.noon.com/uae-en/home-and-kitchen/bath-16182/bath-hardware/showerheads-17143/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Towel Bars",
+   "qty": 29490,
+   "link": "https://www.noon.com/uae-en/home-and-kitchen/bath-16182/bath-hardware/towel-bars-16492/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Towel Holders",
+   "qty": 20086,
+   "link": "https://www.noon.com/uae-en/home-and-kitchen/bath-16182/bath-hardware/towel-holders/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Towel Rings",
+   "qty": 19829,
+   "link": "https://www.noon.com/uae-en/home-and-kitchen/bath-16182/bath-hardware/towel-rings-21580/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Towel Stands",
+   "qty": 18924,
+   "link": "https://www.noon.com/uae-en/home-and-kitchen/bath-16182/bath-hardware/towel-racks-21128/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower Holders",
+   "qty": 14396,
+   "link": "https://www.noon.com/uae-en/home-and-kitchen/bath-16182/bath-hardware/shower-holders/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower Filters",
+   "qty": 6616,
+   "link": "https://www.noon.com/uae-en/home-and-kitchen/bath-16182/bath-hardware/shower-filter/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower Panel Systems",
+   "qty": 6035,
+   "link": "https://www.noon.com/uae-en/home-and-kitchen/bath-16182/bath-hardware/shower-panel-systems1/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower Hoses",
+   "qty": 1302,
+   "link": "https://www.noon.com/uae-en/home-and-kitchen/bath-16182/bath-hardware/shower-hoses1/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower Pans",
+   "qty": 351,
+   "link": "https://www.noon.com/uae-en/home-and-kitchen/bath-16182/bath-hardware/shower-pans/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Aids & Safety",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Grab Bars",
+   "qty": 8183,
+   "link": "https://www.noon.com/uae-en/home-and-kitchen/bath-16182/bath-bathroom-aids-and-safety/grab-bars/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower Safety Strips",
+   "qty": 3132,
+   "link": "https://www.noon.com/uae-en/home-and-kitchen/bath-16182/bath-bathroom-aids-and-safety/shower-safety-strips/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower Chairs",
+   "qty": 1040,
+   "link": "https://www.noon.com/uae-en/home-and-kitchen/bath-16182/bath-bathroom-aids-and-safety/shower-chairs/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Toilet Frames",
+   "qty": 985,
+   "link": "https://www.noon.com/uae-en/home-and-kitchen/bath-16182/bath-bathroom-aids-and-safety/toilet-frames/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Elevated Toilet Seat",
+   "qty": 642,
+   "link": "https://www.noon.com/uae-en/home-and-kitchen/bath-16182/bath-bathroom-aids-and-safety/elevated-toilet-seat/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathtub Lifts",
+   "qty": 138,
+   "link": "https://www.noon.com/uae-en/home-and-kitchen/bath-16182/bath-bathroom-aids-and-safety/bathtub-lifts/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower Thermo Alarms",
+   "qty": 36,
+   "link": "https://www.noon.com/uae-en/home-and-kitchen/bath-16182/bath-bathroom-aids-and-safety/shower-thermo-alarms/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Sitz Bath",
+   "qty": 22,
+   "link": "https://www.noon.com/uae-en/home-and-kitchen/bath-16182/bath-bathroom-aids-and-safety/sitz-bath/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Kids Bathroom Accessories",
+   "qty": 3087,
+   "link": "https://www.noon.com/uae-en/home-and-kitchen/bath-16182/kids-bathroom-accessories/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Over The Toilet Storage",
+   "qty": 2362,
+   "link": "https://www.noon.com/uae-en/home-and-kitchen/furniture-10180/bathroom-furniture/over-the-toilet-storage/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  }
+ ],
+ "review": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath (department hub)",
+   "qty": 1510808,
+   "issue": "PARENT HUB - grouping row per rules 24/38, blank qty and blank link. Breadcrumb Home > Home & Kitchen > Bath, self-canonical /home-and-kitchen/bath-16182. Its own catalog payload reports nbHits 1,510,808 and nbPages 50. THIS FIGURE MUST NOT BE USED AS A COUNT AND MUST NOT BE RECONCILED AGAINST ITS CHILDREN: on a marketplace of this size a department node returns a very broad result set, and the eleven children sum to 1,840,458, i.e. MORE than the parent, which proves the children overlap each other. Recorded here as evidence only.",
+   "link": "https://www.noon.com/uae-en/home-and-kitchen/bath-16182/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath > Bathroom Accessories (hub)",
+   "qty": 992023,
+   "issue": "PARENT HUB with valid children - grouping row per rules 24/38. nbHits 992,023. Children (Holders & Dispensers 284,003; Toilet Accessories 102,750; plus the ten direct leaves) sum to 638,636, leaving a large parent-only residue; the parent figure is evidence, never a row (rule 24) and never a total to reconcile (BATCH_BRIEF s5).",
+   "link": "https://www.noon.com/uae-en/home-and-kitchen/bath-16182/bathroom-accessories/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Accessories > Holders & Dispensers (hub)",
+   "qty": 284003,
+   "issue": "PARENT HUB with 9 recorded children - grouping row per rules 24/38. nbHits 284,003 against children summing 285,749; overlapping, never to be summed.",
+   "link": "https://www.noon.com/uae-en/home-and-kitchen/bath-16182/bathroom-accessories/holders-and-dispensers/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Accessories > Toilet Accessories (hub)",
+   "qty": 102750,
+   "issue": "PARENT HUB with 5 recorded children - grouping row per rules 24/38. nbHits 102,750 against children summing 102,302.",
+   "link": "https://www.noon.com/uae-en/home-and-kitchen/bath-16182/bathroom-accessories/toilet-accessories/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath > Bathroom Storage & Organisation (hub)",
+   "qty": 304311,
+   "issue": "PARENT HUB with children - grouping row per rules 24/38. nbHits 304,311. Three of its ten children are DUPLICATE NAV PATHS of nodes already recorded under Bathroom Accessories (see the three entries below), so its children must never be summed.",
+   "link": "https://www.noon.com/uae-en/home-and-kitchen/bath-16182/bathroom-storage-and-organisation/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath > Bath Hardware (hub)",
+   "qty": 262206,
+   "issue": "PARENT HUB with 11 recorded children - grouping row per rules 24/38. nbHits 262,206 against children summing 245,646.",
+   "link": "https://www.noon.com/uae-en/home-and-kitchen/bath-16182/bath-hardware/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath > Bathroom Aids & Safety (hub)",
+   "qty": 21896,
+   "issue": "PARENT HUB with 8 recorded children - grouping row per rules 24/38. nbHits 21,896 against children summing 14,178.",
+   "link": "https://www.noon.com/uae-en/home-and-kitchen/bath-16182/bath-bathroom-aids-and-safety/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Furniture > Bathroom Furniture (hub)",
+   "qty": 8428,
+   "issue": "PARENT HUB - grouping row per rules 24/38. nbHits 8,428. Sits in the Furniture department, not in Bath. TWO of its three children are ALREADY EXTRACTED in Furniture.xlsx (see below) and stay there under OPTION 1; only Over The Toilet Storage is a clean dedup miss and is therefore the single leaf recorded from this branch. already_extracted() on the hub URL itself is a miss, but it is a grouping row regardless (rule 24).",
+   "link": "https://www.noon.com/uae-en/home-and-kitchen/furniture-10180/bathroom-furniture/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Storage & Organisation > Toothbrush Holders (DUPLICATE PATH)",
+   "qty": 78456,
+   "issue": "DUPLICATE OF A RECORDED NODE - NOT RECORDED AGAIN (rule 28, BATCH_BRIEF s4d). Same products as the recorded Bathroom Accessories > Holders & Dispensers > Toothbrush Holders: page 1 of both, read in the same minute, returns an IDENTICAL 50-SKU set, and the totals track each other (78,448 vs 78,456; on a re-read minutes later 78,383 vs 78,390, i.e. the same 8-item offset moving together). Noon exposes the node under two nav paths with two self-canonical URLs; one record only.",
+   "link": "https://www.noon.com/uae-en/home-and-kitchen/bath-16182/bathroom-storage-and-organisation/toothbrush-holders/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Storage & Organisation > Toilet Paper Holders (DUPLICATE PATH)",
+   "qty": 37134,
+   "issue": "DUPLICATE OF A RECORDED NODE - NOT RECORDED AGAIN (rule 28, BATCH_BRIEF s4d). Identical total to the recorded Toilet Accessories > Toilet Paper Holders (37,134 = 37,134, and both moved to 37,131 together on re-read) and an identical 50-SKU page 1.",
+   "link": "https://www.noon.com/uae-en/home-and-kitchen/bath-16182/bathroom-storage-and-organisation/toilet-paper-holders-23924/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Storage & Organisation > Toilet Brush Holders (DUPLICATE PATH)",
+   "qty": 28050,
+   "issue": "DUPLICATE OF A RECORDED NODE - NOT RECORDED AGAIN (rule 28, BATCH_BRIEF s4d). Identical total (28,050 = 28,050) and identical 50-SKU page 1 to the recorded Toilet Accessories > Toilet Brush Holders.",
+   "link": "https://www.noon.com/uae-en/home-and-kitchen/bath-16182/bathroom-storage-and-organisation/toilet_brush_holder/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Holders & Dispensers > Toilet Paper Holders (OVERLAPPING SIBLING)",
+   "qty": 23556,
+   "issue": "NOT RECORDED - OVERLAPPING SIBLING, disclosed rather than double-counted. A THIRD Toilet Paper Holders node, self-canonical, with a genuinely different total (23,556 vs the recorded 37,134) but the same top-ranked products and 35 of 50 SKUs shared on page 1. Because it is neither a clean duplicate nor a clean distinct category, recording it alongside the Toilet Accessories node would double-count roughly 20,000 listings, so only the rule-14 owner (Toilet Accessories > Toilet Paper Holders) is recorded and this one is surfaced here with its exact figure.",
+   "link": "https://www.noon.com/uae-en/home-and-kitchen/bath-16182/bathroom-accessories/holders-and-dispensers/bathroom-toilet-paper-holders/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath > Towels (hub)",
+   "qty": 176877,
+   "issue": "ROUTED TO TEXTILE (rules 15, 20): the whole Towels branch. Hub nbHits 176,877; children below.",
+   "link": "https://www.noon.com/uae-en/home-and-kitchen/bath-16182/towels-19524/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Towels > Beach Towels",
+   "qty": 36258,
+   "issue": "ROUTED TO TEXTILE (rule 15): beach towels are bathroom textiles.",
+   "link": "https://www.noon.com/uae-en/home-and-kitchen/bath-16182/towels-19524/beach-towels/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Towels > Bath Sheets",
+   "qty": 32604,
+   "issue": "ROUTED TO TEXTILE (rule 15): bath sheets are bathroom textiles.",
+   "link": "https://www.noon.com/uae-en/home-and-kitchen/bath-16182/towels-19524/bath-sheets/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Towels > Bath Towels",
+   "qty": 30670,
+   "issue": "ROUTED TO TEXTILE (rule 15): bath towels are bathroom textiles.",
+   "link": "https://www.noon.com/uae-en/home-and-kitchen/bath-16182/towels-19524/bath-towels/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Towels > Towel Sets",
+   "qty": 34632,
+   "issue": "ROUTED TO TEXTILE (rule 15): towel sets are bathroom textiles.",
+   "link": "https://www.noon.com/uae-en/home-and-kitchen/bath-16182/towels-19524/towel-sets/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Towels > Hair Towels",
+   "qty": 19780,
+   "issue": "ROUTED TO TEXTILE (rule 15): hair towels are bathroom textiles.",
+   "link": "https://www.noon.com/uae-en/home-and-kitchen/bath-16182/towels-19524/hair-towels/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Towels > Washcloths",
+   "qty": 12093,
+   "issue": "ROUTED TO TEXTILE (rule 15): washcloths are bathroom textiles.",
+   "link": "https://www.noon.com/uae-en/home-and-kitchen/bath-16182/towels-19524/washcloths/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Towels > Face Towels",
+   "qty": 4122,
+   "issue": "ROUTED TO TEXTILE (rule 15): face towels are bathroom textiles.",
+   "link": "https://www.noon.com/uae-en/home-and-kitchen/bath-16182/towels-19524/face-towels/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Towels > Hand Towels",
+   "qty": 7834,
+   "issue": "ROUTED TO TEXTILE (rule 15): hand towels are bathroom textiles.",
+   "link": "https://www.noon.com/uae-en/home-and-kitchen/bath-16182/towels-19524/hand-towels/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath > Bath Linen (hub)",
+   "qty": 55927,
+   "issue": "ROUTED TO TEXTILE (rule 20): the Bath Linen branch - shower curtains, bath robes and bath slippers. Hub nbHits 55,927.",
+   "link": "https://www.noon.com/uae-en/home-and-kitchen/bath-16182/bath_linen/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Linen > Shower Curtains",
+   "qty": 46831,
+   "issue": "ROUTED TO TEXTILE (rule 20): shower curtains are named explicitly in rule 20. Note their hardware counterpart, Shower Curtain Rods (24,372), IS recorded in rows under rule 17, and Noon publishes the two as separate nodes so no split had to be invented.",
+   "link": "https://www.noon.com/uae-en/home-and-kitchen/bath-16182/bath_linen/shower-curtains/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Linen > Bath Slippers",
+   "qty": 8231,
+   "issue": "ROUTED TO TEXTILE / APPAREL (rules 2, 20): bath and spa slippers are worn textiles, not bathroom fittings. NOTE THE URL - Noon's own category link carries a literal trailing '%20' (an encoded space) in the slug; that is the site's URL, reproduced verbatim, not a transcription error.",
+   "link": "https://www.noon.com/uae-en/home-and-kitchen/bath-16182/bath_linen/bath_slippers%20/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Linen > Bath Robes",
+   "qty": 505,
+   "issue": "ROUTED TO TEXTILE (rule 20): bathrobes.",
+   "link": "https://www.noon.com/uae-en/home-and-kitchen/bath-16182/bath_linen/bath-robes/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Accessories > Bath Mats & Rugs",
+   "qty": 46570,
+   "issue": "ROUTED TO TEXTILE (rule 16), with the split disclosed. The grid is predominantly TEXTILE - chenille bath mats, Atlanta cotton bathmats, ultra-soft microfibre mats, absorbent quick-dry rug sets - which rule 16 sends to Textile. A minority of PVC/non-slip mats also appears here, but Noon publishes those separately as Bathtub Mats (10,126), which IS recorded in rows as Bathroom under rule 16's rubber/anti-slip branch. Splitting on the site's own two nodes is therefore exact, not a guess.",
+   "link": "https://www.noon.com/uae-en/home-and-kitchen/bath-16182/bathroom-accessories/bath-mats-rugs/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath > Kids Bath Towels",
+   "qty": 3586,
+   "issue": "ROUTED TO TEXTILE (rule 15): kids' bath towels and hooded towels.",
+   "link": "https://www.noon.com/uae-en/home-and-kitchen/bath-16182/kids-bath-towels/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath > Kids Bath Rugs",
+   "qty": 1743,
+   "issue": "ROUTED TO TEXTILE (rule 16): textile kids' bath rugs.",
+   "link": "https://www.noon.com/uae-en/home-and-kitchen/bath-16182/kids-bath-rugs/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath > Bathroom Lighting (hub)",
+   "qty": 12312,
+   "issue": "ROUTED TO LIGHTING (rule 19): the whole Bathroom Lighting branch sits inside Bath but its primary product type is lighting. Hub nbHits 12,312; four children below. Rule 19 explicitly forbids duplicating a Lighting record into Bathroom.",
+   "link": "https://www.noon.com/uae-en/home-and-kitchen/bath-16182/bathroom-lighting/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Lighting > Wall Lamps & Sconces",
+   "qty": 6765,
+   "issue": "ROUTED TO LIGHTING (rules 11, 19): primary product type is a luminaire. Vanity Lighting in particular is a Lighting node, NOT a mirror node - the mirrors themselves are recorded in rows as Bathroom Mirrors (87,831) under rule 11.",
+   "link": "https://www.noon.com/uae-en/home-and-kitchen/bath-16182/bathroom-lighting/wall-lamps/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Lighting > Bathroom Spotlights",
+   "qty": 4249,
+   "issue": "ROUTED TO LIGHTING (rules 11, 19): primary product type is a luminaire. Vanity Lighting in particular is a Lighting node, NOT a mirror node - the mirrors themselves are recorded in rows as Bathroom Mirrors (87,831) under rule 11.",
+   "link": "https://www.noon.com/uae-en/home-and-kitchen/bath-16182/bathroom-lighting/spotlights/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Lighting > Vanity Lighting",
+   "qty": 1001,
+   "issue": "ROUTED TO LIGHTING (rules 11, 19): primary product type is a luminaire. Vanity Lighting in particular is a Lighting node, NOT a mirror node - the mirrors themselves are recorded in rows as Bathroom Mirrors (87,831) under rule 11.",
+   "link": "https://www.noon.com/uae-en/home-and-kitchen/bath-16182/bathroom-lighting/vanity-lighting/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Lighting > Bathroom Recessed Lighting",
+   "qty": 458,
+   "issue": "ROUTED TO LIGHTING (rules 11, 19): primary product type is a luminaire. Vanity Lighting in particular is a Lighting node, NOT a mirror node - the mirrors themselves are recorded in rows as Bathroom Mirrors (87,831) under rule 11.",
+   "link": "https://www.noon.com/uae-en/home-and-kitchen/bath-16182/bathroom-lighting/recessed-lighting-bath/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Storage & Organisation > Hamper",
+   "qty": 1616,
+   "issue": "ROUTED TO STORAGE / LAUNDRY (rules 2, 30-33): primary product type is a laundry hamper. Consistent with this run's standing treatment (SR 4, 21, 48, 55, 89, 92, 111, 133, 135) and with SR 166/167/168 in this same batch.",
+   "link": "https://www.noon.com/uae-en/home-and-kitchen/bath-16182/bathroom-storage-and-organisation/hamper/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Accessories > Bath Ensembles",
+   "qty": 8585,
+   "issue": "NOT RECORDED - LOW CONFIDENCE, MIXED NODE (rule 29). Read the grid before deciding: the top-ranked products are foldable laundry hampers, a 44L wheeled dirty-laundry basket, washing-machine storage racks with drawers and a water-stopper flood barrier, alongside a genuine over-the-toilet shelf and a toothbrush-holder storage set. The majority primary product type is laundry/appliance storage, not bathroom, and the node name gives no reliable steer, so it goes to review with its exact figure rather than being guessed into rows.",
+   "link": "https://www.noon.com/uae-en/home-and-kitchen/bath-16182/bathroom-accessories/bath-ensembles/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath > Bathroom Scales (hub)",
+   "qty": 6490,
+   "issue": "NOT BATHROOM (rules 2, 29): personal weighing and body-composition scales (eufy Smart Scale, body-fat/Wi-Fi scales). Noon files them under Bath, but ROOM/LOCATION is the lowest priority under rule 2 and the primary product type is a measuring appliance. Same call as SR 15 Home Centre's Weighing Scales. Child: Digital Scales (5).",
+   "link": "https://www.noon.com/uae-en/home-and-kitchen/bath-16182/scales-25025/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Scales > Digital Scales",
+   "qty": 5,
+   "issue": "NOT BATHROOM (rules 2, 29): the only child of Bathroom Scales, 5 products, same reasoning as its parent.",
+   "link": "https://www.noon.com/uae-en/home-and-kitchen/bath-16182/scales-25025/digital/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Furniture > Bathroom Furniture > Bathroom Sets",
+   "qty": 2045,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Bathroom Sets' (same company, identical URL) - OPTION 1 applies, it STAYS in Furniture and must not be re-extracted into Bathroom even though rule 9 would otherwise class it as Bathroom. already_extracted() returns the exact record.",
+   "link": "https://www.noon.com/uae-en/home-and-kitchen/furniture-10180/bathroom-furniture/bathroom-sets/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Furniture > Bathroom Furniture > Medicine Cabinets",
+   "qty": 3730,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Medicine Cabinets' (same company, identical URL) - OPTION 1, stays in Furniture. Exactly the bath-cabinet collision the brief warned about.",
+   "link": "https://www.noon.com/uae-en/home-and-kitchen/furniture-10180/bathroom-furniture/medicine-cabinets-19836/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Furniture > Bedroom Furniture > Vanities & Vanity Benches",
+   "qty": 589,
+   "issue": "EXCLUDED ON TWO INDEPENDENT GROUNDS. (1) ALREADY EXTRACTED IN Furniture.xlsx as 'Vanities & Vanity Benches' - OPTION 1. (2) It is not a bathroom node in the first place: its breadcrumb is Home & Kitchen > Furniture > BEDROOM Furniture and the products are dressing tables and vanity benches, i.e. the rule 29 'vanity' disambiguation resolving AWAY from Bathroom. Checked deliberately because rule 9 names Vanity Units and rule 10 forbids skipping vanity mirrors.",
+   "link": "https://www.noon.com/uae-en/home-and-kitchen/furniture-10180/bedroom-furniture/vanities-and-vanity-benches/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Household Supplies > Household Cleaning > Bathroom Cleaners",
+   "qty": 16663,
+   "issue": "ROUTED TO CLEANING / OUT OF SCOPE (rule 2): breadcrumb is Home & Kitchen > Household Supplies > Household Cleaning > Bathroom Cleaners; the products are cleaning CHEMICALS, not bathroom cleaning accessories. Same call as SR 80 HSN. The genuine bathroom cleaning ACCESSORIES (toilet brushes 3,953, toilet brush holders 28,050, toilet plungers 3,203) are recorded in rows.",
+   "link": "https://www.noon.com/uae-en/home-and-kitchen/household-supplies/household-cleaning/bathroom-cleaners/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Tools & Home Improvement > Rough Plumbing > Faucet Parts",
+   "qty": 40328,
+   "issue": "NOT BATHROOM - PLUMBING SPARE PARTS (rule 2). Inspected specifically because rule 8 includes taps and faucets. The department is Tools & Home Improvement > Rough Plumbing, not Bath, and the grid is faucet aerators, tap connector flexi hoses, rubber O-ring kits and flow reducers - replacement parts, not bathroom taps. Noon UAE publishes NO bathroom tap/faucet/mixer category anywhere in its taxonomy.",
+   "link": "https://www.noon.com/uae-en/tools-and-home-improvement/rough-plumbing/faucet-parts/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Tools & Home Improvement > Rough Plumbing > Toilet Parts",
+   "qty": 35134,
+   "issue": "NOT BATHROOM - PLUMBING SPARE PARTS (rule 2). Inspected specifically because rule 4 includes toilets and WCs. Department is Tools & Home Improvement > Rough Plumbing; the grid is concealed in-wall cisterns, dual-flush plates, flush-valve repair kits and WC pan connectors - fittings and spares, not toilet pans. Noon UAE publishes NO toilet, WC, bidet, basin, wash-basin or bathtub category anywhere in its taxonomy.",
+   "link": "https://www.noon.com/uae-en/tools-and-home-improvement/rough-plumbing/toilet-parts/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "CONFIRMED ABSENCES (rule 36 evidence)",
+   "qty": 1510808,
+   "issue": "EVIDENCED ABSENCE, recorded so 'nothing found' is auditable. The complete Bath department tree (86 nodes) was recovered from the server-rendered Category facet on the Bath PLP, and the neighbouring departments were walked as well: Tools & Home Improvement (children: rough-plumbing, hardware-16055, electrical, power-and-hand-tools, lighting-and-ceiling-fans, safety-and-security, accessories-sewing-machines), Furniture, Home Decor, Household Supplies and Storage & Organisation. NO node exists anywhere for: toilets/WCs, bidets, urinals, wash basins or sinks, bathtubs, shower enclosures/screens/cubicles/doors, bathroom taps/faucets/mixers, or bathroom vanity units. Rough Plumbing carries only spare parts (faucet-parts, toilet-parts, pipes-pipe-fittings, valves, water-heaters, drain-cleaning-equipment, garbage-disposals, water-pumps) and Hardware carries only hooks, fasteners, tapes, adhesives, door hardware, cabinet hardware and shelf brackets. What Noon does sell of rules 4-8 is the fittings layer, and that IS recorded: Showerheads 29,713, Shower Panel Systems 6,035, Shower Hoses 1,302, Shower Holders 14,396, Shower Filters 6,616, Shower Pans 351, Drain Stoppers 37,697.",
+   "link": "https://www.noon.com/uae-en/home-and-kitchen/bath-16182/"
+  }
+ ],
+ "_reconstructed_from": "Bathroom.xlsx delivered 2026-09-01 (checkpoint), not original worker JSON"
+}

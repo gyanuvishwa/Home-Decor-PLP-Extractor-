@@ -1,0 +1,16 @@
+{
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "Direct HTTP fetch worked with no WAF/bot-block (matches prior Home-Decor pass for this company; robots.txt re-checked, still no Claude/AI-agent-specific disallow). Site nav (Home & tech > Home) has exactly one pet-related entry, 'Pet accessories', at https://www.selfridges.com/GB/en/cat/home-tech/home/pet-accessories/ - confirmed by grepping the full homepage RSC payload for 'pet' (only 4 distinct hits, all the same single nav link, no separate top-level 'Pets' department and no other pet-adjacent nav entries anywhere on the site). Fetched that category page directly and parsed its Next.js RSC payload (self.__next_f.push chunks) for the same GraphQL search/facet structure used in the prior Home-Decor pass. Its 'facets' array contains only brand_name, _familyColour, on_sale and price facets - no 'categories'-type facet (unlike e.g. the Lighting parent page, which exposes a facet named 'Lighting' listing Table & Desk Lights/Lamp Shades/Ceiling Lights/etc as children). This confirms Pet Accessories is a single flat leaf category with no sub-navigation/child categories anywhere in the facet data, nav, or page structure - checked, not assumed. Exact qty read from the page's own SearchPagination object: {\"perPage\":60,\"page\":1,\"total\":267}. Sampled the first 60 embedded Product objects (all products.name fields returned in the initial RSC payload) to verify genuine Pet Care scope: drying robes, dog carriers, shampoos/conditioners, dog toys, waste-bag dispensers, leads/harnesses/collars, ceramic/porcelain pet bowls, dog beds, dog travel blankets, treat/food storage tins - all Tier 1 Pet Care signals (grooming, feeding, walking, travel, beds, toys, hygiene). No pet-themed-only items (e.g. dog-print homewares for humans) and no food/consumable or medical/veterinary items found in the sample, so no MANUAL REVIEW flag needed. Single row emitted, is_group false (no children to group under it).",
+  "rows": [
+    {
+      "category": "Pet Care",
+      "sub_category": "Pet Accessories",
+      "qty": 267,
+      "link": "https://www.selfridges.com/GB/en/cat/home-tech/home/pet-accessories/",
+      "is_group": false,
+      "evidence": "RSC payload (self.__next_f.push chunks): SearchPagination object {\"perPage\":60,\"page\":1,\"total\":267}",
+      "flag": null
+    }
+  ]
+}

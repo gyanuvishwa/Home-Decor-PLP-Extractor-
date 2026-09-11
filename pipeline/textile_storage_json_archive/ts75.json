@@ -1,0 +1,134 @@
+{
+  "sr": 75,
+  "company": "Scully & Scully",
+  "brand_site": "scullyandscully.com",
+  "country": "USA",
+  "site_url": "https://www.scullyandscully.com/",
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "ACCESS: Tier (a) direct HTTP fetch (curl, browser UA) worked for robots.txt, sitemap, and the homepage, but every deeper category URL returned the same generic SPA shell with no category-specific content (title/product data only appear after JS hydration) - tier (a) blocked for category pages. Escalated to Tier (b) Playwright headless (chromium, domcontentloaded + wait): rendered pages correctly (h1/breadcrumb/products visible) and network-request capture revealed the site's own NetSuite SuiteCommerce Advanced JSON APIs (/api/navigation/v1/categorynavitems for the subcategory tree, /api/cacheable/items?commercecategoryurl=... for exact product totals via the 'total' field). Used those two APIs directly (still tier b - found only via rendered-page network capture) for authoritative subcategory lists and exact qty per node; did not need tier (c) Claude-in-Chrome. robots.txt explicitly allows ClaudeBot/Claude-Web/Claude-SearchBot and GPTBot etc (Allow: /), no blocking. TREE: union of homepage mega-menu (header-menu-level2/level3 links) + XML sitemap (sitemap_www.scullyandscully.com_1690203290_1.xml, ~24k URLs filtered to 3-level category paths) - both sources agreed, no extra nodes found in sitemap beyond the mega-menu set. QTY: exact 'total' field from /api/cacheable/items (limit=1) for each node's commercecategoryurl - this is the same count NetSuite uses to paginate the live listing, not an estimate. EXCLUDED as neither Textile nor Storage: Wastebaskets & Tissue Box Covers and Office Wastebaskets (trash receptacles, not organizational storage per storage.md - no basis in either ruleset to include); Leather Travel Cases & Organizers (dopp kits/weekend bags/picnic sets/toolkits = personal travel-carrying items, excluded per storage.md SS6 fashion/travel-bag exclusion); Tablecloths, Napkins & Napkin Rings (qty 25 - inspected the actual item codes/names: majority are napkin RINGS, i.e. hardware/tableware accessories, not textile; site groups them under 'Table Accents' not a Linens/Textile category, so the node was dropped rather than force-included with an inflated qty); Luggage Racks and all Cabinets/Bookcases/Chests/Filing Cabinets nodes (Furniture - Furniture.xlsx already validated, not touched); More Office Accessories / More Home Accessories catch-all pages (misc grab-bag pages - letter openers, paperweights, photo frames, guest books etc - with only 1-2 incidental storage-shaped items each; not a dedicated storage category so excluded at the category level); Leather Books (books/journals/photo albums - neither category); all Herend/Halcyon Days/china/crystal/jewelry/collectibles branches (decorative/collectible/jewelry, not textile or storage); Gift Ideas > Luxury Women's Gifts > Throws (qty 4, overlaps ~75% with the canonical Home Decor Accessories > Throw Blankets & Decorative Throws node - treated as a persona-based Gift Collection page per textile.md SS15 'do not automatically include Gift Collections', kept only the canonical Home Decor node to avoid double-counting the same throws under two rows). INCLUDED with a note: Wall Tapestries (qty 4) contains one non-textile hardware item (Tapestry Wall Hanging Rods) alongside 3 genuine tapestries - kept as Textile at MEDIUM confidence since tapestries are the category's primary product type. Jewelry Case and Watch Case (both under Home Decor > Leather Accessories) were reclassified from an initial 'leather accessories, skip' assumption to Storage after inspecting their item lists - contents are jewelry boxes/chests/rolls and watch cases/winder chests, i.e. genuine home-organization storage per storage.md SS7 Organizers, not travel-carrying bags. Site is a luxury gift/tableware/collectibles/furniture retailer (est. 1934) - catalog is modest as expected; no dedicated Bedding, Bath, Curtains, Rugs, or Home-Storage/Organization section exists at all - confirmed absent via full mega-menu + sitemap union, not merely a failed search.",
+  "textile_rows": [
+    {
+      "category": "Textile",
+      "sub_category": "Bedding & Linens",
+      "qty": 1,
+      "link": "https://www.scullyandscully.com/furniture/beds/bedding-and-linens",
+      "is_group": false,
+      "evidence": "Playwright-rendered page h1='Bedding & Linens', 1 product card (Clarissa Light Grey Simple Comforter Set, King); confirmed via NetSuite API /api/cacheable/items?commercecategoryurl=/furniture/beds/bedding-and-linens -> total=1",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Home Decor Accessories",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Throw Blankets & Decorative Throws",
+      "qty": 5,
+      "link": "https://www.scullyandscully.com/home-decor/home-decor-accessories/throw-blankets-deco-throws",
+      "is_group": false,
+      "evidence": "NetSuite API /api/cacheable/items?commercecategoryurl=/home-decor/home-decor-accessories/throw-blankets-deco-throws -> total=5",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Pillows",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": "Has own qty=56 via API but 3 valid subcategories exist (Needlepoint/Silk/Tapestry Pillows) so parent URL/qty dropped per parent-category rule",
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Needlepoint Pillows",
+      "qty": 32,
+      "link": "https://www.scullyandscully.com/home-decor/home-decor-accessories/pillows/needlepoint-pillows",
+      "is_group": false,
+      "evidence": "NetSuite API /api/cacheable/items?commercecategoryurl=/home-decor/home-decor-accessories/pillows/needlepoint-pillows -> total=32",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Silk Pillows",
+      "qty": 9,
+      "link": "https://www.scullyandscully.com/home-decor/home-decor-accessories/pillows/silk-pillows",
+      "is_group": false,
+      "evidence": "NetSuite API /api/cacheable/items?commercecategoryurl=/home-decor/home-decor-accessories/pillows/silk-pillows -> total=9",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Tapestry Pillows",
+      "qty": 32,
+      "link": "https://www.scullyandscully.com/home-decor/home-decor-accessories/pillows/tapestry-pillows",
+      "is_group": false,
+      "evidence": "NetSuite API /api/cacheable/items?commercecategoryurl=/home-decor/home-decor-accessories/pillows/tapestry-pillows -> total=32",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Wall Tapestries",
+      "qty": 4,
+      "link": "https://www.scullyandscully.com/home-decor/home-decor-accessories/wall-tapestries",
+      "is_group": false,
+      "evidence": "NetSuite API /api/cacheable/items?commercecategoryurl=/home-decor/home-decor-accessories/wall-tapestries -> total=4",
+      "flag": "Category also includes 1 non-textile item (Tapestry Wall Hanging Rods, hardware); 3 of 4 are genuine tapestries",
+      "confidence": "MEDIUM"
+    }
+  ],
+  "storage_rows": [
+    {
+      "category": "Storage",
+      "sub_category": "Leather Accessories",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Jewelry Case",
+      "qty": 21,
+      "link": "https://www.scullyandscully.com/home-decor/leather-accessories/jewelry-case",
+      "is_group": false,
+      "evidence": "NetSuite API /api/cacheable/items?commercecategoryurl=/home-decor/leather-accessories/jewelry-case -> total=21; item list dominated by jewelry boxes/chests/rolls (e.g. Italian Leather Jewelry Box, Heathcliff Jewelry Chest, Woven Calfskin Travel Jewelry Roll)",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Watch Case",
+      "qty": 10,
+      "link": "https://www.scullyandscully.com/home-decor/leather-accessories/watch-case",
+      "is_group": false,
+      "evidence": "NetSuite API /api/cacheable/items?commercecategoryurl=/home-decor/leather-accessories/watch-case -> total=10; item list is watch cases/chests/winder armoires (e.g. Ebony Fifteen-Watch Case, Twenty-Eight Watch Chest, Saffiano Leather Watch Case)",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Desk Organizer Set",
+      "qty": 12,
+      "link": "https://www.scullyandscully.com/home-decor/office-accessories/desk-organizer-orga-set",
+      "is_group": false,
+      "evidence": "NetSuite API /api/cacheable/items?commercecategoryurl=/home-decor/office-accessories/desk-organizer-orga-set -> total=12",
+      "flag": null,
+      "confidence": "HIGH"
+    }
+  ]
+}

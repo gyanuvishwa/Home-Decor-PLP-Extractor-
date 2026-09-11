@@ -1,0 +1,91 @@
+{
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ROBOTS: https://www.williams-sonoma.com/robots.txt fetched FIRST (HTTP 200, profile safari17_2_ios). Three groups: 'User-agent: EasouSpider / Disallow: /', 'User-agent: Pinterestbot / crawl-delay: 0.2', and 'User-agent: *'. NO group names ClaudeBot, anthropic-ai or Claude-Web - the only blanket Disallow: / is for EasouSpider, which is not a Claude agent - so no Claude-specific exclusion exists and no Crawl-delay applies to me. The '*' group disallows /account/, /checkout/, /shoppingcart/, /services/, /shop_g/, /shop_r/, /products_g/, /products_r/, */minipip, */quicklook, /*N=, */order-shipment-tracking, */undefined, /AEC/SEO/, */registry/list.json and /shop/*+*+* (multi-facet URLs). NOTHING I requested is covered: I used bare /shop/<supercat>/<subcat>/ paths with no '+' facet segments and no N= parameter, /api/catalog/v1/... (/api/ is not disallowed; /services/ is a different path and was never touched), the .static JS bundle, and the shop-sitemap declared in robots.txt itself. ACCESS: williams-sonoma.com sits behind Akamai. As in the Furniture pass, chrome/edge/firefox curl_cffi fingerprints draw HTTP 403 'Restricted Access' while safari15_5 / safari17_0 / safari17_2_ios / safari18_0_ios answer 200 intermittently, so I wrote work/52/ws.py: a 4-profile Safari rotation with a 2.2s per-host floor and escalating backoff, retrying up to 14 times. Every fetch here came back 200 that way. r.jina.ai is still dead for this host (jina answers, williams-sonoma.com returns 403 to jina's fetcher on /shop/ paths - retested on both bath URLs, 403 both times), so it was not used. TREE: the complete mega-menu came from the site's own nav API, https://www.williams-sonoma.com/api/catalog/v1/category/categorytree/shop/data.json (946KB), the same endpoint the Furniture pass identified inside header.a021b2ee.js. I flattened all 3,782 nodes across 46 supercats and regexed bath|shower|towel|soap|vanity|mirror|toilet|sink|basin|robe|hamper over every id and name. Bathroom merchandise lives in exactly ONE supercat, 'Bath' (id home-bath, 20 children). Under its single product header 'Shop by Category' the subcats in the site's own order are: Bath Towels, Bath Robes, Bath Accessories, Bath Mats & Shower Curtains, Soaps, All Bath - then a Collaborations header (AERIN linkcat, Morris & Co.), Labor Day Sale / New Arrivals / Featured headers, In Stock & Ready to Ship, Free Shipping, Chambers Collections, and the secret:true nodes Bath by Color > Brass Bath, Chambers and Greek Key. Bath Accessories is the ONLY node in the whole department whose primary product type is Bathroom. I walked every other supercat for bathroom content and found none: the Bath department has NO vanities, bath furniture, cabinets, hardware, fixtures, sanitaryware, taps or bathroom mirrors (the Furniture pass reached the same conclusion from the other direction); Home Essentials (homekeeping) is kitchen/cleaning/countertop storage with no bath-organization node; 'Shop Rooms' and 'Shop By Room' list Great Room, Living Room, Dining Room, Bedroom, Entryway, Home Office, Kitchen and Outdoor - there is NO Bathroom room; Art & Decor > Mirrors is decorative wall mirrors; Lighting has no vanity/bath-light node, so nothing was routed to Lighting. SITEMAP CROSS-CHECK: https://www.williams-sonoma.com/netstorage/sitemaps/shop-sitemap-1.xml.gz (declared in robots.txt) decompressed and enumerated = 1,274 shop URLs. Every /shop/home-bath/ URL it contains is /shop/home-bath/ plus all-bath-towels, bath-accessories, bath-in-stock, bath-robes, bath-shower-curtains, bath-soaps, home-bath-header, wsh-bath-new-arrivals, wsh-chambers, wsh-greek-key-collection, wsh-morris-co - i.e. the sitemap confirms the nav tree exactly and confirms Bath Accessories has NO children, so it is a true leaf. The parent /shop/home-bath/ is not recorded because valid children exist (rule 24). QTY: response.numFound from the PLP's own product feed, /api/catalog/v1/category/products/shop/home-bath/<subcat>/index.json?index=0. EQUIVALENCE PROOF (numFound == the rendered 'N Items' header) - the PLP is client-rendered (window.__INITIAL_STATE__ ships shop.cat = {} and catDataFromConstructor = {}), so I proved the identity in the storefront's own code instead of by eyeballing two pages. In the shop bundle /.static/shop/202631/595053970/dist/shop.cd506c32.js: (a) t.WCMProductsEndpoint = function(e){ var t = ''.concat(e.hostUrl,'api/catalog/v1/category/products') ... } - the endpoint I queried is the one the PLP itself calls; (b) productCount: function(){ return this.$store.state.shop.cat.response.numFound || 0 }; (c) productCountMessage: function(){ var t = this.text.items; if(!this.productCount) return ''; ... return ''.concat(this.productCount,' ').concat(r) } - the header string is literally numFound + ' ' + the 'items' label, and the page's own language pack carries \"items\":\"Items\" with \"countPosition\":\"beforeKeyword\". So '17 Items' on /shop/home-bath/bath-accessories/ IS response.numFound = 17. VERIFICATION: (1) ENUMERATION TO EXHAUSTION on seven categories of differing size - the feed pages at 20 docs, so I walked index=0,20,40... and counted unique pids: bath-robes 6/6, bath-soaps 12/12, bath-shower-curtains 13/13, all-bath-towels 14/14, bath-accessories 17/17, home-all-bath 57/57 (3 pages), wsh-morris-co 60/60 (3 pages). numFound equalled the unique-pid count in all seven, including the two multi-page ones. (2) Counts DISCRIMINATE (6 / 12 / 13 / 14 / 17 / 27 / 57 / 60) - not a site-wide constant. (3) CONTROL: the same endpoint with a fabricated subcat ('zzz-not-a-real-category') returns an empty body, and bath-in-stock / wsh-chambers / wsh-greek-key-collection return {\"response\":{}} - the endpoint genuinely resolves the category rather than always answering. (4) NODE IDENTITY: the PLP's own analytics block on /shop/home-bath/bath-accessories/ reads \"categoryNames\":[\"Bath\",\"All Bath\",\"Bath Accessories\"] and the <title> is 'Stylish Bath Accessories for Every Bathroom | Williams Sonoma', so the page served is the node requested, not a parent. (5) DRIFT: every count was read TWICE in separate passes - 17/17, 14/14, 6/6, 13/13, 12/12, 57/57, 60/60 - zero drift. CONTENT CHECK of the recorded leaf: all 17 Bath Accessories products enumerated - Daria Onyx / Painted Peacock / Crystal / Black Marble and Brass / White Marble and Brass / Maranello / Callas / AERIN Pink Onyx / Morris & Co. Blue Bell and Honeysuckle Tulip Bath Collections (soap dispenser, dish, tumbler, tray sets), AERIN Spiral Glass and Honeycomb Bee Glass Soap Dispensers, two tissue box covers and three wastebaskets. That is squarely rule 13 (soap dispensers/dishes, tumblers, bath trays, waste bins), so the node is correctly Bathroom. DEDUP: dedup.already_extracted() run on every candidate leaf - no hits. The exclusion index holds 30 williams-sonoma.com URLs, all Furniture.xlsx and all under /shop/home-furniture/ or /shop/home-outdoor/; not one /shop/home-bath/ or /shop/home-decor/ URL is claimed, which independently confirms the Furniture pass took no bath vanity or bathroom cabinet from this banner (there is none to take). EXCLUDED / ROUTED: everything above is in `review` with its qty and URL - Bath Towels, Bath Robes and Bath Mats & Shower Curtains to Textile; Soaps to Home Fragrance / Personal Care; Art & Decor > Mirrors to Decor; All Bath, Morris & Co., In Stock, Free Shipping, Bath by Color, Chambers, Greek Key and Sale > Bath dropped as View-All, collection, fulfilment, promotional or colour-filter nodes under rule 25. Nothing Bathroom-relevant was silently skipped.",
+ "rows": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Accessories",
+   "qty": 17,
+   "link": "https://www.williams-sonoma.com/shop/home-bath/bath-accessories/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  }
+ ],
+ "review": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath > Bath Towels",
+   "qty": 14,
+   "issue": "ROUTED TO TEXTILE: bath towels / bath sheets / washcloths (rules 15, 20). Williams Sonoma Home publishes no separate towel-hardware (towel bar / ring / hook) node anywhere in the Bath department, so nothing splits back into Bathroom.",
+   "link": "https://www.williams-sonoma.com/shop/home-bath/all-bath-towels/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath > Bath Robes",
+   "qty": 6,
+   "issue": "ROUTED TO TEXTILE: bathrobes (rule 20).",
+   "link": "https://www.williams-sonoma.com/shop/home-bath/bath-robes/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath > Bath Mats & Shower Curtains",
+   "qty": 13,
+   "issue": "ROUTED TO TEXTILE: all 13 products enumerated - shower curtains (Chambers Greek Key, AERIN Scallop, Heritage Lace) and TEXTILE bath mats/rugs (Hydrocotton Bath Mat, Oversized Plush Bath Rug, Solid Ribbed Bath Mat, Textured Bath Rug, Chambers Hotel Embroidered Bath Rug, AERIN Scalloped Bath Mat, Chambers Heritage 800-Gram Solid Bath Mat). Rules 16 and 20: a textile bath mat is Textile; there is no rubber/anti-slip mat in the node that rule 16 would pull back into Bathroom.",
+   "link": "https://www.williams-sonoma.com/shop/home-bath/bath-shower-curtains/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath > Soaps",
+   "qty": 12,
+   "issue": "ROUTED TO HOME FRAGRANCE / PERSONAL CARE - not Bathroom (rule 2, primary product type). All 12 products enumerated: 9 are 'Williams Sonoma <scent> Essential Oils Collection', 2 are 'Home Fragrance <scent> Collection' and 1 is a 'Monogrammed Soap & Towel Gift Set'. These are consumable toiletries and room fragrance, not rule-13 soap dispensers/dishes sold empty (those live in Bath Accessories, which IS recorded). The same merchandise is also carried at Home Essentials > Soaps, Lotions & Scents. Same treatment as SR 24 Marshalls > Bath > Soaps.",
+   "link": "https://www.williams-sonoma.com/shop/home-bath/bath-soaps/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath > All Bath",
+   "qty": 57,
+   "issue": "NOT RECORDED - View All node (rule 25). It is the department roll-up whose 57 products are the union of the five Bath children; recording it would both duplicate Bath Accessories and aggregate Textile merchandise into Bathroom.",
+   "link": "https://www.williams-sonoma.com/shop/home-bath/home-all-bath/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath > Collaborations > Morris & Co.",
+   "qty": 60,
+   "issue": "NOT RECORDED - designer collaboration collection (rule 25). It is a brand/collection cut spanning bath, bedding and decor, not a product category; two of its bath items already appear inside the recorded Bath Accessories node (rule 28).",
+   "link": "https://www.williams-sonoma.com/shop/home-bath/wsh-morris-co/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Art & Decor > Mirrors",
+   "qty": 27,
+   "issue": "ROUTED TO DECOR: all 27 products enumerated - decorative wall, leaning and floor mirrors (Gramercy, Horn and Bone, Mother of Pearl, Selenite Stone, Eva Leaning Floor Mirror, AERIN wall mirrors). The node sits under the Art & Decor supercat's 'Art & Wall Decor' header, not under Bath, and Williams Sonoma Home publishes no bathroom/vanity/LED/medicine-cabinet mirror category. One product is titled 'AERIN Gold Scalloped Vanity Mirror' but a single dressing-mirror SKU does not make the node Bathroom (rules 2, 29).",
+   "link": "https://www.williams-sonoma.com/shop/home-decor/mirrors/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath > In Stock & Ready to Ship / Free Shipping / Bath by Color / Chambers / Greek Key",
+   "qty": null,
+   "issue": "NOT RECORDED - fulfilment, promotional and colour/collection filter nodes (rule 25). bath-in-stock, wsh-chambers and wsh-greek-key-collection return an EMPTY response object from the product feed (they are facet-driven, not real listings); bath-free-shipping (7) and wsh-brass-bath are a shipping promo and a colour cut, both flagged secret:true in the nav tree.",
+   "link": "https://www.williams-sonoma.com/shop/home-bath/bath-in-stock/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Sale > Bath",
+   "qty": null,
+   "issue": "NOT RECORDED - sale cut of the same Bath merchandise (rules 25, 28).",
+   "link": "https://www.williams-sonoma.com/shop/home-sale/home-sale-bath/"
+  }
+ ],
+ "_reconstructed_from": "Bathroom.xlsx delivered 2026-09-01 (checkpoint), not original worker JSON"
+}

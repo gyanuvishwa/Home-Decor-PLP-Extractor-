@@ -1,0 +1,34 @@
+{
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "Access: direct HTTP fetch (curl, desktop UA) of ikea.com/de/de/ worked with no blocking; robots.txt at ikea.com/robots.txt checked, no Claude/anthropic-ai/ClaudeBot disallow present, so no escalation needed. Did NOT assume the UK's pt001 slug 'pet-products-pt001' -- probed it directly on DE (404, confirmed IKEA requires an exact slug match: a deliberately wrong slug on a known-good DE category ID also 404s, so slug guessing doesn't work) and instead found the DE site's own Pet Care hub by grepping the DE homepage HTML for pet-related hrefs, which surfaced https://www.ikea.com/de/de/cat/haustierprodukte-pt001/ (same numeric id pt001 as UK, confirming the shared global ID scheme from the prior Home-Decor pass, but independently re-derived here, not copied). That page's embedded hierarchyObjs JSON lists exactly two children under pt001 'Haustierprodukte': id 39569 'Katzenprodukte' (cat products) at katzenprodukte-39569/, and id 39570 'Hundespielzeug & Hundezubehör' (dog toys & dog accessories) at fuer-hunde-39570/ -- note the DE dog-category title/slug differ from the UK's plain 'Dogs'/dogs-39570, an independent DE-specific label, not assumed from UK. Both children's own subCategories arrays are empty (confirmed leaf nodes). The pt001 hub page itself has no 'X von Y Ergebnissen' total-count text, no numeric numberOfItems value, and no <progress> element -- pure grouping/landing page (tiles only), emitted as is_group=true with qty/link null, matching the UK pattern. Katzenprodukte (39569) and Hundespielzeug & Hundezubehör (39570) are full SSR HTML with two independent exact-count signals that agree on each page: the visible catalog-product-list__total-count text and the JSON-LD numberOfItems value, plus a matching <progress value/max> element. Spot-checked actual product aria-labels in both listings to confirm genuine pet-specific products (not pet-themed decor): Cats -- UTSADD Katzenkoje (cat bed), Katzenhaus (cat house, x2 variants), Napf fuer Haustier (pet bowl), Katzenspieltunnel (cat play tunnel), Kissen fuer Haustier (pet cushion), Tierbett (pet bed); Dogs -- UTSADD Stoffspielzeug fuer Hunde (dog fabric toy, x2), Hundebett (dog bed, UTSADD M/L + BOLMSOE outdoor variant), Schnueffelmatte fuer Hunde (dog snuffle mat), Hundespielzeug (dog toy). All UTSADD/BOLMSOE SKUs, same product line as the UK site's Cats/Dogs categories, confirming this is a genuine Pet Care branch. Checked for other pet-related nodes: grepped the DE homepage and the pt001 page's own embedded nav JSON for any other 'pt'-prefixed hierarchy id -- only pt001 exists; no separate pet-food/consumables or medical/veterinary node found anywhere in the checked nav data. No pet food/consumables or medical/veterinary categories found on this site (none to flag). Numbers happen to match the UK site's Cats=11/Dogs=13 exactly, but this was independently verified via direct DE-page fetch and its own total-count/JSON-LD/progress signals, not assumed or copied from the UK result.",
+  "rows": [
+    {
+      "category": "Pet Care",
+      "sub_category": "Pet products",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Cats",
+      "qty": 11,
+      "link": "https://www.ikea.com/de/de/cat/katzenprodukte-39569/",
+      "is_group": false,
+      "evidence": "catalog-product-list__total-count text '11 von 11 Ergebnissen'; corroborated by JSON-LD numberOfItems=11 and <progress value=11 max=11>",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Dog Toys & Accessories",
+      "qty": 13,
+      "link": "https://www.ikea.com/de/de/cat/fuer-hunde-39570/",
+      "is_group": false,
+      "evidence": "catalog-product-list__total-count text '13 von 13 Ergebnissen'; corroborated by JSON-LD numberOfItems=13 and <progress value=13 max=13>",
+      "flag": null
+    }
+  ]
+}

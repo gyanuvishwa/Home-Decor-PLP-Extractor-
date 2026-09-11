@@ -1,0 +1,498 @@
+{
+  "sr": 143,
+  "company": "Finnish Design Shop",
+  "brand_site": "finnishdesignshop.com",
+  "country": "Finland",
+  "site_url": "https://www.finnishdesignshop.com/",
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "ACCESS: Chrome connector only, own tab, no HTTP-layer tooling. The root and category pages loaded first try with no Cloudflare challenge in a real browser session (the prior Home-Decor pass needed curl_cffi TLS impersonation for the same host). No block, 403, CAPTCHA or rate-limit occurred at any point; ~2.2s spacing was held across ~130 same-origin API calls. ROBOTS: /robots.txt is a generic 'User-agent: *' policy disallowing only /login.php, /account, /shopping_cart.php, b2b paths and ~140 unserved en-XX locale paths. No ClaudeBot / anthropic-ai / Claude-Web / Claude-User directive at all, so no opt-out applies. TREE: taken from the storefront's own first-party JSON API, called same-origin from the loaded page via javascript_tool: GET /api/v1/catalog/products?qs=<urlencoded JSON {uri,language:'en',region:'us',perPage:1,page:1}>. It returns data.products.pagination.total plus the live category tree at data.additional.categories.path[-1].children, so one call per node yields both the count and the children. Note: passing a 'fields' array breaks the response (products comes back as an error object) - omit it. QTY / RULE 1: the site is a Vue SPA with no SSR count, but the API total is NOT a separate structured-data source - it is the exact number the rendered listing header prints. Verified twice against the rendered DOM: /furniture/tables/coffee-tables header reads '763 products' (API 763) and /storage/storage-furniture/sideboards-dressers reads '4 products' (API 4), with matching h1 and self-referential canonical on both. 0 nulled qty. TRAPS CHECKED: (1) Bad-slug trap is real and severe - '/zzz-bogus' returns HTTP 200 with the site-wide total 22654, and the locale-prefixed '/en-us/furniture' also returns 22654 because the category filter is silently dropped. Guarded every single node with a validity test (categories.path.length - 1 must equal the uri's segment count; a bogus uri collapses to path.length 1). All emitted nodes passed. (2) Nav vs sitemap cross-check was decisive: the mega-nav and the API tree both show Furniture with exactly 7 children, but /sitemap-index.xml -> /sitemaps/en-us/categories.xml.gz (gunzipped in-page with DecompressionStream) listed 368 categories and exposed a whole Home office furniture branch under Lifestyle & Housekeeping that the Furniture department never links to: Office desks & Dividers (102), Office chairs (142), Storage furniture (20), Display furniture (13). Diffing all 368 sitemap categories against the crawled tree turned up no other furniture node. (3) Node identity keyed on slug, not label - this caught Office chairs existing twice (/furniture/chairs/office-chairs 145 and /lifestyle-housekeeping/home-office/office-chairs 142) and Storage furniture existing twice (/storage/storage-furniture group and the home-office leaf). (4) Counts are stable, not stock-gated snapshots as far as could be told; no absurd zeros among emitted leaves. EXCLUSIONS with reasons: Furniture > Beds > Mattresses (0 products) and Furniture > Furniture care (19) - bedding and care/parts per the brief. Outdoor furniture > Rattan outdoor furniture (53) - material facet, and > Folding outdoor furniture (158) - form-factor facet; both are cross-cutting re-cuts of the same pool (sampled titles are the same Bistro tables/chairs already counted under Outdoor tables/chairs), and > Outdoor furniture care & covers (30) - care. Storage > Coat racks & Hangers > Wall coat racks (252), Wall hooks (171), Coat hangers (37), Umbrella stands (9) - not furniture. Storage > Storage baskets (418), Storage containers (432), Jars & Boxes (70), Magazine racks (55) - standalone storage goods, a future Storage task. Decor > Indoor gardening > Plant stands (34) and Outdoor > Gardening > Plant stands (12) - sampled titles are a mix of planters, plant hangers and trellises with a few side tables and shelves (Lolly side table, Kamu shelf, Turn wall shelf) that are already counted under Furniture > Tables and Furniture > Shelves; excluded as plant-display accessories rather than double-count. For Kids > Kids' furnishings > Swings (1) and Kids' lamps - play equipment and lighting. Whole departments inspected and found to contain no furniture: Bathroom (textiles, accessories, lighting, mirrors, hygiene, laundry baskets, sauna, toiletry bags, hooks - no vanity or bathroom cabinet node exists), Bedroom (bed linen, throws & bed covers, nightwear only - the beds live in Furniture), Decor, Lighting, Kitchenware, Tableware, Rugs. SANITY: counts differ per category and are not constant; parent totals were never used as child totals (Chairs 3372 vs children summing 3445 confirms the site's own cross-listing overlap, so only leaves are emitted); no suspiciously round display caps; every link is the canonical origin /en-us URL and was produced by the same validated node lookup.",
+  "rows": [
+    {
+      "category": "Furniture",
+      "sub_category": "Chairs",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Dining chairs",
+      "qty": 1288,
+      "link": "https://www.finnishdesignshop.com/en-us/furniture/chairs/dining-chairs",
+      "is_group": false,
+      "evidence": "first-party catalog API data.products.pagination.total for uri '/furniture/chairs/dining-chairs'; verified identical to the rendered listing header 'N products' (checked on /furniture/tables/coffee-tables = '763 products', /storage/storage-furniture/storage-units = '45 products' and /storage/storage-furniture/sideboards-dressers = '4 products')",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Bar stools & Chairs",
+      "qty": 524,
+      "link": "https://www.finnishdesignshop.com/en-us/furniture/chairs/bar-stools-chairs",
+      "is_group": false,
+      "evidence": "first-party catalog API data.products.pagination.total for uri '/furniture/chairs/bar-stools-chairs'; verified identical to the rendered listing header 'N products' (checked on /furniture/tables/coffee-tables = '763 products', /storage/storage-furniture/storage-units = '45 products' and /storage/storage-furniture/sideboards-dressers = '4 products')",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Stools",
+      "qty": 334,
+      "link": "https://www.finnishdesignshop.com/en-us/furniture/chairs/stools",
+      "is_group": false,
+      "evidence": "first-party catalog API data.products.pagination.total for uri '/furniture/chairs/stools'; verified identical to the rendered listing header 'N products' (checked on /furniture/tables/coffee-tables = '763 products', /storage/storage-furniture/storage-units = '45 products' and /storage/storage-furniture/sideboards-dressers = '4 products')",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Armchairs & Lounge chairs",
+      "qty": 770,
+      "link": "https://www.finnishdesignshop.com/en-us/furniture/chairs/armchairs-lounge-chairs",
+      "is_group": false,
+      "evidence": "first-party catalog API data.products.pagination.total for uri '/furniture/chairs/armchairs-lounge-chairs'; verified identical to the rendered listing header 'N products' (checked on /furniture/tables/coffee-tables = '763 products', /storage/storage-furniture/storage-units = '45 products' and /storage/storage-furniture/sideboards-dressers = '4 products')",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Poufs & Ottomans",
+      "qty": 191,
+      "link": "https://www.finnishdesignshop.com/en-us/furniture/chairs/poufs-ottomans",
+      "is_group": false,
+      "evidence": "first-party catalog API data.products.pagination.total for uri '/furniture/chairs/poufs-ottomans'; verified identical to the rendered listing header 'N products' (checked on /furniture/tables/coffee-tables = '763 products', /storage/storage-furniture/storage-units = '45 products' and /storage/storage-furniture/sideboards-dressers = '4 products')",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Benches",
+      "qty": 152,
+      "link": "https://www.finnishdesignshop.com/en-us/furniture/chairs/benches",
+      "is_group": false,
+      "evidence": "first-party catalog API data.products.pagination.total for uri '/furniture/chairs/benches'; verified identical to the rendered listing header 'N products' (checked on /furniture/tables/coffee-tables = '763 products', /storage/storage-furniture/storage-units = '45 products' and /storage/storage-furniture/sideboards-dressers = '4 products')",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Office chairs",
+      "qty": 145,
+      "link": "https://www.finnishdesignshop.com/en-us/furniture/chairs/office-chairs",
+      "is_group": false,
+      "evidence": "first-party catalog API data.products.pagination.total for uri '/furniture/chairs/office-chairs'; verified identical to the rendered listing header 'N products' (checked on /furniture/tables/coffee-tables = '763 products', /storage/storage-furniture/storage-units = '45 products' and /storage/storage-furniture/sideboards-dressers = '4 products')",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Bean bag chairs",
+      "qty": 12,
+      "link": "https://www.finnishdesignshop.com/en-us/furniture/chairs/bean-bag-chairs",
+      "is_group": false,
+      "evidence": "first-party catalog API data.products.pagination.total for uri '/furniture/chairs/bean-bag-chairs'; verified identical to the rendered listing header 'N products' (checked on /furniture/tables/coffee-tables = '763 products', /storage/storage-furniture/storage-units = '45 products' and /storage/storage-furniture/sideboards-dressers = '4 products')",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Rocking chairs",
+      "qty": 29,
+      "link": "https://www.finnishdesignshop.com/en-us/furniture/chairs/rocking-chairs",
+      "is_group": false,
+      "evidence": "first-party catalog API data.products.pagination.total for uri '/furniture/chairs/rocking-chairs'; verified identical to the rendered listing header 'N products' (checked on /furniture/tables/coffee-tables = '763 products', /storage/storage-furniture/storage-units = '45 products' and /storage/storage-furniture/sideboards-dressers = '4 products')",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Tables",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Dining tables",
+      "qty": 736,
+      "link": "https://www.finnishdesignshop.com/en-us/furniture/tables/dining-tables",
+      "is_group": false,
+      "evidence": "first-party catalog API data.products.pagination.total for uri '/furniture/tables/dining-tables'; verified identical to the rendered listing header 'N products' (checked on /furniture/tables/coffee-tables = '763 products', /storage/storage-furniture/storage-units = '45 products' and /storage/storage-furniture/sideboards-dressers = '4 products')",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Coffee tables",
+      "qty": 763,
+      "link": "https://www.finnishdesignshop.com/en-us/furniture/tables/coffee-tables",
+      "is_group": false,
+      "evidence": "first-party catalog API data.products.pagination.total for uri '/furniture/tables/coffee-tables'; verified identical to the rendered listing header 'N products' (checked on /furniture/tables/coffee-tables = '763 products', /storage/storage-furniture/storage-units = '45 products' and /storage/storage-furniture/sideboards-dressers = '4 products')",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Side & End tables",
+      "qty": 647,
+      "link": "https://www.finnishdesignshop.com/en-us/furniture/tables/side-end-tables",
+      "is_group": false,
+      "evidence": "first-party catalog API data.products.pagination.total for uri '/furniture/tables/side-end-tables'; verified identical to the rendered listing header 'N products' (checked on /furniture/tables/coffee-tables = '763 products', /storage/storage-furniture/storage-units = '45 products' and /storage/storage-furniture/sideboards-dressers = '4 products')",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Nightstands",
+      "qty": 187,
+      "link": "https://www.finnishdesignshop.com/en-us/furniture/tables/nightstands",
+      "is_group": false,
+      "evidence": "first-party catalog API data.products.pagination.total for uri '/furniture/tables/nightstands'; verified identical to the rendered listing header 'N products' (checked on /furniture/tables/coffee-tables = '763 products', /storage/storage-furniture/storage-units = '45 products' and /storage/storage-furniture/sideboards-dressers = '4 products')",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Kitchen carts & Trolleys",
+      "qty": 103,
+      "link": "https://www.finnishdesignshop.com/en-us/furniture/tables/kitchen-carts-trolleys",
+      "is_group": false,
+      "evidence": "first-party catalog API data.products.pagination.total for uri '/furniture/tables/kitchen-carts-trolleys'; verified identical to the rendered listing header 'N products' (checked on /furniture/tables/coffee-tables = '763 products', /storage/storage-furniture/storage-units = '45 products' and /storage/storage-furniture/sideboards-dressers = '4 products')",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Desks",
+      "qty": 137,
+      "link": "https://www.finnishdesignshop.com/en-us/furniture/tables/desks",
+      "is_group": false,
+      "evidence": "first-party catalog API data.products.pagination.total for uri '/furniture/tables/desks'; verified identical to the rendered listing header 'N products' (checked on /furniture/tables/coffee-tables = '763 products', /storage/storage-furniture/storage-units = '45 products' and /storage/storage-furniture/sideboards-dressers = '4 products')",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Sofas & Daybeds",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Sofas",
+      "qty": 500,
+      "link": "https://www.finnishdesignshop.com/en-us/furniture/sofas-daybeds/sofas",
+      "is_group": false,
+      "evidence": "first-party catalog API data.products.pagination.total for uri '/furniture/sofas-daybeds/sofas'; verified identical to the rendered listing header 'N products' (checked on /furniture/tables/coffee-tables = '763 products', /storage/storage-furniture/storage-units = '45 products' and /storage/storage-furniture/sideboards-dressers = '4 products')",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Sofa beds",
+      "qty": 34,
+      "link": "https://www.finnishdesignshop.com/en-us/furniture/sofas-daybeds/sofa-beds",
+      "is_group": false,
+      "evidence": "first-party catalog API data.products.pagination.total for uri '/furniture/sofas-daybeds/sofa-beds'; verified identical to the rendered listing header 'N products' (checked on /furniture/tables/coffee-tables = '763 products', /storage/storage-furniture/storage-units = '45 products' and /storage/storage-furniture/sideboards-dressers = '4 products')",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Daybeds",
+      "qty": 12,
+      "link": "https://www.finnishdesignshop.com/en-us/furniture/sofas-daybeds/daybeds",
+      "is_group": false,
+      "evidence": "first-party catalog API data.products.pagination.total for uri '/furniture/sofas-daybeds/daybeds'; verified identical to the rendered listing header 'N products' (checked on /furniture/tables/coffee-tables = '763 products', /storage/storage-furniture/storage-units = '45 products' and /storage/storage-furniture/sideboards-dressers = '4 products')",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Shelves",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Bookcases",
+      "qty": 39,
+      "link": "https://www.finnishdesignshop.com/en-us/furniture/shelves/bookcases",
+      "is_group": false,
+      "evidence": "first-party catalog API data.products.pagination.total for uri '/furniture/shelves/bookcases'; verified identical to the rendered listing header 'N products' (checked on /furniture/tables/coffee-tables = '763 products', /storage/storage-furniture/storage-units = '45 products' and /storage/storage-furniture/sideboards-dressers = '4 products')",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Shelving units",
+      "qty": 11,
+      "link": "https://www.finnishdesignshop.com/en-us/furniture/shelves/shelving-units",
+      "is_group": false,
+      "evidence": "first-party catalog API data.products.pagination.total for uri '/furniture/shelves/shelving-units'; verified identical to the rendered listing header 'N products' (checked on /furniture/tables/coffee-tables = '763 products', /storage/storage-furniture/storage-units = '45 products' and /storage/storage-furniture/sideboards-dressers = '4 products')",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Wall shelves",
+      "qty": 444,
+      "link": "https://www.finnishdesignshop.com/en-us/furniture/shelves/wall-shelves",
+      "is_group": false,
+      "evidence": "first-party catalog API data.products.pagination.total for uri '/furniture/shelves/wall-shelves'; verified identical to the rendered listing header 'N products' (checked on /furniture/tables/coffee-tables = '763 products', /storage/storage-furniture/storage-units = '45 products' and /storage/storage-furniture/sideboards-dressers = '4 products')",
+      "flag": "MANUAL REVIEW: ambiguous shelving - wall-mounted, but filed by the site under its Furniture > Shelves department and the sampled titles are furniture-grade modular shelving systems (String Pocket shelf, Shelf Library wall shelf H1148, Gallery Shelf 115 cm, Gaston wall desk), not decorative wall ledges"
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Beds",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Bed frames",
+      "qty": 56,
+      "link": "https://www.finnishdesignshop.com/en-us/furniture/beds/bed-frames",
+      "is_group": false,
+      "evidence": "first-party catalog API data.products.pagination.total for uri '/furniture/beds/bed-frames'; verified identical to the rendered listing header 'N products' (checked on /furniture/tables/coffee-tables = '763 products', /storage/storage-furniture/storage-units = '45 products' and /storage/storage-furniture/sideboards-dressers = '4 products')",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Headboards",
+      "qty": 22,
+      "link": "https://www.finnishdesignshop.com/en-us/furniture/beds/headboards",
+      "is_group": false,
+      "evidence": "first-party catalog API data.products.pagination.total for uri '/furniture/beds/headboards'; verified identical to the rendered listing header 'N products' (checked on /furniture/tables/coffee-tables = '763 products', /storage/storage-furniture/storage-units = '45 products' and /storage/storage-furniture/sideboards-dressers = '4 products')",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Step stools & Ladders",
+      "qty": 24,
+      "link": "https://www.finnishdesignshop.com/en-us/furniture/step-stools-ladders",
+      "is_group": false,
+      "evidence": "first-party catalog API data.products.pagination.total for uri '/furniture/step-stools-ladders'; verified identical to the rendered listing header 'N products' (checked on /furniture/tables/coffee-tables = '763 products', /storage/storage-furniture/storage-units = '45 products' and /storage/storage-furniture/sideboards-dressers = '4 products')",
+      "flag": "MANUAL REVIEW: mixed node - sampled titles are part step stools (furniture seating: 'Slalom step stool') and part stepladders (utility: 'Reech stepladder'); kept because the site files it directly under its Furniture department"
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Outdoor furniture",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Outdoor chairs",
+      "qty": 525,
+      "link": "https://www.finnishdesignshop.com/en-us/outdoor/outdoor-furniture/outdoor-chairs",
+      "is_group": false,
+      "evidence": "first-party catalog API data.products.pagination.total for uri '/outdoor/outdoor-furniture/outdoor-chairs'; verified identical to the rendered listing header 'N products' (checked on /furniture/tables/coffee-tables = '763 products', /storage/storage-furniture/storage-units = '45 products' and /storage/storage-furniture/sideboards-dressers = '4 products')",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Outdoor lounge chairs & armchairs",
+      "qty": 244,
+      "link": "https://www.finnishdesignshop.com/en-us/outdoor/outdoor-furniture/outdoor-lounge-chairs-armchairs",
+      "is_group": false,
+      "evidence": "first-party catalog API data.products.pagination.total for uri '/outdoor/outdoor-furniture/outdoor-lounge-chairs-armchairs'; verified identical to the rendered listing header 'N products' (checked on /furniture/tables/coffee-tables = '763 products', /storage/storage-furniture/storage-units = '45 products' and /storage/storage-furniture/sideboards-dressers = '4 products')",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Outdoor tables",
+      "qty": 384,
+      "link": "https://www.finnishdesignshop.com/en-us/outdoor/outdoor-furniture/outdoor-tables",
+      "is_group": false,
+      "evidence": "first-party catalog API data.products.pagination.total for uri '/outdoor/outdoor-furniture/outdoor-tables'; verified identical to the rendered listing header 'N products' (checked on /furniture/tables/coffee-tables = '763 products', /storage/storage-furniture/storage-units = '45 products' and /storage/storage-furniture/sideboards-dressers = '4 products')",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Outdoor side tables & coffee tables",
+      "qty": 227,
+      "link": "https://www.finnishdesignshop.com/en-us/outdoor/outdoor-furniture/outdoor-side-tables-coffee-tables",
+      "is_group": false,
+      "evidence": "first-party catalog API data.products.pagination.total for uri '/outdoor/outdoor-furniture/outdoor-side-tables-coffee-tables'; verified identical to the rendered listing header 'N products' (checked on /furniture/tables/coffee-tables = '763 products', /storage/storage-furniture/storage-units = '45 products' and /storage/storage-furniture/sideboards-dressers = '4 products')",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Outdoor benches",
+      "qty": 164,
+      "link": "https://www.finnishdesignshop.com/en-us/outdoor/outdoor-furniture/outdoor-benches",
+      "is_group": false,
+      "evidence": "first-party catalog API data.products.pagination.total for uri '/outdoor/outdoor-furniture/outdoor-benches'; verified identical to the rendered listing header 'N products' (checked on /furniture/tables/coffee-tables = '763 products', /storage/storage-furniture/storage-units = '45 products' and /storage/storage-furniture/sideboards-dressers = '4 products')",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Outdoor sofas",
+      "qty": 88,
+      "link": "https://www.finnishdesignshop.com/en-us/outdoor/outdoor-furniture/outdoor-sofas",
+      "is_group": false,
+      "evidence": "first-party catalog API data.products.pagination.total for uri '/outdoor/outdoor-furniture/outdoor-sofas'; verified identical to the rendered listing header 'N products' (checked on /furniture/tables/coffee-tables = '763 products', /storage/storage-furniture/storage-units = '45 products' and /storage/storage-furniture/sideboards-dressers = '4 products')",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Outdoor stools & poufs",
+      "qty": 137,
+      "link": "https://www.finnishdesignshop.com/en-us/outdoor/outdoor-furniture/outdoor-stools-poufs",
+      "is_group": false,
+      "evidence": "first-party catalog API data.products.pagination.total for uri '/outdoor/outdoor-furniture/outdoor-stools-poufs'; verified identical to the rendered listing header 'N products' (checked on /furniture/tables/coffee-tables = '763 products', /storage/storage-furniture/storage-units = '45 products' and /storage/storage-furniture/sideboards-dressers = '4 products')",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Sun loungers, deck chairs & bean bags",
+      "qty": 108,
+      "link": "https://www.finnishdesignshop.com/en-us/outdoor/outdoor-furniture/sun-loungers-deck-chairs-bean-bags",
+      "is_group": false,
+      "evidence": "first-party catalog API data.products.pagination.total for uri '/outdoor/outdoor-furniture/sun-loungers-deck-chairs-bean-bags'; verified identical to the rendered listing header 'N products' (checked on /furniture/tables/coffee-tables = '763 products', /storage/storage-furniture/storage-units = '45 products' and /storage/storage-furniture/sideboards-dressers = '4 products')",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Hammocks & hanging chairs",
+      "qty": 7,
+      "link": "https://www.finnishdesignshop.com/en-us/outdoor/outdoor-furniture/hammocks-hanging-chairs",
+      "is_group": false,
+      "evidence": "first-party catalog API data.products.pagination.total for uri '/outdoor/outdoor-furniture/hammocks-hanging-chairs'; verified identical to the rendered listing header 'N products' (checked on /furniture/tables/coffee-tables = '763 products', /storage/storage-furniture/storage-units = '45 products' and /storage/storage-furniture/sideboards-dressers = '4 products')",
+      "flag": "MANUAL REVIEW: mixed - hanging chairs are seating furniture, hammocks arguably not; node sits under the site's Outdoor furniture department"
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Storage furniture",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "TV stands",
+      "qty": 111,
+      "link": "https://www.finnishdesignshop.com/en-us/storage/storage-furniture/tv-stands",
+      "is_group": false,
+      "evidence": "first-party catalog API data.products.pagination.total for uri '/storage/storage-furniture/tv-stands'; verified identical to the rendered listing header 'N products' (checked on /furniture/tables/coffee-tables = '763 products', /storage/storage-furniture/storage-units = '45 products' and /storage/storage-furniture/sideboards-dressers = '4 products')",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Storage units",
+      "qty": 45,
+      "link": "https://www.finnishdesignshop.com/en-us/storage/storage-furniture/storage-units",
+      "is_group": false,
+      "evidence": "first-party catalog API data.products.pagination.total for uri '/storage/storage-furniture/storage-units'; verified identical to the rendered listing header 'N products' (checked on /furniture/tables/coffee-tables = '763 products', /storage/storage-furniture/storage-units = '45 products' and /storage/storage-furniture/sideboards-dressers = '4 products')",
+      "flag": "MANUAL REVIEW: mixed node - sampled titles are roughly half storage furniture (A Line storage bench, Hide storage pouf, Barboy trolley, Around key cabinet) and half standalone storage goods (Storage Box, Storage box lid) that belong to the future Storage task; kept because the site files it under its own Storage furniture grouping"
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Cabinets",
+      "qty": 20,
+      "link": "https://www.finnishdesignshop.com/en-us/storage/storage-furniture/cabinets",
+      "is_group": false,
+      "evidence": "first-party catalog API data.products.pagination.total for uri '/storage/storage-furniture/cabinets'; verified identical to the rendered listing header 'N products' (checked on /furniture/tables/coffee-tables = '763 products', /storage/storage-furniture/storage-units = '45 products' and /storage/storage-furniture/sideboards-dressers = '4 products')",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Sideboards & Dressers",
+      "qty": 4,
+      "link": "https://www.finnishdesignshop.com/en-us/storage/storage-furniture/sideboards-dressers",
+      "is_group": false,
+      "evidence": "first-party catalog API data.products.pagination.total for uri '/storage/storage-furniture/sideboards-dressers'; verified identical to the rendered listing header 'N products' (checked on /furniture/tables/coffee-tables = '763 products', /storage/storage-furniture/storage-units = '45 products' and /storage/storage-furniture/sideboards-dressers = '4 products')",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Coat racks & Hangers",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Coat stands",
+      "qty": 79,
+      "link": "https://www.finnishdesignshop.com/en-us/storage/coat-racks-hangers/coat-stands",
+      "is_group": false,
+      "evidence": "first-party catalog API data.products.pagination.total for uri '/storage/coat-racks-hangers/coat-stands'; verified identical to the rendered listing header 'N products' (checked on /furniture/tables/coffee-tables = '763 products', /storage/storage-furniture/storage-units = '45 products' and /storage/storage-furniture/sideboards-dressers = '4 products')",
+      "flag": "MANUAL REVIEW: freestanding hall/entryway furniture - sampled titles are freestanding clothes/coat racks (Colour Rack clothes rack, O&O clothes rack, System 1-2-3 rack); sibling wall-mounted nodes were excluded"
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Shoe racks",
+      "qty": 53,
+      "link": "https://www.finnishdesignshop.com/en-us/storage/coat-racks-hangers/shoe-racks",
+      "is_group": false,
+      "evidence": "first-party catalog API data.products.pagination.total for uri '/storage/coat-racks-hangers/shoe-racks'; verified identical to the rendered listing header 'N products' (checked on /furniture/tables/coffee-tables = '763 products', /storage/storage-furniture/storage-units = '45 products' and /storage/storage-furniture/sideboards-dressers = '4 products')",
+      "flag": "MANUAL REVIEW: entryway storage furniture - sampled titles are freestanding shoe racks and shoe shelves (Mixrack shoe rack L, Bill shoe shelf, Classic shoe rack 60 cm)"
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Home office",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Office desks & Dividers",
+      "qty": 102,
+      "link": "https://www.finnishdesignshop.com/en-us/lifestyle-housekeeping/home-office/office-desks-dividers",
+      "is_group": false,
+      "evidence": "first-party catalog API data.products.pagination.total for uri '/lifestyle-housekeeping/home-office/office-desks-dividers'; verified identical to the rendered listing header 'N products' (checked on /furniture/tables/coffee-tables = '763 products', /storage/storage-furniture/storage-units = '45 products' and /storage/storage-furniture/sideboards-dressers = '4 products')",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Office chairs",
+      "qty": 142,
+      "link": "https://www.finnishdesignshop.com/en-us/lifestyle-housekeeping/home-office/office-chairs",
+      "is_group": false,
+      "evidence": "first-party catalog API data.products.pagination.total for uri '/lifestyle-housekeeping/home-office/office-chairs'; verified identical to the rendered listing header 'N products' (checked on /furniture/tables/coffee-tables = '763 products', /storage/storage-furniture/storage-units = '45 products' and /storage/storage-furniture/sideboards-dressers = '4 products')",
+      "flag": "MANUAL REVIEW: distinct site node from Furniture > Chairs > Office chairs (145) - different slug, different count, overlapping product pool; both kept per the slug-identity rule, may need de-duplication at merge"
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Storage furniture",
+      "qty": 20,
+      "link": "https://www.finnishdesignshop.com/en-us/lifestyle-housekeeping/home-office/storage-furniture",
+      "is_group": false,
+      "evidence": "first-party catalog API data.products.pagination.total for uri '/lifestyle-housekeeping/home-office/storage-furniture'; verified identical to the rendered listing header 'N products' (checked on /furniture/tables/coffee-tables = '763 products', /storage/storage-furniture/storage-units = '45 products' and /storage/storage-furniture/sideboards-dressers = '4 products')",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Display furniture",
+      "qty": 13,
+      "link": "https://www.finnishdesignshop.com/en-us/lifestyle-housekeeping/home-office/display-furniture",
+      "is_group": false,
+      "evidence": "first-party catalog API data.products.pagination.total for uri '/lifestyle-housekeeping/home-office/display-furniture'; verified identical to the rendered listing header 'N products' (checked on /furniture/tables/coffee-tables = '763 products', /storage/storage-furniture/storage-units = '45 products' and /storage/storage-furniture/sideboards-dressers = '4 products')",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Kids' furnishings",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Kids' furniture",
+      "qty": 23,
+      "link": "https://www.finnishdesignshop.com/en-us/for-kids/kids-furnishings/kids-furniture",
+      "is_group": false,
+      "evidence": "first-party catalog API data.products.pagination.total for uri '/for-kids/kids-furnishings/kids-furniture'; verified identical to the rendered listing header 'N products' (checked on /furniture/tables/coffee-tables = '763 products', /storage/storage-furniture/storage-units = '45 products' and /storage/storage-furniture/sideboards-dressers = '4 products')",
+      "flag": null
+    }
+  ]
+}

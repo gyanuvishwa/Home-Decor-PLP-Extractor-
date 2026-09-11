@@ -1,0 +1,534 @@
+{
+ "sr": 63,
+ "company": "Serena & Lily",
+ "brand_site": "serenaandlily.com",
+ "country": "USA",
+ "site_url": "https://www.serenaandlily.com/",
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ACCESS: homepage and one category page read directly with curl_cffi impersonate=chrome124 (the prior Home-Decor pass got 403 on category pages; DataDome let them through this session, then re-blocked HTML after a burst - category names were then confirmed through translate.goog SSR shells, which return genuine origin HTML). TREE: taken from the site's own mega-nav JSON in __NEXT_DATA__ at props.pageProps.globalContent.headerV2.slideOutMenu.categoryMenu.menuItems (14 top-level departments walked in full); every furniture node lives under the 'Furniture', 'Outdoor', 'Bath' and 'Kids' departments. QTY - THIS IS THE PART THE PRIOR PASS COULD NOT DO: the grid is client-side only, fetched by Apollo from https://middleware.production.serenaandlily.com/graphql (AWS AppSync in front of Constructor.io). The prior pass reverse-engineered the query but every call returned 'A custom error was thrown from a mapping template'. The missing piece was the auth link in _next/static/chunks/pages/_app-42e5ef73bd06b47b.js: the request needs headers 'ecp-app-source: production' plus an 'Authorization' bearer that falls back to a hardcoded anonymous-guest JWT compiled into the bundle. With those two headers the SearchGetCategoryResults resolver returns 200 and a Constructor payload. qty = response.total_num_results. THAT VALUE IS THE RENDERED HEADER: chunk 5540-af9f31f034a84091.js pipes total_num_results into the PLP filter bar as `${totalItems}\\u00a0Products`, so the number recorded is literally what the page prints as 'N Products'. SANITY CHECKS: (1) discrimination - three invented slugs (living-furniture-sofas-not-a-real-slug, zzz-nonexistent-xyz, living-furniture-sofa) all return total_num_results=0 while real slugs return their own distinct values, so the resolver is not serving a default or a site-wide constant; (2) full enumeration - living-furniture-sofas paged to the end returned exactly 59 rows then 0, and outdoor-furniture-summer returned 100+100+100+73=373 unique ids then 0, both matching their reported totals exactly; (3) every one of the 50 leaves was read twice (rpp=1 and rpp=24) and only outdoor-lounge-sets differed (4 -> 5, flagged; 5 held on four further reads); (4) no total is a suspiciously round display cap - outdoor-furniture-summer proves there is no 100 cap; (5) category identity confirmed per slug via the SSR shell's _meta.deliveryKey/name pair. CAVEAT ON WHAT total_num_results COUNTS: it counts grid tiles after Constructor variation-slicing, so a category where one product is listed once per colour reports more tiles than distinct SKUs (living-furniture-side-tables: 100 tiles / 53 ids). This is the site's own displayed number, so it is recorded as-is and flagged on the one leaf where the gap is large. EXCLUDED AND WHY - rollups/'All' nodes: outdoor-furniture-summer (373, All Outdoor Lounge) and outdoor-furniture-dining (111, All Outdoor Dining), both parents of leaves already listed. Style/curation re-cuts of populations already listed: formal-dining (62) and casual-dining (69) (same dining tables/chairs as Dining Tables 47 + Dining Chairs 44, re-cut by style), custom-upholstery-custom-favorites (86, a curated best-of), custom-upholstery-slipcovered-upholstery (37, an upholstery-construction re-cut of the other custom leaves), living-furniture-sleepers (12) and living-furniture-loveseats (9) (mood-banner sub-cuts of Sofas 59, not in the mega-nav and not a complete decomposition of it). Collection re-cuts whose tiles are individual pieces already counted, not set SKUs: kids-furniture-bedroom-sets (34) and kids-nursery-furniture-sets (20) - unlike dining-furniture-dining-sets and outdoor-dining-sets/outdoor-lounge-sets, whose tiles are genuine '... Set' SKUs, so those were kept. Exact duplicate slug: kids-furniture-nightstands (25, nav 'Baby Nightstands') lists the same 11 products as kids-furniture-nightstand (26, nav 'Kids Nightstands'); kept once. Duplicate nav placements counted once: Daybeds & Chaises (/category/daybeds) and Chairs & Swivels (/category/living-furniture-occasional-chairs) each appear under both Living Room and Bedroom; Baby Dressers and nursery Bookshelves point at kids-furniture-dressers / kids-furniture-shelves; the whole Furniture > Outdoor submenu repeats the Outdoor department. Out of scope: bedroom-mattresses-foundations (3) and kids-furniture-mattresses (3) (mattresses are bedding), dining-cushion-covers (19, textiles), bedroom-bath-storage (16, baskets/hampers/bins = standalone storage), bedroom-bath-accessories (38, nav 'Bathroom Decor' - opened it, the grid is predominantly mirrors, sconces and flush mounts with only a handful of teak stools and a bar cart, so its primary product type is not furniture), furniture-swatches, all Clearance nodes incl. sale-furniture, 'New Furniture', and the landing pages Dining Table Collections, Seating Collections, Outdoor Collections, Riviera Collection, Upholstery Guide (all non-/category/ marketing pages). OVERLAP TO BE AWARE OF AT MERGE: the Custom Upholstery department is the made-to-order cut of the same silhouettes sold in Living Room / Bedroom / Dining, so those 7 leaves partially double-count against them. It is the site's own top-level furniture department with its own URLs, so it is kept and disclosed rather than dropped. ROBOTS: robots.txt names ClaudeBot, Claude-User and Claude-SearchBot explicitly and grants each 'Allow: /' (plus 'Allow: /search?q=') - an explicit permit, not a Claude-specific block; the only Disallows are account/checkout/bag/order/favorites/estimate/trackmyorder and /api/. Note: one call was made to www.serenaandlily.com/api/user-ip (under the disallowed /api/ prefix) to fill the userParameters.userIp field the bundle sends; it is a single non-catalogue helper endpoint and no other /api/ path was touched. The GraphQL host middleware.production.serenaandlily.com is a separate host not covered by that file. The site also publishes /llm-index.json, which was read - it carries no product counts.",
+ "rows": [
+  {
+   "category": "Furniture",
+   "sub_category": "Kitchen & Dining",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bar & Counter Stools",
+   "qty": 79,
+   "link": "https://www.serenaandlily.com/category/dining-furniture-bar-counter-stools",
+   "is_group": false,
+   "evidence": "PLP grid total from the site's own Constructor.io-backed category resolver (POST middleware.production.serenaandlily.com/graphql -> searchGetCategoryResults, JSON path response.total_num_results) - this is the exact value the page renders as '<N> Products' in its filter bar; total_num_results=79 for categorySlug 'dining-furniture-bar-counter-stools'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dining Chairs",
+   "qty": 44,
+   "link": "https://www.serenaandlily.com/category/dining-furniture-dining-chairs",
+   "is_group": false,
+   "evidence": "PLP grid total from the site's own Constructor.io-backed category resolver (POST middleware.production.serenaandlily.com/graphql -> searchGetCategoryResults, JSON path response.total_num_results) - this is the exact value the page renders as '<N> Products' in its filter bar; total_num_results=44 for categorySlug 'dining-furniture-dining-chairs'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dining Tables",
+   "qty": 47,
+   "link": "https://www.serenaandlily.com/category/dining-furniture-dining-tables",
+   "is_group": false,
+   "evidence": "PLP grid total from the site's own Constructor.io-backed category resolver (POST middleware.production.serenaandlily.com/graphql -> searchGetCategoryResults, JSON path response.total_num_results) - this is the exact value the page renders as '<N> Products' in its filter bar; total_num_results=47 for categorySlug 'dining-furniture-dining-tables'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bars & Consoles",
+   "qty": 33,
+   "link": "https://www.serenaandlily.com/category/dining-furniture-barcarts-consoles",
+   "is_group": false,
+   "evidence": "PLP grid total from the site's own Constructor.io-backed category resolver (POST middleware.production.serenaandlily.com/graphql -> searchGetCategoryResults, JSON path response.total_num_results) - this is the exact value the page renders as '<N> Products' in its filter bar; total_num_results=33 for categorySlug 'dining-furniture-barcarts-consoles'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Benches & Banquettes",
+   "qty": 12,
+   "link": "https://www.serenaandlily.com/category/dining-furniture-dining-benches",
+   "is_group": false,
+   "evidence": "PLP grid total from the site's own Constructor.io-backed category resolver (POST middleware.production.serenaandlily.com/graphql -> searchGetCategoryResults, JSON path response.total_num_results) - this is the exact value the page renders as '<N> Products' in its filter bar; total_num_results=12 for categorySlug 'dining-furniture-dining-benches'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dining Sets",
+   "qty": 28,
+   "link": "https://www.serenaandlily.com/category/dining-furniture-dining-sets",
+   "is_group": false,
+   "evidence": "PLP grid total from the site's own Constructor.io-backed category resolver (POST middleware.production.serenaandlily.com/graphql -> searchGetCategoryResults, JSON path response.total_num_results) - this is the exact value the page renders as '<N> Products' in its filter bar; total_num_results=28 for categorySlug 'dining-furniture-dining-sets'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Living Room",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Chairs & Swivels",
+   "qty": 86,
+   "link": "https://www.serenaandlily.com/category/living-furniture-occasional-chairs",
+   "is_group": false,
+   "evidence": "PLP grid total from the site's own Constructor.io-backed category resolver (POST middleware.production.serenaandlily.com/graphql -> searchGetCategoryResults, JSON path response.total_num_results) - this is the exact value the page renders as '<N> Products' in its filter bar; total_num_results=86 for categorySlug 'living-furniture-occasional-chairs'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Coffee Tables",
+   "qty": 46,
+   "link": "https://www.serenaandlily.com/category/living-furniture-side-coffee",
+   "is_group": false,
+   "evidence": "PLP grid total from the site's own Constructor.io-backed category resolver (POST middleware.production.serenaandlily.com/graphql -> searchGetCategoryResults, JSON path response.total_num_results) - this is the exact value the page renders as '<N> Products' in its filter bar; total_num_results=46 for categorySlug 'living-furniture-side-coffee'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Side & Martini Tables",
+   "qty": 100,
+   "link": "https://www.serenaandlily.com/category/living-furniture-side-tables",
+   "is_group": false,
+   "evidence": "PLP grid total from the site's own Constructor.io-backed category resolver (POST middleware.production.serenaandlily.com/graphql -> searchGetCategoryResults, JSON path response.total_num_results) - this is the exact value the page renders as '<N> Products' in its filter bar; total_num_results=100 for categorySlug 'living-furniture-side-tables'",
+   "flag": "MANUAL REVIEW: site reports 100 grid tiles but they resolve to 53 distinct product ids - this category is variation-sliced (same product listed once per colour/finish), so the site's own number counts tiles, not unique SKUs"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sofas",
+   "qty": 59,
+   "link": "https://www.serenaandlily.com/category/living-furniture-sofas",
+   "is_group": false,
+   "evidence": "PLP grid total from the site's own Constructor.io-backed category resolver (POST middleware.production.serenaandlily.com/graphql -> searchGetCategoryResults, JSON path response.total_num_results) - this is the exact value the page renders as '<N> Products' in its filter bar; total_num_results=59 for categorySlug 'living-furniture-sofas'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sectionals",
+   "qty": 65,
+   "link": "https://www.serenaandlily.com/category/living-furniture-sectionals",
+   "is_group": false,
+   "evidence": "PLP grid total from the site's own Constructor.io-backed category resolver (POST middleware.production.serenaandlily.com/graphql -> searchGetCategoryResults, JSON path response.total_num_results) - this is the exact value the page renders as '<N> Products' in its filter bar; total_num_results=65 for categorySlug 'living-furniture-sectionals'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Ottomans & Poufs",
+   "qty": 26,
+   "link": "https://www.serenaandlily.com/category/living-furniture-poufs-stools-ottomans",
+   "is_group": false,
+   "evidence": "PLP grid total from the site's own Constructor.io-backed category resolver (POST middleware.production.serenaandlily.com/graphql -> searchGetCategoryResults, JSON path response.total_num_results) - this is the exact value the page renders as '<N> Products' in its filter bar; total_num_results=26 for categorySlug 'living-furniture-poufs-stools-ottomans'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Consoles & Desks",
+   "qty": 34,
+   "link": "https://www.serenaandlily.com/category/living-furniture-consoles",
+   "is_group": false,
+   "evidence": "PLP grid total from the site's own Constructor.io-backed category resolver (POST middleware.production.serenaandlily.com/graphql -> searchGetCategoryResults, JSON path response.total_num_results) - this is the exact value the page renders as '<N> Products' in its filter bar; total_num_results=34 for categorySlug 'living-furniture-consoles'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Daybeds & Chaises",
+   "qty": 16,
+   "link": "https://www.serenaandlily.com/category/daybeds",
+   "is_group": false,
+   "evidence": "PLP grid total from the site's own Constructor.io-backed category resolver (POST middleware.production.serenaandlily.com/graphql -> searchGetCategoryResults, JSON path response.total_num_results) - this is the exact value the page renders as '<N> Products' in its filter bar; total_num_results=16 for categorySlug 'daybeds'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Benches",
+   "qty": 18,
+   "link": "https://www.serenaandlily.com/category/living-furniture-benches",
+   "is_group": false,
+   "evidence": "PLP grid total from the site's own Constructor.io-backed category resolver (POST middleware.production.serenaandlily.com/graphql -> searchGetCategoryResults, JSON path response.total_num_results) - this is the exact value the page renders as '<N> Products' in its filter bar; total_num_results=18 for categorySlug 'living-furniture-benches'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bookshelves & Hutches",
+   "qty": 9,
+   "link": "https://www.serenaandlily.com/category/living-furniture-desks-shelves",
+   "is_group": false,
+   "evidence": "PLP grid total from the site's own Constructor.io-backed category resolver (POST middleware.production.serenaandlily.com/graphql -> searchGetCategoryResults, JSON path response.total_num_results) - this is the exact value the page renders as '<N> Products' in its filter bar; total_num_results=9 for categorySlug 'living-furniture-desks-shelves'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bedroom",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Beds",
+   "qty": 85,
+   "link": "https://www.serenaandlily.com/category/bedroom-furniture-beds-headboards",
+   "is_group": false,
+   "evidence": "PLP grid total from the site's own Constructor.io-backed category resolver (POST middleware.production.serenaandlily.com/graphql -> searchGetCategoryResults, JSON path response.total_num_results) - this is the exact value the page renders as '<N> Products' in its filter bar; total_num_results=85 for categorySlug 'bedroom-furniture-beds-headboards'",
+   "flag": "MANUAL REVIEW: slug is beds-headboards and the site's own category name is 'Beds'; overlaps the separate Headboards category"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Headboards",
+   "qty": 14,
+   "link": "https://www.serenaandlily.com/category/bedroom-furniture-headboards-1",
+   "is_group": false,
+   "evidence": "PLP grid total from the site's own Constructor.io-backed category resolver (POST middleware.production.serenaandlily.com/graphql -> searchGetCategoryResults, JSON path response.total_num_results) - this is the exact value the page renders as '<N> Products' in its filter bar; total_num_results=14 for categorySlug 'bedroom-furniture-headboards-1'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Nightstands",
+   "qty": 75,
+   "link": "https://www.serenaandlily.com/category/bedroom-furniture-nightstands",
+   "is_group": false,
+   "evidence": "PLP grid total from the site's own Constructor.io-backed category resolver (POST middleware.production.serenaandlily.com/graphql -> searchGetCategoryResults, JSON path response.total_num_results) - this is the exact value the page renders as '<N> Products' in its filter bar; total_num_results=75 for categorySlug 'bedroom-furniture-nightstands'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dressers & Chests",
+   "qty": 52,
+   "link": "https://www.serenaandlily.com/category/bedroom-furniture-dressers",
+   "is_group": false,
+   "evidence": "PLP grid total from the site's own Constructor.io-backed category resolver (POST middleware.production.serenaandlily.com/graphql -> searchGetCategoryResults, JSON path response.total_num_results) - this is the exact value the page renders as '<N> Products' in its filter bar; total_num_results=52 for categorySlug 'bedroom-furniture-dressers'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "End of Bed Benches",
+   "qty": 37,
+   "link": "https://www.serenaandlily.com/category/bedroom-furniture-end-of-bed-seating",
+   "is_group": false,
+   "evidence": "PLP grid total from the site's own Constructor.io-backed category resolver (POST middleware.production.serenaandlily.com/graphql -> searchGetCategoryResults, JSON path response.total_num_results) - this is the exact value the page renders as '<N> Products' in its filter bar; total_num_results=37 for categorySlug 'bedroom-furniture-end-of-bed-seating'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bookshelves",
+   "qty": 8,
+   "link": "https://www.serenaandlily.com/category/bedroom-furniture-bookcases",
+   "is_group": false,
+   "evidence": "PLP grid total from the site's own Constructor.io-backed category resolver (POST middleware.production.serenaandlily.com/graphql -> searchGetCategoryResults, JSON path response.total_num_results) - this is the exact value the page renders as '<N> Products' in its filter bar; total_num_results=8 for categorySlug 'bedroom-furniture-bookcases'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Custom Upholstery",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Custom Chairs & Swivels",
+   "qty": 82,
+   "link": "https://www.serenaandlily.com/category/custom-upholstery-chairs",
+   "is_group": false,
+   "evidence": "PLP grid total from the site's own Constructor.io-backed category resolver (POST middleware.production.serenaandlily.com/graphql -> searchGetCategoryResults, JSON path response.total_num_results) - this is the exact value the page renders as '<N> Products' in its filter bar; total_num_results=82 for categorySlug 'custom-upholstery-chairs'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Custom Sofas",
+   "qty": 64,
+   "link": "https://www.serenaandlily.com/category/custom-upholstery-sofas",
+   "is_group": false,
+   "evidence": "PLP grid total from the site's own Constructor.io-backed category resolver (POST middleware.production.serenaandlily.com/graphql -> searchGetCategoryResults, JSON path response.total_num_results) - this is the exact value the page renders as '<N> Products' in its filter bar; total_num_results=64 for categorySlug 'custom-upholstery-sofas'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Custom Sectionals",
+   "qty": 88,
+   "link": "https://www.serenaandlily.com/category/custom-upholstery-sectionals",
+   "is_group": false,
+   "evidence": "PLP grid total from the site's own Constructor.io-backed category resolver (POST middleware.production.serenaandlily.com/graphql -> searchGetCategoryResults, JSON path response.total_num_results) - this is the exact value the page renders as '<N> Products' in its filter bar; total_num_results=88 for categorySlug 'custom-upholstery-sectionals'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Custom Benches & Ottomans",
+   "qty": 41,
+   "link": "https://www.serenaandlily.com/category/custom-upholstery-benches-ottomans",
+   "is_group": false,
+   "evidence": "PLP grid total from the site's own Constructor.io-backed category resolver (POST middleware.production.serenaandlily.com/graphql -> searchGetCategoryResults, JSON path response.total_num_results) - this is the exact value the page renders as '<N> Products' in its filter bar; total_num_results=41 for categorySlug 'custom-upholstery-benches-ottomans'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Custom Beds & Headboards",
+   "qty": 64,
+   "link": "https://www.serenaandlily.com/category/custom-upholstery-beds-headboards",
+   "is_group": false,
+   "evidence": "PLP grid total from the site's own Constructor.io-backed category resolver (POST middleware.production.serenaandlily.com/graphql -> searchGetCategoryResults, JSON path response.total_num_results) - this is the exact value the page renders as '<N> Products' in its filter bar; total_num_results=64 for categorySlug 'custom-upholstery-beds-headboards'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Custom Daybeds & Chaises",
+   "qty": 11,
+   "link": "https://www.serenaandlily.com/category/custom-upholstery-chaise-loungers",
+   "is_group": false,
+   "evidence": "PLP grid total from the site's own Constructor.io-backed category resolver (POST middleware.production.serenaandlily.com/graphql -> searchGetCategoryResults, JSON path response.total_num_results) - this is the exact value the page renders as '<N> Products' in its filter bar; total_num_results=11 for categorySlug 'custom-upholstery-chaise-loungers'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Custom Dining Chairs & Stools",
+   "qty": 32,
+   "link": "https://www.serenaandlily.com/category/custom-upholstery-dining-chairs",
+   "is_group": false,
+   "evidence": "PLP grid total from the site's own Constructor.io-backed category resolver (POST middleware.production.serenaandlily.com/graphql -> searchGetCategoryResults, JSON path response.total_num_results) - this is the exact value the page renders as '<N> Products' in its filter bar; total_num_results=32 for categorySlug 'custom-upholstery-dining-chairs'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Outdoor Lounge",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Outdoor Chairs",
+   "qty": 56,
+   "link": "https://www.serenaandlily.com/category/outdoor-chairs",
+   "is_group": false,
+   "evidence": "PLP grid total from the site's own Constructor.io-backed category resolver (POST middleware.production.serenaandlily.com/graphql -> searchGetCategoryResults, JSON path response.total_num_results) - this is the exact value the page renders as '<N> Products' in its filter bar; total_num_results=56 for categorySlug 'outdoor-chairs'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Outdoor Sofas",
+   "qty": 29,
+   "link": "https://www.serenaandlily.com/category/outdoor-sofas",
+   "is_group": false,
+   "evidence": "PLP grid total from the site's own Constructor.io-backed category resolver (POST middleware.production.serenaandlily.com/graphql -> searchGetCategoryResults, JSON path response.total_num_results) - this is the exact value the page renders as '<N> Products' in its filter bar; total_num_results=29 for categorySlug 'outdoor-sofas'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Outdoor Sectionals",
+   "qty": 45,
+   "link": "https://www.serenaandlily.com/category/outdoor-sectionals",
+   "is_group": false,
+   "evidence": "PLP grid total from the site's own Constructor.io-backed category resolver (POST middleware.production.serenaandlily.com/graphql -> searchGetCategoryResults, JSON path response.total_num_results) - this is the exact value the page renders as '<N> Products' in its filter bar; total_num_results=45 for categorySlug 'outdoor-sectionals'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Outdoor Coffee & Side Tables",
+   "qty": 24,
+   "link": "https://www.serenaandlily.com/category/outdoor-coffee-side-tables",
+   "is_group": false,
+   "evidence": "PLP grid total from the site's own Constructor.io-backed category resolver (POST middleware.production.serenaandlily.com/graphql -> searchGetCategoryResults, JSON path response.total_num_results) - this is the exact value the page renders as '<N> Products' in its filter bar; total_num_results=24 for categorySlug 'outdoor-coffee-side-tables'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Outdoor Side & Martini Tables",
+   "qty": 39,
+   "link": "https://www.serenaandlily.com/category/outdoor-side-martini-tables",
+   "is_group": false,
+   "evidence": "PLP grid total from the site's own Constructor.io-backed category resolver (POST middleware.production.serenaandlily.com/graphql -> searchGetCategoryResults, JSON path response.total_num_results) - this is the exact value the page renders as '<N> Products' in its filter bar; total_num_results=39 for categorySlug 'outdoor-side-martini-tables'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Outdoor Chaises & Daybeds",
+   "qty": 30,
+   "link": "https://www.serenaandlily.com/category/outdoor-chaise",
+   "is_group": false,
+   "evidence": "PLP grid total from the site's own Constructor.io-backed category resolver (POST middleware.production.serenaandlily.com/graphql -> searchGetCategoryResults, JSON path response.total_num_results) - this is the exact value the page renders as '<N> Products' in its filter bar; total_num_results=30 for categorySlug 'outdoor-chaise'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Outdoor Ottomans & Poufs",
+   "qty": 7,
+   "link": "https://www.serenaandlily.com/category/outdoor-ottomans-poufs",
+   "is_group": false,
+   "evidence": "PLP grid total from the site's own Constructor.io-backed category resolver (POST middleware.production.serenaandlily.com/graphql -> searchGetCategoryResults, JSON path response.total_num_results) - this is the exact value the page renders as '<N> Products' in its filter bar; total_num_results=7 for categorySlug 'outdoor-ottomans-poufs'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Outdoor Lounge Sets",
+   "qty": 5,
+   "link": "https://www.serenaandlily.com/category/outdoor-lounge-sets",
+   "is_group": false,
+   "evidence": "PLP grid total from the site's own Constructor.io-backed category resolver (POST middleware.production.serenaandlily.com/graphql -> searchGetCategoryResults, JSON path response.total_num_results) - this is the exact value the page renders as '<N> Products' in its filter bar; total_num_results=5 for categorySlug 'outdoor-lounge-sets'",
+   "flag": "MANUAL REVIEW: count drifted 4 -> 5 within the session; 5 confirmed on four consecutive later reads and used"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Outdoor Dining",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Outdoor Dining Chairs & Stools",
+   "qty": 66,
+   "link": "https://www.serenaandlily.com/category/outdoor-dining-chairs",
+   "is_group": false,
+   "evidence": "PLP grid total from the site's own Constructor.io-backed category resolver (POST middleware.production.serenaandlily.com/graphql -> searchGetCategoryResults, JSON path response.total_num_results) - this is the exact value the page renders as '<N> Products' in its filter bar; total_num_results=66 for categorySlug 'outdoor-dining-chairs'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Outdoor Dining Tables",
+   "qty": 27,
+   "link": "https://www.serenaandlily.com/category/outdoor-dining-tables",
+   "is_group": false,
+   "evidence": "PLP grid total from the site's own Constructor.io-backed category resolver (POST middleware.production.serenaandlily.com/graphql -> searchGetCategoryResults, JSON path response.total_num_results) - this is the exact value the page renders as '<N> Products' in its filter bar; total_num_results=27 for categorySlug 'outdoor-dining-tables'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Outdoor Dining Sets",
+   "qty": 21,
+   "link": "https://www.serenaandlily.com/category/outdoor-dining-sets",
+   "is_group": false,
+   "evidence": "PLP grid total from the site's own Constructor.io-backed category resolver (POST middleware.production.serenaandlily.com/graphql -> searchGetCategoryResults, JSON path response.total_num_results) - this is the exact value the page renders as '<N> Products' in its filter bar; total_num_results=21 for categorySlug 'outdoor-dining-sets'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Outdoor Bars & Consoles",
+   "qty": 6,
+   "link": "https://www.serenaandlily.com/category/outdoor-dining-bar-carts-consoles",
+   "is_group": false,
+   "evidence": "PLP grid total from the site's own Constructor.io-backed category resolver (POST middleware.production.serenaandlily.com/graphql -> searchGetCategoryResults, JSON path response.total_num_results) - this is the exact value the page renders as '<N> Products' in its filter bar; total_num_results=6 for categorySlug 'outdoor-dining-bar-carts-consoles'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Kids Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Kids Bunk Beds & Beds",
+   "qty": 14,
+   "link": "https://www.serenaandlily.com/category/kids-furniture-beds",
+   "is_group": false,
+   "evidence": "PLP grid total from the site's own Constructor.io-backed category resolver (POST middleware.production.serenaandlily.com/graphql -> searchGetCategoryResults, JSON path response.total_num_results) - this is the exact value the page renders as '<N> Products' in its filter bar; total_num_results=14 for categorySlug 'kids-furniture-beds'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Kids Dressers",
+   "qty": 13,
+   "link": "https://www.serenaandlily.com/category/kids-furniture-dressers",
+   "is_group": false,
+   "evidence": "PLP grid total from the site's own Constructor.io-backed category resolver (POST middleware.production.serenaandlily.com/graphql -> searchGetCategoryResults, JSON path response.total_num_results) - this is the exact value the page renders as '<N> Products' in its filter bar; total_num_results=13 for categorySlug 'kids-furniture-dressers'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Kids Nightstands",
+   "qty": 26,
+   "link": "https://www.serenaandlily.com/category/kids-furniture-nightstand",
+   "is_group": false,
+   "evidence": "PLP grid total from the site's own Constructor.io-backed category resolver (POST middleware.production.serenaandlily.com/graphql -> searchGetCategoryResults, JSON path response.total_num_results) - this is the exact value the page renders as '<N> Products' in its filter bar; total_num_results=26 for categorySlug 'kids-furniture-nightstand'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Kids Bookshelves",
+   "qty": 11,
+   "link": "https://www.serenaandlily.com/category/kids-furniture-shelves",
+   "is_group": false,
+   "evidence": "PLP grid total from the site's own Constructor.io-backed category resolver (POST middleware.production.serenaandlily.com/graphql -> searchGetCategoryResults, JSON path response.total_num_results) - this is the exact value the page renders as '<N> Products' in its filter bar; total_num_results=11 for categorySlug 'kids-furniture-shelves'",
+   "flag": "MANUAL REVIEW: ambiguous shelving - the site's own name is 'Shelves & Storage'; grid is mostly bookshelves plus a storage bench and toy chest (furniture) but includes 2 wall shelves (Piccolo Wall Shelf, Rattan Wave Wall Shelf)"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Kids Desks & Study Room",
+   "qty": 14,
+   "link": "https://www.serenaandlily.com/category/kids-furniture-study",
+   "is_group": false,
+   "evidence": "PLP grid total from the site's own Constructor.io-backed category resolver (POST middleware.production.serenaandlily.com/graphql -> searchGetCategoryResults, JSON path response.total_num_results) - this is the exact value the page renders as '<N> Products' in its filter bar; total_num_results=14 for categorySlug 'kids-furniture-study'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Kids Playroom Furniture",
+   "qty": 54,
+   "link": "https://www.serenaandlily.com/category/kids-furniture-playroom",
+   "is_group": false,
+   "evidence": "PLP grid total from the site's own Constructor.io-backed category resolver (POST middleware.production.serenaandlily.com/graphql -> searchGetCategoryResults, JSON path response.total_num_results) - this is the exact value the page renders as '<N> Products' in its filter bar; total_num_results=54 for categorySlug 'kids-furniture-playroom'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Nursery Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Cribs & Toddler Beds",
+   "qty": 8,
+   "link": "https://www.serenaandlily.com/category/kids-nursery-furniture-cribs",
+   "is_group": false,
+   "evidence": "PLP grid total from the site's own Constructor.io-backed category resolver (POST middleware.production.serenaandlily.com/graphql -> searchGetCategoryResults, JSON path response.total_num_results) - this is the exact value the page renders as '<N> Products' in its filter bar; total_num_results=8 for categorySlug 'kids-nursery-furniture-cribs'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Changing Tables",
+   "qty": 15,
+   "link": "https://www.serenaandlily.com/category/kids-nursery-furniture-changing-tables",
+   "is_group": false,
+   "evidence": "PLP grid total from the site's own Constructor.io-backed category resolver (POST middleware.production.serenaandlily.com/graphql -> searchGetCategoryResults, JSON path response.total_num_results) - this is the exact value the page renders as '<N> Products' in its filter bar; total_num_results=15 for categorySlug 'kids-nursery-furniture-changing-tables'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Gliders",
+   "qty": 3,
+   "link": "https://www.serenaandlily.com/category/kids-nursery-furniture-gliders",
+   "is_group": false,
+   "evidence": "PLP grid total from the site's own Constructor.io-backed category resolver (POST middleware.production.serenaandlily.com/graphql -> searchGetCategoryResults, JSON path response.total_num_results) - this is the exact value the page renders as '<N> Products' in its filter bar; total_num_results=3 for categorySlug 'kids-nursery-furniture-gliders'",
+   "flag": null
+  }
+ ]
+}

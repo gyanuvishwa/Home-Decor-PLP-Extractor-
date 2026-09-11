@@ -1,0 +1,1668 @@
+{
+ "sr": 253,
+ "company": "Lightology",
+ "brand_site": "lightology.com",
+ "country": "USA",
+ "site_url": "https://www.lightology.com/",
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ACCESS: www.lightology.com returns HTTP 404 'Blocked' (Barracuda WAF, reason GEO_IP_BLOCK) on direct fetch, and r.jina.ai hit a Cloudflare challenge page. Working route: translate.goog proxy (https://www-lightology-com.translate.goog/...?_x_tr_sl=en&_x_tr_tl=fr&_x_tr_hl=en), HTTP 200, full HTML. robots.txt itself returned the same Blocked page (no Claude-specific disallow could be read; proceeded per Rule 2 side-door guidance since the block is a generic geo/WAF block, not a targeted bot opt-out). COUNT METHOD: site is a custom (non-Shopify/Magento) PHP catalogue (index.php?module=cat&cat_id=N). No reliable total-count field/JSON was exposed; used product-card DOM count (class='col-md-4 prod-border', confirmed 1 card = 1 unique item_id/SKU) on page 1, found the last pagination page number from the pager widget, fetched that exact last page, and computed total = per_page*(last_page-1) + last_page_count. Verified the pager truly caps there by requesting one page beyond the shown max and confirming the site clamps back to the same last page (tested on cat_id=106 Pendants: requesting page=335 silently served page 334). ONE EXCEPTION FLAGGED: Pendants (cat_id=106) computed to exactly 10000 (334 pages x 30 + 10) - an exactly-round number matching a common search-index max_result_window cap; flagged null+MANUAL REVIEW rather than trusted, per Rule 1 (capped totals are not exact). All other totals were non-round, natural-looking numbers. STRUCTURE DISCOVERY: roughly a third of the nav's direct category links (e.g. cat_id 12,17,18,13,432,612,25,21,22,23,20,27,485,33,575,55,56,58,679, and Track & Rail's 115/119/117/671/576) render as landing pages with zero product cards but DO contain subcategory tiles (col-md-3 cat) leading to further, differently-numbered cat_ids (brand- or sub-type-specific) that hold the actual products - recursively crawled these (up to 4 levels deep, e.g. Track & Rail > Track System 120V > Juno Master Trac > Trac-Master Heads) rather than reporting them as empty. Several of these rollups are themselves aliases of each other under different cat_ids (identical child tile sets) - e.g. cat_id 115 and 538 both list the same 7 brand children, and Track&Rail's Outdoor Track (679) = Ceiling's Track > Outdoor Track (542) = the same PureEdge(63)/WAC(678) pages; each underlying product-bearing cat_id was counted exactly once. cat_id=504 (Lighted Mirrors) HTTP-redirects to cat_id=32 (Mirror With Light) (confirmed via final_url) - exact duplicate, dropped. A cluster of 8 LED-strip cat_ids (658,616,617,192,473,528,521,570) is cross-listed identically under 4 different parent menus (Ceiling Strip Lighting, Cabinet/Under Counter Lighting, Display Lighting, Bath Strip Lighting) - counted once under Ceiling > Strip Lighting. RULE 0 GAINS: found a genuine, separate Home Decor sub-tree (cat_id=491, reached only via the Furniture nav item, not the Lighting mega-menu) containing Wall Decor, Planters & Vases, Clocks & Watches, and Decorative Accents - all in-scope decorative-accessory categories with real product counts, plus a separate Decorative Mirrors (cat_id=572) leaf. Also traversed Lighting 'by room' - the module=shop_by_room_* pages are pure marketing/inspiration landing pages with zero independent product grids; every link on them points back into the same cat_id product pages already captured under the type tree, so per Rule 0 this is a pure facet re-cut (not a genuine independent room branch) and was not emitted as a separate hierarchy. EXCLUSIONS APPLIED: Bulbs (cat_id=72, entire branch), Fans (cat_id=6, entire branch incl. Outdoor Ceiling Fans and Bath Exhaust Fans/Heat Lamps), Furniture (Seating/Tables/Storage/Office Furniture/Outdoor Furniture/Rugs under cat_id=486), and hardware/parts/wiring items throughout the Lighting tree (Canopies, Freejack Canopies, Retrofit Kits, Dimmers/Light Controls, Transformers/Power Supplies, 12V Transformers, generic Lighting Accessories/Outdoor Lighting Accessories shade-lens-cord parts, and every Track & Connectors/Stem Kits/Transformers/Accessories/Hardware child found while crawling the track-system brand sub-trees). Home Fragrance, wallpaper, holiday/gift, textiles, and kitchenware were not found on this site (it is a pure lighting + small home-decor specialist) so no exclusion rows were needed for those categories. DUPLICATE-COMPANY CHECK: no evidence this storefront is a duplicate of another company already in the project (Lightology is an independent Chicago-based online/showroom lighting retailer).",
+ "rows": [
+  {
+   "category": "Lighting",
+   "sub_category": "Chandeliers & Pendants",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Chandeliers",
+   "parent": false,
+   "qty": 5356,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=11",
+   "evidence": "pagination: 179 pages x 30/page + 16 on last page (cat_id=11) = 5356",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Pendants",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=106",
+   "evidence": "pagination-reported total exactly 10000 (334 pages x30 +10; requesting page 335 clamps back to page 334) - matches a common search-index max_result_window cap (e.g. 10000); true count likely higher and not exactly determinable via pagination",
+   "flag": "MANUAL REVIEW: pagination total capped at exactly 10000, suspected search-engine result-window cap, not a verified exact count"
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Mini Pendants",
+   "parent": false,
+   "qty": 1243,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=107",
+   "evidence": "pagination: 42 pages x 30/page + 13 on last page (cat_id=107) = 1243",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Linear Suspensions",
+   "parent": false,
+   "qty": 2632,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=109",
+   "evidence": "pagination: 88 pages x 30/page + 22 on last page (cat_id=109) = 2632",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Freejack Pendants",
+   "parent": false,
+   "qty": 40,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=201",
+   "evidence": "pagination: 2 pages x 30/page + 10 on last page (cat_id=201) = 40",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Multi-Light Pendants",
+   "parent": false,
+   "qty": 1532,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=203",
+   "evidence": "pagination: 52 pages x 30/page + 2 on last page (cat_id=203) = 1532",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Plug-In Pendants",
+   "parent": false,
+   "qty": 56,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=608",
+   "evidence": "pagination: 2 pages x 30/page + 26 on last page (cat_id=608) = 56",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Ceiling",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Ceiling Flush Mount",
+   "parent": false,
+   "qty": 2490,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=9",
+   "evidence": "pagination: 83 pages x 30/page + 30 on last page (cat_id=9) = 2490",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Ceiling Adjustable Spots - Freejack",
+   "parent": false,
+   "qty": 218,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=10",
+   "evidence": "pagination: 8 pages x 30/page + 8 on last page (cat_id=10) = 218",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Ceiling Semi Flush",
+   "parent": false,
+   "qty": 2061,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=442",
+   "evidence": "pagination: 69 pages x 30/page + 21 on last page (cat_id=442) = 2061",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Ceiling Linear",
+   "parent": false,
+   "qty": 60,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=455",
+   "evidence": "pagination: 2 pages x 30/page + 30 on last page (cat_id=455) = 60 (also cross-listed as 'Linear Lighting' under Commercial Ceiling Lighting - same cat_id, counted once)",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Strip Lighting",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "LED Strip Lighting - Lazer Strip",
+   "parent": false,
+   "qty": 12,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=658",
+   "evidence": "single page, 12 product cards (cat_id=658)",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "LED Strip Lighting - Stomp Strip",
+   "parent": false,
+   "qty": 12,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=616",
+   "evidence": "single page, 12 product cards (cat_id=616)",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "LED Strip Lighting - Twist Strip",
+   "parent": false,
+   "qty": 1,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=617",
+   "evidence": "single page, 1 product card (cat_id=617)",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "LED Strip Lighting - SS3 Soft Strip RGB 2.6W 24V",
+   "parent": false,
+   "qty": 19,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=192",
+   "evidence": "single page, 19 product cards (cat_id=192)",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "LED Strip Lighting - Soft Strip Monochromatic Color 24V",
+   "parent": false,
+   "qty": 16,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=473",
+   "evidence": "single page, 16 product cards (cat_id=473)",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "LED Strip Lighting - SS5 Soft Strip RGB 5W 24V",
+   "parent": false,
+   "qty": 19,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=528",
+   "evidence": "single page, 19 product cards (cat_id=528)",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "LED Strip Lighting - SS6 Soft Strip 6.3W 24V RGB White",
+   "parent": false,
+   "qty": 17,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=521",
+   "evidence": "single page, 17 product cards (cat_id=521)",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "LED Strip Lighting - SS10C Soft Strip 9.6W 24V White Commercial",
+   "parent": false,
+   "qty": 8,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=570",
+   "evidence": "single page, 8 product cards (cat_id=570)",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Linear Strip Lighting",
+   "parent": false,
+   "qty": 24,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=94",
+   "evidence": "single page, 24 product cards (cat_id=94)",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "LED Lazer Line",
+   "parent": false,
+   "qty": 4,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=284",
+   "evidence": "single page, 4 product cards (cat_id=284); same cat_id also reachable directly as top-nav 'Lazer Line' under Ceiling - counted once",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Light Channel (Strip Lighting)",
+   "parent": false,
+   "qty": 60,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=474",
+   "evidence": "pagination: 2 pages x 30/page + 30 on last page (cat_id=474) = 60",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Monorail Lighting",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Monorail 1-Circuit Lighting",
+   "parent": false,
+   "qty": 0,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=535",
+   "evidence": "single page, 0 product cards, no subcategory tiles (cat_id=535) - genuinely empty",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Wall Monorail (Tech Lighting)",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Wall Monorail - Heads",
+   "parent": false,
+   "qty": 12,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=388",
+   "evidence": "single page, 12 product cards (cat_id=388)",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Wall Monorail - Monorail",
+   "parent": false,
+   "qty": 1,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=389",
+   "evidence": "single page, 1 product card (cat_id=389)",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Track & Rail",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Track & Rail > MicroTrack",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "MicroTrack Ceiling",
+   "parent": false,
+   "qty": 28,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=673",
+   "evidence": "single page, 28 product cards (cat_id=673)",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "MicroTrack Recessed",
+   "parent": false,
+   "qty": 23,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=672",
+   "evidence": "single page, 23 product cards (cat_id=672)",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Track & Rail > Track System 120V",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Track & Rail > Track System 120V > Juno Master Trac",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Juno Master Trac - Heads",
+   "parent": false,
+   "qty": 68,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=325",
+   "evidence": "pagination: 3 pages x 30/page + 8 on last page (cat_id=325) = 68",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Track & Rail > Track System 120V > Juno Budget Track",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Juno Budget Track - Heads 12 Volt",
+   "parent": false,
+   "qty": 2,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=334",
+   "evidence": "single page, 2 product cards (cat_id=334)",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Juno Budget Track - Heads 120 Volt",
+   "parent": false,
+   "qty": 63,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=335",
+   "evidence": "pagination: 3 pages x 30/page + 3 on last page (cat_id=335) = 63",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Track & Rail > Track System 120V > Halo Track",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Halo Track - Heads",
+   "parent": false,
+   "qty": 56,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=493",
+   "evidence": "pagination: 2 pages x 30/page + 26 on last page (cat_id=493) = 56",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Halo Track - System Components",
+   "parent": false,
+   "qty": 21,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=503",
+   "evidence": "single page, 21 product cards (cat_id=503)",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Track & Rail > Track System 120V > WAC Track System",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "WAC Track System - J, H, L Series Heads 120V",
+   "parent": false,
+   "qty": 38,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=514",
+   "evidence": "pagination: 2 pages x 30/page + 8 on last page (cat_id=514) = 38",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Track & Rail > Track System 120V > Nora NT Track",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Nora NT Track - Heads 120 Volt",
+   "parent": false,
+   "qty": 6,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=582",
+   "evidence": "single page, 6 product cards (cat_id=582)",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Lucifer Track",
+   "parent": false,
+   "qty": 1,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=660",
+   "evidence": "single page, 1 product card (cat_id=660)",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Track & Rail > Track System 120V > Satco Nuvo Track System",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Satco Nuvo Track Heads",
+   "parent": false,
+   "qty": 0,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=666",
+   "evidence": "single page, 0 product cards, no subcategory tiles (cat_id=666) - genuinely empty",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Track & Rail > Mini Track Low Voltage",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Track & Rail > Mini Track Low Voltage > Juno Trac 12",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Juno Trac 12 - Heads",
+   "parent": false,
+   "qty": 3,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=344",
+   "evidence": "single page, 3 product cards (cat_id=344)",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Track & Rail > Mini Track Low Voltage > Juno Trac 12/25",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Juno Trac 12/25 - Heads",
+   "parent": false,
+   "qty": 3,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=354",
+   "evidence": "single page, 3 product cards (cat_id=354)",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "TS24 Surface Track",
+   "parent": false,
+   "qty": 46,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=223",
+   "evidence": "pagination: 2 pages x 30/page + 16 on last page (cat_id=223) = 46",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Track & Rail > Mini Track Low Voltage > ET2 Continuum Track 24V",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "ET2 Continuum Track - Components",
+   "parent": false,
+   "qty": 13,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=669",
+   "evidence": "single page, 13 product cards (cat_id=669)",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "ET2 Continuum Track - Heads and Pendants",
+   "parent": false,
+   "qty": 15,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=670",
+   "evidence": "single page, 15 product cards (cat_id=670)",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Track & Rail > Recessed Track System",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "TruTrack Single Circuit Recessed Track",
+   "parent": false,
+   "qty": 28,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=578",
+   "evidence": "single page, 28 product cards (cat_id=578)",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "TruTrack Dual Source Recessed Track",
+   "parent": false,
+   "qty": 21,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=606",
+   "evidence": "single page, 21 product cards (cat_id=606)",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "TruTrack Trim Magnetic 2-Circuit Recessed Track",
+   "parent": false,
+   "qty": 12,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=677",
+   "evidence": "single page, 12 product cards (cat_id=677)",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "TruTrack Magnetic 2-Circuit Recessed Track",
+   "parent": false,
+   "qty": 27,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=659",
+   "evidence": "single page, 27 product cards (cat_id=659)",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Track & Rail > Track 2-Circuit 120V",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Track & Rail > Track 2-Circuit 120V > Juno 2-Circuit Trac-Master",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Juno 2-Circuit Trac-Master - Heads 12 Volt",
+   "parent": false,
+   "qty": 2,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=362",
+   "evidence": "single page, 2 product cards (cat_id=362)",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Juno 2-Circuit Trac-Master - Heads 120 Volt",
+   "parent": false,
+   "qty": 57,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=363",
+   "evidence": "pagination: 2 pages x 30/page + 27 on last page (cat_id=363) = 57",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Track & Rail > Track 2-Circuit 120V > WAC 2-Circuit Track",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "WAC 2-Circuit Track - 120V Heads",
+   "parent": false,
+   "qty": 24,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=510",
+   "evidence": "single page, 24 product cards (cat_id=510)",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Kable Lighting",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Kable Lighting - Heads",
+   "parent": false,
+   "qty": 4,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=99",
+   "evidence": "single page, 4 product cards (cat_id=99)",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Kable Lighting - Pendants",
+   "parent": false,
+   "qty": 6,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=102",
+   "evidence": "single page, 6 product cards (cat_id=102)",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Kable Lighting - Kits",
+   "parent": false,
+   "qty": 3,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=101",
+   "evidence": "single page, 3 product cards (cat_id=101)",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Recessed Downlights",
+   "parent": false,
+   "qty": 0,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=472",
+   "evidence": "single page, 0 product cards, no subcategory tiles (cat_id=472) - genuinely empty",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Commercial Lighting",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Commercial Lighting > Commercial Ceiling Lighting",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Commercial Lighting > Commercial Ceiling Lighting > LED Panels",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "2x2 LED Panels",
+   "parent": false,
+   "qty": 5,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=213",
+   "evidence": "single page, 5 product cards (cat_id=213)",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "2x4 LED Panels",
+   "parent": false,
+   "qty": 5,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=212",
+   "evidence": "single page, 5 product cards (cat_id=212)",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "1x4 LED Panels",
+   "parent": false,
+   "qty": 4,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=611",
+   "evidence": "single page, 4 product cards (cat_id=611)",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Troffers",
+   "parent": false,
+   "qty": 4,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=111",
+   "evidence": "single page, 4 product cards (cat_id=111)",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "LED Wafers",
+   "parent": false,
+   "qty": 14,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=590",
+   "evidence": "single page, 14 product cards (cat_id=590)",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Commercial Recessed Lighting",
+   "parent": false,
+   "qty": 0,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=600",
+   "evidence": "single page, 0 product cards, no subcategory tiles (cat_id=600) - genuinely empty",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "High Bay",
+   "parent": false,
+   "qty": 1,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=591",
+   "evidence": "single page, 1 product card (cat_id=591)",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Vapor Tight",
+   "parent": false,
+   "qty": 3,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=592",
+   "evidence": "single page, 3 product cards (cat_id=592)",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Performance Cylinders",
+   "parent": false,
+   "qty": 40,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=593",
+   "evidence": "pagination: 2 pages x 30/page + 10 on last page (cat_id=593) = 40",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "T-Bar Ceiling",
+   "parent": false,
+   "qty": 1,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=637",
+   "evidence": "single page, 1 product card (cat_id=637)",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Commercial Lighting > Commercial Wall Sconces",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Commercial Wall Packs",
+   "parent": false,
+   "qty": 32,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=594",
+   "evidence": "pagination: 2 pages x 30/page + 2 on last page (cat_id=594) = 32; same cat_id 485 also reachable as top-nav 'Commercial Wall' under Wall - counted once here",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Commercial Utility Wall",
+   "parent": false,
+   "qty": 36,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=595",
+   "evidence": "pagination: 2 pages x 30/page + 6 on last page (cat_id=595) = 36",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Commercial Lighting > Commercial Outdoor Lighting",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "RLM Lighting",
+   "parent": false,
+   "qty": 89,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=601",
+   "evidence": "pagination: 3 pages x 30/page + 29 on last page (cat_id=601) = 89",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Commercial Flood Lights",
+   "parent": false,
+   "qty": 8,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=596",
+   "evidence": "single page, 8 product cards (cat_id=596)",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Building / Sign Lighting",
+   "parent": false,
+   "qty": 34,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=597",
+   "evidence": "pagination: 2 pages x 30/page + 4 on last page (cat_id=597) = 34",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Parking Lot Lighting",
+   "parent": false,
+   "qty": 1,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=598",
+   "evidence": "single page, 1 product card (cat_id=598)",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Emergency Lighting",
+   "parent": false,
+   "qty": 6,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=599",
+   "evidence": "single page, 6 product cards (cat_id=599)",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Exit Signs",
+   "parent": false,
+   "qty": 2,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=78",
+   "evidence": "single page, 2 product cards (cat_id=78)",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Commercial Task Lighting",
+   "parent": false,
+   "qty": 25,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=605",
+   "evidence": "single page, 25 product cards (cat_id=605)",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Acoustic Lighting",
+   "parent": false,
+   "qty": 92,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=602",
+   "evidence": "pagination: 4 pages x 30/page + 2 on last page (cat_id=602) = 92",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Vanishing Point",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Vanishing Point Millwork",
+   "parent": false,
+   "qty": 19,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=613",
+   "evidence": "single page, 19 product cards (cat_id=613)",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Vanishing Point Drywall",
+   "parent": false,
+   "qty": 21,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=614",
+   "evidence": "single page, 21 product cards (cat_id=614)",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Wall",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Wall Sconces",
+   "parent": false,
+   "qty": 8202,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=24",
+   "evidence": "pagination: 274 pages x 30/page + 12 on last page (cat_id=24) = 8202",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Wall Reading Swing Arm",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Canopy Mount Swing Arm",
+   "parent": false,
+   "qty": 463,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=146",
+   "evidence": "pagination: 16 pages x 30/page + 13 on last page (cat_id=146) = 463",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Plug In Swing Arm",
+   "parent": false,
+   "qty": 302,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=147",
+   "evidence": "pagination: 11 pages x 30/page + 2 on last page (cat_id=147) = 302",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Picture Lights",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Junction Box Picture Light",
+   "parent": false,
+   "qty": 185,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=131",
+   "evidence": "pagination: 7 pages x 30/page + 5 on last page (cat_id=131) = 185",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Plug In Picture Light",
+   "parent": false,
+   "qty": 73,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=132",
+   "evidence": "pagination: 3 pages x 30/page + 13 on last page (cat_id=132) = 73",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Cabinet / Under Counter Lighting",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Puck and Dots",
+   "parent": false,
+   "qty": 21,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=136",
+   "evidence": "single page, 21 product cards (cat_id=136)",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Linear Under Cabinet",
+   "parent": false,
+   "qty": 26,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=321",
+   "evidence": "single page, 26 product cards (cat_id=321)",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Light Channel (Cabinet)",
+   "parent": false,
+   "qty": 26,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=380",
+   "evidence": "single page, 26 product cards (cat_id=380)",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Plug-In Wall Sconces",
+   "parent": false,
+   "qty": 244,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=607",
+   "evidence": "pagination: 9 pages x 30/page + 4 on last page (cat_id=607) = 244",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Wall-Step Recessed Lighting",
+   "parent": false,
+   "qty": 93,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=26",
+   "evidence": "pagination: 4 pages x 30/page + 3 on last page (cat_id=26) = 93",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Wall Wash & Wall Grazer",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "LED Fixtures White",
+   "parent": false,
+   "qty": 12,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=150",
+   "evidence": "single page, 12 product cards (cat_id=150)",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "LED Fixtures RGB",
+   "parent": false,
+   "qty": 3,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=151",
+   "evidence": "single page, 3 product cards (cat_id=151)",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Mirror With Light (Lighted Mirrors)",
+   "parent": false,
+   "qty": 248,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=32",
+   "evidence": "pagination: 9 pages x 30/page + 8 on last page (cat_id=32) = 248; cat_id=504 'Lighted Mirrors' redirects to this same cat_id=32 - duplicate, counted once",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Bath",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Bath Bar & Vanity Wall",
+   "parent": false,
+   "qty": 3245,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=29",
+   "evidence": "pagination: 109 pages x 30/page + 5 on last page (cat_id=29) = 3245",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Vanity Wall Recessed Lighting",
+   "parent": false,
+   "qty": 15,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=30",
+   "evidence": "single page, 15 product cards (cat_id=30)",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Mirror (Bath)",
+   "parent": false,
+   "qty": 55,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=31",
+   "evidence": "pagination: 2 pages x 30/page + 25 on last page (cat_id=31) = 55",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Ceiling Shower Recessed",
+   "parent": false,
+   "qty": 105,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=34",
+   "evidence": "pagination: 4 pages x 30/page + 15 on last page (cat_id=34) = 105",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Ceiling Shower Flush",
+   "parent": false,
+   "qty": 30,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=35",
+   "evidence": "single page, 30 product cards (cat_id=35)",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Shower Recessed Floor / Wall",
+   "parent": false,
+   "qty": 8,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=36",
+   "evidence": "single page, 8 product cards (cat_id=36)",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Floor & Table",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Desk Lamps",
+   "parent": false,
+   "qty": 463,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=38",
+   "evidence": "pagination: 16 pages x 30/page + 13 on last page (cat_id=38) = 463",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Desk Clamp-On",
+   "parent": false,
+   "qty": 52,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=39",
+   "evidence": "pagination: 2 pages x 30/page + 22 on last page (cat_id=39) = 52",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Table Lamps Shade & Ambient",
+   "parent": false,
+   "qty": 3582,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=40",
+   "evidence": "pagination: 120 pages x 30/page + 12 on last page (cat_id=40) = 3582",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Floor Ambient & Shade Lighting",
+   "parent": false,
+   "qty": 1491,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=43",
+   "evidence": "pagination: 50 pages x 30/page + 21 on last page (cat_id=43) = 1491",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Floor Reading / Task Lamps",
+   "parent": false,
+   "qty": 583,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=45",
+   "evidence": "pagination: 20 pages x 30/page + 13 on last page (cat_id=45) = 583",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Floor Recessed",
+   "parent": false,
+   "qty": 4,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=46",
+   "evidence": "single page, 4 product cards (cat_id=46)",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Up Light Floor Spots",
+   "parent": false,
+   "qty": 6,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=48",
+   "evidence": "single page, 6 product cards (cat_id=48)",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "LED Novelty Accent Lamps",
+   "parent": false,
+   "qty": 96,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=460",
+   "evidence": "pagination: 4 pages x 30/page + 6 on last page (cat_id=460) = 96",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Portable Lamps",
+   "parent": false,
+   "qty": 489,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=609",
+   "evidence": "pagination: 17 pages x 30/page + 9 on last page (cat_id=609) = 489",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Recessed",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Ceiling Downlights",
+   "parent": false,
+   "qty": 0,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=110",
+   "evidence": "single page, 0 product cards, no subcategory tiles (cat_id=110) - genuinely empty",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Wall Wash (Recessed)",
+   "parent": false,
+   "qty": 174,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=113",
+   "evidence": "pagination: 6 pages x 30/page + 24 on last page (cat_id=113) = 174",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Wall Grazer (Recessed)",
+   "parent": false,
+   "qty": 4,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=114",
+   "evidence": "single page, 4 product cards (cat_id=114)",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Architectural Recessed / Recessed Linear",
+   "parent": false,
+   "qty": 62,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=433",
+   "evidence": "pagination: 3 pages x 30/page + 2 on last page (cat_id=433) = 62",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Outdoor",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Landscape Lighting",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Flex Neon",
+   "parent": false,
+   "qty": 17,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=629",
+   "evidence": "single page, 17 product cards (cat_id=629)",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Accent Landscape Lighting",
+   "parent": false,
+   "qty": 123,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=153",
+   "evidence": "pagination: 5 pages x 30/page + 3 on last page (cat_id=153) = 123",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Decorative Landscape Lighting",
+   "parent": false,
+   "qty": 240,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=154",
+   "evidence": "pagination: 8 pages x 30/page + 30 on last page (cat_id=154) = 240",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "In Ground Lighting",
+   "parent": false,
+   "qty": 90,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=155",
+   "evidence": "pagination: 3 pages x 30/page + 30 on last page (cat_id=155) = 90",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Path Lighting",
+   "parent": false,
+   "qty": 300,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=156",
+   "evidence": "pagination: 10 pages x 30/page + 30 on last page (cat_id=156) = 300",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Deck Lighting",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Outdoor Step Lights",
+   "parent": false,
+   "qty": 150,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=157",
+   "evidence": "pagination: 5 pages x 30/page + 30 on last page (cat_id=157) = 150",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Deck Recessed Wall Lighting",
+   "parent": false,
+   "qty": 64,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=159",
+   "evidence": "pagination: 3 pages x 30/page + 4 on last page (cat_id=159) = 64",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Outdoor String Lights",
+   "parent": false,
+   "qty": 16,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=160",
+   "evidence": "single page, 16 product cards (cat_id=160)",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Path Lighting / Bollard Lighting",
+   "parent": false,
+   "qty": 287,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=57",
+   "evidence": "pagination: 10 pages x 30/page + 17 on last page (cat_id=57) = 287",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Post Lights",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Fixtures With Post",
+   "parent": false,
+   "qty": 121,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=161",
+   "evidence": "pagination: 5 pages x 30/page + 1 on last page (cat_id=161) = 121",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Post Mount",
+   "parent": false,
+   "qty": 498,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=162",
+   "evidence": "pagination: 17 pages x 30/page + 18 on last page (cat_id=162) = 498",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Posts Only",
+   "parent": false,
+   "qty": 39,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=163",
+   "evidence": "pagination: 2 pages x 30/page + 9 on last page (cat_id=163) = 39",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Pier Mount Lights",
+   "parent": false,
+   "qty": 162,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=158",
+   "evidence": "pagination: 6 pages x 30/page + 12 on last page (cat_id=158) = 162; also cross-listed under Deck Lighting subtiles - same cat_id, counted once",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Linear Outdoor Lighting",
+   "parent": false,
+   "qty": 23,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=628",
+   "evidence": "single page, 23 product cards (cat_id=628)",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Outdoor Ceiling Lighting",
+   "parent": false,
+   "qty": 405,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=60",
+   "evidence": "pagination: 14 pages x 30/page + 15 on last page (cat_id=60) = 405",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Outdoor Decorative Portable Lamps",
+   "parent": false,
+   "qty": 212,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=61",
+   "evidence": "pagination: 8 pages x 30/page + 2 on last page (cat_id=61) = 212",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Outdoor Pendants",
+   "parent": false,
+   "qty": 714,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=62",
+   "evidence": "pagination: 24 pages x 30/page + 24 on last page (cat_id=62) = 714",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Outdoor Track Lighting",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "PureEdge Outdoor Track (Outdoor)",
+   "parent": false,
+   "qty": 7,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=63",
+   "evidence": "single page, 7 product cards (cat_id=63); same cat_id also cross-listed under Track & Rail - counted once total across the site, evidence retained here for the Outdoor room grouping",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "WAC Outdoor Track (Outdoor)",
+   "parent": false,
+   "qty": 11,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=678",
+   "evidence": "single page, 11 product cards (cat_id=678); same cat_id also cross-listed under Track & Rail - counted once total across the site",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Outdoor Wall Lighting",
+   "parent": false,
+   "qty": 2937,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=64",
+   "evidence": "pagination: 98 pages x 30/page + 27 on last page (cat_id=64) = 2937",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Outdoor Wall Recessed Lighting",
+   "parent": false,
+   "qty": 66,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=65",
+   "evidence": "pagination: 3 pages x 30/page + 6 on last page (cat_id=65) = 66",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Outdoor Floor & Table Lamps",
+   "parent": false,
+   "qty": 76,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=664",
+   "evidence": "pagination: 3 pages x 30/page + 16 on last page (cat_id=664) = 76",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Underwater Lighting",
+   "parent": false,
+   "qty": 22,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=428",
+   "evidence": "single page, 22 product cards (cat_id=428)",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Recessed Ground / Well Lighting",
+   "parent": false,
+   "qty": 75,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=59",
+   "evidence": "pagination: 3 pages x 30/page + 15 on last page (cat_id=59) = 75",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Accessories",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Night Lights",
+   "parent": false,
+   "qty": 6,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=77",
+   "evidence": "single page, 6 product cards (cat_id=77)",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Display Lighting",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Display Light with Junction Box",
+   "parent": false,
+   "qty": 5,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=459",
+   "evidence": "single page, 5 product cards (cat_id=459)",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Display Case Lighting",
+   "parent": false,
+   "qty": 6,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=454",
+   "evidence": "single page, 6 product cards (cat_id=454)",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Signage Lighting",
+   "parent": false,
+   "qty": 15,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=130",
+   "evidence": "single page, 15 product cards (cat_id=130)",
+   "flag": null
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Home Decor",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Wall Decor",
+   "parent": false,
+   "qty": 68,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=645",
+   "evidence": "pagination: 6 pages x 30/page + 8 on last page (cat_id=645) = 68",
+   "flag": null
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Planters & Vases",
+   "parent": false,
+   "qty": 476,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=646",
+   "evidence": "pagination: 16 pages x 30/page + 26 on last page (cat_id=646) = 476",
+   "flag": null
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Clocks & Watches",
+   "parent": false,
+   "qty": 101,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=431",
+   "evidence": "pagination: 4 pages x 30/page + 11 on last page (cat_id=431) = 101",
+   "flag": null
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Decorative Accents",
+   "parent": false,
+   "qty": 853,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=647",
+   "evidence": "pagination: 29 pages x 30/page + 13 on last page (cat_id=647) = 853",
+   "flag": null
+  },
+  {
+   "category": "Mirrors",
+   "sub_category": "Decorative Mirrors",
+   "parent": false,
+   "qty": 643,
+   "link": "https://www.lightology.com/index.php?module=cat&cat_id=572",
+   "evidence": "pagination: 22 pages x 30/page + 13 on last page (cat_id=572) = 643",
+   "flag": null
+  }
+ ]
+}

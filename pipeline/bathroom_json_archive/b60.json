@@ -1,0 +1,51 @@
+{
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ACCESS: no block. The manifest URL sohomehome.com is a typo; the live brand site is https://www.sohohome.com/ (the same host the Furniture and Home-Decor passes used for this company). robots.txt (https://www.sohohome.com/robots.txt, HTTP 200, 565 bytes) has two groups - 'User-Agent: Pinterestbot / Crawl-delay: 0.5' and 'User-Agent: *' with 'Allow: /' plus Disallows for /tearsheet/, /search?q=*, /swatches?sku=*, /*?redirect=*, /*/arrangements, /*?limit=*, /*?sort=*. NO ClaudeBot / anthropic-ai / Claude-Web group and no Content-Signal, so there is nothing to stop on. Every URL used here is a bare category path with no query string, so none of the facet/sort/limit Disallows is touched. Direct curl_cffi (probe.fetch) returned HTTP 200 throughout with the 2s per-host pacing; no WAF, no proxy. TREE: taken from the site's own rendered header mega-nav (a.header-nav__link parsed out of the homepage and out of each Bathroom page's header) and confirmed against the in-page category nav on every Bathroom page. The Bathroom department is https://www.sohohome.com/bathroom (rendered H1 'Bathroom', 76 items) and it is FLAT - exactly four product children plus a sale node: Bathroom Accessories & Hardware, Bathroom Mirrors, Bathroom Vanities, Bathroom Lighting, Bathroom Sale. Each child's H1 was read from its own page and matches the node claimed ('Bathroom Accessories & Hardware', 'Bathroom Mirrors', 'Bathroom Vanities', 'Bathroom Lighting', 'Bathroom Sale'). Note /bathroom/lighting is not emitted in the homepage nav but IS emitted in the in-page Bathroom nav on the mirrors and vanities pages - it was found that way, not guessed. QTY: the rendered listing header <span class=\"filters__item-count\" data-live=\"item_count\">N items</span>. VERIFICATION - three independent reads agree on every page: (a) the item_count header; (b) the rendered filter-drawer button 'View N products'; (c) the number of DISTINCT /products/<handle> links on the page. All three give 76 / 13 / 21 / 18 / 21 for the department, accessories, mirrors, vanities and lighting respectively. The Furniture pass warned that Soho Home listing pages can inject recommendation carousels that inflate an href count (vintage-furniture showed 21 hrefs for 16 items); that does NOT happen on any Bathroom page - here handle-count equals item_count exactly on all five, so the href count is a genuine third confirmation rather than a substitute. (d) The department partitions EXACTLY: 76 = 13 (accessories) + 21 (mirrors) + 18 (vanities) + 21 (lighting) + 3, and the 3 remainders are 'house-robe', 'house-towel' and a Leather & Oud candle - cross-merchandised items with no Bathroom child node of their own (robe/towel are Textile, the candle is Decor). Every child handle set is a STRICT SUBSET of the department set (0 handles outside it). (e) Counts discriminate (1, 13, 18, 21, 21, 76) and both 21s were checked for a copy-paste error - the mirrors and lighting handle sets intersect in ZERO products. (f) All five pages were re-read later in the session and returned identical numbers - no intra-session drift. LEAF CONTENT: Bathroom Accessories & Hardware enumerated in full - Charlton and Mayfair bathroom bins, double hook, toilet brushes and holders, toilet roll holders and towel racks in brass/nickel/blackened brass: squarely rules 13, 14 and 17 (metal is explicitly fine, rules 17/22). Bathroom Mirrors enumerated in full - 21 wall and floor mirrors (Betty, Cooper, Lucetta, Gina, Welton, Fiore, Barone, Nel, Pia, Reno, Ridley, Todd, Tuxford); recorded under rule 10, which forbids skipping bathroom mirrors, and rule 11 (primary type = mirror -> Bathroom). DEDUP: already_extracted() run on all 12 candidate URLs. THREE hits, all excluded from rows - /bathroom/vanities (Furniture.xlsx, 'Vanities'), /home-accessories/mirrors (Final.xlsx Home Decor pass, 'Wall & Vanity Mirrors') and /home-accessories/floor-mirrors and /mirrors (Final.xlsx, 'Floor Mirrors' / 'Mirrors'). /bathroom/bathroom-mirrors is NOT in the exclusion index and is a genuinely different URL and a genuinely different cut: it holds 3 products that /home-accessories/mirrors does not (overlap 18 of 21), and it is Soho Home's own Bathroom-department mirror node, so it is recorded here while the three Decor mirror nodes stay where they were already taken (rules 10, 24, 28). EXCLUDED: /bathroom/sale (1 item, an Isaac flush light) as a sale node (rule 25); /new/bathroom as a New In facet (rule 25); /textiles/pool-towels and the department-level house-towel / house-robe as Textile (rules 15, 20) - Soho Home publishes no bath-towel or bathrobe category node, only pool towels under Textiles; /storage-and-decor (general storage/decor accessories, already assessed and rejected by the Furniture pass); /inspiration/bathrooms-by-soho-house is an editorial inspiration page, not a listing. No taps, sanitaryware, baths, showers, enclosures or toilets exist anywhere on this site - Soho Home's bathroom line is accessories, hardware, mirrors, vanities and lighting only.",
+ "rows": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Accessories & Hardware",
+   "qty": 13,
+   "link": "https://www.sohohome.com/bathroom/accessories-and-hardware",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Mirrors",
+   "qty": 21,
+   "link": "https://www.sohohome.com/bathroom/bathroom-mirrors",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  }
+ ],
+ "review": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathroom Vanities",
+   "qty": 18,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Vanities' (same URL, exact match on dedup.already_extracted). Excluded from Bathroom per the run-owner OPTION 1 policy in dispatch_note.md - vanities/vanity units already taken by the Furniture pass stay in Furniture and are not re-extracted here, even though rule 9 would otherwise class this node as Bathroom. Note the live count has moved 17 -> 18 since the Furniture pass; not recorded.",
+   "link": "https://www.sohohome.com/bathroom/vanities"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathroom Lighting",
+   "qty": 21,
+   "issue": "ROUTED TO LIGHTING: primary product type is lighting - wall lights, pendants and flush lights merchandised into the Bathroom department (rules 11, 19). Verified it is a genuinely distinct set from Bathroom Mirrors despite both showing 21 items: the two nodes share ZERO product handles.",
+   "link": "https://www.sohohome.com/bathroom/lighting"
+  }
+ ],
+ "_reconstructed_from": "Bathroom.xlsx delivered 2026-09-01 (checkpoint), not original worker JSON"
+}

@@ -1,0 +1,1734 @@
+{
+ "sr": 184,
+ "company": "IKEA Japan",
+ "brand_site": "ikea.com",
+ "country": "Japan",
+ "site_url": "https://www.ikea.com/jp/ja/",
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ACCESS: Tier (a) direct HTTP only (curl_cffi impersonate=chrome124), no block encountered on any of 137 requests (homepage https://www.ikea.com/jp/ja/ + 136 leaf category pages, all HTTP 200); Playwright/CDP and Claude-in-Chrome were not needed. robots.txt (https://www.ikea.com/robots.txt; the jp/ja path itself defers to the global file) has no anthropic-ai/ClaudeBot/Claude-Web/Claude-User/Claude-SearchBot entry and no blanket 'User-agent: * / Disallow: /' - only specific search/filter/sort/compare query-param paths are disallowed, none of which were used. TREE: Built from the site's own 'catalogSlim' JSON array embedded inline in the homepage HTML (https://www.ikea.com/jp/ja/) - this mirrors the exact IKEA.jp mega-menu, with nested 'subs' arrays down to leaf category pages. This is the same mechanism used for the sibling IKEA storefronts in this project (SR92 UK, SR107 DE, SR164 UAE); the JP catalogSlim tree is structurally near-identical to all three (same category IDs/slugs throughout, e.g. tl001 Textiles, tl002 Curtains & blinds, st001 Storage & organisation, st007 Small storage & organisers - one node, 14317, is locally named 'OMAR' in JP vs 'OLAUS' in the UAE tree, same ID/position), confirming this is the same global IKEA taxonomy localised for JP, not independently re-derived, though every leaf's own quantity/h1/canonical was independently fetched and verified against the live JP site, not copied from a sibling locale. Roots crawled: Textiles (tl001), Curtains & blinds (tl002), Storage & organisation (st001), Small storage & organisers (st007), plus the storage/textile-relevant subset of Bathroom furniture & storage (ba001), Laundry & cleaning (lc001), Kitchenware & tableware (kt001), and Baby & children (bc001) for items that only nest under those roots. bc001 was fully walked and every storage/textile leaf under it turned out to be an identical node ID already reached from st001/st007/tl001 (e.g. Children's storage & organisation 18706, Baby textiles 18690, Children's textiles 18730) - no unique new leaves there except two (18775 Children's bed accessories & canopies under 18730, and 18695 Baby blankets & quilts under 18690) which are recorded once, under their own group. QTY: extracted directly from each category page's rendered result-count text (pattern '<N>件中<M>件表示', i.e. 'N total, showing M') via regex - the exact total IKEA.jp displays above the product grid (storage.md Sec.36 rule 2 / textile.md Sec.28 pattern), not paginated or estimated. Fetched via 10-way concurrent HTTP requests over the 136 curated leaf node IDs; every single one returned a valid count with HTTP 200, no manual-review fallbacks needed for quantity itself. Every leaf's rendered <h1> and <link rel=canonical> were captured and cross-checked against the requested node - all 136 matched exactly (0 mismatches, verified programmatically), confirming no leaf silently served a parent/sibling/site-wide total. All 136 leaf links across both arrays are unique (0 duplicates, verified programmatically). EFFICIENCY ROLLUPS (matching UK/DE/UAE precedent for this very deep IKEA catalog): all 14 named modular storage systems present on IKEA.jp (PAX, BESTA, PLATSA, EKET, SMASTAD, IVAR, BROR, BOAXEL, JONAXEL, JOSTEIN, TROFAST, ELVARLI, OMAR, LADMAKARE) recorded at the system level (one row per system) rather than exploding into every combination/frame/door/part sub-page, since all sub-pages describe the same underlying storage-furniture product differing only by module/finish; Wardrobes (19053) similarly kept as one leaf rather than its 12 door/installation-style sub-pages and its lighting accessory sub-tree (16283). EXCLUDED (checked, not included): Curtain rods & rails and all curtain hardware (18891/18892/18893/18894/700426 - hardware, not fabric), Sewing accessories (14350, notions/tools not a fabric product, appears under both tl001 and tl002), Window films & accessories (700628, adhesive film not textile), Venetian blinds (700599, aluminium slat blinds - not fabric/textile), Anti-slip rug underlays (10699, rubber/PVC grip accessory not a rug/textile itself), Clothing & accessories (42925, apparel), Brackets (20659, mounting hardware), Bedside/side tables (20656) and Dressing tables (20657, surface furniture, not storage), Sideboards & console tables hub (30454, duplicates the narrower Sideboards & buffets 10412 plus non-storage Console tables 16246), Kitchen islands & trolleys (10471, kitchen serving furniture, excluded from the Trolleys node while Bathroom trolleys 20858 kept), Room dividers/partitions (46080) and Hallway furniture sets (700411, mixed furniture sets), Noticeboards (10574) and Hangers (20618) and bare Hooks (20617, hardware not containers - Hooks & hangers subgroup 16274 excluded in full), Recycling bins / waste-paper & pedal bins / bathroom bins / recycling bags (34470/16215/48940/16214, waste disposal not organisational storage of belongings), personal-carry Bags (Shopping/tote 16295, Backpacks 27821, Travel accessories 16255, Cool bags 46082 - fashion/travel carrying items excluded per storage.md Sec.6, only Bag organisers 47441 kept), Moving supplies (46078, packing materials not home storage), most of Bathroom accessories (Bathroom bins 48940, Soap dispensers & dishes 10656, Toilet brushes 48944, Toothbrush holders 48943 - hygiene fixtures not storage; Shower caddies 10658 and No-drill bathroom accessories 700699 were kept as genuine storage racks/caddies), Bathroom stools & benches (20859, seating furniture), Drying racks (20602), Ironing boards (20608, appliance/tool not storage - explicit storage.md Sec.11 exclusion), Dishwashing accessories (15938) and Cleaning accessories (20609, cleaning tools not storage), Water bottles & travel mugs (700352, drinkware/travel not home storage), Garage storage hub (700440, an orphaned parent - every child was a duplicate of a system/node already recorded elsewhere under st001/st007), the entire Bathroom vanity-range collections (HAVBACK/ANGSJON/TANNFORSEN/ENHET/NYSJON/VIDVESSEL, each bundling a sink+mirror+tap+countertop+cabinet as one fixture system) and the standalone Bathroom vanities group (20719/20720/54989) and Mirror cabinets (20500) - excluded as bathroom fixtures per storage.md Sec.14/28, matching UK/DE/UAE precedent, except Under-sink cabinets (20721) which was kept and flagged LOW as a genuine standalone storage cabinet, Bathroom mirrors (20490 and its sub-nodes), Bathroom lighting (10736), Bathroom countertops (30565), Bathroom sinks (20723), Bathroom taps (20724), Showers (40690) and Shower hook/rail sets (40693, hardware). Duplicate cross-linked nodes (same category ID reachable from more than one menu path - e.g. Children's chests of drawers/wardrobes/rugs/towels/bedding reachable from both a top-level storage/textile group and the Children's/Baby storage-organisation/textiles hubs under bc001; Wall shelves reachable from both Bookcases & shelving units and Hooks & wall organisation; Laundry baskets reachable from both Small storage & organisers, Bathroom laundry ba003 and Laundry & cleaning lc001; Food storage & organising 15937 reachable from both Small storage & organisers and Kitchenware & tableware kt001; Table linen 20538 reachable from both Textiles and Kitchenware & tableware; BOAXEL system 47394 reachable from both Wall shelves and Storage solution systems) were each recorded exactly once under their single most specific/primary parent, never duplicated - zero duplicate links confirmed programmatically across both arrays. LOW-CONFIDENCE flags (8 total, review-queued per rule): Bathrobes & spa accessories (700339, mixed category, also contains non-textile spa items); Picture ledges (16305, art-display shelf, may be closer to Wall Decor than Storage); Under-sink cabinets (20721, genuine storage cabinet but sold as part of an otherwise-excluded bathroom vanity range); Towel rails, bathroom racks & hooks (20615, combined node, towel-rail/hook portion is hardware not a storage container); Cable management & accessories (16195, borderline storage/organisation utility, not itself a container); Children's hooks & wall organisers (20481, combined node, hooks are hardware while wall organiser is genuine storage); Desk accessories (10573, general desk-accessories category, likely includes non-storage items alongside organisers); Laundry accessories (55004, general laundry-accessories category, likely includes non-storage items alongside storage-purpose ones).",
+ "textile_rows": [
+  {
+   "category": "Textile",
+   "sub_category": "Textiles & rugs",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Bedding",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Bed linen",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Duvet cover sets",
+   "qty": 97,
+   "link": "https://www.ikea.com/jp/ja/cat/duvet-cover-sets-10680/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=97) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Fitted sheets & bed sheets",
+   "qty": 51,
+   "link": "https://www.ikea.com/jp/ja/cat/bed-sheets-10681/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=51) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Pillowcases",
+   "qty": 15,
+   "link": "https://www.ikea.com/jp/ja/cat/pillowcases-18890/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=15) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Children's duvet covers & sheets",
+   "qty": 47,
+   "link": "https://www.ikea.com/jp/ja/cat/childrens-bedding-18776/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=47) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Baby duvet covers, fitted sheets & bed bumpers",
+   "qty": 27,
+   "link": "https://www.ikea.com/jp/ja/cat/baby-bedding-18692/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=27) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Duvets",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Polyester duvets & summer quilts",
+   "qty": 11,
+   "link": "https://www.ikea.com/jp/ja/cat/polyester-duvets-20530/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=11) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Down & wool duvets",
+   "qty": 4,
+   "link": "https://www.ikea.com/jp/ja/cat/down-feather-duvets-20531/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=4) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Baby duvets & pillows",
+   "qty": 5,
+   "link": "https://www.ikea.com/jp/ja/cat/baby-duvets-pillows-18694/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=5) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Children's duvets & pillows",
+   "qty": 2,
+   "link": "https://www.ikea.com/jp/ja/cat/childrens-duvets-pillows-31773/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=2) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Pillows",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Washable pillows (polyester)",
+   "qty": 12,
+   "link": "https://www.ikea.com/jp/ja/cat/polyester-pillows-20534/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=12) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Washable pillows (down & feather)",
+   "qty": 5,
+   "link": "https://www.ikea.com/jp/ja/cat/down-feather-pillows-20535/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=5) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Ergonomic pillows",
+   "qty": 10,
+   "link": "https://www.ikea.com/jp/ja/cat/memory-foam-ergonomic-pillows-46083/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=10) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Memory foam pillows",
+   "qty": 7,
+   "link": "https://www.ikea.com/jp/ja/cat/memory-foam-pillows-20536/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=7) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Pillow protectors",
+   "qty": 6,
+   "link": "https://www.ikea.com/jp/ja/cat/pillow-protectors-700529/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=6) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Bedspreads & multi-covers",
+   "qty": 9,
+   "link": "https://www.ikea.com/jp/ja/cat/bedspreads-20527/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=9) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Mattress protectors & pillow protectors",
+   "qty": 14,
+   "link": "https://www.ikea.com/jp/ja/cat/mattress-protectors-24824/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=14) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Blankets & throws",
+   "qty": 25,
+   "link": "https://www.ikea.com/jp/ja/cat/blankets-throws-20528/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=25) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Bed base & headboard covers",
+   "qty": 4,
+   "link": "https://www.ikea.com/jp/ja/cat/headboard-covers-57280/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=4) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Cushions & cushion covers",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Cushion covers",
+   "qty": 72,
+   "link": "https://www.ikea.com/jp/ja/cat/cushion-covers-18903/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=72) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Cushions",
+   "qty": 19,
+   "link": "https://www.ikea.com/jp/ja/cat/cushions-18902/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=19) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Cushion inserts (inner cushions)",
+   "qty": 2,
+   "link": "https://www.ikea.com/jp/ja/cat/cushion-inserts-pads-18904/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=2) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Outdoor cushions",
+   "qty": 8,
+   "link": "https://www.ikea.com/jp/ja/cat/outdoor-pillows-46401/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=8) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Children's cushions & blankets",
+   "qty": 12,
+   "link": "https://www.ikea.com/jp/ja/cat/childrens-cushions-blankets-18777/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=12) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Outdoor cushions",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Outdoor seat cushions",
+   "qty": 29,
+   "link": "https://www.ikea.com/jp/ja/cat/outdoor-seat-cushions-46400/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=29) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Rugs",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Living room & dining room rugs",
+   "qty": 56,
+   "link": "https://www.ikea.com/jp/ja/cat/large-medium-rugs-10692/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=56) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Small rugs & kitchen mats",
+   "qty": 30,
+   "link": "https://www.ikea.com/jp/ja/cat/runner-small-rugs-10689/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=30) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Handmade rugs",
+   "qty": 16,
+   "link": "https://www.ikea.com/jp/ja/cat/handmade-rugs-39267/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=16) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Outdoor rugs",
+   "qty": 6,
+   "link": "https://www.ikea.com/jp/ja/cat/outdoor-rugs-34204/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=6) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Door mats",
+   "qty": 17,
+   "link": "https://www.ikea.com/jp/ja/cat/door-mats-10698/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=17) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Sheepskin, faux fur & cowhide rugs",
+   "qty": 4,
+   "link": "https://www.ikea.com/jp/ja/cat/sheepskins-cowhide-rugs-20544/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=4) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Round rugs",
+   "qty": 4,
+   "link": "https://www.ikea.com/jp/ja/cat/round-rugs-20543/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=4) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Children's rugs",
+   "qty": 14,
+   "link": "https://www.ikea.com/jp/ja/cat/childrens-rugs-18774/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=14) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Baby & nursery rugs",
+   "qty": 2,
+   "link": "https://www.ikea.com/jp/ja/cat/nursery-rugs-18699/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=2) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Bath textiles",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Towels",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Bath towels",
+   "qty": 8,
+   "link": "https://www.ikea.com/jp/ja/cat/bath-towels-20523/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=8) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Face towels",
+   "qty": 8,
+   "link": "https://www.ikea.com/jp/ja/cat/hand-towels-20525/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=8) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Bath sheets & beach towels",
+   "qty": 2,
+   "link": "https://www.ikea.com/jp/ja/cat/bath-sheets-20524/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=2) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Hand towels",
+   "qty": 7,
+   "link": "https://www.ikea.com/jp/ja/cat/face-washcloth-20521/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=7) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Baby & children's towels & hand towels",
+   "qty": 10,
+   "link": "https://www.ikea.com/jp/ja/cat/baby-towels-washcloths-18700/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=10) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Bath mats",
+   "qty": 10,
+   "link": "https://www.ikea.com/jp/ja/cat/bath-mats-20519/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=10) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Shower curtains",
+   "qty": 15,
+   "link": "https://www.ikea.com/jp/ja/cat/shower-curtains-18908/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=15) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Bathrobes & spa accessories",
+   "qty": 17,
+   "link": "https://www.ikea.com/jp/ja/cat/bath-robe-spa-accessories-700339/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=17) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": "MANUAL REVIEW: mixed category, includes non-textile spa items alongside bathrobes",
+   "confidence": "LOW"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Seat cushions & chair pads",
+   "qty": 21,
+   "link": "https://www.ikea.com/jp/ja/cat/chair-pads-20542/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=21) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Table linen",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Tablecloths & table runners",
+   "qty": 12,
+   "link": "https://www.ikea.com/jp/ja/cat/table-cloths-runners-20541/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=12) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Placemats & coasters",
+   "qty": 25,
+   "link": "https://www.ikea.com/jp/ja/cat/place-mats-coasters-20539/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=25) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Napkins",
+   "qty": 16,
+   "link": "https://www.ikea.com/jp/ja/cat/napkins-20561/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=16) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Fabrics & sewing",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Fabrics",
+   "qty": 13,
+   "link": "https://www.ikea.com/jp/ja/cat/fabrics-14349/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=13) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Kitchen textiles",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Kitchen cloths",
+   "qty": 11,
+   "link": "https://www.ikea.com/jp/ja/cat/tea-towels-18851/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=11) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Aprons",
+   "qty": 5,
+   "link": "https://www.ikea.com/jp/ja/cat/aprons-18852/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=5) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Pot holders & oven mitts",
+   "qty": 8,
+   "link": "https://www.ikea.com/jp/ja/cat/pot-holders-oven-gloves-20537/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=8) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Baby textiles",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Baby blankets & quilts",
+   "qty": 7,
+   "link": "https://www.ikea.com/jp/ja/cat/baby-swaddle-blankets-quilts-18695/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=7) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Children's textiles",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Children's bed accessories & canopies",
+   "qty": 12,
+   "link": "https://www.ikea.com/jp/ja/cat/childrens-bed-canopy-tent-18775/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=12) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Curtains & blinds",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Curtains",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Blackout curtains",
+   "qty": 8,
+   "link": "https://www.ikea.com/jp/ja/cat/blackout-curtains-700218/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=8) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Drape curtains",
+   "qty": 19,
+   "link": "https://www.ikea.com/jp/ja/cat/room-darkening-curtains-700219/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=19) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Light-filtering curtains",
+   "qty": 26,
+   "link": "https://www.ikea.com/jp/ja/cat/light-filtering-curtains-700220/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=26) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Lace curtains",
+   "qty": 25,
+   "link": "https://www.ikea.com/jp/ja/cat/net-volie-curtains-700221/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=25) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Blinds & screens",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Blackout blinds",
+   "qty": 27,
+   "link": "https://www.ikea.com/jp/ja/cat/blackout-blinds-700222/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=27) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Roller blinds",
+   "qty": 32,
+   "link": "https://www.ikea.com/jp/ja/cat/roller-blinds-700223/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=32) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Roman blinds",
+   "qty": 5,
+   "link": "https://www.ikea.com/jp/ja/cat/roman-blinds-700224/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=5) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Honeycomb & pleated blinds",
+   "qty": 19,
+   "link": "https://www.ikea.com/jp/ja/cat/pleated-cellular-blinds-700225/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=19) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "MEDIUM"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "No-drill blinds",
+   "qty": 5,
+   "link": "https://www.ikea.com/jp/ja/cat/no-drill-blinds-700869/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=5) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "MEDIUM"
+  }
+ ],
+ "storage_rows": [
+  {
+   "category": "Storage",
+   "sub_category": "Storage & organisation",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Bookcases & shelving units",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Cube storage",
+   "qty": 71,
+   "link": "https://www.ikea.com/jp/ja/cat/cube-storage-55012/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=71) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Bookcases",
+   "qty": 120,
+   "link": "https://www.ikea.com/jp/ja/cat/bookcases-10382/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=120) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "MEDIUM"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Storage shelf units",
+   "qty": 67,
+   "link": "https://www.ikea.com/jp/ja/cat/storage-shelves-units-10397/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=67) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Open shelving units",
+   "qty": 126,
+   "link": "https://www.ikea.com/jp/ja/cat/shelving-units-11465/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=126) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Wall shelves",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Complete wall shelves",
+   "qty": 55,
+   "link": "https://www.ikea.com/jp/ja/cat/complete-wall-shelves-20660/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=55) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Display & wall-mounted storage boxes",
+   "qty": 19,
+   "link": "https://www.ikea.com/jp/ja/cat/cube-wall-shelves-55015/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=19) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "MEDIUM"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Picture ledges",
+   "qty": 16,
+   "link": "https://www.ikea.com/jp/ja/cat/picture-ledges-16305/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=16) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": "MANUAL REVIEW: art picture-ledge shelf, may be closer to Wall Decor than Storage",
+   "confidence": "LOW"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Floating shelves",
+   "qty": 3,
+   "link": "https://www.ikea.com/jp/ja/cat/floating-shelves-55014/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=3) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "MEDIUM"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Shelf boards",
+   "qty": 5,
+   "link": "https://www.ikea.com/jp/ja/cat/shelf-boards-20658/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=5) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "MEDIUM"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "BOAXEL system",
+   "qty": 13,
+   "link": "https://www.ikea.com/jp/ja/cat/boaxel-system-47394/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=13) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Pantry & food storage",
+   "qty": 34,
+   "link": "https://www.ikea.com/jp/ja/cat/pantry-16200/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=34) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Storage solution systems",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "PAX system",
+   "qty": 303,
+   "link": "https://www.ikea.com/jp/ja/cat/pax-system-19086/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=303) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "BESTA system",
+   "qty": 172,
+   "link": "https://www.ikea.com/jp/ja/cat/besta-storage-system-46053/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=172) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "IVAR system",
+   "qty": 49,
+   "link": "https://www.ikea.com/jp/ja/cat/ivar-system-11703/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=49) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "PLATSA system",
+   "qty": 125,
+   "link": "https://www.ikea.com/jp/ja/cat/platsa-system-37894/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=125) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "LASTARE system",
+   "qty": 178,
+   "link": "https://www.ikea.com/jp/ja/cat/lastare-storage-system-700780/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=178) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "EKET system",
+   "qty": 70,
+   "link": "https://www.ikea.com/jp/ja/cat/eket-storage-system-59283/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=70) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "SMASTAD system",
+   "qty": 60,
+   "link": "https://www.ikea.com/jp/ja/cat/smastad-system-49140/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=60) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "BROR system",
+   "qty": 34,
+   "link": "https://www.ikea.com/jp/ja/cat/bror-system-42245/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=34) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "JONAXEL system",
+   "qty": 29,
+   "link": "https://www.ikea.com/jp/ja/cat/jonaxel-system-45730/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=29) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "JOSTEIN system",
+   "qty": 47,
+   "link": "https://www.ikea.com/jp/ja/cat/jostein-system-700331/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=47) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "TROFAST system",
+   "qty": 104,
+   "link": "https://www.ikea.com/jp/ja/cat/trofast-system-700556/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=104) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "ELVARLI system",
+   "qty": 22,
+   "link": "https://www.ikea.com/jp/ja/cat/elvarli-system-35766/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=22) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "OMAR system",
+   "qty": 15,
+   "link": "https://www.ikea.com/jp/ja/cat/omar-system-14317/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=15) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "LADMAKARE system",
+   "qty": 15,
+   "link": "https://www.ikea.com/jp/ja/cat/ladmakare-system-700715/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=15) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Chests, drawers & closet storage",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Chests of drawers",
+   "qty": 110,
+   "link": "https://www.ikea.com/jp/ja/cat/chest-of-drawers-10451/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=110) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "MEDIUM"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Closet storage (basket drawer units)",
+   "qty": 10,
+   "link": "https://www.ikea.com/jp/ja/cat/basket-drawer-units-46081/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=10) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Children's chests of drawers",
+   "qty": 10,
+   "link": "https://www.ikea.com/jp/ja/cat/childrens-chests-of-drawers-18708/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=10) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "MEDIUM"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Cabinets & cupboards",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Cabinets",
+   "qty": 110,
+   "link": "https://www.ikea.com/jp/ja/cat/cabinets-10409/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=110) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Sideboards & buffets",
+   "qty": 42,
+   "link": "https://www.ikea.com/jp/ja/cat/sideboards-buffets-10412/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=42) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "MEDIUM"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Display cabinets",
+   "qty": 78,
+   "link": "https://www.ikea.com/jp/ja/cat/display-cabinets-10410/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=78) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "MEDIUM"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Wardrobes",
+   "qty": 318,
+   "link": "https://www.ikea.com/jp/ja/cat/wardrobes-19053/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=318) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Bathroom trolleys",
+   "qty": 6,
+   "link": "https://www.ikea.com/jp/ja/cat/bathroom-trolleys-20858/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=6) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "TV & media furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "TV & media storage",
+   "qty": 41,
+   "link": "https://www.ikea.com/jp/ja/cat/tv-media-storage-14885/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=41) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "MEDIUM"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "TV benches",
+   "qty": 35,
+   "link": "https://www.ikea.com/jp/ja/cat/tv-benches-10810/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=35) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "MEDIUM"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Children's storage & organisation",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Toy boxes & shelves",
+   "qty": 7,
+   "link": "https://www.ikea.com/jp/ja/cat/toy-boxes-shelves-700560/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=7) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Children's storage wardrobes",
+   "qty": 11,
+   "link": "https://www.ikea.com/jp/ja/cat/childrens-wardrobes-18707/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=11) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "MEDIUM"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Outdoor storage & organisation",
+   "qty": 50,
+   "link": "https://www.ikea.com/jp/ja/cat/garden-storage-21958/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=50) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Storage units, files & cabinets",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Office storage cabinets",
+   "qty": 24,
+   "link": "https://www.ikea.com/jp/ja/cat/storage-units-cabinets-for-office-47084/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=24) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Desk drawer units & side chests",
+   "qty": 30,
+   "link": "https://www.ikea.com/jp/ja/cat/drawer-units-for-home-47081/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=30) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Small storage & organisers",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Storage boxes & baskets",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Baskets",
+   "qty": 29,
+   "link": "https://www.ikea.com/jp/ja/cat/baskets-16201/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=29) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Paper & media boxes",
+   "qty": 67,
+   "link": "https://www.ikea.com/jp/ja/cat/paper-media-boxes-16202/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=67) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Clothing storage boxes & plastic storage cases",
+   "qty": 58,
+   "link": "https://www.ikea.com/jp/ja/cat/storage-boxes-10797/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=58) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Clothes storage boxes & drawer dividers",
+   "qty": 55,
+   "link": "https://www.ikea.com/jp/ja/cat/clothes-boxes-10565/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=55) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Bathroom storage baskets & makeup storage",
+   "qty": 20,
+   "link": "https://www.ikea.com/jp/ja/cat/bathroom-boxes-baskets-16233/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=20) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Storage boxes & baskets (children's)",
+   "qty": 38,
+   "link": "https://www.ikea.com/jp/ja/cat/toy-boxes-baskets-20479/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=38) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Clothes organisers",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Hanging closet organisers",
+   "qty": 10,
+   "link": "https://www.ikea.com/jp/ja/cat/hanging-clothes-organisers-10459/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=10) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Shoe boxes & organisers",
+   "qty": 7,
+   "link": "https://www.ikea.com/jp/ja/cat/shoe-boxes-organisers-47380/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=7) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Laundry baskets",
+   "qty": 16,
+   "link": "https://www.ikea.com/jp/ja/cat/laundry-baskets-20601/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=16) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Children's clothes storage & hangers",
+   "qty": 6,
+   "link": "https://www.ikea.com/jp/ja/cat/childrens-clothes-shoes-organisation-20477/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=6) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Shoe cabinets & shoe boxes",
+   "qty": 25,
+   "link": "https://www.ikea.com/jp/ja/cat/shoe-cabinets-10456/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=25) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Clothes racks",
+   "qty": 28,
+   "link": "https://www.ikea.com/jp/ja/cat/clothes-racks-rails-10455/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=28) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Shoe racks & wall shelves",
+   "qty": 53,
+   "link": "https://www.ikea.com/jp/ja/cat/shoe-racks-stands-10454/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=53) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Desk accessories",
+   "qty": 53,
+   "link": "https://www.ikea.com/jp/ja/cat/desk-accessories-10573/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=53) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": "MANUAL REVIEW: general desk-accessories category, may include non-storage items alongside organisers",
+   "confidence": "LOW"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Paper & media organisers",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Magazine files",
+   "qty": 9,
+   "link": "https://www.ikea.com/jp/ja/cat/magazine-files-10567/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=9) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Cable management & accessories",
+   "qty": 21,
+   "link": "https://www.ikea.com/jp/ja/cat/cable-management-accessories-16195/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=21) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": "MANUAL REVIEW: borderline storage/organisation utility, not itself a container",
+   "confidence": "LOW"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Hooks & wall organisation",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Wall storage",
+   "qty": 42,
+   "link": "https://www.ikea.com/jp/ja/cat/wall-storage-37900/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=42) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Children's hooks & wall organisers",
+   "qty": 13,
+   "link": "https://www.ikea.com/jp/ja/cat/childrens-hooks-wall-organisation-20481/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=13) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": "MANUAL REVIEW: combined node, hooks are hardware while wall organiser is genuine storage",
+   "confidence": "LOW"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Bag organisers",
+   "qty": 4,
+   "link": "https://www.ikea.com/jp/ja/cat/bag-organisers-47441/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=4) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Bathroom accessories",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Bathroom storage & shower caddies",
+   "qty": 26,
+   "link": "https://www.ikea.com/jp/ja/cat/shower-caddies-10658/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=26) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "No-drill bathroom accessories",
+   "qty": 22,
+   "link": "https://www.ikea.com/jp/ja/cat/non-drill-bathroom-accessories-700699/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=22) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Food storage & organising",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Freezer bags & food storage accessories",
+   "qty": 43,
+   "link": "https://www.ikea.com/jp/ja/cat/food-storage-accessories-resealable-bags-700611/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=43) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Food containers",
+   "qty": 32,
+   "link": "https://www.ikea.com/jp/ja/cat/food-containers-20606/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=32) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Food container sets",
+   "qty": 17,
+   "link": "https://www.ikea.com/jp/ja/cat/food-container-sets-700586/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=17) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Fridge organisers",
+   "qty": 9,
+   "link": "https://www.ikea.com/jp/ja/cat/fridge-organisers-700588/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=9) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Pantry & worktop organisers",
+   "qty": 46,
+   "link": "https://www.ikea.com/jp/ja/cat/pantry-worktop-organisers-700589/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=46) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Spice & condiment stands",
+   "qty": 31,
+   "link": "https://www.ikea.com/jp/ja/cat/spice-condiment-stands-15951/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=31) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Canisters & storage jars",
+   "qty": 27,
+   "link": "https://www.ikea.com/jp/ja/cat/jars-tins-15950/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=27) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "MEDIUM"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Mix & match food containers & lids",
+   "qty": 17,
+   "link": "https://www.ikea.com/jp/ja/cat/mix-match-food-containers-lids-700610/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=17) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Wine racks",
+   "qty": 8,
+   "link": "https://www.ikea.com/jp/ja/cat/wine-racks-15952/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=8) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Bathroom storage",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Bathroom shelving & laundry racks",
+   "qty": 50,
+   "link": "https://www.ikea.com/jp/ja/cat/bathroom-shelving-units-20804/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=50) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Under-sink cabinets",
+   "qty": 3,
+   "link": "https://www.ikea.com/jp/ja/cat/under-sink-cabinets-20721/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=3) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": "MANUAL REVIEW: component of an integrated bathroom vanity/sink fixture range, kept as a genuine under-sink storage cabinet per storage.md Sec.14",
+   "confidence": "LOW"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Bathroom wall cabinets",
+   "qty": 14,
+   "link": "https://www.ikea.com/jp/ja/cat/bathroom-wall-cabinets-20808/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=14) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Towel rails, bathroom racks & hooks",
+   "qty": 31,
+   "link": "https://www.ikea.com/jp/ja/cat/bathroom-shelves-20615/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=31) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": "MANUAL REVIEW: combined node, includes towel-rail/hook hardware alongside storage racks",
+   "confidence": "LOW"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Laundry storage",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Laundry accessories",
+   "qty": 8,
+   "link": "https://www.ikea.com/jp/ja/cat/laundry-accessories-55004/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=8) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": "MANUAL REVIEW: general laundry-accessories category, may include non-storage items alongside storage-purpose ones",
+   "confidence": "LOW"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Laundry storage racks",
+   "qty": 18,
+   "link": "https://www.ikea.com/jp/ja/cat/laundry-storage-48925/",
+   "is_group": false,
+   "evidence": "rendered category page text pattern '<N>kenchu...kenhyouji' (N total, e.g. total=18) near the product grid; rendered h1 (Japanese) and canonical URL both independently verified to match the requested node, translated to English here for the output",
+   "flag": null,
+   "confidence": "HIGH"
+  }
+ ]
+}

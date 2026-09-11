@@ -1,0 +1,174 @@
+{
+  "sr": 151,
+  "company": "Bloomingville",
+  "brand_site": "bloomingville.com",
+  "country": "Denmark",
+  "site_url": "https://www.bloomingville.com/",
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "ACCESS: robots.txt (https://www.bloomingville.com/robots.txt) only disallows /Files/Papirkurv/ and a cartcmd query param - no bot block. Tier (a) direct HTTP (curl, real UA) worked for HTML/nav, but this B2B catalog client-renders its product-list module via an XHR to /en/system/data/products-with-filters (empty SSR shell, data-page-count attr present but no total). Escalated to tier (b) Playwright (headless chromium, sync API) to load each candidate category page, capture that XHR response, and read moduleSettings.productCount - this is the site's own authoritative product-count field, cross-checked against rendered card counts on a sample page (matched within 1). TREE: site has two parallel nav structures on /en homepage mega-menu: room-based (Furniture, Home Accessories, Kitchen, Lighting, Outdoor, Christmas, Kids, Living Room, Bath, Tableware, Home Office) and a flat cross-cutting 'Category' hub (/en/products/category/*: Bags, Baskets, Bed & Bath, Candle Holders, Candles, Decoration, Fans, Flowerpots, Hooks & Coat Racks, Mirrors, Rugs & Doormats, Storage, Textiles, Trays, Wall Decoration). Each listing page's underlying query carries a GroupId product-tag list (e.g. Cushions=BATH-CUSHIONS+CHRISTMAS-CUSHIONS+HOMEACC-CUSHIONS), so many pages are literal unions/subsets of other pages' tag sets rather than independent inventories. Where a Category-hub page's GroupId list was confirmed to be the exact union of Room-page nodes already recorded (Textiles hub = union of Living Room Cushions + Throws + Bath towels + Outdoor cushions; Christmas>Throws & Cushions = pure subset of Living Room Cushions+Throws via CHRISTMAS-CUSHIONS/CHRISTMAS-THROWSQUI tags; Home Office>Magazine Holders = single item already inside the Storage hub) it was dropped to avoid re-counting the same underlying products under a second parent; this is called out per row below. Sibling nodes with only partial/incidental tag overlap (e.g. Kids>Storage baskets vs the general Baskets hub, or Kids>Textile rugs vs Rugs & Doormats) were both kept since they are genuinely separate navigable pages a shopper reaches via different menu paths. QTY: exact moduleSettings.productCount from the live products-with-filters XHR for each page's default (unfiltered) PageNum=1 state. URL: recorded the exact category/subcategory listing URL requested; h1 confirmed to match the requested node on every row. EXCLUDED (checked, not qualifying): Category hub Textiles (156, redundant aggregate, see above); Christmas>Throws & Cushions (10, redundant subset of Living Room Cushions+Throws); Home Office>Magazine Holders (1, already inside Storage hub); Category hub Bags/'Bags and cosmetic bags' (13 - Tote Bags/Shopping Bags/Cosmetic Bags, fashion/personal-carry items per storage.md S6/textile.md S19, not home storage or home textile); Category hub Trays (27, Kitchen&Dining/Decorative, out of scope); Category hub Hooks & Coat Racks (21) and Furniture>Racks (3) and Furniture>Shelves (40) - all explicitly GroupId=FURNITURE-*, site itself files them under Furniture (storage.md S21/S18 boundary); Kitchen>Placemats (5 - Silicone/Bamboo/Seagrass/Water Hyacinth materials, none textile-fabric, textile.md S7/S16 exclude); Category hub Bed & Bath and room page Bath>All for the bathroom (same page, GroupId=HOMEACC-BATH, 6 items) - a mixed grab-bag (clothes rack, laundry basket, tumbler, soap dispenser, 1 towel, towel rack) with no single dominant purpose, not a genuine dedicated Textile or Storage category page, so dropped whole rather than cherry-picking; Category hub Candle Holders/Candles/Decoration/Fans/Flowerpots/Mirrors/Wall Decoration - Decorative Home Accessories/Wall Decor, out of scope for this task. LOW-CONFIDENCE FLAGS: Bath>Towels (qty=2) and Kitchen>Kitchen Towels (qty=1) both use a keyword-search backend (DescriptionUK=Towel / Kitchen towel) rather than a clean category tag, and in the Bath case one of the 2 results is actually a 'Towel Rack' (non-textile) that matched the keyword - flagged for manual review, numbers reported as-is per the site's own query result.",
+  "textile_rows": [
+    {
+      "category": "Textile",
+      "sub_category": "Living Room",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Cushions",
+      "qty": 47,
+      "link": "https://www.bloomingville.com/en/products/living-room/cushions",
+      "is_group": false,
+      "evidence": "products-with-filters XHR moduleSettings.productCount=47 (GroupId=BATH-CUSHIONS,CHRISTMAS-CUSHIONS,HOMEACC-CUSHIONS), h1 'Cushions'",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Throws",
+      "qty": 108,
+      "link": "https://www.bloomingville.com/en/products/living-room/throws",
+      "is_group": false,
+      "evidence": "products-with-filters XHR moduleSettings.productCount=108 (GroupId=CHRISTMAS-THROWSQUI,BATH-THROWSQUI,HOMEACC-THROWSQUI), h1 'Throws'",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Kids",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Textiles & Rugs",
+      "qty": 25,
+      "link": "https://www.bloomingville.com/en/products/kids/textile",
+      "is_group": false,
+      "evidence": "products-with-filters XHR moduleSettings.productCount=25, h1 'Textiles & Rugs'; sample items confirmed textile (throws, cushions, wool/jute rugs, cotton play mat)",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Bath",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "MEDIUM"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Towels",
+      "qty": 2,
+      "link": "https://www.bloomingville.com/en/products/bath/towels",
+      "is_group": false,
+      "evidence": "products-with-filters XHR moduleSettings.productCount=2 (DescriptionUK=Towel keyword search), h1 'Towels'",
+      "flag": "MANUAL REVIEW: page uses a keyword-search backend not a clean category tag; of the 2 results only 1 is an actual towel (Malou Towel, Cotton), the other is a Towel Rack; true bath-towel assortment may be undercounted",
+      "confidence": "LOW"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Kitchen",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "MEDIUM"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Kitchen Towels",
+      "qty": 1,
+      "link": "https://www.bloomingville.com/en/products/kitchen/kitchen-towels",
+      "is_group": false,
+      "evidence": "products-with-filters XHR moduleSettings.productCount=1 (DescriptionUK=Kitchen towel keyword search), h1 'Kitchen towels'; item confirmed textile (Ornamentia Kitchen Towel, Cotton)",
+      "flag": "MANUAL REVIEW: keyword-search backend may undercount the true kitchen-towel assortment",
+      "confidence": "MEDIUM"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Rugs & Doormats",
+      "qty": 16,
+      "link": "https://www.bloomingville.com/en/products/category/rugs-doormats",
+      "is_group": false,
+      "evidence": "products-with-filters XHR moduleSettings.productCount=16 (GroupId=HOMEACC-RUGS,CHRISTMAS-RUGS,OUTDOOR-DOORMATS,OUTDOOR-RUG), h1 'Rugs & Doormats'; sample items confirmed textile (cotton/wool/jute rugs)",
+      "flag": null,
+      "confidence": "HIGH"
+    }
+  ],
+  "storage_rows": [
+    {
+      "category": "Storage",
+      "sub_category": "Storage",
+      "qty": 13,
+      "link": "https://www.bloomingville.com/en/products/category/storage",
+      "is_group": false,
+      "evidence": "products-with-filters XHR moduleSettings.productCount=13 (GroupId=BATH-STORAGE,CHRISTMAS-STORAGE,HOMEACC-STORAGE,KITCHEN-STORAGE,OUTDOOR-STORAGE,FURNITURE-STORAGE), h1 'Storage'; sample items confirmed storage (Box w/Lid, Storage Box, Magazine Holder)",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Baskets",
+      "qty": 30,
+      "link": "https://www.bloomingville.com/en/products/category/baskets",
+      "is_group": false,
+      "evidence": "products-with-filters XHR moduleSettings.productCount=30 (GroupId=BATH-BASKETS,KITCHEN-BASKETS,HOMEACC-BASKETS,OUTDOOR-BASKETS), h1 'Baskets'; sample items confirmed genuine storage baskets (rattan/seagrass/water hyacinth/jute Basket, Basket w/Lid, Laundry Basket)",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Kitchen",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Storage",
+      "qty": 39,
+      "link": "https://www.bloomingville.com/en/products/kitchen/storage",
+      "is_group": false,
+      "evidence": "products-with-filters XHR moduleSettings.productCount=39 (GroupId=KITCHEN-BASKETS,KITCHEN-JARS,KITCHEN-RACKS,KITCHEN-STORAGE), title 'Storage products for the kitchen', h1 'Storage'; sample items confirmed storage (Jar w/Lid, Storage Box, Cup Rack, Basket)",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Kids",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Storage",
+      "qty": 20,
+      "link": "https://www.bloomingville.com/en/products/kids/storage",
+      "is_group": false,
+      "evidence": "products-with-filters XHR moduleSettings.productCount=20 (GroupId=HOMEACC-STORAGE,HOMEACC-BASKETS,FURNITURE-STORAGE), title 'Unique storage solutions', h1 'Storage'; sample items confirmed storage (woven baskets, Storage Box)",
+      "flag": null,
+      "confidence": "HIGH"
+    }
+  ]
+}

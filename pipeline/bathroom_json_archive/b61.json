@@ -1,0 +1,97 @@
+{
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ACCESS: plain direct curl_cffi fetch of https://www.heals.com/ (Shopify storefront); every profile in the rotation returned 200, no proxy, no WAF. ROBOTS: https://www.heals.com/robots.txt fetched FIRST (200, 3618 bytes). It is the Shopify agentic template - a single generic 'User-agent: *' group (Allow: / plus transactional/filter-trap Disallows: /admin, /cart/, /checkout, /orders, /account, /services, /sf_*, /cart.js, /recommendations/products, /collections/*sort_by*, /collections/*+*, /collections/*filter*&*filter*, /*?*oseid=*) and one 'User-agent: adsbot-google' group. NO group names ClaudeBot, Claude-Web, Claude-User, Claude-SearchBot or anthropic-ai anywhere in the file, and no Crawl-delay. Nothing I requested is disallowed: /collections/<handle>, /collections/<handle>?page=N and /collections/<handle>/products.json are all outside every Disallow pattern (no sort_by, no '+', no filter pair, no oseid). TREE: taken from the site's OWN desktop mega-menu in the page header HTML (identical on every page). Top-level nav = By Room / Sofas / Furniture / Lighting / Accessories / Soft Furnishings / Gifts / Brands / Clearance & Offers. Bathroom is a level-2 node of 'By Room' (id megamenu-bathroom__level--2) whose level-3 children are, in DOM order: Bathroom Storage, Bathroom Wall Cabinets, Bathroom Accessories, Towel Rails, Towels. The landing page /collections/bathroom carries its own child tile grid which lists those five PLUS a sixth, Bathroom Mirrors (/collections/bathroom-mirrors, H1 'Bathroom Mirrors'), which is also cross-linked from /collections/mirrors and from /collections/bathroom-accessories - so six real children in total. Confirmed against sitemap_collections_1.xml (665 collections) that no further bathroom-hierarchy collection exists: the only other bath/mirror slugs are bathroom-wall-lights, bathroom-lights, bath-and-spa, bath-and-spa-gifts, vanity-mirrors, wall-mirrors, floor-mirrors, arch/round/rectangular/square/large/decorative/fine-edge/orta-mirrors - all handled below or belonging to Home Accessories > Mirrors, none of them under Bathroom. Each of the four recorded leaves was fetched and confirmed to have NO child collections of its own (only sibling cross-links), so the deepest-node rule is satisfied and the parent /collections/bathroom (125) is correctly NOT recorded (rule 24). QTY: Heal's publishes NO product-count header and NO count in any embedded JSON - there is no 'N products' / 'Showing 1-N of M' string on any listing page and no Algolia/Searchspring/Boost/Constructor layer on this store. So every qty is a FULL ENUMERATION done TWO independent ways and cross-checked: (a) /collections/<handle>/products.json?limit=250&page=N paged to exhaustion, counting unique product handles; (b) walking /collections/<handle>?page=N to the last page number in the pagination widget and collecting unique /products/<handle> links from <main>, with the three header-promo product links that Shopify injects into every page (arc-dining-chair, forum-3-seater-sofa, heals-e-gift-card) stripped. The two methods agreed EXACTLY on all nine collections measured: bathroom-storage 43/43, bathroom-wall-cabinets 7/7, bathroom-mirrors 10/10, bathroom-accessories 42/42, towel-rails 4/4, towels 16/16, bathroom-wall-lights 27/27, bathroom-lights 18/18, vanity-mirrors 4/4. VERIFICATION: (1) method validation - my figure for bathroom-wall-cabinets (7) reproduces exactly the 7 that the validated Furniture.xlsx pass recorded for that same URL by the same two-method enumeration; (2) discrimination - the four recorded counts are all different (43/42/10/4) and none equals the parent 125 or any site-wide constant; (3) H1 check - every recorded URL returned HTTP 200 with an H1 matching the node name exactly (Bathroom Storage / Bathroom Accessories / Towel Rails / Bathroom Mirrors), no silent fallback to a parent grid; (4) no aggregation - the four recorded leaves sum to 99, the parent to 125, and no parent number is reused for a child. EXCLUDED: /collections/bathroom (parent, 125 - rule 24, valid children exist); /collections/bath-and-spa-gifts (gift/seasonal collection, rule 25); /collections/bath-and-spa (cross-cutting roll-up, see review); /collections/mirrors, wall-mirrors, floor-mirrors, arch-mirrors, round/rectangular/square/large/decorative/fine-edge/orta-mirrors (Home Accessories > Mirrors decorative mirror hierarchy, primary type is decorative wall mirror, not bathroom - only the site's own bathroom-mirrors node is taken, rule 11/21). DEDUP: dedup.already_extracted() was called on all nine candidate URLs; exactly one hit - bathroom-wall-cabinets (Furniture.xlsx) - which is in review, not rows.",
+ "rows": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Storage",
+   "qty": 43,
+   "link": "https://www.heals.com/collections/bathroom-storage",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Accessories",
+   "qty": 42,
+   "link": "https://www.heals.com/collections/bathroom-accessories",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Towel Rails",
+   "qty": 4,
+   "link": "https://www.heals.com/collections/towel-rails",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Mirrors",
+   "qty": 10,
+   "link": "https://www.heals.com/collections/bathroom-mirrors",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  }
+ ],
+ "review": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Wall Cabinets",
+   "qty": 7,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Bathroom Wall Cabinets' (qty 7, identical URL). Per dispatch_note OPTION 1 it stays in Furniture and is not re-extracted into Bathroom, even though rules 9/12 would class it as Bathroom. dedup.already_extracted() hit.",
+   "link": "https://www.heals.com/collections/bathroom-wall-cabinets"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Towels",
+   "qty": 16,
+   "issue": "ROUTED TO TEXTILE: child of By Room > Bathroom in the mega-menu, but the primary product type is bath/hand towels and bath sheets (rule 15/20).",
+   "link": "https://www.heals.com/collections/towels"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Wall Lights",
+   "qty": 27,
+   "issue": "ROUTED TO LIGHTING: primary product type is lighting (rule 19). Sits in the site's own nav under Lighting > Wall Lights, not under Bathroom.",
+   "link": "https://www.heals.com/collections/bathroom-wall-lights"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Lights",
+   "qty": 18,
+   "issue": "ROUTED TO LIGHTING: primary product type is lighting (rule 19). Collection exists in sitemap_collections_1.xml but is not linked from the mega-menu or from /collections/bathroom.",
+   "link": "https://www.heals.com/collections/bathroom-lights"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Vanity Mirrors",
+   "qty": 4,
+   "issue": "LOW CONFIDENCE (rule 29) - not recorded. H1 'Vanity Mirrors' and the 4 products are magnifying/shaving mirrors (Column Vanity Mirror, Look Magnify Mirror, Magnify Mirror, Look Mirror White Oiled Oak) which rule 10 would class as Bathroom, BUT the site's own breadcrumb is Home > Home Accessories > Mirrors, the collection is absent from the Bathroom mega-menu and from the /collections/bathroom child grid, and its own meta description says 'for dressing tables and bathrooms'. Website hierarchy places it in Home Accessories, so it is sent to review rather than guessed into Bathroom.",
+   "link": "https://www.heals.com/collections/vanity-mirrors"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath & Body (bath-and-spa)",
+   "qty": 98,
+   "issue": "EXCLUDED as a cross-cutting roll-up (rules 24/25). H1 'Bath & Body', breadcrumb Home > Home Accessories > Home Decor > Candles & Home fragrance. Its 98 products mix the already-recorded Bathroom Accessories / Bathroom Storage / Cabinets / Towel Rails leaves with 'Face & Body' toiletries (hand wash, body soap, hand cream) and Beauty Accessories wash bags - it aggregates leaves already recorded and would duplicate/aggregate quantities.",
+   "link": "https://www.heals.com/collections/bath-and-spa"
+  }
+ ],
+ "_reconstructed_from": "Bathroom.xlsx delivered 2026-09-01 (checkpoint), not original worker JSON"
+}

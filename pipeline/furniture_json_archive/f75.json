@@ -1,0 +1,372 @@
+{
+ "sr": 75,
+ "company": "Scully & Scully",
+ "brand_site": "scullyandscully.com",
+ "country": "USA",
+ "site_url": "https://www.scullyandscully.com/",
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "Route: the prior Home-Decor pass concluded only WebFetch worked, because this is a fully client-side-rendered NetSuite SuiteCommerce Advanced (SCA) storefront. This pass found the SCA Items service instead, and it is served unauthenticated to a plain desktop UA: https://www.scullyandscully.com/api/items?limit=1&custitem_is_subitem=false&commercecategoryurl=<category path> returns {\"total\": N}. robots.txt explicitly ALLOWS ClaudeBot / Claude-Web / Claude-SearchBot (no Claude-specific disallow); its only Disallow rules cover /search, /checkout, /my_account and sort/filter query URLs, none of which were used. CRITICAL calibration: the raw API total is inflated because it counts matrix sub-items. Adding custitem_is_subitem=false reproduces the site's own rendered '#### N Products' listing header exactly. Validated against the rendered header via WebFetch on 6 pages: /furniture 620 vs 620, seating/armchairs 70 vs 70 (raw API said 74 - this is why the filter is required), tables/side-tables 71 vs 71, cabinets-bookcases-chests/cabinets-cupboards 64 vs 64, seating/sofas-loveseats 18 vs 18, miscellaneous/etageres 3 vs 3. Every qty below is the filtered API total, i.e. the rendered header number. Tree source: the complete mega-menu is present server-side in the homepage HTML (485 anchors parsed with BeautifulSoup); cross-checked against the rendered /furniture department page via WebFetch, whose 8 second-level nodes and their children match exactly, so the tree is complete. Furniture exists only under the /furniture department. The whole nav (jewelry, home-decor, tabletop, collectibles, herend, gift-ideas, inspiration, new-arrivals) was reviewed and holds no furniture-typed nodes - home-decor carries lamps, mirrors, clocks, picture frames, trays, vases, fire screens, umbrella stands, wastebaskets and desk accessories, all decor/accessory rather than furniture. All 8 second-level nodes (Seating, Cabinets/Bookcases/Chests, Tables, Folding Furniture, Office, Beds, Contemporary, Miscellaneous) have children, so all are emitted as grouping rows and only the leaves carry qty and link. EXCLUDED: every 'Shop All ...' rollup under each parent, per the NEVER-EXTRACT list. Those rollups are also smaller than the sum of their siblings (Shop All Tables 206 vs children summing 268), which shows the site cross-lists items across sibling leaves; no sums or aggregates were used anywhere. EXCLUDED Beds > 'Bedding & Linens' (6) as textiles. EXCLUDED Miscellaneous > 'Eco-Friendly Furniture' (39, /furniture/miscellaneous/eco-friendly-frie-furniture): it is an attribute cross-cut, and all 39 tiles were listed via the API - they are dominated by wastebaskets, umbrella stands, hampers, trays, wall shelves and a storage box, so the products clearly contradict the Furniture filing. DE-DUPLICATED 'Desk Chairs': it is cross-listed in the nav under both Seating (/furniture/seating/desk-chairs) and Office (/furniture/office/desk-chairs), and both return the same total of 19, so it is emitted once under Seating; Office therefore keeps Desks, Writing Tables and Filing Cabinets. Ambiguous nodes were resolved by listing their real product tiles through the API (fields=displayname) rather than by guessing - see the flags on Jewelry & Silver Chests, Luggage Racks and Other Furniture. Sanity checks: totals differ per category (no constant site-wide number); no suspiciously round display caps; the department total 620 is far below the sum of its leaves, so it is a genuine de-duplicated department figure and not an aggregate; the parent nodes Seating, Cabinets/Bookcases/Chests, Folding Furniture, Office, Contemporary and Miscellaneous each return total=0 directly, which is what identifies them as pure grouping nodes. Minor drift versus the prior Home-Decor pass was seen on unrelated decor categories (rectangular-mirrors 80 -> 81, mantel-desk-clocks 81 -> 85), consistent with ordinary catalogue churn since that session; all furniture numbers here are fresh reads taken in this session.",
+ "rows": [
+  {
+   "category": "Furniture",
+   "sub_category": "Seating",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Armchairs",
+   "qty": 70,
+   "link": "https://www.scullyandscully.com/furniture/seating/armchairs",
+   "is_group": false,
+   "evidence": "SuiteCommerce items API /api/items?custitem_is_subitem=false&commercecategoryurl=/furniture/seating/armchairs -> total=70; this filtered API total reproduces the site's own rendered listing header '#### N Products' exactly (verified on 6 pages incl. /furniture '620 Products', side-tables '71 Products', cabinets-cupboards '64 Products', sofas-loveseats '18 Products', armchairs '70 Products', etageres '3 Products')",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Benches, Ottomans & Stools",
+   "qty": 130,
+   "link": "https://www.scullyandscully.com/furniture/seating/benches-ottomans-stool",
+   "is_group": false,
+   "evidence": "SuiteCommerce items API /api/items?custitem_is_subitem=false&commercecategoryurl=/furniture/seating/benches-ottomans-stool -> total=130; this filtered API total reproduces the site's own rendered listing header '#### N Products' exactly (verified on 6 pages incl. /furniture '620 Products', side-tables '71 Products', cabinets-cupboards '64 Products', sofas-loveseats '18 Products', armchairs '70 Products', etageres '3 Products')",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Desk Chairs",
+   "qty": 19,
+   "link": "https://www.scullyandscully.com/furniture/seating/desk-chairs",
+   "is_group": false,
+   "evidence": "SuiteCommerce items API /api/items?custitem_is_subitem=false&commercecategoryurl=/furniture/seating/desk-chairs -> total=19; this filtered API total reproduces the site's own rendered listing header '#### N Products' exactly (verified on 6 pages incl. /furniture '620 Products', side-tables '71 Products', cabinets-cupboards '64 Products', sofas-loveseats '18 Products', armchairs '70 Products', etageres '3 Products')",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dining Chairs",
+   "qty": 27,
+   "link": "https://www.scullyandscully.com/furniture/seating/dining-chairs",
+   "is_group": false,
+   "evidence": "SuiteCommerce items API /api/items?custitem_is_subitem=false&commercecategoryurl=/furniture/seating/dining-chairs -> total=27; this filtered API total reproduces the site's own rendered listing header '#### N Products' exactly (verified on 6 pages incl. /furniture '620 Products', side-tables '71 Products', cabinets-cupboards '64 Products', sofas-loveseats '18 Products', armchairs '70 Products', etageres '3 Products')",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Leather Footstools",
+   "qty": 26,
+   "link": "https://www.scullyandscully.com/furniture/seating/leather-footstools",
+   "is_group": false,
+   "evidence": "SuiteCommerce items API /api/items?custitem_is_subitem=false&commercecategoryurl=/furniture/seating/leather-footstools -> total=26; this filtered API total reproduces the site's own rendered listing header '#### N Products' exactly (verified on 6 pages incl. /furniture '620 Products', side-tables '71 Products', cabinets-cupboards '64 Products', sofas-loveseats '18 Products', armchairs '70 Products', etageres '3 Products')",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Recliners",
+   "qty": 21,
+   "link": "https://www.scullyandscully.com/furniture/seating/recliners-recliners",
+   "is_group": false,
+   "evidence": "SuiteCommerce items API /api/items?custitem_is_subitem=false&commercecategoryurl=/furniture/seating/recliners-recliners -> total=21; this filtered API total reproduces the site's own rendered listing header '#### N Products' exactly (verified on 6 pages incl. /furniture '620 Products', side-tables '71 Products', cabinets-cupboards '64 Products', sofas-loveseats '18 Products', armchairs '70 Products', etageres '3 Products')",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sofas & Loveseats",
+   "qty": 18,
+   "link": "https://www.scullyandscully.com/furniture/seating/sofas-loveseats",
+   "is_group": false,
+   "evidence": "SuiteCommerce items API /api/items?custitem_is_subitem=false&commercecategoryurl=/furniture/seating/sofas-loveseats -> total=18; this filtered API total reproduces the site's own rendered listing header '#### N Products' exactly (verified on 6 pages incl. /furniture '620 Products', side-tables '71 Products', cabinets-cupboards '64 Products', sofas-loveseats '18 Products', armchairs '70 Products', etageres '3 Products')",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Cabinets, Bookcases & Chests",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bookcases",
+   "qty": 39,
+   "link": "https://www.scullyandscully.com/furniture/cabinets-bookcases-chests/bookcases",
+   "is_group": false,
+   "evidence": "SuiteCommerce items API /api/items?custitem_is_subitem=false&commercecategoryurl=/furniture/cabinets-bookcases-chests/bookcases -> total=39; this filtered API total reproduces the site's own rendered listing header '#### N Products' exactly (verified on 6 pages incl. /furniture '620 Products', side-tables '71 Products', cabinets-cupboards '64 Products', sofas-loveseats '18 Products', armchairs '70 Products', etageres '3 Products')",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Cabinets & Cupboards",
+   "qty": 64,
+   "link": "https://www.scullyandscully.com/furniture/cabinets-bookcases-chests/cabinets-cupboards",
+   "is_group": false,
+   "evidence": "SuiteCommerce items API /api/items?custitem_is_subitem=false&commercecategoryurl=/furniture/cabinets-bookcases-chests/cabinets-cupboards -> total=64; this filtered API total reproduces the site's own rendered listing header '#### N Products' exactly (verified on 6 pages incl. /furniture '620 Products', side-tables '71 Products', cabinets-cupboards '64 Products', sofas-loveseats '18 Products', armchairs '70 Products', etageres '3 Products')",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Chests of Drawers",
+   "qty": 53,
+   "link": "https://www.scullyandscully.com/furniture/cabinets-bookcases-chests/chests-drawers",
+   "is_group": false,
+   "evidence": "SuiteCommerce items API /api/items?custitem_is_subitem=false&commercecategoryurl=/furniture/cabinets-bookcases-chests/chests-drawers -> total=53; this filtered API total reproduces the site's own rendered listing header '#### N Products' exactly (verified on 6 pages incl. /furniture '620 Products', side-tables '71 Products', cabinets-cupboards '64 Products', sofas-loveseats '18 Products', armchairs '70 Products', etageres '3 Products')",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sideboards",
+   "qty": 13,
+   "link": "https://www.scullyandscully.com/furniture/cabinets-bookcases-chests/sideboards-sideboards",
+   "is_group": false,
+   "evidence": "SuiteCommerce items API /api/items?custitem_is_subitem=false&commercecategoryurl=/furniture/cabinets-bookcases-chests/sideboards-sideboards -> total=13; this filtered API total reproduces the site's own rendered listing header '#### N Products' exactly (verified on 6 pages incl. /furniture '620 Products', side-tables '71 Products', cabinets-cupboards '64 Products', sofas-loveseats '18 Products', armchairs '70 Products', etageres '3 Products')",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Jewelry & Silver Chests",
+   "qty": 37,
+   "link": "https://www.scullyandscully.com/furniture/cabinets-bookcases-chests/jewelry-silv-chests",
+   "is_group": false,
+   "evidence": "SuiteCommerce items API /api/items?custitem_is_subitem=false&commercecategoryurl=/furniture/cabinets-bookcases-chests/jewelry-silv-chests -> total=37; this filtered API total reproduces the site's own rendered listing header '#### N Products' exactly (verified on 6 pages incl. /furniture '620 Products', side-tables '71 Products', cabinets-cupboards '64 Products', sofas-loveseats '18 Products', armchairs '70 Products', etageres '3 Products')",
+   "flag": "MANUAL REVIEW: mixed node - product tiles include freestanding jewelry armoires and armoured jewelry safes (furniture) alongside tabletop jewelry chests and silver chests (storage boxes); kept because the site files the whole node under Furniture > Cabinets, Bookcases & Chests"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Tables",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Coffee Tables",
+   "qty": 34,
+   "link": "https://www.scullyandscully.com/furniture/tables/coffee-tables",
+   "is_group": false,
+   "evidence": "SuiteCommerce items API /api/items?custitem_is_subitem=false&commercecategoryurl=/furniture/tables/coffee-tables -> total=34; this filtered API total reproduces the site's own rendered listing header '#### N Products' exactly (verified on 6 pages incl. /furniture '620 Products', side-tables '71 Products', cabinets-cupboards '64 Products', sofas-loveseats '18 Products', armchairs '70 Products', etageres '3 Products')",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Console Tables",
+   "qty": 33,
+   "link": "https://www.scullyandscully.com/furniture/tables/console-tables",
+   "is_group": false,
+   "evidence": "SuiteCommerce items API /api/items?custitem_is_subitem=false&commercecategoryurl=/furniture/tables/console-tables -> total=33; this filtered API total reproduces the site's own rendered listing header '#### N Products' exactly (verified on 6 pages incl. /furniture '620 Products', side-tables '71 Products', cabinets-cupboards '64 Products', sofas-loveseats '18 Products', armchairs '70 Products', etageres '3 Products')",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dining Tables",
+   "qty": 20,
+   "link": "https://www.scullyandscully.com/furniture/tables/dining-tables",
+   "is_group": false,
+   "evidence": "SuiteCommerce items API /api/items?custitem_is_subitem=false&commercecategoryurl=/furniture/tables/dining-tables -> total=20; this filtered API total reproduces the site's own rendered listing header '#### N Products' exactly (verified on 6 pages incl. /furniture '620 Products', side-tables '71 Products', cabinets-cupboards '64 Products', sofas-loveseats '18 Products', armchairs '70 Products', etageres '3 Products')",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Drop-Leaf Tables",
+   "qty": 12,
+   "link": "https://www.scullyandscully.com/furniture/tables/drop-leaf-tables",
+   "is_group": false,
+   "evidence": "SuiteCommerce items API /api/items?custitem_is_subitem=false&commercecategoryurl=/furniture/tables/drop-leaf-tables -> total=12; this filtered API total reproduces the site's own rendered listing header '#### N Products' exactly (verified on 6 pages incl. /furniture '620 Products', side-tables '71 Products', cabinets-cupboards '64 Products', sofas-loveseats '18 Products', armchairs '70 Products', etageres '3 Products')",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Game Tables",
+   "qty": 14,
+   "link": "https://www.scullyandscully.com/furniture/tables/game-tables",
+   "is_group": false,
+   "evidence": "SuiteCommerce items API /api/items?custitem_is_subitem=false&commercecategoryurl=/furniture/tables/game-tables -> total=14; this filtered API total reproduces the site's own rendered listing header '#### N Products' exactly (verified on 6 pages incl. /furniture '620 Products', side-tables '71 Products', cabinets-cupboards '64 Products', sofas-loveseats '18 Products', armchairs '70 Products', etageres '3 Products')",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "More Tables",
+   "qty": 32,
+   "link": "https://www.scullyandscully.com/furniture/tables/more-tables",
+   "is_group": false,
+   "evidence": "SuiteCommerce items API /api/items?custitem_is_subitem=false&commercecategoryurl=/furniture/tables/more-tables -> total=32; this filtered API total reproduces the site's own rendered listing header '#### N Products' exactly (verified on 6 pages incl. /furniture '620 Products', side-tables '71 Products', cabinets-cupboards '64 Products', sofas-loveseats '18 Products', armchairs '70 Products', etageres '3 Products')",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Round Tables",
+   "qty": 52,
+   "link": "https://www.scullyandscully.com/furniture/tables/round-tables",
+   "is_group": false,
+   "evidence": "SuiteCommerce items API /api/items?custitem_is_subitem=false&commercecategoryurl=/furniture/tables/round-tables -> total=52; this filtered API total reproduces the site's own rendered listing header '#### N Products' exactly (verified on 6 pages incl. /furniture '620 Products', side-tables '71 Products', cabinets-cupboards '64 Products', sofas-loveseats '18 Products', armchairs '70 Products', etageres '3 Products')",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Side Tables",
+   "qty": 71,
+   "link": "https://www.scullyandscully.com/furniture/tables/side-tables",
+   "is_group": false,
+   "evidence": "SuiteCommerce items API /api/items?custitem_is_subitem=false&commercecategoryurl=/furniture/tables/side-tables -> total=71; this filtered API total reproduces the site's own rendered listing header '#### N Products' exactly (verified on 6 pages incl. /furniture '620 Products', side-tables '71 Products', cabinets-cupboards '64 Products', sofas-loveseats '18 Products', armchairs '70 Products', etageres '3 Products')",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Folding Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Folding Tables",
+   "qty": 8,
+   "link": "https://www.scullyandscully.com/furniture/folding-furniture/folding-tables",
+   "is_group": false,
+   "evidence": "SuiteCommerce items API /api/items?custitem_is_subitem=false&commercecategoryurl=/furniture/folding-furniture/folding-tables -> total=8; this filtered API total reproduces the site's own rendered listing header '#### N Products' exactly (verified on 6 pages incl. /furniture '620 Products', side-tables '71 Products', cabinets-cupboards '64 Products', sofas-loveseats '18 Products', armchairs '70 Products', etageres '3 Products')",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Luggage Racks",
+   "qty": 17,
+   "link": "https://www.scullyandscully.com/furniture/folding-furniture/luggage-racks",
+   "is_group": false,
+   "evidence": "SuiteCommerce items API /api/items?custitem_is_subitem=false&commercecategoryurl=/furniture/folding-furniture/luggage-racks -> total=17; this filtered API total reproduces the site's own rendered listing header '#### N Products' exactly (verified on 6 pages incl. /furniture '620 Products', side-tables '71 Products', cabinets-cupboards '64 Products', sofas-loveseats '18 Products', armchairs '70 Products', etageres '3 Products')",
+   "flag": "MANUAL REVIEW: folding luggage racks are furniture-adjacent freestanding stands; kept because the site files them under its own Furniture > Folding Furniture department"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Office",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Desks",
+   "qty": 39,
+   "link": "https://www.scullyandscully.com/furniture/office/desks-desks",
+   "is_group": false,
+   "evidence": "SuiteCommerce items API /api/items?custitem_is_subitem=false&commercecategoryurl=/furniture/office/desks-desks -> total=39; this filtered API total reproduces the site's own rendered listing header '#### N Products' exactly (verified on 6 pages incl. /furniture '620 Products', side-tables '71 Products', cabinets-cupboards '64 Products', sofas-loveseats '18 Products', armchairs '70 Products', etageres '3 Products')",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Writing Tables",
+   "qty": 19,
+   "link": "https://www.scullyandscully.com/furniture/office/writing-tables",
+   "is_group": false,
+   "evidence": "SuiteCommerce items API /api/items?custitem_is_subitem=false&commercecategoryurl=/furniture/office/writing-tables -> total=19; this filtered API total reproduces the site's own rendered listing header '#### N Products' exactly (verified on 6 pages incl. /furniture '620 Products', side-tables '71 Products', cabinets-cupboards '64 Products', sofas-loveseats '18 Products', armchairs '70 Products', etageres '3 Products')",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Filing Cabinets",
+   "qty": 10,
+   "link": "https://www.scullyandscully.com/furniture/office/filing-cabinets",
+   "is_group": false,
+   "evidence": "SuiteCommerce items API /api/items?custitem_is_subitem=false&commercecategoryurl=/furniture/office/filing-cabinets -> total=10; this filtered API total reproduces the site's own rendered listing header '#### N Products' exactly (verified on 6 pages incl. /furniture '620 Products', side-tables '71 Products', cabinets-cupboards '64 Products', sofas-loveseats '18 Products', armchairs '70 Products', etageres '3 Products')",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Beds",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Upholstered Beds",
+   "qty": 1,
+   "link": "https://www.scullyandscully.com/furniture/beds/upholstered-beds",
+   "is_group": false,
+   "evidence": "SuiteCommerce items API /api/items?custitem_is_subitem=false&commercecategoryurl=/furniture/beds/upholstered-beds -> total=1; this filtered API total reproduces the site's own rendered listing header '#### N Products' exactly (verified on 6 pages incl. /furniture '620 Products', side-tables '71 Products', cabinets-cupboards '64 Products', sofas-loveseats '18 Products', armchairs '70 Products', etageres '3 Products')",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Wood Beds",
+   "qty": 5,
+   "link": "https://www.scullyandscully.com/furniture/beds/wood-beds",
+   "is_group": false,
+   "evidence": "SuiteCommerce items API /api/items?custitem_is_subitem=false&commercecategoryurl=/furniture/beds/wood-beds -> total=5; this filtered API total reproduces the site's own rendered listing header '#### N Products' exactly (verified on 6 pages incl. /furniture '620 Products', side-tables '71 Products', cabinets-cupboards '64 Products', sofas-loveseats '18 Products', armchairs '70 Products', etageres '3 Products')",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Contemporary",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Cabinets, Bookcases, Chests",
+   "qty": 13,
+   "link": "https://www.scullyandscully.com/furniture/contemporary/cont-cabinets-bookcases-chests",
+   "is_group": false,
+   "evidence": "SuiteCommerce items API /api/items?custitem_is_subitem=false&commercecategoryurl=/furniture/contemporary/cont-cabinets-bookcases-chests -> total=13; this filtered API total reproduces the site's own rendered listing header '#### N Products' exactly (verified on 6 pages incl. /furniture '620 Products', side-tables '71 Products', cabinets-cupboards '64 Products', sofas-loveseats '18 Products', armchairs '70 Products', etageres '3 Products')",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Miscellaneous",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bar Carts & Bars",
+   "qty": 13,
+   "link": "https://www.scullyandscully.com/furniture/miscellaneous/bar-carts-bars",
+   "is_group": false,
+   "evidence": "SuiteCommerce items API /api/items?custitem_is_subitem=false&commercecategoryurl=/furniture/miscellaneous/bar-carts-bars -> total=13; this filtered API total reproduces the site's own rendered listing header '#### N Products' exactly (verified on 6 pages incl. /furniture '620 Products', side-tables '71 Products', cabinets-cupboards '64 Products', sofas-loveseats '18 Products', armchairs '70 Products', etageres '3 Products')",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Etagere",
+   "qty": 3,
+   "link": "https://www.scullyandscully.com/furniture/miscellaneous/etageres",
+   "is_group": false,
+   "evidence": "SuiteCommerce items API /api/items?custitem_is_subitem=false&commercecategoryurl=/furniture/miscellaneous/etageres -> total=3; this filtered API total reproduces the site's own rendered listing header '#### N Products' exactly (verified on 6 pages incl. /furniture '620 Products', side-tables '71 Products', cabinets-cupboards '64 Products', sofas-loveseats '18 Products', armchairs '70 Products', etageres '3 Products')",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Library Steps",
+   "qty": 6,
+   "link": "https://www.scullyandscully.com/furniture/miscellaneous/library-steps",
+   "is_group": false,
+   "evidence": "SuiteCommerce items API /api/items?custitem_is_subitem=false&commercecategoryurl=/furniture/miscellaneous/library-steps -> total=6; this filtered API total reproduces the site's own rendered listing header '#### N Products' exactly (verified on 6 pages incl. /furniture '620 Products', side-tables '71 Products', cabinets-cupboards '64 Products', sofas-loveseats '18 Products', armchairs '70 Products', etageres '3 Products')",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Other Furniture",
+   "qty": 38,
+   "link": "https://www.scullyandscully.com/furniture/miscellaneous/other-furniture",
+   "is_group": false,
+   "evidence": "SuiteCommerce items API /api/items?custitem_is_subitem=false&commercecategoryurl=/furniture/miscellaneous/other-furniture -> total=38; this filtered API total reproduces the site's own rendered listing header '#### N Products' exactly (verified on 6 pages incl. /furniture '620 Products', side-tables '71 Products', cabinets-cupboards '64 Products', sofas-loveseats '18 Products', armchairs '70 Products', etageres '3 Products')",
+   "flag": "MANUAL REVIEW: catch-all node - all 38 tiles were listed; the majority are freestanding furniture pieces (coat racks, hall stands, valet stands, blanket chest, plant/dictionary/music stands, pedestal, folding screens, milking stool, coffee table, club fenders, footstools) but a minority are not furniture (hampers, a wall shelf, a telescope, a firescreen)"
+  }
+ ]
+}

@@ -1,0 +1,193 @@
+{
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ACCESS: www.conforama.fr sits behind Cloudflare and 403s plain requests; reached with curl_cffi impersonation - safari18_0, safari18_0_ios and chrome124 all returned HTTP 200 (robots.txt itself only yielded to safari18_0). No proxy or r.jina.ai needed. ROBOTS: https://www.conforama.fr/robots.txt was fetched FIRST. It opens 'User-agent: * / Disallow: /', but a later, MORE SPECIFIC named group under the comment '# RITM0037413 Ouverture LLMs' lists Applebot, CCBot, ChatGPT-User, Claude-SearchBot, Claude-User, ClaudeBot, MistralAI-*, Meta-*, OAI-SearchBot and Perplexity* and ends 'Allow: /'. A named ClaudeBot group with Allow: / therefore governs us and Conforama has explicitly OPTED IN for Claude agents - this is the opposite of a robots exclusion. No Crawl-delay is declared. The file's technical bans were honoured exactly: /*recherche-conforama*, /*query=*, /*fromSearch* (internal search was never used), /*I-Page* (so the /H-<code>/I-PageN_60 pagination URLs were deliberately NOT requested - the exhaustion identity below was proven from the SSR payload instead), /*sortBy=*, /*limit=*, /*view=list|grid*, /*NW-* (so no facet URL was ever fetched; the facet counts quoted below were read out of the SSR payload of the un-faceted category page, not by requesting a facet URL), /m/, /medias/, /*.pdf*. Every URL recorded here is a bare /<department>/<section>/<leaf>/c/<code> path with no query string. TREE: built from two independent sources and merged, exactly as in the Furniture pass. (1) The site's own mega-menu, parsed out of the rendered SSR HTML of the department page /cuisine-salle-de-bain/c/04 - 473 distinct /c/<code> nodes with their live labels and their CURRENT URL paths. (2) https://www.conforama.fr/sitemap-categories.xml (HTTP 200, 519 nodes). Union = 520. The URL shape is /<2-digit department>/<4-digit section>/<6-digit leaf>/c/<code>; note the numeric code is legacy and does NOT match the current path (e.g. Baignoire et douche keeps code 090806 from an old Jardin placement while its live path is cuisine-salle-de-bain/meuble-de-salle-de-bain/, and Miroir de salle de bain keeps 050304 from Décoration while its live path is cuisine-salle-de-bain/accessoires-de-salle-de-bain/). The live URL path, not the code, was used for parentage. BATHROOM TREE: department 04 'Cuisine Salle de bain' splits into a kitchen half (0401 Meuble de cuisine, 0406 Nos cuisines, 0407 Elément de cuisine - all Kitchen, out of scope) and a bathroom half of exactly two sections: 0107 'Salle de bain' with six children in mega-menu order (Salle de bain prêtes à emporter 010710, Meuble et rangement de salle de bain 010701, Armoire colonne étagère 010702, Colonne et paroi de douche 010713, Vasque et lavabo 010714, Baignoire et douche 090806) and 0402 'Accessoires de Salle de bain' with eight children in mega-menu order (Poubelle de salle de bain 010706, Panier à linge et corbeille 010709, Petits accessoires de salle de bain 010711, Porte Serviette 010707, Tapis de bain 050604, Miroir de salle de bain 050304, Etendoir à linge 040201, WC et accessoires wc 010715). Both 04 and the two 4-digit section pages were fetched and confirmed to carry NO product grid at all - no data-component-id=\"plp-title\" block, no productCount, no nbPages - so they are pure landing pages and are emitted only as grouping rows (rule 24). No 6-digit node has any child. QTY: every qty is the rendered listing header read from the page's own HTML - the block <div data-component-id=\"plp-title\"><h1>NAME</h1><p>(N produits)</p></div> that sits directly above the grid. It was independently corroborated on EVERY row three ways: (a) the SSR React-Server-Component root PLP object, which carries \\\"nbPages\\\":N, \\\"productCount\\\":M and \\\"canonicalUri\\\":{\\\"uri\\\":\\\"/H-<code>/I-Page1_60\\\"} - header == productCount on all 21 nodes measured; (b) the exhaustion identity ceil(productCount/60) == nbPages (page size 60, stated by the canonicalUri suffix), which held exactly on all 21 (e.g. Vasque et lavabo 2482 -> 42 pages, Baignoire et douche 1138 -> 19, Poubelle 319 -> 6); (c) the canonicalUri code, which equalled the requested node's code on every single page, proving no silent parent-serving. FOURTH, INDEPENDENT PROOF - the 'Type de produit' facet breakdown embedded in each PLP's own SSR payload sums EXACTLY to the header on every node that publishes one: Vasque et lavabo 1439 Vasque + 1043 Lavabo = 2482; Colonne et paroi de douche 1885 Receveur de douche + 775 Paroi de douche + 364 Colonne de douche = 3024; Baignoire et douche 615 Baignoire + 365 Colonne de douche + 158 Cabine de douche = 1138; WC et accessoires wc 893 Accessoire wc + 120 Abattant wc + 56 Toilettes WC = 1069; Panier à linge et corbeille 885 Panier à linge + 608 Panier = 1493; Porte Serviette 667 Porte serviette + 386 Sèche serviette = 1053. These partitions also confirm each node's actual merchandise, not just its name. DRIFT CHECK: five leaves were re-fetched cache-cold in a second pass on different fingerprints. Four were byte-identical (010713 3024, 010714 2482, 050304 2159, 010706 319). One moved: WC et accessoires wc read 1074 on the first pass and 1069 on the second and third (its facet partition moved in lockstep, 896/122/56 -> 893/120/56), i.e. ~0.5% live marketplace inventory flux. The settled value 1069 is recorded, and it is the one the facet sum reproduces. Counts discriminate strongly (319 to 7239) and are nowhere a site-wide constant. Numbers are large because Conforama's PLPs merge its own stock with its Mirakl marketplace partners (the 'Vendu par' facet on Tapis de bain, for example, reads Conforama 9 / Partenaires 801). EXCLUDED / ROUTED: see `review` - three Bathroom-furniture leaves suppressed by cross-file dedup (010710, 010701, 010702, all already in Furniture.xlsx), three textile leaves routed to Textile (Tapis de bain 810, Serviette et drap de bain 508, Peignoir 482), Etendoir à linge (565, laundry not bathroom), the two decorative mirror leaves (Miroir mural 5303, Miroir sur pied et psyché 421, both Wall Decor - Conforama has a separate genuine Miroir de salle de bain node which IS recorded), the baby bath (060302, 120), the outdoor/pool shower (090802, 61) and the kitchen sink/tap node (040110, 2260). 'Tous les miroirs' (050302) was excluded outright as a View All node (rule 25), as were the other 'Tous les ...' nodes throughout the menu. COMPLETENESS: all 520 union nodes were regex-scanned for salle-de-bain|bain|douche|wc|toilette|vasque|lavabo|robinet|mitigeur|baignoire|paroi|sanitaire|miroir|serviette|peignoir|hygiene and every hit was resolved to one of the nodes accounted for above. The 48 sitemap-only nodes (present in sitemap-categories.xml but absent from the mega-menu) were checked individually: their bathroom-vocabulary hits are all named kitchen/utility ranges (cuisine-spoon-blanc, cuisine-manchester, buanderie-opale, buanderie-ombre, buanderie-coton, etc.) plus Enfant & Bébé > Jeux et jouets > Jouet de bain (bath toys), none of which is a bathroom listing. There is NO bathroom robinetterie/mitigeur node and NO bathroom lighting node anywhere on the site, so nothing was routed to Lighting. DEDUP: dedup.already_extracted() was run on all 22 candidate URLs; three hit Furniture.xlsx and were moved to `review`; the ten recorded rows are all clean misses. No Bathroom row duplicates a Furniture, Storage or Home-Decor URL.",
+ "rows": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower Column and Screen",
+   "qty": 3024,
+   "link": "https://www.conforama.fr/cuisine-salle-de-bain/meuble-de-salle-de-bain/colonne-et-paroi-de-douche/c/010713",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Basin and Washbasin",
+   "qty": 2482,
+   "link": "https://www.conforama.fr/cuisine-salle-de-bain/meuble-de-salle-de-bain/vasque-et-lavabo/c/010714",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathtub and Shower",
+   "qty": 1138,
+   "link": "https://www.conforama.fr/cuisine-salle-de-bain/meuble-de-salle-de-bain/baignoire-et-douche/c/090806",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Accessories",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Bin",
+   "qty": 319,
+   "link": "https://www.conforama.fr/cuisine-salle-de-bain/accessoires-de-salle-de-bain/poubelle-de-salle-de-bain/c/010706",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Laundry Basket and Bin",
+   "qty": 1493,
+   "link": "https://www.conforama.fr/cuisine-salle-de-bain/accessoires-de-salle-de-bain/panier-a-linge-et-corbeille/c/010709",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Small Bathroom Accessories",
+   "qty": 2013,
+   "link": "https://www.conforama.fr/cuisine-salle-de-bain/accessoires-de-salle-de-bain/petits-accessoires-de-salle-de-bain/c/010711",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Towel Rail",
+   "qty": 1053,
+   "link": "https://www.conforama.fr/cuisine-salle-de-bain/accessoires-de-salle-de-bain/porte-serviette/c/010707",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Mirror",
+   "qty": 2159,
+   "link": "https://www.conforama.fr/cuisine-salle-de-bain/accessoires-de-salle-de-bain/miroir-de-salle-de-bain/c/050304",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Toilets and Toilet Accessories",
+   "qty": 1069,
+   "link": "https://www.conforama.fr/cuisine-salle-de-bain/accessoires-de-salle-de-bain/wc-et-accessoires-wc/c/010715",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  }
+ ],
+ "review": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Ready-to-Take Bathroom Sets",
+   "qty": 7239,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Ready-to-Take Bathroom Furniture Sets' - dedup.already_extracted() hit on this exact URL. Per the run-owner OPTION 1 policy it stays in Furniture and is NOT re-extracted into Bathroom, even though rule 9 would otherwise class it as Bathroom furniture.",
+   "link": "https://www.conforama.fr/cuisine-salle-de-bain/meuble-de-salle-de-bain/salle-de-bain-pretes-a-emporter/c/010710"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathroom Furniture and Storage",
+   "qty": 4139,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Bathroom Furniture and Storage Units' - dedup.already_extracted() hit on this exact URL. Stays in Furniture (OPTION 1); would otherwise be Bathroom under rules 9/12.",
+   "link": "https://www.conforama.fr/cuisine-salle-de-bain/meuble-de-salle-de-bain/meuble-et-rangement/c/010701"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Cabinet, Column, Shelving Unit",
+   "qty": 6694,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Bathroom Cabinets, Columns and Shelf Units' - dedup.already_extracted() hit on this exact URL. Stays in Furniture (OPTION 1); would otherwise be Bathroom under rules 9/12 (it is the node that carries Conforama's armoires de toilette / mirror cabinets).",
+   "link": "https://www.conforama.fr/cuisine-salle-de-bain/meuble-de-salle-de-bain/armoire-colonne-etagere/c/010702"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Accessories > Bath Mat",
+   "qty": 810,
+   "issue": "ROUTED TO TEXTILE: textile bath mats (rules 16, 20). Although Conforama cross-links this node into the 'Accessoires de Salle de bain' mega-menu column, its canonical URL and true parent are Décoration & Textile > Linge de toilette (/decoration-textile/linge-de-toilette/tapis-de-bain/c/050604), i.e. the site itself files it as bath linen alongside Serviette et drap de bain and Peignoir. Website hierarchy decides (rule 16). Its facet set is coloris/style/origine with no material or anti-slip facet, so no separable rubber/anti-slip subset exists to keep in Bathroom.",
+   "link": "https://www.conforama.fr/decoration-textile/linge-de-toilette/tapis-de-bain/c/050604"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Accessories > Clothes Airer",
+   "qty": 565,
+   "issue": "NOT RECORDED - primary product type is a clothes airer / drying rack, a laundry product, not a bathroom fixture, accessory or piece of hardware (rules 2 and 5: PRIMARY PRODUCT TYPE outranks WEBSITE HIERARCHY, and nothing in rule 3/13/17 covers clothes-drying racks). It is filed under 'Accessoires de Salle de bain' by Conforama only because that section doubles as its laundry/utility column (its canonical code 040201 belongs to the 0402 section, and its own meta description is the generic 'Tout l'univers de la maison' one rather than the 'EN STOCK : ... sur Conforama.fr' pattern every genuine bathroom leaf carries). Flagged rather than silently dropped.",
+   "link": "https://www.conforama.fr/cuisine-salle-de-bain/accessoires-de-salle-de-bain/etendoir-a-linge/c/040201"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Decoration & Textile > Bath Linen > Bath Towel and Bath Sheet",
+   "qty": 508,
+   "issue": "ROUTED TO TEXTILE: bath towels and bath sheets (rules 15, 20).",
+   "link": "https://www.conforama.fr/decoration-textile/linge-de-toilette/serviette-et-drap-de-bain/c/050601"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Decoration & Textile > Bath Linen > Bathrobe",
+   "qty": 482,
+   "issue": "ROUTED TO TEXTILE: bathrobes (rule 20).",
+   "link": "https://www.conforama.fr/decoration-textile/linge-de-toilette/peignoir/c/050602"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Decoration & Textile > Mirror > Wall Mirror",
+   "qty": 5303,
+   "issue": "NOT RECORDED - general decorative wall mirrors under Décoration & Textile > Miroir, a sibling of 'Miroir sur pied et psyché'. Primary product type is a decorative mirror, not a bathroom mirror (rules 11, 21). Conforama publishes a SEPARATE, explicitly bathroom node - Miroir de salle de bain (050304, 2159) - which IS recorded in rows; recording 050301 as well would duplicate and would misclassify wall decor as Bathroom.",
+   "link": "https://www.conforama.fr/decoration-textile/miroir/miroir-mural/c/050301"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Decoration & Textile > Mirror > Floor Mirror and Cheval Mirror",
+   "qty": 421,
+   "issue": "NOT RECORDED - freestanding / cheval mirrors, i.e. bedroom-dressing decor, not bathroom (rules 11, 21). Same reasoning as Miroir mural.",
+   "link": "https://www.conforama.fr/decoration-textile/miroir/miroir-sur-pied-et-psyche/c/050303"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Child & Baby > Baby Hygiene and Care > Baby Bathtub and Bath Seat",
+   "qty": 120,
+   "issue": "NOT RECORDED - LOW CONFIDENCE (rule 29). Primary product type is a portable plastic baby bath tub / bath seat sold as baby-care equipment under Enfant & Bébé > Hygiène et soins de bébé, not a plumbed bathtub in the Salle de bain hierarchy (rule 5: hierarchy and function both point at baby care). Conforama's real bath category is Baignoire et douche (090806), which is recorded. Flagged so it is not silently skipped.",
+   "link": "https://www.conforama.fr/enfant-bebe/hygiene-et-soins-de-bebe/baignoire-et-siege-de-bain/c/060302"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Garden, Leisure & Sport > Pool and Spa > Outdoor Shower",
+   "qty": 61,
+   "issue": "NOT RECORDED - LOW CONFIDENCE (rule 29). Outdoor/garden and poolside showers, filed by the site under Jardin, Loisirs & Sport > Piscine et balnéo, not under Salle de bain. Rule 6 covers showers, but rule 5 puts WEBSITE CATEGORY HIERARCHY above ROOM and the function here is poolside rinsing, not bathroom sanitaryware. Flagged rather than guessed.",
+   "link": "https://www.conforama.fr/jardin-loisirs-sport/piscine-et-balneo/douche-exterieure/c/090802"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Kitchen Bathroom > Kitchen Element > Sink and Mixer Tap",
+   "qty": 2260,
+   "issue": "NOT RECORDED - kitchen sinks and kitchen mixer taps, filed under Elément de cuisine alongside Meuble haut / Meuble bas / Plan de travail. This is the only 'mitigeur' node on the whole site; Conforama publishes NO bathroom robinetterie / mitigeur de lavabo category at all, so there is no bathroom-taps leaf to record (rule 8 has nothing to attach to here).",
+   "link": "https://www.conforama.fr/cuisine-salle-de-bain/element-de-cuisine/evier-et-mitigeur/c/040110"
+  }
+ ],
+ "_reconstructed_from": "Bathroom.xlsx delivered 2026-09-01 (checkpoint), not original worker JSON"
+}

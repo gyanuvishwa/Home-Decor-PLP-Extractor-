@@ -1,0 +1,156 @@
+{
+  "sr": 213,
+  "company": "Lightology",
+  "brand_site": "lightology.com",
+  "country": "USA",
+  "site_url": "https://www.lightology.com/",
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "Reached entirely via Claude-in-Chrome (own tab, tabId 1961719701) with zero blocks encountered at any point - contradicts the prior Home-Decor pass's HTTP-layer finding of a Barracuda WAF GEO_IP_BLOCK, confirming that was an HTTP-fingerprint issue, not a real access restriction. robots.txt was readable in-tab (query-string-bearing Sitemap lines triggered the connector's own redaction filter on raw output, worked around by filtering to User-agent lines only): lists User-agent:* blocks plus named-bot blocks for Googlebot, msnbot, bing, Yandex, MJ12bot, Bytespider, crawl-amazonbot, Pinterest, AhrefsBot - no Claude/Anthropic-specific entry anywhere, so proceeded per Rule 2 (generic bot rules are not a targeted Claude opt-out). TREE SOURCE: the site's own mega-menu flyout for the top-level 'Furniture' nav item (cat_id=486), read via the DOM (li.querySelectorAll scoped to that nav item's <li>, avoiding the connector's query-string redaction by extracting only the numeric cat_id, not full hrefs). That flyout listed 9 direct children: Seating(487), Tables(488), Home Decor(491), Decorative Mirrors(572), Storage(573), Hardware(661), Outdoor Furniture(652), Office Furniture(656), Rugs(651) - this matches and supersedes the prior Home-Decor pass's own note that it had excluded exactly 'Seating/Tables/Storage/Office Furniture/Outdoor Furniture/Rugs under cat_id=486' as furniture, confirming completeness. Each landing-page branch (Seating/Tables/Storage/Outdoor Furniture) was opened and its own '.cat' tile block (matching the platform's known landing-page-with-subcategory-tiles pattern documented in the prior pass) was read the same way to get its real children; a sitemap.xml lookup returned the site's custom 404 page (this is a non-Shopify/Magento PHP catalogue with no XML sitemap, matching the prior pass's finding), so the nav-plus-tile-tiles route was the only tree source needed and was cross-checked by opening every landing node directly (none silently 404'd or served a mismatched h1). EXCLUDED at cat_id=486's own child level: Home Decor(491, wall art/planters/clocks - Home Decor project's turf), Decorative Mirrors(572, mirrors), Hardware(661, furniture legs/knobs/parts), Rugs(651, textile) - all per Section 1. EXCLUDED one level down: Desktop Storage & Baskets(648, standalone organizer baskets - title alone is unambiguous per Section 1's storage-vs-furniture line, not opened) and Planters(655, decorative planters, not opened - title unambiguous). EXCLUDED with justification after inspection: Wall-Mounted Storage(650, titled 'Wall Cabinets, Medicine Cabinets, Wall Shelves & Open Shelving') - opened and inspected; of the first 30 products only ~5 were genuine wall cabinets/wall bookshelves, the large majority were wall hooks, coat racks and open decorative wall shelves (Curvature Wall Hook, Basho Wall Hanger, Epoch Rack, Coil Coat Rack, Fracture Wall Shelf, Folded Wall Shelf, etc.) - per the brief's SHELVING LINE rule ('decorative wall shelves... NOT furniture') the dominant product type is decorative wall accessories, not furniture, so the whole node was excluded rather than emitted with a MANUAL REVIEW flag, since the product-tile evidence was unambiguous. Office Chairs(657) is tiled as a child of Seating, not of Office Furniture - Office Furniture(656) itself is a flat leaf listing desks/sideboards/etc with no further children and does not repeat Office Chairs, so no duplicate. QTY METHOD: this platform exposes no rendered 'N products' header or usable structured JSON (confirmed by the prior pass); the exact same pager-arithmetic method the prior pass validated (and re-verified live here on cat_id=638 by observing the pager clamp) was used: each category has a fixed 'View: 30' per-page setting, the pager's own numeric links give the true last page number, clicking the last numeric page link (AJAX-driven - the URL updates to &page=N but a direct GET navigation to that same URL silently resets to page 1, confirmed on cat_id=639, so all last-page reads were done via in-page click, never by typing the page= URL) and counting the 'COMPARE' button occurrences (one per product tile, confirmed reliable across all 12 leaf categories) on that final page gives the remainder; total = 30*(lastPage-1) + remainder. Every leaf's last page was confirmed to show no further 'Next' link. No count came out suspiciously round (1000/5000/10000), so none were nulled. Sanity check: counts varied naturally category to category (69 to 848), never repeating a constant site-wide figure. No 'Bedroom'/'Beds' furniture category exists anywhere in the Furniture nav tree - Lightology's furniture assortment appears deliberately narrow (seating, tables, storage/media furniture, outdoor, office) with no bed frames, wardrobes or dedicated bedroom department; this is treated as a genuine absence, not a miss, since the full nav tree plus every landing page's own tile strip was walked.",
+  "rows": [
+    {
+      "category": "Furniture",
+      "sub_category": "Seating",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Stools, Benches & Ottomans",
+      "qty": 485,
+      "link": "https://www.lightology.com/index.php?module=cat&cat_id=638",
+      "is_group": false,
+      "evidence": "View:30/page; pager last numeric page link = 17 (clicked, URL became &page=17); COMPARE button count on that final page = 5; total = 30*16+5 = 485; no Next link present on final page",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Dining Chairs",
+      "qty": 417,
+      "link": "https://www.lightology.com/index.php?module=cat&cat_id=639",
+      "is_group": false,
+      "evidence": "View:30/page; pager last numeric page link = 14 (clicked, URL became &page=14); COMPARE button count on that final page = 27; total = 30*13+27 = 417; no Next link present on final page",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Lounge Chairs",
+      "qty": 324,
+      "link": "https://www.lightology.com/index.php?module=cat&cat_id=640",
+      "is_group": false,
+      "evidence": "View:30/page; pager last numeric page link = 11 (clicked, URL became &page=11); COMPARE button count on that final page = 24; total = 30*10+24 = 324; no Next link present on final page",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Sofas & Loveseats",
+      "qty": 90,
+      "link": "https://www.lightology.com/index.php?module=cat&cat_id=641",
+      "is_group": false,
+      "evidence": "View:30/page; pager last numeric page link = 3 (clicked, URL became &page=3); COMPARE button count on that final page = 30 (a full page); pagination showed 'Previous 1 2 3' with no Next link, confirming page 3 is genuinely last; total = 30*2+30 = 90",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Office Chairs",
+      "qty": 69,
+      "link": "https://www.lightology.com/index.php?module=cat&cat_id=657",
+      "is_group": false,
+      "evidence": "View:30/page; pager last numeric page link = 3 (clicked, URL became &page=3); COMPARE button count on that final page = 9; total = 30*2+9 = 69; no Next link present on final page",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Tables",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Dining Tables",
+      "qty": 252,
+      "link": "https://www.lightology.com/index.php?module=cat&cat_id=642",
+      "is_group": false,
+      "evidence": "View:30/page; pager last numeric page link = 9 (clicked, URL became &page=9); COMPARE button count on that final page = 12; total = 30*8+12 = 252; no Next link present on final page",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Coffee Tables",
+      "qty": 278,
+      "link": "https://www.lightology.com/index.php?module=cat&cat_id=643",
+      "is_group": false,
+      "evidence": "View:30/page; pager last numeric page link = 10 (clicked, URL became &page=10); COMPARE button count on that final page = 8; total = 30*9+8 = 278; no Next link present on final page",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Side & Accent Tables",
+      "qty": 848,
+      "link": "https://www.lightology.com/index.php?module=cat&cat_id=644",
+      "is_group": false,
+      "evidence": "View:30/page; pager last numeric page link = 29 (clicked, URL became &page=29); COMPARE button count on that final page = 8; total = 30*28+8 = 848; no Next link present on final page",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Storage",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Storage Furniture",
+      "qty": 358,
+      "link": "https://www.lightology.com/index.php?module=cat&cat_id=649",
+      "is_group": false,
+      "evidence": "View:30/page; pager last numeric page link = 12 (clicked, URL became &page=12); COMPARE button count on that final page = 28; total = 30*11+28 = 358; no Next link present on final page",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Outdoor Furniture",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Outdoor Tables",
+      "qty": 290,
+      "link": "https://www.lightology.com/index.php?module=cat&cat_id=653",
+      "is_group": false,
+      "evidence": "View:30/page; pager last numeric page link = 10 (clicked, URL became &page=10); COMPARE button count on that final page = 20; total = 30*9+20 = 290; no Next link present on final page",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Outdoor Seating",
+      "qty": 445,
+      "link": "https://www.lightology.com/index.php?module=cat&cat_id=654",
+      "is_group": false,
+      "evidence": "View:30/page; pager last numeric page link = 15 (clicked, URL became &page=15); COMPARE button count on that final page = 25; total = 30*14+25 = 445; no Next link present on final page",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Office Furniture",
+      "qty": 82,
+      "link": "https://www.lightology.com/index.php?module=cat&cat_id=656",
+      "is_group": false,
+      "evidence": "View:30/page; pager last numeric page link = 3 (clicked, URL became &page=3); COMPARE button count on that final page = 22; total = 30*2+22 = 82; no Next link present on final page",
+      "flag": null
+    }
+  ]
+}

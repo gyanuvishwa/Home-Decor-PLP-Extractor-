@@ -1,0 +1,309 @@
+{
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ROBOTS: https://www.moemax.de/robots.txt fetched FIRST (HTTP 200, 776 bytes, profile firefox133) before any other request on the host. It contains exactly ONE group, 'User-agent: *', disallowing /account, /checkout, /e-billing, /error, /cart, /feedexport/export/google/products/xml, /feedexport/export/criteo/products/xml, /feedexport/export/criteo/products/csv, /mpp/register, /newsletter, /reservation, /return, /wishlist, /s?encodedfhlink=*, /api/tracking, /s/, /h/, /orders/, plus six Sitemap: lines. There is NO group naming ClaudeBot, Claude-Web, Claude-User, Claude-SearchBot or anthropic-ai anywhere in the file, and no Content-Signal line, so no Claude opt-out exists and there is no hard stop. No Crawl-delay is declared; probe.py's 2 s per-host gap was kept and API calls were paced at 1.2 s. Nothing disallowed was requested: no /s/ or /s?encodedfhlink= internal-search URL, no facet/sort URL, no cart/account/wishlist path, and NOT /api/tracking. The only /api path used was /api/graphql, which the '*' group does not disallow (only /api/tracking is listed). Second host checked separately: assets.moemax.com/robots.txt returns HTTP 404 (no file, therefore no restriction); the JS bundles read for API discovery live there. services.xxxlgroup.com/robots.txt also 404s and was in the end not used. ACCESS: www.moemax.de is a client-rendered React SPA behind Cloudflare. GET of a category URL returns a 4.2 KB shell whose only <h1> is 'JavaScript is required' - there is no server-rendered product grid and no rendered total, so an on-page count is physically unavailable. r.jina.ai returned HTTP 403 (key-gated) and was abandoned. POST to /api/graphql draws a Cloudflare 'Just a moment...' challenge, but GET /api/graphql?operationName=..&variables=..&query=.. is served normally once the Apollo CSRF preflight header 'x-apollo-operation-name' is supplied (without it the server answers 400 with the Apollo CSRF message, which is how the header was identified). No browser automation, no CORS proxy and no campaign parameters were used. TREE: taken from the site's own artefacts, nothing guessed. (a) https://www.moemax.de/sitemap-categories.xml (declared in robots.txt) - 3,098 <loc>s, 661 of them clean category URLs whose trailing code (C30..C47, CxCyCz...) encodes Mömax's own hierarchy. (b) The storefront's own GraphQL 'category' query (getCategory(code){name code breadcrumbs seoData{canonicalUrl noIndex}}), lifted verbatim from the shop bundle assets.moemax.com/webshop/mmx/assets/js/main_910940b161b34a6e35d4.js, was then used to enumerate children exhaustively by probing CxxCn for n=1..20 under every bathroom-relevant parent. That recovered a node the sitemap TRUNCATES: C44C5 'Alles Sonstige' (noIndex, 374 products) is absent from sitemap-categories.xml but is a real, indexed-in-nav child of Badzubehör. Top level is C30 Möbel, C31 Heimtextilien, C32 Teppiche, C33 Lampen & Leuchten, C34 Küchen, C35 Kochen & Essen, C36 Aufbewahrung, C37 Deko, C38 Garderoben, C39 Spiegel, C40/C45 Outdoor, C41 Freizeit, C42 Haushaltsgeräte, C43 Weihnachten, C44 Badzubehör, C46 Kindermöbel, C47 Küchengeräte (C28/C29/C48+ do not resolve). Badzubehör (C44) is a TOP-LEVEL category with children C44C1..C44C6; C44C7+ do not resolve, so the branch is complete. Spiegel (C39) has exactly C39C1..C39C5; C39C6+ do not resolve. QTY: every figure is pagination.totalResults from the storefront's OWN product API - the Coveo-backed 'coveoSearch' GraphQL operation that the PLP itself renders from. The query document was lifted verbatim from the site's listing chunk assets.moemax.com/webshop/mmx/assets/js/49647_<hash>.js (found by scanning the 64 numeric webpack chunks listed in runtime_beb14adf6a9528e44405.js), and the category page's own filter shape - [{id:'categories',type:'categoryFilter',values:[<code>]}] - was taken from AbstractCategoryView_<hash>.js. In the same chunk AbstractCategoryView feeds pagination.totalResults into productCountText for the on-page heading, so this field IS the number the listing prints. VERIFICATION: equivalence proved by ENUMERATION TO EXHAUSTION on five nodes of deliberately different size, paging numberOfResults=60 and collecting distinct product codes: Seifenschalen C44C6 total 19 / 19 distinct codes; WC-Bürsten C44C4 28 / 28; Seifenspender C44C3 33 / 33; Wäschekörbe C44C1 116 / 116 across 2 pages; Badezimmerspiegel C39C1 146 / 146 across 3 pages. Exact match every time, including multi-page cases, so totalResults is neither capped nor inflated. Counts clearly discriminate (13, 19, 28, 32, 33, 46, 109, 116, 146, 374 - no site-wide constant). Each node's identity was confirmed from getCategory's own name + breadcrumbs + seoData.canonicalUrl, and every recorded link is that canonical URL verbatim, which also closes the rel=canonical dedup blind spot: dedup was run on the canonical form, not on a nav alias. DEDUP: already_extracted() run on every candidate leaf. 11 hits, all left in review and none in rows. The entire Möbel > Schränke > Badezimmerschränke branch (9 children: Hochschränke, Unterschränke, Hängeschränke, Spiegelschränke Bad, Waschbeckenunterschränke, Waschtische, Badmöbel-Sets, Eckschränke, Wäscheschrank) plus Badezimmerregale are Furniture.xlsx records for this same company - OPTION 1, they stay in Furniture. Wandspiegel and Standspiegel are Final.xlsx (Home Decor) records. The parent C30C6C3 itself is NOT in the index, but recording it would breach rule 24 (valid children exist) and would re-import 5,761 already-extracted products, so it is in review, not rows. INCLUDED / JUDGEMENT CALLS: Wäschekörbe (laundry baskets) is recorded as Bathroom because Mömax's own hierarchy puts it under the top-level Badzubehör node, not under C36 Aufbewahrung - C36's children are only Aufbewahrungsboxen, Körbe, Zeitungsständer and Kleideraufbewahrung, so there is no competing Storage path and no rule-28 double-listing. 'Alles Sonstige' (C44C5) is recorded as a leaf, not treated as a View All: it is Mömax's residual bucket under Badzubehör and is DISJOINT from its siblings (116+109+33+28+19 = 305 named + 374 = 679 <= parent 770), and its products are genuine bath accessories (Toilettenpapierhalter, Badewannenablage, Antirutschmatte, WC-Sitz mit Absenkautomatik, Überkopfbrauseset, Wäschekorb, Treteimer). A true View All would have returned the parent's 770. Kosmetikspiegel (46) is recorded under rule 10 (vanity/magnifying/Hollywood/Schminkspiegel, several explicitly BADSPIEGEL mit LED-Beleuchtung). LED Spiegel (13) is recorded under rules 10/11 and the run's routing decision that mirrors belong to Bathroom; its stock is mixed (Wandspiegel 'Linear', 'New York' alongside Badezimmerspiegel Badinos), so it is flagged here as the one lower-confidence inclusion - its sibling Wandspiegel was taken by the Home Decor pass, so some overlap in underlying products is possible even though the URL is distinct and not in the index. Duschablagen (32) is recorded: shower racks/caddies and a Badewannenablage (rules 6/13/17), reached via Möbel > Regale > Wandregale > Duschablagen; the URL is not in the exclusion index and its canonical is itself. EXCLUDED: no sanitaryware exists at Mömax - probing found no Badewannen, Duschen, Duschkabinen, WCs, Waschbecken or Armaturen node anywhere in C30..C47 (the only Armaturen node is C34C6C4 Küchenarmaturen, kitchen taps, under Küchen; the only Spülen are kitchen sinks C34C6C3), so those rule 4-8 branches are genuinely absent rather than missed. No 'shop by room' Bad landing page exists to create a rule-28 second path. Facet URLs present in the sitemap (?pa_*, ?ec_*, ?p_color=) were never requested and never recorded.",
+ "rows": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Accessories",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Laundry Baskets",
+   "qty": 116,
+   "link": "https://www.moemax.de/alle-waeschekoerbe-C44C1",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Towel Rails",
+   "qty": 109,
+   "link": "https://www.moemax.de/alle-handtuchhalter-C44C2",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Soap Dispensers",
+   "qty": 33,
+   "link": "https://www.moemax.de/alle-seifenspender-C44C3",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Toilet Brushes",
+   "qty": 28,
+   "link": "https://www.moemax.de/alle-wc-buersten-C44C4",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Accessories - Everything Else",
+   "qty": 374,
+   "link": "https://www.moemax.de/alles-sonstige-C44C5",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Soap Dishes",
+   "qty": 19,
+   "link": "https://www.moemax.de/alle-seifenschalen-C44C6",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Mirrors",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Mirrors",
+   "qty": 146,
+   "link": "https://www.moemax.de/alle-badezimmerspiegel-C39C1",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Cosmetic Mirrors",
+   "qty": 46,
+   "link": "https://www.moemax.de/alle-kosmetikspiegel-C39C4",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "LED Mirrors",
+   "qty": 13,
+   "link": "https://www.moemax.de/alle-led-spiegel-C39C5",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower Shelves",
+   "qty": 32,
+   "link": "https://www.moemax.de/alle-duschablagen-C30C7C4C3",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  }
+ ],
+ "review": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Cabinets (parent roll-up)",
+   "qty": 5761,
+   "issue": "PARENT ROLL-UP NOT RECORDED (rule 24) + ALL NINE CHILDREN ALREADY EXTRACTED IN Furniture.xlsx. Möbel > Schränke > Badezimmerschränke (C30C6C3) is the bath-furniture roll-up; every one of its nine children is already a Furniture.xlsx record for this same company, so under OPTION 1 the whole branch stays in Furniture and none of it re-enters Bathroom. Recorded here only so the branch is not silently dropped. Its own coveoSearch total is 5,761.",
+   "link": "https://www.moemax.de/alle-badezimmerschraenke-C30C6C3"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Tall Cabinets",
+   "qty": 433,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Bathroom Tall Cabinets'",
+   "link": "https://www.moemax.de/badezimmer-hochschraenke-C30C6C3C1"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Base Cabinets",
+   "qty": 651,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Bathroom Base Cabinets'",
+   "link": "https://www.moemax.de/alle-badezimmer-unterschraenke-C30C6C3C2"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Wall Cabinets",
+   "qty": 79,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Bathroom Wall Cabinets'",
+   "link": "https://www.moemax.de/alle-bad-haengeschraenke-C30C6C3C3"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Mirror Cabinets",
+   "qty": 334,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Bathroom Mirror Cabinets' (rule 10 would otherwise pull mirror cabinets into Bathroom; OPTION 1 keeps them in Furniture)",
+   "link": "https://www.moemax.de/alle-spiegelschraenke-bad-C30C6C3C4"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Washbasin Base Cabinets",
+   "qty": 730,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Washbasin Base Cabinets'",
+   "link": "https://www.moemax.de/alle-waschbeckenunterschraenke-C30C6C3C5"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Vanity Units",
+   "qty": 807,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Vanity Units'",
+   "link": "https://www.moemax.de/alle-waschtische-C30C6C3C6"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Furniture Sets",
+   "qty": 2316,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Bathroom Furniture Sets'",
+   "link": "https://www.moemax.de/alle-badmoebel-sets-C30C6C3C7"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Corner Cabinets",
+   "qty": 290,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Bathroom Corner Cabinets'",
+   "link": "https://www.moemax.de/alle-badezimmereckschraenke-C30C6C3C8"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Laundry Cabinet",
+   "qty": 8,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Laundry Cabinets'",
+   "link": "https://www.moemax.de/alle-waescheschrank-C30C6C3C9"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Shelving Units",
+   "qty": 32,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Bathroom Shelf Units' (rule 12 bathroom storage; OPTION 1 keeps it in Furniture)",
+   "link": "https://www.moemax.de/alle-badezimmerregale-C30C7C7C7"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Wall Mirrors",
+   "qty": 1333,
+   "issue": "ALREADY EXTRACTED IN Final.xlsx (Home Decor pass) as 'Wall Mirrors'",
+   "link": "https://www.moemax.de/alle-wandspiegel-C39C2"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Floor Mirrors",
+   "qty": 77,
+   "issue": "ALREADY EXTRACTED IN Final.xlsx (Home Decor pass) as 'Floor Mirrors'",
+   "link": "https://www.moemax.de/alle-standspiegel-C39C3"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Lamps",
+   "qty": 134,
+   "issue": "ROUTED TO LIGHTING: primary product type is lighting, not a mirror or bathroom fitting (rules 11/19). Node sits under Lampen & Leuchten > Leuchten nach Räumen (C33C14), i.e. a room re-cut of the Lighting tree, not under a Bathroom parent.",
+   "link": "https://www.moemax.de/alle-badezimmer-lampen-C33C14C5"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Textiles (parent)",
+   "qty": 1243,
+   "issue": "ROUTED TO TEXTILE: whole Heimtextilien > Badtextilien branch is textile (rules 15/20). Parent roll-up total 1,243; its eight children are listed below and none is recorded in Bathroom.",
+   "link": "https://www.moemax.de/alle-badtextilien-C31C3"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower Curtains",
+   "qty": 15,
+   "issue": "ROUTED TO TEXTILE: shower curtains (rule 20)",
+   "link": "https://www.moemax.de/alle-duschvorhaenge-C31C3C1"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Washcloths",
+   "qty": 18,
+   "issue": "ROUTED TO TEXTILE: washcloths (rule 15)",
+   "link": "https://www.moemax.de/alle-waschlappen-C31C3C2"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Towels",
+   "qty": 219,
+   "issue": "ROUTED TO TEXTILE: towels (rule 15)",
+   "link": "https://www.moemax.de/alle-handtuecher-C31C3C3"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Rugs",
+   "qty": 599,
+   "issue": "ROUTED TO TEXTILE: textile bath mats/rugs (rules 15/16). Non-textile anti-slip mats are NOT here - the rubber Antirutschmatte products sit inside Badzubehör > Alles Sonstige, which IS recorded.",
+   "link": "https://www.moemax.de/alle-badteppiche-C31C3C4"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Sheets",
+   "qty": 44,
+   "issue": "ROUTED TO TEXTILE: bath sheets (rule 15)",
+   "link": "https://www.moemax.de/alle-badetuecher-C31C3C6"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Guest Towels",
+   "qty": 52,
+   "issue": "ROUTED TO TEXTILE: guest towels (rule 15)",
+   "link": "https://www.moemax.de/alle-gaestehandtuecher-C31C3C7"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower Towels",
+   "qty": 67,
+   "issue": "ROUTED TO TEXTILE: shower towels (rule 15)",
+   "link": "https://www.moemax.de/alle-duschtuecher-C31C3C8"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Toilet Mats",
+   "qty": 308,
+   "issue": "ROUTED TO TEXTILE: textile WC pedestal mats (rules 15/16)",
+   "link": "https://www.moemax.de/alle-wc-vorleger-C31C3C9"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathrobes",
+   "qty": 4,
+   "issue": "ROUTED TO TEXTILE: bathrobes (rule 20). Sits under Freizeit (C41), not under a Bathroom parent; inspected because rule 20 names bathrobes explicitly.",
+   "link": "https://www.moemax.de/alle-bademaentel-C41C10C3"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Accessories (parent roll-up)",
+   "qty": 770,
+   "issue": "PARENT NOT RECORDED (rule 24): C44 is the Badzubehör roll-up over the six recorded children and must not be recorded alongside them. Noted because its total (770) exceeds the sum of its children (116+109+33+28+374+19 = 679), i.e. 91 products are attached to C44 directly and have no deeper node of their own; they are therefore not reachable as a leaf and are deliberately not counted anywhere.",
+   "link": "https://www.moemax.de/alles-badzubehoer-C44"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Mirrors (parent roll-up)",
+   "qty": 1815,
+   "issue": "PARENT NOT RECORDED (rule 24): C39 Spiegel is the roll-up over Badezimmerspiegel/Wandspiegel/Standspiegel/Kosmetikspiegel/LED Spiegel and overlaps every one of them.",
+   "link": "https://www.moemax.de/alle-spiegel-C39"
+  }
+ ],
+ "_reconstructed_from": "Bathroom.xlsx delivered 2026-09-01 (checkpoint), not original worker JSON"
+}

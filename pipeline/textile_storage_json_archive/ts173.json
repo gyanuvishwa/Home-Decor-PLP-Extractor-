@@ -1,0 +1,214 @@
+{
+  "sr": 173,
+  "company": "Chattels & More",
+  "brand_site": "chattelsandmore.com",
+  "country": "UAE",
+  "site_url": "https://www.chattelsandmore.com/",
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "ACCESS: robots.txt (https://www.chattelsandmore.com/robots.txt) has only param/controller-path Disallows (search, cart, checkout, admin, etc.) and names no anthropic-ai/ClaudeBot/Claude-Web/Claude-User/Claude-SearchBot rule - all tiers permitted. Tier (a) direct HTTP fetch (requests) worked for robots.txt and the category sitemap (https://www.chattelsandmore.com/en/sitemap.xml, 6494 URLs incl. 98 /category/ URLs) but the category listing pages themselves are a client-rendered Next.js app-router SPA (no __NEXT_DATA__/RSC-embedded product count, no server-rendered h1/count text in the raw HTML) so exact qty could not be read via tier (a) alone. Escalated to tier (b) Playwright (headless chromium) solely to observe each category page's own XHR calls; every page fires a request to a public first-party JSON API at api.chattelsandmore.com/api/category-products/{id}/{slug}?locale=en&per_page=33& whose data.meta.total is the site's own authoritative per-category count (data.meta also gives current_page/last_page/per_page confirming no double count). Once the numeric category id per slug was discovered this way, the same API URL was re-fetched directly over plain HTTP (requests) for reliable JSON parsing - this is the qty evidence used below. Playwright also read each page's live h1 to confirm it matches the requested node (all matched; h1 sometimes differs cosmetically from the URL slug, e.g. slug 'bedding' renders h1 'Bed Linen' - h1 text used as the recorded sub_category name). Tier (c) Claude-in-Chrome was not needed - no anti-bot wall encountered at any tier. TREE: built from the union of the 98 sitemap /category/ URLs (which is the site's full nav+subcategory-strip structure - every leaf page also cross-checked live via its own h1/breadcrumb) - top nav sections are Living Room, Dining, Bedroom, Accessories, Lighting, Bathroom; no standalone top-level 'Storage' nav section exists, only a 'Storage & Home Office' sub-group under Living Room. QTY: data.meta.total from the category-products API for each leaf (see evidence per row); parent nodes with subcategories (Accessories, Carpets & Rugs, Cushions, Bedroom, Bathroom, Storage & Home Office, Dining) were NOT given their own qty/link per the parent-category-URL rule since valid child leaves exist and were recorded instead; Table Linen (leaf directly under Dining with no further site subcategories) recorded with its own URL. EXCLUDED (checked, not qualifying): Living Room > Sofas/Armchairs/Coffee-Side-Tables/Stools-and-Ottomans/Entertainment (furniture, all leaves), Living Room > Storage-and-Home-Office > Bookcases (3 items: Savona Bookshelf, Step Low Bookcase, Paco Shelf - furniture per storage.md Sec18/21), Desks and Office Chairs (furniture, not checked individually - unambiguous by name/site placement); Dining > Dining Tables/Dining Chairs/Consoles-Buffets (furniture) and Dinnerware (cups-mugs, glassware, plates-bowls, serveware, dinnerware-sets, flatware, crystalware - Kitchen & Dining, storage.md Sec13/26 boundary) and Bar & Hosting (9 items, all bar cabinets/trolleys/sideboards - furniture); Bedroom > Beds/Wardrobes(+Closets, 0 items)/Nightstands/Dressers (furniture per storage.md Sec9/17 - site places these under Bedroom furniture nav, no explicit 'storage' labeling, unlike Shoe Racks/Shelving Units which the site groups under an explicit 'Storage & Home Office' node) and Mattress (not a textile/fabric product itself); Accessories > Decorative-Accessories(+wall-clocks/vases/figurines-sculptures/candles-candleholders/games), Mirrors, Faux-Trees-Plants, Fragrances, Galleries-Wall-Art (Decorative Home Accessories / Wall Decor territory per textile.md Sec23 and storage.md Sec24, none textile/storage); Lighting (all 3 leaves - Lighting category). No View All/Shop All/Search/Collection URLs exist in this nav - every URL used is a genuine listing page. No duplicates - each row is a unique category+URL. AMBIGUOUS ITEMS FLAGGED: Bedroom > Pillows (25 items - support/orthopedic/feather-down filled sleep pillows, e.g. 'Kauffmann Pro Pil O Latex Neck Support Pillow', 'Laura Ashley Superior Goose Feather & Down Filled Pillow') included as Textile/Bedding by analogy to Duvets/Comforters (filled fabric bedding inserts explicitly listed in textile.md Sec3) even though the rule file's own bedding list names only 'Pillowcases' not 'Pillows' - flagged MEDIUM for review. Living Room > Storage-and-Home-Office > Shelving Units (15 items) is a mixed bag - 2x 'Display Cabinet' plus mostly open decorative wood/glass/steel shelf units (Loft Shelf, Balance Cube Shelf, Skyler Smoke Shelf) alongside one explicitly named 'Cosy Sixties Shelf Black Oak Storage Unit' - genuine Storage-vs-Furniture ambiguity per storage.md Sec18/21/42; kept in Storage (nav hierarchy is checked first per storage.md Sec42 and the site explicitly groups this under 'Storage & Home Office') but flagged LOW for review. Round Rugs and Round Cushions both returned data.meta.total=0 from the API with h1 correctly matching the requested node (not a wrong-slug parent-total fallback) - recorded as genuine qty=0 leaves rather than omitted.",
+  "textile_rows": [
+    {
+      "category": "Textile",
+      "sub_category": "Bedroom",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Bed Linen",
+      "qty": 81,
+      "link": "https://www.chattelsandmore.com/en/category/bedroom/bedding",
+      "is_group": false,
+      "evidence": "api.chattelsandmore.com/api/category-products/45/bedding?locale=en&per_page=33& data.meta.total=81 (last_page=3, per_page=33); rendered h1 'Bed Linen' matches requested page",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Pillows",
+      "qty": 25,
+      "link": "https://www.chattelsandmore.com/en/category/bedroom/pillows",
+      "is_group": false,
+      "evidence": "api.chattelsandmore.com/api/category-products/184/pillows?locale=en&per_page=33& data.meta.total=25; rendered h1 'Pillows' matches requested page",
+      "flag": "MANUAL REVIEW: products are filled sleep/support pillows (e.g. Neck Support Pillow, Goose Feather & Down Filled Pillow), not the 'Pillowcases' item explicitly named in textile.md Sec3 - included by analogy to Duvets/Comforters (filled fabric bedding items also explicitly included)",
+      "confidence": "MEDIUM"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Table Linen",
+      "qty": 50,
+      "link": "https://www.chattelsandmore.com/en/category/dining/table-linen",
+      "is_group": false,
+      "evidence": "api.chattelsandmore.com/api/category-products/65/table-linen?locale=en&per_page=33& data.meta.total=50; rendered h1 'Table Linen' matches requested page; sample products are runners/placemats/napkins (e.g. 'Olive Stripe 100% Linen Runner', 'Bora Bora Pink Cotton-Linen Table Napkin')",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Accessories",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Carpets & Rugs",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Carpets",
+      "qty": 61,
+      "link": "https://www.chattelsandmore.com/en/category/accessories/carpets-rugs/carpets",
+      "is_group": false,
+      "evidence": "api.chattelsandmore.com/api/category-products/136/carpets?locale=en&per_page=33& data.meta.total=61; rendered h1 'Carpets' matches requested page",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Round Rugs",
+      "qty": 0,
+      "link": "https://www.chattelsandmore.com/en/category/accessories/carpets-rugs/round-rugs",
+      "is_group": false,
+      "evidence": "api.chattelsandmore.com/api/category-products/137/round-rugs?locale=en&per_page=33& data.meta.total=0; rendered h1 'Round Rugs' matches requested page (genuine empty leaf, not a wrong-slug fallback)",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Runner Rugs",
+      "qty": 0,
+      "link": "https://www.chattelsandmore.com/en/category/accessories/carpets-rugs/runner-rugs",
+      "is_group": false,
+      "evidence": "api.chattelsandmore.com/api/category-products/138/runner-rugs?locale=en&per_page=33& data.meta.total=0; rendered h1 'Runner Rugs' matches requested page (genuine empty leaf, not a wrong-slug fallback)",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Cushions",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Square Cushions",
+      "qty": 37,
+      "link": "https://www.chattelsandmore.com/en/category/accessories/cushions/square-cushions",
+      "is_group": false,
+      "evidence": "api.chattelsandmore.com/api/category-products/140/square-cushions?locale=en&per_page=33& data.meta.total=37 (last_page=2, per_page=33); rendered h1 'Square Cushions' matches requested page",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Rectangular Cushions",
+      "qty": 15,
+      "link": "https://www.chattelsandmore.com/en/category/accessories/cushions/rectangular-cushions",
+      "is_group": false,
+      "evidence": "api.chattelsandmore.com/api/category-products/141/rectangular-cushions?locale=en&per_page=33& data.meta.total=15; rendered h1 'Rectangular Cushions' matches requested page",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Round Cushions",
+      "qty": 0,
+      "link": "https://www.chattelsandmore.com/en/category/accessories/cushions/round-cushions",
+      "is_group": false,
+      "evidence": "api.chattelsandmore.com/api/category-products/142/round-cushions?locale=en&per_page=33& data.meta.total=0; rendered h1 'Round Cushions' matches requested page (genuine empty leaf, not a wrong-slug fallback)",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Plaids",
+      "qty": 10,
+      "link": "https://www.chattelsandmore.com/en/category/accessories/plaids",
+      "is_group": false,
+      "evidence": "api.chattelsandmore.com/api/category-products/139/plaids?locale=en&per_page=33& data.meta.total=10; rendered h1 'Plaids' matches requested page; sample products are throws/blankets (e.g. 'Murmur Cynthia Cotton Throw', 'Black Trail Plaid Blanket')",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Bathroom",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Towels",
+      "qty": 9,
+      "link": "https://www.chattelsandmore.com/en/category/bathroom/towels",
+      "is_group": false,
+      "evidence": "api.chattelsandmore.com/api/category-products/189/towels?locale=en&per_page=33& data.meta.total=9; rendered h1 'Towels' matches requested page; sample products are hand/face towels",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Bath Robes",
+      "qty": 3,
+      "link": "https://www.chattelsandmore.com/en/category/bathroom/bath-robes",
+      "is_group": false,
+      "evidence": "api.chattelsandmore.com/api/category-products/190/bath-robes?locale=en&per_page=33& data.meta.total=3; rendered h1 'Bath Robes' matches requested page",
+      "flag": null,
+      "confidence": "HIGH"
+    }
+  ],
+  "storage_rows": [
+    {
+      "category": "Storage",
+      "sub_category": "Storage & Home Office",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Shoe Racks",
+      "qty": 16,
+      "link": "https://www.chattelsandmore.com/en/category/living-room/storage-and-home-office/shoe-racks",
+      "is_group": false,
+      "evidence": "api.chattelsandmore.com/api/category-products/156/shoe-racks?locale=en&per_page=33& data.meta.total=16; rendered h1 'Shoe Racks' matches requested page",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Shelving Units",
+      "qty": 15,
+      "link": "https://www.chattelsandmore.com/en/category/living-room/storage-and-home-office/shelving-units",
+      "is_group": false,
+      "evidence": "api.chattelsandmore.com/api/category-products/158/shelving-units?locale=en&per_page=33& data.meta.total=15; rendered h1 'Shelving Units' matches requested page",
+      "flag": "MANUAL REVIEW: product mix includes 2x 'Display Cabinet' and mostly open decorative wood/glass/steel shelf units alongside one item explicitly named 'Storage Unit' - ambiguous Storage vs Furniture boundary (storage.md Sec18/21); kept as Storage because site nav groups it under 'Storage & Home Office' (checked first per storage.md Sec42 ambiguity order)",
+      "confidence": "LOW"
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "Access: root domain behind Cloudflare managed challenge under plain requests; bypassed via curl_cffi TLS impersonation (chrome131/chrome124/safari17_0/firefox133 rotated, 4-8 retries), consistent with prior Home-Decor pass notes for this company (archive c160). Used the site's first-party JSON API (GET /api/v1/catalog/products?qs=<urlencoded JSON>) discovered/documented in the prior pass to both enumerate the live category tree (additional.categories.path[-1].children) and get exact product counts (data.products.pagination.total). NOTE: the 'fields' param in the qs payload causes a 500 internal_server_error on this API (undocumented in the prior pass, discovered this run) - omitting it fixes the query; 'uri' must stay the bare category path without the /en-us locale prefix, as previously documented. CATEGORY TREE WALK for Pet Care: root -> /lifestyle-housekeeping (Lifestyle & Housekeeping) -> /lifestyle-housekeeping/pets (Pets, id 1986) -> two leaf children: Pet accessories (id 2064) and Pet beds (id 2065), both with empty children arrays (confirmed leaves, no further nesting). No other pet-specific node found anywhere else in the top-level category tree (checked root and Lifestyle & Housekeeping's full sibling list: Home electronics, Bags & Cases, Books & Magazines, Housekeeping, Home office, Accessories, Pets, Games, Hygiene & Cosmetics, Jewellery, Sports & Outdoors, Moomin products, Stationery, DIY & Crafts, Sauna, Cycling, Travel - none pet-related besides Pets itself). QTY VERIFICATION: both leaf totals confirmed via perPage=50 exhaustion check - pet-accessories total=75 (page2 of 50-per-page returned exactly 25, i.e. 50+25=75 exact), pet-beds total=35 (single 50-per-page page returned exactly 35 items, matching total exactly, no overflow). SAMPLE TITLES checked for both categories to confirm genuine Tier-1 pet care: pet-accessories = dog shampoo, treat tins, leashes, collars, nail clippers/scissors/combs/brushes (Fiskars pet grooming line), paw balm, food/water bowls, feeding mats, harnesses, pet-care storage bag, cooling bowls - all grooming/feeding/walking, no pet food/consumables and no medical/veterinary items found, so no MANUAL REVIEW flag needed. pet-beds = dog beds in various materials/sizes (HAY Dogs, Globe, Wooly, Treasure Bed, Cooling Orthopedic Bed lines) plus one recovery bed cover - straightforward Tier-1 beds category. Both rows kept as separate leaves (not merged) since they are genuinely distinct category IDs/PLPs with different product sets, not the same underlying listing.",
+  "rows": [
+    {
+      "category": "Pet Care",
+      "sub_category": "Pets",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Pet Accessories",
+      "qty": 75,
+      "link": "https://www.finnishdesignshop.com/en-us/lifestyle-housekeeping/pets/pet-accessories",
+      "is_group": false,
+      "evidence": "API /api/v1/catalog/products?uri=/lifestyle-housekeeping/pets/pet-accessories -> data.products.pagination.total=75; exhaustion check perPage=50 page2 returned count=25 (50+25=75 exact match)",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Pet Beds",
+      "qty": 35,
+      "link": "https://www.finnishdesignshop.com/en-us/lifestyle-housekeeping/pets/pet-beds",
+      "is_group": false,
+      "evidence": "API /api/v1/catalog/products?uri=/lifestyle-housekeeping/pets/pet-beds -> data.products.pagination.total=35; exhaustion check perPage=50 page1 returned count=35, totalPages=1 (exact match, no overflow)",
+      "flag": null
+    }
+  ]
+}

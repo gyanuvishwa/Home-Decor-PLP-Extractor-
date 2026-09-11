@@ -1,0 +1,43 @@
+{
+  "sr": 37,
+  "company": "The Novogratz",
+  "brand_site": "thenovogratz.com",
+  "country": "USA",
+  "site_url": "https://thenovogratz.com/",
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "ACCESS: tier (a) direct HTTP (curl_cffi, impersonate=chrome) for robots.txt and sitemap.xml on www.shopthenovogratz.com (the live Wix store; thenovogratz.com serves the same Wix site). robots.txt is 'User-agent: * / Allow: /' (no anthropic-ai/ClaudeBot disallow), so all tiers permitted. Static category-page HTML is a Wix pre-render shell with no real product totals (the CSS var --gallery_productsCount is a fixed page-size of 16 on every page, not an actual count), so escalated to tier (b) Playwright headless Chromium to read the rendered DOM, global mega-menu nav, and exhaustively paginate via 'Load More'. No blocks encountered at either tier; tier (c) Claude-in-Chrome was not needed. TREE: union of store-categories-sitemap.xml (29 category slugs) + the site's global mega-menu (identical across pages): Furniture > Sofas+Futons, Beds, Fireplaces, Seating, Dining Tables+Sets, Coffee+End Tables, Dressers+Consoles, Desks+Bookshelves, Storage Lockers; Rugs (slug 'textiles') > Indoor/Outdoor Rugs, Indoor Rugs; Lighting > Table Lamps, Floor Lamps, Sconces, Pendants, Flush Mounts, Outdoor Lights; Decor (slug 'decor-gifts') > Wallpaper; Outdoor Furniture > Outdoor Conversation Sets, Outdoor Seating, Outdoor Dining. Each leaf page's rendered title/h1 was confirmed to match the requested slug. Sitemap also listed a 'dining' category absent from the nav; checked directly - contains only furniture (chairs, table+bench sets), no textile/storage relevance, not recorded. QTY: exhaustive pagination count - loaded each qualifying leaf category headless, clicked 'Load More' repeatedly until the button no longer appeared, then counted unique /product-page/ hrefs in the rendered DOM (re-run twice, same result both times). EXCLUDED FROM STORAGE: 'Storage Lockers' shows 'No products here yet...' (0 products) AND is nested inside the 'Furniture' mega-menu group alongside Sofas/Beds/Dining Tables/Dressers/Desks - the site's own hierarchy places it under Furniture, not a Storage/Organization section, so per storage.md Sec21 (explicit Furniture placement -> prefer Furniture) it is excluded here; it is in-scope for the already-validated Furniture.xlsx instead. EXCLUDED FROM TEXTILE: 'Wallpaper' (under Decor) is a peel-and-stick wall covering, not a fabric/textile product per textile.md - excluded. All other mega-menu nodes (Furniture subcats, Lighting subcats, Outdoor Furniture subcats, Decor's rug/lamp duplicates) are Furniture/Lighting, out of scope for this task, not recorded. The Rugs parent ('Shop All' -> /category/textiles) was not recorded per the parent-category-URL rule since 2 valid subcategories exist under it. No candidate node qualified for both Textile and Storage.",
+  "textile_rows": [
+    {
+      "category": "Textile",
+      "sub_category": "Rugs",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Indoor/Outdoor Rugs",
+      "qty": 20,
+      "link": "https://www.shopthenovogratz.com/category/indooroutdoor-rugs",
+      "is_group": false,
+      "evidence": "Playwright headless render: initial grid shows 16 product tiles; clicked 'Load More' 3x until button disappeared; 20 unique /product-page/ hrefs counted in final DOM (confirmed on repeat run)",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Indoor Rugs",
+      "qty": 18,
+      "link": "https://www.shopthenovogratz.com/category/textilesindoor-rugs",
+      "is_group": false,
+      "evidence": "Playwright headless render: initial grid shows 16 product tiles; clicked 'Load More' 2x until button disappeared; 18 unique /product-page/ hrefs counted in final DOM (confirmed on repeat run)",
+      "flag": null,
+      "confidence": "HIGH"
+    }
+  ],
+  "storage_rows": []
+}

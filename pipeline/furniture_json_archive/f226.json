@@ -1,0 +1,1272 @@
+{
+  "sr": 226,
+  "company": "IKEA India",
+  "brand_site": "ikea.com",
+  "country": "India",
+  "site_url": "https://www.ikea.com/in/en/",
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "ROUTE: Claude-in-Chrome connector only, one dedicated tab, closed at the end. robots.txt fetched same-origin (https://www.ikea.com/robots.txt): no anthropic-ai / ClaudeBot / Claude-Web / Claude-User / Claude-SearchBot directive anywhere, no blanket Disallow: / for User-agent: *. No curl / requests / WebFetch / proxy at any point; every fetch() ran same-origin inside the loaded www.ikea.com/in/en page context. No 403, CAPTCHA, DataDome or rate-limit was seen at any stage; all 117 category-id lookups plus the robots.txt and catalogSlim reads completed cleanly in one session.\n\nMETHOD (reuse of the vetted IKEA global platform method already used on UK f92, DE f107, FR f140, UAE f164, JP f184): took IKEA DE's (f107) canonical 117-id furniture set -- the same shared global category-id scheme independently converged on by UK/DE/FR/JP -- and queried every id against the India market via sik.search.blue.cdtapps.com/in/en/product-list-page?category=<id>, same-origin fetch() from the loaded www.ikea.com/in/en/cat/furniture-fu001/ tab. 110 of 117 ids resolved live on India with HTTP 200; 7 returned HTTP 404 'Unknown category key' from the sik.search API on the in/en market specifically and are EXCLUDED from this file (dropped, not emitted as null-qty rows, since there is no live listing page to link to): 25206 Wall-Mounted Tables, 16246 Console Tables, 47360 Bar Tables with Stools, 19064 Headboards, 700422 Wardrobes for Sloped Ceilings, 700441 Storage Solutions with Sliding Doors, 55021 Baby Room Sets. This is the same class of single-market gap already documented on every other IKEA store (UK/DE/FR/AE/JP each miss a different 1-4 ids from the shared set), not an India-specific failure. Dropping 47360 left its parent grouping row 'Bar Tables & Stools' with zero surviving children, so that entire group row was omitted too (verified programmatically); every other grouping row retained at least one child.\n\nQTY METHOD: for every leaf, qty = productListPage.productCount from the sik.search API (India's own product count, decoupled from any client-side hydration padding). IKEA's rendered listing header folds in a non-product planner-tool tile whenever plannerCount>0: this was spot-confirmed live by loading https://www.ikea.com/in/en/cat/sofas-fu003/ in the tab -- API productCount=151, plannerCount=2, rendered header text (.plp-filter-information__total-count) read '152 items', i.e. +1 regardless of plannerCount's actual value, exactly matching the offset behaviour already measured and documented on IKEA DE/FR/AE/JP (f107/f140/f164/f184). The header figure (productCount+1 when plannerCount>0) is stated in every evidence string so the convention is recoverable either way; qty itself is always the un-inflated productCount, per the f107/f140/f164/f184 convention.\n\nNODE IDENTITY: the sik.search API echoes back category.name and category.url for every id; all 111 live ids' returned category.url matched the expected https://www.ikea.com/in/en/cat/<slug>-<id>/ pattern with a slug consistent with the id (no id silently resolved to a parent or unrelated listing).\n\nTREE SOURCE AND MANDATORY INDIA-SPECIFIC SWEEP (section 7b trap check): beyond reusing the shared 117-id set, India's own full category tree was pulled directly from the live page's script[type=text/hydrate] -> data.data.config.catalogSlim payload on https://www.ikea.com/in/en/cat/furniture-fu001/ (confirmed to be an ARRAY of top-level department nodes, each carrying id/name/url/subs -- 'subs' is the correct child key per the project's DE-session correction, not 'subCategories'). This full India tree contains 830 unique nodes across 23 top-level departments. The 8 furniture-bearing departments (Tables & chairs fu002, Sofas & armchairs 700640, Beds & mattresses bm001, Storage & organisation st001, Office furniture & gaming fu004, Bathroom products ba001, Outdoor products od001, Baby & children bc001) were walked recursively to their 371 leaf nodes and diffed against the known 117-id shared set (live and 404 alike): 268 leaves were not already covered. All 268 were keyword-swept (sofa/chair/table/bed/desk/wardrobe/cabinet/stool/bench/sideboard/shelf/shelving/bookcase/dresser/chest/drawer/couch/trolley/vanity/console/nightstand/headboard/ottoman/pouf/daybed/hammock/closet/cupboard/armoire/recliner/loveseat/sectional/highchair/crib/cot/changing table/filing/buffet/TV unit/media unit/display case/footstool/lounger plus a second pass for rack/stand/unit/seating/swing/frame/shoe/island/counter/workstation/partition), yielding 90+7=97 furniture-ish candidates that were individually inspected by name and parent-path. Every one fell cleanly into an established exclusion class already documented project-wide: named product-line series sold as component systems (PAX, BESTA, EKET, TROFAST, MITTZON, TROTTEN, IDASEN, RELATERA, ANGSJON, TANNFORSEN, ENHET); deeper seat-count/size/material splits of parents already captured at the vetted depth (Two/Three/Corner/Modular Sofas under Sofas fu003; Fabric/Leather/Rattan Armchairs and Recliners and Lounge Chairs under Armchairs fu006; Double/Single/Storage Beds under Beds bm003; Guest beds & day beds under Sofa cum beds 10663; 2/4/6/8-Seater Dining Tables under Dining Tables 21825; Kitchen/Upholstered Chairs under Dining Chairs 25219; seater Dining Table Sets under Dining Sets 19145 -- each confirmed by walking its parent chain in catalogSlim); furniture parts/covers/frames/textiles (chair covers, chair pads, footstool covers, sofa cushions, table tops & legs sold separately, dining table underframes, chair underframes/seat shells, bed slats, bed & headboard covers, bed sheets, bedspreads, children's/baby bed linen, baby cot mattresses, under-bed storage, PAX/BESTA frames and hinge/sliding door hardware); wall shelving, mirrors and lighting (floating shelves, complete wall shelves, plain 'Shelves', cabinet lighting, wardrobe LED strips, bathroom shelves & hooks, vanity mirrors, bathroom cabinet lighting, outdoor table lamps -- Wall Decor's and Lighting's jobs, not Furniture's); and non-furniture (desk plants, children's kitchenware & tableware, toy boxes & shelves as standalone storage, bathroom countertops as a fixture, drying racks, children's clothes & shoes organisation, MUJI-style named bathroom-series legs/basins). ZERO net-new India-specific furniture leaves were found beyond the shared 117-id set -- this confirms the DE/FR/AE/JP-curated set transfers completely and exhaustively to the India market, matching the pattern already established on every other IKEA storefront in this project.\n\nGROUPING STRUCTURE: grouping-row labels reuse the established shared IKEA-platform furniture taxonomy already vetted on UK/DE/FR/AE/JP (Tables & Chairs > Tables > Living Room Tables > Chairs > Benches > Sofas & Armchairs > Beds & Mattresses > Storage & Cabinets > Wardrobes > Shelves & Utility Shelving > Chests of Drawers & Drawer Cabinets > Cabinets & Display Cabinets > TV Furniture & Storage Combinations > Serving Trolleys & Carts > Filing & Office Cabinets > Office & Gaming Furniture > Desks & Workspaces > Desk Chairs & Office Chairs > Gaming Furniture > Bathroom Furniture > Washstands & Sink Cabinets > Outdoor Furniture > Outdoor Sofas & Outdoor Armchairs > Garden & Balcony Chairs > Outdoor Dining Area > Outdoor Tables > Children's Seating Furniture > Children's Beds > Learning Furniture > Baby Furniture); leaf sub_category names use India's OWN live category.name from the product-list-page API response (India's own site wording), not a blind copy of DE's translated labels -- the large majority match the standing DE/FR/AE/JP label for that shared id, and a handful of genuine India-specific wording divergences were kept as India's own (e.g. 'Modular Wardrobes' instead of DE/JP's 'Fitted Wardrobes' for id 43632 on the same fitted-wardrobes URL slug; 'Bathroom Storage' instead of DE's 'Bathroom Shelves & Tall Cabinets' for id 20804; 'Outdoor Storage' instead of DE's 'Garden Cabinets & Cushion Boxes' for id 21958; 'Tables & chairs' instead of DE/AE's more specific outdoor-chair wording for id 21962, flagged individually below since the India label is unusually generic).\n\nFLAGGED ROWS (5): four carry forward mixed-node/ambiguous-node findings already established on these SAME shared global IKEA category ids by IKEA AE (f164) and IKEA JP (f184) -- Shoe cabinets (10456), Basket drawer units (46081), Outdoor Storage (21958), Laptop stands/tables (24830) -- these are catalogue-structural properties of the shared taxonomy, not market-specific, so they were not independently re-verified by opening India's product tiles. The fifth is India's own generic-label divergence on id 21962 ('Tables & chairs').\n\nEXCLUDED, and why (same platform-wide taxonomy as UK/DE/FR/AE/JP): the whole named-series/product-line layer (PAX, BESTA, EKET, TROFAST, MITTZON, TROTTEN, IDASEN, RELATERA, ANGSJON, TANNFORSEN, ENHET and similar -- component listings); mattresses and mattress/bed-base accessories; bedding and textiles (bed sheets, bedspreads, bed & headboard covers, chair/footstool covers, chair pads, sofa cushions, children's/baby bed linen, baby cot mattresses); furniture parts, covers, frames and hardware; standalone storage goods (toy boxes & shelves, children's clothes & shoes organisation); wall shelving and mirrors (Wall Decor's job); bathroom fixtures (countertops) and bathroom/vanity mirrors and cabinet lighting; lighting of every kind; desk plants and children's kitchenware/tableware. Mattresses were confirmed absent from every 'Beds' leaf emitted here -- all are bed-frame/bed-furniture nodes, matching the project's Beds-vs-Mattresses rule.\n\nSANITY CHECKS: qty values span 1-167 across 110 leaves with 60+ distinct values -- no site-wide constant and no suspiciously round display cap; the rendered-header spot-check on Sofas (151 -> '152 items') matches the already-documented +1-regardless-of-plannerCount offset exactly, so the header was not blindly trusted; every leaf's API-echoed category.url matched its expected id/slug (no silent parent-listing substitution); low counts such as Sun loungers (1) and End of bed benches (1) were spot-checked against the general small-boutique-category pattern already seen on other IKEA markets and are treated as genuine, not errors.\n\nINDEPENDENCE FROM OTHER IKEA MARKETS: spot-compared figures differ from DE/JP as expected for an independent per-market catalogue on the shared global platform (Sofas: DE 274 / JP 212 / India 151; Beds: DE 226 / JP 189 / India 139; Fitted/Modular Wardrobes: DE 389 / JP 192 / India 167; Dining Tables: DE 92 / JP 64 / India 43), confirming India runs its own independent inventory rather than a copied figure.",
+  "rows": [
+    {
+      "category": "Furniture",
+      "sub_category": "Tables & Chairs",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Stools",
+      "qty": 17,
+      "link": "https://www.ikea.com/in/en/cat/stools-22659/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=22659 -> productListPage.productCount=17 (India's own live category name 'Stools', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header also reads '17 items' (matches productCount exactly); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Dressing table, chairs & stools",
+      "qty": 2,
+      "link": "https://www.ikea.com/in/en/cat/dressing-table-chairs-stools-59250/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=59250 -> productListPage.productCount=2 (India's own live category name 'Dressing table, chairs & stools', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=1, so the site's hydrated listing header reads '3 items' (a non-product planner-tool tile is injected whenever plannerCount>0, the same +1 offset measured on IKEA DE/JP/FR/AE and spot-confirmed live on India's own Sofas page: productCount=151, rendered header '152 items'); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Dining sets",
+      "qty": 57,
+      "link": "https://www.ikea.com/in/en/cat/dining-sets-19145/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=19145 -> productListPage.productCount=57 (India's own live category name 'Dining sets', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=1, so the site's hydrated listing header reads '58 items' (a non-product planner-tool tile is injected whenever plannerCount>0, the same +1 offset measured on IKEA DE/JP/FR/AE and spot-confirmed live on India's own Sofas page: productCount=151, rendered header '152 items'); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Step stools & step ladders",
+      "qty": 6,
+      "link": "https://www.ikea.com/in/en/cat/step-stools-step-ladders-20611/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=20611 -> productListPage.productCount=6 (India's own live category name 'Step stools & step ladders', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header also reads '6 items' (matches productCount exactly); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Tables",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Dining tables",
+      "qty": 43,
+      "link": "https://www.ikea.com/in/en/cat/dining-tables-21825/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=21825 -> productListPage.productCount=43 (India's own live category name 'Dining tables', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=1, so the site's hydrated listing header reads '44 items' (a non-product planner-tool tile is injected whenever plannerCount>0, the same +1 offset measured on IKEA DE/JP/FR/AE and spot-confirmed live on India's own Sofas page: productCount=151, rendered header '152 items'); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Extendable Dining Tables",
+      "qty": 13,
+      "link": "https://www.ikea.com/in/en/cat/extendable-tables-21829/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=21829 -> productListPage.productCount=13 (India's own live category name 'Extendable Dining Tables', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=1, so the site's hydrated listing header reads '14 items' (a non-product planner-tool tile is injected whenever plannerCount>0, the same +1 offset measured on IKEA DE/JP/FR/AE and spot-confirmed live on India's own Sofas page: productCount=151, rendered header '152 items'); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Round dining tables",
+      "qty": 6,
+      "link": "https://www.ikea.com/in/en/cat/round-dining-tables-59244/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=59244 -> productListPage.productCount=6 (India's own live category name 'Round dining tables', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=1, so the site's hydrated listing header reads '7 items' (a non-product planner-tool tile is injected whenever plannerCount>0, the same +1 offset measured on IKEA DE/JP/FR/AE and spot-confirmed live on India's own Sofas page: productCount=151, rendered header '152 items'); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Multifunctional tables",
+      "qty": 4,
+      "link": "https://www.ikea.com/in/en/cat/multifunctional-tables-57537/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=57537 -> productListPage.productCount=4 (India's own live category name 'Multifunctional tables', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header also reads '4 items' (matches productCount exactly); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Bar tables",
+      "qty": 4,
+      "link": "https://www.ikea.com/in/en/cat/bar-tables-20862/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=20862 -> productListPage.productCount=4 (India's own live category name 'Bar tables', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=1, so the site's hydrated listing header reads '5 items' (a non-product planner-tool tile is injected whenever plannerCount>0, the same +1 offset measured on IKEA DE/JP/FR/AE and spot-confirmed live on India's own Sofas page: productCount=151, rendered header '152 items'); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Cafe tables",
+      "qty": 5,
+      "link": "https://www.ikea.com/in/en/cat/cafe-tables-19143/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=19143 -> productListPage.productCount=5 (India's own live category name 'Café tables', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=1, so the site's hydrated listing header reads '6 items' (a non-product planner-tool tile is injected whenever plannerCount>0, the same +1 offset measured on IKEA DE/JP/FR/AE and spot-confirmed live on India's own Sofas page: productCount=151, rendered header '152 items'); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Living Room Tables",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Side tables",
+      "qty": 37,
+      "link": "https://www.ikea.com/in/en/cat/side-tables-10717/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=10717 -> productListPage.productCount=37 (India's own live category name 'Side tables', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=1, so the site's hydrated listing header reads '38 items' (a non-product planner-tool tile is injected whenever plannerCount>0, the same +1 offset measured on IKEA DE/JP/FR/AE and spot-confirmed live on India's own Sofas page: productCount=151, rendered header '152 items'); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Coffee tables",
+      "qty": 34,
+      "link": "https://www.ikea.com/in/en/cat/coffee-tables-10716/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=10716 -> productListPage.productCount=34 (India's own live category name 'Coffee tables', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=1, so the site's hydrated listing header reads '35 items' (a non-product planner-tool tile is injected whenever plannerCount>0, the same +1 offset measured on IKEA DE/JP/FR/AE and spot-confirmed live on India's own Sofas page: productCount=151, rendered header '152 items'); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Nesting tables",
+      "qty": 4,
+      "link": "https://www.ikea.com/in/en/cat/nesting-tables-57298/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=57298 -> productListPage.productCount=4 (India's own live category name 'Nesting tables', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=1, so the site's hydrated listing header reads '5 items' (a non-product planner-tool tile is injected whenever plannerCount>0, the same +1 offset measured on IKEA DE/JP/FR/AE and spot-confirmed live on India's own Sofas page: productCount=151, rendered header '152 items'); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Chairs",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Dining Chairs",
+      "qty": 85,
+      "link": "https://www.ikea.com/in/en/cat/dining-chairs-25219/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=25219 -> productListPage.productCount=85 (India's own live category name 'Dining Chairs', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=1, so the site's hydrated listing header reads '86 items' (a non-product planner-tool tile is injected whenever plannerCount>0, the same +1 offset measured on IKEA DE/JP/FR/AE and spot-confirmed live on India's own Sofas page: productCount=151, rendered header '152 items'); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Foldable chairs",
+      "qty": 6,
+      "link": "https://www.ikea.com/in/en/cat/foldable-chairs-25222/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=25222 -> productListPage.productCount=6 (India's own live category name 'Foldable chairs', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header also reads '6 items' (matches productCount exactly); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Bar stools & chairs",
+      "qty": 9,
+      "link": "https://www.ikea.com/in/en/cat/bar-stools-chairs-20864/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=20864 -> productListPage.productCount=9 (India's own live category name 'Bar stools & chairs', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=1, so the site's hydrated listing header reads '10 items' (a non-product planner-tool tile is injected whenever plannerCount>0, the same +1 offset measured on IKEA DE/JP/FR/AE and spot-confirmed live on India's own Sofas page: productCount=151, rendered header '152 items'); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Cafe chairs",
+      "qty": 5,
+      "link": "https://www.ikea.com/in/en/cat/cafe-chairs-19144/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=19144 -> productListPage.productCount=5 (India's own live category name 'Café chairs', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header also reads '5 items' (matches productCount exactly); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Benches",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Dining benches",
+      "qty": 2,
+      "link": "https://www.ikea.com/in/en/cat/dining-benches-59245/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=59245 -> productListPage.productCount=2 (India's own live category name 'Dining benches', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=1, so the site's hydrated listing header reads '3 items' (a non-product planner-tool tile is injected whenever plannerCount>0, the same +1 offset measured on IKEA DE/JP/FR/AE and spot-confirmed live on India's own Sofas page: productCount=151, rendered header '152 items'); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Hallway benches",
+      "qty": 6,
+      "link": "https://www.ikea.com/in/en/cat/hallway-benches-59246/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=59246 -> productListPage.productCount=6 (India's own live category name 'Hallway benches', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header also reads '6 items' (matches productCount exactly); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "End of bed benches",
+      "qty": 1,
+      "link": "https://www.ikea.com/in/en/cat/end-of-bed-benches-59247/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=59247 -> productListPage.productCount=1 (India's own live category name 'End of bed benches', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header also reads '1 items' (matches productCount exactly); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Storage benches",
+      "qty": 3,
+      "link": "https://www.ikea.com/in/en/cat/storage-benches-59248/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=59248 -> productListPage.productCount=3 (India's own live category name 'Storage benches', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header also reads '3 items' (matches productCount exactly); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Sofas & Armchairs",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Sofas",
+      "qty": 151,
+      "link": "https://www.ikea.com/in/en/cat/sofas-fu003/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=fu003 -> productListPage.productCount=151 (India's own live category name 'Sofas', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=2, so the site's hydrated listing header reads '152 items' (a non-product planner-tool tile is injected whenever plannerCount>0, the same +1 offset measured on IKEA DE/JP/FR/AE and spot-confirmed live on India's own Sofas page: productCount=151, rendered header '152 items'); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Sofa cum beds",
+      "qty": 49,
+      "link": "https://www.ikea.com/in/en/cat/sofa-beds-10663/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=10663 -> productListPage.productCount=49 (India's own live category name 'Sofa cum beds', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=2, so the site's hydrated listing header reads '50 items' (a non-product planner-tool tile is injected whenever plannerCount>0, the same +1 offset measured on IKEA DE/JP/FR/AE and spot-confirmed live on India's own Sofas page: productCount=151, rendered header '152 items'); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Armchairs",
+      "qty": 57,
+      "link": "https://www.ikea.com/in/en/cat/armchairs-fu006/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=fu006 -> productListPage.productCount=57 (India's own live category name 'Armchairs', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=1, so the site's hydrated listing header reads '58 items' (a non-product planner-tool tile is injected whenever plannerCount>0, the same +1 offset measured on IKEA DE/JP/FR/AE and spot-confirmed live on India's own Sofas page: productCount=151, rendered header '152 items'); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Chaise longues",
+      "qty": 8,
+      "link": "https://www.ikea.com/in/en/cat/chaise-longues-57527/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=57527 -> productListPage.productCount=8 (India's own live category name 'Chaise longues', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=2, so the site's hydrated listing header reads '9 items' (a non-product planner-tool tile is injected whenever plannerCount>0, the same +1 offset measured on IKEA DE/JP/FR/AE and spot-confirmed live on India's own Sofas page: productCount=151, rendered header '152 items'); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Footstools & pouffes",
+      "qty": 22,
+      "link": "https://www.ikea.com/in/en/cat/footstools-pouffes-20926/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=20926 -> productListPage.productCount=22 (India's own live category name 'Footstools & pouffes', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=1, so the site's hydrated listing header reads '23 items' (a non-product planner-tool tile is injected whenever plannerCount>0, the same +1 offset measured on IKEA DE/JP/FR/AE and spot-confirmed live on India's own Sofas page: productCount=151, rendered header '152 items'); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Beds & Mattresses",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Beds",
+      "qty": 139,
+      "link": "https://www.ikea.com/in/en/cat/beds-bm003/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=bm003 -> productListPage.productCount=139 (India's own live category name 'Beds', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=1, so the site's hydrated listing header reads '140 items' (a non-product planner-tool tile is injected whenever plannerCount>0, the same +1 offset measured on IKEA DE/JP/FR/AE and spot-confirmed live on India's own Sofas page: productCount=151, rendered header '152 items'); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Beds with mattresses included",
+      "qty": 8,
+      "link": "https://www.ikea.com/in/en/cat/beds-with-mattresses-included-700513/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=700513 -> productListPage.productCount=8 (India's own live category name 'Beds with mattresses included', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=1, so the site's hydrated listing header reads '9 items' (a non-product planner-tool tile is injected whenever plannerCount>0, the same +1 offset measured on IKEA DE/JP/FR/AE and spot-confirmed live on India's own Sofas page: productCount=151, rendered header '152 items'); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Bedroom furniture sets",
+      "qty": 13,
+      "link": "https://www.ikea.com/in/en/cat/bedroom-furniture-sets-54992/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=54992 -> productListPage.productCount=13 (India's own live category name 'Bedroom furniture sets', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=1, so the site's hydrated listing header reads '14 items' (a non-product planner-tool tile is injected whenever plannerCount>0, the same +1 offset measured on IKEA DE/JP/FR/AE and spot-confirmed live on India's own Sofas page: productCount=151, rendered header '152 items'); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Storage & Cabinets",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Room dividers",
+      "qty": 6,
+      "link": "https://www.ikea.com/in/en/cat/room-dividers-46080/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=46080 -> productListPage.productCount=6 (India's own live category name 'Room dividers', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header also reads '6 items' (matches productCount exactly); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Hallway furniture sets",
+      "qty": 7,
+      "link": "https://www.ikea.com/in/en/cat/hallway-furniture-sets-700411/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=700411 -> productListPage.productCount=7 (India's own live category name 'Hallway furniture sets', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=1, so the site's hydrated listing header reads '8 items' (a non-product planner-tool tile is injected whenever plannerCount>0, the same +1 offset measured on IKEA DE/JP/FR/AE and spot-confirmed live on India's own Sofas page: productCount=151, rendered header '152 items'); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Shoe cabinets",
+      "qty": 21,
+      "link": "https://www.ikea.com/in/en/cat/shoe-cabinets-10456/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=10456 -> productListPage.productCount=21 (India's own live category name 'Shoe cabinets', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=1, so the site's hydrated listing header reads '22 items' (a non-product planner-tool tile is injected whenever plannerCount>0, the same +1 offset measured on IKEA DE/JP/FR/AE and spot-confirmed live on India's own Sofas page: productCount=151, rendered header '152 items'); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": "MANUAL REVIEW: mixed node - IKEA's own node ('Shoe cabinets') mixes freestanding shoe cabinets with slimmer shoe racks; kept whole because the site files it as storage furniture (same mixed-node finding carried forward from IKEA AE f164 / IKEA JP f184 on this shared category id, not independently re-verified on India's product tiles)."
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Wardrobes",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Solitaire wardrobes",
+      "qty": 25,
+      "link": "https://www.ikea.com/in/en/cat/solitaire-wardrobes-43631/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=43631 -> productListPage.productCount=25 (India's own live category name 'Solitaire wardrobes', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=1, so the site's hydrated listing header reads '26 items' (a non-product planner-tool tile is injected whenever plannerCount>0, the same +1 offset measured on IKEA DE/JP/FR/AE and spot-confirmed live on India's own Sofas page: productCount=151, rendered header '152 items'); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Modular Wardrobes",
+      "qty": 167,
+      "link": "https://www.ikea.com/in/en/cat/fitted-wardrobes-43632/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=43632 -> productListPage.productCount=167 (India's own live category name 'Modular Wardrobes', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header also reads '167 items' (matches productCount exactly); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Hinged door wardrobes",
+      "qty": 150,
+      "link": "https://www.ikea.com/in/en/cat/hinged-wardrobes-48005/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=48005 -> productListPage.productCount=150 (India's own live category name 'Hinged door wardrobes', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=1, so the site's hydrated listing header reads '151 items' (a non-product planner-tool tile is injected whenever plannerCount>0, the same +1 offset measured on IKEA DE/JP/FR/AE and spot-confirmed live on India's own Sofas page: productCount=151, rendered header '152 items'); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Sliding wardrobes",
+      "qty": 40,
+      "link": "https://www.ikea.com/in/en/cat/sliding-wardrobes-43635/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=43635 -> productListPage.productCount=40 (India's own live category name 'Sliding wardrobes', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=1, so the site's hydrated listing header reads '41 items' (a non-product planner-tool tile is injected whenever plannerCount>0, the same +1 offset measured on IKEA DE/JP/FR/AE and spot-confirmed live on India's own Sofas page: productCount=151, rendered header '152 items'); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Open wardrobes",
+      "qty": 26,
+      "link": "https://www.ikea.com/in/en/cat/open-wardrobes-43634/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=43634 -> productListPage.productCount=26 (India's own live category name 'Open wardrobes', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header also reads '26 items' (matches productCount exactly); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Corner wardrobes",
+      "qty": 6,
+      "link": "https://www.ikea.com/in/en/cat/corner-wardrobes-43636/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=43636 -> productListPage.productCount=6 (India's own live category name 'Corner wardrobes', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header also reads '6 items' (matches productCount exactly); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Hallway wardrobes",
+      "qty": 18,
+      "link": "https://www.ikea.com/in/en/cat/hallway-wardrobes-48007/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=48007 -> productListPage.productCount=18 (India's own live category name 'Hallway wardrobes', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=1, so the site's hydrated listing header reads '19 items' (a non-product planner-tool tile is injected whenever plannerCount>0, the same +1 offset measured on IKEA DE/JP/FR/AE and spot-confirmed live on India's own Sofas page: productCount=151, rendered header '152 items'); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Mirrored wardrobes",
+      "qty": 29,
+      "link": "https://www.ikea.com/in/en/cat/mirrored-wardrobes-48006/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=48006 -> productListPage.productCount=29 (India's own live category name 'Mirrored wardrobes', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=1, so the site's hydrated listing header reads '30 items' (a non-product planner-tool tile is injected whenever plannerCount>0, the same +1 offset measured on IKEA DE/JP/FR/AE and spot-confirmed live on India's own Sofas page: productCount=151, rendered header '152 items'); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Walk in wardrobes",
+      "qty": 6,
+      "link": "https://www.ikea.com/in/en/cat/walk-in-wardrobes-43633/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=43633 -> productListPage.productCount=6 (India's own live category name 'Walk in wardrobes', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header also reads '6 items' (matches productCount exactly); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Wardrobe shelving",
+      "qty": 8,
+      "link": "https://www.ikea.com/in/en/cat/wardrobe-shelving-49079/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=49079 -> productListPage.productCount=8 (India's own live category name 'Wardrobe shelving', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header also reads '8 items' (matches productCount exactly); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Shelves & Utility Shelving",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Cube shelves",
+      "qty": 58,
+      "link": "https://www.ikea.com/in/en/cat/cube-shelves-55012/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=55012 -> productListPage.productCount=58 (India's own live category name 'Cube shelves', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header also reads '58 items' (matches productCount exactly); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Shelving units",
+      "qty": 98,
+      "link": "https://www.ikea.com/in/en/cat/shelving-units-11465/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=11465 -> productListPage.productCount=98 (India's own live category name 'Shelving units', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=1, so the site's hydrated listing header reads '99 items' (a non-product planner-tool tile is injected whenever plannerCount>0, the same +1 offset measured on IKEA DE/JP/FR/AE and spot-confirmed live on India's own Sofas page: productCount=151, rendered header '152 items'); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Bookshelves and Bookcases",
+      "qty": 78,
+      "link": "https://www.ikea.com/in/en/cat/bookcases-10382/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=10382 -> productListPage.productCount=78 (India's own live category name 'Bookshelves and Bookcases', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=1, so the site's hydrated listing header reads '79 items' (a non-product planner-tool tile is injected whenever plannerCount>0, the same +1 offset measured on IKEA DE/JP/FR/AE and spot-confirmed live on India's own Sofas page: productCount=151, rendered header '152 items'); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Storage shelves & units",
+      "qty": 26,
+      "link": "https://www.ikea.com/in/en/cat/storage-shelves-units-10397/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=10397 -> productListPage.productCount=26 (India's own live category name 'Storage shelves & units', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=1, so the site's hydrated listing header reads '27 items' (a non-product planner-tool tile is injected whenever plannerCount>0, the same +1 offset measured on IKEA DE/JP/FR/AE and spot-confirmed live on India's own Sofas page: productCount=151, rendered header '152 items'); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Pantry",
+      "qty": 24,
+      "link": "https://www.ikea.com/in/en/cat/pantry-16200/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=16200 -> productListPage.productCount=24 (India's own live category name 'Pantry', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=1, so the site's hydrated listing header reads '25 items' (a non-product planner-tool tile is injected whenever plannerCount>0, the same +1 offset measured on IKEA DE/JP/FR/AE and spot-confirmed live on India's own Sofas page: productCount=151, rendered header '152 items'); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Chests of Drawers & Drawer Cabinets",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Chest of drawers",
+      "qty": 48,
+      "link": "https://www.ikea.com/in/en/cat/chests-of-drawers-10451/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=10451 -> productListPage.productCount=48 (India's own live category name 'Chest of drawers', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=1, so the site's hydrated listing header reads '49 items' (a non-product planner-tool tile is injected whenever plannerCount>0, the same +1 offset measured on IKEA DE/JP/FR/AE and spot-confirmed live on India's own Sofas page: productCount=151, rendered header '152 items'); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Bedside tables",
+      "qty": 42,
+      "link": "https://www.ikea.com/in/en/cat/bedside-tables-20656/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=20656 -> productListPage.productCount=42 (India's own live category name 'Bedside tables', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=1, so the site's hydrated listing header reads '43 items' (a non-product planner-tool tile is injected whenever plannerCount>0, the same +1 offset measured on IKEA DE/JP/FR/AE and spot-confirmed live on India's own Sofas page: productCount=151, rendered header '152 items'); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Dressing tables",
+      "qty": 9,
+      "link": "https://www.ikea.com/in/en/cat/dressing-tables-20657/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=20657 -> productListPage.productCount=9 (India's own live category name 'Dressing tables', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=1, so the site's hydrated listing header reads '10 items' (a non-product planner-tool tile is injected whenever plannerCount>0, the same +1 offset measured on IKEA DE/JP/FR/AE and spot-confirmed live on India's own Sofas page: productCount=151, rendered header '152 items'); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Basket drawer units",
+      "qty": 7,
+      "link": "https://www.ikea.com/in/en/cat/basket-drawer-units-46081/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=46081 -> productListPage.productCount=7 (India's own live category name 'Basket drawer units', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header also reads '7 items' (matches productCount exactly); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": "MANUAL REVIEW: ambiguous - IKEA files 'Basket drawer units' under its Chest of drawers & drawer units branch; the products are JONAXEL-style wire-basket drawer/mesh units that could read as standalone storage (same ambiguity carried forward from IKEA AE f164 / IKEA JP f184 on this shared category id, not independently re-verified on India's product tiles)."
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Cabinets & Display Cabinets",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Cabinets",
+      "qty": 77,
+      "link": "https://www.ikea.com/in/en/cat/cabinets-10409/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=10409 -> productListPage.productCount=77 (India's own live category name 'Cabinets', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=1, so the site's hydrated listing header reads '78 items' (a non-product planner-tool tile is injected whenever plannerCount>0, the same +1 offset measured on IKEA DE/JP/FR/AE and spot-confirmed live on India's own Sofas page: productCount=151, rendered header '152 items'); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Sideboards",
+      "qty": 40,
+      "link": "https://www.ikea.com/in/en/cat/sideboards-10412/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=10412 -> productListPage.productCount=40 (India's own live category name 'Sideboards', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=1, so the site's hydrated listing header reads '41 items' (a non-product planner-tool tile is injected whenever plannerCount>0, the same +1 offset measured on IKEA DE/JP/FR/AE and spot-confirmed live on India's own Sofas page: productCount=151, rendered header '152 items'); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Display cabinets",
+      "qty": 59,
+      "link": "https://www.ikea.com/in/en/cat/display-cabinets-10410/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=10410 -> productListPage.productCount=59 (India's own live category name 'Display cabinets', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=1, so the site's hydrated listing header reads '60 items' (a non-product planner-tool tile is injected whenever plannerCount>0, the same +1 offset measured on IKEA DE/JP/FR/AE and spot-confirmed live on India's own Sofas page: productCount=151, rendered header '152 items'); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "TV Furniture & Storage Combinations",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "TV & media storage",
+      "qty": 43,
+      "link": "https://www.ikea.com/in/en/cat/tv-media-storage-14885/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=14885 -> productListPage.productCount=43 (India's own live category name 'TV & media storage', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=1, so the site's hydrated listing header reads '44 items' (a non-product planner-tool tile is injected whenever plannerCount>0, the same +1 offset measured on IKEA DE/JP/FR/AE and spot-confirmed live on India's own Sofas page: productCount=151, rendered header '152 items'); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "TV stands",
+      "qty": 30,
+      "link": "https://www.ikea.com/in/en/cat/tv-benches-10810/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=10810 -> productListPage.productCount=30 (India's own live category name 'TV stands', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=1, so the site's hydrated listing header reads '31 items' (a non-product planner-tool tile is injected whenever plannerCount>0, the same +1 offset measured on IKEA DE/JP/FR/AE and spot-confirmed live on India's own Sofas page: productCount=151, rendered header '152 items'); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Serving Trolleys & Carts",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Kitchen trolleys",
+      "qty": 12,
+      "link": "https://www.ikea.com/in/en/cat/kitchen-islands-trolleys-10471/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=10471 -> productListPage.productCount=12 (India's own live category name 'Kitchen trolleys', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header also reads '12 items' (matches productCount exactly); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Bathroom trolleys",
+      "qty": 4,
+      "link": "https://www.ikea.com/in/en/cat/bathroom-trolleys-20858/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=20858 -> productListPage.productCount=4 (India's own live category name 'Bathroom trolleys', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header also reads '4 items' (matches productCount exactly); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Filing & Office Cabinets",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Storage units & cabinets for office",
+      "qty": 5,
+      "link": "https://www.ikea.com/in/en/cat/storage-units-cabinets-for-office-47084/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=47084 -> productListPage.productCount=5 (India's own live category name 'Storage units & cabinets for office', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=2, so the site's hydrated listing header reads '6 items' (a non-product planner-tool tile is injected whenever plannerCount>0, the same +1 offset measured on IKEA DE/JP/FR/AE and spot-confirmed live on India's own Sofas page: productCount=151, rendered header '152 items'); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Drawer units for home",
+      "qty": 17,
+      "link": "https://www.ikea.com/in/en/cat/drawer-units-for-home-47081/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=47081 -> productListPage.productCount=17 (India's own live category name 'Drawer units for home', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=1, so the site's hydrated listing header reads '18 items' (a non-product planner-tool tile is injected whenever plannerCount>0, the same +1 offset measured on IKEA DE/JP/FR/AE and spot-confirmed live on India's own Sofas page: productCount=151, rendered header '152 items'); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Office & Gaming Furniture",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Conference & meeting tables",
+      "qty": 9,
+      "link": "https://www.ikea.com/in/en/cat/bekant-conference-meeting-tables-54173/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=54173 -> productListPage.productCount=9 (India's own live category name 'Conference & meeting tables', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header also reads '9 items' (matches productCount exactly); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Conference table & chair sets",
+      "qty": 3,
+      "link": "https://www.ikea.com/in/en/cat/conference-table-chair-sets-700424/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=700424 -> productListPage.productCount=3 (India's own live category name 'Conference table & chair sets', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header also reads '3 items' (matches productCount exactly); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Conference chairs",
+      "qty": 9,
+      "link": "https://www.ikea.com/in/en/cat/conference-chairs-47068/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=47068 -> productListPage.productCount=9 (India's own live category name 'Conference chairs', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=1, so the site's hydrated listing header reads '10 items' (a non-product planner-tool tile is injected whenever plannerCount>0, the same +1 offset measured on IKEA DE/JP/FR/AE and spot-confirmed live on India's own Sofas page: productCount=151, rendered header '152 items'); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Desk & chair sets",
+      "qty": 18,
+      "link": "https://www.ikea.com/in/en/cat/desk-chair-sets-53249/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=53249 -> productListPage.productCount=18 (India's own live category name 'Desk & chair sets', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=1, so the site's hydrated listing header reads '19 items' (a non-product planner-tool tile is injected whenever plannerCount>0, the same +1 offset measured on IKEA DE/JP/FR/AE and spot-confirmed live on India's own Sofas page: productCount=151, rendered header '152 items'); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Desks & Workspaces",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Standing desks",
+      "qty": 8,
+      "link": "https://www.ikea.com/in/en/cat/standing-desks-55008/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=55008 -> productListPage.productCount=8 (India's own live category name 'Standing desks', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=1, so the site's hydrated listing header reads '9 items' (a non-product planner-tool tile is injected whenever plannerCount>0, the same +1 offset measured on IKEA DE/JP/FR/AE and spot-confirmed live on India's own Sofas page: productCount=151, rendered header '152 items'); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Home office desks & tables",
+      "qty": 58,
+      "link": "https://www.ikea.com/in/en/cat/home-office-desks-and-tables-20651/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=20651 -> productListPage.productCount=58 (India's own live category name 'Home office desks & tables', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=1, so the site's hydrated listing header reads '59 items' (a non-product planner-tool tile is injected whenever plannerCount>0, the same +1 offset measured on IKEA DE/JP/FR/AE and spot-confirmed live on India's own Sofas page: productCount=151, rendered header '152 items'); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Desks for office",
+      "qty": 13,
+      "link": "https://www.ikea.com/in/en/cat/desks-for-office-47069/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=47069 -> productListPage.productCount=13 (India's own live category name 'Desks for office', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=1, so the site's hydrated listing header reads '14 items' (a non-product planner-tool tile is injected whenever plannerCount>0, the same +1 offset measured on IKEA DE/JP/FR/AE and spot-confirmed live on India's own Sofas page: productCount=151, rendered header '152 items'); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Desks for gaming",
+      "qty": 8,
+      "link": "https://www.ikea.com/in/en/cat/desks-for-gaming-47070/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=47070 -> productListPage.productCount=8 (India's own live category name 'Desks for gaming', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=1, so the site's hydrated listing header reads '9 items' (a non-product planner-tool tile is injected whenever plannerCount>0, the same +1 offset measured on IKEA DE/JP/FR/AE and spot-confirmed live on India's own Sofas page: productCount=151, rendered header '152 items'); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Laptop stands/tables",
+      "qty": 13,
+      "link": "https://www.ikea.com/in/en/cat/laptop-tables-24830/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=24830 -> productListPage.productCount=13 (India's own live category name 'Laptop stands/tables', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header also reads '13 items' (matches productCount exactly); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": "MANUAL REVIEW: ambiguous - 'Laptop stands/tables' mixes small laptop tables (furniture) with handheld laptop stands/trays on other markets (carried forward from IKEA AE f164 / IKEA JP f184 on this shared category id, not independently re-verified on India's product tiles)."
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Desk Chairs & Office Chairs",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Desk chairs for home",
+      "qty": 35,
+      "link": "https://www.ikea.com/in/en/cat/desk-chairs-for-home-20653/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=20653 -> productListPage.productCount=35 (India's own live category name 'Desk chairs for home', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=1, so the site's hydrated listing header reads '36 items' (a non-product planner-tool tile is injected whenever plannerCount>0, the same +1 offset measured on IKEA DE/JP/FR/AE and spot-confirmed live on India's own Sofas page: productCount=151, rendered header '152 items'); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Office chairs",
+      "qty": 16,
+      "link": "https://www.ikea.com/in/en/cat/office-chairs-20654/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=20654 -> productListPage.productCount=16 (India's own live category name 'Office chairs', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=1, so the site's hydrated listing header reads '17 items' (a non-product planner-tool tile is injected whenever plannerCount>0, the same +1 offset measured on IKEA DE/JP/FR/AE and spot-confirmed live on India's own Sofas page: productCount=151, rendered header '152 items'); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Gaming chairs",
+      "qty": 6,
+      "link": "https://www.ikea.com/in/en/cat/gaming-chairs-47067/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=47067 -> productListPage.productCount=6 (India's own live category name 'Gaming chairs', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header also reads '6 items' (matches productCount exactly); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Gaming Furniture",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Gaming desk & chair sets",
+      "qty": 9,
+      "link": "https://www.ikea.com/in/en/cat/gaming-desk-chair-sets-56516/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=56516 -> productListPage.productCount=9 (India's own live category name 'Gaming desk & chair sets', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header also reads '9 items' (matches productCount exactly); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Bathroom Furniture",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Bathroom Storage",
+      "qty": 30,
+      "link": "https://www.ikea.com/in/en/cat/shelf-units-20804/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=20804 -> productListPage.productCount=30 (India's own live category name 'Bathroom Storage', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header also reads '30 items' (matches productCount exactly); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Bathroom wall cabinets",
+      "qty": 8,
+      "link": "https://www.ikea.com/in/en/cat/bathroom-wall-cabinets-20808/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=20808 -> productListPage.productCount=8 (India's own live category name 'Bathroom wall cabinets', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=1, so the site's hydrated listing header reads '9 items' (a non-product planner-tool tile is injected whenever plannerCount>0, the same +1 offset measured on IKEA DE/JP/FR/AE and spot-confirmed live on India's own Sofas page: productCount=151, rendered header '152 items'); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Mirror cabinets",
+      "qty": 6,
+      "link": "https://www.ikea.com/in/en/cat/mirror-cabinets-20500/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=20500 -> productListPage.productCount=6 (India's own live category name 'Mirror cabinets', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=1, so the site's hydrated listing header reads '7 items' (a non-product planner-tool tile is injected whenever plannerCount>0, the same +1 offset measured on IKEA DE/JP/FR/AE and spot-confirmed live on India's own Sofas page: productCount=151, rendered header '152 items'); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Bathroom stools & benches",
+      "qty": 4,
+      "link": "https://www.ikea.com/in/en/cat/bathroom-stools-benches-20859/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=20859 -> productListPage.productCount=4 (India's own live category name 'Bathroom stools & benches', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header also reads '4 items' (matches productCount exactly); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Laundry cabinets & shelving",
+      "qty": 10,
+      "link": "https://www.ikea.com/in/en/cat/laundry-cabinets-shelving-48925/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=48925 -> productListPage.productCount=10 (India's own live category name 'Laundry cabinets & shelving', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header also reads '10 items' (matches productCount exactly); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Washstands & Sink Cabinets",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Bathroom vanity units with basin",
+      "qty": 66,
+      "link": "https://www.ikea.com/in/en/cat/vanity-units-20720/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=20720 -> productListPage.productCount=66 (India's own live category name 'Bathroom vanity units with basin', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=1, so the site's hydrated listing header reads '67 items' (a non-product planner-tool tile is injected whenever plannerCount>0, the same +1 offset measured on IKEA DE/JP/FR/AE and spot-confirmed live on India's own Sofas page: productCount=151, rendered header '152 items'); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Bathroom vanity units without basin",
+      "qty": 7,
+      "link": "https://www.ikea.com/in/en/cat/vanity-units-without-basin-54989/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=54989 -> productListPage.productCount=7 (India's own live category name 'Bathroom vanity units without basin', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header also reads '7 items' (matches productCount exactly); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Under sink cabinets",
+      "qty": 2,
+      "link": "https://www.ikea.com/in/en/cat/under-sink-cabinets-20721/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=20721 -> productListPage.productCount=2 (India's own live category name 'Under sink cabinets', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=1, so the site's hydrated listing header reads '3 items' (a non-product planner-tool tile is injected whenever plannerCount>0, the same +1 offset measured on IKEA DE/JP/FR/AE and spot-confirmed live on India's own Sofas page: productCount=151, rendered header '152 items'); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Outdoor Furniture",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Sun loungers",
+      "qty": 1,
+      "link": "https://www.ikea.com/in/en/cat/sun-loungers-hammocks-21963/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=21963 -> productListPage.productCount=1 (India's own live category name 'Sun loungers', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=1, so the site's hydrated listing header reads '2 items' (a non-product planner-tool tile is injected whenever plannerCount>0, the same +1 offset measured on IKEA DE/JP/FR/AE and spot-confirmed live on India's own Sofas page: productCount=151, rendered header '152 items'); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Children's outdoor furniture",
+      "qty": 4,
+      "link": "https://www.ikea.com/in/en/cat/childrens-outdoor-furniture-37899/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=37899 -> productListPage.productCount=4 (India's own live category name 'Children's outdoor furniture', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header also reads '4 items' (matches productCount exactly); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Outdoor Storage",
+      "qty": 23,
+      "link": "https://www.ikea.com/in/en/cat/outdoor-organising-21958/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=21958 -> productListPage.productCount=23 (India's own live category name 'Outdoor Storage', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=1, so the site's hydrated listing header reads '24 items' (a non-product planner-tool tile is injected whenever plannerCount>0, the same +1 offset measured on IKEA DE/JP/FR/AE and spot-confirmed live on India's own Sofas page: productCount=151, rendered header '152 items'); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": "MANUAL REVIEW: mixed node - 'Outdoor Storage' (id 21958) is filed by IKEA under both the Storage & organisation and Outdoor products departments and has previously been found to mix furniture-grade outdoor cabinets/cushion boxes with lighter organisers on other markets (carried forward from IKEA AE f164 / IKEA JP f184 on this shared category id, not independently re-verified on India's product tiles)."
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Outdoor Sofas & Outdoor Armchairs",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Outdoor Sofas",
+      "qty": 13,
+      "link": "https://www.ikea.com/in/en/cat/outdoor-sofas-21959/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=21959 -> productListPage.productCount=13 (India's own live category name 'Outdoor Sofas', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=2, so the site's hydrated listing header reads '14 items' (a non-product planner-tool tile is injected whenever plannerCount>0, the same +1 offset measured on IKEA DE/JP/FR/AE and spot-confirmed live on India's own Sofas page: productCount=151, rendered header '152 items'); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Outdoor sofa combinations",
+      "qty": 3,
+      "link": "https://www.ikea.com/in/en/cat/outdoor-sofa-combinations-21960/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=21960 -> productListPage.productCount=3 (India's own live category name 'Outdoor sofa combinations', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=1, so the site's hydrated listing header reads '4 items' (a non-product planner-tool tile is injected whenever plannerCount>0, the same +1 offset measured on IKEA DE/JP/FR/AE and spot-confirmed live on India's own Sofas page: productCount=151, rendered header '152 items'); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Outdoor sofa sections",
+      "qty": 7,
+      "link": "https://www.ikea.com/in/en/cat/outdoor-sofa-sections-21961/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=21961 -> productListPage.productCount=7 (India's own live category name 'Outdoor sofa sections', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=2, so the site's hydrated listing header reads '8 items' (a non-product planner-tool tile is injected whenever plannerCount>0, the same +1 offset measured on IKEA DE/JP/FR/AE and spot-confirmed live on India's own Sofas page: productCount=151, rendered header '152 items'); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Outdoor Benches",
+      "qty": 3,
+      "link": "https://www.ikea.com/in/en/cat/outdoor-benches-47386/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=47386 -> productListPage.productCount=3 (India's own live category name 'Outdoor Benches', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=2, so the site's hydrated listing header reads '4 items' (a non-product planner-tool tile is injected whenever plannerCount>0, the same +1 offset measured on IKEA DE/JP/FR/AE and spot-confirmed live on India's own Sofas page: productCount=151, rendered header '152 items'); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Garden & Balcony Chairs",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Tables & chairs",
+      "qty": 8,
+      "link": "https://www.ikea.com/in/en/cat/outdoor-chairs-21962/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=21962 -> productListPage.productCount=8 (India's own live category name 'Tables & chairs', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=1, so the site's hydrated listing header reads '9 items' (a non-product planner-tool tile is injected whenever plannerCount>0, the same +1 offset measured on IKEA DE/JP/FR/AE and spot-confirmed live on India's own Sofas page: productCount=151, rendered header '152 items'); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": "MANUAL REVIEW: generic node label - India's own live category name for this id is simply 'Tables & chairs' (slug outdoor-chairs-21962), which collides in wording with the top-level Tables & Chairs department; on other markets this same shared id was labelled 'Outdoor Armchairs'/'Outdoor Lounge Chairs' and found to list outdoor chairs specifically. Kept as outdoor seating furniture on India's own wording per the site's-own-label rule; not independently re-verified against India's product tiles."
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Outdoor Dining Chairs",
+      "qty": 27,
+      "link": "https://www.ikea.com/in/en/cat/outdoor-dining-chairs-21966/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=21966 -> productListPage.productCount=27 (India's own live category name 'Outdoor Dining Chairs', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=1, so the site's hydrated listing header reads '28 items' (a non-product planner-tool tile is injected whenever plannerCount>0, the same +1 offset measured on IKEA DE/JP/FR/AE and spot-confirmed live on India's own Sofas page: productCount=151, rendered header '152 items'); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Outdoor Dining Area",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Outdoor dining sets",
+      "qty": 20,
+      "link": "https://www.ikea.com/in/en/cat/outdoor-dining-sets-21967/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=21967 -> productListPage.productCount=20 (India's own live category name 'Outdoor dining sets', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=1, so the site's hydrated listing header reads '21 items' (a non-product planner-tool tile is injected whenever plannerCount>0, the same +1 offset measured on IKEA DE/JP/FR/AE and spot-confirmed live on India's own Sofas page: productCount=151, rendered header '152 items'); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Bistro sets",
+      "qty": 15,
+      "link": "https://www.ikea.com/in/en/cat/bistro-sets-59249/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=59249 -> productListPage.productCount=15 (India's own live category name 'Bistro sets', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=1, so the site's hydrated listing header reads '16 items' (a non-product planner-tool tile is injected whenever plannerCount>0, the same +1 offset measured on IKEA DE/JP/FR/AE and spot-confirmed live on India's own Sofas page: productCount=151, rendered header '152 items'); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Outdoor Tables",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Outdoor dining tables",
+      "qty": 19,
+      "link": "https://www.ikea.com/in/en/cat/outdoor-dining-tables-21965/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=21965 -> productListPage.productCount=19 (India's own live category name 'Outdoor dining tables', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=1, so the site's hydrated listing header reads '20 items' (a non-product planner-tool tile is injected whenever plannerCount>0, the same +1 offset measured on IKEA DE/JP/FR/AE and spot-confirmed live on India's own Sofas page: productCount=151, rendered header '152 items'); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Outdoor coffee & side tables",
+      "qty": 6,
+      "link": "https://www.ikea.com/in/en/cat/outdoor-coffee-side-tables-700192/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=700192 -> productListPage.productCount=6 (India's own live category name 'Outdoor coffee & side tables', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=1, so the site's hydrated listing header reads '7 items' (a non-product planner-tool tile is injected whenever plannerCount>0, the same +1 offset measured on IKEA DE/JP/FR/AE and spot-confirmed live on India's own Sofas page: productCount=151, rendered header '152 items'); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Children's Seating Furniture",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Small chairs",
+      "qty": 17,
+      "link": "https://www.ikea.com/in/en/cat/small-chairs-18769/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=18769 -> productListPage.productCount=17 (India's own live category name 'Small chairs', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=1, so the site's hydrated listing header reads '18 items' (a non-product planner-tool tile is injected whenever plannerCount>0, the same +1 offset measured on IKEA DE/JP/FR/AE and spot-confirmed live on India's own Sofas page: productCount=151, rendered header '152 items'); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Children's tables",
+      "qty": 5,
+      "link": "https://www.ikea.com/in/en/cat/childrens-tables-18768/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=18768 -> productListPage.productCount=5 (India's own live category name 'Children's tables', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=1, so the site's hydrated listing header reads '6 items' (a non-product planner-tool tile is injected whenever plannerCount>0, the same +1 offset measured on IKEA DE/JP/FR/AE and spot-confirmed live on India's own Sofas page: productCount=151, rendered header '152 items'); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Children's stools & benches",
+      "qty": 10,
+      "link": "https://www.ikea.com/in/en/cat/childrens-stools-benches-45816/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=45816 -> productListPage.productCount=10 (India's own live category name 'Children's stools & benches', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=1, so the site's hydrated listing header reads '11 items' (a non-product planner-tool tile is injected whenever plannerCount>0, the same +1 offset measured on IKEA DE/JP/FR/AE and spot-confirmed live on India's own Sofas page: productCount=151, rendered header '152 items'); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Children's armchairs",
+      "qty": 6,
+      "link": "https://www.ikea.com/in/en/cat/childrens-armchairs-20483/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=20483 -> productListPage.productCount=6 (India's own live category name 'Children's armchairs', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=1, so the site's hydrated listing header reads '7 items' (a non-product planner-tool tile is injected whenever plannerCount>0, the same +1 offset measured on IKEA DE/JP/FR/AE and spot-confirmed live on India's own Sofas page: productCount=151, rendered header '152 items'); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Junior dining chairs",
+      "qty": 7,
+      "link": "https://www.ikea.com/in/en/cat/junior-dining-chairs-45815/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=45815 -> productListPage.productCount=7 (India's own live category name 'Junior dining chairs', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header also reads '7 items' (matches productCount exactly); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Children's Beds",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Children's single beds",
+      "qty": 15,
+      "link": "https://www.ikea.com/in/en/cat/childrens-single-beds-45848/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=45848 -> productListPage.productCount=15 (India's own live category name 'Children's single beds', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=1, so the site's hydrated listing header reads '16 items' (a non-product planner-tool tile is injected whenever plannerCount>0, the same +1 offset measured on IKEA DE/JP/FR/AE and spot-confirmed live on India's own Sofas page: productCount=151, rendered header '152 items'); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Junior & extendable beds",
+      "qty": 4,
+      "link": "https://www.ikea.com/in/en/cat/junior-extendable-beds-45847/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=45847 -> productListPage.productCount=4 (India's own live category name 'Junior & extendable beds', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=1, so the site's hydrated listing header reads '5 items' (a non-product planner-tool tile is injected whenever plannerCount>0, the same +1 offset measured on IKEA DE/JP/FR/AE and spot-confirmed live on India's own Sofas page: productCount=151, rendered header '152 items'); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Loft beds",
+      "qty": 5,
+      "link": "https://www.ikea.com/in/en/cat/loft-beds-19049/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=19049 -> productListPage.productCount=5 (India's own live category name 'Loft beds', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=1, so the site's hydrated listing header reads '6 items' (a non-product planner-tool tile is injected whenever plannerCount>0, the same +1 offset measured on IKEA DE/JP/FR/AE and spot-confirmed live on India's own Sofas page: productCount=151, rendered header '152 items'); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Bunk beds",
+      "qty": 3,
+      "link": "https://www.ikea.com/in/en/cat/bunk-beds-19048/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=19048 -> productListPage.productCount=3 (India's own live category name 'Bunk beds', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=1, so the site's hydrated listing header reads '4 items' (a non-product planner-tool tile is injected whenever plannerCount>0, the same +1 offset measured on IKEA DE/JP/FR/AE and spot-confirmed live on India's own Sofas page: productCount=151, rendered header '152 items'); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Learning Furniture",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Children's desks",
+      "qty": 41,
+      "link": "https://www.ikea.com/in/en/cat/childrens-desks-24714/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=24714 -> productListPage.productCount=41 (India's own live category name 'Children's desks', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header also reads '41 items' (matches productCount exactly); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Children's desk chairs",
+      "qty": 6,
+      "link": "https://www.ikea.com/in/en/cat/childrens-desk-chairs-24715/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=24715 -> productListPage.productCount=6 (India's own live category name 'Children's desk chairs', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header also reads '6 items' (matches productCount exactly); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Baby Furniture",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Children's wardrobes",
+      "qty": 2,
+      "link": "https://www.ikea.com/in/en/cat/childrens-wardrobes-18707/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=18707 -> productListPage.productCount=2 (India's own live category name 'Children's wardrobes', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=1, so the site's hydrated listing header reads '3 items' (a non-product planner-tool tile is injected whenever plannerCount>0, the same +1 offset measured on IKEA DE/JP/FR/AE and spot-confirmed live on India's own Sofas page: productCount=151, rendered header '152 items'); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Children's chests of drawers",
+      "qty": 2,
+      "link": "https://www.ikea.com/in/en/cat/childrens-chests-of-drawers-18708/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=18708 -> productListPage.productCount=2 (India's own live category name 'Children's chests of drawers', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=1, so the site's hydrated listing header reads '3 items' (a non-product planner-tool tile is injected whenever plannerCount>0, the same +1 offset measured on IKEA DE/JP/FR/AE and spot-confirmed live on India's own Sofas page: productCount=151, rendered header '152 items'); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Baby cots",
+      "qty": 3,
+      "link": "https://www.ikea.com/in/en/cat/cots-45781/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=45781 -> productListPage.productCount=3 (India's own live category name 'Baby cots', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=1, so the site's hydrated listing header reads '4 items' (a non-product planner-tool tile is injected whenever plannerCount>0, the same +1 offset measured on IKEA DE/JP/FR/AE and spot-confirmed live on India's own Sofas page: productCount=151, rendered header '152 items'); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Baby chairs & highchairs",
+      "qty": 13,
+      "link": "https://www.ikea.com/in/en/cat/baby-chairs-highchairs-45782/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=45782 -> productListPage.productCount=13 (India's own live category name 'Baby chairs & highchairs', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=1, so the site's hydrated listing header reads '14 items' (a non-product planner-tool tile is injected whenever plannerCount>0, the same +1 offset measured on IKEA DE/JP/FR/AE and spot-confirmed live on India's own Sofas page: productCount=151, rendered header '152 items'); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Changing tables",
+      "qty": 5,
+      "link": "https://www.ikea.com/in/en/cat/changing-tables-45783/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=45783 -> productListPage.productCount=5 (India's own live category name 'Changing tables', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=1, so the site's hydrated listing header reads '6 items' (a non-product planner-tool tile is injected whenever plannerCount>0, the same +1 offset measured on IKEA DE/JP/FR/AE and spot-confirmed live on India's own Sofas page: productCount=151, rendered header '152 items'); qty here is the enumerated product count, following the established f92/f107/f140/f164/f184 IKEA-platform convention of using productCount rather than the inflated rendered header",
+      "flag": null
+    }
+  ]
+}

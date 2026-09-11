@@ -1,0 +1,624 @@
+{
+ "sr": 155,
+ "company": "IKEA France",
+ "brand_site": "ikea.com",
+ "country": "France",
+ "site_url": "https://www.ikea.com/fr/fr/",
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "Independence check vs S.N. 100 IKEA UK (c100.json) and S.N. 117 IKEA DE (c117.json): confirmed GENUINELY SEPARATE. IKEA runs one global platform (shared sik.search.blue.cdtapps.com PRIMARY_AREA API and shared numeric category-ID scheme across country storefronts) but each locale has its own market-specific catalog/pricing/qty. Verified independence three ways: (1) locale path https://www.ikea.com/fr/fr/ is the genuine French storefront (direct fetch HTTP 200, EUR pricing, IKEA PS 2026 current-season products present, French-language nav/UI, no shutdown language); (2) queried the fr/fr market endpoint (sik.search.blue.cdtapps.com/fr/fr/search) and every single leaf qty differs from both the UK and DE figures (e.g. Floor Lamps: UK=40, DE=46, FR=45; Ceiling Lights: UK=106, DE=105, FR=95; LED Lights: UK=110, DE=99, FR=91; Flower Pots & Planters: UK=138, DE=155, FR=105) -- no two-country qty match found anywhere in the 58-row set; (3) each leaf category's own FR-language canonical slug was independently re-derived by following the site's own redirect from the bare category ID (not assumed from the UK/DE slug lists), e.g. lampadaires-10731, miroirs-muraux-24858, horloges-murales-et-de-table-10785. This is the 3rd data point for the IKEA per-country pattern (UK/DE/FR all genuinely independent), extending the project's 2-for-2 precedent to 3-for-3. Category-ID parity with UK/DE is 1:1 (same 58 leaf category IDs resolve on the FR site), expected under IKEA's single global platform and independently confirmed here (not assumed) via the redirect-slug + API-query sweep plus a manual nav sweep of every FR hub page (Eclairage/Lighting, Decoration hub, Miroirs/Mirrors, Vases et coupes, Bougies/Candles, Horloges/Clocks, Cadres et affiches/Frames, Arts de la table/Kitchen&Dining) which surfaced no FR-only categories beyond this set and no missing ones. TWO scoping/labelling divergences were found and followed rather than assumed, both cross-checked against product-title samples via the API: (a) category 10785 is 'Horloges murales et de table' (Wall & Table Clocks) on FR -- matching DE's broader 'Wand- & Tischuhren' scope, NOT the UK's narrower pure 'Wall Clocks' label -- confirmed IN SCOPE either way (clocks). (b) category 24861 is 'Miroirs decoratifs' (Decorative Mirrors) on FR -- matching the UK's 'Decorative Mirrors' label, NOT DE's narrower 'Small Mirrors' (Kleine Spiegel) label for the same numeric ID -- a genuine 3-way per-market naming split on one shared category ID, each site's own page title used as the source of truth rather than copying either sibling's label. Also checked and confirmed IN-SCOPE (not a holiday exclusion) despite an unusual FR-only page title: category 14971 is titled 'Eclairage saisonnier interieur et exterieur' (Seasonal indoor/outdoor lighting) on FR vs UK/DE's 'Decorative Lighting' -- pulled a 30-item product sample via the API (SOLVINDEN, LEDFYR, KUSTFYR LED string lights/light decorations etc) and confirmed it is the same decorative-LED-lighting category as the UK/DE Decorative Lighting node, not a Christmas/holiday-only listing, so it is kept as 'Decorative Lighting' for naming consistency with the sibling rows. Access route: direct fetch of ikea.com/fr/fr/ pages worked with no blocking encountered. Category IDs and hierarchy scaffolded from the confirmed-global 58-category scheme shared with S.N. 100/117, then independently re-verified for FR: reverse-engineered the sik.search request body from a public sample script (searchParameters.type=CATEGORY, components[0].component=PRIMARY_AREA, window.offset/size, POST with a stable Session-Id header) since a naive JSON payload guess returned HTTP 400. IMPORTANT correction to the UK/DE methodology found on FR: the raw metadata.max field is NOT reliable as a boundary anchor on its own -- it fluctuated between 44/45/46 for the same category (Floor Lamps) across different window sizes/refetches because it also counts a non-product PLANNER breakout card (an 'IKEA Kreativ' room-planner promo tile) that sik.search sometimes splices into the PRIMARY_AREA item stream at a fixed position. Fixed methodology: qty = metadata.itemsPerType.PRODUCT, independently cross-checked against the unique count of type=='PRODUCT' items (by itemNoGlobal) from a full window=999 fetch (always matched), then boundary-tested at offset=qty-1 (returned the final product) and offset=qty (returned an empty PRIMARY_AREA result set) -- all 58 categories passed this corrected exhaustion+boundary check cleanly, plus a same-window refetch reproduced an identical qty every time (ruling out A/B-test-bucket qty flicker once Session-Id was pinned per category). Excluded per standing rules, all confirmed present on the FR nav during the sweep: Ampoules (light bulbs), Abat-jour/pieds/cables (lamp shades/bases/cords -- hardware parts); Bougies parfumees (scented candles) and Parfums d'ambiance (home fragrance/diffusers/pot-pourri); Plantes et fleurs and fleurs artificielles coupees (living and artificial plants/flowers -- only the empty decorative Pots/cache-pots/jardinieres kept); Tableaux d'affichage (noticeboards); Papeterie et fournitures de bureau (stationery/office supplies); Boites de rangement et paniers (storage boxes/baskets); Meubles hauts avec miroir (mirror cabinets -- storage furniture with a mirror door, same basis as UK/DE's mirror-cabinet exclusion); Accessoires bougies (candle snuffers/tools -- functional accessory, not a holder); Etageres (shelving furniture); all kitchen-utensil/cookware/cutlery/bakeware/dishwashing/vacuum-flask/coffee-machine/straw-and-bar-tool categories under Arts de la table -- functional/appliance, out of scope, mirroring the UK/DE exclusion list exactly. All *-serie collection pages (ARSTID, NYMANE, HEKTAR, NAEVLINGE, SKURUP, SIMRISHAMN, RODALM, FEJKA, PJATTERYD, IKEA PS 2026, etc) are marketing/collection pages, not categories, skipped per the standing 'Collections' exclusion. Rule 0 applied: Bathroom Lighting (10736), Outdoor Lighting (17897), Bathroom Mirrors (20490) and Vanity Mirrors (20498) all INCLUDED as room-qualified branches of the type trees (Lighting, Mirrors) they belong to. Rule 0.6 overlap: as on UK/DE, Mirrors presents both a shape/type cross-cut (Large/Wall/Round/Standing/Decorative) and a room/use cross-cut (Vanity/Bathroom/Makeup mirrors, Mirrors with Lights) as separate site-curated category IDs; both trees emitted in full, overlap documented here rather than dropped. Lighting similarly mixes a fixture-type tree (Ceiling/Table/Floor/Wall/Desk/Children's/Spotlights/Smart/LED/Rechargeable/Pendant) with a room/use tree (Decorative/Integrated/Smart/Outdoor/Bathroom lighting) at the same level; both kept.",
+ "rows": [
+  {
+   "category": "Lighting",
+   "sub_category": "Lighting",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Lamps & Lighting",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Ceiling Lights",
+   "parent": false,
+   "qty": 95,
+   "link": "https://www.ikea.com/fr/fr/cat/suspensions-et-plafonniers-18750/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (fr/fr market) itemsPerType.PRODUCT=95 for category 18750, matching unique product itemNoGlobal count from a full window=999 fetch; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=95 identically. Note: the raw metadata.max field was found unreliable (fluctuated 44-46 on this same category across window sizes because it also counts a non-product PLANNER breakout card spliced into the stream) so itemsPerType.PRODUCT / unique product-ID count was used as qty instead of raw max.",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Table Lamps",
+   "parent": false,
+   "qty": 65,
+   "link": "https://www.ikea.com/fr/fr/cat/lampes-a-poser-10732/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (fr/fr market) itemsPerType.PRODUCT=65 for category 10732, matching unique product itemNoGlobal count from a full window=999 fetch; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=65 identically. Note: the raw metadata.max field was found unreliable (fluctuated 44-46 on this same category across window sizes because it also counts a non-product PLANNER breakout card spliced into the stream) so itemsPerType.PRODUCT / unique product-ID count was used as qty instead of raw max.",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Floor Lamps",
+   "parent": false,
+   "qty": 45,
+   "link": "https://www.ikea.com/fr/fr/cat/lampadaires-10731/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (fr/fr market) itemsPerType.PRODUCT=45 for category 10731, matching unique product itemNoGlobal count from a full window=999 fetch; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=45 identically. Note: the raw metadata.max field was found unreliable (fluctuated 44-46 on this same category across window sizes because it also counts a non-product PLANNER breakout card spliced into the stream) so itemsPerType.PRODUCT / unique product-ID count was used as qty instead of raw max.",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Wall Lights",
+   "parent": false,
+   "qty": 30,
+   "link": "https://www.ikea.com/fr/fr/cat/appliques-spots-20503/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (fr/fr market) itemsPerType.PRODUCT=30 for category 20503, matching unique product itemNoGlobal count from a full window=999 fetch; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=30 identically. Note: the raw metadata.max field was found unreliable (fluctuated 44-46 on this same category across window sizes because it also counts a non-product PLANNER breakout card spliced into the stream) so itemsPerType.PRODUCT / unique product-ID count was used as qty instead of raw max.",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Desk Lamps",
+   "parent": false,
+   "qty": 20,
+   "link": "https://www.ikea.com/fr/fr/cat/lampes-de-bureau-20502/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (fr/fr market) itemsPerType.PRODUCT=20 for category 20502, matching unique product itemNoGlobal count from a full window=999 fetch; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=20 identically. Note: the raw metadata.max field was found unreliable (fluctuated 44-46 on this same category across window sizes because it also counts a non-product PLANNER breakout card spliced into the stream) so itemsPerType.PRODUCT / unique product-ID count was used as qty instead of raw max.",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Children's Lighting",
+   "parent": false,
+   "qty": 23,
+   "link": "https://www.ikea.com/fr/fr/cat/luminaires-bebe-enfant-18773/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (fr/fr market) itemsPerType.PRODUCT=23 for category 18773, matching unique product itemNoGlobal count from a full window=999 fetch; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=23 identically. Note: the raw metadata.max field was found unreliable (fluctuated 44-46 on this same category across window sizes because it also counts a non-product PLANNER breakout card spliced into the stream) so itemsPerType.PRODUCT / unique product-ID count was used as qty instead of raw max.",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Spotlights",
+   "parent": false,
+   "qty": 18,
+   "link": "https://www.ikea.com/fr/fr/cat/spots-20506/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (fr/fr market) itemsPerType.PRODUCT=18 for category 20506, matching unique product itemNoGlobal count from a full window=999 fetch; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=18 identically. Note: the raw metadata.max field was found unreliable (fluctuated 44-46 on this same category across window sizes because it also counts a non-product PLANNER breakout card spliced into the stream) so itemsPerType.PRODUCT / unique product-ID count was used as qty instead of raw max.",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Smart Lamps",
+   "parent": false,
+   "qty": 4,
+   "link": "https://www.ikea.com/fr/fr/cat/luminaire-connecte-59308/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (fr/fr market) itemsPerType.PRODUCT=4 for category 59308, matching unique product itemNoGlobal count from a full window=999 fetch; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=4 identically. Note: the raw metadata.max field was found unreliable (fluctuated 44-46 on this same category across window sizes because it also counts a non-product PLANNER breakout card spliced into the stream) so itemsPerType.PRODUCT / unique product-ID count was used as qty instead of raw max.",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "LED Lights",
+   "parent": false,
+   "qty": 91,
+   "link": "https://www.ikea.com/fr/fr/cat/ampoules-et-luminaires-led-20515/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (fr/fr market) itemsPerType.PRODUCT=91 for category 20515, matching unique product itemNoGlobal count from a full window=999 fetch; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=91 identically. Note: the raw metadata.max field was found unreliable (fluctuated 44-46 on this same category across window sizes because it also counts a non-product PLANNER breakout card spliced into the stream) so itemsPerType.PRODUCT / unique product-ID count was used as qty instead of raw max.",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Rechargeable Lamps",
+   "parent": false,
+   "qty": 9,
+   "link": "https://www.ikea.com/fr/fr/cat/lampes-portables-700512/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (fr/fr market) itemsPerType.PRODUCT=9 for category 700512, matching unique product itemNoGlobal count from a full window=999 fetch; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=9 identically. Note: the raw metadata.max field was found unreliable (fluctuated 44-46 on this same category across window sizes because it also counts a non-product PLANNER breakout card spliced into the stream) so itemsPerType.PRODUCT / unique product-ID count was used as qty instead of raw max.",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Pendant Lights",
+   "parent": false,
+   "qty": 68,
+   "link": "https://www.ikea.com/fr/fr/cat/suspensions-et-lustres-18751/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (fr/fr market) itemsPerType.PRODUCT=68 for category 18751, matching unique product itemNoGlobal count from a full window=999 fetch; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=68 identically. Note: the raw metadata.max field was found unreliable (fluctuated 44-46 on this same category across window sizes because it also counts a non-product PLANNER breakout card spliced into the stream) so itemsPerType.PRODUCT / unique product-ID count was used as qty instead of raw max.",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Decorative Lighting",
+   "parent": false,
+   "qty": 46,
+   "link": "https://www.ikea.com/fr/fr/cat/eclairage-saisonnier-14971/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (fr/fr market) itemsPerType.PRODUCT=46 for category 14971, matching unique product itemNoGlobal count from a full window=999 fetch; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=46 identically. Note: the raw metadata.max field was found unreliable (fluctuated 44-46 on this same category across window sizes because it also counts a non-product PLANNER breakout card spliced into the stream) so itemsPerType.PRODUCT / unique product-ID count was used as qty instead of raw max.",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Integrated Lighting",
+   "parent": false,
+   "qty": 31,
+   "link": "https://www.ikea.com/fr/fr/cat/eclairage-integre-16280/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (fr/fr market) itemsPerType.PRODUCT=31 for category 16280, matching unique product itemNoGlobal count from a full window=999 fetch; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=31 identically. Note: the raw metadata.max field was found unreliable (fluctuated 44-46 on this same category across window sizes because it also counts a non-product PLANNER breakout card spliced into the stream) so itemsPerType.PRODUCT / unique product-ID count was used as qty instead of raw max.",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Smart Lighting",
+   "parent": false,
+   "qty": 50,
+   "link": "https://www.ikea.com/fr/fr/cat/eclairage-connecte-36812/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (fr/fr market) itemsPerType.PRODUCT=50 for category 36812, matching unique product itemNoGlobal count from a full window=999 fetch; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=50 identically. Note: the raw metadata.max field was found unreliable (fluctuated 44-46 on this same category across window sizes because it also counts a non-product PLANNER breakout card spliced into the stream) so itemsPerType.PRODUCT / unique product-ID count was used as qty instead of raw max.",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Outdoor Lighting",
+   "parent": false,
+   "qty": 53,
+   "link": "https://www.ikea.com/fr/fr/cat/luminaires-dexterieur-17897/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (fr/fr market) itemsPerType.PRODUCT=53 for category 17897, matching unique product itemNoGlobal count from a full window=999 fetch; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=53 identically. Note: the raw metadata.max field was found unreliable (fluctuated 44-46 on this same category across window sizes because it also counts a non-product PLANNER breakout card spliced into the stream) so itemsPerType.PRODUCT / unique product-ID count was used as qty instead of raw max.",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Bathroom Lighting",
+   "parent": false,
+   "qty": 27,
+   "link": "https://www.ikea.com/fr/fr/cat/luminaires-salle-de-bain-10736/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (fr/fr market) itemsPerType.PRODUCT=27 for category 10736, matching unique product itemNoGlobal count from a full window=999 fetch; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=27 identically. Note: the raw metadata.max field was found unreliable (fluctuated 44-46 on this same category across window sizes because it also counts a non-product PLANNER breakout card spliced into the stream) so itemsPerType.PRODUCT / unique product-ID count was used as qty instead of raw max.",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Mirrors",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Large Mirrors",
+   "parent": false,
+   "qty": 19,
+   "link": "https://www.ikea.com/fr/fr/cat/grands-miroirs-24859/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (fr/fr market) itemsPerType.PRODUCT=19 for category 24859, matching unique product itemNoGlobal count from a full window=999 fetch; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=19 identically. Note: the raw metadata.max field was found unreliable (fluctuated 44-46 on this same category across window sizes because it also counts a non-product PLANNER breakout card spliced into the stream) so itemsPerType.PRODUCT / unique product-ID count was used as qty instead of raw max.",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Decorative Mirrors",
+   "parent": false,
+   "qty": 17,
+   "link": "https://www.ikea.com/fr/fr/cat/miroirs-decoratifs-24861/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (fr/fr market) itemsPerType.PRODUCT=17 for category 24861, matching unique product itemNoGlobal count from a full window=999 fetch; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=17 identically. Note: the raw metadata.max field was found unreliable (fluctuated 44-46 on this same category across window sizes because it also counts a non-product PLANNER breakout card spliced into the stream) so itemsPerType.PRODUCT / unique product-ID count was used as qty instead of raw max.",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Wall Mirrors",
+   "parent": false,
+   "qty": 53,
+   "link": "https://www.ikea.com/fr/fr/cat/miroirs-muraux-24858/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (fr/fr market) itemsPerType.PRODUCT=53 for category 24858, matching unique product itemNoGlobal count from a full window=999 fetch; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=53 identically. Note: the raw metadata.max field was found unreliable (fluctuated 44-46 on this same category across window sizes because it also counts a non-product PLANNER breakout card spliced into the stream) so itemsPerType.PRODUCT / unique product-ID count was used as qty instead of raw max.",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Round Mirrors",
+   "parent": false,
+   "qty": 17,
+   "link": "https://www.ikea.com/fr/fr/cat/miroirs-ronds-24860/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (fr/fr market) itemsPerType.PRODUCT=17 for category 24860, matching unique product itemNoGlobal count from a full window=999 fetch; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=17 identically. Note: the raw metadata.max field was found unreliable (fluctuated 44-46 on this same category across window sizes because it also counts a non-product PLANNER breakout card spliced into the stream) so itemsPerType.PRODUCT / unique product-ID count was used as qty instead of raw max.",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Standing Mirrors",
+   "parent": false,
+   "qty": 6,
+   "link": "https://www.ikea.com/fr/fr/cat/miroirs-sur-pied-49139/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (fr/fr market) itemsPerType.PRODUCT=6 for category 49139, matching unique product itemNoGlobal count from a full window=999 fetch; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=6 identically. Note: the raw metadata.max field was found unreliable (fluctuated 44-46 on this same category across window sizes because it also counts a non-product PLANNER breakout card spliced into the stream) so itemsPerType.PRODUCT / unique product-ID count was used as qty instead of raw max.",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Vanity Mirrors",
+   "parent": false,
+   "qty": 19,
+   "link": "https://www.ikea.com/fr/fr/cat/miroirs-a-poser-20498/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (fr/fr market) itemsPerType.PRODUCT=19 for category 20498, matching unique product itemNoGlobal count from a full window=999 fetch; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=19 identically. Note: the raw metadata.max field was found unreliable (fluctuated 44-46 on this same category across window sizes because it also counts a non-product PLANNER breakout card spliced into the stream) so itemsPerType.PRODUCT / unique product-ID count was used as qty instead of raw max.",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Bathroom Mirrors",
+   "parent": false,
+   "qty": 33,
+   "link": "https://www.ikea.com/fr/fr/cat/miroirs-salle-de-bain-20490/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (fr/fr market) itemsPerType.PRODUCT=33 for category 20490, matching unique product itemNoGlobal count from a full window=999 fetch; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=33 identically. Note: the raw metadata.max field was found unreliable (fluctuated 44-46 on this same category across window sizes because it also counts a non-product PLANNER breakout card spliced into the stream) so itemsPerType.PRODUCT / unique product-ID count was used as qty instead of raw max.",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Mirrors with Lights",
+   "parent": false,
+   "qty": 9,
+   "link": "https://www.ikea.com/fr/fr/cat/miroirs-avec-lumieres-49138/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (fr/fr market) itemsPerType.PRODUCT=9 for category 49138, matching unique product itemNoGlobal count from a full window=999 fetch; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=9 identically. Note: the raw metadata.max field was found unreliable (fluctuated 44-46 on this same category across window sizes because it also counts a non-product PLANNER breakout card spliced into the stream) so itemsPerType.PRODUCT / unique product-ID count was used as qty instead of raw max.",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Makeup & Magnifying Mirrors",
+   "parent": false,
+   "qty": 6,
+   "link": "https://www.ikea.com/fr/fr/cat/miroirs-grossissants-et-a-maquillage-20499/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (fr/fr market) itemsPerType.PRODUCT=6 for category 20499, matching unique product itemNoGlobal count from a full window=999 fetch; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=6 identically. Note: the raw metadata.max field was found unreliable (fluctuated 44-46 on this same category across window sizes because it also counts a non-product PLANNER breakout card spliced into the stream) so itemsPerType.PRODUCT / unique product-ID count was used as qty instead of raw max.",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Wall Decor",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Picture & Photo Frames",
+   "parent": false,
+   "qty": 30,
+   "link": "https://www.ikea.com/fr/fr/cat/cadres-photo-18746/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (fr/fr market) itemsPerType.PRODUCT=30 for category 18746, matching unique product itemNoGlobal count from a full window=999 fetch; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=30 identically. Note: the raw metadata.max field was found unreliable (fluctuated 44-46 on this same category across window sizes because it also counts a non-product PLANNER breakout card spliced into the stream) so itemsPerType.PRODUCT / unique product-ID count was used as qty instead of raw max.",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Framed Pictures & Picture Sets",
+   "parent": false,
+   "qty": 47,
+   "link": "https://www.ikea.com/fr/fr/cat/prets-a-accrocher-10788/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (fr/fr market) itemsPerType.PRODUCT=47 for category 10788, matching unique product itemNoGlobal count from a full window=999 fetch; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=47 identically. Note: the raw metadata.max field was found unreliable (fluctuated 44-46 on this same category across window sizes because it also counts a non-product PLANNER breakout card spliced into the stream) so itemsPerType.PRODUCT / unique product-ID count was used as qty instead of raw max.",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Posters",
+   "parent": false,
+   "qty": 51,
+   "link": "https://www.ikea.com/fr/fr/cat/affiches-10787/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (fr/fr market) itemsPerType.PRODUCT=51 for category 10787, matching unique product itemNoGlobal count from a full window=999 fetch; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=51 identically. Note: the raw metadata.max field was found unreliable (fluctuated 44-46 on this same category across window sizes because it also counts a non-product PLANNER breakout card spliced into the stream) so itemsPerType.PRODUCT / unique product-ID count was used as qty instead of raw max.",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Display Shelves & Picture Ledges",
+   "parent": false,
+   "qty": 14,
+   "link": "https://www.ikea.com/fr/fr/cat/etageres-porte-cadres-16305/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (fr/fr market) itemsPerType.PRODUCT=14 for category 16305, matching unique product itemNoGlobal count from a full window=999 fetch; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=14 identically. Note: the raw metadata.max field was found unreliable (fluctuated 44-46 on this same category across window sizes because it also counts a non-product PLANNER breakout card spliced into the stream) so itemsPerType.PRODUCT / unique product-ID count was used as qty instead of raw max.",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Collage Photo Frames",
+   "parent": false,
+   "qty": 6,
+   "link": "https://www.ikea.com/fr/fr/cat/cadres-pele-mele-10789/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (fr/fr market) itemsPerType.PRODUCT=6 for category 10789, matching unique product itemNoGlobal count from a full window=999 fetch; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=6 identically. Note: the raw metadata.max field was found unreliable (fluctuated 44-46 on this same category across window sizes because it also counts a non-product PLANNER breakout card spliced into the stream) so itemsPerType.PRODUCT / unique product-ID count was used as qty instead of raw max.",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Art Cards",
+   "parent": false,
+   "qty": 2,
+   "link": "https://www.ikea.com/fr/fr/cat/cartes-decoratives-24831/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (fr/fr market) itemsPerType.PRODUCT=2 for category 24831, matching unique product itemNoGlobal count from a full window=999 fetch; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=2 identically. Note: the raw metadata.max field was found unreliable (fluctuated 44-46 on this same category across window sizes because it also counts a non-product PLANNER breakout card spliced into the stream) so itemsPerType.PRODUCT / unique product-ID count was used as qty instead of raw max.",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Wall Accents",
+   "parent": false,
+   "qty": 6,
+   "link": "https://www.ikea.com/fr/fr/cat/accents-muraux-700425/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (fr/fr market) itemsPerType.PRODUCT=6 for category 700425, matching unique product itemNoGlobal count from a full window=999 fetch; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=6 identically. Note: the raw metadata.max field was found unreliable (fluctuated 44-46 on this same category across window sizes because it also counts a non-product PLANNER breakout card spliced into the stream) so itemsPerType.PRODUCT / unique product-ID count was used as qty instead of raw max.",
+   "flag": null
+  },
+  {
+   "category": "Home Accessories",
+   "sub_category": "Decorative Accessories",
+   "parent": false,
+   "qty": 16,
+   "link": "https://www.ikea.com/fr/fr/cat/accessoires-decoratifs-24924/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (fr/fr market) itemsPerType.PRODUCT=16 for category 24924, matching unique product itemNoGlobal count from a full window=999 fetch; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=16 identically. Note: the raw metadata.max field was found unreliable (fluctuated 44-46 on this same category across window sizes because it also counts a non-product PLANNER breakout card spliced into the stream) so itemsPerType.PRODUCT / unique product-ID count was used as qty instead of raw max.",
+   "flag": null
+  },
+  {
+   "category": "Home Accessories",
+   "sub_category": "Vases & Bowls",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Home Accessories",
+   "sub_category": "Vases",
+   "parent": false,
+   "qty": 64,
+   "link": "https://www.ikea.com/fr/fr/cat/vases-10776/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (fr/fr market) itemsPerType.PRODUCT=64 for category 10776, matching unique product itemNoGlobal count from a full window=999 fetch; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=64 identically. Note: the raw metadata.max field was found unreliable (fluctuated 44-46 on this same category across window sizes because it also counts a non-product PLANNER breakout card spliced into the stream) so itemsPerType.PRODUCT / unique product-ID count was used as qty instead of raw max.",
+   "flag": null
+  },
+  {
+   "category": "Home Accessories",
+   "sub_category": "Decorative Bowls & Dishes",
+   "parent": false,
+   "qty": 10,
+   "link": "https://www.ikea.com/fr/fr/cat/plats-bols-et-coupes-16308/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (fr/fr market) itemsPerType.PRODUCT=10 for category 16308, matching unique product itemNoGlobal count from a full window=999 fetch; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=10 identically. Note: the raw metadata.max field was found unreliable (fluctuated 44-46 on this same category across window sizes because it also counts a non-product PLANNER breakout card spliced into the stream) so itemsPerType.PRODUCT / unique product-ID count was used as qty instead of raw max.",
+   "flag": null
+  },
+  {
+   "category": "Home Accessories",
+   "sub_category": "Candles and Candle Holders",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Home Accessories",
+   "sub_category": "Unscented Candles",
+   "parent": false,
+   "qty": 20,
+   "link": "https://www.ikea.com/fr/fr/cat/bougies-sans-parfum-10782/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (fr/fr market) itemsPerType.PRODUCT=20 for category 10782, matching unique product itemNoGlobal count from a full window=999 fetch; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=20 identically. Note: the raw metadata.max field was found unreliable (fluctuated 44-46 on this same category across window sizes because it also counts a non-product PLANNER breakout card spliced into the stream) so itemsPerType.PRODUCT / unique product-ID count was used as qty instead of raw max.",
+   "flag": null
+  },
+  {
+   "category": "Home Accessories",
+   "sub_category": "Candle Holders",
+   "parent": false,
+   "qty": 39,
+   "link": "https://www.ikea.com/fr/fr/cat/bougeoirs-et-photophores-10784/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (fr/fr market) itemsPerType.PRODUCT=39 for category 10784, matching unique product itemNoGlobal count from a full window=999 fetch; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=39 identically. Note: the raw metadata.max field was found unreliable (fluctuated 44-46 on this same category across window sizes because it also counts a non-product PLANNER breakout card spliced into the stream) so itemsPerType.PRODUCT / unique product-ID count was used as qty instead of raw max.",
+   "flag": null
+  },
+  {
+   "category": "Home Accessories",
+   "sub_category": "Lanterns",
+   "parent": false,
+   "qty": 16,
+   "link": "https://www.ikea.com/fr/fr/cat/lanternes-20491/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (fr/fr market) itemsPerType.PRODUCT=16 for category 20491, matching unique product itemNoGlobal count from a full window=999 fetch; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=16 identically. Note: the raw metadata.max field was found unreliable (fluctuated 44-46 on this same category across window sizes because it also counts a non-product PLANNER breakout card spliced into the stream) so itemsPerType.PRODUCT / unique product-ID count was used as qty instead of raw max.",
+   "flag": null
+  },
+  {
+   "category": "Home Accessories",
+   "sub_category": "LED Candles",
+   "parent": false,
+   "qty": 14,
+   "link": "https://www.ikea.com/fr/fr/cat/bougies-led-39266/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (fr/fr market) itemsPerType.PRODUCT=14 for category 39266, matching unique product itemNoGlobal count from a full window=999 fetch; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=14 identically. Note: the raw metadata.max field was found unreliable (fluctuated 44-46 on this same category across window sizes because it also counts a non-product PLANNER breakout card spliced into the stream) so itemsPerType.PRODUCT / unique product-ID count was used as qty instead of raw max.",
+   "flag": null
+  },
+  {
+   "category": "Home Accessories",
+   "sub_category": "Clocks",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Home Accessories",
+   "sub_category": "Wall & Table Clocks",
+   "parent": false,
+   "qty": 20,
+   "link": "https://www.ikea.com/fr/fr/cat/horloges-murales-et-de-table-10785/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (fr/fr market) itemsPerType.PRODUCT=20 for category 10785, matching unique product itemNoGlobal count from a full window=999 fetch; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=20 identically. Note: the raw metadata.max field was found unreliable (fluctuated 44-46 on this same category across window sizes because it also counts a non-product PLANNER breakout card spliced into the stream) so itemsPerType.PRODUCT / unique product-ID count was used as qty instead of raw max.",
+   "flag": null
+  },
+  {
+   "category": "Home Accessories",
+   "sub_category": "Alarm Clocks",
+   "parent": false,
+   "qty": 11,
+   "link": "https://www.ikea.com/fr/fr/cat/reveils-10786/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (fr/fr market) itemsPerType.PRODUCT=11 for category 10786, matching unique product itemNoGlobal count from a full window=999 fetch; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=11 identically. Note: the raw metadata.max field was found unreliable (fluctuated 44-46 on this same category across window sizes because it also counts a non-product PLANNER breakout card spliced into the stream) so itemsPerType.PRODUCT / unique product-ID count was used as qty instead of raw max.",
+   "flag": null
+  },
+  {
+   "category": "Home Accessories",
+   "sub_category": "Flower Pots & Planters",
+   "parent": false,
+   "qty": 105,
+   "link": "https://www.ikea.com/fr/fr/cat/pots-cache-pots-et-jardinieres-pp004/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (fr/fr market) itemsPerType.PRODUCT=105 for category pp004, matching unique product itemNoGlobal count from a full window=999 fetch; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=105 identically. Note: the raw metadata.max field was found unreliable (fluctuated 44-46 on this same category across window sizes because it also counts a non-product PLANNER breakout card spliced into the stream) so itemsPerType.PRODUCT / unique product-ID count was used as qty instead of raw max.",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Glassware",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Drinking Glasses",
+   "parent": false,
+   "qty": 37,
+   "link": "https://www.ikea.com/fr/fr/cat/verres-18869/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (fr/fr market) itemsPerType.PRODUCT=37 for category 18869, matching unique product itemNoGlobal count from a full window=999 fetch; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=37 identically. Note: the raw metadata.max field was found unreliable (fluctuated 44-46 on this same category across window sizes because it also counts a non-product PLANNER breakout card spliced into the stream) so itemsPerType.PRODUCT / unique product-ID count was used as qty instead of raw max.",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Wine & Champagne Glasses",
+   "parent": false,
+   "qty": 19,
+   "link": "https://www.ikea.com/fr/fr/cat/verres-a-vin-18870/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (fr/fr market) itemsPerType.PRODUCT=19 for category 18870, matching unique product itemNoGlobal count from a full window=999 fetch; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=19 identically. Note: the raw metadata.max field was found unreliable (fluctuated 44-46 on this same category across window sizes because it also counts a non-product PLANNER breakout card spliced into the stream) so itemsPerType.PRODUCT / unique product-ID count was used as qty instead of raw max.",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Cocktail Glasses",
+   "parent": false,
+   "qty": 4,
+   "link": "https://www.ikea.com/fr/fr/cat/verres-a-cocktail-22663/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (fr/fr market) itemsPerType.PRODUCT=4 for category 22663, matching unique product itemNoGlobal count from a full window=999 fetch; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=4 identically. Note: the raw metadata.max field was found unreliable (fluctuated 44-46 on this same category across window sizes because it also counts a non-product PLANNER breakout card spliced into the stream) so itemsPerType.PRODUCT / unique product-ID count was used as qty instead of raw max.",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Jugs, Bottles & Carafes",
+   "parent": false,
+   "qty": 25,
+   "link": "https://www.ikea.com/fr/fr/cat/pichets-et-carafes-18871/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (fr/fr market) itemsPerType.PRODUCT=25 for category 18871, matching unique product itemNoGlobal count from a full window=999 fetch; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=25 identically. Note: the raw metadata.max field was found unreliable (fluctuated 44-46 on this same category across window sizes because it also counts a non-product PLANNER breakout card spliced into the stream) so itemsPerType.PRODUCT / unique product-ID count was used as qty instead of raw max.",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Dinnerware",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Dinnerware Sets",
+   "parent": false,
+   "qty": 8,
+   "link": "https://www.ikea.com/fr/fr/cat/services-de-vaisselle-31781/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (fr/fr market) itemsPerType.PRODUCT=8 for category 31781, matching unique product itemNoGlobal count from a full window=999 fetch; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=8 identically. Note: the raw metadata.max field was found unreliable (fluctuated 44-46 on this same category across window sizes because it also counts a non-product PLANNER breakout card spliced into the stream) so itemsPerType.PRODUCT / unique product-ID count was used as qty instead of raw max.",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Plates",
+   "parent": false,
+   "qty": 31,
+   "link": "https://www.ikea.com/fr/fr/cat/assiettes-18861/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (fr/fr market) itemsPerType.PRODUCT=31 for category 18861, matching unique product itemNoGlobal count from a full window=999 fetch; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=31 identically. Note: the raw metadata.max field was found unreliable (fluctuated 44-46 on this same category across window sizes because it also counts a non-product PLANNER breakout card spliced into the stream) so itemsPerType.PRODUCT / unique product-ID count was used as qty instead of raw max.",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Side Plates",
+   "parent": false,
+   "qty": 30,
+   "link": "https://www.ikea.com/fr/fr/cat/assiettes-a-dessert-18863/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (fr/fr market) itemsPerType.PRODUCT=30 for category 18863, matching unique product itemNoGlobal count from a full window=999 fetch; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=30 identically. Note: the raw metadata.max field was found unreliable (fluctuated 44-46 on this same category across window sizes because it also counts a non-product PLANNER breakout card spliced into the stream) so itemsPerType.PRODUCT / unique product-ID count was used as qty instead of raw max.",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Deep Plates",
+   "parent": false,
+   "qty": 23,
+   "link": "https://www.ikea.com/fr/fr/cat/assiettes-creuses-18862/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (fr/fr market) itemsPerType.PRODUCT=23 for category 18862, matching unique product itemNoGlobal count from a full window=999 fetch; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=23 identically. Note: the raw metadata.max field was found unreliable (fluctuated 44-46 on this same category across window sizes because it also counts a non-product PLANNER breakout card spliced into the stream) so itemsPerType.PRODUCT / unique product-ID count was used as qty instead of raw max.",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Bowls",
+   "parent": false,
+   "qty": 29,
+   "link": "https://www.ikea.com/fr/fr/cat/bols-18864/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (fr/fr market) itemsPerType.PRODUCT=29 for category 18864, matching unique product itemNoGlobal count from a full window=999 fetch; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=29 identically. Note: the raw metadata.max field was found unreliable (fluctuated 44-46 on this same category across window sizes because it also counts a non-product PLANNER breakout card spliced into the stream) so itemsPerType.PRODUCT / unique product-ID count was used as qty instead of raw max.",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Serveware",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Trays",
+   "parent": false,
+   "qty": 37,
+   "link": "https://www.ikea.com/fr/fr/cat/plateaux-16048/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (fr/fr market) itemsPerType.PRODUCT=37 for category 16048, matching unique product itemNoGlobal count from a full window=999 fetch; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=37 identically. Note: the raw metadata.max field was found unreliable (fluctuated 44-46 on this same category across window sizes because it also counts a non-product PLANNER breakout card spliced into the stream) so itemsPerType.PRODUCT / unique product-ID count was used as qty instead of raw max.",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Serving Bowls",
+   "parent": false,
+   "qty": 25,
+   "link": "https://www.ikea.com/fr/fr/cat/saladiers-20619/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (fr/fr market) itemsPerType.PRODUCT=25 for category 20619, matching unique product itemNoGlobal count from a full window=999 fetch; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=25 identically. Note: the raw metadata.max field was found unreliable (fluctuated 44-46 on this same category across window sizes because it also counts a non-product PLANNER breakout card spliced into the stream) so itemsPerType.PRODUCT / unique product-ID count was used as qty instead of raw max.",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Serving Dishes",
+   "parent": false,
+   "qty": 14,
+   "link": "https://www.ikea.com/fr/fr/cat/plats-de-service-16047/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (fr/fr market) itemsPerType.PRODUCT=14 for category 16047, matching unique product itemNoGlobal count from a full window=999 fetch; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=14 identically. Note: the raw metadata.max field was found unreliable (fluctuated 44-46 on this same category across window sizes because it also counts a non-product PLANNER breakout card spliced into the stream) so itemsPerType.PRODUCT / unique product-ID count was used as qty instead of raw max.",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Cake & Serving Stands",
+   "parent": false,
+   "qty": 4,
+   "link": "https://www.ikea.com/fr/fr/cat/presentoir-59251/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (fr/fr market) itemsPerType.PRODUCT=4 for category 59251, matching unique product itemNoGlobal count from a full window=999 fetch; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=4 identically. Note: the raw metadata.max field was found unreliable (fluctuated 44-46 on this same category across window sizes because it also counts a non-product PLANNER breakout card spliced into the stream) so itemsPerType.PRODUCT / unique product-ID count was used as qty instead of raw max.",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Mugs & Cups",
+   "parent": false,
+   "qty": 37,
+   "link": "https://www.ikea.com/fr/fr/cat/tasses-et-mugs-16045/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (fr/fr market) itemsPerType.PRODUCT=37 for category 16045, matching unique product itemNoGlobal count from a full window=999 fetch; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=37 identically. Note: the raw metadata.max field was found unreliable (fluctuated 44-46 on this same category across window sizes because it also counts a non-product PLANNER breakout card spliced into the stream) so itemsPerType.PRODUCT / unique product-ID count was used as qty instead of raw max.",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Tea Pots & Accessories",
+   "parent": false,
+   "qty": 11,
+   "link": "https://www.ikea.com/fr/fr/cat/theieres-et-accessoires-20621/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (fr/fr market) itemsPerType.PRODUCT=11 for category 20621, matching unique product itemNoGlobal count from a full window=999 fetch; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=11 identically. Note: the raw metadata.max field was found unreliable (fluctuated 44-46 on this same category across window sizes because it also counts a non-product PLANNER breakout card spliced into the stream) so itemsPerType.PRODUCT / unique product-ID count was used as qty instead of raw max.",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Napkin Holders",
+   "parent": false,
+   "qty": 3,
+   "link": "https://www.ikea.com/fr/fr/cat/porte-serviettes-de-table-20562/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (fr/fr market) itemsPerType.PRODUCT=3 for category 20562, matching unique product itemNoGlobal count from a full window=999 fetch; boundary check offset=qty-1 returned the last product, offset=qty returned zero results (empty PRIMARY_AREA); refetch at same window reproduced qty=3 identically. Note: the raw metadata.max field was found unreliable (fluctuated 44-46 on this same category across window sizes because it also counts a non-product PLANNER breakout card spliced into the stream) so itemsPerType.PRODUCT / unique product-ID count was used as qty instead of raw max.",
+   "flag": null
+  }
+ ]
+}

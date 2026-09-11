@@ -1,0 +1,25 @@
+{
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "Access: HTTP fetch tier only (curl to Shopify storefront JSON/HTML endpoints), no blocks encountered -- consistent with prior Home-Decor pass (robots.txt has no Claude-specific disallow). Discovery: main nav and footer menu on homepage do NOT link to any bestseller page; found via exhaustive enumeration of /collections.json (65 published collections) and cross-checked against /sitemap_collections_1.xml (73 handles incl. a few leftover/test entries like 'Untitled','Website','table','wall'). Two distinct collections are titled 'Best Sellers': handle 'best-sellers' and handle 'best-sellers-1'. Both opened and confirmed as real browsable PLPs (product grid, toolbar count, pagination). Treated as two separate, genuinely different listings (not aliases) because their product sets differ (144 vs 339) -- per the 'different listings, keep both' rule. However 'best-sellers-1' (339 products) is an EXACT set match to the full 339-product catalog (/collections/all/products.json enumerated across 2 pages = same 339 handles, verified by Python set equality, zero difference either direction). That means it contains literally every product the store sells, not a curated bestseller subset, so it fails the 'genuinely represents a bestseller/popularity merchandising concept' test in the brief even though it carries the 'Best Sellers' label -- recorded per the 'if uncertain, record + flag rather than guess' principle instead of silently dropping it. 'best-sellers' (144 products) IS a genuine curated subset of the catalog (144 of 339, not everything) and is the row treated as the valid Bestsellers PLP. Neither collection appears in site nav/footer -- both are orphan direct-URL collections, reached only via the JSON/sitemap enumeration, but both return 200 with real product grids so they qualify as genuine PLPs regardless of nav placement. No local-language search needed (English-only Indian site). collections.json products_count field matched exhaustive products.json pagination exactly for both collections (no inflation observed here, unlike the category-taxonomy collections in the prior pass).",
+  "rows": [
+    {
+      "category": "Bestsellers",
+      "sub_category": "Bestsellers",
+      "qty": 144,
+      "link": "https://www.oorjaa.in/collections/best-sellers",
+      "is_group": false,
+      "evidence": "Rendered collection page toolbar text '144 products'; cross-verified via exhaustive /collections/best-sellers/products.json?limit=250 pagination -- page 1 returned 144 unique product handles, page 2 returned 0 (confirms exhaustion, no inflation)",
+      "flag": null
+    },
+    {
+      "category": "Bestsellers",
+      "sub_category": "Best Sellers (duplicate/all-products collection)",
+      "qty": 339,
+      "link": "https://www.oorjaa.in/collections/best-sellers-1",
+      "is_group": false,
+      "evidence": "Exhaustive /collections/best-sellers-1/products.json?limit=250 pagination -- page 1 = 250 handles, page 2 = 89 handles, page 3 empty; total 339 unique handles. This set is an exact match (Python set equality, zero-element difference both directions) to the full catalog enumerated from /collections/all/products.json (339 unique handles across 2 pages)",
+      "flag": "MANUAL REVIEW: AMBIGUOUS BESTSELLER - handle 'best-sellers-1' is titled 'Best Sellers' in /collections.json but its 339-product set is an exact match to the entire store catalog (/collections/all), i.e. it lists every single product, not a curated bestseller subset. Likely a mislabeled 'all products' smart collection or a stale duplicate left behind when the genuine curated Best Sellers list (handle 'best-sellers', 144 products) was set up. Recorded per instructions rather than silently dropped; recommend excluding from final Bestsellers count or treating qty as not representative of true bestseller merchandising."
+    }
+  ]
+}

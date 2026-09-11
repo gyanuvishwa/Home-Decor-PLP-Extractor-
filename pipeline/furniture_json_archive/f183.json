@@ -1,0 +1,66 @@
+{
+  "sr": 183,
+  "company": "House",
+  "brand_site": "house.com.au",
+  "country": "Australia",
+  "site_url": "https://www.house.com.au/",
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "Reached via Chrome directly, no WAF. robots.txt has no Claude-specific disallow (only Nutch fully blocked, Googlebot/AdsBot/Ahrefs unrestricted) - safe to proceed. Site is Shopify/Next.js-Searchspring headless (same platform as the prior Home-Decor pass, archive c212), shop id 21958261. Found the full furniture tree by two independent routes that agreed exactly: (1) keyword-scanning /sitemap-0.xml (863 total /collections/ URLs) for furniture-type terms with a bedding/tableware exclusion list, and (2) keyword-scanning the site's own globalData.menu object embedded in __NEXT_DATA__ on the homepage (494 nav collection links). Both surfaced the identical 7-node set - no nav-only or sitemap-only furniture nodes exist here, so the tree is confirmed complete. House is overwhelmingly a kitchenware/homewares specialty retailer; furniture is a small side assortment under 'Living > Furniture' and 'Bedroom & Bathroom > Bedroom > Bedroom Furniture'. Per-leaf qty came from __NEXT_DATA__ props.pageProps.initialSearchspringResponse.pagination.totalResults and was cross-checked against the rendered 'N items' header text on Beds (12=12) and Side Tables (4=4) - exact match both times, so the structured value was trusted for the other leaves too. Product titles were pulled from initialProducts on every node and read to classify contents (per efficiency rules: extract once, classify locally, only re-open pages for the ambiguous ones). Two leaves are genuinely mixed and were emitted anyway (per 7b: omitting is not recoverable, emitting is) rather than dropped or silently recounted: 'Chairs' (5 raw items - only 1, a 'Casa Decor Arles Grey Office Chair', is an actual chair; the other 4 are 'Elan Cambridge Sofa/Recliner Cover' products, i.e. furniture protectors, an explicitly excluded category) and 'Outdoor Furniture' (14 raw items - 8 are genuine outdoor furniture: patio/ensemble/bistro sets, a wicker rattan patio set, a rattan sunlounge set, a swing bench, a 5pc rattan sofa set; the other 6 are non-furniture beach/garden accessories: 2 umbrellas, a beach tent, a UV-resistant rattan storage box, a fringed beach umbrella, and a terry beach lounger towel). Both are flagged for manual review rather than hand-recounted, since the site itself files them under Furniture and provides no facet to cleanly separate the sub-content on that URL - the qty recorded is the site's own exact total for the URL, per the ONE RULE. 'Mattresses' (8 items, 100% genuine mattresses) was excluded entirely per the brief's explicit mattress exclusion - not a furniture row at all, since 'Beds' exists as a separate clean node beside it (not a merged 'Beds & Mattresses' case). No sofas, wardrobes, dressers, TV units, bookcases, dining tables/chairs, desks, or standalone cabinet/storage furniture exist anywhere on the site (checked via broad keyword sweep across the full 863-URL sitemap - zero hits for sofa/couch/wardrobe/dresser/bookcase/desk/tv-unit/sideboard/console/armoire/chaise/loveseat/vanity/drawer beyond the nodes already listed here, and the 'table' keyword's only non-tableware hits were the two side-table nodes already captured).",
+  "rows": [
+    {
+      "category": "Furniture",
+      "sub_category": "Living Room",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Chairs",
+      "qty": 5,
+      "link": "https://www.house.com.au/collections/living-furniture-chairs",
+      "is_group": false,
+      "evidence": "__NEXT_DATA__ props.pageProps.initialSearchspringResponse.pagination.totalResults=5 for this URL",
+      "flag": "MANUAL REVIEW: node title is 'Chairs' but only 1 of the 5 listed products is an actual chair ('Casa Decor Arles Grey Office Chair'); the other 4 are 'Elan Cambridge Sofa Cover' / 'Elan Cambridge Recliner Cover' listings (furniture protectors, an excluded category). qty=5 is the site's own exact total for this URL; site provides no facet to isolate the chair alone."
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Side Tables",
+      "qty": 4,
+      "link": "https://www.house.com.au/collections/living-furniture-side-tables",
+      "is_group": false,
+      "evidence": "__NEXT_DATA__ props.pageProps.initialSearchspringResponse.pagination.totalResults=4, cross-checked against rendered header '4 items' - exact match. All 4 titles are genuine side/bedside tables (Alex Liddy Double Tray Table, Umbra Bellwood Storage Table x2, Amalfi Crew Side Table).",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Outdoor Furniture",
+      "qty": 14,
+      "link": "https://www.house.com.au/collections/living-furniture-outdoor-furniture",
+      "is_group": false,
+      "evidence": "__NEXT_DATA__ props.pageProps.initialSearchspringResponse.pagination.totalResults=14 for this URL",
+      "flag": "MANUAL REVIEW: of the 14 listed products, 8 are genuine outdoor furniture (patio/ensemble/bistro sets, wicker rattan patio set, rattan sunlounge set, swing bench seat, 5pc rattan sofa set) and 6 are non-furniture beach/garden accessories (2 umbrellas, a beach tent, a rattan storage box, a fringed beach umbrella, a terry beach lounger towel). qty=14 is the site's own exact total for this URL; site provides no facet to isolate the furniture-only subset."
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Bedroom",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Beds",
+      "qty": 12,
+      "link": "https://www.house.com.au/collections/bedroom-bathroom-bedroom-bedroom-furniture-beds",
+      "is_group": false,
+      "evidence": "__NEXT_DATA__ props.pageProps.initialSearchspringResponse.pagination.totalResults=12, cross-checked against rendered header '12 items' - exact match. All 12 titles are genuine bed frames/bases/bedheads (Milano Decor gas-lift beds, metal/timber bed bases, curved bedhead), 0 non-furniture items.",
+      "flag": null
+    }
+  ]
+}

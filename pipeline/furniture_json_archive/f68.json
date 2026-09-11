@@ -1,0 +1,498 @@
+{
+ "sr": 68,
+ "company": "Joybird",
+ "brand_site": "joybird.com",
+ "country": "USA",
+ "site_url": "https://joybird.com/",
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ACCESS: plain requests/BeautifulSoup direct fetch worked for every URL, no WAF, no proxy needed (matches the prior Home-Decor pass). robots.txt checked first: it disallows only /checkout/, /cart/, /customer/, /lightbox/, /my-favorites/manage/ and /search?, blocks Yandex, and names no Anthropic/ClaudeBot/Claude-Web agent, so no Claude-specific disallow applies. TREE SOURCE: three independent views, all reconciled. (1) The site's own GraphQL getSitemapLinks payload, embedded verbatim in the Apollo SSR blob on https://joybird.com/sitemap/, gives the authoritative parent_id/child category graph (mainCategories + subCategories keyed by parent id). (2) The desktop mega-menu top bar (Living Room | Dining Room | Bedroom | Home Office | Outdoor | Decor | Featured | Sale | Inspiration) confirms the department level and matches the graph's Furniture(id 218) children exactly: Living Room Furniture(601), Bedroom(213), Dining Room(580), Home Office(602), Outdoor(624). (3) The mobile flyout, present in the homepage SSR HTML, gives the product-type groups (Sofas / Chairs / Tables / Bedroom / Storage / Outdoor / Decor) and supplied the few nav-only leaves. sitemap.xml was also enumerated for any category slug missing from all three. QTY METHOD: every listing page is a Next.js App Router page carrying an Algolia InstantSearch (index products_jb4, filter categories:\"<slug>\") result blob in the SSR HTML. For each leaf I took the rendered '<N> Products' header text (source of truth) and independently the blob's nbHits, and required them to be identical; I also required nbPages == ceil(nbHits/12) with hitsPerPage 12. All 55 URLs (44 leaves + 11 parents) were fetched TWICE, ~25 minutes apart: zero drift, zero disagreement between the two signals, and every page's h1 matched the category requested (no silent parent-serving). Discrimination is proven: the numbers span 0..730 and change per category, so this is not a site-wide constant. No Shopify/products_count-style structured source was used; no tile hrefs were counted. HIERARCHY: parents that are genuine roll-ups were emitted as grouping rows, never as leaves. Verified by reading the SSR hits' own categories[] arrays: /living-room-furniture/ (501), /bedroom/ (76), /dining-room-furniture/ (21), /home-office-furniture/ (12, and it even carries a rug), /outdoor-furniture/ (28), /sofas/ (100), /sectionals/ (103), /chairs/ (90), /ottomans/ (74), /all-storage/ (46) and /all-tables/ (35) each aggregate products that are separately tagged into the child slugs I did record. /all-storage/ and /all-tables/ are cross-department roll-ups (all-storage's page-1 products carry media-consoles, dressers-chests, nightstands, desks, console-and-entry-tables and bookcases-wall-units tags), so their non-storage/non-living-room members are recorded once under Bedroom, Home Office and Tables rather than twice. Sanity note, not used as a source: the six Sofas children happen to sum to exactly 100 = /sofas/'s own total. DROPPED AS ROLL-UPS OR DUPLICATE URLs FOR THE SAME POPULATION: /sofas-and-sectionals/ (203, exactly /sofas/ 100 + /sectionals/ 103); /coffee-and-end-tables/ (37 = coffee 16 + end 21); /end-tables/ (21, h1 'End Tables', identical population to /end-tables-entry-tables/ 21 - products carry both slugs, so only the nav-linked one is emitted); /outdoor-sofas-and-sectionals/ (9, identical to /outdoor-sofas/ 9 and co-tagged on the same products); /shelving/ (1 - its single product is also tagged bookcases-wall-units, i.e. a strict subset of Bookcases & Shelving 4, so emitting it would double-count); /chaises/ (11) and /poufs/ (9) as strict subsets of /daybeds-chaises/ (25) and /ottomans-poufs-and-cubes/ (67); /bundles/ (19 sofa+ottoman and chair+ottoman sets - genuine furniture sets, but 12/12 of its page-1 products are tagged 'ottomans' and 11/12 'ottomans-poufs-and-cubes', so it sits wholly inside the 67 already recorded); /reclining-furniture/ (18, a cross-cutting motion facet whose members are already recorded as Reclining Sofas 6 / Reclining Sectionals 6 / Reclining Chairs 4). DROPPED AS STYLE/SIZE/MATERIAL FACET RE-CUTS of the same catalogue (same convention the prior Home-Decor pass used for /modern/*): /modern/* (26 slugs), /mid-century-furniture/* (138 + 7 children), /small-space-furniture/* (14 + 4 children), /apartment-furniture/ (16), /leather-furniture/, /leather-sofas/ (10), /leather-chairs/ (4), /wood/. Per-brief navigation junk dropped: /all/ (730), /collections/ + its 37 named collection pages, /new-arrivals/ + /new/*, /best-sellers/, /sale/, /featured/, /bipoc-owned/, /bundles/ landing, /lookbooks/, /customer-photos/. DEAD OR NON-LISTING PAGES (HTTP 200 but no product grid, no h1 and no Algolia blob, so no count is obtainable and they were NOT emitted): /modular-sofas/ (11.9 MB pure marketing landing page - it is a mobile-nav item but §3 forbids landing pages, and the site's own category graph gives node id 642 'Modular Sofas' an EMPTY url); /recliners-gliders/ (title just 'Joybird'; replaced by /reclining-chairs/); /daybeds/ (covered by /daybeds-chaises/ 25); /outdoor-sectionals/ (a real category tag - 3 of /outdoor-furniture/'s page-1 products carry it - but every one of them is also tagged outdoor-sofas, so it is a subset of the Outdoor Sofas 9 already recorded). UNLINKED LEGACY ZERO-COUNT SLUGS found in sitemap.xml, all live and all reporting 0, all duplicating a type already represented, so noted here rather than padded into rows: /all-sectionals/, /l-and-u-shaped-sectionals/, /corner-sectional-sleepers/, /table-top-ottomans/, /ottomans-benches/, /credenzas/, /apartment-credenza/, /apartment-desk/. Only /counter-stools/ (0) was emitted from this group, flagged, because it names a furniture type nothing else covers. EXCLUDED PER BRIEF §1: /mattresses/ (0 - bedding, not furniture); /slipcovers/ (19 - furniture covers); /pet-beds/ (1 - pet furniture, filed by the site under Decor); /outdoor-accessories/ (3 - opened it, the products are outdoor PILLOWS, tagged pillows + decoration-accessories); /cushions/, /pillows/, /throws/, /rugs/, /washable-rugs/, /outdoor-rugs/ (textiles); /decoration-accessories/ and its whole subtree - /wall-art/, /wall-decor/, /wallpaper/, /mirrors/, /all-lighting/ + /floor-lamps/ /table-lamps/ /ceiling-lamps/ /pendants/, /vases-and-bowls/, /clocks/, /plants-and-planters/, /tableware/, /glassware/, /serveware/ (lighting, mirrors, wall decor, decor objects, tableware - other workstreams); /fabrics/, /select-fabrics/, /swatches/, /material-swatches/, /samples/ (fabric swatches). Joybird sells no bathroom, kids/nursery or filing-cabinet furniture - none of those slugs exist in sitemap.xml, the mega-menu or the getSitemapLinks graph.",
+ "rows": [
+  {
+   "category": "Furniture",
+   "sub_category": "Living Room Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sofas",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sleeper Sofas",
+   "qty": 30,
+   "link": "https://joybird.com/sleeper-sofas/",
+   "is_group": false,
+   "evidence": "rendered listing header '30 Products' on https://joybird.com/sleeper-sofas/, cross-checked against the page's embedded Algolia InstantSearch result blob (nbHits:30, hitsPerPage:12, nbPages==ceil(30/12)); both signals identical on two live reads ~25 min apart",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Apartment Sofas",
+   "qty": 7,
+   "link": "https://joybird.com/apartment-sofas/",
+   "is_group": false,
+   "evidence": "rendered listing header '7 Products' on https://joybird.com/apartment-sofas/, cross-checked against the page's embedded Algolia InstantSearch result blob (nbHits:7, hitsPerPage:12, nbPages==ceil(7/12)); both signals identical on two live reads ~25 min apart",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Grand Sofas",
+   "qty": 5,
+   "link": "https://joybird.com/grand-sofas/",
+   "is_group": false,
+   "evidence": "rendered listing header '5 Products' on https://joybird.com/grand-sofas/, cross-checked against the page's embedded Algolia InstantSearch result blob (nbHits:5, hitsPerPage:12, nbPages==ceil(5/12)); both signals identical on two live reads ~25 min apart",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Loveseats",
+   "qty": 27,
+   "link": "https://joybird.com/loveseats/",
+   "is_group": false,
+   "evidence": "rendered listing header '27 Products' on https://joybird.com/loveseats/, cross-checked against the page's embedded Algolia InstantSearch result blob (nbHits:27, hitsPerPage:12, nbPages==ceil(27/12)); both signals identical on two live reads ~25 min apart",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Chaises & Daybeds",
+   "qty": 25,
+   "link": "https://joybird.com/daybeds-chaises/",
+   "is_group": false,
+   "evidence": "rendered listing header '25 Products' on https://joybird.com/daybeds-chaises/, cross-checked against the page's embedded Algolia InstantSearch result blob (nbHits:25, hitsPerPage:12, nbPages==ceil(25/12)); both signals identical on two live reads ~25 min apart",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Reclining Sofas",
+   "qty": 6,
+   "link": "https://joybird.com/reclining-sofas/",
+   "is_group": false,
+   "evidence": "rendered listing header '6 Products' on https://joybird.com/reclining-sofas/, cross-checked against the page's embedded Algolia InstantSearch result blob (nbHits:6, hitsPerPage:12, nbPages==ceil(6/12)); both signals identical on two live reads ~25 min apart",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sectionals",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Corner Sectionals",
+   "qty": 21,
+   "link": "https://joybird.com/corner-sectionals/",
+   "is_group": false,
+   "evidence": "rendered listing header '21 Products' on https://joybird.com/corner-sectionals/, cross-checked against the page's embedded Algolia InstantSearch result blob (nbHits:21, hitsPerPage:12, nbPages==ceil(21/12)); both signals identical on two live reads ~25 min apart",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "L Sectionals",
+   "qty": 17,
+   "link": "https://joybird.com/l-sectionals/",
+   "is_group": false,
+   "evidence": "rendered listing header '17 Products' on https://joybird.com/l-sectionals/, cross-checked against the page's embedded Algolia InstantSearch result blob (nbHits:17, hitsPerPage:12, nbPages==ceil(17/12)); both signals identical on two live reads ~25 min apart",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Round Corner Sectionals",
+   "qty": 1,
+   "link": "https://joybird.com/round-corner-sectionals/",
+   "is_group": false,
+   "evidence": "rendered listing header '1 Products' on https://joybird.com/round-corner-sectionals/, cross-checked against the page's embedded Algolia InstantSearch result blob (nbHits:1, hitsPerPage:12, nbPages==ceil(1/12)); both signals identical on two live reads ~25 min apart",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sectionals with Bumpers",
+   "qty": 0,
+   "link": "https://joybird.com/bumper-sectionals/",
+   "is_group": false,
+   "evidence": "page renders its own category h1 and zero product tiles; embedded Algolia InstantSearch blob for filters categories:\"bumper-sectionals\" returns nbHits:0, nbPages:0 (verified live twice, ~25 min apart)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sleeper Sectionals",
+   "qty": 11,
+   "link": "https://joybird.com/sleeper-sectionals/",
+   "is_group": false,
+   "evidence": "rendered listing header '11 Products' on https://joybird.com/sleeper-sectionals/, cross-checked against the page's embedded Algolia InstantSearch result blob (nbHits:11, hitsPerPage:12, nbPages==ceil(11/12)); both signals identical on two live reads ~25 min apart",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "U Chaise Sectionals",
+   "qty": 0,
+   "link": "https://joybird.com/u-chaise-sectionals/",
+   "is_group": false,
+   "evidence": "page renders its own category h1 and zero product tiles; embedded Algolia InstantSearch blob for filters categories:\"u-chaise-sectionals\" returns nbHits:0, nbPages:0 (verified live twice, ~25 min apart)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "U Sofa Bumper Sectionals",
+   "qty": 11,
+   "link": "https://joybird.com/u-sofa-bumper-sectionals/",
+   "is_group": false,
+   "evidence": "rendered listing header '11 Products' on https://joybird.com/u-sofa-bumper-sectionals/, cross-checked against the page's embedded Algolia InstantSearch result blob (nbHits:11, hitsPerPage:12, nbPages==ceil(11/12)); both signals identical on two live reads ~25 min apart",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "U Sofa Sectionals",
+   "qty": 13,
+   "link": "https://joybird.com/u-sofa-sectionals/",
+   "is_group": false,
+   "evidence": "rendered listing header '13 Products' on https://joybird.com/u-sofa-sectionals/, cross-checked against the page's embedded Algolia InstantSearch result blob (nbHits:13, hitsPerPage:12, nbPages==ceil(13/12)); both signals identical on two live reads ~25 min apart",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Reversible Sectionals",
+   "qty": 4,
+   "link": "https://joybird.com/reversible-sectionals/",
+   "is_group": false,
+   "evidence": "rendered listing header '4 Products' on https://joybird.com/reversible-sectionals/, cross-checked against the page's embedded Algolia InstantSearch result blob (nbHits:4, hitsPerPage:12, nbPages==ceil(4/12)); both signals identical on two live reads ~25 min apart",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Apartment Sectionals",
+   "qty": 6,
+   "link": "https://joybird.com/apartment-sectionals/",
+   "is_group": false,
+   "evidence": "rendered listing header '6 Products' on https://joybird.com/apartment-sectionals/, cross-checked against the page's embedded Algolia InstantSearch result blob (nbHits:6, hitsPerPage:12, nbPages==ceil(6/12)); both signals identical on two live reads ~25 min apart",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Reclining Sectionals",
+   "qty": 6,
+   "link": "https://joybird.com/reclining-sectionals/",
+   "is_group": false,
+   "evidence": "rendered listing header '6 Products' on https://joybird.com/reclining-sectionals/, cross-checked against the page's embedded Algolia InstantSearch result blob (nbHits:6, hitsPerPage:12, nbPages==ceil(6/12)); both signals identical on two live reads ~25 min apart",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Chairs",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Accent Chairs",
+   "qty": 21,
+   "link": "https://joybird.com/accent-chairs/",
+   "is_group": false,
+   "evidence": "rendered listing header '21 Products' on https://joybird.com/accent-chairs/, cross-checked against the page's embedded Algolia InstantSearch result blob (nbHits:21, hitsPerPage:12, nbPages==ceil(21/12)); both signals identical on two live reads ~25 min apart",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Apartment Chairs",
+   "qty": 5,
+   "link": "https://joybird.com/apartment-chairs/",
+   "is_group": false,
+   "evidence": "rendered listing header '5 Products' on https://joybird.com/apartment-chairs/, cross-checked against the page's embedded Algolia InstantSearch result blob (nbHits:5, hitsPerPage:12, nbPages==ceil(5/12)); both signals identical on two live reads ~25 min apart",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Swivel Chairs",
+   "qty": 14,
+   "link": "https://joybird.com/swivel-chairs/",
+   "is_group": false,
+   "evidence": "rendered listing header '14 Products' on https://joybird.com/swivel-chairs/, cross-checked against the page's embedded Algolia InstantSearch result blob (nbHits:14, hitsPerPage:12, nbPages==ceil(14/12)); both signals identical on two live reads ~25 min apart",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Corner Chairs",
+   "qty": 11,
+   "link": "https://joybird.com/corner-chairs/",
+   "is_group": false,
+   "evidence": "rendered listing header '11 Products' on https://joybird.com/corner-chairs/, cross-checked against the page's embedded Algolia InstantSearch result blob (nbHits:11, hitsPerPage:12, nbPages==ceil(11/12)); both signals identical on two live reads ~25 min apart",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Occasional Chairs",
+   "qty": 4,
+   "link": "https://joybird.com/occasional-chairs/",
+   "is_group": false,
+   "evidence": "rendered listing header '4 Products' on https://joybird.com/occasional-chairs/, cross-checked against the page's embedded Algolia InstantSearch result blob (nbHits:4, hitsPerPage:12, nbPages==ceil(4/12)); both signals identical on two live reads ~25 min apart",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Rocking Chairs",
+   "qty": 0,
+   "link": "https://joybird.com/rocking-chairs/",
+   "is_group": false,
+   "evidence": "page renders its own category h1 and zero product tiles; embedded Algolia InstantSearch blob for filters categories:\"rocking-chairs\" returns nbHits:0, nbPages:0 (verified live twice, ~25 min apart)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Reclining Chairs",
+   "qty": 4,
+   "link": "https://joybird.com/reclining-chairs/",
+   "is_group": false,
+   "evidence": "rendered listing header '4 Products' on https://joybird.com/reclining-chairs/, cross-checked against the page's embedded Algolia InstantSearch result blob (nbHits:4, hitsPerPage:12, nbPages==ceil(4/12)); both signals identical on two live reads ~25 min apart",
+   "flag": "MANUAL REVIEW: the nav labels this node 'Recliner Chairs' and points at /recliners-gliders/, which returns HTTP 200 but renders no product grid, no h1 and no Algolia blob (dead page); the live equivalent /reclining-chairs/ (h1 'Reclining Chairs') was used instead"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Ottomans & Benches",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Ottomans, Poufs & Cubes",
+   "qty": 67,
+   "link": "https://joybird.com/ottomans-poufs-and-cubes/",
+   "is_group": false,
+   "evidence": "rendered listing header '67 Products' on https://joybird.com/ottomans-poufs-and-cubes/, cross-checked against the page's embedded Algolia InstantSearch result blob (nbHits:67, hitsPerPage:12, nbPages==ceil(67/12)); both signals identical on two live reads ~25 min apart",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Benches",
+   "qty": 4,
+   "link": "https://joybird.com/benches/",
+   "is_group": false,
+   "evidence": "rendered listing header '4 Products' on https://joybird.com/benches/, cross-checked against the page's embedded Algolia InstantSearch result blob (nbHits:4, hitsPerPage:12, nbPages==ceil(4/12)); both signals identical on two live reads ~25 min apart",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Cabinets and Storage",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Media Consoles & Cabinets",
+   "qty": 10,
+   "link": "https://joybird.com/media-consoles/",
+   "is_group": false,
+   "evidence": "rendered listing header '10 Products' on https://joybird.com/media-consoles/, cross-checked against the page's embedded Algolia InstantSearch result blob (nbHits:10, hitsPerPage:12, nbPages==ceil(10/12)); both signals identical on two live reads ~25 min apart",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bookcases & Shelving",
+   "qty": 4,
+   "link": "https://joybird.com/bookcases-wall-units/",
+   "is_group": false,
+   "evidence": "rendered listing header '4 Products' on https://joybird.com/bookcases-wall-units/, cross-checked against the page's embedded Algolia InstantSearch result blob (nbHits:4, hitsPerPage:12, nbPages==ceil(4/12)); both signals identical on two live reads ~25 min apart",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bar Carts & Cabinets",
+   "qty": 1,
+   "link": "https://joybird.com/bar-carts-cabinets/",
+   "is_group": false,
+   "evidence": "rendered listing header '1 Products' on https://joybird.com/bar-carts-cabinets/, cross-checked against the page's embedded Algolia InstantSearch result blob (nbHits:1, hitsPerPage:12, nbPages==ceil(1/12)); both signals identical on two live reads ~25 min apart",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Tables and Desks",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Coffee Tables",
+   "qty": 16,
+   "link": "https://joybird.com/coffee-tables/",
+   "is_group": false,
+   "evidence": "rendered listing header '16 Products' on https://joybird.com/coffee-tables/, cross-checked against the page's embedded Algolia InstantSearch result blob (nbHits:16, hitsPerPage:12, nbPages==ceil(16/12)); both signals identical on two live reads ~25 min apart",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "End & Side Tables",
+   "qty": 21,
+   "link": "https://joybird.com/end-tables-entry-tables/",
+   "is_group": false,
+   "evidence": "rendered listing header '21 Products' on https://joybird.com/end-tables-entry-tables/, cross-checked against the page's embedded Algolia InstantSearch result blob (nbHits:21, hitsPerPage:12, nbPages==ceil(21/12)); both signals identical on two live reads ~25 min apart",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Console & Entry Tables",
+   "qty": 3,
+   "link": "https://joybird.com/console-and-entry-tables/",
+   "is_group": false,
+   "evidence": "rendered listing header '3 Products' on https://joybird.com/console-and-entry-tables/, cross-checked against the page's embedded Algolia InstantSearch result blob (nbHits:3, hitsPerPage:12, nbPages==ceil(3/12)); both signals identical on two live reads ~25 min apart",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dining Room Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dining Tables",
+   "qty": 7,
+   "link": "https://joybird.com/dining-tables/",
+   "is_group": false,
+   "evidence": "rendered listing header '7 Products' on https://joybird.com/dining-tables/, cross-checked against the page's embedded Algolia InstantSearch result blob (nbHits:7, hitsPerPage:12, nbPages==ceil(7/12)); both signals identical on two live reads ~25 min apart",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dining Chairs",
+   "qty": 14,
+   "link": "https://joybird.com/dining-chairs/",
+   "is_group": false,
+   "evidence": "rendered listing header '14 Products' on https://joybird.com/dining-chairs/, cross-checked against the page's embedded Algolia InstantSearch result blob (nbHits:14, hitsPerPage:12, nbPages==ceil(14/12)); both signals identical on two live reads ~25 min apart",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Counter Stools",
+   "qty": 0,
+   "link": "https://joybird.com/counter-stools/",
+   "is_group": false,
+   "evidence": "page renders its own category h1 and zero product tiles; embedded Algolia InstantSearch blob for filters categories:\"counter-stools\" returns nbHits:0, nbPages:0 (verified live twice, ~25 min apart)",
+   "flag": "MANUAL REVIEW: genuine site-reported 0; /counter-stools/ is listed in sitemap.xml and renders its own 'Counter Stools' h1 and template, but is not linked from the current mega-menu, mobile flyout or the site's own getSitemapLinks category tree"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bedroom Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Beds",
+   "qty": 19,
+   "link": "https://joybird.com/beds/",
+   "is_group": false,
+   "evidence": "rendered listing header '19 Products' on https://joybird.com/beds/, cross-checked against the page's embedded Algolia InstantSearch result blob (nbHits:19, hitsPerPage:12, nbPages==ceil(19/12)); both signals identical on two live reads ~25 min apart",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Nightstands",
+   "qty": 9,
+   "link": "https://joybird.com/nightstands/",
+   "is_group": false,
+   "evidence": "rendered listing header '9 Products' on https://joybird.com/nightstands/, cross-checked against the page's embedded Algolia InstantSearch result blob (nbHits:9, hitsPerPage:12, nbPages==ceil(9/12)); both signals identical on two live reads ~25 min apart",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dressers & Chests",
+   "qty": 8,
+   "link": "https://joybird.com/dressers-chests/",
+   "is_group": false,
+   "evidence": "rendered listing header '8 Products' on https://joybird.com/dressers-chests/, cross-checked against the page's embedded Algolia InstantSearch result blob (nbHits:8, hitsPerPage:12, nbPages==ceil(8/12)); both signals identical on two live reads ~25 min apart",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Home Office Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Desks",
+   "qty": 1,
+   "link": "https://joybird.com/desks/",
+   "is_group": false,
+   "evidence": "rendered listing header '1 Products' on https://joybird.com/desks/, cross-checked against the page's embedded Algolia InstantSearch result blob (nbHits:1, hitsPerPage:12, nbPages==ceil(1/12)); both signals identical on two live reads ~25 min apart",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Office Chairs",
+   "qty": 3,
+   "link": "https://joybird.com/office-chairs/",
+   "is_group": false,
+   "evidence": "rendered listing header '3 Products' on https://joybird.com/office-chairs/, cross-checked against the page's embedded Algolia InstantSearch result blob (nbHits:3, hitsPerPage:12, nbPages==ceil(3/12)); both signals identical on two live reads ~25 min apart",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Outdoor Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Outdoor Sofas",
+   "qty": 9,
+   "link": "https://joybird.com/outdoor-sofas/",
+   "is_group": false,
+   "evidence": "rendered listing header '9 Products' on https://joybird.com/outdoor-sofas/, cross-checked against the page's embedded Algolia InstantSearch result blob (nbHits:9, hitsPerPage:12, nbPages==ceil(9/12)); both signals identical on two live reads ~25 min apart",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Outdoor Chairs",
+   "qty": 6,
+   "link": "https://joybird.com/outdoor-chairs/",
+   "is_group": false,
+   "evidence": "rendered listing header '6 Products' on https://joybird.com/outdoor-chairs/, cross-checked against the page's embedded Algolia InstantSearch result blob (nbHits:6, hitsPerPage:12, nbPages==ceil(6/12)); both signals identical on two live reads ~25 min apart",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Outdoor Tables",
+   "qty": 8,
+   "link": "https://joybird.com/outdoor-tables/",
+   "is_group": false,
+   "evidence": "rendered listing header '8 Products' on https://joybird.com/outdoor-tables/, cross-checked against the page's embedded Algolia InstantSearch result blob (nbHits:8, hitsPerPage:12, nbPages==ceil(8/12)); both signals identical on two live reads ~25 min apart",
+   "flag": null
+  }
+ ]
+}

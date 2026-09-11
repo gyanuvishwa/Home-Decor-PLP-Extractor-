@@ -1,0 +1,43 @@
+{
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "Orange Tree (orangetree.in) is a Shopify store. Direct HTTP fetch worked throughout (200s, no WAF/bot-block); robots.txt has no Claude-specific disallow -- it explicitly names and allows anthropic-ai/Claude-Web/GPTBot/CCBot for crawling public product pages. Site also publishes an AI-agent onboarding file at /agents.md (UCP/Shop-skill commerce-agent instructions, irrelevant to this PLP-extraction task and not acted on). Discovery: enumerated the FULL collections.json catalog (300 collections across 2 pages, limit=250) rather than relying on site search, then checked main nav (top-level items: Gifting/Bestsellers/Blogs/Trade Program/Design Projects/Our Stores/Franchise Enquiry), the 'SHOP BY CATEGORY' mega-menu accordion, homepage, and the furniture/lighting/decor/wall-decor category pages for actual hrefs, plus sitemap_collections_1.xml (240 of the 300 collections are listed there). Found 4 collections matching bestseller-type title/handle: furniture-best-seller ('Bestsellers', 25 exact), best-seller ('Best Seller', 42 exact), best-sellers ('Best Sellers', 16 exact), best-seller-products ('Best Sellers', 12 exact). Only /collections/furniture-best-seller is actually linked anywhere found: it is the main-nav TOP-LEVEL item literally labelled 'Bestsellers' (sits alongside Gifting/Blogs/Trade Program, not nested under Furniture), and the identical link recurs on the furniture, lighting, decor and wall-decor category pages -- so despite its URL handle it is the site's real, actively-promoted Bestsellers PLP (content is mixed, mostly furniture plus at least one mirror, not furniture-exclusive). The other 3 collections are NOT linked in main nav, homepage, any category page checked, footer, or sitemap_collections.xml -- they appear orphaned/legacy. ID-overlap check rules out them being simple aliases of the nav-linked page or of each other (furniture-best-seller vs best-seller: 12/42 shared; vs best-sellers: 5/16 shared; vs best-seller-products: 0/12 shared), so they are recorded below with MANUAL REVIEW flags rather than silently dropped or silently trusted. Every qty is the EXACT unique-product-id count from exhaustive pagination of /collections/<handle>/products.json (limit=250, deduped by numeric id) -- the site's own cached collections.json products_count is inflated for all 4 handles (e.g. furniture-best-seller cached 72 vs exact 25; best-seller cached 132 vs exact 42; best-sellers cached 37 vs exact 16), matching the known Shopify products_count-unreliable pattern documented for this exact store in the prior Home-Decor pass (notes/268.md).",
+  "rows": [
+    {
+      "category": "Bestsellers",
+      "sub_category": "Bestsellers",
+      "qty": 25,
+      "link": "https://www.orangetree.in/collections/furniture-best-seller",
+      "is_group": false,
+      "evidence": "Exhaustive pagination of /collections/furniture-best-seller/products.json (limit=250) -> 25 unique product ids (cached collections.json products_count=72 is inflated). Main nav top-level item <span class=\"text\">Bestsellers</span> links to this URL; same link recurs on the furniture/lighting/decor/wall-decor category pages.",
+      "flag": null
+    },
+    {
+      "category": "Bestsellers",
+      "sub_category": "Best Seller (unlinked collection)",
+      "qty": 42,
+      "link": "https://www.orangetree.in/collections/best-seller",
+      "is_group": false,
+      "evidence": "Exhaustive pagination of /collections/best-seller/products.json -> 42 unique product ids (cached products_count=132, inflated).",
+      "flag": "MANUAL REVIEW: collection titled 'Best Seller' with 42 real products exists and is publicly reachable, but is not linked from main nav, homepage, any checked category page (furniture/lighting/decor/wall-decor), footer, or sitemap_collections.xml -- appears orphaned/legacy rather than an actively-used PLP. Confirmed NOT an alias of the nav-linked furniture-best-seller (only 12 of 42 ids overlap). Human should confirm current customer-reachability before deciding whether to include."
+    },
+    {
+      "category": "Bestsellers",
+      "sub_category": "Best Sellers (unlinked collection)",
+      "qty": 16,
+      "link": "https://www.orangetree.in/collections/best-sellers",
+      "is_group": false,
+      "evidence": "Exhaustive pagination of /collections/best-sellers/products.json -> 16 unique product ids (cached products_count=37, inflated).",
+      "flag": "MANUAL REVIEW: same orphan situation as best-seller -- not linked from nav/homepage/category pages/footer/sitemap found during this pass. Only 5 of 16 ids overlap with the nav-linked furniture-best-seller, so not a simple alias. Human should confirm reachability."
+    },
+    {
+      "category": "Bestsellers",
+      "sub_category": "Best Sellers Products (unlinked collection)",
+      "qty": 12,
+      "link": "https://www.orangetree.in/collections/best-seller-products",
+      "is_group": false,
+      "evidence": "Exhaustive pagination of /collections/best-seller-products/products.json -> 12 unique product ids (cached products_count=12, matches exactly).",
+      "flag": "MANUAL REVIEW: same orphan situation -- not linked anywhere found during this pass; 0 overlap with the nav-linked furniture-best-seller (fully distinct product set). Human should confirm reachability."
+    }
+  ]
+}

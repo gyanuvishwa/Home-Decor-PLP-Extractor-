@@ -1,0 +1,98 @@
+{
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "Access: direct HTTP (requests/curl, plain Mozilla UA) worked throughout, no block encountered. robots.txt has only a generic 'User-agent: *' (Allow: /) plus an adsbot-google block; no ClaudeBot/Claude-Web/anthropic-ai/Claude-User/Claude-SearchBot group exists, so no Claude-specific disallow -> not blocked. Site is a large Shopify store (Design Public). Tree source: fetched full /collections.json (1952 collections, paginated) and grepped for bath/toilet/vanity/shower/faucet/basin/mirror/towel keywords, then cross-checked against the live site-wide nav (home page mega-menu, fully enumerated) which has ZERO 'Bath'/'Bathroom' entry anywhere (Living, Lighting, Dining, Outdoor, Bedroom, Workspace, Kitchen are the only rooms navigated; no Bath tab, no Bath item nested under any other room). Per SKILL.md trap 'nav under-reports the tree', treated the sitemap/collections.json-discovered bath-prefixed collections as legitimate orphaned-but-live category pages (all return 200, are indexed, have real product grids) rather than excluding them for being nav-absent. IMPORTANT DATA-QUALITY FINDING: Shopify collections.json 'products_count' is confirmed inflated here too (e.g. parent /collections/bath reports 227 but full pagination of that collection yields only 65 unique product IDs, matching exactly the sum of its own product_type filter facet counts) -- for every candidate collection, qty was taken from an exhaustive count of unique data-product-id / product-href occurrences across all pages (checked for a rel=next pagination link; none of the small collections below paginate, single page each), never from the collections.json count. CONTAMINATION FOUND: several bath-prefixed collections are marketing catch-alls, not real Bathroom taxonomy nodes, and were excluded/flagged rather than recorded wholesale (would violate no-fabrication/no-unrelated-aggregation): (1) /collections/bath-storage-wastebaskets ('Storage & Wastebaskets', 39 items) is dominated by generic non-bathroom storage -- laundry baskets, office bins, toolboxes, wastepaper baskets (e.g. Braided Laundry Basket, Grib Toolbox, Haus Toolbox, Wegner PP40 Paper Basket) -- with only the toilet brush/paper-holder items (already captured in their own dedicated collections below) being genuinely bathroom; routed to review as Storage-owned per rule 12/30-33, not recorded. (2) /collections/bath-vanity-accessories ('Vanity & Accessories', 19 items) reads as dressing-table/valet accessories (Valet Tray, Circle Valet Tray, Arrange Tray, Curved Pedestal Box, Componibili Storage Tower, Skagerak Cutter Box) not bathroom vanity items, with only 3-4 genuinely bathroom items (soap tray, toothbrush/razor holders) duplicating the dedicated collections below; ambiguous per rule 29, sent to review rather than guessed. (3) /collections/bath-shower ('Shower', 7 items) contains ZERO actual shower fixtures/heads/enclosures -- it is towel hardware (Curvature Towel Hanger, Dora Towel Stand, Rail Towel Rack -- genuinely Bathroom per rule 17 but with no clean dedicated URL of their own), a kitchen tea towel, two bath/hand towels (Textile), and one bath mat (duplicate of the Bath Mats collection product) -- recording this as 'Shower' would fabricate a shower category that has no shower products, so it was excluded/flagged rather than recorded. (4) /collections/bath-hand-towels and /collections/bath-towels are pure towel collections -> Textile per rule 15/20, routed to review, not recorded. (5) /collections/bathroom-mini-makeover (47 listed, 5 actual) is a promotional curated bundle (mirror + laundry stand + towel + toothbrush holder) -> excluded per rule 25 (promotional page), not recorded and not flagged (unambiguous). (6) General /collections/mirrors and /collections/clocks-mirrors are undifferentiated home-decor mirror collections with no bathroom-specific designation anywhere on the site -> correctly stay out of Bathroom (Wall Decor territory per project convention), not flagged. Parent /collections/bath ('Modern Bathroom') itself not recorded per rule 24 since valid child listing URLs exist. RECORDED (6 clean, unambiguous, verified leaves, all single-page collections, qty = exact unique product-id count on the page): Toilet Brushes & Holders (2), Toilet Paper Holders (2), Toothbrush Holders (3), Dispensers & Soap Dishes (1; collections.json overstates this as 4), Bathroom Accessories (1: a replacement toilet-brush head), Bath Mats (1: Skagerak Dania teak bathroom mat, non-textile, explicitly a bathroom accessory per rule 16). Cross-category dedup: all 6 recorded URLs checked against cross_category_url_index.json -- all returned null (not previously extracted in Furniture/Storage/Wall_Decor/Textile), so all placed in rows[], none suppressed. No robots block, no access block encountered anywhere.",
+  "rows": [
+    {
+      "category": "Bathroom",
+      "sub_category": "Toilet Brushes and Holders",
+      "qty": 2,
+      "link": "https://www.designpublic.com/collections/toilet-brushes-holders",
+      "is_group": false,
+      "evidence": "HTTP 200, single page, no pagination link; 2 unique data-product-id values on the page (Ballo Toilet Brush, Ballo Toilet Brush - Extra Brush Head), matching collections.json handle toilet-brushes-holders",
+      "flag": null
+    },
+    {
+      "category": "Bathroom",
+      "sub_category": "Toilet Paper Holders",
+      "qty": 2,
+      "link": "https://www.designpublic.com/collections/toilet-paper-holders",
+      "is_group": false,
+      "evidence": "HTTP 200, single page, no pagination link; 2 unique data-product-id values (Curvature Toilet Paper Holder, Dora Toilet Paper Stand)",
+      "flag": null
+    },
+    {
+      "category": "Bathroom",
+      "sub_category": "Toothbrush Holders",
+      "qty": 3,
+      "link": "https://www.designpublic.com/collections/toothbrush-holders",
+      "is_group": false,
+      "evidence": "HTTP 200, single page, no pagination link; 3 unique data-product-id values (Bon Accessories - Toothbrush Holder, VIKTOR Toothbrush/Razor Holders - Black Nickel, VIKTOR Toothbrush/Razor Holders - 18K Gold)",
+      "flag": null
+    },
+    {
+      "category": "Bathroom",
+      "sub_category": "Dispensers and Soap Dishes",
+      "qty": 1,
+      "link": "https://www.designpublic.com/collections/dispensers-soap-dishes",
+      "is_group": false,
+      "evidence": "HTTP 200, single page, no pagination link; 1 unique data-product-id (Bon Accessories - Soap Tray). collections.json lists products_count=4 for this handle but full-page count is 1; used the verified page count per the known Shopify products_count-inflation trap",
+      "flag": null
+    },
+    {
+      "category": "Bathroom",
+      "sub_category": "Bathroom Accessories",
+      "qty": 1,
+      "link": "https://www.designpublic.com/collections/bathroom-accessories",
+      "is_group": false,
+      "evidence": "HTTP 200, single page, no pagination link; 1 unique data-product-id (Ballo Brush Head, a replacement head for the Ballo Toilet Brush)",
+      "flag": null
+    },
+    {
+      "category": "Bathroom",
+      "sub_category": "Bath Mats",
+      "qty": 1,
+      "link": "https://www.designpublic.com/collections/bath-mats",
+      "is_group": false,
+      "evidence": "HTTP 200, single page, no pagination link; 1 unique data-product-id (Skagerak Dania Bathroom Mat, teak wood, vendor Fritz Hansen/Skagerak) - non-textile, explicitly named a bathroom mat, so classified Bathroom per rule 16 not Textile",
+      "flag": null
+    }
+  ],
+  "review": [
+    {
+      "category": "Bathroom",
+      "sub_category": "Bath and Hand Towels",
+      "qty": 3,
+      "issue": "ROUTED TO TEXTILE: collection /collections/bath-hand-towels contains only bath/hand towels, textile per rule 15/20",
+      "link": "https://www.designpublic.com/collections/bath-hand-towels"
+    },
+    {
+      "category": "Bathroom",
+      "sub_category": "Bath Towels",
+      "qty": 1,
+      "issue": "ROUTED TO TEXTILE: collection /collections/bath-towels contains only a bath towel, textile per rule 15/20",
+      "link": "https://www.designpublic.com/collections/bath-towels"
+    },
+    {
+      "category": "Bathroom",
+      "sub_category": "Storage and Wastebaskets",
+      "qty": 39,
+      "issue": "MANUAL REVIEW: collection /collections/bath-storage-wastebaskets is a mixed catch-all dominated by generic non-bathroom storage (laundry baskets, office bins, toolboxes, wastepaper baskets); only 2-4 items are genuinely bathroom and those are already captured in the dedicated Toilet Brushes/Toilet Paper Holders leaves above. Ambiguous per rule 29/30-33 (Storage-owned), not recorded as a Bathroom leaf to avoid unrelated-item aggregation",
+      "link": "https://www.designpublic.com/collections/bath-storage-wastebaskets"
+    },
+    {
+      "category": "Bathroom",
+      "sub_category": "Vanity and Accessories",
+      "qty": 19,
+      "issue": "MANUAL REVIEW: collection /collections/bath-vanity-accessories reads as dressing-table/valet accessories (Valet Tray, Circle Valet Tray, Arrange Tray, Curved Pedestal Box, Componibili Storage Tower) rather than bathroom vanity accessories; only 3-4 items overlap genuine bathroom accessories, already captured in dedicated leaves above. Ambiguous vanity type per rule 29, not recorded",
+      "link": "https://www.designpublic.com/collections/bath-vanity-accessories"
+    },
+    {
+      "category": "Bathroom",
+      "sub_category": "Shower",
+      "qty": 7,
+      "issue": "MANUAL REVIEW: collection /collections/bath-shower ('Shower') contains zero shower fixtures/heads/enclosures; it is a mixed grab-bag of towel hardware (Bathroom per rule 17, but no dedicated clean URL of its own), a kitchen tea towel, two textile towels, and one bath mat duplicating the Bath Mats leaf above. Recording it as 'Shower' would fabricate a category with no matching products, so it was not recorded",
+      "link": "https://www.designpublic.com/collections/bath-shower"
+    }
+  ]
+}

@@ -1,0 +1,52 @@
+{
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "Kohl's Home (kohls.com) - Clearance investigation. ACCESS: same tier progression as bs196.json/na196.json - tier1 curl_cffi got sitemaps but only Akamai behavioral-challenge shells for catalog pages; tier2 plain Playwright chromium hard 403'd; tier3 Claude-in-Chrome (real connected browser) cleared the behavioral challenge after ~6-8s per fresh nav and rendered real content, used for every page below. robots.txt (live, no Claude-specific disallow) checked first. SCOPE: Kohl's 'Clearance' is a real, permanent Promotions:Clearance facet (confirmed via sitemap - thousands of clearance-*.jsp URLs exist combining this facet with almost every Department/Category), not a temporary seasonal campaign, so it clearly passes the Clearance-vs-Sale test. NAVIGATION: grepped all 6 sitemap_catalog_N.xml for Promotions:Clearance combined with Home-relevant Department/Category values; the sitemap only exposed a bare Department:Home Decor clearance page directly (no bare Furniture/Kitchen&Dining/Lighting Department-level clearance URLs were present in the curated sitemap). Loading catalog.jsp?CN=Activity:For the Home+Promotions:Clearance live revealed this is itself a genuine site-authored hub page (breadcrumb 'Clearance: Home', title 'Home Clearance') that lists no products of its own but links to real per-department Clearance children: Kitchen & Dining, Home Decor, Bed & Bath, Pet Supplies, Closeouts - recorded as a grouping row. Of those children, Pet Supplies was excluded (a separate department/project scope, not home furnishing) and Closeouts was excluded (it is a different Assortment:Closeout Deals facet, not the Clearance promotion, and not Home-specific). Furniture and Lighting were not linked from this hub but were confirmed to independently exist via direct Promotions:Clearance+Department:<X> facet construction (Furniture=1 item, kept; Lighting=0 items, dropped per the zero-listing rule). All qty values below are the site's own on-page 'Show N Items'/heading count, read directly off the rendered PLP after the Akamai challenge cleared - no estimation. Each of these department-level clearance pages also displayed a 'Best Sellers' recommendation carousel (duplicate content across pages) - not treated as a Clearance row, and not a Bestsellers PLP either (see bs196.json).",
+  "rows": [
+    {
+      "category": "Clearance",
+      "sub_category": "Home Clearance",
+      "qty": null,
+      "link": "https://www.kohls.com/catalog.jsp?CN=Activity:For+the+Home+Promotions:Clearance",
+      "is_group": true,
+      "evidence": "Page title 'Home Clearance', breadcrumb 'Clearance: Home', page body lists only sub-department links (Kitchen & Dining, Home Decor, Bed & Bath, Pet Supplies, Closeouts) with no product grid of its own",
+      "flag": "MANUAL REVIEW: hub/landing page with no own product count - grouping row only, children listed as separate rows below (Pet Supplies and Closeouts children deliberately excluded, see notes)"
+    },
+    {
+      "category": "Home Decor Clearance",
+      "sub_category": "Home Decor Clearance",
+      "qty": 52,
+      "link": "https://www.kohls.com/catalog/clearance-home-decor.jsp?CN=Promotions:Clearance+Department:Home%20Decor",
+      "is_group": false,
+      "evidence": "On-page heading 'Clearance Home Decor (52)' and 'Show 52 Items'; filter chips Department:Home Decor, Promotions:Clearance",
+      "flag": null
+    },
+    {
+      "category": "Kitchen & Dining Clearance",
+      "sub_category": "Kitchen & Dining Clearance",
+      "qty": 16,
+      "link": "https://www.kohls.com/catalog/clearance-kitchen-dining.jsp?CN=Promotions:Clearance+Department:Kitchen%20%26%20Dining",
+      "is_group": false,
+      "evidence": "On-page heading 'Dining Clearance (16)' and 'Show 16 Items'; filter chips Kitchen & Dining, Clearance",
+      "flag": null
+    },
+    {
+      "category": "Bedding & Bath Clearance",
+      "sub_category": "Bedding & Bath Clearance",
+      "qty": 50,
+      "link": "https://www.kohls.com/catalog/clearance-bedding.jsp?CN=Promotions:Clearance+Department:Bath+Department:Bedding&BL=y",
+      "is_group": false,
+      "evidence": "On-page heading 'Clearance Bedding & Bath (50)' and 'Show 50 Items'; filter chips Department: Bath, Bedding",
+      "flag": null
+    },
+    {
+      "category": "Furniture Clearance",
+      "sub_category": "Furniture Clearance",
+      "qty": 1,
+      "link": "https://www.kohls.com/catalog.jsp?CN=Promotions:Clearance+Department:Furniture",
+      "is_group": false,
+      "evidence": "On-page heading 'Clearance Furniture (1)' and 'Show 1 Item'",
+      "flag": "MANUAL REVIEW: only 1 item currently in stock for this facet combo - genuine live count, but a thin/volatile listing worth a human glance"
+    }
+  ]
+}

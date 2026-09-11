@@ -1,0 +1,103 @@
+{
+  "sr": 5,
+  "company": "PB Kids US",
+  "brand_site": "potterybarnkids.com",
+  "country": "USA",
+  "site_url": "https://www.potterybarnkids.com/",
+  "status": "partial",
+  "failure_reason": "First-block encountered: https://www.potterybarnkids.com/shop/bedding/ returned a full-page '403 - Restricted Access' (site's own WAF block page) partway through the research pass, immediately after the Storage branch had been fully captured. Per the browser-only hard rules, all further requests to the potterybarnkids.com host were stopped at that point (no retry/chase via another route). This happened before any Bedding/Bath/Rugs/Windows/Decor subcategory URL or quantity (the Textile-candidate branches) could be captured, so textile_rows is empty rather than guessed or fabricated.",
+  "notes": "ACCESS: robots.txt (https://www.potterybarnkids.com/robots.txt) has no Claude/anthropic-ai/ClaudeBot disallow - only EasouSpider is fully blocked and Pinterestbot has a crawl-delay; User-agent:* disallows only account/checkout/search/tracking-type paths, so proceeded. Site is on the Williams-Sonoma platform (shares nav chrome with Pottery Barn, PB Teen, RH, West Elm). TREE METHOD: opened own Chrome tab, read the top mega-menu (Baby, Furniture, Bedding, Decor, Lighting, Bath, Rugs, Windows, Toys & Play, Baby Gear, Gifts, Halloween, Study, Backpacks & Lunch, Sale). Furniture menu exposed a 'Storage Furniture' link (/shop/storage/all-storage-furniture-acc/) which is the site's own dedicated Storage section; its own sub-nav strip (read via DOM extraction, not View-All) listed 8 real subcategories: Wall Systems, Bookcases, Bins & Baskets, Shelving, Storage Beds, Desks, Toy Storage, Nursery Storage. 'Shop All Storage', 'All Storage Furniture', 'All Storage Accessories' were View-All/aggregate links and excluded per rule; 'Playroom'/'Family Spaces'/'Bedroom' were shop-by-room cross-links to the same underlying facets and were also excluded to avoid duplicate rows. QTY METHOD: each of the 8 subcategory pages is a client-side-rendered facet listing (URL segment like producttype-m-product-type-...); the total is NOT in a static h1 but renders asynchronously as 'N Items' text in the filter bar. Product grid + count text loads on a delay (page loads with 0 products / a false 'no products in your location' message on first read even though country=USA), so each page was read only after an explicit wait, and pages that still showed 0/empty were re-read once more with a longer wait before the real count appeared - none were retried more than that, and no zero was ever recorded as a final qty. Evidence string = the exact 'N Items' text captured from the page body after render. EXCLUDED: Storage Beds (bunk/loft/captain's/upholstered beds with storage) and Desks (writing desks/hutches) are furniture-storage hybrids per storage.md 21; site explicitly places them under the Storage nav section (not under generic Bedroom/Study Furniture), so per storage.md 21's 'explicit site categorization wins' rule they were kept in storage_rows but flagged confidence MEDIUM rather than HIGH. Bookcases and Shelving are similarly flagged MEDIUM per storage.md 18's explicit ambiguity callout, again explicit-site-placement wins for inclusion. BLOCKED: attempting the next branch (/shop/bedding/) returned a hard 403 'Restricted Access' page (confirmed via get_page_text, title 'Pottery Barn Kids: 403 - Restricted Access'); per the standing rule this stopped all further potterybarnkids.com requests immediately - Bath, Rugs, Windows, and Decor (all likely Textile-bearing branches: towels/bath mats/robes, area rugs, curtains, throws) were never opened and are not represented in textile_rows because no real qty/URL evidence exists for them. No View All/Collection/search/product-detail URLs were recorded. No quantities were estimated, aggregated, or carried over between pages.",
+  "textile_rows": [],
+  "storage_rows": [
+    {
+      "category": "Storage",
+      "sub_category": "Storage Furniture",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Wall Systems",
+      "qty": 36,
+      "link": "https://www.potterybarnkids.com/shop/storage/storage-wall-sets+modular+bulk-bins+wall-cubbies+all-storage-furniture-acc/producttype-m-product-type-ff00080d11181d2126343b43fe2020202020-4/",
+      "is_group": false,
+      "evidence": "Rendered filter-bar text '36 Items' on the category listing page",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Bookcases",
+      "qty": 16,
+      "link": "https://www.potterybarnkids.com/shop/storage/3-shelf-bookcase+book-rack+2-shelf-bookcase+bookcases+4-plus-shelf-bookcase+tower-bookcases+all-storage-furniture-acc/producttype-m-product-type-ff020810151b212934393f474d5d646cfe20202020202020202020-6/",
+      "is_group": false,
+      "evidence": "Rendered filter-bar text '16 Items' on the category listing page",
+      "flag": "Bookcase/storage-furniture boundary per storage.md section 18/21 - site explicitly lists it under the Storage nav section, kept in Storage",
+      "confidence": "MEDIUM"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Bins & Baskets",
+      "qty": 12,
+      "link": "https://www.potterybarnkids.com/shop/storage/shaped-novelty+baskets+hampers+changing-table-storage+underbed-storage+toy-storage+all-storage-furniture-acc/producttype-m-product-type-ff00070e151c252b323b4246545b63fe202020202020-6/",
+      "is_group": false,
+      "evidence": "Rendered filter-bar text '12 Items' on the category listing page",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Shelving",
+      "qty": 12,
+      "link": "https://www.potterybarnkids.com/shop/storage/single-shelf+all-storage-furniture-acc/producttype-m-product-type-ff0007131a22fe2020-1/",
+      "is_group": false,
+      "evidence": "Rendered filter-bar text '12 Items' on the category listing page",
+      "flag": "Shelving is a named ambiguity in storage.md section 18 (could be Furniture/Wall Decor); site explicitly lists it under Storage nav, kept in Storage",
+      "confidence": "MEDIUM"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Storage Beds",
+      "qty": 22,
+      "link": "https://www.potterybarnkids.com/shop/storage/loft-bed+storage-bed+upholstered-bed+captains-bed+stair-loft-bed+bunk-bed+all-storage-furniture-acc/producttype-m-product-type-ff00050810131f222b2e34393c414b525afe2020202020202020-6/",
+      "is_group": false,
+      "evidence": "Rendered filter-bar text '22 Items' on the category listing page",
+      "flag": "Beds with built-in storage (bunk/loft/captain's/upholstered); furniture-storage hybrid per storage.md section 21, kept in Storage because site explicitly places it under the Storage nav section",
+      "confidence": "MEDIUM"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Desks",
+      "qty": 13,
+      "link": "https://www.potterybarnkids.com/shop/storage/storage-desks+writing-desks+wall-systems+hutches+accessible-desk+all-storage-furniture-acc/producttype-m-product-type-ff00080d151a1f262d38434a52fe2020202020-5/",
+      "is_group": false,
+      "evidence": "Rendered filter-bar text '13 Items' on the category listing page",
+      "flag": "Writing desks/hutches with storage; furniture-storage hybrid per storage.md section 15/21, kept in Storage because site explicitly places it under the Storage nav section",
+      "confidence": "MEDIUM"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Toy Storage",
+      "qty": 3,
+      "link": "https://www.potterybarnkids.com/shop/storage/toy-storage+all-storage-furniture-acc/producttype-m-product-type-ff0004121921fe2020-1/",
+      "is_group": false,
+      "evidence": "Rendered filter-bar text '3 Items' on the category listing page",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Nursery Storage",
+      "qty": 4,
+      "link": "https://www.potterybarnkids.com/shop/storage/changing-table-storage+diaper-caddies+shaped-novelty+all-storage-furniture-acc/producttype-m-product-type-ff00090f161d242b394048fe2020202020-3/",
+      "is_group": false,
+      "evidence": "Rendered filter-bar text '4 Items' on the category listing page",
+      "flag": null,
+      "confidence": "HIGH"
+    }
+  ]
+}

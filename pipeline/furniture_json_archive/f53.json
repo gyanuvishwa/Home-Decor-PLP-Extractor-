@@ -1,0 +1,120 @@
+{
+ "sr": 53,
+ "company": "The Citizenry",
+ "brand_site": "the-citizenry.com",
+ "country": "USA",
+ "site_url": "https://www.the-citizenry.com/",
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ACCESS: direct fetch, HTTP 200 throughout, no WAF (same as the prior Home-Decor pass). Shopify store. NAV: the mega-menu is a Vue component (#vue-desktop-nav) with no server-rendered links. Recovered the tree two ways and cross-checked them: (a) the site's headless CMS - GET https://cdn.builder.io/api/v3/content/nav?apiKey=ffd771d56cde49a3932ba2dc845afab8 returns 10 published nav variants; the newest, 'Default Nav 2026' (lastUpdated 2026-08-13), is the live one; (b) rendered the live homepage in Chrome and read the hydrated #vue-desktop-nav anchors - the Furniture menu matched 'Default Nav 2026' item-for-item, so the tree below is the site's current live navigation. The Furniture department has exactly two published branches, 'Shop by Room' (Bedroom / Living Room / Bath / Outdoor) and 'Shop by Category' (Beds & Headboards / Ottomans & Benches / Chairs & Sofas / Tables & Nightstands / Dressers / Accent Furniture / Outdoor Furniture), plus 'Swatches'. Neither branch is a parent of the other - they are two parallel cuts of the same 49-product furniture catalogue, so BOTH are emitted and BOTH grouping rows carry an overlap flag. Do not sum them: shop-all-furniture (the department total, not emitted as a leaf under rule 3) is 49 products, while the room rows sum to 104 and the category rows to 73. QTY METHOD - THE RENDERED HEADER ON THIS SITE IS NOT A PRODUCT COUNT AND WAS REJECTED WITH PROOF. The PLP ('ComboPLP' template) prints 'N Products' where N is the number of merchandised TILES, which includes (i) one product split into several colour/size tiles and (ii) injected promo banner tiles. Proof: /collections/dressers renders 'ORDER 3 Products' but all three tiles link to the single product /products/avon-dresser (Natural Ash / Natural Walnut / Black Finished Ash); /collections/all-seating-chairs prints '12 Products' but one of the 12 grid <li> elements is a 'Throw Pillows - Shop by Size' banner with no product link; /collections/beds prints '21 Products' with an 'Order Swatches' banner tile among them; /collections/bedroom-furniture prints '42 Products' but has only 41 distinct product URLs (Avon Nightstand is tiled twice, Standard and Wide); /collections/shop-all-furniture prints '96 Products' against a 49-product collection. QTY USED = the site's own analytics blob on each collection page ('collection_handle':'<handle>','total_products':<n>, HTML-entity-escaped in the ShopifyAnalytics script), independently confirmed by exhaustive enumeration of /collections/<handle>/products.json?limit=250&page=N to an empty page counting UNIQUE product ids. The two methods agreed on 12/12 furniture handles with zero divergence (49/41/42/8/13/16/19/11/23/1/3/2), reproducing the prior pass's 16/16 agreement on this site. Third corroboration: the site's Searchspring index (siteId g4yph2, pagination.totalResults, discrimination-checked - a bogus handle returns 0) agreed on 12 of 14 handles, differing only on 'beds' (15 vs 16), so it was used as a cross-check only, never as the source. No Shopify /collections.json products_count was used (known-inflated). No tile-href counting was used. EXCLUDED FROM THE NAV: 'Shop All' (x2), 'Ready to Ship Furniture' (in-stock-collection-furniture, 15 - an availability cut of nodes already counted) and 'Custom Furniture' (custom-furniture, 24 - a made-to-order fulfilment cut of nodes already counted) under rule 3; the whole 'Swatches' sub-menu (all-swatches / swatches-mto-seating / swatches-mto-beds) as fabric samples, i.e. furniture parts. 'Outdoor Furniture' appears twice in the Furniture menu, under Shop by Room as 'Outdoor' and again under Shop by Category, at the identical URL - emitted ONCE, under Shop by Room. 'Bath Furniture' in the top-level Bath menu is the same URL as Furniture > Shop by Room > Bath - emitted once. ORPHANS CHECKED AND REJECTED: the 1,145-entry collections sitemap contains deeper room x type handles (bedroom-furniture-beds-headboards 16, bedroom-furniture-nightstands 12, bedroom-furniture-ottomans-benches 17, bedroom-furniture-chairs 0, living-room-furniture-chairs-sofas 6, living-room-furniture-coffee-side-tables 5, living-room-furniture-ottomans 13, living-room-furniture-benches 5) plus headboards 2, upholstered-beds 9, seating 5, all-bedroom-furniture, entryway. None of these appears in ANY of the 10 Builder nav variants, none is linked from the room PLPs (checked the rendered DOM and the raw HTML - the room pages carry no sub-category chips), one of them is empty, and their children do not reconcile with their parent (16+0+12+17=45 vs bedroom-furniture 41). They are dead PLP-redesign artifacts, not a live level of the taxonomy, so no deeper level was recorded. 'kitchen-furniture' (2: Meru Counter Stool - Mindi, Meru Counter Stool - Teak) is a real furniture collection that appears in the nine OLDER nav variants but has been dropped from the live 'Default Nav 2026'; it was therefore not emitted, and nothing is lost because both stools are already inside Chairs & Sofas. NOT FURNITURE, so no other department was mined: Rugs, Bedding, Pillows & Throws, Decor (baskets/wall hangings/framed art/planters/vases/accents/tabletop), Bath towels-mats-accessories, Archive Sale, and all New Arrivals / Best Sellers / Ready to Ship / Back in Stock / seasonal-event nodes.",
+ "rows": [
+  {
+   "category": "Furniture",
+   "sub_category": "Shop by Room",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": "MANUAL REVIEW: 'Shop by Room' and 'Shop by Category' are two parallel cuts of the same 49-product furniture catalogue (shop-all-furniture total_products=49). Their children overlap heavily and must not be summed."
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bedroom",
+   "qty": 41,
+   "link": "https://www.the-citizenry.com/collections/bedroom-furniture",
+   "is_group": false,
+   "evidence": "ShopifyAnalytics blob \"collection_handle\":\"bedroom-furniture\",\"total_products\":41 ; confirmed by exhaustive /collections/bedroom-furniture/products.json?limit=250 enumeration = 41 unique product ids, and by Searchspring pagination.totalResults=41. Rendered header says '42 Products' but was rejected: the grid has 42 tiles for 41 distinct product URLs (Avon Nightstand tiled twice as Standard and Wide)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Living Room",
+   "qty": 42,
+   "link": "https://www.the-citizenry.com/collections/living-room-furniture",
+   "is_group": false,
+   "evidence": "ShopifyAnalytics blob \"collection_handle\":\"living-room-furniture\",\"total_products\":42 ; confirmed by exhaustive products.json enumeration = 42 unique product ids, by Searchspring totalResults=42, and by the rendered header '42 Products' (42 tiles / 42 distinct product URLs)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bath",
+   "qty": 8,
+   "link": "https://www.the-citizenry.com/collections/all-bath-furniture",
+   "is_group": false,
+   "evidence": "ShopifyAnalytics blob \"collection_handle\":\"all-bath-furniture\",\"total_products\":8 ; confirmed by exhaustive products.json enumeration = 8 unique product ids, by Searchspring totalResults=8, and by the rendered header '8 Products' (8 tiles / 8 distinct product URLs)",
+   "flag": "MANUAL REVIEW: the site files this node as 'Bath Furniture' under its Furniture department, but 4 of the 8 products are out of scope for this task - Hinoki Wood Floor Mirror and Hinoki Wood Wall Mirror (mirrors) and Hinoki Wood Bath Mat and Hinoki Wood Bath Runner (textiles). Only Side Table, Ladder, Standing Rack and Bath Caddy are furniture. Kept at the site's own classification and count"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Outdoor",
+   "qty": 13,
+   "link": "https://www.the-citizenry.com/collections/outdoor-furniture",
+   "is_group": false,
+   "evidence": "ShopifyAnalytics blob \"collection_handle\":\"outdoor-furniture\",\"total_products\":13 ; confirmed by exhaustive products.json enumeration = 13 unique product ids, by Searchspring totalResults=13, and by the rendered header '13 Products' (13 tiles / 13 distinct product URLs). All 13 titles read as outdoor furniture (Dunes Teak sectional/sofas/lounge chair/ottoman/sun lounger, Cove sofas/sectionals/lounge chair/ottoman)",
+   "flag": "MANUAL REVIEW: the same URL is also published in the Furniture menu under 'Shop by Category' as 'Outdoor Furniture'; emitted once here to avoid a duplicate row"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Shop by Category",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": "MANUAL REVIEW: parallel cut of the same catalogue as 'Shop by Room' (see that row). Children also overlap each other - e.g. 6 Torres/Bower ottomans are counted in both 'Ottomans & Benches' and 'Tables & Nightstands'. Do not sum."
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Beds & Headboards",
+   "qty": 16,
+   "link": "https://www.the-citizenry.com/collections/beds",
+   "is_group": false,
+   "evidence": "ShopifyAnalytics blob \"collection_handle\":\"beds\",\"total_products\":16 ; confirmed by exhaustive /collections/beds/products.json?limit=250 enumeration = 16 unique product ids. Rendered header '21 Products' rejected: the 21 grid tiles include an 'Order Swatches' promo banner with no product link plus colour/size variant splits. Searchspring totalResults=15 (stale index) so it was not used",
+   "flag": "MANUAL REVIEW: 15 of the 16 are beds/headboards, but the collection also contains 'Azibo Woven Wall Hanging', which is wall decor, not furniture"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Ottomans & Benches",
+   "qty": 19,
+   "link": "https://www.the-citizenry.com/collections/all-seating-ottomans-and-poufs",
+   "is_group": false,
+   "evidence": "ShopifyAnalytics blob \"collection_handle\":\"all-seating-ottomans-and-poufs\",\"total_products\":19 ; confirmed by exhaustive products.json enumeration = 19 unique product ids, by Searchspring totalResults=19, and by the rendered header '19 Products' (19 tiles / 19 distinct product URLs). All 19 titles are ottomans or benches",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Chairs & Sofas",
+   "qty": 11,
+   "link": "https://www.the-citizenry.com/collections/all-seating-chairs",
+   "is_group": false,
+   "evidence": "ShopifyAnalytics blob \"collection_handle\":\"all-seating-chairs\",\"total_products\":11 ; confirmed by exhaustive products.json enumeration = 11 unique product ids, and by Searchspring totalResults=11. Rendered header '12 Products' rejected: one of the 12 grid <li> tiles is an injected 'Throw Pillows - Shop by Size' promo banner carrying no product link; the other 11 match products.json exactly",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Tables & Nightstands",
+   "qty": 23,
+   "link": "https://www.the-citizenry.com/collections/tables-nightstands",
+   "is_group": false,
+   "evidence": "ShopifyAnalytics blob \"collection_handle\":\"tables-nightstands\",\"total_products\":23 ; confirmed by exhaustive products.json enumeration = 23 unique product ids, and by Searchspring totalResults=23. Rendered header '24 Products' rejected (24 tiles for 23 distinct products - a variant split)",
+   "flag": "MANUAL REVIEW: 6 of the 23 are Torres/Bower ottomans that are also counted in 'Ottomans & Benches'; the node is the site's own and is kept as published"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dressers",
+   "qty": 1,
+   "link": "https://www.the-citizenry.com/collections/dressers",
+   "is_group": false,
+   "evidence": "ShopifyAnalytics blob \"collection_handle\":\"dressers\",\"total_products\":1 ; confirmed by exhaustive products.json enumeration = 1 unique product id (Avon Dresser), and by Searchspring totalResults=1. Rendered header '3 Products' rejected with direct proof: all three grid tiles link to the same URL /products/avon-dresser (Natural Ash / Natural Walnut / Black Finished Ash)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Accent Furniture",
+   "qty": 3,
+   "link": "https://www.the-citizenry.com/collections/accent-furniture",
+   "is_group": false,
+   "evidence": "ShopifyAnalytics blob \"collection_handle\":\"accent-furniture\",\"total_products\":3 ; confirmed by exhaustive products.json enumeration = 3 unique product ids, by Searchspring totalResults=3, and by the rendered header '3 Products' (3 tiles / 3 distinct product URLs)",
+   "flag": "MANUAL REVIEW: only 2 of the 3 are furniture (Hinoki Wood Ladder, Kambas Ladder - Teak); the third is 'Hinoki Wood Floor Mirror', a mirror, which also appears in the Bath node"
+  }
+ ]
+}

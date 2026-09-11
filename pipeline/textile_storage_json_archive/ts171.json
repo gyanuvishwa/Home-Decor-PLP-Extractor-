@@ -1,0 +1,113 @@
+{
+  "sr": 171,
+  "company": "Aura Living UAE",
+  "brand_site": "auraliving.com",
+  "country": "UAE",
+  "site_url": "https://www.auraliving.com/",
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "ACCESS: Tier (a) HTTP (curl_cffi, chrome-impersonate) worked throughout. robots.txt = User-agent:* Allow:* (no Claude-specific block, no anthropic-ai/ClaudeBot disallow). Site is a Nuxt/Storyblok app on Chalhoub-Group infra (leem-global Cloudinary assets); region-detected to /sa by default, switched to /ae path which matches country=UAE. Top nav (from SSR header HTML) = Sale, New In, Furniture, Tableware, Bed and Bath, Decor, Made To Order, Collections. Category listing pages are client-hydrated (SSR shell has no product/count data), so used Playwright (tier b) once to discover the site's own JSON REST endpoint POST https://api.auraliving.com/aura/catalog/filters (body {category, region:'ae', language:'en', filters:[]}) which returns exact per-node CATEGORY quantities; this endpoint was then called directly via curl_cffi (tier a) for all nodes - no anti-bot wall encountered at any tier, Chrome/tier(c) not needed. TREE method: walked all 4 top-level categories (Furniture qty169, Tableware qty125, Bed-and-Bath qty46, Decor qty143) and every level-2/level-3 CATEGORY facet returned by the filters API; spot-checked product listings (via ?category=<path> query, confirmed by page h1/counter 'All <Cat>N') for every included leaf to verify the label matched actual products. QTY method: exact 'quantity' field from the catalog/filters API response for each node, cross-checked against the rendered 'All <Category>N' counter on the category page. EXCLUDED and why: Furniture (Sofas and Armchairs 58, Bedroom->Dressers and Chests/Beds and Mattresses/Bedside Tables/Benches and Stools, Dining Room->Dining Chairs/Dining Tables, Living Room->Side Tables/Coffee and Console Tables/Ottomans/Cabinets, Game Room) - furniture, out of scope. Furniture>Dining Room>Storage (qty1, product 'Victory Dining Storage' AED 2,499-6,999) - explicitly labeled 'Storage' at level-3 but nested entirely under the Furniture top-level nav with furniture-tier pricing and no dedicated Storage/Organization section exists anywhere on the site; per storage.md Sec21 'prefer Furniture when explicitly placed inside Furniture category' and to avoid duplicating an item already in scope of the separate Furniture task, this was excluded from storage_rows (documented here rather than silently dropped). Tableware>Drinkware/Dinnerware/Cutlery - Kitchen & Dining, out of scope. Tableware>Serveware (Trays/Coasters/Cake Trays/Platters and Bowls/Serveware Accessories) - Trays excluded per storage.md Sec8 decorative-tray rule (Kitchen & Dining/Decorative, not Storage); rest is Kitchen & Dining. Bed-and-Bath>Bathroom Accessories (qty26: ceramic tissue boxes, soap dispensers, ceramic/resin bins, trays, catchall trays) - decorative bath accessories; not Textile (not fabric), not Storage (waste bins/decorative trays are not organizational storage per storage.md Sec23/24). Decor>Candles and Candle Holders/Flowers and Vases/Decorative Accessories/Mirrors and Wall Decor/Lighting - out of scope decor/lighting/wall-decor categories. Sale, New In, Made To Order, Collections (top-nav items) - promotional/collection landing pages excluded per View-All/Collections rule. No duplicates encountered; no fabricated qty/links.",
+  "textile_rows": [
+    {
+      "category": "Textile",
+      "sub_category": "Tableware",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Table Linen",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Napkins and Napkin Rings",
+      "qty": 4,
+      "link": "https://www.auraliving.com/ae/c/all-tableware?category=/category-1/Tableware/category-2/table-linen/category-3/napkins-and-napkin-rings",
+      "is_group": false,
+      "evidence": "aura/catalog/filters API: category=/category-1/Tableware/category-2/table-linen, option 'Napkins and Napkin Rings' quantity=4; product listing verified all 4 items are cloth napkins (Moonstone Floral Jacquard Napkin, Centro Embroidered Napkin, Wiggle Napkin, Amber Embroidered Napkin) - no napkin rings present despite category label",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Placemats and Runners",
+      "qty": 3,
+      "link": "https://www.auraliving.com/ae/c/all-tableware?category=/category-1/Tableware/category-2/table-linen/category-3/placemats-and-runners",
+      "is_group": false,
+      "evidence": "aura/catalog/filters API: category=/category-1/Tableware/category-2/table-linen, option 'Placemats and Runners' quantity=3; product listing verified (Oslo Table Runner, Centro Embroidered Placemat, Wiggle Placemat)",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Bed and Bath",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Bed Linen",
+      "qty": 12,
+      "link": "https://www.auraliving.com/ae/c/all-bed-and-bath?category=/category-1/Bed-and-Bath/category-2/bed-linen",
+      "is_group": false,
+      "evidence": "aura/catalog/filters API: category=/category-1/Bed-and-Bath, option 'Bed Linen' quantity=12; leaf node (no level-3 children); products are duvet sets/covers (e.g. Matilda Embroidered Cotton Duvet Set)",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Bath Linen",
+      "qty": 8,
+      "link": "https://www.auraliving.com/ae/c/all-bed-and-bath?category=/category-1/Bed-and-Bath/category-2/bath-linen",
+      "is_group": false,
+      "evidence": "aura/catalog/filters API: category=/category-1/Bed-and-Bath, option 'Bath Linen' quantity=8; leaf node; product listing verified all 8 are bath sheets/towels/hand towels/face towels (Essex Embroidered Bath Sheet, Essex Embroidered Bath Towel, Neutral Jacquard Bath Sheet/Bath Towel/Hand Towel/Face Towel, Moonstone Cotton Bath Sheet, Sunstone Cotton Bath Sheet)",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Decor",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Cushions and Throws",
+      "qty": 11,
+      "link": "https://www.auraliving.com/ae/c/all-decor?category=/category-1/Decor/category-2/cushions-and-throws",
+      "is_group": false,
+      "evidence": "aura/catalog/filters API: category=/category-1/Decor, option 'Cushions and Throws' quantity=11; leaf node; product listing verified (Atomic Beaded Cushion, Bilbao Floor Cushion, ...)",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Rugs",
+      "qty": 7,
+      "link": "https://www.auraliving.com/ae/c/all-decor?category=/category-1/Decor/category-2/rugs",
+      "is_group": false,
+      "evidence": "aura/catalog/filters API: category=/category-1/Decor, option 'Rugs' quantity=7; leaf node; product listing verified (Zircon Patterned Carpet 200x300cm, Arx Wool Tufted Rug 160x230cm, ...)",
+      "flag": null,
+      "confidence": "HIGH"
+    }
+  ],
+  "storage_rows": []
+}

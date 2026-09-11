@@ -1,0 +1,75 @@
+{
+  "sr": 132,
+  "company": "DEPOT",
+  "brand_site": "depot-online.de",
+  "country": "Germany",
+  "site_url": "https://www.depot-online.de/",
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "ACCESS: Claude-in-Chrome only, one dedicated tab, ~2.2-2.5s spacing across ~50 same-origin fetch() calls issued from the loaded page context. Zero 403 / DataDome / Akamai / CAPTCHA / rate-limit at any point. robots.txt names no Claude agent and disallows only /de/account, /de/wishlist, /de/basket, /de/checkout, /de/order, /prudsys, /api. TREE SOURCE: sitemap.xml is DEAD (returns an S3 'NoSuchKey' error for DE/sitemap.xml), so the sitemap cross-check of trap 1 was impossible - documented, not skipped. The desktop mega-menu is a Contentful 'megaMenu' record whose child entries are unresolved sys refs and it did not expand under hover, so the tree came from three other sources unioned: (a) the department landing pages' own sub-category tile/chip strips, (b) category slugs embedded in the Angular SSR 'serverApp-state' JSON, (c) a numeric-ID sweep. URL SHAPE + KEY QUIRK: /de/c/<slug-path>, and every category also answers at <anything>-<numericId>, which 301s to its clean canonical slug; an unknown id 404s. This let me enumerate ids 66-95 plus 749/6815/7006/7240 and recover the whole Moebel family. TRAP 2 IS LIVE HERE: an id that exists but is INACTIVE returns HTTP 200 serving its PARENT listing and the parent's count - ids 71,72,73,74 all serve /de/c/moebel/tische and ids 78,79,80,81,83 all serve /de/c/moebel/sitzmoebel (79 = 'Sessel'/armchairs, still linked from the Moebel page but with no listing of its own). Those are therefore NOT rows. Every leaf below was re-requested at its clean canonical slug and confirmed HTTP 200 with an h1 that matches the node asked for and no redirect. COUNTS: taken from the rendered listing header, which prints both 'Ergebnisse anzeigen (N)' and 'N Artikel'; both agreed on every node. Prior Home-Decor pass had already proven this header is a stable TOTAL, not a per-page number. TRAP 4 / ZERO COUNTS: DEPOT is a German decor retailer whose furniture line is tiny and, at the end of August, largely sold through. Tische, Stuehle, Sitzbaenke, Aufbewahrungsmoebel and Haengesessel & Haengematten each render a live listing page with header '0' and the site's own empty-state line 'Es gibt keine Produkte in dieser Kategorie.' These are emitted as qty 0 per the brief, not omitted - they are a real in-stock reading of live nodes, not a partial read. PARENT-vs-CHILD DISCREPANCY, please read at merge: the Moebel department page itself reads 9 Artikel and Sitzmoebel itself reads 1 Artikel, while their extractable children read 0. The stock sits directly on the parent nodes (Moebel's 9 tiles are 3x Hocker/stools, 3x Outdoor-Sitzgruppe/folding outdoor seating set, 2x Beistelltisch/side table and 1x Haengeleuchte, which is a pendant lamp and not furniture at all). Per the section 2 hierarchy rule I did NOT record Moebel or Sitzmoebel as leaves because they have extractable children, so those 9 and 1 do not appear in any row - flagging it explicitly here rather than silently inflating a child. EXCLUDED after inspection: /de/c/balkon-garten/blumentreppen-pflanzregale 'Pflanzregale' (6) - plant stands/plant ladders for pots, a planter accessory rather than furniture; the whole Deko & Wohnen > Weitere Home-Accessoires branch (111) whose children are Kinderland, Aufbewahrung, Badezimmer, Basteln & Streuartikel and Hobbies & Lifestyle - standalone storage goods, kids decor, crafts and bathroom accessories, all excluded by section 1 and all already product-verified in the prior Home-Decor pass; /de/s/geflecht-moebel-fuer-jeden-stil-749 which is an editorial /de/s/ story page, not a category. ABSENCE CHECK for the rest of the site: the twelve top-level departments are Herbst, Balkon & Garten, Inspiration, Neu, Deko, Textilien, Tisch & Kueche, Moebel, Geschenke & Party, Anlaesse, ipuro and Sale; furniture exists only under Moebel and under Balkon & Garten > Outdoor-Moebel. The numeric sweep found no Regale/Kommode/Schrank/Bett/Schreibtisch node anywhere in the Moebel id block, and the prior pass had already walked Deko, Textilien and Tisch & Kueche node by node. Outdoor-Moebel reads 3 and its child Loungemoebel also reads 3, so the department is fully accounted for by that one child.",
+  "rows": [
+    {
+      "category": "Furniture",
+      "sub_category": "Tables",
+      "qty": 0,
+      "link": "https://www.depot-online.de/de/c/moebel/tische",
+      "is_group": false,
+      "evidence": "listing header 'Ergebnisse anzeigen (0)' / '0 Artikel'; empty-state text 'Es gibt keine Produkte in dieser Kategorie.'; h1 'Tische' matches requested slug, HTTP 200, no redirect",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Seating",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Chairs",
+      "qty": 0,
+      "link": "https://www.depot-online.de/de/c/moebel/sitzmoebel/stuehle",
+      "is_group": false,
+      "evidence": "listing header 'Ergebnisse anzeigen (0)' / '0 Artikel'; empty-state text 'Es gibt keine Produkte in dieser Kategorie.'; h1 'Stuehle' matches requested slug, HTTP 200, no redirect",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Benches",
+      "qty": 0,
+      "link": "https://www.depot-online.de/de/c/moebel/sitzmoebel/sitzbaenke",
+      "is_group": false,
+      "evidence": "listing header 'Ergebnisse anzeigen (0)' / '0 Artikel'; empty-state text 'Es gibt keine Produkte in dieser Kategorie.'; h1 'Baenke' (page title 'Sitzbaenke online kaufen | DEPOT'), HTTP 200, no redirect",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Storage Furniture",
+      "qty": 0,
+      "link": "https://www.depot-online.de/de/c/moebel/aufbewahrungsmoebel",
+      "is_group": false,
+      "evidence": "loaded directly in the browser tab: h1 'Aufbewahrungsmoebel', rendered header '0 Artikel', rendered empty-state 'Es gibt keine Produkte in dieser Kategorie.'; no live sub-categories",
+      "flag": null
+    },
+    {
+      "category": "Outdoor Furniture",
+      "sub_category": "Lounge Furniture",
+      "qty": 3,
+      "link": "https://www.depot-online.de/de/c/balkon-garten/outdoor-moebel/loungemoebel",
+      "is_group": false,
+      "evidence": "listing header 'Ergebnisse anzeigen (3)' / '3 Artikel'; h1 'Loungemoebel' matches requested slug, HTTP 200, no redirect; parent Outdoor-Moebel also reads 3, consistent",
+      "flag": null
+    },
+    {
+      "category": "Outdoor Furniture",
+      "sub_category": "Hanging Chairs & Hammocks",
+      "qty": 0,
+      "link": "https://www.depot-online.de/de/c/balkon-garten/outdoor-moebel/haengematten-haengesessel",
+      "is_group": false,
+      "evidence": "listing header 'Ergebnisse anzeigen (0)' / '0 Artikel'; empty-state text 'Es gibt keine Produkte in dieser Kategorie.'; h1 'Haengesessel & Haengematten' matches requested slug, HTTP 200, no redirect",
+      "flag": "MANUAL REVIEW: mixed node - hanging chairs are outdoor seating furniture, hammocks arguably are not; kept because the site files it under its Outdoor-Moebel department. Currently reads 0 so the classification has no numeric effect."
+    }
+  ]
+}

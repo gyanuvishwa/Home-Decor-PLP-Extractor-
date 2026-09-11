@@ -1,0 +1,572 @@
+{
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ACCESS: robots.txt for THIS host fetched FIRST (https://shop.vtwonen.nl/robots.txt, 200, 6541 bytes) before any other request to shop.vtwonen.nl. NO group names ClaudeBot, anthropic-ai or Claude-Web - the full file was grepped for 'claude|anthropic': zero hits. Groups present: '*', adsbot-google, Nutch (Disallow: /), AhrefsBot (Crawl-delay: 10), AhrefsSiteAudit, and 'User-Agent: CCBot / Disallow: /' at line 168 followed by a DPG Media copyright notice - CCBot is Common Crawl, not a Claude agent, so it is not a hard stop for this run. The '*' group declares no Crawl-delay and no blanket Disallow; probe.fetch()'s 2s/host pacing was used throughout. Disallows that constrain this run: /search, /collections/*sort_by*, /collections/*+* (and %2B/%2b variants), */collections/*filter*&*filter*, /checkout, /cart, /account, /policies/. I requested NO sort_by, NO multi-filter and NO /search URL - only bare /collections/<handle>, bare '?page=N' pagination (not disallowed) and /collections/<handle>/products.json. Sitemap declared: https://shop.vtwonen.nl/sitemap.xml. All requests HTTP 200 via probe.fetch() (curl_cffi, safari15_5 and rotation).\nTREE (three site-owned sources, mutually confirming): (1) The homepage mega-menu, server-rendered as Shopify Liquid with explicit data-level / data-level-index attributes. Panel data-level-index='10' is the 'badkamer' top-level item -> /collections/badkamer-sanitair, containing three level-3 groups: badtextiel (children: badmatten, handdoeken, badjassen), badkamer accessoires (handdoekhouders, zeepdispensers, planchets, toiletrolhouders, toiletborstels) and sanitair (toiletpotten). Each group also carries an 'alle <group>' View-All link back to its own parent - never recorded (rule 25). (2) THE DECISIVE SOURCE - the site's own collection sitemap https://shop.vtwonen.nl/sitemap_collections_1.xml (200, 1600 collections), which is emitted in DEPTH-FIRST HIERARCHICAL ORDER, not alphabetically. The Badkamer & Sanitair branch occupies a single contiguous block, lines 162-252: 162 badkamer-sanitair; 163 badkamer-accessoires + its 16 children (164-179); 180 badkamermeubels + 8 children (181-188); 189 badkamerspiegels + 5 (190-194); 195 badkamer-veiligheid-comfort + 10 (196-205); 206 kranen + 6 (207-212); 213 baden + 3 (214-216); 217 badtextiel + 8 (218-225); 226 douches + 14 (227-240); 241 toiletten + 5 (242-246); 247 wastafels-fonteinen + 5 (248-252). Line 253 starts a different branch (wellness). The mega-menu only surfaces a fraction of this. (3) EVERY hub page was then opened and its OWN on-page child-category tiles (absolute-URL chips, distinct from the repeated global nav) were read back - they reproduce the sitemap block exactly: badkamer-accessoires lists Bad accessoires / Douche accessoires / Handdoekhouders / Make-up organizers / Planchets / Tandenborstelhouders / Tissue houders / Toiletborstels / Toiletrolhouders / Zeepdispensers / Zeephouders; badkamermeubels lists Badkamerrekken / Badmeubels / Badmeubelsets / Kolomkasten / Medicijnkastjes / Spiegelkasten / Toiletmeubels / Wastafelonderkasten; badkamerspiegels, badkamer-veiligheid-comfort, kranen, baden, douches, toiletten and wastafels-fonteinen likewise. So the hierarchy is the site's, not inferred, and no URL was pattern-guessed. Also swept all 1600 sitemap slugs for bathroom vocabulary: radiatoren (line 405), keukenkranen (482), buitendouches (644, outdoor) and strandlakens (1538) sit OUTSIDE the 162-252 block and are not part of this branch (strandlakens is nonetheless a Badtextiel tile and is routed to Textile below).\nQTY SOURCE + PROOF: the vtwonen PLP renders NO product total anywhere in the DOM (searched for producten/artikelen/resultaten/aantal/total/count - nothing), and its grid pages at 48 tiles with only a next-page link, so there is no rendered figure to read. Per the brief I therefore used the storefront's OWN product endpoint, Shopify /collections/<handle>/products.json?limit=250&page=N, ENUMERATED TO EXHAUSTION (no reported total is trusted - products were counted). EQUIVALENCE PROVEN against the real PLP on four collections of four different sizes spanning 1, 1, 2 and 7 rendered pages, by paginating shop.vtwonen.nl/collections/<h>?page=N at 48 tiles/page and counting distinct /products/ hrefs: douche-accessoires json=2 / PLP=2; toiletpotten 38 / 38; badmatten 80 / 80; badkamer-accessoires 308 / 308. Exact match in every case. INTERNAL CONSISTENCY - independent corroboration: enumerated child counts reproduce their enumerated parent EXACTLY in eight separate branches, which could not happen if the enumeration were lossy. badkamer-accessoires 308 = 99+2+2+8+1+2+19+16+17+0+35+4+13+35+16+39. badkamermeubels 471 = 53+136+17+63+0+0+49+153. badkamerspiegels 67 = 0+0+0+46+21. kranen 40 = 2+0+0+7+3+28. baden 15 = 0+15+0. douches 179 = 23+35+0+0+0+1+13+0+0+0+10+7+0+90. toiletten 38 = 38+0+0+0+0. wastafels-fonteinen 9 = 5+4+0+0+0. (These identities are stated as EVIDENCE ONLY - no recorded quantity is a sum; every recorded qty is that node's own enumerated count.) Counts plainly discriminate (1 to 1728) and every page's H1 matched the node requested. ZERO-COUNT NODES were re-verified a second way: spiegelkasten, douchegordijnen and wastafels each return 0 by products.json AND 0 by PLP pagination.\nDEDUP: already_extracted() run on all 93 candidate URLs in the branch plus /collections/spiegels. Five hits, all moved to review[] and kept out of rows[]: badmeubels -> Furniture.xlsx 'Bathroom Vanity Units'; badmeubelsets -> 'Bathroom Vanity Sets'; kolomkasten -> 'Tall Bathroom Cabinets'; wastafelonderkasten -> 'Washbasin Base Cabinets' (all OPTION 1); spiegels -> Final.xlsx (Home Decor pass) 'Mirrors'. Notably the parent Badkamermeubels and its children Badkamerrekken, Toiletmeubels, Spiegelkasten and Medicijnkastjes are NOT in the index, so the two non-empty ones (Badkamerrekken 17, Toiletmeubels 49) are correctly new Bathroom rows.\nROUTING / EXCLUSIONS: Badtextiel and all nine children -> Textile (rules 15, 16, 20). Douchegordijnen -> Textile (rule 20), though empty. Badkamerspiegelverlichting -> Lighting (rule 11: primary type is the light), while Badkamerspiegels met verlichting (46) stays in Bathroom because there the primary type is the mirror - this is exactly the rule-11 split. Badkamerspiegels zonder verlichting (21) recorded. Sale collection excluded (rule 25). Wellness/sauna branch excluded as a separate top-level node. Roughly 30 nodes across the branch are structurally present but hold 0 products (the whole Badkamer veiligheid & comfort branch, all toilet children except Toiletpotten, all wastafel children except Fonteinen and montageonderdelen, most douche fittings); every one is named explicitly in review[] so nothing is silently skipped, but none is recorded as a row since a node with no products is not a valid listing. NET: 34 recordable Bathroom leaves under 9 grouping rows. No parent URL recorded where children exist, no View All / Shop All / search / PDP URL recorded, no quantity estimated, inherited or summed.",
+ "rows": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Badkamer & Sanitair",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Badkamer & Sanitair > Badkamer accessoires",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bad accessoires",
+   "qty": 99,
+   "link": "https://shop.vtwonen.nl/collections/bad-accessoires",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bekerhouders",
+   "qty": 2,
+   "link": "https://shop.vtwonen.nl/collections/bekerhouders",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Wattenschijfjes- & wattenstaafjeshouders",
+   "qty": 2,
+   "link": "https://shop.vtwonen.nl/collections/wattenschijfjes-wattenstaafjeshouders",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Make-up organizers",
+   "qty": 8,
+   "link": "https://shop.vtwonen.nl/collections/make-up-organizers",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Scheerspiegels",
+   "qty": 1,
+   "link": "https://shop.vtwonen.nl/collections/scheerspiegels",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Douche accessoires",
+   "qty": 2,
+   "link": "https://shop.vtwonen.nl/collections/douche-accessoires",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Planchets",
+   "qty": 19,
+   "link": "https://shop.vtwonen.nl/collections/planchets",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Zeepdispensers",
+   "qty": 16,
+   "link": "https://shop.vtwonen.nl/collections/zeepdispensers",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Zeephouders",
+   "qty": 17,
+   "link": "https://shop.vtwonen.nl/collections/zeephouders",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Tissue houders",
+   "qty": 35,
+   "link": "https://shop.vtwonen.nl/collections/tissue-houders",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Toiletaccessoiresets",
+   "qty": 4,
+   "link": "https://shop.vtwonen.nl/collections/toiletaccessoiresets",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Toiletborstels",
+   "qty": 13,
+   "link": "https://shop.vtwonen.nl/collections/toiletborstels",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Toiletrolhouders",
+   "qty": 35,
+   "link": "https://shop.vtwonen.nl/collections/toiletrolhouders",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Tandenborstelhouders",
+   "qty": 16,
+   "link": "https://shop.vtwonen.nl/collections/tandenborstelhouders",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Handdoekhouders",
+   "qty": 39,
+   "link": "https://shop.vtwonen.nl/collections/handdoekhouders",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Badkamer & Sanitair > Badkamermeubels",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Badkamerrekken",
+   "qty": 17,
+   "link": "https://shop.vtwonen.nl/collections/badkamerrekken",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Toiletmeubels",
+   "qty": 49,
+   "link": "https://shop.vtwonen.nl/collections/toiletmeubels",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Badkamer & Sanitair > Badkamerspiegels",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Badkamerspiegels met verlichting",
+   "qty": 46,
+   "link": "https://shop.vtwonen.nl/collections/badkamerspiegels-met-verlichting",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Badkamerspiegels zonder verlichting",
+   "qty": 21,
+   "link": "https://shop.vtwonen.nl/collections/badkamerspiegels-zonder-verlichting",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Badkamer & Sanitair > Kranen",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Badkranen",
+   "qty": 2,
+   "link": "https://shop.vtwonen.nl/collections/badkranen",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Fonteinkranen",
+   "qty": 7,
+   "link": "https://shop.vtwonen.nl/collections/fonteinkranen",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Douchekranen",
+   "qty": 3,
+   "link": "https://shop.vtwonen.nl/collections/douchekranen",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Wastafelkranen",
+   "qty": 28,
+   "link": "https://shop.vtwonen.nl/collections/wastafelkranen",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Badkamer & Sanitair > Baden",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Badkuipen",
+   "qty": 15,
+   "link": "https://shop.vtwonen.nl/collections/badkuipen",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Badkamer & Sanitair > Douches",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Regendouches",
+   "qty": 23,
+   "link": "https://shop.vtwonen.nl/collections/regendouches",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Douchecabines",
+   "qty": 35,
+   "link": "https://shop.vtwonen.nl/collections/douchecabines",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Douchedeuren",
+   "qty": 1,
+   "link": "https://shop.vtwonen.nl/collections/douchedeuren",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Doucheafvoeren",
+   "qty": 13,
+   "link": "https://shop.vtwonen.nl/collections/doucheafvoeren",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Douchepanelen",
+   "qty": 10,
+   "link": "https://shop.vtwonen.nl/collections/douchepanelen",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Douchesets",
+   "qty": 7,
+   "link": "https://shop.vtwonen.nl/collections/douchesets",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Douchewanden",
+   "qty": 90,
+   "link": "https://shop.vtwonen.nl/collections/douchewanden",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Badkamer & Sanitair > Toiletten",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Toiletpotten",
+   "qty": 38,
+   "link": "https://shop.vtwonen.nl/collections/toiletpotten",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Badkamer & Sanitair > Wastafels & Fonteinen",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Fonteinen",
+   "qty": 5,
+   "link": "https://shop.vtwonen.nl/collections/fonteinen",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Wastafel montageonderdelen",
+   "qty": 4,
+   "link": "https://shop.vtwonen.nl/collections/wastafel-montageonderdelen",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  }
+ ],
+ "review": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Badkamermeubels > Badmeubels (Bathroom Vanity Units)",
+   "qty": 53,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Bathroom Vanity Units'. OPTION 1: stays in Furniture, not re-extracted into Bathroom.",
+   "link": "https://shop.vtwonen.nl/collections/badmeubels"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Badkamermeubels > Badmeubelsets (Bathroom Vanity Sets)",
+   "qty": 136,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Bathroom Vanity Sets'. OPTION 1: stays in Furniture.",
+   "link": "https://shop.vtwonen.nl/collections/badmeubelsets"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Badkamermeubels > Kolomkasten (Tall Bathroom Cabinets)",
+   "qty": 63,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Tall Bathroom Cabinets'. OPTION 1: stays in Furniture.",
+   "link": "https://shop.vtwonen.nl/collections/kolomkasten"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Badkamermeubels > Wastafelonderkasten (Washbasin Base Cabinets)",
+   "qty": 153,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Washbasin Base Cabinets'. OPTION 1: stays in Furniture.",
+   "link": "https://shop.vtwonen.nl/collections/wastafelonderkasten"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Badkamerspiegels > Badkamerspiegelverlichting (Mirror Lighting)",
+   "qty": 0,
+   "issue": "ROUTED TO LIGHTING: primary product type is a mirror light, not a mirror (rules 11, 19) - the sibling nodes 'Badkamerspiegels met verlichting' (46) and 'zonder verlichting' (21) are the actual mirrors and ARE recorded in rows. Node is currently empty as well: 0 products by both measurement methods.",
+   "link": "https://shop.vtwonen.nl/collections/badkamerspiegelverlichting"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Badkamer & Sanitair > Badtextiel",
+   "qty": 586,
+   "issue": "ROUTED TO TEXTILE: entire branch is bath linen (rules 15, 20). One of only two children vtwonen surfaces in its own mega-menu under badkamer. All nine of its children are listed individually below so nothing is silently skipped; the parent itself is not recorded (rule 24) and its number is neither reused nor summed.",
+   "link": "https://shop.vtwonen.nl/collections/badtextiel"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Badtextiel > Handdoeken",
+   "qty": 233,
+   "issue": "ROUTED TO TEXTILE: towels (rule 15).",
+   "link": "https://shop.vtwonen.nl/collections/handdoeken"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Badtextiel > Badjassen",
+   "qty": 181,
+   "issue": "ROUTED TO TEXTILE: bathrobes (rule 20).",
+   "link": "https://shop.vtwonen.nl/collections/badjassen"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Badtextiel > Badmatten",
+   "qty": 80,
+   "issue": "ROUTED TO TEXTILE: textile bath mats (rule 16 - only rubber/anti-slip mats stay in Bathroom, and vtwonen keeps those in a separate 'Antislipmatten' node under Badkamer veiligheid & comfort). vtwonen files this under Badtextiel, which decides it.",
+   "link": "https://shop.vtwonen.nl/collections/badmatten"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Badtextiel > Gastendoekjes",
+   "qty": 45,
+   "issue": "ROUTED TO TEXTILE: guest towels (rule 15).",
+   "link": "https://shop.vtwonen.nl/collections/gastendoekjes"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Badtextiel > Washandjes",
+   "qty": 20,
+   "issue": "ROUTED TO TEXTILE: washcloths (rule 15).",
+   "link": "https://shop.vtwonen.nl/collections/washandjes"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Badtextiel > Strandlakens",
+   "qty": 14,
+   "issue": "ROUTED TO TEXTILE: beach towels (rule 15).",
+   "link": "https://shop.vtwonen.nl/collections/strandlakens"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Badtextiel > Hammandoeken",
+   "qty": 6,
+   "issue": "ROUTED TO TEXTILE: hammam towels (rule 15).",
+   "link": "https://shop.vtwonen.nl/collections/hammandoeken"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Badtextiel > Handdoekensets",
+   "qty": 0,
+   "issue": "ROUTED TO TEXTILE: towel sets (rule 15). Empty node - 0 products.",
+   "link": "https://shop.vtwonen.nl/collections/handdoekensets"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Badtextiel > Bad- en toiletmatten",
+   "qty": 0,
+   "issue": "ROUTED TO TEXTILE: textile bath/toilet mats (rules 16, 20). Empty node - 0 products.",
+   "link": "https://shop.vtwonen.nl/collections/bad-en-toiletmatten"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Douches > Douchegordijnen",
+   "qty": 0,
+   "issue": "ROUTED TO TEXTILE: shower curtains are explicitly Textile (rule 20). Empty node - 0 products by both measurement methods. NOTE the sibling hardware nodes Douchegordijnringen and Douchegordijnstangen (rings/rods) would be Bathroom hardware under rule 17, but they are empty too (0/0), so neither is recordable.",
+   "link": "https://shop.vtwonen.nl/collections/douchegordijnen"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Badkamer & Sanitair > Badkamer veiligheid & comfort",
+   "qty": 0,
+   "issue": "ENTIRE BRANCH EMPTY - not recordable, but genuinely Bathroom by type so logged here rather than silently skipped. The node itself and ALL TEN of its children return 0 products: /collections/bad-en-douchegrepen (grab bars), /badstoelen, /badliften, /antislipmatten (the rubber anti-slip mats rule 16 would put in Bathroom), /douchestoelen, /douchezitjes, /douchekrukken, /toiletbeugels, /toiletstoelen, /toiletverhogers. Because it has no extractable children it is not carried as a grouping row either.",
+   "link": "https://shop.vtwonen.nl/collections/badkamer-veiligheid-comfort"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Badkamermeubels - empty children",
+   "qty": 0,
+   "issue": "EMPTY NODES, not recordable: /collections/spiegelkasten (mirror cabinets - rule 10 would place these in Bathroom, and they are NOT in the dedup index, so they would have been rows; 0 products confirmed independently by products.json AND by paginating the real PLP) and /collections/medicijnkastjes (medicine cabinets, 0). Logged so the mirror-cabinet node is not silently skipped.",
+   "link": "https://shop.vtwonen.nl/collections/spiegelkasten"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Badkamerspiegels - empty children",
+   "qty": 0,
+   "issue": "EMPTY NODES, not recordable, both genuinely Bathroom by type: /collections/badkamerspiegelbevestiging (mirror mounting hardware, rule 17) and /collections/badkamerspiegelverwarming (mirror demister/heating, rule 10) - 0 products each.",
+   "link": "https://shop.vtwonen.nl/collections/badkamerspiegelbevestiging"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Kranen / Baden / Douches / Toiletten / Wastafels - empty children",
+   "qty": 0,
+   "issue": "EMPTY NODES, not recordable, all genuinely Bathroom by type (rules 4, 5, 6, 7, 8, 14). Kranen: /bidetkranen, /kraanonderdelen. Baden: /bad-onderdelen, /mobiele-baden. Douches: /douchegordijnringen, /douchegordijnstangen, /douchekoppen, /doucheslangen, /douchemontageonderdelen, /douchebakken. Toiletten: /toiletmontageonderdelen, /wc-brillen (toilet seats), /toiletsets, /urinoirs. Wastafels & Fonteinen: /wastafels, /waskommen, /wastafelbladen. Every one returns 0 products; /collections/wastafels was double-checked by PLP pagination as well. Listed exhaustively so no bathroom subcategory is silently skipped.",
+   "link": "https://shop.vtwonen.nl/collections/wc-brillen"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Badkamer accessoires > Reserverolhouders",
+   "qty": 0,
+   "issue": "EMPTY NODE - spare toilet-roll holders, Bathroom by type (rule 14) but 0 products, so not recordable.",
+   "link": "https://shop.vtwonen.nl/collections/reserverolhouders"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Badkamer & Sanitair (top node)",
+   "qty": 1728,
+   "issue": "PARENT NOT RECORDED (rule 24) - vtwonen's own top-level Bathroom listing; valid children exist so it is carried as the grouping row. Logged with its enumerated total as evidence; the number is not reused for any child and no siblings were summed.",
+   "link": "https://shop.vtwonen.nl/collections/badkamer-sanitair"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Badkamer & Sanitair > Sale",
+   "qty": null,
+   "issue": "EXCLUDED - promotional/outlet listing, not a category (rule 25). It is the third tile on the Badkamer & Sanitair page alongside Badkamer accessoires and Badtextiel.",
+   "link": "https://shop.vtwonen.nl/collections/badkamer-sanitair-sale"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Wellness (Sauna's, Stoomcabines, Whirlpools, Sauna-accessoires)",
+   "qty": null,
+   "issue": "NOT RECORDED - separate top-level branch in vtwonen's own category sitemap (immediately AFTER the Badkamer & Sanitair block, not inside it) covering sauna, steam cabins and hot tubs. Primary product type is wellness/spa equipment, not bathroom sanitaryware; 'Whirlpools' here are outdoor hot tubs, not the whirlpool BATHS of rule 5 (those live under Baden > Badkuipen, which IS recorded). Flagged rather than guessed (rule 29).",
+   "link": "https://shop.vtwonen.nl/collections/wellness"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Spiegels (general Mirrors)",
+   "qty": null,
+   "issue": "ALREADY EXTRACTED IN Final.xlsx (Home Decor pass) as 'Mirrors'. General decorative mirrors under Woonaccessoires, outside the Badkamer branch - the bathroom-specific mirror nodes are recorded separately in rows.",
+   "link": "https://shop.vtwonen.nl/collections/spiegels"
+  }
+ ],
+ "_reconstructed_from": "Bathroom.xlsx delivered 2026-09-01 (checkpoint), not original worker JSON"
+}

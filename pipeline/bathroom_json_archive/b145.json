@@ -1,0 +1,205 @@
+{
+ "status": "partial",
+ "failure_reason": "PARTIAL: full Bathroom category tree recovered from the site's own published sitemap, but no product-count quantities are obtainable because the site is a client-side-only Angular SPA whose only data source, sapapi.galerieslafayette.com, has robots.txt 'Disallow: /'. See notes for the retry-session browser attempt (inconclusive due to a shared/contended browser tab group, not a robots or access failure).",
+ "notes": "STATUS EXPLAINED FIRST, BECAUSE IT IS UNUSUAL: this is NOT a bot wall and NOT a robots exclusion of Galeries Lafayette. www.galerieslafayette.com is fully reachable and its robots.txt permits everything used here. The company is closed as BLOCKED / ACCESS FAILURE for one specific reason: the ONLY source of an exact product count is an API host whose own robots.txt is a blanket 'User-agent: * / Disallow: /', so there is no quantity we are permitted to take, and rules 26 and 38 forbid recording a leaf without one. The complete Bathroom tree WAS recovered, is verified against the site's own published category sitemap, and is in review[] with exact URLs so nothing is lost. ROBOTS, HOST 1 - www.galerieslafayette.com: fetched FIRST, before any other request (HTTP 200, 65,438 bytes, 2,007 lines, dated 20/08/2026 in its own header comment). NO Claude agent is named anywhere in it - no 'User-agent: ClaudeBot', no 'anthropic-ai', no 'Claude-Web', and no Content-Signal line. I parsed it into groups rather than eyeballing it. There are exactly two groups: 'User-agent:*' at line 16 (1,997 rules) and a second 'Agressive Agent' group at lines 1013-1017 naming Pinterestbot, Twitterbot, SemrushBot, AhrefsBot and MJ12bot, which carries 'Crawl-Delay: 5'. WE ARE NOT IN THAT GROUP, so the Crawl-Delay does not bind us; I raised probe.MIN_GAP to 4.0s for this host anyway as a courtesy. NOTE a false positive I checked and dismissed: the file contains the string 'Claude' twice, at lines 91 and 1093, but both are 'Allow:/search/Coupe-vent+Claude+K-Way?search=$' - a K-Way product name, not a user-agent group. TWO RULES IN THE '*' GROUP GOVERNED HOW I WORKED. (1) Line 181 'Disallow:*?' and line 182 'Disallow:*&' disallow ALL query strings, with only these Allow exceptions: '*?lpo=ori', '*?lpo=lpo', '*?lpovarid=*', '*?lposrc=meta', '*?lpoid=*', '*gad_source=*', '*gclsrc=*', '*gclid=*' and '*?currentPage=*'. CONSEQUENCE FOR THE CAMPAIGN-PARAMETER ROUTE the dispatch note permits: utm_source / utm_medium are NOT in the allow list and are therefore caught by 'Disallow:*?' on this host, so the utm route is robots-disallowed here and I did not use it. (It would in any case have been pointless - see ACCESS below, there is no DataDome challenge to exempt.) (2) 'Disallow:*/search/*' plus 'Disallow:*/t:*', 'Disallow:*/tri/*', 'Disallow:*/prix/*', 'Disallow:*/fc/*/*', 'Disallow:*/fm/*/*' and a long list of '*/f<facet>/*?currentPage=*' rules bar search, sort and multi-facet URLs; none was requested, and none would be recordable under rules 25/27 anyway. ACCESS TO www: CLEAN. There is no DataDome or Akamai challenge on this host at all. probe.fetch() returned HTTP 200 on the first or second fingerprint every time (chrome120, chrome124, chrome131, edge101, safari17_0, safari17_2_ios, safari18_0, safari18_0_ios all worked) on the home page, the sitemap index, the category sitemap, the 50 MB product sitemap, the 5 MB main.js bundle and every category page tried. So the ladder never needed a rung. TREE: recovered in full from the site's OWN published category sitemap. robots.txt line 3 declares 'Sitemap: https://www.galerieslafayette.com/sitemap.xml'; that index lists 17 files, including https://www.galerieslafayette.com/siteMap/Category-fr-EUR.xml, which returned 200 (350 KB) and contains 1,481 category URLs, 526 of them under /c/maison-et-loisirs and 441 under /c/maison-et-loisirs/maison. I walked all 1,481 and swept them for salle-de-bain|bain|douche|toilette|miroir|savon|lavabo|robinet|baignoire|wc|sanitaire|serviette|peignoir|brosse. The complete Bathroom footprint of this retailer is: (a) Rangement > Rangements de salle de bain with five children (Accessoires de rangement de salle de bain, D\u00e9rouleurs papier toilette, Paniers \u00e0 linge, Porte-serviettes, Poubelles de salle de bain); (b) D\u00e9coration de la maison > Objets de d\u00e9coration > Miroirs with four children, of which Miroirs de salle de bain and Miroirs lumineux are Bathroom under rules 10/11 while Miroirs muraux and Miroirs \u00e0 poser are already in Final.xlsx; (c) Mobilier > Salle de bain and Mobilier > Meubles de rangement > Meubles salle de bains, the bathroom furniture pair; (d) Linge de maison > Linge de bain with ten children, all Textile; plus the out-of-scope adjacencies Rangement > Rangements de cuisine > Distributeurs de savon, Rangement > Rangements d\u00e9coratifs > Pat\u00e8res et portemanteaux, Beaut\u00e9 > Soins > Soins corps et bain > Bain et douche (+7 children) and Enfant > Pu\u00e9riculture > Toilette et bain > Baignoires. Every one of those is in review[] with its exact URL. Galeries Lafayette is a department store, not a bathroom specialist: it sells NO baths, showers, enclosures, screens, taps, basins, sinks, toilets or bidets, so rules 4-8 have no nodes here. No URL was invented - all 27 URLs in review[] appear verbatim in the site's own Category sitemap (I asserted membership programmatically; the only two that do not are not URLs at all but the 'Bain et douche' and 'Baignoires' branch heads outside /maison, which I quote from the same sitemap). WHY NO COUNTS - THE DECISIVE FINDING: www.galerieslafayette.com is an Angular single-page app. EVERY page on it, home page and category page alike, returns exactly the same 6,343-byte client-side shell: no products, no H1, no breadcrumb, no 'N articles' string (probe.counts_in() returns [] on all of them), no JSON-LD, no rel=canonical and no embedded state. I confirmed this was deterministic and not a fluke: seven separate requests to /c/maison-et-loisirs/maison/rangement/rangements-de-salle-de-bain across different fingerprints, with plain headers, with a full text/html Accept + fr-FR Accept-Language, and with Sec-Fetch-Mode: navigate + Upgrade-Insecure-Requests, ALL returned 6,343 bytes; so did the bare-domain form without www and the robots-permitted ?currentPage=1 form. There is no server-side-rendered variant. The shell names its data source in the head: <meta name=\"occ-backend-base-url\" content=\"https://sapapi.galerieslafayette.com\">, and the 5 MB main.1fc5a6e1574bf14c.js bundle confirms it builds SAP Commerce OCC calls against '/occ/v2/' on that host. So the PLP renders from the SAP OCC API and from nothing else. ROBOTS, HOST 2 - sapapi.galerieslafayette.com: because robots is PER-HOST and a parent domain's permission never extends to another host, I fetched its robots.txt BEFORE making any API call. All ten curl_cffi fingerprints got HTTP 403 on it; adding a Referer/Origin of https://www.galerieslafayette.com returned HTTP 200 and the file in full, which is, verbatim and in its entirety: 'User-agent: *\\nDisallow: /'. That is a blanket disallow under the wildcard group, it covers us, and it covers every path on that host. Under the run's own standing decision - the api.qvc.com precedent, 'that host must never be touched' - sapapi.galerieslafayette.com is off limits, and I made ZERO requests to it beyond its robots.txt. Consequently there is no permitted source of an exact product total for any Galeries Lafayette category. ROUTES CONSIDERED AND WHAT EACH RETURNED: (1) rendered HTML on www - always the 6,343-byte shell, no total, seven variants tried. (2) The published product sitemaps - Product-fr-EUR-0.xml returned 200 with 50,000 URLs, but the URL shape is /p/<slug>-<brand>/<productId>/<colourId> and carries NO category path, so products cannot be attributed to categories and the four product sitemaps cannot yield a per-category count. (3) The Category, Trend and Brand sitemaps - they publish URLs only, no counts. (4) The main.js bundle - read in full for an alternative data host; the only storefront hosts it references are sapapi (the OCC backend), ss.galerieslafayette.com (which the bundle uses solely for /user/orders), static.galerieslafayette.com (assets) and ph.galerieslafayette.com (images, and its robots.txt 404s). There is no second listing API. (5) Campaign-parameter fetch - robots-disallowed on this host, as shown above, and pointless since there is no challenge. (6) An honest self-identifying User-Agent (ClaudeBot / anthropic-ai) in case the SSR tier serves crawlers - the request failed outright at the edge; no search-engine crawler was impersonated. (7) r.jina.ai - DELIBERATELY NOT USED, and this is a judgement I want on the record: rendering the page through a third-party reader would have made that reader fetch sapapi on my behalf, which is obtaining data from a host that has said 'Disallow: /'. The dispatch note bans third-party proxies used to get round a wall, and getting round a robots exclusion is a stronger version of the same thing, so I did not do it. No browser automation was used anywhere. DEDUP: already_extracted() was run on all 27 candidate URLs. Three hits, all exact URL matches, all moved to review[]: /mobilier/salle-de-bain -> Furniture.xlsx 'Bathroom'; /decoration-de-la-maison/objets-de-decoration/miroirs/miroirs-muraux -> Final.xlsx 'Wall Mirrors'; /decoration-de-la-maison/objets-de-decoration/miroirs/miroirs-a-poser -> Final.xlsx 'Table & Freestanding Mirrors'. The index holds 100 Galeries Lafayette URLs in total (62 Final.xlsx, 38 Furniture.xlsx), all on this same host and in this same /c/ URL form, so there is no locale-variant blind spot here. ONE SUSPECTED CANONICAL-ALIAS BLIND SPOT IS FLAGGED EXPLICITLY in review[]: /mobilier/meubles-de-rangement/meubles-salle-de-bains returns no dedup hit while its sibling /mobilier/salle-de-bain does, and both are bathroom furniture reached by two nav paths - the rule-28 situation. I could not check rel=canonical to settle it because the shell carries none and the API that would resolve it is the robots-excluded host. WHAT A FOLLOW-UP WOULD NEED: permission from the run owner either to query sapapi.galerieslafayette.com (currently forbidden) or to obtain the eight would-be leaf counts by some sanctioned means. The tree, the routing decisions, the dedup results and the exact URLs are all settled and are in review[]; only the quantities are missing. TO BE UNAMBIGUOUS ABOUT THE CLASSIFICATION: Galeries Lafayette has NOT opted out of Claude crawling. Its own robots.txt names no Claude agent and allows the paths we needed. The block is narrower and stranger than the usual case - the main site is open and readable but carries no data, and the data host is closed to every crawler including us. RETRY SESSION 2026-09-05 - BROWSER ATTEMPT: per updated dispatch instructions, attempted mcp__claude-in-chrome to see if a rendered page shows a product count without personally issuing the disallowed sapapi.galerieslafayette.com request. I NEVER navigated to or fetched sapapi.galerieslafayette.com myself, directly or via WebFetch/curl. Three separate attempts were made to load https://www.galerieslafayette.com/c/maison-et-loisirs/maison/rangement/rangements-de-salle-de-bain/accessoires-de-rangement-de-salle-de-bain in a fresh Chrome tab. Each time the navigate call itself landed correctly on galerieslafayette.com, but within a few seconds (including during an explicit wait) the SAME tab silently changed to a completely unrelated third-party site with no action from me: first bhv.fr ('Just a moment...' Cloudflare check), then bloomingdales.com, lowes.com and leroymerlin.fr appeared in the shared tab group, then a second attempt jumped to templeandwebster.com.au ('Just a moment...' Cloudflare check), and a third attempt jumped to etsy.com mid-read. tabs_context_mcp confirmed the browser's MCP tab group is being shared/contended by other concurrent automated sessions (other tabs in the same group independently showed tavolashop.com and bhv.fr Cloudflare pages that I never opened) - consistent with many parallel bathroom-extraction workers running this same batch and colliding on one Chrome instance. RESULT: I could not get a single stable, uninterrupted view of the galerieslafayette.com rendered DOM long enough to observe whether the SPA's own page-load naturally fires the sapapi XHR and paints a product-count string, because the tab was hijacked away from the target domain every time before or during the read. This is an environment/contention failure, not a robots or access failure on Galeries Lafayette's part, and it does NOT change the underlying finding: the site is still confirmed (via the earlier plain-HTTP investigation, unaffected by browser contention) to be a client-side-only Angular SPA whose sole data source is the robots-disallowed sapapi host, with no SSR fallback and no alternate count source. No new count was obtained; no disallowed request was made by me. Status changed from 'blocked' to 'partial' this session per the updated instruction wording, since the full 28-node Bathroom tree WAS recovered (see review[]) even though zero quantities could be obtained through any permitted route in either session.",
+ "rows": [],
+ "review": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Storage > Bathroom Storage",
+   "qty": null,
+   "issue": "NO QUANTITY OBTAINABLE - not recorded in rows[]. The node is real and its URL is the site's own published category URL (present verbatim in https://www.galerieslafayette.com/siteMap/Category-fr-EUR.xml), but Galeries Lafayette renders every listing client-side and the ONLY source of a product total is the SAP OCC API on sapapi.galerieslafayette.com, whose robots.txt is a blanket 'User-agent: * / Disallow: /'. That host is therefore off limits, so no exact count exists that we are permitted to take, and rules 26/38 forbid a leaf row without one. WOULD BE A GROUPING ROW (blank qty and link, rule 24): it has five child listings, all listed below. This is Galeries Lafayette's dedicated bathroom storage and accessories branch.",
+   "link": "https://www.galerieslafayette.com/c/maison-et-loisirs/maison/rangement/rangements-de-salle-de-bain"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Storage > Bathroom Storage > Bathroom Storage Accessories",
+   "qty": null,
+   "issue": "NO QUANTITY OBTAINABLE - not recorded in rows[]. The node is real and its URL is the site's own published category URL (present verbatim in https://www.galerieslafayette.com/siteMap/Category-fr-EUR.xml), but Galeries Lafayette renders every listing client-side and the ONLY source of a product total is the SAP OCC API on sapapi.galerieslafayette.com, whose robots.txt is a blanket 'User-agent: * / Disallow: /'. That host is therefore off limits, so no exact count exists that we are permitted to take, and rules 26/38 forbid a leaf row without one. WOULD BE A BATHROOM LEAF (rules 12, 13, 17): bathroom storage accessories. Dedup clean - already_extracted() returns None.",
+   "link": "https://www.galerieslafayette.com/c/maison-et-loisirs/maison/rangement/rangements-de-salle-de-bain/accessoires-de-rangement-de-salle-de-bain"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Storage > Bathroom Storage > Toilet Paper Holders",
+   "qty": null,
+   "issue": "NO QUANTITY OBTAINABLE - not recorded in rows[]. The node is real and its URL is the site's own published category URL (present verbatim in https://www.galerieslafayette.com/siteMap/Category-fr-EUR.xml), but Galeries Lafayette renders every listing client-side and the ONLY source of a product total is the SAP OCC API on sapapi.galerieslafayette.com, whose robots.txt is a blanket 'User-agent: * / Disallow: /'. That host is therefore off limits, so no exact count exists that we are permitted to take, and rules 26/38 forbid a leaf row without one. WOULD BE A BATHROOM LEAF (rule 14): toilet-roll holders. Dedup clean.",
+   "link": "https://www.galerieslafayette.com/c/maison-et-loisirs/maison/rangement/rangements-de-salle-de-bain/derouleurs-papier-toilette"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Storage > Bathroom Storage > Laundry Baskets",
+   "qty": null,
+   "issue": "NO QUANTITY OBTAINABLE - not recorded in rows[]. The node is real and its URL is the site's own published category URL (present verbatim in https://www.galerieslafayette.com/siteMap/Category-fr-EUR.xml), but Galeries Lafayette renders every listing client-side and the ONLY source of a product total is the SAP OCC API on sapapi.galerieslafayette.com, whose robots.txt is a blanket 'User-agent: * / Disallow: /'. That host is therefore off limits, so no exact count exists that we are permitted to take, and rules 26/38 forbid a leaf row without one. WOULD BE A BATHROOM LEAF (rule 12): laundry baskets sitting inside the bathroom-storage branch, exactly as Zara Home's PANIERS \u00c0 LINGE does. Dedup clean.",
+   "link": "https://www.galerieslafayette.com/c/maison-et-loisirs/maison/rangement/rangements-de-salle-de-bain/paniers-a-linge"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Storage > Bathroom Storage > Towel Rails",
+   "qty": null,
+   "issue": "NO QUANTITY OBTAINABLE - not recorded in rows[]. The node is real and its URL is the site's own published category URL (present verbatim in https://www.galerieslafayette.com/siteMap/Category-fr-EUR.xml), but Galeries Lafayette renders every listing client-side and the ONLY source of a product total is the SAP OCC API on sapapi.galerieslafayette.com, whose robots.txt is a blanket 'User-agent: * / Disallow: /'. That host is therefore off limits, so no exact count exists that we are permitted to take, and rules 26/38 forbid a leaf row without one. WOULD BE A BATHROOM LEAF (rules 15, 17): towel rails and holders - hardware, which rule 15 keeps in Bathroom while the towels themselves go to Textile. Dedup clean.",
+   "link": "https://www.galerieslafayette.com/c/maison-et-loisirs/maison/rangement/rangements-de-salle-de-bain/porte-serviettes"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Storage > Bathroom Storage > Bathroom Bins",
+   "qty": null,
+   "issue": "NO QUANTITY OBTAINABLE - not recorded in rows[]. The node is real and its URL is the site's own published category URL (present verbatim in https://www.galerieslafayette.com/siteMap/Category-fr-EUR.xml), but Galeries Lafayette renders every listing client-side and the ONLY source of a product total is the SAP OCC API on sapapi.galerieslafayette.com, whose robots.txt is a blanket 'User-agent: * / Disallow: /'. That host is therefore off limits, so no exact count exists that we are permitted to take, and rules 26/38 forbid a leaf row without one. WOULD BE A BATHROOM LEAF (rule 13): bathroom bins. Dedup clean.",
+   "link": "https://www.galerieslafayette.com/c/maison-et-loisirs/maison/rangement/rangements-de-salle-de-bain/poubelles-de-salle-de-bain"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Home Decoration > Decorative Objects > Mirrors > Bathroom Mirrors",
+   "qty": null,
+   "issue": "NO QUANTITY OBTAINABLE - not recorded in rows[]. The node is real and its URL is the site's own published category URL (present verbatim in https://www.galerieslafayette.com/siteMap/Category-fr-EUR.xml), but Galeries Lafayette renders every listing client-side and the ONLY source of a product total is the SAP OCC API on sapapi.galerieslafayette.com, whose robots.txt is a blanket 'User-agent: * / Disallow: /'. That host is therefore off limits, so no exact count exists that we are permitted to take, and rules 26/38 forbid a leaf row without one. WOULD BE A BATHROOM LEAF (rules 10, 11): the site's own explicitly bathroom-designated mirror node. Rule 10 is emphatic that the word 'salle de bain' must never cause exclusion, and rule 11 puts primary-type mirrors in Bathroom. Dedup clean, and note its two siblings Miroirs muraux and Miroirs \u00e0 poser ARE already in Final.xlsx while this one is not - so it is genuinely unextracted.",
+   "link": "https://www.galerieslafayette.com/c/maison-et-loisirs/maison/decoration-de-la-maison/objets-de-decoration/miroirs/miroirs-de-salle-de-bain"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Home Decoration > Decorative Objects > Mirrors > Illuminated Mirrors",
+   "qty": null,
+   "issue": "NO QUANTITY OBTAINABLE - not recorded in rows[]. The node is real and its URL is the site's own published category URL (present verbatim in https://www.galerieslafayette.com/siteMap/Category-fr-EUR.xml), but Galeries Lafayette renders every listing client-side and the ONLY source of a product total is the SAP OCC API on sapapi.galerieslafayette.com, whose robots.txt is a blanket 'User-agent: * / Disallow: /'. That host is therefore off limits, so no exact count exists that we are permitted to take, and rules 26/38 forbid a leaf row without one. WOULD BE A BATHROOM LEAF (rules 10, 11): illuminated / backlit mirrors. Rule 10 names LED, Illuminated and Backlit mirrors explicitly, and rule 11 resolves the mirror-vs-lighting question in favour of Bathroom when the primary product type is a mirror. Dedup clean. Flagged LOW only in the sense that the node is not named 'salle de bain'; its product type is unambiguous.",
+   "link": "https://www.galerieslafayette.com/c/maison-et-loisirs/maison/decoration-de-la-maison/objets-de-decoration/miroirs/miroirs-lumineux"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Furniture > Storage Furniture > Bathroom Furniture",
+   "qty": null,
+   "issue": "NO QUANTITY OBTAINABLE - not recorded in rows[]. The node is real and its URL is the site's own published category URL (present verbatim in https://www.galerieslafayette.com/siteMap/Category-fr-EUR.xml), but Galeries Lafayette renders every listing client-side and the ONLY source of a product total is the SAP OCC API on sapapi.galerieslafayette.com, whose robots.txt is a blanket 'User-agent: * / Disallow: /'. That host is therefore off limits, so no exact count exists that we are permitted to take, and rules 26/38 forbid a leaf row without one. WOULD BE A BATHROOM FURNITURE LEAF (rule 9) BUT IS FLAGGED AS A SUSPECTED CANONICAL/DEDUP ALIAS. already_extracted() returns None for this URL, while the sibling node https://www.galerieslafayette.com/c/maison-et-loisirs/maison/mobilier/salle-de-bain IS already in Furniture.xlsx as 'Bathroom'. Both are bathroom furniture nodes reached by two different nav paths, which is exactly the rule-28 'one page via two nav paths is ONE record' situation and dedup blind spot (a). I could NOT check rel=canonical to settle it, because the page is a 6.3 KB client-rendered Angular shell with no canonical tag and the API that would resolve it is robots-excluded. Left for the run owner; under OPTION 1 the safe reading is that Galeries Lafayette bathroom furniture already lives in Furniture.xlsx and must not come into Bathroom.",
+   "link": "https://www.galerieslafayette.com/c/maison-et-loisirs/maison/mobilier/meubles-de-rangement/meubles-salle-de-bains"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Furniture > Bathroom",
+   "qty": null,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Bathroom' (exact URL match on already_extracted()). OPTION 1 policy: Galeries Lafayette's bathroom furniture stays in Furniture and is not re-extracted into Bathroom, even though rule 9 would otherwise class it as Bathroom.",
+   "link": "https://www.galerieslafayette.com/c/maison-et-loisirs/maison/mobilier/salle-de-bain"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Home Decoration > Decorative Objects > Mirrors",
+   "qty": null,
+   "issue": "NOT RECORDABLE - parent URL with four valid child listings (Miroirs \u00e0 poser, Miroirs de salle de bain, Miroirs lumineux, Miroirs muraux), so rule 24 forbids recording it. Listed so the branch is fully documented.",
+   "link": "https://www.galerieslafayette.com/c/maison-et-loisirs/maison/decoration-de-la-maison/objets-de-decoration/miroirs"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Home Decoration > Decorative Objects > Mirrors > Wall Mirrors",
+   "qty": null,
+   "issue": "ALREADY EXTRACTED IN Final.xlsx (Home Decor pass) as 'Wall Mirrors' (exact URL match). Decorative wall mirrors - Wall Decor, not Bathroom (rules 2, 21) - and out of scope under the cross-file dedup rule either way.",
+   "link": "https://www.galerieslafayette.com/c/maison-et-loisirs/maison/decoration-de-la-maison/objets-de-decoration/miroirs/miroirs-muraux"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Home Decoration > Decorative Objects > Mirrors > Table and Freestanding Mirrors",
+   "qty": null,
+   "issue": "ALREADY EXTRACTED IN Final.xlsx (Home Decor pass) as 'Table & Freestanding Mirrors' (exact URL match). Decorative table and freestanding mirrors - Decor, not Bathroom.",
+   "link": "https://www.galerieslafayette.com/c/maison-et-loisirs/maison/decoration-de-la-maison/objets-de-decoration/miroirs/miroirs-a-poser"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Storage > Kitchen Storage > Soap Dispensers",
+   "qty": null,
+   "issue": "NO QUANTITY OBTAINABLE - not recorded in rows[]. The node is real and its URL is the site's own published category URL (present verbatim in https://www.galerieslafayette.com/siteMap/Category-fr-EUR.xml), but Galeries Lafayette renders every listing client-side and the ONLY source of a product total is the SAP OCC API on sapapi.galerieslafayette.com, whose robots.txt is a blanket 'User-agent: * / Disallow: /'. That host is therefore off limits, so no exact count exists that we are permitted to take, and rules 26/38 forbid a leaf row without one. LOW CONFIDENCE, NOT BATHROOM ON CURRENT EVIDENCE: soap dispensers are rule-13 bathroom accessories by product type, but Galeries Lafayette files this node under KITCHEN storage (rangements-de-cuisine, beside poubelles-de-cuisine, d\u00e9rouleurs and organisateurs de tiroirs), and there is no soap-dispenser node under rangements-de-salle-de-bain. Rule 13 says 'bathroom-intended only' and rule 2 puts website hierarchy above room inference, so it is not claimed for Bathroom. Flagged rather than dropped because it is the only soap-dispenser node on the site.",
+   "link": "https://www.galerieslafayette.com/c/maison-et-loisirs/maison/rangement/rangements-de-cuisine/distributeurs-de-savon"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Storage > Decorative Storage > Coat Hooks and Coat Racks",
+   "qty": null,
+   "issue": "NO QUANTITY OBTAINABLE - not recorded in rows[]. The node is real and its URL is the site's own published category URL (present verbatim in https://www.galerieslafayette.com/siteMap/Category-fr-EUR.xml), but Galeries Lafayette renders every listing client-side and the ONLY source of a product total is the SAP OCC API on sapapi.galerieslafayette.com, whose robots.txt is a blanket 'User-agent: * / Disallow: /'. That host is therefore off limits, so no exact count exists that we are permitted to take, and rules 26/38 forbid a leaf row without one. NOT BATHROOM: coat hooks and coat stands in the DECORATIVE STORAGE branch, beside porte-parapluies, porte-revues and vide-poches - hallway hardware, not bathroom hooks (rules 2, 17). The bathroom hook/rail node is Rangements de salle de bain > Porte-serviettes.",
+   "link": "https://www.galerieslafayette.com/c/maison-et-loisirs/maison/rangement/rangements-decoratifs/pateres-et-portemanteaux"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Home Linen > Bath Linen",
+   "qty": null,
+   "issue": "ROUTED TO TEXTILE: the bath-linen branch (rules 15, 20). It is also a parent with ten child listings, so rule 24 forbids recording it regardless. Its children are itemised below so nothing is silently skipped.",
+   "link": "https://www.galerieslafayette.com/c/maison-et-loisirs/maison/linge-de-maison/linge-de-bain"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Home Linen > Bath Linen > Hand and Face Towels",
+   "qty": null,
+   "issue": "ROUTED TO TEXTILE: hand and face towels (rule 15).",
+   "link": "https://www.galerieslafayette.com/c/maison-et-loisirs/maison/linge-de-maison/linge-de-bain/serviettes-de-toilette"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Home Linen > Bath Linen > Bath Sheets",
+   "qty": null,
+   "issue": "ROUTED TO TEXTILE: bath sheets (rule 15).",
+   "link": "https://www.galerieslafayette.com/c/maison-et-loisirs/maison/linge-de-maison/linge-de-bain/draps-de-bain"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Home Linen > Bath Linen > Washcloths",
+   "qty": null,
+   "issue": "ROUTED TO TEXTILE: washcloths / flannel mitts (rule 15).",
+   "link": "https://www.galerieslafayette.com/c/maison-et-loisirs/maison/linge-de-maison/linge-de-bain/gants-de-toilette"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Home Linen > Bath Linen > Towel Sets",
+   "qty": null,
+   "issue": "ROUTED TO TEXTILE: matched towel sets (rule 15).",
+   "link": "https://www.galerieslafayette.com/c/maison-et-loisirs/maison/linge-de-maison/linge-de-bain/parures-de-toilette"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Home Linen > Bath Linen > Bathrobes",
+   "qty": null,
+   "issue": "ROUTED TO TEXTILE: bathrobes (rule 20).",
+   "link": "https://www.galerieslafayette.com/c/maison-et-loisirs/maison/linge-de-maison/linge-de-bain/peignoirs"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Home Linen > Bath Linen > Bath Capes and Ponchos",
+   "qty": null,
+   "issue": "ROUTED TO TEXTILE: hooded bath capes and ponchos (rule 20).",
+   "link": "https://www.galerieslafayette.com/c/maison-et-loisirs/maison/linge-de-maison/linge-de-bain/capes-et-ponchos-de-bain"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Home Linen > Bath Linen > Shower Curtains",
+   "qty": null,
+   "issue": "ROUTED TO TEXTILE: shower curtains (rule 20).",
+   "link": "https://www.galerieslafayette.com/c/maison-et-loisirs/maison/linge-de-maison/linge-de-bain/rideaux-de-douche"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Home Linen > Bath Linen > Bath Mats and Pedestal Mats",
+   "qty": null,
+   "issue": "ROUTED TO TEXTILE: textile bath mats and pedestal surrounds, not rubber/anti-slip bathroom accessories (rule 16).",
+   "link": "https://www.galerieslafayette.com/c/maison-et-loisirs/maison/linge-de-maison/linge-de-bain/tapis-de-bain-et-contours"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Home Linen > Bath Linen > Beach Towels and Foutas",
+   "qty": null,
+   "issue": "ROUTED TO TEXTILE: beach towels and fouta throws - textile and not bathroom at all (rule 15); listed because it is a child of the Linge de bain branch.",
+   "link": "https://www.galerieslafayette.com/c/maison-et-loisirs/maison/linge-de-maison/linge-de-bain/serviettes-de-plage-et-foutas"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Home Linen > Bath Linen > Toiletry Bags",
+   "qty": null,
+   "issue": "NOT BATHROOM: wash bags / toiletry bags. Primary product type is a bag (rule 2); the same node is duplicated under Femme > Sacs et bagages > Trousses de toilette et vanity and Homme > Sacs et bagages > Trousses de toilette. Belongs with Clothing and Accessories.",
+   "link": "https://www.galerieslafayette.com/c/maison-et-loisirs/maison/linge-de-maison/linge-de-bain/trousses-de-toilette"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Beauty > Care > Body and Bath Care > Bath and Shower (and its 7 children)",
+   "qty": null,
+   "issue": "NOT BATHROOM: consumable toiletries - gels douche, huiles de douche, savons, savons solide, sels et bombes de bain, gel hydroalcoolique, and hygi\u00e8ne dentaire with its brosses-\u00e0-dents and dentifrices children. Cosmetics, not bathroom fittings, storage or accessories (rules 2, 21). Inspected during the keyword sweep and excluded deliberately.",
+   "link": "https://www.galerieslafayette.com/c/beaute/soins/soins-corps-et-bain/bain-et-douche"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Child > Childcare > Toileting and Bathing > Baby Bathtubs",
+   "qty": null,
+   "issue": "NOT BATHROOM: baby bath tubs in the nursery/pu\u00e9riculture department. These are portable infant baths, i.e. baby-care equipment, not installed sanitaryware under rule 5, and the department is Enfant rather than Maison (rule 2). Recorded here so the only 'baignoires' node on the site is not silently skipped.",
+   "link": "https://www.galerieslafayette.com/c/enfant/puericulture/toilette-et-bain/baignoires"
+  }
+ ],
+ "_reconstructed_from": "Bathroom.xlsx delivered 2026-09-01 (checkpoint), not original worker JSON"
+}

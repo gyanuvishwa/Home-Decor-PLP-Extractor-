@@ -1,0 +1,258 @@
+{
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ROBOTS: https://www.zarahome.com/robots.txt fetched FIRST. NO Claude agent is named anywhere in it - there is no 'User-agent: ClaudeBot', 'anthropic-ai' or 'Claude-Web' group; the named-bot groups are HTTrack, Slurp, MJ12bot, proximic (Disallow: /itxrest/*), AmazonProductDiscoverybot and AmazonProductBot, all Disallow: /. We fall under 'User-agent: *', which does NOT disallow /gb/ or /itxrest/ (only proximic is barred from /itxrest/*). Its disallows cover checkout/account/wishlist/search.html/share/shop-the-look, the /ki /ax /wa /wy /wz /we /wm /xx /xy /ru stores, secondary-language paths, and *hidden/*, */hidden*, *contact-swatches*, plus query params - none of which any recorded URL touches (all are /gb/<slug>-n<id>, no query string). No Crawl-delay declared. ACCESS: the GB storefront sits behind an Akamai Bot Manager JS interstitial. Solved cleanly from the interstitial page's own inline JS: it defines 'var i = <int>; var j = i + Number(\"5557\"+\"5850\");' and POSTs {bm-verify:<page token>, pow:j} to /_sec/verify?provider=interstitial. I reproduced exactly that (work/w89_92/zh_sess.py, curl_cffi impersonate=chrome124, Accept-Language en-GB) and reused the resulting cookie jar for every subsequent request. No proxy, no third-party renderer. STORE: this is the UK catalogue, discovered from the page itself, not assumed: the hydration payload carries appconfig {storeId: 84009906, catalogId: 80290024, languageCode: en-US} and the store list entry {countryCode: GB, countryName: United Kingdom, id: 84009906}, and /itxrest/2/catalog/store/84009906 returns catalog identifier 'ZH_UK_SEASON'. Extracted independently of SR 21 Zara Home UAE (a different Inditex store and catalogue); all URLs below are /gb/ and all counts are the GB assortment. TREE SOURCE: the storefront's own category tree, /itxrest/2/catalog/store/84009906/80290024/category?languageId=-1&appId=1 (1.17 MB, 628 named nodes), cross-checked node-for-node against the rendered mega-menu /api/storefront/1/stores/84009906/menu?language=en-US&clientId=web-zh&catalogId=80290024. The two agree exactly for the BATHROOM department (id 1089013, 21 children after dropping the 4 'empty' spacer nodes). Each node's real slug comes from its own categoryUrl field, never guessed. I also keyword-swept all 628 nodes for bath|shower|toilet|basin|sink|tap|mirror|towel|soap|vanit to find bathroom content filed elsewhere; that surfaced FURNITURE > BATHROOM FURNITURE, FURNITURE > COAT STANDS AND TOWEL RACKS, KIDS AND BABY > BATHROOM, KIDS AND BABY > BABY > Bathroom, HOME DECOR > MIRRORS and the SALE / SPECIAL PRICES cuts - all handled in `review`. Zara Home is a textiles-and-accessories retailer: it sells no baths, toilets, basins, taps, showers or enclosures, so rules 4-8 have no nodes here. QTY METHOD: Zara Home publishes no 'N items' or 'Showing 1-N of M' header anywhere on the site, and numberOfProducts is null for every node in the category tree. The quantity is therefore the exact size of the node's own server-rendered grid: the unique ccIds returned by /itxrest/3/catalog/store/84009906/80290024/category/<id>/product?showProducts=true&showNoStock=false. VERIFICATION (the equivalence proof): for every node I then fetched the canonical /gb/ SEO PLP with a browser session and parsed the page's OWN embedded transfer-state entry for 'category\\u002F<id>\\u002Fproduct?showProducts=false&showNoStock=false&withSubCategories=false&languageId=-1', brace-matching the JSON blob and counting its gridElements ccIds. The rendered grid matched the API count EXACTLY on 19 of the 24 nodes fetched, including all 9 recorded leaves (Bathroom bins 16/16, Soap dispensers 25/25, Toothbrush holders 25/25, Soap dishes 26/26, Trays 18/18, Laundry baskets 17/17, Baskets 44/44, Towel racks and hooks 17/17, Mirrors 13/13), across counts from 3 to 123 - so the equivalence is proven on nodes of very different size. The rendered category id was also read back from each page and equalled the node requested for all 9 recorded leaves, and each page's <h1> matched (e.g. 'Bathroom mirrors', 'Functional bathroom bins', 'Practical and stylish towel racks and hooks'). The 5 mismatches are all diagnostic, not errors, and all are in `review`: 3 nodes whose slug renders a DIFFERENT category (Cosmetic Storage -> STORAGE, Soaps and Creams -> Fragrances 1020528657, Toiletry Bags -> Wash bags 1020327003), STORAGE itself (58 API vs 57 rendered), and Bestsellers (parent slug). Counts discriminate (3, 9, 13, 16, 17, 18, 22, 25, 26, 37, 44, 48, 52, 64, 76, 100, 123) - not a site-wide constant. PARENT-URL RULE: BATHROOM (1089013) and BATHROOM ACCESSORIES (1020447624) both return HTTP != 200 from the product endpoint - they are pure hub nodes with no grid of their own - which independently confirms they are grouping rows, not leaves. STORAGE is a grouping row because its child Baskets is a live listing (rule 24). DEDUP: dedup.already_extracted() run on all 26 candidate URLs. 2 hits, both Furniture.xlsx SR 90 Zara Home UK (Bathroom Furniture 21, Coat Stands and Towel Racks 8) - both in `review`, neither in `rows`. The 9 recorded leaves are all clean. INCLUDED-DESPITE-AMBIGUITY: 'Laundry Baskets' (17) and 'Storage > Baskets' (44) are kept as Bathroom under rules 12/33 - Zara Home parents them ONLY under BATHROOM (no Storage department owns them), their grid sections are literally 'Laundry baskets bath' and 'Storage baskets bath', and the products carry the BATHROOM taxonomy tag. This is the opposite call from IKEA UK (SR 92), where the identical product types are dual-parented under IKEA's own 'Laundry & cleaning' department and were therefore routed out - hierarchy decides, as rule 12 requires. RESULT: 9 leaf rows + 3 grouping rows.",
+ "rows": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Accessories",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Accessories > Bathroom Bins",
+   "qty": 16,
+   "link": "https://www.zarahome.com/gb/bathroom-bins-n3827",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Accessories > Soap Dispensers",
+   "qty": 25,
+   "link": "https://www.zarahome.com/gb/bathroom-soap-dispensers-n3882",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Accessories > Toothbrush Holders",
+   "qty": 25,
+   "link": "https://www.zarahome.com/gb/bathroom-toothbrush-tumblers-n3883",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Accessories > Soap Dishes",
+   "qty": 26,
+   "link": "https://www.zarahome.com/gb/bathroom-soap-dishes-n3884",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Accessories > Trays",
+   "qty": 18,
+   "link": "https://www.zarahome.com/gb/bathroom-trays-n3885",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Laundry Baskets",
+   "qty": 17,
+   "link": "https://www.zarahome.com/gb/bathroom-baskets-laundry-n3891",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Storage",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Storage > Baskets",
+   "qty": 44,
+   "link": "https://www.zarahome.com/gb/bathroom-baskets-all-n4142",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Towel Racks and Hooks",
+   "qty": 17,
+   "link": "https://www.zarahome.com/gb/bathroom-towel-racks-n4615",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Mirrors",
+   "qty": 13,
+   "link": "https://www.zarahome.com/gb/bathroom-mirrors-n2468",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  }
+ ],
+ "review": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Embroidery Collection",
+   "qty": 16,
+   "issue": "EXCLUDED AS COLLECTION (rule 25): a Heritage capsule/embroidery collection cut of the bathroom assortment (grid section 'Camarinas towels bath | Heritage capsulas'), not a product-type category; its items are towels and bathrobes already covered by the routed-out textile nodes.",
+   "link": "https://www.zarahome.com/gb/bathroom-capsule-collection-n5294"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Towels",
+   "qty": 123,
+   "issue": "ROUTED TO TEXTILE: bath/hand/guest towels (rules 15/20). Grid sections 'Towels basic bath | Towels bath'.",
+   "link": "https://www.zarahome.com/gb/bathroom-towels-n1051"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Everyday Towels",
+   "qty": 37,
+   "issue": "ROUTED TO TEXTILE: basic cotton towels graded by GSM (grid sections 'Gms 500/600/650/700 towels basic bath'), rules 15/20.",
+   "link": "https://www.zarahome.com/gb/bathroom-basic-towels-n1817"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Beach Towels",
+   "qty": 9,
+   "issue": "ROUTED TO TEXTILE: beach towels (rules 15/20). Node carries HIDE_CATEGORY_MENU but is live.",
+   "link": "https://www.zarahome.com/gb/bathroom-towels-beach-n1335"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Mats",
+   "qty": 48,
+   "issue": "ROUTED TO TEXTILE: textile bath mats (rules 16/20). Grid section 'Bath mats bath'; Zara Home sells no rubber/anti-slip bathroom mat.",
+   "link": "https://www.zarahome.com/gb/bathroom-bathmats-n1052"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathrobes and Slippers",
+   "qty": 48,
+   "issue": "ROUTED TO TEXTILE: bathrobes and bath slippers (rule 20).",
+   "link": "https://www.zarahome.com/gb/bathroom-bathrobes-n1053"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Accessories > See all",
+   "qty": 52,
+   "issue": "EXCLUDED AS VIEW ALL (rule 25): the site's own 'See all' node inside Bathroom Accessories; its 52 items are the union of the six recorded accessory leaves.",
+   "link": "https://www.zarahome.com/gb/bathroom-accessories-n2470"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Accessories > Cosmetic Storage",
+   "qty": 18,
+   "issue": "UNRECORDABLE URL COLLISION - LOW CONFIDENCE. Genuine Bathroom content (18 items, grid section 'Boxes bath', e.g. RECTANGULAR CERAMIC TISSUE BOX, product taxonomy 'ACCESORIOS BANO'), but the category tree and mega-menu give it the SAME slug as BATHROOM > STORAGE (bathroom-boxes-n3886), and a cold fetch of that URL renders category 1020708636 (STORAGE, 57 items), not 1020447630. Recording it would mean attaching a count of 18 to a URL that serves a 57-item listing, so it is held here rather than invented. Its products are reachable via the recorded Storage > Baskets leaf and the Bathroom Accessories siblings.",
+   "link": "https://www.zarahome.com/gb/bathroom-boxes-n3886"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Lighting",
+   "qty": 3,
+   "issue": "ROUTED TO LIGHTING: 3 bathroom wall lamps (grid section 'Bath-wall-lamps bath'); primary product type is lighting (rules 11/19).",
+   "link": "https://www.zarahome.com/gb/lighting-lamps-bathroom-n5792"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Soaps and Creams",
+   "qty": 64,
+   "issue": "ROUTED TO BEAUTY / PERSONAL CARE: cross-linked into the Bathroom menu but the URL renders category 1020528657 = FRAGRANCES > SOAPS AND CREAMS (grid sections 'Creams fragrances | Soaps fragrances'); consumable toiletries, not bathroom fixtures or accessories (rule 2).",
+   "link": "https://www.zarahome.com/gb/fragrances-soaps-creams-n5045"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Toiletry Bags",
+   "qty": 43,
+   "issue": "ROUTED TO BAGS & ACCESSORIES: cross-linked into the Bathroom menu but the URL renders category 1020327003 = CLOTHING AND FOOTWEAR > WASH BAGS AND BAGS > Wash bags (grid sections 'Washbags bags-washbags homewear | Washbags shoes and accesories'); primary product type is a bag (rule 2).",
+   "link": "https://www.zarahome.com/gb/bathroom-toiletry-wash-bags-n4748"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Self Care",
+   "qty": 26,
+   "issue": "ROUTED TO BEAUTY / PERSONAL CARE: grid section 'Selfcare capsulas'; enumerated products are body oils and cosmetics (e.g. '(100 ML) CITRUS LEAVES BODY OIL'), not bathroom hardware or accessories (rule 2).",
+   "link": "https://www.zarahome.com/gb/bathroom-self-care-n1418"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Customisation",
+   "qty": 22,
+   "issue": "EXCLUDED AS PROMOTIONAL / SERVICE PAGE (rule 25): Zara Home's monogramming service landing for the bathroom range; its 22 items are bathrobes and towels already routed to Textile (grid sections 'Heritage capsulas', 'Bathrobe bath | Towels bath').",
+   "link": "https://www.zarahome.com/gb/edited-bathroom-n1416"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bestsellers",
+   "qty": 100,
+   "issue": "EXCLUDED (rules 24/25): a TOP-5/TOP-100 merchandising cut, and its slug is the Bathroom department's own parent URL (bathroom-n1050), which must never be recorded while valid child listings exist.",
+   "link": "https://www.zarahome.com/gb/bathroom-n1050"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Furniture > Bathroom Furniture",
+   "qty": 21,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Bathroom Furniture' (SR 90 Zara Home UK, Furniture pass). Genuine Bathroom content under rule 9 (wall storage units, bathroom cabinets) but retained in Furniture per the run-owner OPTION 1 policy. Reached via the FURNITURE department, not the BATHROOM menu.",
+   "link": "https://www.zarahome.com/gb/bathroom-furniture-n2469"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Furniture > Coat Stands and Towel Racks",
+   "qty": 8,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Coat Stands and Towel Racks' (SR 90, Furniture pass). Mixed node (grid sections 'Rack- coats stands | Rack-clothes | Rack-towell | Room divider'); the bathroom-specific towel hardware is separately recorded from the Bathroom menu as 'Towel Racks and Hooks' (17), a different URL.",
+   "link": "https://www.zarahome.com/gb/furniture-racks-n4900"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Kids and Baby > Bathroom",
+   "qty": 76,
+   "issue": "ROUTED TO TEXTILE: kids' hooded bath towels and bath linen (rules 15/20). Sits under KIDS AND BABY, not the Bathroom department.",
+   "link": "https://www.zarahome.com/gb/kids-bathroom-towels-n1140"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Kids and Baby > Baby > Bathroom",
+   "qty": 24,
+   "issue": "ROUTED TO TEXTILE / BABY: baby bath towels, muslins, combs and bath thermometers (grid section 'Bath-hooded-newborn ... | Muslins ... | Thermometres ...'); rules 15/20 and rule 2.",
+   "link": "https://www.zarahome.com/gb/baby-bathroom-n3950"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Home Decor > Mirrors (department)",
+   "qty": null,
+   "issue": "OUT OF SCOPE - DECOR MIRRORS: HOME DECOR > MIRRORS and its children (MIRRORS, Irregular mirrors, WALL MIRRORS, Full length mirrors, Table mirrors) are living-room/bedroom decorative and full-length mirrors with no bathroom parentage; the bathroom mirror node (bathroom-mirrors-n2468, 13 items, grid section 'Mirrors bath') is a separate URL and IS recorded in rows (rules 10/11/29). Listed here so the sweep is not silent.",
+   "link": "https://www.zarahome.com/gb/home-decor-mirrors-living-room-n993"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Special Prices > Bathroom / Sale > Bathroom",
+   "qty": null,
+   "issue": "EXCLUDED (rule 25): promotional Sale and Special Prices cuts of the Bathroom department; both resolve to the department parent slug bathroom-n1050.",
+   "link": "https://www.zarahome.com/gb/bathroom-n1050"
+  }
+ ],
+ "_reconstructed_from": "Bathroom.xlsx delivered 2026-09-01 (checkpoint), not original worker JSON"
+}

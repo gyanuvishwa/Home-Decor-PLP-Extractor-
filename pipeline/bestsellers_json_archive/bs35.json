@@ -1,0 +1,25 @@
+{
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "Access: direct curl_cffi (impersonate chrome124) to www.frontgate.com, 200 OK throughout, no block encountered. robots.txt has no Claude/anthropic-specific disallow. Platform is IBM WebSphere Commerce PWA (React, empty SSR shell) with Unbxd search/merchandising layer; product counts come from the site's own first-party proxy https://www.frontgate.com/UnbxdAPI?categoryId=<id>&returnRespAsJSON=true&isAPI=true&requesttype=ajax -> numberOfProducts, the same field the rendered PLP header binds to (confirmed in the prior Furniture pass's notes for this company). Discovery: pulled the site's own nav tree via /JSONAPIs?module=categories (full category tree with categoryIds and targetURLs) and grepped it for Bestsellers/Popular/Trending/Favorite/Top-Seller/Recommend signal words across all ~1600 category nodes, then read every hit in context (parent/child, landingPage template, H1 overrides). Found: 'Best Sellers' (categoryId 228661, /whats-new/best-sellers/) under the 'New & Trending' mega-menu hub, landingPage ProductGridView -> genuine site-wide Bestsellers PLP. Also found 'Customer Favorite Gifts' (categoryId 144215, /holiday-decor/gifts/top-gifts/) whose own OVERWRITE_H1_TAG_TITLE attribute is literally 'Top-Selling Gifts' -> a genuine gifts-scoped Bestsellers-type PLP. Both counts verified twice: (a) the Unbxd API numberOfProducts field, and (b) a boundary test (unbxdStart=N-1 returns exactly 1 tile, unbxdStart=N returns 0 tiles) with zero divergence. EXCLUDED as non-qualifying: 'Trending' (categoryId 214154, /whats-new/seasonal-favorites/) - opened it: landingPage is CategoryLandingView1 (editorial hub, not ProductGridView) and its children are seasonal/campaign themes (Fall Decor, a 'Frontgate x Chef Symon' collab collection, Outdoor Furniture Sets) - this is a seasonal-campaign hub, not a bestseller/popularity merchandising concept, so it fails the 'genuinely represents a bestseller/popularity concept' test in section 3; also excluded 'Recommended' (/whats-new/recommended/, personalized recommendations, not a popularity/bestseller listing). No other Bestsellers/Popular/Trending/Top-Seller/Customer-Favorite named nodes exist anywhere in the full category tree (grep was exhaustive over all categoryTitle and OVERWRITE_H1_TAG_TITLE values). Site search was not used as the primary method since the full nav/category JSON tree already gave complete, authoritative coverage of every named category on the site (a stronger signal than search-box results per the brief's own guidance to prefer real navigation/sitemap over search).",
+  "rows": [
+    {
+      "category": "Bestsellers",
+      "sub_category": "Best Sellers",
+      "qty": 160,
+      "link": "https://www.frontgate.com/whats-new/best-sellers/",
+      "is_group": false,
+      "evidence": "Unbxd API https://www.frontgate.com/UnbxdAPI?categoryId=228661&returnRespAsJSON=true&isAPI=true&requesttype=ajax -> numberOfProducts=160; boundary-verified (unbxdStart=159 returns 1 item, unbxdStart=160 returns 0 items)",
+      "flag": null
+    },
+    {
+      "category": "Bestsellers",
+      "sub_category": "Customer Favorite Gifts (Top-Selling Gifts)",
+      "qty": 45,
+      "link": "https://www.frontgate.com/holiday-decor/gifts/top-gifts/",
+      "is_group": false,
+      "evidence": "Unbxd API categoryId=144215 -> numberOfProducts=45; page's own OVERWRITE_H1_TAG_TITLE category attribute is 'Top-Selling Gifts'; boundary-verified (unbxdStart=44 returns 1 item, unbxdStart=45 returns 0 items)",
+      "flag": null
+    }
+  ]
+}

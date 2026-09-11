@@ -1,0 +1,184 @@
+{
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ACCESS: https://www.myer.com.au/robots.txt fetched FIRST via probe.fetch (HTTP 200, safari18_0_ios, 994 bytes). NO Claude / ClaudeBot / anthropic-ai / Claude-Web group - a single `User-agent: *` group plus two Sitemap lines. Myer did NOT present a bot wall to probe.fetch: every page returned HTTP 200 first or second fingerprint, so no campaign-parameter fetch, no reader and no browser was needed or used (BATCH_BRIEF s2 ladder not required). ROBOTS COMPLIANCE IN DETAIL, because this file is restrictive: `Disallow: /*facets=` (allowed only under /buy/) - I never requested a facets URL; `Disallow: /*sort=` - I never sent a sort parameter; `Disallow: */search*` - I never used internal search; `Disallow: /*/all$` - none of my URLs ends in /all (note /c/home/allbathroom is a single segment 'allbathroom', not '/all'); `Disallow: /*pageNumber*pageNumber*` forbids only a DOUBLED pageNumber, so the single `?pageNumber=N` form I used for enumeration is permitted; `Disallow: /women/ /men/ /beauty/ /kidsbaby/ /electrical/ /gifts/ /offers/ /promo/ /webapp/*` are root-level paths and Myer's category URLs are /c/<dept>/..., but I stayed inside /c/home/ and /c/home/all-furniture/ anyway and requested none of those departments. PER-HOST: everything is served from www.myer.com.au - the PLPs are server-rendered Next.js pages that ship their own Fredhopper category payload inline, so no separate API host was contacted; the two sitemap files are on the same host. TREE: taken from the site's OWN catalogue payload, not guessed. Every Myer page embeds __NEXT_DATA__.props.pageProps.dehydratedState.queries, and the ['catalogue'] query carries the COMPLETE 815KB category tree for all 11 top departments (New In, Women, Men, Beauty, Home, Travel & Tech, Kids, Toys, Gifts, Sale, MYER one) with name / categoryId / seoToken / description for every node. The full Bathroom footprint, recovered from that tree and cross-checked against the ['category'] query on each page: Home > Bathroom (s_home_bathroom, seo allbathroom, id 457614, 1126) with children Bath Towels (544), Bath Mats (71), Bathrobes (66), Bathroom Accessories (418) and a cross-listed Cleaning node (27); Bathroom Accessories has five children - Bathroom Organisation (246), Toilet Brushes & Sets (27), Soap Dispensers (30), Bathroom Scales (29), Bathroom Mirrors (43); and a SECOND branch under Home > Furniture: Bathroom Furniture (83) with Bathroom Cabinets & Vanities (16) and Bathroom Fittings (52), plus Home > Furniture > Home Storage > Bathroom & Laundry Storage (87). I did not stop at the mega-menu: I regex-swept the ENTIRE catalogue tree (all departments) for bath|shower|toilet|soap|towel|vanit|basin|sanitar|bidet|faucet|washroom|mirror|toothbrush and inspected every hit. Everything else is out of scope - Beauty > Bath & Body and every brand's Bath & Body (cosmetics), Kids > Nursery > Bath & Change (baby bathing, toiletries, bath toys, potties), Men/Travel > Toiletry Bags (luggage), Home > Kitchen > Kitchen Linen > Tea Towels, Home > Outdoor > Beach & Pool > Beach Towels, Home > Personal Care Appliances > Dental Care > Electric Toothbrushes (appliance, not a bathroom accessory), and the whole Sale/Clearance and New In mirror-trees (New In > Home > Bathroom, Sale > Home Sale > Bathroom and its four children, Sale > Clearance > Home Clearance > Bathroom, Sale > ... > Bathroom Furniture, Sale > ... > Bathroom & Laundry Storage) which are promotional re-cuts of the same nodes and are banned by rule 25 - recording any of them would duplicate the recorded leaves. QTY: source is `productTotalCount` in each page's own ['category', <path>, <page>, [], 'relevance'] payload - the exact field the PLP header and grid render from - and it was PROVED, not assumed. (a) Direct equivalence on small nodes, where Fredhopper sets productsPerPage == the total: Bathroom Mirrors 43 = perPage 43 = productList length 43; Bathroom Scales 29 = 29 = 29; Soap Dispensers 30 = 30 = 30; Toilet Brushes 27 = 27 = 27; Cleaning 27 = 27 = 27; Cabinets & Vanities 16 = 16 = 16. (b) EXHAUSTIVE UNIQUE-ID ENUMERATION via ?pageNumber=N on ten nodes of five different sizes, counting distinct product ids: Bathrobes 66 = 66 (48+18), Bathroom Fittings 52 = 52 (48+4), Bath Mats 71 = 71 (48+23), Bathroom & Laundry Storage 87 = 87 (48+39), Bathroom Organisation 246 = 246 (5x48 + 6), Bathroom Accessories 418 = 418, Bathroom Furniture 83 = 83, Home Decor Mirrors 225 = 225. Every page returned a DIFFERENT product set with the offset advancing correctly (0, 48, 96, ...) and zero duplicate ids across pages, so this is not the IKEA re-serve trap; and the last page's short length matches total mod 48 exactly in every case. (c) Roll-up consistency: the Bathroom department's five children sum to exactly 544+71+66+418+27 = 1126 = its own productTotalCount, an independent arithmetic confirmation. Counts discriminate strongly per node (1126/544/418/246/87/83/71/66/52/43/30/29/27/27/16) with no round-number cap and no site-wide constant, and each page's category.description matched the node requested. NO figure was estimated and none came from a facet, sort or search URL. DEDUP (OPTION 1): already_extracted() run on every candidate leaf, every review node and every parent. The index holds 73 myer.com.au URLs (32 Furniture.xlsx, 41 Final.xlsx). ONE bathroom hit: /c/home/all-furniture/furniture-bathroom/cabinets-vanities is in Furniture.xlsx as 'Bathroom Cabinets & Vanities' - it stays there and is in review, not rows. The four recorded Bathroom Accessories leaves, Bathroom Fittings, and the Bathroom/Bathroom Accessories/Bathroom Furniture parents are all ABSENT from the index. Critical near-miss checked and cleared: /c/home/furniture-home-decor/wall-art--1/home-decor-mirrors IS already extracted in Final.xlsx as 'Mirrors', so I enumerated both mirror nodes in full and proved the intersection of its 225 ids with Bathroom Mirrors' 43 ids is ZERO - the recorded Bathroom Mirrors node is a genuinely separate population, not a re-extraction. Blind spots: (a) canonical - each recorded URL is served under exactly one seoToken path built from the catalogue's own parent chain, no alias observed; (b)/(c) locale - myer.com.au is single-locale en-AU with no country subdomain or hreflang alternate, so no locale variant can hide an extracted node; (d) two nav paths - the Sale and New In trees re-expose the same categoryIds under different seoTokens and are excluded under rule 25 rather than recorded twice. ROUTING: bath towels (544), bath mats (71) and bathrobes (66) go to Textile; the Cleaning node goes nowhere (kitchen utility); Bathroom Scales and Bathroom & Laundry Storage are held in review at LOW confidence rather than guessed. RECORDED: 4 leaves under Bathroom Accessories (Organisation 246, Toilet Brushes & Sets 27, Soap Dispensers 30, Bathroom Mirrors 43) and 1 leaf under Bathroom Furniture (Fittings 52). Bathroom Fittings was inspected product-by-product and is the strongest find on the site under rules 6/8/14: Cefito and My Plaza basin, bath, shower and wall mixer taps and faucets in brass/chrome/black, wall spouts, shower mixer sets and Cefito non-electric and electric bidet toilet seats - rule 8 explicitly allows metallic taps. It does also contain a run of pull-out KITCHEN mixer taps that Myer files under Bathroom Fittings; rule 26 forbids adjusting the node's own figure, so 52 is recorded as shown and that is disclosed here. FOLLOW-UP 2026-09-05 (targeted re-check of the two rule-24 residues flagged for run-owner review): live HTTP-first re-fetch of both parent pages via pipeline/probe.py confirmed current exact totals (Bathroom Accessories 418->434, Bathroom Furniture 83->85; catalog has grown since the original pass) and re-ran full product-id enumeration (fixed a pagination regex bug in the ad hoc enumeration script that had undercounted ids containing an underscore, e.g. '290752360_290758000' -- a JSON bracket-matching parse was used instead and reconciled every page's array length and every node's total exactly). CONFIRMED: Bathroom Scales (29->28) is the genuine 5th child of Bathroom Accessories the notes referenced -- it was already found and correctly held in review as NOT RECORDED (ambiguous, primarily a weighing appliance, rule 29), same adjudication independently reached for Kmart's identical Bathroom Scales node; no change needed. CONFIRMED: Bathroom Cabinets & Vanities is the 2nd child of Bathroom Furniture the notes referenced (\"Cabine...\") -- it was already correctly dedup'd to Furniture.xlsx via cross_category_url_index.json and held in review, not rows; no change needed. Both residues were re-proven via exhaustive product-id enumeration (parent ids fully recovered = declared total in both cases; child ids fully recovered = declared total in every child) and each residue set was inspected item-by-item: both are genuinely mixed (part real bathroom hardware/fixtures/furniture, part Myer cross-listed junk from Kitchenware/Laundry/general Storage/gifts), exactly the same pattern already accepted for SR176 Kmart's 'Bathroom Accessories (other)' / 'Bathroom Storage (other)' residue rows. Applying that same run-owner decision: added 'Bathroom Accessories (other)' qty 60 (was 53 at the 418-total snapshot; recomputed against today's 434 total and today's child totals: children sum 384, union 374, 434-374=60) and 'Bathroom Furniture (other)' qty 17 (was 15 at the 83-total snapshot; recomputed against today's 85 total: children union 68, 85-68=17) to rows[], both linked to their own parent URL per rule 24's own-URL exception and rule 26 (figure not adjusted for the mixed composition, exactly as Kmart's 246/306/432 were not adjusted). The pre-existing four Bathroom Accessories leaves (Organisation 246, Toilet Brushes & Sets 27, Soap Dispensers 30, Bathroom Mirrors 43) and Bathroom Fittings (52) are left UNCHANGED at their originally-recorded values -- this follow-up was scoped to the residue gap only, not a full requantification pass (rule 34); today's fresher child figures (Organisation 249, Toilet Brushes 29, Soap Dispensers 37, Bathroom Mirrors 41) are disclosed here for transparency and were used ONLY as the internally-consistent basis for today's own residue arithmetic, not written into the older rows.",
+ "rows": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Accessories",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Organisation",
+   "qty": 246,
+   "link": "https://www.myer.com.au/c/home/allbathroom/bathroom-accessories/acessories-854100-1",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Toilet Brushes & Sets",
+   "qty": 27,
+   "link": "https://www.myer.com.au/c/home/allbathroom/bathroom-accessories/toilet-brushes",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Soap Dispensers",
+   "qty": 30,
+   "link": "https://www.myer.com.au/c/home/allbathroom/bathroom-accessories/soap-dispensers",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Mirrors",
+   "qty": 43,
+   "link": "https://www.myer.com.au/c/home/allbathroom/bathroom-accessories/bathroom-mirrors",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Accessories (other)",
+   "qty": 60,
+   "link": "https://www.myer.com.au/c/home/allbathroom/bathroom-accessories",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Fittings",
+   "qty": 52,
+   "link": "https://www.myer.com.au/c/home/all-furniture/furniture-bathroom/fittings",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Furniture (other)",
+   "qty": 17,
+   "link": "https://www.myer.com.au/c/home/all-furniture/furniture-bathroom",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  }
+ ],
+ "review": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bath Towels",
+   "qty": 544,
+   "issue": "ROUTED TO TEXTILE (rules 15/20): Home > Bathroom > Bath Towels, the largest child of the Bathroom department. productTotalCount 544 (verified against the same payload that renders the grid). Bath towels, hand towels, face washers and bath sheets are Textile, not Bathroom.",
+   "link": "https://www.myer.com.au/c/home/allbathroom/bath-towels"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bath Mats",
+   "qty": 71,
+   "issue": "ROUTED TO TEXTILE (rules 15/16): Home > Bathroom > Bath Mats, productTotalCount 71. Inspected rather than assumed - the products are woven/tufted textile mats (Heritage Classic Bath Mat, Vue Norfolk Super Soft Microfibre Bath Mat and Contour Mat, Australian House & Garden Textured Bath Mat, Sheridan Larken, Linen House Tamber/Ravello, Nautica Washed Ashore, Country Road Pippa Australian Cotton) and Myer's own merchandise hierarchy files them under 'HO Home/Towels/Bath Access/.../BATH MAT'. No rubber or anti-slip mat in the node, so rule 16 sends the whole node to Textile.",
+   "link": "https://www.myer.com.au/c/home/allbathroom/bathroom-bath-mats"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathrobes",
+   "qty": 66,
+   "issue": "ROUTED TO TEXTILE (rule 20): Home > Bathroom > Bathrobes, productTotalCount 66, proved by exhaustive id enumeration (48 on page 1 + 18 on page 2 = 66 unique ids). Bathrobes are Textile.",
+   "link": "https://www.myer.com.au/c/home/allbathroom/bathrobes"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathroom Accessories > Bathroom Scales",
+   "qty": 29,
+   "issue": "AMBIGUOUS / NOT RECORDED (rule 29, LOW confidence): a genuine fifth child of Bathroom Accessories, productTotalCount 29 = perPage = productList length (direct equivalence). But the primary product type is a weighing appliance, not a bathroom fixture, accessory, fitting or hardware - the products are Vue Body Fat Scale, Soehnle Shape/Style Sense, Weight Watchers Smart Scale WW710A/WW750A, Brabantia digital scales, Halo Bluetooth Smart Body Scale, and Myer's own merchandise hierarchy files 11 of the 29 under '.../ELECTRONIC' and one under 'SPORTING GOOD MK CNC'. Rules 3-21 enumerate what counts as Bathroom in detail and scales appear nowhere in that list. Rather than guess, this is sent to review per rule 29 / BATCH_BRIEF s7 for the run owner to decide.",
+   "link": "https://www.myer.com.au/c/home/allbathroom/bathroom-accessories/bathroom-scales"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Cleaning",
+   "qty": 27,
+   "issue": "NOT RECORDED (rule 2, primary product type beats room placement): Myer cross-lists a KITCHEN node into the Bathroom department - its internal name is s_home_kitchenware_kitchen-linen_cleaning, i.e. it is really Home > Kitchen > Kitchen Linen > Cleaning. productTotalCount 27 = perPage = productList length. Every product enumerated is kitchen-sink cleaning gear: Joseph Joseph Flip-Up Draining Board, SinkTech Dish Brush, Caddy Sink Area Tidy, KitchenAid Soap Dispensing Palm/Bottle Brush, Ladelle and Sheridan microfibre dishcloths, Le Creuset nylon cleaning brush, OXO Deep Cleaning Brush Set - and 15 of the 27 carry the merchandise path 'HO Home/Kitchenware/KITCHENWARE/UTILITY/UTILITY'. Rule 3's 'Cleaning Accessories' means bathroom-cleaning accessories; these are not. Excluded from Bathroom.",
+   "link": "https://www.myer.com.au/c/home/allbathroom/utility-cleaning---storage"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Furniture > Bathroom Furniture > Bathroom Cabinets & Vanities",
+   "qty": 16,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Bathroom Cabinets & Vanities' - dedup.already_extracted('https://www.myer.com.au/c/home/all-furniture/furniture-bathroom/cabinets-vanities') is a direct URL-exact hit. Under OPTION 1 bath vanities, vanity units, bathroom cabinets and medicine cabinets already in Furniture.xlsx stay in Furniture and are NOT re-extracted, even though rule 9 would otherwise class them as Bathroom. productTotalCount 16 = perPage = productList length; contents are Cefito bathroom mirror cabinets, vanity units, vessel/ceramic basins and Artiss bathroom storage cabinets.",
+   "link": "https://www.myer.com.au/c/home/all-furniture/furniture-bathroom/cabinets-vanities"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Furniture > Home Storage > Bathroom & Laundry Storage",
+   "qty": 87,
+   "issue": "NOT RECORDED (rules 12 and 30-33, LOW confidence): productTotalCount 87, proved by exhaustive id enumeration (48 + 39 = 87 unique ids). Rule 12 admits bathroom storage ONLY where the site presents it under Bathroom; Myer presents this node under Home > Furniture > Home Storage, as a sibling of Storage Boxes, Baskets, Kitchen Storage, Wardrobe Storage and Sheds & Outdoor Storage - it is Storage-owned, which is exactly the 'Storage > Storage Baskets = Storage' discriminator in rules 30-33. It is also a COMBINED Bathroom-and-Laundry node, and the enumerated contents are overwhelmingly laundry and cleaning: Joseph Joseph Tota / Tota Trio / Hold-All laundry baskets and separation baskets, CleanTech spray mops, tile scrubbers, wall-mounted dustpans, cleaning-tool storage rails and iron caddies, with 20 of the first 48 carrying 'HO Home/Kitchenware/KITCHENWARE/UTILITY/UTILITY'. Recording it would import a mostly-laundry node into Bathroom and would also aggregate two rooms in one figure. Flagged rather than guessed.",
+   "link": "https://www.myer.com.au/c/home/all-furniture/home--storage/bathroom-laundry-storage"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Accessories (rule 24 residue - 60 items covered by no child, RECORDED 2026-09-05 as 'Bathroom Accessories (other)')",
+   "qty": 434,
+   "issue": "RULE 24 RESIDUE, RE-VERIFIED 2026-09-05 (BATCH_BRIEF s5; run-owner decision precedent SR176 Kmart applied here): live re-fetch shows the site's Bathroom Accessories population has grown since the original pass (parent 418->434; children now Organisation 249, Toilet Brushes & Sets 29, Soap Dispensers 37, Bathroom Mirrors 41, Bathroom Scales 28). Exhaustive product-id enumeration today of the parent (434/434 ids recovered, exact) and all five children (all exact vs their own productTotalCount) shows the five children's ids sum to 384 but UNION to only 374 (10 cross-listed ids shared between siblings, the same magnitude of overlap found in the original pass), and that the parent minus the child union leaves 60 product ids in NO child. Every one of the 60 was inspected: a genuine bathroom-hardware/fixture subset (Cefito/basin/shower/bathtub mixer taps and wall spouts, an electric bidet toilet seat cover, a ceramic hand-wash basin, a toilet paper holder, a shower head set, 4 bamboo bath caddies, 3 Levede towel racks, 2 electric heated towel rails, 3 salt&pepper toilet brush holders and 2 'Tide 3 Piece Bathroom Set', a Spot toilet brush and roll holder, 2 Flex TriBlade toilet brushes, 2 EasyStore toothbrush caddies, an EasyStore 5L bathroom bin, roll storage with holder, and 4 OXO suction shower accessories) mixed with Myer cross-listed non-bathroom junk (laundry hampers/baskets/drying racks/ironing boards/dryer balls, general kitchen pedal bins and dustbins, a kitchen wall shelf, a shoe cabinet, a bedside table, a serving tray, a window wiper, a soap-on-a-rope novelty gift, and one Munchkin baby-bath organiser correctly out of scope). Containment is proven (all 5 children are strict subsets of the 434-id parent set, zero ids outside), so per the run-owner decision already applied to SR176 Kmart (rule-24 residue captured as a '<parent> (other)' leaf carrying the parent URL, figure not adjusted per rule 26), this is now RECORDED in rows[] as 'Bathroom Accessories (other)' qty 60, link = the parent URL itself (no deeper listing URL exists for the uncaptured remainder).",
+   "link": "https://www.myer.com.au/c/home/allbathroom/bathroom-accessories"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Furniture (rule 24 residue - 17 items covered by no child, RECORDED 2026-09-05 as 'Bathroom Furniture (other)')",
+   "qty": 85,
+   "issue": "RULE 24 RESIDUE, RE-VERIFIED 2026-09-05 (BATCH_BRIEF s5; run-owner decision precedent SR176 Kmart applied here): live re-fetch shows Bathroom Furniture grew from 83 to 85; its two children are unchanged (Cabinets & Vanities 16, already extracted in Furniture.xlsx; Fittings 52). Exhaustive product-id enumeration today of the parent (85/85 ids recovered, exact) and both children (16/16 and 52/52, exact) proves the children's union (68) is a strict subset of the parent with zero overlap between the two siblings, leaving 17 ids in neither child. All 17 were inspected: a genuine bathroom-furniture subset (a Furb 4-tier towel ladder, a Kodu over-the-toilet storage cabinet, a Kodu wall-mount hanging cabinet, 3 Artiss bathroom storage cabinets including a slim linen tower, and a Cefito LED mirror cabinet) mixed with Myer cross-listed non-bathroom furniture (7 Innovatec credenzas/cabinets, an Artiss kitchen cookware organiser rack, and a Cefito kitchen sink). Containment is proven, so per the SR176 Kmart precedent this is now RECORDED in rows[] as 'Bathroom Furniture (other)' qty 17, link = the parent URL itself (no deeper listing URL exists for the uncaptured remainder).",
+   "link": "https://www.myer.com.au/c/home/all-furniture/furniture-bathroom"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Home Decor > Wall Art, Mirrors & Clocks > Mirrors",
+   "qty": 225,
+   "issue": "ALREADY EXTRACTED IN Final.xlsx (Home Decor pass) as 'Mirrors' - direct URL-exact dedup hit, so it stays in Final.xlsx. Enumerated to exhaustion (225 unique ids) SOLELY to prove it is disjoint from the Bathroom Mirrors node I did record: the intersection of its 225 ids with bathroom-mirrors' 43 ids is EXACTLY ZERO, so recording Bathroom Mirrors introduces no duplicate and no double count. Two genuinely different URLs under two different parents = two records under rule 28.",
+   "link": "https://www.myer.com.au/c/home/furniture-home-decor/wall-art--1/home-decor-mirrors"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Home > Top Brands > Heritage > Bathroom",
+   "qty": null,
+   "issue": "NOT RECORDED (rule 25): a brand landing page (s_dynamic_pep_brand_home_heritage_bathroom, id 897074) under Home > Top Brands > Heritage, not a category in the product taxonomy. Its products are a brand-filtered subset of the Bathroom nodes already handled. Not fetched for a count.",
+   "link": "https://www.myer.com.au/c/home/featured-home-brands/featured-brands-heritage/home-heritage-bathroom"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "COMPOSITION DISCLOSURE - Bathroom Organisation (246)",
+   "qty": 246,
+   "issue": "DISCLOSURE on a recorded row: 'Bathroom Organisation' is Myer's own node at Home > Bathroom > Bathroom Accessories > Bathroom Organisation and is recorded as Bathroom on that hierarchy. All 246 products were enumerated and read. The majority are genuine bathroom organisation: Vue Hudson Soft Touch / Heritage Charmaine Ceramic / Heritage Grace Marble / Vue Textured Cement bathroom accessory sets, Country Road Loft marble trays, holders, round storage and jewellery trays, Fitzroy and Jac trays and holders, Lucinda and Celeste trinket boxes, storage baskets, a Joseph Joseph EasyStore concealed toilet roll holder and toothbrush caddy. But roughly 48 of the 246 are laundry and ironing product that Myer cross-lists into this node - Joseph Joseph Glide/Pocket ironing boards and AirFrame airers, Tota and Sherwood Voyager laundry hampers, stainless-steel clothes pegs, clothes racks, pedal bins and Bo laundry bins. Rule 26 forbids adjusting the listing's own figure, so 246 is recorded exactly as the site reports it and the contamination is disclosed here.",
+   "link": "https://www.myer.com.au/c/home/allbathroom/bathroom-accessories/acessories-854100-1"
+  }
+ ],
+ "_reconstructed_from": "Bathroom.xlsx delivered 2026-09-01 (checkpoint), not original worker JSON"
+}

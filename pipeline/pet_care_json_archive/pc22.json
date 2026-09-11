@@ -1,0 +1,286 @@
+{
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "Target Home (target.com), scoped strictly to the site's own 'Pets' department (https://www.target.com/c/pets/-/N-5xt44), a same-level sibling of Home & Decor/Kitchen & Dining/etc. in Target's root taxonomy. ACCESS: direct HTTP fetch (curl, plain UA) reached every /c/ category page cleanly (200) and the server-rendered __NEXT_DATA__ script on each page exposes the site's own taxonomy.metadata.children array (node_id, name, number_of_children, canonical_url) - this is the authoritative category tree, walked breadth-first from the Pets root through Dog Supplies (17 children) and Cat Supplies (16 children); every node with number_of_children=0 was spot-checked by fetching it directly and confirming it has no further real children (only brand-page or duplicate-parent cross-links). QTY METHOD: category PLP grids are client-rendered so counts are not in the raw HTML. First tried Target's redsky_aggregations/v1/web/plp_search_v2 -> search_response.metadata.total_results endpoint via WebFetch (direct curl_cffi/Playwright requests to redsky all got 403/435 PerimeterX blocks from this IP, matching the prior Home-Decor pass's note) using the prior pass's exact verified param set (default_purchasability_filter=true, include_sponsored=false, include_dmc_dmr=true - confirmed this combo gives the non-inflated true count by testing default_purchasability_filter=false/true and include_sponsored=false/true side by side on two nodes). Got 12 of 13 Dog Supplies leaf counts this way before WebFetch itself started getting 403'd from redsky (rate-based PerimeterX block) - per the brief's 'first block stops that host' rule, stopped calling redsky entirely once blocked (also independently confirmed blocked via Playwright network-interception of the site's own client-side XHR call, which returned a PerimeterX captcha page). For the one remaining Dog Supplies row (Dog Clothing & Accessories) and all Cat Supplies (12) and Pets-root-only (4) leaves, escalated to Claude-in-Chrome (robots.txt has no Claude-specific disallow) and read the rendered 'N results' header directly on each live PLP page - this is the same number the grid paginates through. Dog Clothing & Accessories showing exactly '2,463 results' (identical to Dog Collars/Harnesses/Leashes' redsky count) looked like possible stale/cached data at first, so it was independently re-navigated and re-checked from scratch - confirmed twice, genuine coincidence not a caching artifact. EXCLUDED as navigation/marketing, not categories: Pet Deals, Gifts for Pets, Pets New Arrivals, New Dog Checklist, New Cat Checklist (curated 'what a new pet needs' landing pages, each with exactly one child that just links back to Puppy/Kitten Supplies). EXCLUDED as brand landing page: Boots & Barkley (/b/ URL, Target's pet private label brand hub - appears as a pseudo-child on almost every Pets node). OVERLAP: Puppy Supplies and Kitten Supplies are each cross-listed both directly under the Pets root AND under Dog Supplies / Cat Supplies respectively (identical node_id/canonical_url in both places) - recorded once each, nested under Dog Supplies / Cat Supplies since that is their more specific home; not double-counted. Pet Health & Wellness (node 5xt3j) has a URL slug 'dog-health-wellness' but its own page title/H1 and breadcrumb read 'Pet Health & Wellness' (covers both dog and cat) - kept as one row under the Pets root, not nested under Dog Supplies. No zero-result Pet Care nodes were found (none dropped for that reason) - all leaf counts above 0.",
+  "rows": [
+    {
+      "category": "Pets",
+      "sub_category": "Dog Supplies",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Dog Supplies",
+      "sub_category": "Dog Food",
+      "qty": 558,
+      "link": "https://www.target.com/c/dog-food-supplies-pets/-/N-5xt3m",
+      "is_group": false,
+      "evidence": "redsky_aggregations/v1/web/plp_search_v2 (category=5xt3m, default_purchasability_filter=true, include_sponsored=false): search_response.metadata.total_results=558",
+      "flag": "MANUAL REVIEW: PET CONSUMABLE - dog food"
+    },
+    {
+      "category": "Dog Supplies",
+      "sub_category": "Dog Collars, Harnesses & Leashes",
+      "qty": 2463,
+      "link": "https://www.target.com/c/dog-collars-harnesses-leashes-supplies-pets/-/N-5xt3o",
+      "is_group": false,
+      "evidence": "redsky_aggregations/v1/web/plp_search_v2 (category=5xt3o, default_purchasability_filter=true, include_sponsored=false): search_response.metadata.total_results=2463",
+      "flag": null
+    },
+    {
+      "category": "Dog Supplies",
+      "sub_category": "Dog Toys",
+      "qty": 1917,
+      "link": "https://www.target.com/c/dog-toys-supplies-pets/-/N-5xt3f",
+      "is_group": false,
+      "evidence": "redsky_aggregations/v1/web/plp_search_v2 (category=5xt3f, default_purchasability_filter=true, include_sponsored=false): search_response.metadata.total_results=1917",
+      "flag": null
+    },
+    {
+      "category": "Dog Supplies",
+      "sub_category": "Dog Treats",
+      "qty": 949,
+      "link": "https://www.target.com/c/dog-treats-supplies-pets/-/N-f3xkn",
+      "is_group": false,
+      "evidence": "redsky_aggregations/v1/web/plp_search_v2 (category=f3xkn, default_purchasability_filter=true, include_sponsored=false): search_response.metadata.total_results=949",
+      "flag": "MANUAL REVIEW: PET CONSUMABLE - dog treats"
+    },
+    {
+      "category": "Dog Supplies",
+      "sub_category": "Dog Waste Bags, Training Pads & Clean Up",
+      "qty": 373,
+      "link": "https://www.target.com/c/dog-waste-bags-training-pads-clean-up-supplies-pets/-/N-5xt3p",
+      "is_group": false,
+      "evidence": "redsky_aggregations/v1/web/plp_search_v2 (category=5xt3p, default_purchasability_filter=true, include_sponsored=false): search_response.metadata.total_results=373",
+      "flag": null
+    },
+    {
+      "category": "Dog Supplies",
+      "sub_category": "Dog Beds",
+      "qty": 979,
+      "link": "https://www.target.com/c/dog-beds-supplies-pets/-/N-5xt3r",
+      "is_group": false,
+      "evidence": "redsky_aggregations/v1/web/plp_search_v2 (category=5xt3r, default_purchasability_filter=true, include_sponsored=false): search_response.metadata.total_results=979",
+      "flag": null
+    },
+    {
+      "category": "Dog Supplies",
+      "sub_category": "Dog Flea & Tick Treatment",
+      "qty": 34,
+      "link": "https://www.target.com/c/dog-flea-tick-treatment-supplies-pets/-/N-4tgy3",
+      "is_group": false,
+      "evidence": "redsky_aggregations/v1/web/plp_search_v2 (category=4tgy3, default_purchasability_filter=true, include_sponsored=false): search_response.metadata.total_results=34",
+      "flag": "MANUAL REVIEW: PET MEDICAL / VETERINARY CATEGORY - flea & tick treatment"
+    },
+    {
+      "category": "Dog Supplies",
+      "sub_category": "Dog Grooming & Bathing",
+      "qty": 760,
+      "link": "https://www.target.com/c/dog-grooming-bathing-supplies-pets/-/N-5xt3k",
+      "is_group": false,
+      "evidence": "redsky_aggregations/v1/web/plp_search_v2 (category=5xt3k, default_purchasability_filter=true, include_sponsored=false): search_response.metadata.total_results=760",
+      "flag": null
+    },
+    {
+      "category": "Dog Supplies",
+      "sub_category": "Dog Bowls & Food Storage",
+      "qty": 748,
+      "link": "https://www.target.com/c/dog-bowls-supplies-pets/-/N-5xt3q",
+      "is_group": false,
+      "evidence": "redsky_aggregations/v1/web/plp_search_v2 (category=5xt3q, default_purchasability_filter=true, include_sponsored=false): search_response.metadata.total_results=748",
+      "flag": null
+    },
+    {
+      "category": "Dog Supplies",
+      "sub_category": "Dog Clothing & Accessories",
+      "qty": 2463,
+      "link": "https://www.target.com/c/dog-clothing-accessories-supplies-pets/-/N-5xt3s",
+      "is_group": false,
+      "evidence": "Claude-in-Chrome rendered listing header '2,463 results' on live PLP (redsky blocked by then; independently re-navigated and re-checked from scratch, same value both times)",
+      "flag": null
+    },
+    {
+      "category": "Dog Supplies",
+      "sub_category": "Dog Crates, Carriers & Containment",
+      "qty": 1583,
+      "link": "https://www.target.com/c/dog-crates-carriers-containment-supplies-pets/-/N-5xt3n",
+      "is_group": false,
+      "evidence": "redsky_aggregations/v1/web/plp_search_v2 (category=5xt3n, default_purchasability_filter=true, include_sponsored=false): search_response.metadata.total_results=1583",
+      "flag": null
+    },
+    {
+      "category": "Dog Supplies",
+      "sub_category": "Dog Vitamins & Supplements",
+      "qty": 399,
+      "link": "https://www.target.com/c/dog-vitamins-supplements-supplies-pets/-/N-j54dk",
+      "is_group": false,
+      "evidence": "redsky_aggregations/v1/web/plp_search_v2 (category=j54dk, default_purchasability_filter=true, include_sponsored=false): search_response.metadata.total_results=399",
+      "flag": "MANUAL REVIEW: PET CONSUMABLE - vitamins/supplements"
+    },
+    {
+      "category": "Dog Supplies",
+      "sub_category": "Puppy Supplies",
+      "qty": 270,
+      "link": "https://www.target.com/c/puppy-supplies/-/N-vm86w",
+      "is_group": false,
+      "evidence": "redsky_aggregations/v1/web/plp_search_v2 (category=vm86w, default_purchasability_filter=true, include_sponsored=false): search_response.metadata.total_results=270",
+      "flag": null
+    },
+    {
+      "category": "Pets",
+      "sub_category": "Cat Supplies",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Cat Supplies",
+      "sub_category": "Cat Food",
+      "qty": 417,
+      "link": "https://www.target.com/c/cat-food-supplies-pets/-/N-5xt3y",
+      "is_group": false,
+      "evidence": "Claude-in-Chrome rendered listing header '417 results' on live PLP (also 'page 1 of 18' at 24/page, consistent)",
+      "flag": "MANUAL REVIEW: PET CONSUMABLE - cat food"
+    },
+    {
+      "category": "Cat Supplies",
+      "sub_category": "Cat Litter & Supplies",
+      "qty": 707,
+      "link": "https://www.target.com/c/cat-litter-supplies-pets/-/N-5xt3v",
+      "is_group": false,
+      "evidence": "Claude-in-Chrome rendered listing header '707 results' on live PLP",
+      "flag": null
+    },
+    {
+      "category": "Cat Supplies",
+      "sub_category": "Cat Toys",
+      "qty": 821,
+      "link": "https://www.target.com/c/cat-toys-supplies-pets/-/N-5xt3u",
+      "is_group": false,
+      "evidence": "Claude-in-Chrome rendered listing header '821 results' on live PLP",
+      "flag": null
+    },
+    {
+      "category": "Cat Supplies",
+      "sub_category": "Cat Treats",
+      "qty": 166,
+      "link": "https://www.target.com/c/cat-treats-supplies-pets/-/N-bpteb",
+      "is_group": false,
+      "evidence": "Claude-in-Chrome rendered listing header '166 results' on live PLP",
+      "flag": "MANUAL REVIEW: PET CONSUMABLE - cat treats"
+    },
+    {
+      "category": "Cat Supplies",
+      "sub_category": "Cat Flea & Tick Treatment",
+      "qty": 21,
+      "link": "https://www.target.com/c/cat-flea-tick-treatment-supplies-pets/-/N-4snyh",
+      "is_group": false,
+      "evidence": "Claude-in-Chrome rendered listing header '21 results' on live PLP",
+      "flag": "MANUAL REVIEW: PET MEDICAL / VETERINARY CATEGORY - flea & tick treatment"
+    },
+    {
+      "category": "Cat Supplies",
+      "sub_category": "Cat Beds",
+      "qty": 197,
+      "link": "https://www.target.com/c/cat-beds-supplies-pets/-/N-5xt41",
+      "is_group": false,
+      "evidence": "Claude-in-Chrome rendered listing header '197 results' on live PLP",
+      "flag": null
+    },
+    {
+      "category": "Cat Supplies",
+      "sub_category": "Cat Bowls & Food Storage",
+      "qty": 289,
+      "link": "https://www.target.com/c/cat-bowls-supplies-pets/-/N-5xt40",
+      "is_group": false,
+      "evidence": "Claude-in-Chrome rendered listing header '289 results' on live PLP",
+      "flag": null
+    },
+    {
+      "category": "Cat Supplies",
+      "sub_category": "Cat Carriers, Crates & Mobility",
+      "qty": 668,
+      "link": "https://www.target.com/c/cat-carriers-crates-mobility-supplies-pets/-/N-akwft",
+      "is_group": false,
+      "evidence": "Claude-in-Chrome rendered listing header '668 results' on live PLP",
+      "flag": null
+    },
+    {
+      "category": "Cat Supplies",
+      "sub_category": "Cat Collars, Leashes & Accessories",
+      "qty": 237,
+      "link": "https://www.target.com/c/cat-collars-leashes-accessories-supplies-pets/-/N-5xt3z",
+      "is_group": false,
+      "evidence": "Claude-in-Chrome rendered listing header '237 results' on live PLP",
+      "flag": null
+    },
+    {
+      "category": "Cat Supplies",
+      "sub_category": "Cat Health & Grooming",
+      "qty": 290,
+      "link": "https://www.target.com/c/cat-health-grooming-supplies-pets/-/N-5xt3w",
+      "is_group": false,
+      "evidence": "Claude-in-Chrome rendered listing header '290 results' on live PLP",
+      "flag": "MANUAL REVIEW: PET MEDICAL / VETERINARY CATEGORY - combined health-and-grooming bucket, may include medical items"
+    },
+    {
+      "category": "Cat Supplies",
+      "sub_category": "Cat Scratchers, Trees & Towers",
+      "qty": 1202,
+      "link": "https://www.target.com/c/cat-trees-towers-furniture-supplies-pets/-/N-5xt3x",
+      "is_group": false,
+      "evidence": "Claude-in-Chrome rendered listing header '1,202 results' on live PLP",
+      "flag": null
+    },
+    {
+      "category": "Cat Supplies",
+      "sub_category": "Kitten Supplies",
+      "qty": 170,
+      "link": "https://www.target.com/c/kitten-supplies/-/N-x5okh",
+      "is_group": false,
+      "evidence": "Claude-in-Chrome rendered listing header '170 results' on live PLP",
+      "flag": null
+    },
+    {
+      "category": "Pets",
+      "sub_category": "Pet Vacuums",
+      "qty": 103,
+      "link": "https://www.target.com/c/pet-vacuums/-/N-r4cjp",
+      "is_group": false,
+      "evidence": "Claude-in-Chrome rendered listing header '103 results' on live PLP",
+      "flag": null
+    },
+    {
+      "category": "Pets",
+      "sub_category": "Pet Health & Wellness",
+      "qty": 1876,
+      "link": "https://www.target.com/c/dog-health-wellness/-/N-5xt3j",
+      "is_group": false,
+      "evidence": "Claude-in-Chrome rendered listing header '1,876 results' on live PLP (page title/H1 'Pet Health & Wellness' despite dog-slug URL; site's own taxonomy places it as a direct Pets-root child, not nested under Dog Supplies)",
+      "flag": "MANUAL REVIEW: PET MEDICAL / VETERINARY CATEGORY - health & wellness bucket, likely includes supplements/medicines/wound care alongside flea-tick"
+    },
+    {
+      "category": "Pets",
+      "sub_category": "Bird Supplies",
+      "qty": 2457,
+      "link": "https://www.target.com/c/bird-supplies-pets/-/N-5xt43",
+      "is_group": false,
+      "evidence": "Claude-in-Chrome rendered listing header '2,457 results' on live PLP (re-checked after an initial stale read on the same page)",
+      "flag": null
+    },
+    {
+      "category": "Pets",
+      "sub_category": "Pets Travel",
+      "qty": 1949,
+      "link": "https://www.target.com/c/pets-travel/-/N-6thwb",
+      "is_group": false,
+      "evidence": "Claude-in-Chrome rendered listing header '1,949 results' on live PLP",
+      "flag": null
+    }
+  ]
+}

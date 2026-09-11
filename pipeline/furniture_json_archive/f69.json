@@ -1,0 +1,1011 @@
+{
+ "sr": 69,
+ "company": "Macy's Home",
+ "brand_site": "macys.com",
+ "country": "USA",
+ "site_url": "https://www.macys.com/shop/home?id=22672",
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ACCESS: plain direct fetch worked throughout via the shared probe.py session - no proxy, no curl_cffi profile sweep needed, matching the prior Home-Decor pass. Note macys.com/robots.txt is itself 403 to us on every route tried (direct, Googlebot UA, r.jina.ai); the only body I could get was translate.goog's OWN robots.txt (the documented trap), so I could neither confirm nor refute a Claude-specific directive - I saw no evidence of one, and /shop/* pages serve normally. All non-/shop paths (robots.txt, every sitemap.xml variant, /navigation/header-footer) return the same Akamai Access-Denied page, so the sitemap route was unavailable.\n\nSCOPE: stayed strictly inside the Furniture department, macys.com/shop/home/furniture-mattress?id=29391 (h1 'Furniture', categoryName 'Furniture & Mattresses', 65,527 items). The assigned roster URL /shop/home?id=22672 still normalises to the Home landing id=173142; Furniture is its child department. Did not enumerate the rest of the department store.\n\nTREE: the global mega-menu only exposes 2-3 levels, but every category page carries its own left-rail child list, so I crawled recursively - a node's children are the links whose path is exactly the current path plus one lowercase slug segment (facet URLs are distinguishable because their added segment is Capitalised, e.g. /Brand/..., /Bed_style/..., /Pageindex/...). That produced 136 real category nodes to depth 3. Depth 4 was probed and does not exist. This found 40+ nodes the mega-menu never shows (e.g. Armoires, Vanities, Room Dividers, Buffets & Sideboards, China Cabinets & Curios, Wine Racks, Hall Trees, Shoe Racks, Loveseats, Modular Couches, Curved Sofas, Swivel Chairs, Loft Beds, Montessori Beds, the whole Outdoor sub-tree).\n\nQTY METHOD: Macy's is Nuxt with a devalue-flattened payload in <script type=\"application/json\" data-nuxt-data=\"nuxt-app\">, so literal regex on the HTML does not work - I wrote an index resolver for it. The authoritative figure is pinia.pageDataStore.pageData[1][1].meta.analytics.data.totalResults. It was validated three independent ways: (1) ceil(totalResults / resultsPerPage) == body.canvas.rows[..].rowSortableGrid.zones[..].sortableGrid.model.pagination.numberOfPages on 136 of 136 nodes (resultsPerPage was 60 everywhere, no A/B drift); (2) on every category that fits on one page the SSR HTML renders a real header <div class=\"pagination-total\">Showing All N Items</div> - it matched totalResults exactly on 21 of 21 such nodes in the crawl and on all 20 single-page leaves in the final set (multi-page categories hydrate that header client-side, so it is absent there, which is why most rows cite the JSON path); (3) last-page arithmetic - loading /Pageindex/<last> and counting unique structured product IDs gave exactly totalResults - (pages-1)*60 on 4 of 4 spot checks (coat-racks 14/14, curved-sofas 5/5, loveseats 18/18, armoires 44/44). Per the prior pass and confirmed here, counting product tiles/hrefs UNDERCOUNTS on this platform (armoires page 1 yielded 58 structured IDs for a 60-slot page), so tile counts were never used as a qty.\n\nSANITY CHECKS: counts vary per category (no site-wide constant); no suspiciously round display caps; the h1/categoryName of every fetched page was compared against the label the parent's nav gave it and matched on all 136. IMPORTANT TRAP FOUND: on macys.com a correct slug with a WRONG ?id= still returns HTTP 200 and silently serves a different listing with a different count rather than 404ing (e.g. .../kitchen-islands-carts?id=341162 renders 51 items, the real id=185646 renders 616). Every URL emitted here therefore carries the id Macy's own nav link supplied; I ran a validator that re-checked all 91 leaf URLs against the crawl and it corrected 43 ids.\n\nDRIFT / REPRODUCIBILITY - read this before comparing these figures to a later re-run: Macy's counts are perfectly deterministic at any instant but the catalogue churns continuously. Fetching one URL four times back-to-back gave spread 0 on 5 of 5 URLs tested, and two full consecutive sweeps of all 91 leaves agreed on 91 of 91 - so the numbers below are exact, not noisy. Over about an hour, however, 55 of 91 leaves moved by roughly 1% (e.g. Ottomans 1028 -> 1043 -> 1045, Outdoor & Patio Chairs 914 -> 925, Nightstands 1395 -> 1388 -> 1390) as marketplace sellers add and drop listings. Every qty here comes from the SAME final sweep so the set is internally consistent as a point-in-time snapshot; a re-extraction on another day should be expected to differ by ~1% on the large nodes, and that is the site, not an error.\n\nEXCLUDED and why: the entire Mattresses branch (19 nodes, 1,149 items) - the site's own Item Type facet reports 740 Mattresses + 403 Bases + 2 Furniture, i.e. it is bedding not furniture per the brief; bed frames are separately and fully covered by Bedroom > Beds. Kids Play Kitchen (685) and Kids Playhouse & Tents (174) - product typeName is TOYS_AND_GAMES on every sampled tile; their parent Kids Playroom is 857 Pretend Play vs 611 Furniture, so it is kept only as a grouping row over its two genuinely furniture children (Kids Couch, Kids Table & Chairs). In-Stock Furniture (621), Small Space Furniture (8,771) and White Glove Delivery (4,163) - cross-cutting availability / size / delivery-service buckets that re-list products already counted under their product-type nodes, not product categories. Sale & Clearance furniture links. All facet/filter URLs (Brand, Bed_style, Price, Color, Material, Room Type, Item Type, Pageindex).\n\nAMBIGUOUS INCLUSIONS (all flagged individually): Fireplaces (317) is dominated by electric-fireplace TV stands and mantel media consoles; Fire Pits (30, split into 3 children that sum exactly to the parent) is dominated by fire-pit TABLES and patio sets; Hammocks & Swings (115) is mostly porch swings and swing gliders; Game Tables & Sets (32) mixes real game tables with air hockey/pinball. Macy's Item Type = Furniture for 91-100% of each. INCLUDED after inspecting page-1 titles: Wine Racks (wine bar cabinets/sideboards), Shoe Racks (shoe cabinets - explicitly in scope), Coat Racks (freestanding coat stands and hall trees, flagged for a wall-hook minority), Room Dividers (freestanding folding screens), Bed Canopies (4 items, all canopy-bed sets), Vanities (bedroom vanity tables, in scope per the brief), Changing Tables and Bassinets (nursery furniture, in scope).\n\nDEDUP: Bedroom > Beds > 'Bunk Bed Frames & Box Springs' (824) and Kids > 'Bunk Beds' (823) share 51 of 60 page-1 product IDs - near-duplicate populations under two differently-named nodes in different branches; both kept and both flagged. Conversely 'Rocking Chairs & Gliders' exists twice (Baby Nursery 104, Living Room > Chairs 139) but shares 0 of 60 page-1 IDs - genuinely different listings, both kept and flagged as a name collision.",
+ "rows": [
+  {
+   "category": "Furniture",
+   "sub_category": "Baby Nursery",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bassinets & Bedside Sleepers",
+   "qty": 1,
+   "link": "https://www.macys.com/shop/home/furniture-mattress/baby-nursery/bassinets-bedside-sleepers?id=341250",
+   "is_group": false,
+   "evidence": "rendered listing header 'Showing All 1 Items'; Nuxt page-data JSON meta.analytics.data.totalResults=1 on /shop/home/furniture-mattress/baby-nursery/bassinets-bedside-sleepers?id=341250; cross-checked ceil(1/60)=1 == sortableGrid.model.pagination.numberOfPages=1",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Changing Tables",
+   "qty": 61,
+   "link": "https://www.macys.com/shop/home/furniture-mattress/baby-nursery/changing-tables-pads?id=228437",
+   "is_group": false,
+   "evidence": "Nuxt page-data JSON meta.analytics.data.totalResults=61 on /shop/home/furniture-mattress/baby-nursery/changing-tables-pads?id=228437; cross-checked ceil(61/60)=2 == sortableGrid.model.pagination.numberOfPages=2",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Cribs",
+   "qty": 107,
+   "link": "https://www.macys.com/shop/home/furniture-mattress/baby-nursery/cribs?id=228438",
+   "is_group": false,
+   "evidence": "Nuxt page-data JSON meta.analytics.data.totalResults=107 on /shop/home/furniture-mattress/baby-nursery/cribs?id=228438; cross-checked ceil(107/60)=2 == sortableGrid.model.pagination.numberOfPages=2",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Nursery Dressers",
+   "qty": 49,
+   "link": "https://www.macys.com/shop/home/furniture-mattress/baby-nursery/nursery-dressers?id=341259",
+   "is_group": false,
+   "evidence": "rendered listing header 'Showing All 49 Items'; Nuxt page-data JSON meta.analytics.data.totalResults=49 on /shop/home/furniture-mattress/baby-nursery/nursery-dressers?id=341259; cross-checked ceil(49/60)=1 == sortableGrid.model.pagination.numberOfPages=1",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Rocking Chairs & Gliders",
+   "qty": 105,
+   "link": "https://www.macys.com/shop/home/furniture-mattress/baby-nursery/rocking-chairs-gliders?id=228435",
+   "is_group": false,
+   "evidence": "Nuxt page-data JSON meta.analytics.data.totalResults=105 on /shop/home/furniture-mattress/baby-nursery/rocking-chairs-gliders?id=228435; cross-checked ceil(105/60)=2 == sortableGrid.model.pagination.numberOfPages=2",
+   "flag": "MANUAL REVIEW: name collision - Macy's has two distinct nodes both called \"Rocking Chairs & Gliders\" (this one under Baby Nursery, another under Living Room > Chairs). Verified DISTINCT: 0 of 60 page-1 product IDs are shared. Both kept."
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bedroom Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Armoires",
+   "qty": 286,
+   "link": "https://www.macys.com/shop/home/furniture-mattress/bedroom/armoires?id=341190",
+   "is_group": false,
+   "evidence": "Nuxt page-data JSON meta.analytics.data.totalResults=286 on /shop/home/furniture-mattress/bedroom/armoires?id=341190; cross-checked ceil(286/60)=5 == sortableGrid.model.pagination.numberOfPages=5",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Beds",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Beds with Storage",
+   "qty": 2785,
+   "link": "https://www.macys.com/shop/home/furniture-mattress/bedroom/beds/beds-with-storage?id=338227",
+   "is_group": false,
+   "evidence": "Nuxt page-data JSON meta.analytics.data.totalResults=2785 on /shop/home/furniture-mattress/bedroom/beds/beds-with-storage?id=338227; cross-checked ceil(2785/60)=47 == sortableGrid.model.pagination.numberOfPages=47",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bunk Bed Frames & Box Springs",
+   "qty": 832,
+   "link": "https://www.macys.com/shop/home/furniture-mattress/bedroom/beds/bunk-beds?id=338237",
+   "is_group": false,
+   "evidence": "Nuxt page-data JSON meta.analytics.data.totalResults=832 on /shop/home/furniture-mattress/bedroom/beds/bunk-beds?id=338237; cross-checked ceil(832/60)=14 == sortableGrid.model.pagination.numberOfPages=14",
+   "flag": "MANUAL REVIEW: near-duplicate population of Kids > Bunk Beds - 51 of 60 page-1 product IDs are shared; kept both because Macy's exposes them as two separately-named nodes under different parents"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Custom Beds & Headboards",
+   "qty": 91,
+   "link": "https://www.macys.com/shop/home/furniture-mattress/bedroom/beds/custom-beds-headboards?id=65678",
+   "is_group": false,
+   "evidence": "Nuxt page-data JSON meta.analytics.data.totalResults=91 on /shop/home/furniture-mattress/bedroom/beds/custom-beds-headboards?id=65678; cross-checked ceil(91/60)=2 == sortableGrid.model.pagination.numberOfPages=2",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Upholstered Bed Frames & Box Springs",
+   "qty": 3114,
+   "link": "https://www.macys.com/shop/home/furniture-mattress/bedroom/beds/upholstered-beds?id=338265",
+   "is_group": false,
+   "evidence": "Nuxt page-data JSON meta.analytics.data.totalResults=3114 on /shop/home/furniture-mattress/bedroom/beds/upholstered-beds?id=338265; cross-checked ceil(3114/60)=52 == sortableGrid.model.pagination.numberOfPages=52",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bed Canopies",
+   "qty": 4,
+   "link": "https://www.macys.com/shop/home/furniture-mattress/bedroom/canopies?id=341278",
+   "is_group": false,
+   "evidence": "rendered listing header 'Showing All 4 Items'; Nuxt page-data JSON meta.analytics.data.totalResults=4 on /shop/home/furniture-mattress/bedroom/canopies?id=341278; cross-checked ceil(4/60)=1 == sortableGrid.model.pagination.numberOfPages=1",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dressers & Chests",
+   "qty": 3464,
+   "link": "https://www.macys.com/shop/home/furniture-mattress/bedroom/dressers-chests?id=69952",
+   "is_group": false,
+   "evidence": "Nuxt page-data JSON meta.analytics.data.totalResults=3464 on /shop/home/furniture-mattress/bedroom/dressers-chests?id=69952; cross-checked ceil(3464/60)=58 == sortableGrid.model.pagination.numberOfPages=58",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Headboards",
+   "qty": 208,
+   "link": "https://www.macys.com/shop/home/furniture-mattress/bedroom/headboards?id=341166",
+   "is_group": false,
+   "evidence": "Nuxt page-data JSON meta.analytics.data.totalResults=208 on /shop/home/furniture-mattress/bedroom/headboards?id=341166; cross-checked ceil(208/60)=4 == sortableGrid.model.pagination.numberOfPages=4",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Nightstands",
+   "qty": 1390,
+   "link": "https://www.macys.com/shop/home/furniture-mattress/bedroom/nightstands?id=69954",
+   "is_group": false,
+   "evidence": "Nuxt page-data JSON meta.analytics.data.totalResults=1390 on /shop/home/furniture-mattress/bedroom/nightstands?id=69954; cross-checked ceil(1390/60)=24 == sortableGrid.model.pagination.numberOfPages=24",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Room Dividers",
+   "qty": 138,
+   "link": "https://www.macys.com/shop/home/furniture-mattress/bedroom/room-dividers?id=341187",
+   "is_group": false,
+   "evidence": "Nuxt page-data JSON meta.analytics.data.totalResults=138 on /shop/home/furniture-mattress/bedroom/room-dividers?id=341187; cross-checked ceil(138/60)=3 == sortableGrid.model.pagination.numberOfPages=3",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bedroom Sets",
+   "qty": 610,
+   "link": "https://www.macys.com/shop/home/furniture-mattress/bedroom/sets?id=198104",
+   "is_group": false,
+   "evidence": "Nuxt page-data JSON meta.analytics.data.totalResults=610 on /shop/home/furniture-mattress/bedroom/sets?id=198104; cross-checked ceil(610/60)=11 == sortableGrid.model.pagination.numberOfPages=11",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Vanities",
+   "qty": 2536,
+   "link": "https://www.macys.com/shop/home/furniture-mattress/bedroom/vanities?id=223850",
+   "is_group": false,
+   "evidence": "Nuxt page-data JSON meta.analytics.data.totalResults=2536 on /shop/home/furniture-mattress/bedroom/vanities?id=223850; cross-checked ceil(2536/60)=43 == sortableGrid.model.pagination.numberOfPages=43",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dining Room & Kitchen Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bar & Counter Stools",
+   "qty": 2176,
+   "link": "https://www.macys.com/shop/home/furniture-mattress/dining-room-kitchen/bar-stools?id=69958",
+   "is_group": false,
+   "evidence": "Nuxt page-data JSON meta.analytics.data.totalResults=2176 on /shop/home/furniture-mattress/dining-room-kitchen/bar-stools?id=69958; cross-checked ceil(2176/60)=37 == sortableGrid.model.pagination.numberOfPages=37",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Buffets & Sideboards",
+   "qty": 1150,
+   "link": "https://www.macys.com/shop/home/furniture-mattress/dining-room-kitchen/buffet-credenza?id=69957",
+   "is_group": false,
+   "evidence": "Nuxt page-data JSON meta.analytics.data.totalResults=1150 on /shop/home/furniture-mattress/dining-room-kitchen/buffet-credenza?id=69957; cross-checked ceil(1150/60)=20 == sortableGrid.model.pagination.numberOfPages=20",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "China Cabinets & Curios",
+   "qty": 239,
+   "link": "https://www.macys.com/shop/home/furniture-mattress/dining-room-kitchen/china-curio-cabinets?id=69959",
+   "is_group": false,
+   "evidence": "Nuxt page-data JSON meta.analytics.data.totalResults=239 on /shop/home/furniture-mattress/dining-room-kitchen/china-curio-cabinets?id=69959; cross-checked ceil(239/60)=4 == sortableGrid.model.pagination.numberOfPages=4",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dining Room Chairs & Benches",
+   "qty": 2229,
+   "link": "https://www.macys.com/shop/home/furniture-mattress/dining-room-kitchen/dining-room-chairs?id=69960",
+   "is_group": false,
+   "evidence": "Nuxt page-data JSON meta.analytics.data.totalResults=2229 on /shop/home/furniture-mattress/dining-room-kitchen/dining-room-chairs?id=69960; cross-checked ceil(2229/60)=38 == sortableGrid.model.pagination.numberOfPages=38",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dining Room Sets",
+   "qty": 5254,
+   "link": "https://www.macys.com/shop/home/furniture-mattress/dining-room-kitchen/dining-room-sets?id=69962",
+   "is_group": false,
+   "evidence": "Nuxt page-data JSON meta.analytics.data.totalResults=5254 on /shop/home/furniture-mattress/dining-room-kitchen/dining-room-sets?id=69962; cross-checked ceil(5254/60)=88 == sortableGrid.model.pagination.numberOfPages=88",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dining Room Tables",
+   "qty": 2563,
+   "link": "https://www.macys.com/shop/home/furniture-mattress/dining-room-kitchen/dining-room-tables?id=69961",
+   "is_group": false,
+   "evidence": "Nuxt page-data JSON meta.analytics.data.totalResults=2563 on /shop/home/furniture-mattress/dining-room-kitchen/dining-room-tables?id=69961; cross-checked ceil(2563/60)=43 == sortableGrid.model.pagination.numberOfPages=43",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Home Bar",
+   "qty": 3311,
+   "link": "https://www.macys.com/shop/home/furniture-mattress/dining-room-kitchen/home-bar?id=37823",
+   "is_group": false,
+   "evidence": "Nuxt page-data JSON meta.analytics.data.totalResults=3311 on /shop/home/furniture-mattress/dining-room-kitchen/home-bar?id=37823; cross-checked ceil(3311/60)=56 == sortableGrid.model.pagination.numberOfPages=56",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Kitchen Islands & Carts",
+   "qty": 633,
+   "link": "https://www.macys.com/shop/home/furniture-mattress/dining-room-kitchen/kitchen-islands-carts?id=185646",
+   "is_group": false,
+   "evidence": "Nuxt page-data JSON meta.analytics.data.totalResults=633 on /shop/home/furniture-mattress/dining-room-kitchen/kitchen-islands-carts?id=185646; cross-checked ceil(633/60)=11 == sortableGrid.model.pagination.numberOfPages=11",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Wine Racks",
+   "qty": 226,
+   "link": "https://www.macys.com/shop/home/furniture-mattress/dining-room-kitchen/wine-racks?id=341175",
+   "is_group": false,
+   "evidence": "Nuxt page-data JSON meta.analytics.data.totalResults=226 on /shop/home/furniture-mattress/dining-room-kitchen/wine-racks?id=341175; cross-checked ceil(226/60)=4 == sortableGrid.model.pagination.numberOfPages=4",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Entertainment & Game Room",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bean Bag Chairs",
+   "qty": 108,
+   "link": "https://www.macys.com/shop/home/furniture-mattress/entertainment-game-room/bean-bag-chairs?id=341191",
+   "is_group": false,
+   "evidence": "Nuxt page-data JSON meta.analytics.data.totalResults=108 on /shop/home/furniture-mattress/entertainment-game-room/bean-bag-chairs?id=341191; cross-checked ceil(108/60)=2 == sortableGrid.model.pagination.numberOfPages=2",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Game Tables & Sets",
+   "qty": 32,
+   "link": "https://www.macys.com/shop/home/furniture-mattress/entertainment-game-room/game-tables-sets?id=60312",
+   "is_group": false,
+   "evidence": "rendered listing header 'Showing All 32 Items'; Nuxt page-data JSON meta.analytics.data.totalResults=32 on /shop/home/furniture-mattress/entertainment-game-room/game-tables-sets?id=60312; cross-checked ceil(32/60)=1 == sortableGrid.model.pagination.numberOfPages=1",
+   "flag": "MANUAL REVIEW: ambiguous - Macy's files these under its Furniture department and the site's own Item Type is Furniture, but page-1 titles are a mix of genuine game tables (board-game/stone game tables) and game equipment (air hockey, pinball, shuffleboard, basketball arcade)"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Gaming Chairs",
+   "qty": 51,
+   "link": "https://www.macys.com/shop/home/furniture-mattress/entertainment-game-room/gaming-chairs?id=136644",
+   "is_group": false,
+   "evidence": "rendered listing header 'Showing All 51 Items'; Nuxt page-data JSON meta.analytics.data.totalResults=51 on /shop/home/furniture-mattress/entertainment-game-room/gaming-chairs?id=136644; cross-checked ceil(51/60)=1 == sortableGrid.model.pagination.numberOfPages=1",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Gaming Desks",
+   "qty": 8,
+   "link": "https://www.macys.com/shop/home/furniture-mattress/entertainment-game-room/gaming-desks?id=34904",
+   "is_group": false,
+   "evidence": "rendered listing header 'Showing All 8 Items'; Nuxt page-data JSON meta.analytics.data.totalResults=8 on /shop/home/furniture-mattress/entertainment-game-room/gaming-desks?id=34904; cross-checked ceil(8/60)=1 == sortableGrid.model.pagination.numberOfPages=1",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Home Theater Seating & Furniture",
+   "qty": 22,
+   "link": "https://www.macys.com/shop/home/furniture-mattress/entertainment-game-room/home-theater-seating-furniture?id=198402",
+   "is_group": false,
+   "evidence": "rendered listing header 'Showing All 22 Items'; Nuxt page-data JSON meta.analytics.data.totalResults=22 on /shop/home/furniture-mattress/entertainment-game-room/home-theater-seating-furniture?id=198402; cross-checked ceil(22/60)=1 == sortableGrid.model.pagination.numberOfPages=1",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Entryway",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Entryway Benches",
+   "qty": 628,
+   "link": "https://www.macys.com/shop/home/furniture-mattress/entryway/benches?id=341180",
+   "is_group": false,
+   "evidence": "Nuxt page-data JSON meta.analytics.data.totalResults=628 on /shop/home/furniture-mattress/entryway/benches?id=341180; cross-checked ceil(628/60)=11 == sortableGrid.model.pagination.numberOfPages=11",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Coat Racks",
+   "qty": 136,
+   "link": "https://www.macys.com/shop/home/furniture-mattress/entryway/coat-racks?id=341167",
+   "is_group": false,
+   "evidence": "Nuxt page-data JSON meta.analytics.data.totalResults=136 on /shop/home/furniture-mattress/entryway/coat-racks?id=341167; cross-checked ceil(136/60)=3 == sortableGrid.model.pagination.numberOfPages=3",
+   "flag": "MANUAL REVIEW: mostly freestanding coat stands, hall trees and garment racks (furniture), but a minority of page-1 tiles are wall-mounted coat hooks"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Hall Trees",
+   "qty": 254,
+   "link": "https://www.macys.com/shop/home/furniture-mattress/entryway/hall-trees?id=341168",
+   "is_group": false,
+   "evidence": "Nuxt page-data JSON meta.analytics.data.totalResults=254 on /shop/home/furniture-mattress/entryway/hall-trees?id=341168; cross-checked ceil(254/60)=5 == sortableGrid.model.pagination.numberOfPages=5",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Shoe Racks",
+   "qty": 155,
+   "link": "https://www.macys.com/shop/home/furniture-mattress/entryway/shoe-racks?id=341184",
+   "is_group": false,
+   "evidence": "Nuxt page-data JSON meta.analytics.data.totalResults=155 on /shop/home/furniture-mattress/entryway/shoe-racks?id=341184; cross-checked ceil(155/60)=3 == sortableGrid.model.pagination.numberOfPages=3",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Entryway Tables",
+   "qty": 1272,
+   "link": "https://www.macys.com/shop/home/furniture-mattress/entryway/tables?id=341161",
+   "is_group": false,
+   "evidence": "Nuxt page-data JSON meta.analytics.data.totalResults=1272 on /shop/home/furniture-mattress/entryway/tables?id=341161; cross-checked ceil(1272/60)=22 == sortableGrid.model.pagination.numberOfPages=22",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Home Office",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Desks",
+   "qty": 1575,
+   "link": "https://www.macys.com/shop/home/furniture-mattress/home-office-study/desks?id=261365",
+   "is_group": false,
+   "evidence": "Nuxt page-data JSON meta.analytics.data.totalResults=1575 on /shop/home/furniture-mattress/home-office-study/desks?id=261365; cross-checked ceil(1575/60)=27 == sortableGrid.model.pagination.numberOfPages=27",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Filing Cabinets",
+   "qty": 14,
+   "link": "https://www.macys.com/shop/home/furniture-mattress/home-office-study/filing-cabinets?id=44517",
+   "is_group": false,
+   "evidence": "rendered listing header 'Showing All 14 Items'; Nuxt page-data JSON meta.analytics.data.totalResults=14 on /shop/home/furniture-mattress/home-office-study/filing-cabinets?id=44517; cross-checked ceil(14/60)=1 == sortableGrid.model.pagination.numberOfPages=1",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Kids Study Furniture & Accessories",
+   "qty": 787,
+   "link": "https://www.macys.com/shop/home/furniture-mattress/home-office-study/kids?id=228429",
+   "is_group": false,
+   "evidence": "Nuxt page-data JSON meta.analytics.data.totalResults=787 on /shop/home/furniture-mattress/home-office-study/kids?id=228429; cross-checked ceil(787/60)=14 == sortableGrid.model.pagination.numberOfPages=14",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Office Chairs",
+   "qty": 447,
+   "link": "https://www.macys.com/shop/home/furniture-mattress/home-office-study/office-chairs?id=261364",
+   "is_group": false,
+   "evidence": "Nuxt page-data JSON meta.analytics.data.totalResults=447 on /shop/home/furniture-mattress/home-office-study/office-chairs?id=261364; cross-checked ceil(447/60)=8 == sortableGrid.model.pagination.numberOfPages=8",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Kids & Baby Room",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Kids Bedroom Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Kids Beds",
+   "qty": 1784,
+   "link": "https://www.macys.com/shop/home/furniture-mattress/kids/bedroom/beds?id=341270",
+   "is_group": false,
+   "evidence": "Nuxt page-data JSON meta.analytics.data.totalResults=1784 on /shop/home/furniture-mattress/kids/bedroom/beds?id=341270; cross-checked ceil(1784/60)=30 == sortableGrid.model.pagination.numberOfPages=30",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bunk Beds",
+   "qty": 831,
+   "link": "https://www.macys.com/shop/home/furniture-mattress/kids/bedroom/bunk-beds?id=341260",
+   "is_group": false,
+   "evidence": "Nuxt page-data JSON meta.analytics.data.totalResults=831 on /shop/home/furniture-mattress/kids/bedroom/bunk-beds?id=341260; cross-checked ceil(831/60)=14 == sortableGrid.model.pagination.numberOfPages=14",
+   "flag": "MANUAL REVIEW: near-duplicate population of Bedroom > Beds > Bunk Bed Frames & Box Springs - 51 of 60 page-1 product IDs are shared"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Kids Dressers",
+   "qty": 1022,
+   "link": "https://www.macys.com/shop/home/furniture-mattress/kids/bedroom/dresser-chest?id=341266",
+   "is_group": false,
+   "evidence": "Nuxt page-data JSON meta.analytics.data.totalResults=1022 on /shop/home/furniture-mattress/kids/bedroom/dresser-chest?id=341266; cross-checked ceil(1022/60)=18 == sortableGrid.model.pagination.numberOfPages=18",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Loft Beds",
+   "qty": 3802,
+   "link": "https://www.macys.com/shop/home/furniture-mattress/kids/bedroom/loft-beds?id=341268",
+   "is_group": false,
+   "evidence": "Nuxt page-data JSON meta.analytics.data.totalResults=3802 on /shop/home/furniture-mattress/kids/bedroom/loft-beds?id=341268; cross-checked ceil(3802/60)=64 == sortableGrid.model.pagination.numberOfPages=64",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Montessori Beds",
+   "qty": 102,
+   "link": "https://www.macys.com/shop/home/furniture-mattress/kids/bedroom/montessori-beds?id=341583",
+   "is_group": false,
+   "evidence": "Nuxt page-data JSON meta.analytics.data.totalResults=102 on /shop/home/furniture-mattress/kids/bedroom/montessori-beds?id=341583; cross-checked ceil(102/60)=2 == sortableGrid.model.pagination.numberOfPages=2",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Toddler Beds",
+   "qty": 35,
+   "link": "https://www.macys.com/shop/home/furniture-mattress/kids/bedroom/toddler-beds?id=341255",
+   "is_group": false,
+   "evidence": "rendered listing header 'Showing All 35 Items'; Nuxt page-data JSON meta.analytics.data.totalResults=35 on /shop/home/furniture-mattress/kids/bedroom/toddler-beds?id=341255; cross-checked ceil(35/60)=1 == sortableGrid.model.pagination.numberOfPages=1",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Kids Bookshelves",
+   "qty": 243,
+   "link": "https://www.macys.com/shop/home/furniture-mattress/kids/bookshelves-bookcases?id=341253",
+   "is_group": false,
+   "evidence": "Nuxt page-data JSON meta.analytics.data.totalResults=243 on /shop/home/furniture-mattress/kids/bookshelves-bookcases?id=341253; cross-checked ceil(243/60)=5 == sortableGrid.model.pagination.numberOfPages=5",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Kids Desks & Chairs",
+   "qty": 401,
+   "link": "https://www.macys.com/shop/home/furniture-mattress/kids/desks-chairs?id=341249",
+   "is_group": false,
+   "evidence": "Nuxt page-data JSON meta.analytics.data.totalResults=401 on /shop/home/furniture-mattress/kids/desks-chairs?id=341249; cross-checked ceil(401/60)=7 == sortableGrid.model.pagination.numberOfPages=7",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Kids Playroom Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Kids Couch",
+   "qty": 52,
+   "link": "https://www.macys.com/shop/home/furniture-mattress/kids/kids-playroom/couches-sofas?id=341258",
+   "is_group": false,
+   "evidence": "rendered listing header 'Showing All 52 Items'; Nuxt page-data JSON meta.analytics.data.totalResults=52 on /shop/home/furniture-mattress/kids/kids-playroom/couches-sofas?id=341258; cross-checked ceil(52/60)=1 == sortableGrid.model.pagination.numberOfPages=1",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Kids Table & Chairs",
+   "qty": 7,
+   "link": "https://www.macys.com/shop/home/furniture-mattress/kids/kids-playroom/tables-chairs?id=341277",
+   "is_group": false,
+   "evidence": "rendered listing header 'Showing All 7 Items'; Nuxt page-data JSON meta.analytics.data.totalResults=7 on /shop/home/furniture-mattress/kids/kids-playroom/tables-chairs?id=341277; cross-checked ceil(7/60)=1 == sortableGrid.model.pagination.numberOfPages=1",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Living Room Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Accent Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bar Carts",
+   "qty": 255,
+   "link": "https://www.macys.com/shop/home/furniture-mattress/living-room/accent-furniture/bar-carts?id=341188",
+   "is_group": false,
+   "evidence": "Nuxt page-data JSON meta.analytics.data.totalResults=255 on /shop/home/furniture-mattress/living-room/accent-furniture/bar-carts?id=341188; cross-checked ceil(255/60)=5 == sortableGrid.model.pagination.numberOfPages=5",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Benches",
+   "qty": 1578,
+   "link": "https://www.macys.com/shop/home/furniture-mattress/living-room/accent-furniture/benches?id=341172",
+   "is_group": false,
+   "evidence": "Nuxt page-data JSON meta.analytics.data.totalResults=1578 on /shop/home/furniture-mattress/living-room/accent-furniture/benches?id=341172; cross-checked ceil(1578/60)=27 == sortableGrid.model.pagination.numberOfPages=27",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Accent Cabinets",
+   "qty": 159,
+   "link": "https://www.macys.com/shop/home/furniture-mattress/living-room/accent-furniture/cabinets?id=341179",
+   "is_group": false,
+   "evidence": "Nuxt page-data JSON meta.analytics.data.totalResults=159 on /shop/home/furniture-mattress/living-room/accent-furniture/cabinets?id=341179; cross-checked ceil(159/60)=3 == sortableGrid.model.pagination.numberOfPages=3",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Accent Chairs",
+   "qty": 1144,
+   "link": "https://www.macys.com/shop/home/furniture-mattress/living-room/accent-furniture/chairs?id=341159",
+   "is_group": false,
+   "evidence": "Nuxt page-data JSON meta.analytics.data.totalResults=1144 on /shop/home/furniture-mattress/living-room/accent-furniture/chairs?id=341159; cross-checked ceil(1144/60)=20 == sortableGrid.model.pagination.numberOfPages=20",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Accent Tables",
+   "qty": 705,
+   "link": "https://www.macys.com/shop/home/furniture-mattress/living-room/accent-furniture/tables?id=341185",
+   "is_group": false,
+   "evidence": "Nuxt page-data JSON meta.analytics.data.totalResults=705 on /shop/home/furniture-mattress/living-room/accent-furniture/tables?id=341185; cross-checked ceil(705/60)=12 == sortableGrid.model.pagination.numberOfPages=12",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bookshelves & Cabinets",
+   "qty": 5437,
+   "link": "https://www.macys.com/shop/home/furniture-mattress/living-room/bookshelves-bookcases?id=69949",
+   "is_group": false,
+   "evidence": "Nuxt page-data JSON meta.analytics.data.totalResults=5437 on /shop/home/furniture-mattress/living-room/bookshelves-bookcases?id=69949; cross-checked ceil(5437/60)=91 == sortableGrid.model.pagination.numberOfPages=91",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Chairs",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Arm Chairs",
+   "qty": 1157,
+   "link": "https://www.macys.com/shop/home/furniture-mattress/living-room/chairs/arm-chair?id=341186",
+   "is_group": false,
+   "evidence": "Nuxt page-data JSON meta.analytics.data.totalResults=1157 on /shop/home/furniture-mattress/living-room/chairs/arm-chair?id=341186; cross-checked ceil(1157/60)=20 == sortableGrid.model.pagination.numberOfPages=20",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Chair Sets",
+   "qty": 510,
+   "link": "https://www.macys.com/shop/home/furniture-mattress/living-room/chairs/chair-sets?id=341169",
+   "is_group": false,
+   "evidence": "Nuxt page-data JSON meta.analytics.data.totalResults=510 on /shop/home/furniture-mattress/living-room/chairs/chair-sets?id=341169; cross-checked ceil(510/60)=9 == sortableGrid.model.pagination.numberOfPages=9",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Recliners",
+   "qty": 1143,
+   "link": "https://www.macys.com/shop/home/furniture-mattress/living-room/chairs/recliners?id=36166",
+   "is_group": false,
+   "evidence": "Nuxt page-data JSON meta.analytics.data.totalResults=1143 on /shop/home/furniture-mattress/living-room/chairs/recliners?id=36166; cross-checked ceil(1143/60)=20 == sortableGrid.model.pagination.numberOfPages=20",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Rocking Chairs & Gliders",
+   "qty": 141,
+   "link": "https://www.macys.com/shop/home/furniture-mattress/living-room/chairs/rocking-chairs-gliders?id=341174",
+   "is_group": false,
+   "evidence": "Nuxt page-data JSON meta.analytics.data.totalResults=141 on /shop/home/furniture-mattress/living-room/chairs/rocking-chairs-gliders?id=341174; cross-checked ceil(141/60)=3 == sortableGrid.model.pagination.numberOfPages=3",
+   "flag": "MANUAL REVIEW: name collision - Macy's has two distinct nodes both called \"Rocking Chairs & Gliders\" (this one under Living Room > Chairs, another under Baby Nursery). Verified DISTINCT: 0 of 60 page-1 product IDs are shared. Both kept."
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Swivel Chairs",
+   "qty": 539,
+   "link": "https://www.macys.com/shop/home/furniture-mattress/living-room/chairs/swivel-chairs?id=341189",
+   "is_group": false,
+   "evidence": "Nuxt page-data JSON meta.analytics.data.totalResults=539 on /shop/home/furniture-mattress/living-room/chairs/swivel-chairs?id=341189; cross-checked ceil(539/60)=9 == sortableGrid.model.pagination.numberOfPages=9",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Coffee & Accent Tables",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Coffee & Side Table Sets",
+   "qty": 221,
+   "link": "https://www.macys.com/shop/home/furniture-mattress/living-room/coffee-accent-tables/coffee-side-table-sets?id=341164",
+   "is_group": false,
+   "evidence": "Nuxt page-data JSON meta.analytics.data.totalResults=221 on /shop/home/furniture-mattress/living-room/coffee-accent-tables/coffee-side-table-sets?id=341164; cross-checked ceil(221/60)=4 == sortableGrid.model.pagination.numberOfPages=4",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Coffee Tables",
+   "qty": 2098,
+   "link": "https://www.macys.com/shop/home/furniture-mattress/living-room/coffee-accent-tables/coffee-tables?id=341165",
+   "is_group": false,
+   "evidence": "Nuxt page-data JSON meta.analytics.data.totalResults=2098 on /shop/home/furniture-mattress/living-room/coffee-accent-tables/coffee-tables?id=341165; cross-checked ceil(2098/60)=35 == sortableGrid.model.pagination.numberOfPages=35",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Side Tables",
+   "qty": 3812,
+   "link": "https://www.macys.com/shop/home/furniture-mattress/living-room/coffee-accent-tables/side-tables?id=341173",
+   "is_group": false,
+   "evidence": "Nuxt page-data JSON meta.analytics.data.totalResults=3812 on /shop/home/furniture-mattress/living-room/coffee-accent-tables/side-tables?id=341173; cross-checked ceil(3812/60)=64 == sortableGrid.model.pagination.numberOfPages=64",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "TV Trays",
+   "qty": 17,
+   "link": "https://www.macys.com/shop/home/furniture-mattress/living-room/coffee-accent-tables/tv-trays?id=341181",
+   "is_group": false,
+   "evidence": "rendered listing header 'Showing All 17 Items'; Nuxt page-data JSON meta.analytics.data.totalResults=17 on /shop/home/furniture-mattress/living-room/coffee-accent-tables/tv-trays?id=341181; cross-checked ceil(17/60)=1 == sortableGrid.model.pagination.numberOfPages=1",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Couches & Sofas",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Curved Sofas",
+   "qty": 66,
+   "link": "https://www.macys.com/shop/home/furniture-mattress/living-room/couches-sofas/curved-sofas?id=341160",
+   "is_group": false,
+   "evidence": "Nuxt page-data JSON meta.analytics.data.totalResults=66 on /shop/home/furniture-mattress/living-room/couches-sofas/curved-sofas?id=341160; cross-checked ceil(66/60)=2 == sortableGrid.model.pagination.numberOfPages=2",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Loveseats",
+   "qty": 564,
+   "link": "https://www.macys.com/shop/home/furniture-mattress/living-room/couches-sofas/loveseats?id=341171",
+   "is_group": false,
+   "evidence": "Nuxt page-data JSON meta.analytics.data.totalResults=564 on /shop/home/furniture-mattress/living-room/couches-sofas/loveseats?id=341171; cross-checked ceil(564/60)=10 == sortableGrid.model.pagination.numberOfPages=10",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Modular Couches",
+   "qty": 665,
+   "link": "https://www.macys.com/shop/home/furniture-mattress/living-room/couches-sofas/modular-couches?id=341158",
+   "is_group": false,
+   "evidence": "Nuxt page-data JSON meta.analytics.data.totalResults=665 on /shop/home/furniture-mattress/living-room/couches-sofas/modular-couches?id=341158; cross-checked ceil(665/60)=12 == sortableGrid.model.pagination.numberOfPages=12",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sectional Sofas",
+   "qty": 1299,
+   "link": "https://www.macys.com/shop/home/furniture-mattress/living-room/couches-sofas/sectional-sofas?id=37394",
+   "is_group": false,
+   "evidence": "Nuxt page-data JSON meta.analytics.data.totalResults=1299 on /shop/home/furniture-mattress/living-room/couches-sofas/sectional-sofas?id=37394; cross-checked ceil(1299/60)=22 == sortableGrid.model.pagination.numberOfPages=22",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sofa Bed Couches",
+   "qty": 550,
+   "link": "https://www.macys.com/shop/home/furniture-mattress/living-room/couches-sofas/sofa-bed-couches?id=341182",
+   "is_group": false,
+   "evidence": "Nuxt page-data JSON meta.analytics.data.totalResults=550 on /shop/home/furniture-mattress/living-room/couches-sofas/sofa-bed-couches?id=341182; cross-checked ceil(550/60)=10 == sortableGrid.model.pagination.numberOfPages=10",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Fireplaces",
+   "qty": 328,
+   "link": "https://www.macys.com/shop/home/furniture-mattress/living-room/fireplaces?id=313360",
+   "is_group": false,
+   "evidence": "Nuxt page-data JSON meta.analytics.data.totalResults=328 on /shop/home/furniture-mattress/living-room/fireplaces?id=313360; cross-checked ceil(328/60)=6 == sortableGrid.model.pagination.numberOfPages=6",
+   "flag": "MANUAL REVIEW: ambiguous - page-1 titles are dominated by electric-fireplace TV stands / mantel media consoles / storage cabinets (furniture with a heater insert), but the node also contains standalone electric fireplace heaters; site Item Type = Furniture for 307 of 317"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Ottomans",
+   "qty": 1045,
+   "link": "https://www.macys.com/shop/home/furniture-mattress/living-room/ottomans?id=60313",
+   "is_group": false,
+   "evidence": "Nuxt page-data JSON meta.analytics.data.totalResults=1045 on /shop/home/furniture-mattress/living-room/ottomans?id=60313; cross-checked ceil(1045/60)=18 == sortableGrid.model.pagination.numberOfPages=18",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "TV Stands & Media Consoles",
+   "qty": 1880,
+   "link": "https://www.macys.com/shop/home/furniture-mattress/living-room/tv-stands?id=35424",
+   "is_group": false,
+   "evidence": "Nuxt page-data JSON meta.analytics.data.totalResults=1880 on /shop/home/furniture-mattress/living-room/tv-stands?id=35424; cross-checked ceil(1880/60)=32 == sortableGrid.model.pagination.numberOfPages=32",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Outdoor & Patio Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Outdoor Bar Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Outdoor Bar Carts",
+   "qty": 6,
+   "link": "https://www.macys.com/shop/home/furniture-mattress/outdoor-patio/bar-furniture/bar-carts?id=190200",
+   "is_group": false,
+   "evidence": "rendered listing header 'Showing All 6 Items'; Nuxt page-data JSON meta.analytics.data.totalResults=6 on /shop/home/furniture-mattress/outdoor-patio/bar-furniture/bar-carts?id=190200; cross-checked ceil(6/60)=1 == sortableGrid.model.pagination.numberOfPages=1",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Outdoor Bar Sets",
+   "qty": 19,
+   "link": "https://www.macys.com/shop/home/furniture-mattress/outdoor-patio/bar-furniture/bar-sets?id=190207",
+   "is_group": false,
+   "evidence": "rendered listing header 'Showing All 19 Items'; Nuxt page-data JSON meta.analytics.data.totalResults=19 on /shop/home/furniture-mattress/outdoor-patio/bar-furniture/bar-sets?id=190207; cross-checked ceil(19/60)=1 == sortableGrid.model.pagination.numberOfPages=1",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Outdoor Bar Stools",
+   "qty": 51,
+   "link": "https://www.macys.com/shop/home/furniture-mattress/outdoor-patio/bar-furniture/bar-stools?id=341162",
+   "is_group": false,
+   "evidence": "rendered listing header 'Showing All 51 Items'; Nuxt page-data JSON meta.analytics.data.totalResults=51 on /shop/home/furniture-mattress/outdoor-patio/bar-furniture/bar-stools?id=341162; cross-checked ceil(51/60)=1 == sortableGrid.model.pagination.numberOfPages=1",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Outdoor Cocktail Tables",
+   "qty": 1,
+   "link": "https://www.macys.com/shop/home/furniture-mattress/outdoor-patio/bar-furniture/cocktail-tables?id=341176",
+   "is_group": false,
+   "evidence": "rendered listing header 'Showing All 1 Items'; Nuxt page-data JSON meta.analytics.data.totalResults=1 on /shop/home/furniture-mattress/outdoor-patio/bar-furniture/cocktail-tables?id=341176; cross-checked ceil(1/60)=1 == sortableGrid.model.pagination.numberOfPages=1",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Outdoor Dining Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Outdoor Coffee Tables",
+   "qty": 116,
+   "link": "https://www.macys.com/shop/home/furniture-mattress/outdoor-patio/dining-furniture/coffee-side-tables?id=190234",
+   "is_group": false,
+   "evidence": "Nuxt page-data JSON meta.analytics.data.totalResults=116 on /shop/home/furniture-mattress/outdoor-patio/dining-furniture/coffee-side-tables?id=190234; cross-checked ceil(116/60)=2 == sortableGrid.model.pagination.numberOfPages=2",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Outdoor Dining Chairs",
+   "qty": 100,
+   "link": "https://www.macys.com/shop/home/furniture-mattress/outdoor-patio/dining-furniture/dining-chairs?id=190211",
+   "is_group": false,
+   "evidence": "Nuxt page-data JSON meta.analytics.data.totalResults=100 on /shop/home/furniture-mattress/outdoor-patio/dining-furniture/dining-chairs?id=190211; cross-checked ceil(100/60)=2 == sortableGrid.model.pagination.numberOfPages=2",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Outdoor Dining Sets",
+   "qty": 320,
+   "link": "https://www.macys.com/shop/home/furniture-mattress/outdoor-patio/dining-furniture/dining-sets?id=190214",
+   "is_group": false,
+   "evidence": "Nuxt page-data JSON meta.analytics.data.totalResults=320 on /shop/home/furniture-mattress/outdoor-patio/dining-furniture/dining-sets?id=190214; cross-checked ceil(320/60)=6 == sortableGrid.model.pagination.numberOfPages=6",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Outdoor Dining Tables",
+   "qty": 97,
+   "link": "https://www.macys.com/shop/home/furniture-mattress/outdoor-patio/dining-furniture/dining-tables?id=190226",
+   "is_group": false,
+   "evidence": "Nuxt page-data JSON meta.analytics.data.totalResults=97 on /shop/home/furniture-mattress/outdoor-patio/dining-furniture/dining-tables?id=190226; cross-checked ceil(97/60)=2 == sortableGrid.model.pagination.numberOfPages=2",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Small Outdoor Furniture",
+   "qty": 1348,
+   "link": "https://www.macys.com/shop/home/furniture-mattress/outdoor-patio/dining-furniture/small-space-furniture?id=190229",
+   "is_group": false,
+   "evidence": "Nuxt page-data JSON meta.analytics.data.totalResults=1348 on /shop/home/furniture-mattress/outdoor-patio/dining-furniture/small-space-furniture?id=190229; cross-checked ceil(1348/60)=23 == sortableGrid.model.pagination.numberOfPages=23",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Fire Pits",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Fire Pit Tables",
+   "qty": 16,
+   "link": "https://www.macys.com/shop/home/furniture-mattress/outdoor-patio/fire-pits/fire-pit-tables?id=341177",
+   "is_group": false,
+   "evidence": "rendered listing header 'Showing All 16 Items'; Nuxt page-data JSON meta.analytics.data.totalResults=16 on /shop/home/furniture-mattress/outdoor-patio/fire-pits/fire-pit-tables?id=341177; cross-checked ceil(16/60)=1 == sortableGrid.model.pagination.numberOfPages=1",
+   "flag": "MANUAL REVIEW: ambiguous - fire-pit tables sit between outdoor table furniture and outdoor heating appliance; site Item Type = Furniture"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Gas & Propane Fire Pits",
+   "qty": 9,
+   "link": "https://www.macys.com/shop/home/furniture-mattress/outdoor-patio/fire-pits/gas-propane?id=341163",
+   "is_group": false,
+   "evidence": "rendered listing header 'Showing All 9 Items'; Nuxt page-data JSON meta.analytics.data.totalResults=9 on /shop/home/furniture-mattress/outdoor-patio/fire-pits/gas-propane?id=341163; cross-checked ceil(9/60)=1 == sortableGrid.model.pagination.numberOfPages=1",
+   "flag": "MANUAL REVIEW: ambiguous - outdoor heating appliance filed by Macy's under Outdoor & Patio Furniture; page-1 titles are largely fire-pit TABLES and patio sets that include one"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Wood-Burning Fire Pits",
+   "qty": 5,
+   "link": "https://www.macys.com/shop/home/furniture-mattress/outdoor-patio/fire-pits/wood-burning?id=341183",
+   "is_group": false,
+   "evidence": "rendered listing header 'Showing All 5 Items'; Nuxt page-data JSON meta.analytics.data.totalResults=5 on /shop/home/furniture-mattress/outdoor-patio/fire-pits/wood-burning?id=341183; cross-checked ceil(5/60)=1 == sortableGrid.model.pagination.numberOfPages=1",
+   "flag": "MANUAL REVIEW: ambiguous - outdoor heating appliance filed by Macy's under Outdoor & Patio Furniture"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Hammocks & Swings",
+   "qty": 115,
+   "link": "https://www.macys.com/shop/home/furniture-mattress/outdoor-patio/hammocks?id=188573",
+   "is_group": false,
+   "evidence": "Nuxt page-data JSON meta.analytics.data.totalResults=115 on /shop/home/furniture-mattress/outdoor-patio/hammocks?id=188573; cross-checked ceil(115/60)=2 == sortableGrid.model.pagination.numberOfPages=2",
+   "flag": "MANUAL REVIEW: ambiguous - page-1 titles are mostly porch swings and swing gliders (outdoor seating furniture); free-hanging hammocks and hammock-with-stand sets are also present"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Outdoor Lounge Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Outdoor Chaise Lounge",
+   "qty": 180,
+   "link": "https://www.macys.com/shop/home/furniture-mattress/outdoor-patio/lounge-furniture/chaise-lounge?id=190233",
+   "is_group": false,
+   "evidence": "Nuxt page-data JSON meta.analytics.data.totalResults=180 on /shop/home/furniture-mattress/outdoor-patio/lounge-furniture/chaise-lounge?id=190233; cross-checked ceil(180/60)=3 == sortableGrid.model.pagination.numberOfPages=3",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Outdoor Conversation Sets",
+   "qty": 480,
+   "link": "https://www.macys.com/shop/home/furniture-mattress/outdoor-patio/lounge-furniture/conversation-sets?id=190235",
+   "is_group": false,
+   "evidence": "Nuxt page-data JSON meta.analytics.data.totalResults=480 on /shop/home/furniture-mattress/outdoor-patio/lounge-furniture/conversation-sets?id=190235; cross-checked ceil(480/60)=8 == sortableGrid.model.pagination.numberOfPages=8",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Outdoor Couches & Sofas",
+   "qty": 66,
+   "link": "https://www.macys.com/shop/home/furniture-mattress/outdoor-patio/lounge-furniture/couches-sofas?id=190236",
+   "is_group": false,
+   "evidence": "Nuxt page-data JSON meta.analytics.data.totalResults=66 on /shop/home/furniture-mattress/outdoor-patio/lounge-furniture/couches-sofas?id=190236; cross-checked ceil(66/60)=2 == sortableGrid.model.pagination.numberOfPages=2",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Outdoor Sectionals",
+   "qty": 62,
+   "link": "https://www.macys.com/shop/home/furniture-mattress/outdoor-patio/lounge-furniture/outdoor-sectional-sofas?id=190237",
+   "is_group": false,
+   "evidence": "Nuxt page-data JSON meta.analytics.data.totalResults=62 on /shop/home/furniture-mattress/outdoor-patio/lounge-furniture/outdoor-sectional-sofas?id=190237; cross-checked ceil(62/60)=2 == sortableGrid.model.pagination.numberOfPages=2",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Outdoor & Patio Chairs",
+   "qty": 925,
+   "link": "https://www.macys.com/shop/home/furniture-mattress/outdoor-patio/lounge-furniture/patio-chairs?id=286157",
+   "is_group": false,
+   "evidence": "Nuxt page-data JSON meta.analytics.data.totalResults=925 on /shop/home/furniture-mattress/outdoor-patio/lounge-furniture/patio-chairs?id=286157; cross-checked ceil(925/60)=16 == sortableGrid.model.pagination.numberOfPages=16",
+   "flag": null
+  }
+ ]
+}

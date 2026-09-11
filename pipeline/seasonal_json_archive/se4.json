@@ -1,0 +1,57 @@
+{
+  "sr": 4,
+  "company": "Pottery Barn Teen US",
+  "brand_site": "pbteen.com",
+  "country": "USA",
+  "site_url": "https://www.pbteen.com/",
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "RETRY 2026-09-04, SUCCEEDED after the original attempt's 4-way block (direct curl, Playwright Chromium, Claude-in-Chrome real browser, WebFetch all got Akamai 403 'Restricted Access' on every /shop/ path). robots.txt re-checked first via curl_cffi (chrome124 impersonation, 200): no Claude-specific disallow (no anthropic-ai/ClaudeBot/Claude-Web/Claude-User/Claude-SearchBot entry) - proceeded. Route that worked: curl_cffi TLS-impersonation brute-force across ~19 profiles. Chrome/Edge profiles (chrome99-131, edge99/101) all still hit the same 403 - matches the original Playwright/Chromium and Claude-in-Chrome failures, confirming Akamai is fingerprinting at the TLS/JA3 layer specifically against Chromium-family clients from this path. Safari and Firefox profiles (safari15_3/15_5/17_0/18_0/18_0_ios/184_ios/153/155/170/172_ios/180/180_ios/260_ios, firefox133) got clean 200s with full page HTML on /shop/holiday/ and most subpages, though which exact profile worked varied per-URL/per-session (had to retry several subpages with a fresh session across the Safari/Firefox list before one succeeded - e.g. easter-shop only succeeded on safari260_ios after 6 other profiles 403'd in the same run). r.jina.ai was also tried as a fallback on a blocked URL and still got the origin's 403 passed through (not useful here). Playwright WebKit (real headless Safari engine) was also tried directly and still got 403 - confirming the block is on curl_cffi's specific BoringSSL ClientHello fingerprint mimicry, not just User-Agent/engine choice; a generic headless WebKit build's real TLS stack doesn't match. translate.goog and Googlebot-UA were not needed once curl_cffi succeeded. Site architecture: pbteen.com is a Williams-Sonoma-family Vue SPA storefront where category pages (catType supercat/subcat) render an empty product shell server-side (totalProductsCount:0 in initial state) and hydrate the real product grid client-side via Constructor.io's public Browse API (https://ac.cnstrc.com/browse/group_id/<id>?key=key_QdCsKhJzRGmFMX0N, the same public client key and group_id embedded in every fetched page's own JSON state) - so exact qty was taken from that live structured API response's total_num_results (the identical data source the rendered page itself calls), per the qty-method priority's 'structured/API count' tier, since the displayed PLP total never appears in static/curl-fetched HTML on this SPA and headless rendering is blocked. Discovery: /shop/holiday/ is the supercat 'Holidays' hub (breadcrumb-confirmed, secondary-nav-confirmed as the only two holiday nav entries: 'Holidays' and 'Halloween'); its own embedded category-tile JSON (catType:supercat) lists the complete, closed set of holiday branches - the-halloween-shop, christmas-hogwarts-holiday-link, all-holiday-decor (Christmas), valentines-day-shop, all-loveshackfancy-hanukkah-link, hanukkah-shop, easter-shop - nothing else; searched full-text for Thanksgiving/New Year/St. Patrick/Mother's/Father's/Black Friday/Back-to-School/Independence Day in the supercat page and mega-nav JSON, none present as genuine holiday categories (Back-to-School only appears as an alias label for the ordinary Backpacks & Luggage nav item, not a seasonal branch). Also checked the three extra collab/gift-guide candidates the original attempt had flagged as unverifiable (shop/new/all-new-christmas, shop/gifts/christmas-at-hogwarts, shop/collaborations/nightmare-before-christmas-shop, shop/gifts/shop-easter-gifts) by fetching their own Constructor group_id counts and full product-id lists to content-verify and check overlap: EXCLUDED all four plus one supercat tile, each for a specific reason - (1) 'all-new-christmas' (New > Christmas, 26 items): 26/26 of its product ids are already inside all-holiday-decor's 63 - a pure New-arrivals filter of the same Christmas set, not a distinct category, would double-count; (2) 'christmas-at-hogwarts' (Gifts > Christmas at Hogwarts, 6 items): 6/6 of its ids already inside all-holiday-decor's 63 - same reason; (3) 'nightmare-before-christmas-shop' (Collaborations > Disney Tim Burton's The Nightmare Before Christmas, 2 items): 2/2 of its ids already inside the-halloween-shop's 17, and it's parented under Collaborations not Holidays in Constructor's own group hierarchy - a brand-collab tile, not a distinct seasonal category, would double-count; (4) 'shop-easter-gifts' (Gifts > 'Easter Shop' label, 77 items): content-sampled the actual product titles (Stanley tumblers, Harry Potter jewelry boxes/lamps, NFL/NBA pillow covers, sports neon signs, robes, jewelry organizers) - this is a generic Gifts catalog with zero Easter theming, mislabeled under an Easter-sounding slug/breadcrumb; 42 of its 77 ids also overlap directly with valentines-day-shop, confirming it is a shared generic-gift pool, not a holiday-specific PLP - excluded per the Gift Guide / marketing-catalog exclusion (rules SS4/SS17), exactly the 'generic catalog mislabeled under a holiday URL' trap this retry was told to check for; (5) 'christmas-hogwarts-holiday-link' (a linkcat tile on the supercat page, not its own PLP) resolves to /shop/collaborations/harry-potter-shop/, a general 95-product Harry Potter collab shop with no Christmas-specific filtering (its own Constructor group_id returns 0 - it has no dedicated group of its own) - excluded as a promotional cross-link, not a genuine distinct Christmas category. Overlap kept as single row: 'all-loveshackfancy-hanukkah-link' (1 item) is byte-for-byte the same single product (loveshackfancy-hanukkah-garland) as hanukkah-shop's only item - kept the Hanukkah row, dropped the LoveShackFancy-branded duplicate tile per the shared overlap rule (SS13-14). Content-verified (sampled real product titles via the Constructor API, not just URL/title) that all 5 kept rows are genuine seasonal merchandise: Halloween (Roller Rabbit Trick-or-Treat pillow/sheets, LoveShackFancy pumpkin pillows, ghost throw, etc.), Christmas/All Christmas (Harry Potter ornament sets, stockings, holiday tree, tree skirt, etc.), Valentine's Day (heart-themed pillows, neon signs, eye masks, sheet sets - the site's own 'Valentine's Day Shop' framing, consistent with SS2's guidance that the site's taxonomy is the final authority even for broadly heart-themed teen merchandise), Hanukkah (LoveShackFancy Hanukkah garland), Easter (seagrass Easter basket, bunny pillow, Easter throw/liner). No parent/child grouping row was needed - each holiday resolves to exactly one genuine leaf PLP once the New/Gifts/Collaborations duplicate tiles and the generic gift-guide page are excluded; the product-type facet tiles nested under All Christmas and Valentine's Day (Bedding, Pillows & Throws, Stockings, Ornaments, Trees & Trim, Tabletop, Jewelry & Beauty, etc.) are long concatenated-facet filter URLs (producttype-m-product-type-ff...), not separate category pages, and were excluded per the filter-only-page rule.",
+  "rows": [
+    {
+      "category": "Halloween",
+      "sub_category": "The Halloween Shop",
+      "qty": 17,
+      "link": "https://www.pbteen.com/shop/holiday/the-halloween-shop/",
+      "is_group": false,
+      "evidence": "Constructor.io Browse API (ac.cnstrc.com/browse/group_id/the-halloween-shop) - the same live product-search API that hydrates this page's product grid client-side - total_num_results: 17 (matches full enumeration of the group's returned product ids)",
+      "flag": null
+    },
+    {
+      "category": "Christmas",
+      "sub_category": "Christmas Shop",
+      "qty": 63,
+      "link": "https://www.pbteen.com/shop/holiday/all-holiday-decor/",
+      "is_group": false,
+      "evidence": "Constructor.io Browse API (ac.cnstrc.com/browse/group_id/all-holiday-decor, page's own group_id) - total_num_results: 63 (matches full enumeration); page breadcrumb label 'Christmas Shop', tile name 'All Christmas'",
+      "flag": null
+    },
+    {
+      "category": "Valentine's Day",
+      "sub_category": "Valentine's Day Shop",
+      "qty": 248,
+      "link": "https://www.pbteen.com/shop/holiday/valentines-day-shop/",
+      "is_group": false,
+      "evidence": "Constructor.io Browse API (ac.cnstrc.com/browse/group_id/valentines-day-shop) - total_num_results: 248 (matches full paginated enumeration of the group's returned product ids)",
+      "flag": null
+    },
+    {
+      "category": "Hanukkah",
+      "sub_category": "Hanukkah Shop",
+      "qty": 1,
+      "link": "https://www.pbteen.com/shop/holiday/hanukkah-shop/",
+      "is_group": false,
+      "evidence": "Constructor.io Browse API (ac.cnstrc.com/browse/group_id/hanukkah-shop) - total_num_results: 1 (LoveShackFancy Happy Hanukkah Garland); the supercat page's separate 'All LoveShackFancy Hanukkah' tile (all-loveshackfancy-hanukkah-link) resolves to this identical single product and was dropped as a duplicate per the overlap rule",
+      "flag": null
+    },
+    {
+      "category": "Easter",
+      "sub_category": "Easter",
+      "qty": 4,
+      "link": "https://www.pbteen.com/shop/holiday/easter-shop/",
+      "is_group": false,
+      "evidence": "Constructor.io Browse API (ac.cnstrc.com/browse/group_id/easter-shop) - total_num_results: 4 (seagrass Easter basket, bunny pillow, Easter throw, Easter liner - content-verified as genuine Easter merchandise); the site's separate 'shop-easter-gifts' (Gifts > Easter Shop, 77 items) was excluded as a generic gift-guide catalog with no Easter theming, see notes",
+      "flag": null
+    }
+  ]
+}

@@ -1,0 +1,183 @@
+{
+ "sr": 73,
+ "company": "Ferm Living US",
+ "brand_site": "fermliving.us",
+ "country": "USA",
+ "site_url": "https://fermliving.us/",
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "DOMAIN: all rows come from the US storefront fermliving.us itself; it did NOT redirect and is not retired. https://fermliving.us/ returned HTTP 200 directly, and its own locale switcher lists fermliving.com (EUR), fermliving.co.uk (GBP), fermliving.dk and fermliving.se as separate sibling storefronts, confirming fermliving.us is a live, distinct US catalogue. Every link recorded is a fermliving.us canonical URL and every count was read from fermliving.us; nothing was taken from fermliving.com. ACCESS: plain direct fetch via the shared probe.py curl_cffi session, no WAF and no proxy needed. A single transient HTTP 429 (Your connection needs to be verified) appeared mid-run under concurrency and cleared after a 45s backoff; the two affected collections (outdoor-tables, kids-furniture) were re-run clean afterwards. TREE: taxonomy read from the live homepage mega-menu (the data-dynamic-menu-parent / data-dynamic-menu-child blocks), cross-checked against the full /collections.json (182 collections). Two furniture departments exist in the nav: Furniture (/collections/furniture-us) and a separate Sofas department (/collections/sofas-and-daybeds-us); furniture also appears under Kids > Furniture and under Outdoor Living > Outdoor Seating / Outdoor Tables. There is no deeper level below any of these nodes: /collections.json contains no coffee-tables / dining-tables / beds / desks style handles, so the nodes recorded here are the deepest that exist on the site. QTY METHOD: this Shopify theme renders NO product-count header on any collection page (verified by stripping the full rendered HTML of /collections/tables to plain text; it goes straight from the sort control to the product grid to the pagination 1 2 3 Next). Counts therefore come from full enumeration, performed twice by two independent routes for every single leaf: (a) paging the rendered collection HTML at 48 products per page and counting unique data-product-handle attributes through to the last page, and (b) exhausting /collections/<handle>/products.json?limit=250 until an empty page and de-duplicating numeric product IDs. All 17 leaves matched exactly between the two methods. The h1 of each fetched page was also compared against the expected category name (all matched), ruling out the silent parent-listing substitution the brief warns about. On this store the Shopify products_count field happened to agree with both enumerations, but the enumerated figure is what is reported. HIERARCHY AND OVERLAP WORK: Outdoor Furniture (78) was proved by product-ID set comparison to be exactly the disjoint union of Outdoor Seating (50) and Outdoor Tables (28) (intersection 0, union 78), so it is emitted as a grouping row with those two children rather than as a leaf. All Furniture (furniture-us, 558) is fully covered by its nav children, so it is not emitted. The Sofas department (251) was decomposed by product-ID set algebra: Rico Modules (21), Catena Modules (115) and Dase Modules (40) are mutually disjoint and total 176; 2-Seaters (25) + 3-Seaters (25) + 4-Seaters (11) = 61 and are disjoint from the modules. The two remaining nav nodes, Rico Sofas and Divans (69) and Turn Sofas and Daybeds (6), are NOT independent: their 75 items are exactly the 61 seat-count items plus 14 Rico Divan / Turn Daybed items that all also live in the Daybeds collection. Those two series roll-ups were therefore DROPPED to avoid double counting. The six emitted sofa leaves plus Daybeds cover all 255 unique sofa/daybed products with zero overlap. EXCLUDED after inspection: Fabric Samples (51), upholstery swatches / furniture parts. The configurator pages /pages/punctual-shelving-system, /pages/catena, /pages/dase, /pages/rico and /pages/collect-lighting, which are tools not listings. The All Furniture / All Sofas / All Kids Items / All Outdoor Living Items view-all nodes. Kids > Storage (44): all 44 titles inspected and dominated by braided and woven baskets, wall pockets, textile storage, Harbour and Paper Pulp boxes and storage bags (standalone storage goods, explicitly out of scope), while its 24 genuinely furniture items (Sill Cupboard, Slope Storage Bench, Slope/Horse/Giraffe Bookcase, Sill Wall Cabinet) are already inside Kids Furniture, so the node was dropped rather than double-counted. Accessories > Small Storage (152) and Bags and Baskets (16), standalone storage goods. Mirrors (28), Wall Decor scope. Outdoor Accessories (57) and Outdoor Textiles (26), cushions, covers, umbrellas and textiles. Lighting, Kitchen, Textiles, Rugs, Wallpaper and the Kids Toys/Textiles/Rugs/Lamps/Accessories branches, all out of scope. Sale, Bestsellers, News, Gift Guide, Certified Products, the The <Room> room-landing handles and the ~50 The <Name> Collection design-series handles, all promotional or marketing collections per the brief. SANITY CHECKS: every leaf returns a different number, so no site-wide constant is being echoed; no suspiciously round display caps; the two enumeration passes were separate network reads and produced identical figures, so no intra-session drift; no parent total was ever copied to a child and no children were ever summed into a parent.",
+ "rows": [
+  {
+   "category": "Furniture",
+   "sub_category": "Lounge Chairs",
+   "qty": 86,
+   "link": "https://fermliving.us/collections/lounge-chairs-and-poufs-us",
+   "is_group": false,
+   "evidence": "full enumeration: paged /collections/lounge-chairs-and-poufs-us (48 products/page, 2 page(s)) counting unique data-product-handle = 86; independently confirmed by exhausting /collections/lounge-chairs-and-poufs-us/products.json?limit=250 to an empty page -> 86 unique product IDs. This store renders no product-count header anywhere on a collection page.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Poufs",
+   "qty": 55,
+   "link": "https://fermliving.us/collections/poufs-us",
+   "is_group": false,
+   "evidence": "full enumeration: paged /collections/poufs-us (48 products/page, 2 page(s)) counting unique data-product-handle = 55; independently confirmed by exhausting /collections/poufs-us/products.json?limit=250 to an empty page -> 55 unique product IDs. This store renders no product-count header anywhere on a collection page.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Daybeds",
+   "qty": 18,
+   "link": "https://fermliving.us/collections/daybeds",
+   "is_group": false,
+   "evidence": "full enumeration: paged /collections/daybeds (48 products/page, 1 page(s)) counting unique data-product-handle = 18; independently confirmed by exhausting /collections/daybeds/products.json?limit=250 to an empty page -> 18 unique product IDs. This store renders no product-count header anywhere on a collection page.",
+   "flag": "MANUAL REVIEW: 2 of the 18 items are Kona Mattress (mattresses are out of scope per the brief); the site provides no sub-listing that separates them, so the node total is reported as-is."
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Tables",
+   "qty": 122,
+   "link": "https://fermliving.us/collections/tables",
+   "is_group": false,
+   "evidence": "full enumeration: paged /collections/tables (48 products/page, 3 page(s)) counting unique data-product-handle = 122; independently confirmed by exhausting /collections/tables/products.json?limit=250 to an empty page -> 122 unique product IDs. This store renders no product-count header anywhere on a collection page.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Chairs and Benches",
+   "qty": 78,
+   "link": "https://fermliving.us/collections/chairs-and-benches-us",
+   "is_group": false,
+   "evidence": "full enumeration: paged /collections/chairs-and-benches-us (48 products/page, 2 page(s)) counting unique data-product-handle = 78; independently confirmed by exhausting /collections/chairs-and-benches-us/products.json?limit=250 to an empty page -> 78 unique product IDs. This store renders no product-count header anywhere on a collection page.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Stools",
+   "qty": 10,
+   "link": "https://fermliving.us/collections/stools",
+   "is_group": false,
+   "evidence": "full enumeration: paged /collections/stools (48 products/page, 1 page(s)) counting unique data-product-handle = 10; independently confirmed by exhausting /collections/stools/products.json?limit=250 to an empty page -> 10 unique product IDs. This store renders no product-count header anywhere on a collection page.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Storage",
+   "qty": 100,
+   "link": "https://fermliving.us/collections/storage",
+   "is_group": false,
+   "evidence": "full enumeration: paged /collections/storage (48 products/page, 3 page(s)) counting unique data-product-handle = 100; independently confirmed by exhausting /collections/storage/products.json?limit=250 to an empty page -> 100 unique product IDs. This store renders no product-count header anywhere on a collection page.",
+   "flag": "MANUAL REVIEW: mixed node that the site itself files under its Furniture department. The majority is storage furniture (Kona Bookcase x10, Haze Wall Cabinet x8, Parcel/Bon Hallway Cabinet, Sill Cupboard x4, Haze/Reed Vitrine, Haze/Stilt/Scarni/Unda Sideboard, Dora Shelving Unit, Lager Low Rack, clothes racks and stands), but roughly 25 of the 100 are standalone storage goods (Enkel Bin x6, Paper Pulp Box x4, Sama Bin x3, braided/woven baskets, wall pockets, laundry baskets) which the brief excludes. No sub-listing exists to strip them out, so the node is kept whole per the site classification."
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Shelves",
+   "qty": 71,
+   "link": "https://fermliving.us/collections/shelves",
+   "is_group": false,
+   "evidence": "full enumeration: paged /collections/shelves (48 products/page, 2 page(s)) counting unique data-product-handle = 71; independently confirmed by exhausting /collections/shelves/products.json?limit=250 to an empty page -> 71 unique product IDs. This store renders no product-count header anywhere on a collection page.",
+   "flag": "MANUAL REVIEW: ambiguous shelving. The node sits under the site Furniture department (not Wall Decor) and does contain furniture shelving (Kona Bookcase x10, Kona Bookcase Cabinet Insert, Bon Hallway Cabinet, Lager Bedside Table x3), but the majority are wall-mounted shelves, racks and picture rails (Sector Shelf x13, Lager Wall Shelf x5, Tilem/Pilu/Stagger/Parade/Leta Shelf, Leta Picture Rail). Included per the site own classification; no sub-listing splits them."
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Kids Furniture",
+   "qty": 49,
+   "link": "https://fermliving.us/collections/kids-furniture",
+   "is_group": false,
+   "evidence": "full enumeration: paged /collections/kids-furniture (48 products/page, 2 page(s)) counting unique data-product-handle = 49; independently confirmed by exhausting /collections/kids-furniture/products.json?limit=250 to an empty page -> 49 unique product IDs. This store renders no product-count header anywhere on a collection page.",
+   "flag": "MANUAL REVIEW: filed by the site under Kids > Furniture and the majority is furniture (Pilu/Parade/Slope/Array Shelf, Up Step Stool x4, Sill Cupboard x4, Pear Bean Bag x4, Slope Storage Bench x3, Slope Table x3, Slope/Horse/Giraffe Bookcase, Sill Wall Cabinet, Slope Lounge Chair, Sill Junior Bed, Isola Storage Table), but about 8 of the 49 are storage boxes, bags and wall pockets (Paper Pulp Box x2, Braided Wall Pocket x2, Pocket Storage Bag, Willora Braided Storage) which the brief excludes. No sub-listing isolates them."
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sofas",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "2-Seater Sofas",
+   "qty": 25,
+   "link": "https://fermliving.us/collections/2-seaters",
+   "is_group": false,
+   "evidence": "full enumeration: paged /collections/2-seaters (48 products/page, 1 page(s)) counting unique data-product-handle = 25; independently confirmed by exhausting /collections/2-seaters/products.json?limit=250 to an empty page -> 25 unique product IDs. This store renders no product-count header anywhere on a collection page.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "3-Seater Sofas",
+   "qty": 25,
+   "link": "https://fermliving.us/collections/3-seaters",
+   "is_group": false,
+   "evidence": "full enumeration: paged /collections/3-seaters (48 products/page, 1 page(s)) counting unique data-product-handle = 25; independently confirmed by exhausting /collections/3-seaters/products.json?limit=250 to an empty page -> 25 unique product IDs. This store renders no product-count header anywhere on a collection page.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "4-Seater Sofas",
+   "qty": 11,
+   "link": "https://fermliving.us/collections/4-seaters",
+   "is_group": false,
+   "evidence": "full enumeration: paged /collections/4-seaters (48 products/page, 1 page(s)) counting unique data-product-handle = 11; independently confirmed by exhausting /collections/4-seaters/products.json?limit=250 to an empty page -> 11 unique product IDs. This store renders no product-count header anywhere on a collection page.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Rico Modular Sofas",
+   "qty": 21,
+   "link": "https://fermliving.us/collections/rico-modular-sofa-us",
+   "is_group": false,
+   "evidence": "full enumeration: paged /collections/rico-modular-sofa-us (48 products/page, 1 page(s)) counting unique data-product-handle = 21; independently confirmed by exhausting /collections/rico-modular-sofa-us/products.json?limit=250 to an empty page -> 21 unique product IDs. This store renders no product-count header anywhere on a collection page.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Catena Modular Sofas",
+   "qty": 115,
+   "link": "https://fermliving.us/collections/catena-us",
+   "is_group": false,
+   "evidence": "full enumeration: paged /collections/catena-us (48 products/page, 3 page(s)) counting unique data-product-handle = 115; independently confirmed by exhausting /collections/catena-us/products.json?limit=250 to an empty page -> 115 unique product IDs. This store renders no product-count header anywhere on a collection page.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dase Modular Sofas",
+   "qty": 40,
+   "link": "https://fermliving.us/collections/dase-us",
+   "is_group": false,
+   "evidence": "full enumeration: paged /collections/dase-us (48 products/page, 1 page(s)) counting unique data-product-handle = 40; independently confirmed by exhausting /collections/dase-us/products.json?limit=250 to an empty page -> 40 unique product IDs. This store renders no product-count header anywhere on a collection page.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Outdoor Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Outdoor Seating",
+   "qty": 50,
+   "link": "https://fermliving.us/collections/outdoor-seating",
+   "is_group": false,
+   "evidence": "full enumeration: paged /collections/outdoor-seating (48 products/page, 2 page(s)) counting unique data-product-handle = 50; independently confirmed by exhausting /collections/outdoor-seating/products.json?limit=250 to an empty page -> 50 unique product IDs. This store renders no product-count header anywhere on a collection page.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Outdoor Tables",
+   "qty": 28,
+   "link": "https://fermliving.us/collections/outdoor-tables",
+   "is_group": false,
+   "evidence": "full enumeration: paged /collections/outdoor-tables (48 products/page, 1 page(s)) counting unique data-product-handle = 28; independently confirmed by exhausting /collections/outdoor-tables/products.json?limit=250 to an empty page -> 28 unique product IDs. This store renders no product-count header anywhere on a collection page.",
+   "flag": null
+  }
+ ]
+}

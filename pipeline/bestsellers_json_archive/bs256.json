@@ -1,0 +1,34 @@
+{
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "Site: Shopify store behind Cloudflare managed challenge; accessed via curl_cffi Chrome-124 TLS impersonation hitting Shopify JSON side-doors (collections.json, /collections/<handle>/products.json), same route verified working in prior Home-Decor pass. Enumerated ALL 201 published collections via collections.json pagination and searched handles/titles for bestseller-type terms (best, sell, popular, trend, favorite/favourite). Found 5 candidates: best-sellers (Best Sellers), latest-arrival (title 'Best Selling' despite the handle name), best-selling-products (Best Selling Products), top-trending-products (Top Trending Products, also a genuine homepage featured-collection carousel section confirmed in homepage HTML), and festive-favourites (excluded - a seasonal/festival merchandising theme, not a genuine popularity/bestseller concept, confirmed by title and product mix). None of best-sellers/latest-arrival/top-trending-products are linked in main nav; top-trending-products IS surfaced as a homepage carousel section (h2 'Top Trending Products'). Checked exhaustive product-id counts via products.json pagination (site's collections.json products_count field is confirmed inflated again per prior pass: 'all' collection lists 2640 but exhaustive pagination gives 1568) and cross-verified every kept row's count against the rendered page's own 'cc-filters-results__summary' text ('N products') - all matched exactly. best-sellers and latest-arrival ('Best Selling') both show qty=4 but hold genuinely DIFFERENT product sets (only 2 of 4 products shared) so both are kept as separate rows per the different-listing rule, not merged as aliases. best-selling-products was DROPPED: exhaustive pagination shows its product-id set is byte-for-byte IDENTICAL to the site's 'newest-products' collection AND to the generic 'all' collection (1568 identical ids, verified by set equality) - i.e. it is the full catalog under a bestseller-sounding label, not a curated bestseller listing, so it fails the 'genuinely represents a bestseller concept' test in section 3 of the brief. Checked site predictive-search (search/suggest.json) for 'bestseller'/'popular'/'trending' equivalents - no additional collection or page results beyond the nav/collections.json findings.",
+  "rows": [
+    {
+      "category": "Bestsellers",
+      "sub_category": "Best Sellers",
+      "qty": 4,
+      "link": "https://www.thebombaystore.com/collections/best-sellers",
+      "is_group": false,
+      "evidence": "H1 'Best Sellers'; page text 'cc-filters-results__summary'=\"4 products\"; products.json exhaustive pagination = 4 unique product ids",
+      "flag": null
+    },
+    {
+      "category": "Bestsellers",
+      "sub_category": "Best Selling",
+      "qty": 4,
+      "link": "https://www.thebombaystore.com/collections/latest-arrival",
+      "is_group": false,
+      "evidence": "H1 'Best Selling' at /collections/latest-arrival; page text 'cc-filters-results__summary'=\"4 products\"; products.json exhaustive pagination = 4 unique product ids; only 2 of 4 products overlap with /collections/best-sellers so treated as a genuinely different listing, not an alias",
+      "flag": null
+    },
+    {
+      "category": "Bestsellers",
+      "sub_category": "Top Trending Products",
+      "qty": 10,
+      "link": "https://www.thebombaystore.com/collections/top-trending-products",
+      "is_group": false,
+      "evidence": "Homepage featured-collection carousel h2 'Top Trending Products'; collection page H1 'Top Trending Products'; page text 'cc-filters-results__summary'=\"10 products\"; products.json exhaustive pagination = 10 unique product ids",
+      "flag": null
+    }
+  ]
+}

@@ -1,0 +1,88 @@
+{
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "Prior Home-Decor pass on this company (notes/77.md) recorded bloomingdales.com as hard-blocked at every route (direct HTTP, 18-profile curl_cffi, WebFetch, r.jina.ai, translate.goog, PowerShell, CORS proxies) -- confirmed still true this session for direct HTTP (robots.txt -> 403 Akamai) and Playwright/Chromium headless (homepage -> 403 'Access Denied - Bloomingdales'). Escalated to Claude-in-Chrome (real logged-in Chrome session) per tier-3 rule, which loaded the live site with no challenge. robots.txt itself is 403'd by the WAF (not a real robots policy), so no Claude-specific disallow could be checked; treated as a general anti-bot block, not a robots exclusion, and browser automation via the user's own Chrome is permitted at tier 3. Found footer nav link 'pets' -> The Pet Shop hub (https://www.bloomingdales.com/shop/home/pet-accessories?id=1064759, breadcrumb Home > The Pet Shop), hub total 164 items. The hub has one facet, 'Pet Item Type', with 8 values and per-value counts, each with its own filterable URL (/shop/home/pet-accessories/Pet_item_type/<value>?id=1064759). Cross-verified 2 of 8 facet counts against the rendered 'THE PET SHOP (N)' page header after applying the filter live in the browser (Beds: facet=29, header=29; Collars & Leashes: facet=37, header=37) -- both matched exactly, giving high confidence in the other 6 unverified-by-header facet counts, which are still reported as-is since they are the site's own facet-panel numbers. Facet children sum to 155 vs hub total 164 (some items likely multi-tagged or in additional untagged bucket) -- normal for a faceted count breakdown, not treated as an error. Checked the 'Department' facet on the hub (Beauty & Cosmetics 1, Home 152, Kids 11) -- this is a cross-department tag, not a further Pet Care sub-category, so not emitted as rows. No other pet-specific navigation, mega-menu section, or sitemap entry was found beyond this single 'Pet Shop' hub; did not find separate Dog/Cat top-level sections (unlike sibling Macy's SR69). 'Treats' (28) is flagged as PET CONSUMABLE per the open policy gap. No medical/veterinary category was found.",
+  "rows": [
+    {
+      "category": "Pet Care",
+      "sub_category": "The Pet Shop",
+      "qty": null,
+      "link": "https://www.bloomingdales.com/shop/home/pet-accessories?id=1064759",
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Beds",
+      "qty": 29,
+      "link": "https://www.bloomingdales.com/shop/home/pet-accessories/Pet_item_type/Beds?id=1064759",
+      "is_group": false,
+      "evidence": "Pet Item Type facet 'Beds (29)'; cross-verified against rendered header 'THE PET SHOP (29)' after applying the filter live",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Bowls",
+      "qty": 12,
+      "link": "https://www.bloomingdales.com/shop/home/pet-accessories/Pet_item_type/Bowls?id=1064759",
+      "is_group": false,
+      "evidence": "Pet Item Type facet 'Bowls (12)' on The Pet Shop hub",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Carrier",
+      "qty": 24,
+      "link": "https://www.bloomingdales.com/shop/home/pet-accessories/Pet_item_type/Carrier?id=1064759",
+      "is_group": false,
+      "evidence": "Pet Item Type facet 'Carrier (24)' on The Pet Shop hub",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Collars & Leashes",
+      "qty": 37,
+      "link": "https://www.bloomingdales.com/shop/home/pet-accessories/Pet_item_type/Collars%20%26%20Leashes?id=1064759",
+      "is_group": false,
+      "evidence": "Pet Item Type facet 'Collars & Leashes (37)'; cross-verified against rendered header 'THE PET SHOP (37)' after applying the filter live",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Pet Clothing",
+      "qty": 8,
+      "link": "https://www.bloomingdales.com/shop/home/pet-accessories/Pet_item_type/Pet%20Clothing?id=1064759",
+      "is_group": false,
+      "evidence": "Pet Item Type facet 'Pet Clothing (8)' on The Pet Shop hub",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Toys",
+      "qty": 5,
+      "link": "https://www.bloomingdales.com/shop/home/pet-accessories/Pet_item_type/Toys?id=1064759",
+      "is_group": false,
+      "evidence": "Pet Item Type facet 'Toys (5)' on The Pet Shop hub",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Other",
+      "qty": 12,
+      "link": "https://www.bloomingdales.com/shop/home/pet-accessories/Pet_item_type/Other?id=1064759",
+      "is_group": false,
+      "evidence": "Pet Item Type facet 'Other (12)' on The Pet Shop hub -- generic bucket label but sits directly under the clearly pet-specific 'Pet Item Type' facet on the pet-only hub, per Tier 2 contextual-inclusion rule",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Treats",
+      "qty": 28,
+      "link": "https://www.bloomingdales.com/shop/home/pet-accessories/Pet_item_type/Treats?id=1064759",
+      "is_group": false,
+      "evidence": "Pet Item Type facet 'Treats (28)' on The Pet Shop hub",
+      "flag": "MANUAL REVIEW: PET CONSUMABLE - pet treats/food category, no include/exclude policy yet"
+    }
+  ]
+}

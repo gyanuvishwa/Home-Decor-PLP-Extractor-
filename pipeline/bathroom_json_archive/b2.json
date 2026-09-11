@@ -1,0 +1,206 @@
+{
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ACCESS: westelm.com is Akamai-fronted but answered curl_cffi impersonation directly on every request this session - HTTP 200 on the mega-menu API, on the shop sitemap, on the JS bundle and on every PLP tested (winning profiles rotated: safari17_0, safari15_5, firefox133, chrome124). r.jina.ai, the fallback used in the prior Home-Decor pass, is now dead for this workstation (HTTP 403 on every attempt) and was not needed. robots.txt was fetched FIRST: it names EasouSpider (disallow all) and Pinterestbot (crawl-delay 0.2) and then a 'User-agent: *' group with no anthropic-ai / ClaudeBot / Claude-Web directive; it disallows only /account/, /checkout/, /shoppingcart/, /services/, /wishlist/, */minipip, */quicklook, /*N= and the '/shop/*+*+*' faceted URLs. Every URL emitted below is a plain single-segment /shop/<supercat>/<subcat>/ node, so nothing here touches a Disallow rule, and no Crawl-delay applies to '*'. probe.py's 2s/host pacing was used. TREE: taken from West Elm's OWN live mega-menu API, https://www.westelm.com/api/catalog/v1/category/categorytree/shop/data.json (557 KB, 41 supercats). The Bath supercat's structure is explicit in that payload: type='header' nodes are the grouping rows and type='subcat' nodes are the leaves. Bath contains five real headers - Bath Linens, Bathroom Furniture, Bathroom Renovation, Bathroom Accessories, plus promo/featured headers. Cross-checked against (a) the shop sitemap https://www.westelm.com/netstorage/sitemaps/shop-sitemap-1.xml.gz (881 canonical /shop/ URLs, lastmod 2026-08-30) - every link emitted appears verbatim there - and (b) constructor.io's own group tree for group_id=bath, which lists exactly the same 26 child groups. The taxonomy is two levels deep: every leaf's constructor group returns parents=['all','bath'] and children=[], so there is no deeper level to walk. The Bathroom Furniture header's own page /shop/bath/bathroom-furniture/ returns total_num_results=0 in the site's own product engine, confirming it is a navigation-only node - it is emitted as a grouping row with blank qty and blank link, per rule 24. The 'All Bathroom Furniture' linkcat resolves to /shop/furniture/bath-furniture/ (109), 'Bath Cabinets' and 'Bathroom' linkcats in the Storage supercat resolve back to /shop/bath/bath-cabinets/ and /shop/bath/all-bath-accessories-storage/, and the Art & Mirrors supercat's 'Bathroom Mirrors' linkcat resolves to /shop/bath/vanity-mirrors/ - i.e. every cross-supercat pointer lands back inside the Bath tree, so no extra rows and no duplicates (rule 28). QTY: West Elm's PLP is client-rendered - the served HTML carries no product total - so every number is response.total_num_results from the storefront's OWN product API, https://ac.cnstrc.com/browse/group_id/<slug>?key=key_SQBuGmXjiXmP0UNI (key read live out of the PLP's __INITIAL_STATE__: constructor.abTestConfig.variant='treatmentSearchEngineConstructor', enabled=true, key=key_SQBuGmXjiXmP0UNI). VERIFICATION - three independent checks. (1) SOURCE CHAIN, read out of the live storefront bundle https://www.westelm.com/.static/shop/202631/595053970/dist/shop.cd506c32.js: that file literally assigns 'v.response.numFound = e.response.total_num_results' from this exact browse call; the same bundle defines productCount() as '(state.shop.cat.response.numFound) || 0' and productCountMessage() as productCount + productCountDisplayConfig.displayText; and the PLP's own __INITIAL_STATE__ sets productCountDisplay={displayText:'Items', isEnabled:true}. So total_num_results IS the number West Elm prints in its 'N Items' header, not a proxy for it. (2) ENUMERATION TO EXHAUSTION on three categories of differing size - bathroom-vanities, vanity-mirrors and bath-accessories were paged out at 100 results/page and the unique product ids counted: 88/88, 42/42, 128/128, an exact match to total_num_results in each case. (3) DISCRIMINATION + IDENTITY: the counts differ per category (0 to 128, never a site-wide constant), and every PLP was fetched and its __INITIAL_STATE__ analytics.pageCategory.categoryNames checked to confirm the page really is the node requested (e.g. /shop/bath/vanity-mirrors/ -> [\"Bath\",\"Medicine Cabinets & Mirrors\"]). No filter, store, zip or availability pre_filter_expression was attached to any request, matching the default unfiltered PLP state. EXCLUDED: 'All Bath Linens', 'All Bathroom Renovation', 'All Accessories', 'All Bath', 'All Bathroom Furniture' and 'All Kids Bath' as View-All (rule 25); 'In Stock Bath' and 'In Stock Kids Bedding & Bath' as availability filters; 'New Bath', 'Up To 40% Off Bath' and the Sale header as promotional; and the five collection groups the nav exposes - Bath Furniture Collections (16 named collections), Bath Towels Collections (6), Bath Accessory Collections (9), Bath Hardware Collections (12), Bath Fixture Collections (3) - plus 'Pierce & Ward Bath', all as Collections pages (rule 25). None of those collection slugs appear in the shop sitemap either. ROUTED OUT (recorded in review, not rows): the entire Bath Linens header - Towels, Bath Mats, Shower Curtains, Beach Towels - and the kids equivalents -> Textile; Lighting > Bathroom & Vanity -> Lighting. KEPT DELIBERATELY: Vanities, Bath Cabinets and Bathtubs as Bathroom Furniture (rule 9 - West Elm's own hierarchy files them under Bath); 'Medicine Cabinets & Mirrors' as Bathroom, not Decor or Lighting, because the primary product type is a mirror / mirrored cabinet (rules 10/11); Cabinet Knobs & Pulls and Bath Shelving as bathroom hardware/shelving (rule 17) since they sit inside Bath > Bathroom Renovation; 'Baskets & Hampers' because it sits inside Bath > Bathroom Accessories and rule 13 explicitly includes bathroom baskets/containers (the generic Storage supercat's own hamper node is a different URL and was left to Storage); West Elm Kids' Bathroom Accessories, since westelm.com serves the kids assortment on the same brand site. || CROSS-FILE DEDUP: 2 leaf record(s) removed as already extracted in a prior category workbook. See Review sheet.",
+ "rows": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Medicine Cabinets & Mirrors",
+   "qty": 42,
+   "link": "https://www.westelm.com/shop/bath/vanity-mirrors/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathtubs",
+   "qty": 6,
+   "link": "https://www.westelm.com/shop/bath/bathtubs/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Renovation",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Hardware",
+   "qty": 64,
+   "link": "https://www.westelm.com/shop/bath/bathroom-hardware/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Faucets & Sinks",
+   "qty": 39,
+   "link": "https://www.westelm.com/shop/bath/bath-faucets-sinks/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Cabinet Knobs & Pulls",
+   "qty": 28,
+   "link": "https://www.westelm.com/shop/bath/knobs-pulls/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Shelving",
+   "qty": 14,
+   "link": "https://www.westelm.com/shop/bath/bath-shelves/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Accessories",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Accessories",
+   "qty": 128,
+   "link": "https://www.westelm.com/shop/bath/bath-accessories/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Baskets & Hampers",
+   "qty": 25,
+   "link": "https://www.westelm.com/shop/bath/bath-baskets-hampers/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Kids & Baby > Bedding & Bath > Bath",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Kids Bathroom Accessories",
+   "qty": 26,
+   "link": "https://www.westelm.com/shop/kids-bedding-bath/kids-bathroom-accessories/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  }
+ ],
+ "review": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Lighting (Lighting > Bathroom & Vanity)",
+   "qty": 97,
+   "issue": "ROUTED TO LIGHTING: primary product type is lighting (rule 19). West Elm links it from the Bath supercat as linkcat 'redirect-bath-lighting' -> /shop/lighting/bathroom-lighting/, but the node itself lives under the Lighting supercat.",
+   "link": "https://www.westelm.com/shop/lighting/bathroom-lighting/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Towels (Bath > Bath Linens)",
+   "qty": 87,
+   "issue": "ROUTED TO TEXTILE: bath towels (rules 15/20).",
+   "link": "https://www.westelm.com/shop/bath/towels/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Mats (Bath > Bath Linens)",
+   "qty": 73,
+   "issue": "ROUTED TO TEXTILE: textile bath mats (rules 16/20).",
+   "link": "https://www.westelm.com/shop/bath/bath-mats/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower Curtains (Bath > Bath Linens)",
+   "qty": 49,
+   "issue": "ROUTED TO TEXTILE: shower curtains (rule 20).",
+   "link": "https://www.westelm.com/shop/bath/shower-curtains/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Beach Towels (Bath > Bath Linens)",
+   "qty": 18,
+   "issue": "ROUTED TO TEXTILE: beach towels (rules 15/20).",
+   "link": "https://www.westelm.com/shop/bath/beach-towels/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Kids Bath Mats",
+   "qty": 8,
+   "issue": "ROUTED TO TEXTILE: textile bath mats (rules 16/20).",
+   "link": "https://www.westelm.com/shop/kids-bedding-bath/kids-bath-mats/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Kids Towels & Wraps",
+   "qty": 8,
+   "issue": "ROUTED TO TEXTILE: towels/wraps (rules 15/20).",
+   "link": "https://www.westelm.com/shop/kids-bedding-bath/kids-towels/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Kids Shower Curtains",
+   "qty": 10,
+   "issue": "ROUTED TO TEXTILE: shower curtains (rule 20).",
+   "link": "https://www.westelm.com/shop/kids-bedding-bath/kids-shower-curtains/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Vanities",
+   "qty": 88,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Vanities' - excluded from Bathroom per cross-category dedup (master guide s13)",
+   "link": "https://www.westelm.com/shop/bath/bathroom-vanities/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Cabinets",
+   "qty": 17,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Bath Cabinets' - excluded from Bathroom per cross-category dedup (master guide s13)",
+   "link": "https://www.westelm.com/shop/bath/bath-cabinets/"
+  }
+ ],
+ "_reconstructed_from": "Bathroom.xlsx delivered 2026-09-01 (checkpoint), not original worker JSON"
+}

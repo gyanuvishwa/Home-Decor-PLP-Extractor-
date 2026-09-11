@@ -1,0 +1,61 @@
+{
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "harrods.com is Akamai-WAF-protected; curl_cffi impersonate=safari17_0 bypassed it cleanly (HTTP 200) for every URL fetched, matching the prior Home-Decor pass's access route. robots.txt (checked in the prior pass) allows ClaudeBot except for query-string search URLs; all URLs used here are clean paths. Found Harrods' dedicated Pet Care department at /en-gb/pet-supplies (discovered via sitemap-categories.xml, not linked from the Home & Furniture nav) with 5 real leaf sub-categories: Carriers, Collars, Pet Clothing, Grooming, Beds & Blankets, plus a 'Pet Accessories' nav entry whose listing (/pet-supplies/pet-accessories) returned the identical 44-product set (same links, same order) as Pet Clothing -- merged into one row per the same-URL/same-listing rule; Pet Accessories dropped, Pet Clothing kept as the site's more accurate leaf name for that product mix (coats, sweaters, polos). COUNT METHOD: each PLP embeds a Nuxt __NUXT_DATA__ SSR payload with a product-search node {results, totalResults, queryId, pagination}. The top-level 'totalResults' field proved unreliable/inflated for this department (e.g. Pet Clothing and Pet Accessories both showed totalResults=6838 despite being single-page listings of only 44 actual products each -- almost certainly a non-discriminating/broad search-fallback count, consistent with the project's known 'storefront counts can be inflated' pattern). The nested pagination object's 'total' field, by contrast, exactly matched the resolved 'results' array length for every listing checked (verified item-by-item), and pagination.last=1 (single page) for every sub-category confirms nothing further was truncated -- so pagination.total was used as qty instead of the top-level totalResults. Spot-checked product PDPs to resolve one ambiguity: Beds & Blankets (31 items) includes 3 SKU-variant listings of 'Merino Jersey Pillow, Blanket and Socks Travel Set' whose own PDP breadcrumb links to /en-gb/women-clothing, not pet-supplies -- flagged rather than silently subtracted, since qty must reflect the site's own reported total for the URL, not a manual per-product curation. Other borderline-named items in that same listing (Venezia/Frette/Pratesi-branded blankets) were verified via PDP breadcrumb as genuinely categorized under /en-gb/pet-supplies by Harrods itself, so kept as legitimate pet products (luxury linen brands with dedicated pet blanket lines). Checked the Home & Furniture hub page and homepage nav for any other pet-related branch; none found outside /pet-supplies. No pet-food/consumable or medical/veterinary category exists on this site.",
+  "rows": [
+    {
+      "category": "Pet Care",
+      "sub_category": "Pet Supplies",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Carriers",
+      "qty": 2,
+      "link": "https://www.harrods.com/en-gb/pet-supplies/carriers",
+      "is_group": false,
+      "evidence": "__NUXT_DATA__ product-search node pagination.total=2 (single page, last=1), matches resolved results array length (2 items: quilted water-resistant dog carrier, leather dog carrier)",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Collars",
+      "qty": 8,
+      "link": "https://www.harrods.com/en-gb/pet-supplies/collars",
+      "is_group": false,
+      "evidence": "__NUXT_DATA__ product-search node pagination.total=8 (single page, last=1), matches resolved results array length of 8 dog/cat collar and harness items",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Pet Clothing",
+      "qty": 44,
+      "link": "https://www.harrods.com/en-gb/pet-supplies/pet-clothing",
+      "is_group": false,
+      "evidence": "__NUXT_DATA__ product-search node pagination.total=44 (single page, last=1), matches resolved results array length of 44 dog coats/sweaters/polos",
+      "flag": "MANUAL REVIEW: nav also lists /pet-supplies/pet-accessories as a separate leaf, but its listing is byte-identical (same 44 product links, same order) to this Pet Clothing listing -- merged into this single row rather than double-counted; the site's own 'Pet Accessories' category appears to be a broken/duplicate query pointing at the same underlying data as Pet Clothing"
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Grooming",
+      "qty": 3,
+      "link": "https://www.harrods.com/en-gb/pet-supplies/grooming",
+      "is_group": false,
+      "evidence": "__NUXT_DATA__ product-search node pagination.total=3 (single page, last=1), matches resolved results array length (3 items: dog fragrance mist, dog wash, grooming product minis set)",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Beds & Blankets",
+      "qty": 31,
+      "link": "https://www.harrods.com/en-gb/pet-supplies/beds-blankets",
+      "is_group": false,
+      "evidence": "__NUXT_DATA__ product-search node pagination.total=31 (single page, last=1), matches resolved results array length of 31 items",
+      "flag": "MANUAL REVIEW: PDP spot-check found 3 of the 31 listed SKUs ('Merino Jersey Pillow, Blanket and Socks Travel Set', 3 colour variants) carry a PDP breadcrumb pointing to /en-gb/women-clothing, not pet-supplies -- likely a mistagged/leaked non-pet item in this listing. qty=31 is reported as-is per the site's own listing total for this URL; true pet-specific count may be closer to 28 but was not independently re-counted product-by-product"
+    }
+  ]
+}

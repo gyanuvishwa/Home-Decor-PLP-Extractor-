@@ -1,0 +1,39 @@
+{
+  "sr": 18,
+  "company": "Marina Home UAE",
+  "brand_site": "marinahomeinteriors.com",
+  "country": "UAE",
+  "site_url": "https://www.marinahomeinteriors.com/ae/en/",
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "Magento 2 PWA site (GraphQL /graphql endpoint, public, no auth). robots.txt has no Claude-specific disallow (only cart/checkout/search/etc. blocked for User-agent: *). Fetched the full category tree via categoryList GraphQL query (all IDs, language-independent) plus the sitemap XMLs and searched both for seasonal/holiday keywords (Christmas, Xmas, Holiday, Festive, Halloween, Diwali, Eid, Ramadan, Easter, Valentine, Thanksgiving, New Year, Holi, Rakhi, Navratri, Dussehra, Festival, National Day, Singles Day). One genuine, live seasonal branch found: FESTIVE (parent) with children ACCENTS and DECORATIVES - confirmed as real, working PLPs by rendering them in-browser (category-specific page titles 'Buy Online exclusive FESTIVE/ACCENTS/DECORATIVES Selection', breadcrumb Home/Festive, live product grids). qty was taken from the GraphQL products(category_id) search total_count and cross-validated by full-page scroll enumeration of the live PLP grid - both matched exactly (Accents=8, Decoratives=8, Festive=16=sum of children, no unique parent-only items). The categoryList.product_count field was rejected as a qty source because it proved stale/inflated versus the live site (claimed Accents=31, Decoratives=42, Festive=125, actual live counts are 8/8/16) - same class of issue as the known Shopify products_count problem. Also present in the Magento catalog with real product assignments but NOT reachable as functional live PLPs (tested directly in-browser, each rendered as an empty default/home shell with no product grid and no category-specific title despite HTTP 200, repeated wait/retry): EID EDIT (catalog count 48), RAMADAN EDIT (220), DIWALI EDITS (44), SPRING EDIT (39), FATHERS DAY EDIT (20), SINGLES DAY EDIT (81), KICK OFF EDIT (21) - all have include_in_menu=0 and are orphaned/non-functional marketing nodes; excluded because they fail the genuine-live-PLP test (rules Sec 20 test 1), not because they lack products. Presence in the sitemap did not predict functionality (DIWALI EDITS is sitemap-listed but still failed to render). Also checked and excluded as not seasonal: NEW IN / season-latest (plain new-arrivals, not holiday-specific), GIFTING (generic gifting, no holiday tie), SALE, Augmented Reality/3D Models, and all normal nav branches (Seating, Table, Bedroom, Decor, Storage, Lighting, Rugs, Bathroom, Outdoor, Living Room, Dining Room) - checked one level of subcategories under each of these for hidden seasonal nodes and found none (e.g. Decor's children are Accents/Wall/Fabric/Greenery/Candlelights/Sculptures/Easels & Plinths/Host/Mirror/Objet D'Art/Vinyl - no Christmas/Diwali/Eid-named nodes). Could not pin the FESTIVE branch to one single specific holiday from product content alone (mix of Christmas-tree/wreath items - Kylix Hand Etched Glass Tree, Goldka Tree Wax Filled, Maeve Deco Wreath - alongside generic lantern/votive items that could equally serve Diwali or year-end festive season); kept the site's own generic 'Festive' label per rules guidance against assuming Diwali or Christmas without clear site-context evidence, and flagged the branch for manual review.",
+  "rows": [
+    {
+      "category": "Festive",
+      "sub_category": "Festive",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": "ADJUDICATED KEEP: site's own generic FESTIVE parent branch mixes Christmas-tree/wreath items with lanterns/votives that could equally serve Diwali or a general Oct-Jan festive season; fully investigated (GraphQL + live PLP + categoryList cross-check) with no single-holiday signal available - genuinely irreducible, kept under the site's own generic taxonomy label."
+    },
+    {
+      "category": "Festive",
+      "sub_category": "Festive Accents",
+      "qty": 8,
+      "link": "https://www.marinahomeinteriors.com/en-uae/festive/accents.html",
+      "is_group": false,
+      "evidence": "Live PLP full-page-scroll enumeration = 8 unique products (SPIN 900/1200/1500 table lanterns in gold/black/silver). Matches GraphQL products(filter:{category_id:{eq:\"235\"}}) total_count = 8. Magento categoryList.product_count field reported a stale/inflated 31 for this category and was rejected as unreliable.",
+      "flag": null
+    },
+    {
+      "category": "Festive",
+      "sub_category": "Festive Decoratives",
+      "qty": 8,
+      "link": "https://www.marinahomeinteriors.com/en-uae/festive/decoratives.html",
+      "is_group": false,
+      "evidence": "Live PLP full-page-scroll enumeration = 8 unique products (Deco Turtle, Maeve Deco Wreath With Light/Stand, Kylix Hand Etched Glass Tree, Goldka I Tree Wax Filled, and 4x Pyxis/Phiale Hand Carved Votives With Wax). Matches GraphQL products(filter:{category_id:{eq:\"495\"}}) total_count = 8. Magento categoryList.product_count field reported a stale/inflated 42 for this category and was rejected as unreliable.",
+      "flag": null
+    }
+  ]
+}

@@ -1,0 +1,90 @@
+{
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ACCESS: direct curl_cffi, chrome124/chrome131 desktop profiles, HTTP 200 on every request, no proxy (plain python-requests is 403'd by Akamai). Platform is IBM WebSphere Commerce / Cornerstone Brands React PWA with an Unbxd grid layer - same recipe as the sibling Frontgate site and the same route the Furniture pass used. robots.txt was fetched FIRST (2,738 bytes): one 'User-agent: *' group plus an 'AdsBot-Google' group; it names NO anthropic-ai, ClaudeBot or Claude-Web agent and declares no Crawl-delay. Its Disallow list is checkout/account/registry controllers, /catalogs, /hidden-categories, the howtodecorate blog admin and some search params - nothing under /bed-bath/ or /mirrors-art/. It does carry non-standard 'Noindex: /bathroom/*' (and /bedroom/*, /kitchen/* etc.) lines; those are indexing hints, not crawl directives, and https://www.ballarddesigns.com/bathroom/ was probed and returns HTTP 404, so no separate room-level bathroom hub exists on this site. probe.py's 2s per-host gap was applied throughout. TREE: taken from the site's OWN nav API https://www.ballarddesigns.com/JSONAPIs?module=categories (16 top departments, 473 nodes, each with categoryId + targetURL) - no URL was guessed or pattern-invented. The full 473-node tree was grepped for bath|shower|mirror|vanity|towel|toilet|sink|basin|faucet|tap|hardware|soap|sanitary|robe. Ballard sells NO sanitaryware, baths, showers, enclosures, toilets, basins or taps - no such node exists anywhere - so its Bathroom footprint is bath accessories/hardware, bathroom mirrors and bathroom storage furniture. Bathroom content sits under Bed & Bath [68056]: Bath [104950] /bed-bath/bath/ with children Bath Towels [88908], Bath Rugs & Mats [88905], Bath Storage [88907], Bath Accessories [88909]; plus Bathroom Mirrors & Hardware [162458] (a direct child of Bed & Bath, itself childless); plus Bed & Bath Organization [162459] with children Bathroom Storage & Seating [162460], Laundry Racks & Storage [162461], Closet Systems and Storage [162462]. NAV ALIAS COLLAPSED (prevents a duplicate row): the nav's 'Bath Storage' node [88907] is a stale shell - its own API total is 3, but fetching its URL /bed-bath/bath/storage/ shows the server resolves it to /bed-bath/bed-bath-organization/bathroom-storage-seating/ and serves categoryId 162460 (18 products). So Bath Storage and Bathroom Storage & Seating are one listing; it is recorded ONCE, at the canonical URL, at 18. All other recorded URLs were re-fetched with ?templateInfo=true and each returned HTTP 200 resolving to ITSELF while carrying its own categoryId in the served page (/bed-bath/bath/accessories/ -> 88909, /bed-bath/bathroom-mirrors-hardware/ -> 162458, /bed-bath/bed-bath-organization/bathroom-storage-seating/ -> 162460), so no page was counted against the wrong node. QTY: the storefront's own PLP grid controller https://www.ballarddesigns.com/UnbxdAPI?categoryId=<id>&returnRespAsJSON=true&isAPI=true&requesttype=ajax with header 'CBI-AJAX: 1' -> numberOfProducts. That number was not trusted alone: every node was paged with &unbxdStart to exhaustion and the returned tiles counted, and the enumerated tile count equalled numberOfProducts EXACTLY on all ten nodes touched - Bath Accessories 17/17, Bathroom Mirrors & Hardware 5/5, Bathroom Storage & Seating 18/18, Bath Storage shell 3/3, Bath Towels 10/10, Bath Rugs & Mats 3/3, Bath & Vanity lighting 5/5, Wall Mirrors 61/61, Bath parent 34/34, Bed & Bath Organization parent 27/27. Every count was read a second time in a separate pass with identical results (zero drift). Counts discriminate (3 to 61 across ten nodes, no round display cap, no site-wide constant) and each leaf sits below its parent (Bathroom Storage & Seating 18 under Bed & Bath Organization 27; Bath Accessories 17 under Bath 34; all far below Bed & Bath 203). This platform renders one tile per colourway, so the site's own reported number is the tile count and that is exactly what numberOfProducts returns. CONTENT CHECK (every recorded leaf enumerated by name, not just counted): Bath Accessories = 17 genuine bathroom accessories and hardware - Acrylic 2-Tier Towel Holder, Acrylic Toilet Paper Holder, Maia Marble Toilet Paper Holder, Maia Marble Adjustable Towel Holder, Maia Marble 2-Tiered Towel Holder, Maia Marble Hook Rack, Acrylic Bath Corner Shelf, Maia Marble Corner Shelf, Scalloped Bath Hardware, Brimsley Bath Collection, Clarrington Bath Collection, Maia Marble Bath Accessories, Tali Vanity Mirror, Embroidered Tissue Box Cover, plus three small vanity-top items (Sophia Jewelry Dish, Orleans Jewelry Holder, Monogrammed Paper Guest Towels) - rules 13, 17 and 10. Bathroom Mirrors & Hardware = 5 tiles: two bathroom mirrors (Grant Vanity Mirror, Hayli Scallop Mirror) and three sconces (Owen 1-Light Outdoor Sconce, Owen 1-Light Outdoor Sconce - White, Amelie Sconce). The node itself is a Bathroom node by name and hierarchy and its primary type is mirrors/hardware, so it stays in Bathroom at the site's own reported total of 5; the three sconces are individual products, not a category, and Ballard's actual bathroom-lighting CATEGORY (Lighting > Bath & Vanity, 5) is routed out to Lighting in review per rule 19. No partial or derived count was invented for this node. Bathroom Storage & Seating = 18 tiles, predominantly bath storage furniture (Langley/Chandler/Ann/Apothicaire 2-Door Cabinets, Chandler/Faro/Shelby/Lindsay Wall Cabinets, Shelby Open Shelf/Storage Drawer/Storage Cabinet, Newberry Petite Etagere) with four seating pieces (Victoria Vanity Stool, Upholstered Swivel Stool, X Bench, Courbe Ottoman) - the node's primary type and the site's own label are bathroom storage, so rules 9 and 12 keep it whole in Bathroom. PARENTS SUPPRESSED (rule 24): Bed & Bath [68056] (203), Bath [104950] (34) and Bed & Bath Organization [162459] (27) all have extractable children, so no parent URL is recorded; Bath appears as a grouping row with blank qty and blank link, and Bed & Bath Organization is not emitted because only one of its three children is Bathroom. EXCLUDED: /bed-bath/bedding/* (all 10 bedding leaves - sheets, duvet covers, shams, quilts, blankets, mattresses, pillows, bedskirts, lumbar pillows, mattress guide: bedding textiles, rule 30-33 no crossover); /bed-bath/bed-bath-organization/laundry-racks-storage/ (6) and /closet-systems-storage/ (6) and /furniture/home-organization/closet-storage/ (laundry and closet storage - general Storage, not bathroom, rule 12's 'clearly-Storage-owned' carve-out); /bed-bath/design/r/ and /mirrors-art/design/r/ (Design Partners landing pages, rule 25); /mirrors-art/mirrors/ 'Shop All Mirrors' (rule 25 forbids Shop All); /new/bed-bath/ and /sale/category/bed-bath/ and /featured/free-shipping/bath/ and /featured/multiples/art-mirrors/ (New / Clearance / promotional edit pages, rule 25); /decor-more/hardware/drapery/r/ and /rugs-drapery/drapery/hardware/ and its six Drapery Hardware Collections and /dorm/decor/cabinet-hardware/ (drapery rods and furniture cabinet knobs - hardware with no bathroom parent, rule 17 requires a bathroom hierarchy); /lighting/indoor-lighting/* other than Bath & Vanity (general room lighting, nothing bathroom-specific to route).",
+ "rows": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Accessories",
+   "qty": 17,
+   "link": "https://www.ballarddesigns.com/bed-bath/bath/accessories/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Mirrors & Hardware",
+   "qty": 5,
+   "link": "https://www.ballarddesigns.com/bed-bath/bathroom-mirrors-hardware/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Storage & Seating",
+   "qty": 18,
+   "link": "https://www.ballarddesigns.com/bed-bath/bed-bath-organization/bathroom-storage-seating/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  }
+ ],
+ "review": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bed & Bath > Bath > Bath Towels",
+   "qty": 10,
+   "issue": "ROUTED TO TEXTILE: bath/beach/hand towels (rules 15 and 20). All 10 enumerated tiles are woven towels (Ballard Signature Bath Towels, Suzanne Kasler Trimmed Towel Collection, Amelie Bath Towel Collection, Ellie Scalloped Towels, Sienne Embroidered Towels, Leupart Beach Towel ...). Nothing in the node is a towel rail, ring, bar or hook - Ballard's towel HARDWARE lives in Bath Accessories, which is recorded in rows.",
+   "link": "https://www.ballarddesigns.com/bed-bath/bath/towels/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bed & Bath > Bath > Bath Rugs & Mats",
+   "qty": 3,
+   "issue": "ROUTED TO TEXTILE: textile bath rugs and mats (rule 16). All 3 enumerated tiles are textile (Amelie Bath Mat, Amelie Bath Mat - Gray, Ballard Signature Bath Rug). No rubber or hard anti-slip bathroom-accessory mat is present, so no part of this node stays in Bathroom.",
+   "link": "https://www.ballarddesigns.com/bed-bath/bath/rugs-mats/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Lighting > Indoor Lighting > Bath & Vanity",
+   "qty": 5,
+   "issue": "ROUTED TO LIGHTING: primary product type is lighting (rules 11 and 19). This is Ballard's bathroom/vanity lighting node and all 5 enumerated tiles are light fittings (Rose 2-Light Alabaster Sconce, Owen 1-Light Outdoor Sconce, Owen 1-Light Outdoor Sconce - White, Amelie Sconce, Brewer 1-Light Hanging Sconce). Not duplicated into Bathroom per rule 19.",
+   "link": "https://www.ballarddesigns.com/lighting/indoor-lighting/bath-vanity/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Mirrors & Art > Mirrors > Wall Mirrors",
+   "qty": 61,
+   "issue": "ROUTED TO DECOR: not a Bathroom node. Ballard files it under Mirrors & Art with no bathroom parent, and the 61 enumerated tiles are overwhelmingly decorative wall mirrors (Beaumont Mirror, Athena Mirror, Suzanne Kasler Starburst V Mirror, Grand Palais 54\" Arch Mirror, Bunny Williams Norfolk Mirror ...). Exactly two of the 61 are bathroom mirrors (Grant Vanity Mirror, Hayli Scallop Mirror) and BOTH are already captured in Bathroom via Bed & Bath > Bathroom Mirrors & Hardware, so re-taking this node would duplicate rather than add. Its sibling leaves under the same parent are Floor Mirrors (7) https://www.ballarddesigns.com/mirrors-art/mirrors/floor-mirrors/ and Oversize Mirrors (11) https://www.ballarddesigns.com/mirrors-art/mirrors/oversize-mirrors/, both purely decorative floor/oversize pieces, and their parent /mirrors-art/mirrors/ is titled 'Shop All Mirrors' (65) which rule 25 forbids recording. Listed here so no mirror node is silently skipped.",
+   "link": "https://www.ballarddesigns.com/mirrors-art/mirrors/wall-mirrors/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Furniture > Home Organization > Bathroom Storage & Seating",
+   "qty": 17,
+   "issue": "DUPLICATE-CONTENT TWIN, NOT RECORDED IN ROWS: Ballard surfaces a second 'Bathroom Storage & Seating' category in the Furniture department (categoryId 163954) alongside the Bed & Bath one (categoryId 162460, 18, which IS in rows). They are separate categoryIds that each resolve to themselves, but their product sets are the same merchandise - 14 of the 17 titles here are identical to the Bed & Bath node (Apothicaire Cabinet, Ann 2-Door Cabinet, Chandler Wall Cabinet, Shelby Wall Cabinet/Open Shelf/Storage Drawer/Storage Cabinet, Victoria Vanity Stool, Newberry Petite Etagere, Upholstered Swivel Stool, X Bench, Courbe Ottoman ...). Recording both would double-count the same products, and the Furniture pass already recorded this exact URL as Furniture (18 at the time, 17 now). Kept here with its own verified count so the node is visible but not duplicated.",
+   "link": "https://www.ballarddesigns.com/furniture/home-organization/bathroom-storage/"
+  }
+ ],
+ "_reconstructed_from": "Bathroom.xlsx delivered 2026-09-01 (checkpoint), not original worker JSON"
+}

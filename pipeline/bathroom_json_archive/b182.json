@@ -1,0 +1,205 @@
+{
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ROBOTS (www.hipvan.com): fetched FIRST, before any other request - HTTP 200, 1,948 bytes - and read by GROUP BOUNDARY. Fourteen groups: Googlebot, Bingbot and GeedoProductSearch (crawl-delayed), 'User-agent: *', and Disallow-all groups for Nutch, polaris botnet, rogerbot, mj12bot, dotbot, exabot, gigabot, BacklinkCrawler, EtaoSpider and SiteGuruCrawler. NO Claude agent is named - a case-insensitive search for claude, anthropic, ClaudeBot, Claude-Web and anthropic-ai returns ZERO hits - so we fall under '*'. THE '*' GROUP CARRIES 'Crawl-delay: 1', WHICH IS SATISFIED AND EXCEEDED by probe.py's own 2.0 s per-host gap (I did not lower it). The '*' disallows are /cart$, /carts$, /cart*?*, /carts*?*, /*?gclid, /*?q=, /referrals, /feedbacks, /order, /orders, /checkout, /checkouts, /account, /collections/*+*, /collections/*%2B*, /collections/*%2b*, /collections/newnav*, /dev/*, /communa/* and /tracking-order, /reschedule. I requested NONE of them. DISCLOSURE - TWO QUERY-STRING FORMS WERE USED, BOTH PERMITTED, AND NEITHER PRODUCED A RECORDED FIGURE. (1) '?page=N' - present in HipVan's OWN collections sitemap and not disallowed anywhere in the file; it turned out to be USELESS (see the count traps below). (2) '?sort=<code>' - not disallowed anywhere in the file (the only query-string disallows are '?gclid' and '?q='), used purely to rotate the server-rendered first page for a containment proof. Every URL written into rows[] and review[] is the clean canonical path with NO query string. ONE HOST ONLY: www.hipvan.com. No API host, no CDN host, no proxy, no r.jina.ai, no browser automation, no campaign parameters - so no second robots file was owed. ACCESS: plain HTTP 200 on every request through probe.fetch(); no bot wall, no interstitial, no 403, no 429. About 60 category pages, 4 product pages, the sitemap index and the gzipped collections sitemap were fetched; the category pages are cached under work/182/pages/. BRIEF-SPECIFIC CHECK - 'HipVan is Singapore; check whether it runs a second locale or host'. CHECKED AND CLEARED, not assumed. (a) The category pages emit NO <link rel=alternate hreflang> at all - zero hreflang tags on the pages inspected - only a self-referential rel=canonical. (b) HipVan's own collections sitemap (2,622 <loc> entries, 919 distinct collection paths after stripping ?page) contains NOT ONE locale-prefixed path: no /sg/, no /my/, no /en/. (c) The exclusion index contains exactly one HipVan host, hipvan.com, across all 89 of its keys. (d) I resolved the two plausible alternate hosts directly: hipvan.com.sg and www.hipvan.my both fail DNS resolution - they do not exist. So blind spots (b) locale variants and (c) cross-host locale alternates do not arise here; this is a single-locale, single-host SG storefront. TREE SOURCE - HIPVAN'S OWN TAXONOMY, from two independent places, cross-checked. (1) The home page server-renders HipVan's COMPLETE category taxonomy inside its Next.js flight payload as (id, display name, slug, path, count-or-children) tuples; I parsed 301 nodes out of it. (2) Every category page renders its own BREADCRUMB TRAIL with the item count - e.g. 'Home > Decor > Bath & Laundry > Bathroom Accessories (84 items)' - so parentage comes from the page's own breadcrumb, not from URL shape (BATCH_BRIEF s5). (3) Each category page also renders its parent's full sibling list in the left nav. (4) The gzipped collections sitemap gives a 919-collection ground truth for orphan hunting. The Bathroom-relevant structure is: Decor > Bath & Laundry (151) > {Bathroom Accessories 84, Laundry Baskets & Racks 49, Automated Laundry Racks 10, Ironing Boards 8}; Decor > Mirrors (53) > {Round 4, Standing 36, Wall 16, Vanity & Bathroom Mirrors 10}; Soft Furnishings > Towels & Mats (162) > {Bath Mats 86, Bath Towels 46, Hand 26, Face 4}; plus Decor > Home Organisation (411) and Kitchen > Home & Kitchen Cleaning. ORPHAN COLLECTIONS HUNTED AND RESOLVED (BATCH_BRIEF s5/s6). Four collections exist in the sitemap that appear in NO nav path and in NO node of the 301-entry taxonomy: /toilet-brushes, /bath-essentials-by-hipvan, /decorative-mirrors and /bathtub-accessories. I chased all four and PROVED what each is rather than recording it on sight: /decorative-mirrors and /bathtub-accessories are pure ALIASES (identical enumerated product sets and rel=canonical pointing at /decor/bathroom-mirrors and /kids/bath-baby-care respectively); /toilet-brushes is a STRICT SUBSET of the recorded Bathroom Accessories node (4 of 4 products inside, zero outside); /bath-essentials-by-hipvan is an own-brand towel collection (rule 25) whose products do not appear in Bathroom Accessories at all. None became a row. QTY: every quantity is the LISTING PAGE'S OWN RENDERED EXACT TOTAL, read from the breadcrumb's '(N items)' string on the page itself (rule 26). No estimate, no aggregation, no parent's number reused for a child. *** THREE COUNT TRAPS FOUND HERE, ALL AVOIDED, ALL DOCUMENTED. *** (1) THE NAV-ATTRIBUTE COUNTS ARE STALE - the exact Sklum trap from BATCH_BRIEF s3. HipVan's own home-page taxonomy payload ships a product count per node, and it is the easiest number on the site to take. It is WRONG on five of the nodes I checked: it says 108 for (Sale) Bathroom & Vanity where the page renders 71; 59 for Mirrors where the page renders 53; 41 for Standing Mirrors against 36; 88 for Bath Mats against 86; 164 for Towels & Mats against 162. NOT ONE recorded figure comes from the nav payload; every figure comes from the listing page's own breadcrumb. (Where the two agree - Bathroom Accessories 84/84, Laundry Baskets 49/49, Ironing Boards 8/8, Automated Laundry Racks 10/10 - that agreement is a bonus cross-check, not the source.) (2) THE JSON-LD COUNT IS THE PAGE SIZE, NOT THE TOTAL. Every collection page carries a schema.org CollectionPage with mainEntity.ItemList.numberOfItems - and it reads 24 on EVERY node regardless of size, because 24 is the page size. On Bathroom Accessories it says 24 against a true 84. Exactly the BATCH_BRIEF s3 warning that a JSON-LD count is a hint to verify and never a source; it was not used. (3) HIPVAN IGNORES '?page=' AND RE-SERVES PAGE 1 - the same trap the IKEA sibling companies hit. HipVan's own sitemap lists ?page=2 … ?page=7 URLs for large collections, which invites pagination arithmetic. PROVED false on Bathroom Accessories: ?page=2, ?page=3 and ?page=4 each return HTTP 200 with the IDENTICAL 24 product ids as page 1 (set equality in all three cases, union of all four pages = 24, and the breadcrumb still reads 84). Four pages x 24 would have suggested 96 for an 84-product node. NO recorded figure rests on pagination. VERIFICATION. (a) EXHAUSTIVE ENUMERATION on every node small enough to fit one page: the distinct products carried in the page's own JSON-LD equal the rendered total EXACTLY on eight nodes - Vanity & Bathroom Mirrors 10/10, /decorative-mirrors 10/10, Wall Mirrors 16/16, Bath & Baby Care 21/21, /bathtub-accessories 21/21, Soap Pumps 14/14, Toilet Brushes 4/4, Round Mirrors 4/4, Face Towels 4/4. That includes ONE of the two recorded leaves (Vanity & Bathroom Mirrors), which is therefore proved exactly. (b) The other recorded leaf, Bathroom Accessories 84, exceeds the 24-per-page grid and ?page is ignored, so I verified it a different way: SORT ROTATION. '?sort=' is not robots-disallowed and DOES change the server-rendered first 24 (price_asc, price_desc, newest_desc, name_asc, name_desc, popularity_desc each return a different 24, while ?page does not). Rotating eight sort orders recovered a union of 72 DISTINCT products for this node - conclusive proof that it holds far more than the 24 the JSON-LD claims, and consistent with the rendered 84 (the 12 not surfaced are the ones no sort order puts in a top-24). (c) PARENT = EXACT SUM OF CHILDREN on two independent branches: Bath & Laundry 151 = 84+49+10+8 exactly, and Towels & Mats 162 = 86+46+26+4 exactly. Both confirm that the breadcrumb totals are consistent with each other and are not a cap. (d) The Mirrors branch does NOT sum - 4+36+16+10 = 66 against a parent of 53 - because those siblings overlap, and the overlap was MEASURED rather than assumed: 5 of Wall Mirrors' 16 products and 3 of Round Mirrors' 4 are also in Vanity & Bathroom Mirrors. These figures are recorded separately per rule 28 and MUST NOT be added. (e) DISCRIMINATION: 4, 8, 10, 14, 16, 17, 21, 26, 29, 36, 45, 46, 49, 50, 53, 54, 57, 71, 84, 86, 151, 162, 411, 1035 - no site-wide constant, no round-number cap. (f) H1, breadcrumb trail and rel=canonical were read on every node; both recorded leaves are self-canonical at the URL written into rows[]. (g) Content of the two recorded leaves, read product by product. Bathroom Accessories: Droplet and STEP and Touch soap pumps, Droplet and STEP toothbrush holders, Droplet Soap Dish Tray, Touch Toilet Brush, Flex Shower Caddy, Flex Drain Stop / Hair Catcher, Flex Gel-Lock Corner Bin, Cubiko Wall Shelf Racks - soap accessories, toilet accessories, shower accessories, bathroom hardware and bathroom bins under rules 13, 14, 17. Vanity & Bathroom Mirrors: Bando Vanity Mirror, Lisa Vanity Mirror (Natural and Walnut), Hub and Hubba Round Mirrors, Forma Arched Mirror, Buttercup Round Mirror, Sandy Irregular Wooden Frame Mirror, Julia Half-Length Mirror, Kira Standing Floor Mirror with Storage - all primary product type MIRROR, which rule 11 puts in Bathroom and rule 10 forbids excluding for containing the word 'Vanity'. DEDUP - OPTION 1, run on every candidate URL and every rel=canonical target. The exclusion index holds 89 hipvan.com keys, concentrated in Furniture (beds, sofas, dining, cabinets, wardrobes, dressing tables) and the Home Decor pass (lighting, wall decor, vases, candles, trays & baskets, photo frames, tableware). FOUR HITS, all in review[] and never in rows[]: Decor > Mirrors 53, Round Mirrors 4, Standing Mirrors 36 and Wall Mirrors 16, every one Final.xlsx (Home Decor pass). ZERO hits on either recorded leaf and zero on any node in the Bath & Laundry branch. THE ONE REAL JUDGEMENT CALL, STATED OPENLY: the Home Decor pass took the whole Mirrors branch EXCEPT its 'Vanity & Bathroom Mirrors' child, whose URL is absent from the index. I record that child, because rule 10 is explicit that the words 'Bathroom' and 'Vanity' must never cause exclusion and because its URL is not already extracted. DISCLOSED: it overlaps its already-extracted siblings by measurement - 5 shared with Wall Mirrors, 3 with Round Mirrors, 1 with Standing Mirrors, 4 visible in the Mirrors parent - so its 10 are not 10 wholly-new products. I also checked the reverse direction that BATCH_BRIEF s6 warns about (mirror as a false-positive magnet) and rejected Vanity Organisers 54 on exactly those grounds: despite 'Vanity' in the name its products are jewellery organisers, trays and storage boxes under Home Organisation. BLIND SPOT (a) CANONICAL ALIASES - two were found and both were caught by reading rel=canonical rather than by trusting the URL: /decorative-mirrors -> /decor/bathroom-mirrors and /bathtub-accessories -> /kids/bath-baby-care. Each is one node, handled once (rule 28). WHAT IS ABSENT FROM THIS RETAILER, evidenced rather than assumed. HipVan is a Singapore furniture and homewares retailer, not a bathroom-fittings retailer. It sells NO baths or bathtubs (other than the Skip Hop baby bath in the Kids branch), NO toilets/WCs, NO bidets, NO basins or wash-basins, NO bathroom taps or faucets, NO showers, shower heads, shower mixers, shower enclosures or screens, and NO bathroom vanity units, wash-stands or bathroom cabinets. Evidence: the complete 301-node taxonomy from the site's own payload, the complete 919-collection sitemap, and a 22-term keyword sweep of every collection path (bath, shower, toilet, soap, towel, mirror, vanity, laundry, basin, sink, tap, hook, dispenser, tumbler, organiser, tissue, trash, bin and more) - the only bathroom-word collections that exist anywhere on the site are the ones enumerated in rows[] and review[]. NO EMPTY NODES were found: every node walked returned a non-zero rendered total. NO VIEW ALL / SHOP ALL / SEARCH / SALE / FACET / PDP URL is recorded - /sale/sale-bathroom-vanity (71) and /bath-essentials-by-hipvan (50) are both explicitly excluded under rule 25 and logged in review[]. RESULT: 1 grouping row + 2 leaf rows; 24 review entries (4 dedup hits, 2 canonical aliases, 1 proved-subset orphan, 1 brand collection, 1 sale page, 2 rule-29 holds, and 13 routed-out or parent-excluded nodes).",
+ "rows": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathroom Accessories",
+   "qty": 84,
+   "link": "https://www.hipvan.com/decor/bathroom-accessories",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Vanity & Bathroom Mirrors",
+   "qty": 10,
+   "link": "https://www.hipvan.com/decor/bathroom-mirrors",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  }
+ ],
+ "review": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath & Laundry (parent)",
+   "qty": 151,
+   "issue": "EXCLUDED AS PARENT URL (rule 24): 'Home > Decor > Bath & Laundry' has four extractable children and its own rendered total is EXACTLY the sum of them - Bathroom Accessories 84 + Laundry Baskets & Racks 49 + Automated Laundry Racks 10 + Ironing Boards 8 = 151 - so it is a pure roll-up with no rule-24 residue. Only ONE of its four children is Bathroom on primary product type (Bathroom Accessories); the other three are laundry equipment and are routed out below. It is therefore NOT recorded as a grouping row under its own name; the top grouping row in rows[] is 'Bathroom'.",
+   "link": "https://www.hipvan.com/decor/bathroom-wardrobe-storage"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath & Laundry > Laundry Baskets & Racks",
+   "qty": 49,
+   "issue": "ROUTED TO STORAGE / LAUNDRY (rules 2, 30-33): laundry baskets, laundry bags, rattan and rope baskets, laundry hampers and hampers with wheels (ESSENTIALS Laundry Bag, Gretchen/Genesis/Greg/Gino Rattan Basket, Nisa Rope Laundry Basket, Marie / Nikki / Elysian Laundry Basket, Mory Laundry Hamper with Wheels, Mason Slim Laundry Hamper). Primary product type is laundry storage, not a bathroom fixture, accessory or hardware.",
+   "link": "https://www.hipvan.com/decor/bathroom-laundry-baskets-racks"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath & Laundry > Automated Laundry Racks",
+   "qty": 10,
+   "issue": "ROUTED TO STORAGE / LAUNDRY (rule 2): motorised ceiling laundry drying racks - laundry appliances.",
+   "link": "https://www.hipvan.com/decor/automated-laundry-racks"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath & Laundry > Ironing Boards",
+   "qty": 8,
+   "issue": "ROUTED TO STORAGE / LAUNDRY (rule 2): ironing boards.",
+   "link": "https://www.hipvan.com/decor/ironing-boards"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Vanity & Bathroom Mirrors (duplicate URL)",
+   "qty": 10,
+   "issue": "SAME NODE AS THE RECORDED ROW, RECORDED ONCE (rule 28 and BATCH_BRIEF s4a). /decorative-mirrors is a second, top-level URL for the identical listing: same H1 'Vanity & Bathroom Mirrors', same breadcrumb 'Home > Decor > Mirrors > Vanity & Bathroom Mirrors', same rendered '(10 items)', an IDENTICAL 10-product set proved by full enumeration, and - decisively - its own <link rel=canonical> points at https://www.hipvan.com/decor/bathroom-mirrors. Only the canonical form is in rows[].",
+   "link": "https://www.hipvan.com/decorative-mirrors"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Decor > Mirrors",
+   "qty": 53,
+   "issue": "ALREADY EXTRACTED IN Final.xlsx (Home Decor pass) as 'Mirrors' - verified URL-exact by dedup.already_extracted(). It is also a general DECOR mirror node, not a bathroom one. NOTE ON THE OVERLAP, measured rather than assumed: the sibling node that IS Bathroom under rule 10 (Vanity & Bathroom Mirrors, 10) shares products with these - 4 of the 10 are visible in this parent’s first page - so the recorded 10 must not be read as 10 products that appear nowhere else. It is recorded because its URL is absent from the exclusion index, its own name and hierarchy are 'Vanity & Bathroom Mirrors', and rule 10 states explicitly that the words 'Bathroom' and 'Vanity' must NEVER cause exclusion.",
+   "link": "https://www.hipvan.com/decor/new-mirrors"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Decor > Mirrors > Round Mirrors",
+   "qty": 4,
+   "issue": "ALREADY EXTRACTED IN Final.xlsx (Home Decor pass) as 'Round Mirrors' - verified URL-exact by dedup.already_extracted(). It is also a general DECOR mirror node, not a bathroom one. NOTE ON THE OVERLAP, measured rather than assumed: the sibling node that IS Bathroom under rule 10 (Vanity & Bathroom Mirrors, 10) shares products with these - 3 of its 4 products are also in Vanity & Bathroom Mirrors - so the recorded 10 must not be read as 10 products that appear nowhere else. It is recorded because its URL is absent from the exclusion index, its own name and hierarchy are 'Vanity & Bathroom Mirrors', and rule 10 states explicitly that the words 'Bathroom' and 'Vanity' must NEVER cause exclusion.",
+   "link": "https://www.hipvan.com/decor/round-mirrors"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Decor > Mirrors > Standing Mirrors",
+   "qty": 36,
+   "issue": "ALREADY EXTRACTED IN Final.xlsx (Home Decor pass) as 'Standing Mirrors' - verified URL-exact by dedup.already_extracted(). It is also a general DECOR mirror node, not a bathroom one. NOTE ON THE OVERLAP, measured rather than assumed: the sibling node that IS Bathroom under rule 10 (Vanity & Bathroom Mirrors, 10) shares products with these - 1 shared product visible - so the recorded 10 must not be read as 10 products that appear nowhere else. It is recorded because its URL is absent from the exclusion index, its own name and hierarchy are 'Vanity & Bathroom Mirrors', and rule 10 states explicitly that the words 'Bathroom' and 'Vanity' must NEVER cause exclusion.",
+   "link": "https://www.hipvan.com/decor/standing-mirrors"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Decor > Mirrors > Wall Mirrors",
+   "qty": 16,
+   "issue": "ALREADY EXTRACTED IN Final.xlsx (Home Decor pass) as 'Wall Mirrors' - verified URL-exact by dedup.already_extracted(). It is also a general DECOR mirror node, not a bathroom one. NOTE ON THE OVERLAP, measured rather than assumed: the sibling node that IS Bathroom under rule 10 (Vanity & Bathroom Mirrors, 10) shares products with these - 5 of its 16 fully-enumerated products are also in Vanity & Bathroom Mirrors - so the recorded 10 must not be read as 10 products that appear nowhere else. It is recorded because its URL is absent from the exclusion index, its own name and hierarchy are 'Vanity & Bathroom Mirrors', and rule 10 states explicitly that the words 'Bathroom' and 'Vanity' must NEVER cause exclusion.",
+   "link": "https://www.hipvan.com/decor/wall-mirrors"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Toilet Brushes (orphan landing page)",
+   "qty": 4,
+   "issue": "PROVED A STRICT SUBSET - NOT RECORDED (BATCH_BRIEF s5/s6: an orphan is not automatically a new row). /toilet-brushes is a real page (HTTP 200, H1 'Toilet Brushes', self-canonical, rendered '(4 items)') but it is an ORPHAN: it appears in HipVan's collections sitemap and in NO nav path - its own breadcrumb is just 'Home > Toilet Brushes', with no parent - and it is absent from the 301-node taxonomy the site ships in its own home-page payload. CONTAINMENT PROVED BY PRODUCT IDENTITY, not asserted: all 4 of its products (Corsa Toilet Brush - White, Touch Toilet Brush - White, Touch Toilet Brush - Grey, simplehuman Toilet Brush - Black) are members of the recorded Bathroom Accessories node - 4 of 4 inside, ZERO outside. Recording it would double-count 4 products already inside the 84.",
+   "link": "https://www.hipvan.com/toilet-brushes"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Essentials by HipVan (own-brand collection)",
+   "qty": 50,
+   "issue": "NEVER RECORDED - A BRAND / CURATED COLLECTION, NOT A SUBCATEGORY (rule 25). Orphan page with breadcrumb 'Home > Bath Essentials by HipVan' and no parent, absent from the site's own taxonomy payload. Its content is also Textile: enumeration of its first page returns EVERYDAY 100% Cotton Face Towels and Hand Towels in colourway after colourway, i.e. HipVan's own-label towel line, which rules 15 and 20 send to Textile. Zero of its enumerated products appear in the recorded Bathroom Accessories node. Logged with its exact rendered figure so it is visibly excluded rather than missed.",
+   "link": "https://www.hipvan.com/bath-essentials-by-hipvan"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Kitchen > Home & Kitchen Cleaning > Soap Pumps",
+   "qty": 14,
+   "issue": "HELD FOR REVIEW, NOT RECORDED - OVERLAP WITH A RECORDED NODE PLUS A MIXED PRIMARY TYPE. Rule 13 does list Soap Dispensers as Bathroom, and the run brief's warning about judging a kitchen retailer's soap dispensers on product type was applied here rather than dismissed. Two things stopped it becoming a row: (1) OVERLAP, MEASURED - 6 of its 14 fully-enumerated products (STEP Soap Pump, Droplet Soap Pump, Touch Soap Pump White and Slate Blue, and others) are ALREADY inside the recorded Bathroom Accessories node, so recording it would double-count them; and (2) the remainder are kitchen-sink products by primary function - Sling Sink Caddy with Soap Pump, and four Joey Pump/Scrubby Combos (a dish-soap pump bundled with a dish scrubber) - and HipVan's own hierarchy files the node under 'Kitchen > Home & Kitchen Cleaning'. Confidence LOW under rule 29, so it goes to review with its exact figure and URL rather than into rows[].",
+   "link": "https://www.hipvan.com/kitchen/soap-pumps"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Kids > Baby Nursery > Bath & Baby Care",
+   "qty": 21,
+   "issue": "HELD FOR REVIEW UNDER RULE 29, NOT RECORDED. Reached by two URLs - /kids/bath-baby-care and the orphan /bathtub-accessories, which is an alias: identical 21-product set proved by full enumeration and its rel=canonical points at /kids/bath-baby-care, so this is ONE node (rule 28). It is held rather than recorded because its primary product types are baby care, bath toys and textiles, not bathroom fixtures or accessories: Skip Hop Moby Smart Sling 3 Stage Bath (a baby bath tub), Moby Waterfall Bath Rinser, Zoo Fill Up Fountain / Scoop & Catch Squirties / Narwhal Ring Toss (bath toys), Baby Bjorn Smart Potty, and seven Soft Spot Soft Swaddle/Towel colourways (Textile, rule 20). The site files it under Kids > Baby Nursery. A baby bath tub is arguably rule 5, but the node as a whole is not, and rule 29 says do not guess.",
+   "link": "https://www.hipvan.com/kids/bath-baby-care"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Soft Furnishings > Towels & Mats",
+   "qty": 162,
+   "issue": "ROUTED TO TEXTILE (rules 15, 20). Parent of the bath-textile branch; its rendered total is EXACTLY the sum of its four children (86+46+26+4 = 162), so it is a pure roll-up. The matching bathroom HARDWARE and ACCESSORIES stay in Bathroom as Bathroom Accessories (soap pumps, toothbrush holders, soap dish trays, toilet brushes, shower caddies, wall shelf racks, drain stops, corner bins) - the split rule 15 asks for.",
+   "link": "https://www.hipvan.com/soft-furnishings/towels-bath-mats"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Soft Furnishings > Towels & Mats > Bath Mats",
+   "qty": 86,
+   "issue": "ROUTED TO TEXTILE (rules 15, 20). Rule 16: textile bath mats sold as soft furnishings, filed by the site under Soft Furnishings, not as a bathroom accessory.",
+   "link": "https://www.hipvan.com/soft-furnishings/bath-mats"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Soft Furnishings > Towels & Mats > Bath Towels",
+   "qty": 46,
+   "issue": "ROUTED TO TEXTILE (rules 15, 20). ",
+   "link": "https://www.hipvan.com/soft-furnishings/bath-towels"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Soft Furnishings > Towels & Mats > Hand Towels",
+   "qty": 26,
+   "issue": "ROUTED TO TEXTILE (rules 15, 20). ",
+   "link": "https://www.hipvan.com/soft-furnishings/hand-towels"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Soft Furnishings > Towels & Mats > Face Towels",
+   "qty": 4,
+   "issue": "ROUTED TO TEXTILE (rules 15, 20). ",
+   "link": "https://www.hipvan.com/soft-furnishings/face-towels"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Decor > Home Organisation",
+   "qty": 411,
+   "issue": "NOT BATHROOM ON PRIMARY PRODUCT TYPE AND HIERARCHY (rules 2, 30-33). The site files it under 'Home > Decor > Home Organisation', a general storage branch, and its products are general homeware. Parent of the general-organisation branch; logged so the branch is visibly considered.",
+   "link": "https://www.hipvan.com/decor/home-organisation"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Decor > Home Organisation > Vanity Organisers",
+   "qty": 54,
+   "issue": "NOT BATHROOM ON PRIMARY PRODUCT TYPE AND HIERARCHY (rules 2, 30-33). The site files it under 'Home > Decor > Home Organisation', a general storage branch, and its products are general homeware. CHECKED CAREFULLY BECAUSE OF THE WORD 'VANITY' (rule 10 forbids excluding on that word alone, and BATCH_BRIEF s6 warns it is a false-positive magnet). Enumeration of its first page shows the products are general and jewellery organisers, not bathroom ones: Edd Nordic Tray with Rack, Trigem Jewelry Stand, four Ferris Jewelry Organizers, Malibu and Cove Storage Boxes, Wooden Tissue Box, Reagan Glass Display Bowl, Bellwood Caddy Storage Basket. Rules 30-33 forbid re-extracting general storage.",
+   "link": "https://www.hipvan.com/decor/vanity-organisers"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Decor > Home Organisation > Wall Hooks",
+   "qty": 45,
+   "issue": "NOT BATHROOM ON PRIMARY PRODUCT TYPE AND HIERARCHY (rules 2, 30-33). The site files it under 'Home > Decor > Home Organisation', a general storage branch, and its products are general homeware. CHECKED because rule 17 includes robe and bathroom hooks. The products are general entry/door/key hooks - Estique Key Hook & Organiser, Dripping Paint Door Hook Hanger, Picket 5/8 Wall Hook, Flip 5/8 Hook - not bathroom-intended hooks, and the node sits under Home Organisation rather than under Bath & Laundry. Rule 13's 'Bathroom-intended only' qualifier decides it.",
+   "link": "https://www.hipvan.com/decor/wall-hooks-holders"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Decor > Home Organisation > Tissue Boxes",
+   "qty": 29,
+   "issue": "NOT BATHROOM ON PRIMARY PRODUCT TYPE AND HIERARCHY (rules 2, 30-33). The site files it under 'Home > Decor > Home Organisation', a general storage branch, and its products are general homeware. General tissue box covers.",
+   "link": "https://www.hipvan.com/decor/tissue-boxes"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Decor > Home Organisation > Trash Bins",
+   "qty": 57,
+   "issue": "NOT BATHROOM ON PRIMARY PRODUCT TYPE AND HIERARCHY (rules 2, 30-33). The site files it under 'Home > Decor > Home Organisation', a general storage branch, and its products are general homeware. General household bins; the bathroom-specific bins (Flex Gel-Lock Corner Bin and similar) sit inside the recorded Bathroom Accessories node.",
+   "link": "https://www.hipvan.com/decor/trash-bins-1"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "(Sale) Bathroom & Vanity",
+   "qty": 71,
+   "issue": "NEVER RECORDED - SALE / PROMOTIONAL PAGE (rule 25). Breadcrumb 'Home > Sale > Clearance (Up to 50% Off) > (Sale) Bathroom & Vanity'. Logged with its exact rendered figure only so it is visibly excluded. NOTE: the site's own nav payload claims 108 for this node while the page itself renders 71 - one of five nav counts proved stale (see notes).",
+   "link": "https://www.hipvan.com/sale/sale-bathroom-vanity"
+  }
+ ],
+ "_reconstructed_from": "Bathroom.xlsx delivered 2026-09-01 (checkpoint), not original worker JSON"
+}

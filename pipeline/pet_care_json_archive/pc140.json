@@ -1,0 +1,25 @@
+{
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "IKEA France (ikea.com/fr/fr/), independently re-derived from the site itself, not copied from other IKEA-market passes. Direct HTTP fetch worked with no blocking (confirms prior notes). Initial guess at a global pet-category ID (32812/'lurvig') was WRONG for FR and 301-redirected to the generic 'Tous nos produits' fallback page, proving it doesn't resolve on this locale -- discarded, not used. Used WebSearch to find the real FR pet-care URLs, then verified each by direct fetch: https://www.ikea.com/fr/fr/cat/animalerie-pt001/ (top hub, page title 'Meubles & Accessoires pour animaux') and its embedded page-hydration JSON (a full site hierarchy blob in the raw HTML) which gives GROUND-TRUTH taxonomy: pt001 'Animalerie' has exactly two subCategories -- id 39569 'Chat' and id 39570 'Chien' -- both flagged isHiddenNavigation:true (real category pages, just not linked from the visible mega-menu) and both themselves have empty subCategories arrays (i.e. both are leaves, no further nesting). Checked for other pet-adjacent nav (LURVIG collection, Outdoor department) via WebSearch; no separate/parallel FR pet listing found beyond this pt001 hierarchy -- LURVIG/UTSADD pet lines are reported (via WebSearch results, e.g. Creapills coverage) as discontinued on IKEA France specifically, consistent with what the site itself shows. Because product counts are not present in the static HTML (client-fetched via the sik.search.blue.cdtapps.com PRIMARY_AREA API, same pattern as the prior Home-Decor FR pass), used Playwright (tier 2) to render each leaf page and capture both the rendered results-footer text and the underlying sik.search API network response. Chat (39569): page renders an explicit site banner 'Les series de produits specifiquement destinees aux chats ne sont malheureusement plus disponibles chez IKEA France' (cat-specific product lines are no longer available at IKEA France), zero products rendered, no sik.search network call fired at all -- genuine zero, dropped per the zero-product rule (not emitted as a row). Chien (39570): rendered footer text 'Affiche 1 resultats sur 1' (Showing 1 result of 1) and the sik.search PRIMARY_AREA JSON payload independently confirms exactly 1 item (BOLMSO, 'Panier pour chien, exterieur gris fonce', itemNo 90564641, categoryPath key '39570') -- both signals agree, qty=1. The pt001 hub page itself also renders the same 'no longer available' banner text (generic, covers both chien+chat) rather than an aggregated listing/count, so it is treated purely as a grouping/hub node (is_group, qty null, link null) -- its one surviving real child (Chien) is emitted below. Nothing found here overlaps with or should be reassigned from Furniture/Storage/Outdoor -- BOLMSO is an outdoor dog basket, businessStructure tag is 'Outdoor accessories & covers' internally at IKEA but its own categoryPath/nav placement is squarely under Chien/Pet Care, so kept here per the site's own category assignment, not the internal business-area tag.",
+  "rows": [
+    {
+      "category": "Pet Care",
+      "sub_category": "Animalerie (Pet Products)",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Dog Accessories",
+      "qty": 1,
+      "link": "https://www.ikea.com/fr/fr/cat/chien-39570/",
+      "is_group": false,
+      "evidence": "Rendered listing footer 'Affiche 1 resultats sur 1'; corroborated by sik.search.blue.cdtapps.com PRIMARY_AREA API response returning exactly 1 item (BOLMSO, itemNo 90564641, categoryPath key '39570')",
+      "flag": null
+    }
+  ]
+}

@@ -1,0 +1,351 @@
+{
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ROBOTS: https://www.zarahome.com/robots.txt fetched FIRST, before any other request on the host (HTTP 200, 5,840 bytes). NO Claude agent is named anywhere in it - there is no 'User-agent: ClaudeBot', 'anthropic-ai' or 'Claude-Web' group, and no Content-Signal line. I parsed the file into user-agent groups rather than eyeballing it, because the /itxrest/ question turns on group membership. The result: there are exactly six named-bot groups - HTTrack (Disallow: /), Slurp (Disallow: /), MJ12bot (Disallow: /), proximic (Disallow: /itxrest/*), AmazonProductDiscoverybot (Disallow: /) and AmazonProductBot (Disallow: /) - followed by 'User-agent: *' carrying 247 rules. CONFIRMED MYSELF, NOT TAKEN ON TRUST: 'Disallow: /itxrest/*' appears exactly once in the file, at line 14, and it sits under 'User-agent: proximic' at line 13; the '*' group does not begin until line 20 and contains no /itxrest/ rule at all. We fall under '*', so /itxrest/ is permitted for us. The '*' group disallows checkout/account/wishlist paths, /*search.html*, /*share*, /*shop-the-look*, a list of country stores, secondary-language paths INCLUDING 'Disallow: /fr/en/*' (with only 'Allow: /fr/en$' and '/fr/en/$' for the bare landing page), *hidden/*, *contact-swatches* and a parameter list. TWO CONSEQUENCES I ACTED ON. (1) Because /fr/en/* is disallowed, every URL in this file is the FRENCH /fr/ form; the English FR storefront was never requested. (2) The '*' parameter list at line 309 includes 'Disallow: /*catalogId=*'. That binds us, so unlike the ES pass I did NOT call the storefront menu endpoint /api/storefront/1/stores/<id>/menu?...&catalogId=..., which would have carried that parameter. The tree below therefore comes from the catalogue endpoint alone, whose catalogue id is a PATH segment, not a query parameter. 'celement' is NOT in the disallowed parameter list. No Crawl-delay is declared; probe.py's 2s per-host pacing was left in force throughout. ACCESS - HONEST ACCOUNT: every HTML page on www.zarahome.com is served an Akamai Bot Manager JS interstitial, and I verified this on the FR store myself rather than assuming it from the ES pass. Requesting https://www.zarahome.com/fr/salle-de-bain-miroirs-n2468 with each of the ten curl_cffi fingerprints in probe.PROFILES individually returned, in all ten cases, HTTP 200 with a ~2.26 KB stub containing 'bm-verify', an /interstitial/ iframe and a POST to /_sec/verify - chrome120 2262, chrome124 2256, chrome131 2264, edge101 2262, firefox133 2264, safari15_5 2264, safari17_0 2264, safari17_2_ios 2262, safari18_0 2264, safari18_0_ios 2264 bytes. The r.jina.ai reader prefix returned HTTP 403. I did NOT attempt to solve or circumvent the challenge, and no browser automation was used. That is an ACCESS obstacle and NOT a robots exclusion, and the two are not conflated here. THE RUNG THAT WORKED: the site's own sitemap and catalogue API hosts are not behind the interstitial and are robots-permitted for us. https://www.zarahome.com/8/info/sitemaps/sitemap-index-home-categories-zh.xml returned 200 and lists sitemap-home-categories-zh-fr-0.xml.gz, which contains 664 URLs, every one of them a /fr/ category URL. The /itxrest/ storefront APIs answer plain 200 JSON with no cookie, no session and no challenge. STORE - DISCOVERED FROM THE SITE'S OWN DATA, NOT GUESSED: I walked /itxrest/2/catalog/store/<id> over 84009900-84009919 and read each store's identity document. 84009901 = countryCode 'FR', countryName 'France', storeDefaultLanguageId -2 (French), catalogs[type 1] = {id: 80209919, identifier 'ZH_ONT_SUR_SEASON'}. The neighbours confirm the ids are real and per-country rather than a pattern I invented: 84009900 ES / 80290093 ZH_ONT_ES_SEASON, 84009902 BE, 84009903 NL, 84009904 DE / 80290000 ZH_POZ_NOR_SEASON, 84009905 IT, 84009906 GB / 80290024 ZH_UK_SEASON, 84009907 IE, 84009908 DK, 84009909 GR, 84009910 PT, 84009911 LU, 84009912 SE, 84009913 IC, 84009917 MC, 84009919 AT (84009914/15/16/18 return 404). France's catalogue 80209919 is a genuinely different Inditex catalogue from Spain's 80290093, Germany's 80290000 and the UK's 80290024, so what follows is the FR storefront's own assortment and not a sibling's. languageId=-2 (French) was used on every call, so all node names and slugs here are the French ones. TREE: the storefront's OWN category tree, /itxrest/2/catalog/store/84009901/80209919/category?languageId=-2&appId=1 (1.26 MB, 694 nodes walked recursively). SALLE DE BAIN is node id 1089013, categoryUrl salle-de-bain-n1050, with 22 children: four unnamed 'empty' spacer nodes (1020031168, 1020031169, 1020699666, 1020699667, all type 1 with no name and no URL) which were dropped, EMBROIDERY COLLECTION, SERVIETTES DE BAIN, SERVIETTES DE BAIN ESSENTIELLES, SERVIETTES DE PLAGE, TAPIS DE BAIN, PEIGNOIRS ET CHAUSSONS, RIDEAUX DE DOUCHE, ACCESSOIRES DE BAIN (7 children), PANIERS À LINGE, RANGEMENT (1 child), PORTE-SERVIETTES ET PATÈRES, MIROIRS, ÉCLAIRAGE, SAVONS ET CRÈMES (3 children), TROUSSES DE TOILETTE, SOINS DU CORPS, PERSONNALISATION and BESTSELLERS. Every slug recorded comes from the node's own categoryUrl field - none was constructed - and all ten recorded leaf slugs were additionally confirmed present verbatim in the site's published FR category sitemap. I also keyword-swept all 694 nodes for salle de bain|bain|bath|miroir|mirror|serviette|towel|douche|shower|toilette|lavabo|savon|soap|robinet|peignoir|brosse|patère|corbeille|panier|rangement, which surfaced the bathroom content filed OUTSIDE the SALLE DE BAIN department: MEUBLES > MEUBLES DE SALLE DE BAINS (bathroom furniture, RECORDED), MEUBLES > PORTEMANTEAUX ET PORTE-SERVIETTES (already in Furniture.xlsx), ENFANTS ET BÉBÉS > SALLE DE BAINS and > BÉBÉS > Salle de bains, BAISSE DE PRIX > SALLE DE BAIN, BUANDERIE ET MÉNAGE > PANIERS ET RANGEMENTS, CHAMBRE > DRESSING > Rangement, PARFUMS D'AMBIANCE > SAVONS ET CRÈMES, DÉCORATION > MIROIRS (+5 children), DÉCORATION > PATÈRES and DÉCORATION > PANIERS ET CORBEILLES - every one of them handled in review[]. Zara Home is a textiles-and-accessories retailer: it sells no baths, toilets, basins, taps, showers or enclosures, so rules 4-8 have no nodes on this storefront. DUPLICATE-SLUG RULE (verified on the FR data, and load-bearing): several nodes share one categoryUrl, and in every collision exactly ONE node has categoryUrlParam == null - that node owns the bare slug, and the others need ?celement=<id>. Confirmed collisions on this storefront: salle-de-bain-boites-n3886 is owned by SALLE DE BAIN > RANGEMENT (1020708636, param null) while ACCESSOIRES DE BAIN > Stockage de produits cosmétiques (1020447630) carries the param; salle-de-bain-corbeilles-paniers-n4142 is owned by RANGEMENT > Corbeilles (1020708638, param null) while BUANDERIE ET MÉNAGE > PANIERS ET RANGEMENTS (1020696138) and CHAMBRE > DRESSING > Rangement (1020742395) carry it; salle-de-bain-n1050 is owned by BESTSELLERS (1020322005, param null), NOT by the department node 1089013 which carries param 1089013, and BAISSE DE PRIX > SALLE DE BAIN (1020461936) carries it too; parfums-savons-cremes-n5045 is owned by PARFUMS D'AMBIANCE > SAVONS ET CRÈMES > Tout afficher (1020527161, param null) while all four SALLE DE BAIN copies carry params; salle-de-bains-trousses-de-toilette-n4748 is owned by VÊTEMENTS ET CHAUSSURES > ... > Trousses de toilette (1020327003, param null) while SALLE DE BAIN > TROUSSES DE TOILETTE (1020631421) carries it. ONLY nodes that own their bare slug outright are in rows[]; every ?celement-dependent node is in review[] as LOW confidence instead. Independent corroboration that this is the site's real URL form: Final.xlsx already records this storefront with exactly that syntax (/es/en/lighting-lamps-cordless-n5192?celement=1020692636). QTY: Zara Home publishes no 'N articles' / 'Affichage 1-N sur M' header anywhere on the site, and numberOfProducts is null for every node in the category tree, so there is no rendered total to read. The quantity is therefore an EXHAUSTIVE ENUMERATION of each node's own grid - the endpoint the PLP itself renders from, /itxrest/3/catalog/store/84009901/80209919/category/<id>/product?languageId=-2&appId=1&showProducts=true&showNoStock=false&withSubCategories=false. That endpoint returns the whole grid in one response with no pagination (it emits gridElements, productIds, sortedProductIds and products together), so counting it IS enumeration to exhaustion, not a header taken on trust. VERIFICATION: (a) on every recorded node three independent figures in the payload agree exactly - len(productIds) == len(set(productIds)) == unique ccIds summed across all gridElements: 16/16/16, 27/27/27, 26/26/26, 26/26/26, 19/19/19, 15/15/15, 43/43/43, 17/17/17, 12/12/12, 22/22/22. Across the whole 42-node sweep the ONLY node where raw != unique is PERSONNALISATION (24 raw ccIds, 23 unique product ids), and it is not recorded. (b) Each node's gridContext.sectionNames identify the node independently of its id and match what the node claims to be: Poubelles 'Bins bath'; Distributeurs de savon 'Dispensers bath'; Porte-brosses à dents 'Toothbrush holders bath'; Porte-savons 'Soap dishes bath'; Plateaux 'Trays bath'; Paniers à linge 'Laundry baskets bath'; Corbeilles 'Laundry baskets bath | Storage baskets bath'; Porte-serviettes et patères 'Hooks bath | Toilet paper holders bath | Towel racks bath'; Miroirs 'Mirrors bath'; Meubles de salle de bains 'Fbathroom furniture'. (c) The two hub nodes SALLE DE BAIN (1089013) and ACCESSOIRES DE BAIN (1020447624) both return HTTP 404 from the product endpoint - they have no grid of their own - which independently confirms they are grouping rows and not leaves. (d) Counts discriminate: 0, 2, 3, 4, 9, 12, 13, 15, 16, 17, 18, 19, 21, 22, 23, 26, 27, 32, 36, 37, 40, 41, 43, 44, 51, 53, 55, 62, 64, 77, 135 - no site-wide constant. (e) The figures are FR-specific and not the ES numbers reused: ES/FR differ on Poubelles 16/16, Distributeurs 26/27, Porte-brosses 24/26, Porte-savons 24/26, Plateaux 17/19, Paniers à linge 14/15, Corbeilles 42/43, Porte-serviettes 16/17, Miroirs 12/12, Meubles 22/22, Serviettes 130/135, Tapis 50/53. LIMITATION STATED PLAINLY, EXACTLY AS THE ES WORKER DID: these counts come from the catalogue API, and the FR PLPs are unreachable behind the Akamai interstitial, so I could NOT cross-check any number against a rendered listing page. The Zara Home UK pass was able to match this same API against each PLP's embedded transfer-state 21/21 and 9/9; that cross-check was not available to me for France. The FR evidence is the exhaustive grid enumeration, the three-way internal agreement, the section-name identification, the 404 proof on the two hubs, and the presence of all ten recorded slugs in the site's own published FR category sitemap. This is not PLP proof and is not presented as such. No count here is estimated, inferred from a parent, or summed from siblings. DEDUP: already_extracted() was run on all 23 candidate URLs in their /fr/ form. Exactly one hit - /fr/meubles-portants-n4900 -> Furniture.xlsx 'Zara Home France / Coat Stands and Towel Racks' - moved to review[], not rows[]. All ten recorded URLs returned None, including /fr/salle-de-bain-meubles-n2469: the index holds the GB, DE and AE siblings of that node (bathroom-furniture-n2469, badmoebel-n2469) and 16 other Zara Home France furniture nodes, but NOT the FR bathroom-furniture one, so under the OPTION 1 URL-keyed policy Zara Home France bathroom furniture is unextracted and is recorded here (rule 9). THREE LOCALE-VARIANT BLIND SPOTS ARE CALLED OUT EXPLICITLY IN review[] rather than left silent: the Home Decor pass took the France decorative-mirror nodes as /fr/en/bedroom-mirrors-wall-n4888, /fr/en/bedroom-full-length-mirrors-n4889 and /fr/en/bedroom-mirrors-table-n4890 - the ENGLISH forms of category ids 1020620911/912/913 - so the French /fr/ forms do not match the index. All three are decorative wall/floor/table mirrors and are routed out to Decor regardless, so no double-count results either way. This is the same blind spot the ES worker flagged on /es/decoracion-espejos-salon-n993. EXCLUDED: SALLE DE BAIN (1089013) and ACCESSOIRES DE BAIN (1020447624) are grouping rows with blank qty and blank link (rule 24, plus the 404 proof above). RANGEMENT (1020708636) is a grouping row because its child Corbeilles is a live listing - note RANGEMENT's own grid holds 62 products against the child's 43, so recording the parent instead would have been an aggregation across a child plus loose stock, which rule 24 forbids. The four unnamed 'empty' spacer nodes were dropped. 'Tout afficher' nodes (salle-de-bain-accessoires-n2470 51, parfums-savons-cremes-n5045 64), the BESTSELLERS roll-up on the bare department slug (0 products - a real-but-empty node, in review[], never a zero-qty row), the EMBROIDERY COLLECTION capsule (21), PERSONNALISATION (23) and BAISSE DE PRIX > SALLE DE BAIN (15) are View All / capsule / promotional pages and are not recorded (rule 25). ROLL-UP OVERLAP: no recorded row overlaps another. The only roll-ups on this department - salle-de-bain-n1050 (BESTSELLERS) and salle-de-bain-accessoires-n2470 ('Tout afficher') - are both in review[] and neither is recorded alongside the five ACCESSOIRES children it would have double-counted. Route-outs (six towel/mat/robe/curtain nodes and two kids nodes -> Textile, bathroom wall lamps -> Lighting, soaps and creams -> Decor/Fragrances) and the not-bathroom nodes (trousses de toilette, soins du corps, laundry baskets organisation, decorative mirrors, decorative hooks, decorative baskets) are all in review[] so nothing is silently skipped.",
+ "rows": [
+  {
+   "category": "Bathroom",
+   "sub_category": "BATHROOM",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "BATHROOM > BATH ACCESSORIES",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "BATHROOM > BATH ACCESSORIES > Bathroom Bins",
+   "qty": 16,
+   "link": "https://www.zarahome.com/fr/salle-de-bains-corbeilles-a-papier-n3827",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "BATHROOM > BATH ACCESSORIES > Soap Dispensers",
+   "qty": 27,
+   "link": "https://www.zarahome.com/fr/salle-de-bain-distributeurs-n3882",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "BATHROOM > BATH ACCESSORIES > Toothbrush Holders",
+   "qty": 26,
+   "link": "https://www.zarahome.com/fr/salle-de-bain-portebrosses-a-dents-n3883",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "BATHROOM > BATH ACCESSORIES > Soap Dishes",
+   "qty": 26,
+   "link": "https://www.zarahome.com/fr/salle-de-bain-pote-savons-n3884",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "BATHROOM > BATH ACCESSORIES > Trays",
+   "qty": 19,
+   "link": "https://www.zarahome.com/fr/salle-de-bain-plateaux-n3885",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "BATHROOM > LAUNDRY BASKETS",
+   "qty": 15,
+   "link": "https://www.zarahome.com/fr/salle-de-bain-corbeilles-linge-n3891",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "BATHROOM > STORAGE",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "BATHROOM > STORAGE > Baskets",
+   "qty": 43,
+   "link": "https://www.zarahome.com/fr/salle-de-bain-corbeilles-paniers-n4142",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "BATHROOM > TOWEL RACKS & HOOKS",
+   "qty": 17,
+   "link": "https://www.zarahome.com/fr/salle-de-bain-porte-serviettes-n4615",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "BATHROOM > MIRRORS",
+   "qty": 12,
+   "link": "https://www.zarahome.com/fr/salle-de-bain-miroirs-n2468",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "FURNITURE > BATHROOM FURNITURE",
+   "qty": 22,
+   "link": "https://www.zarahome.com/fr/salle-de-bain-meubles-n2469",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  }
+ ],
+ "review": [
+  {
+   "category": "Bathroom",
+   "sub_category": "FURNITURE > COAT STANDS AND TOWEL RACKS",
+   "qty": 9,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Coat Stands and Towel Racks' (company 'Zara Home France', identical /fr/ URL - an exact index match, not a locale guess). OPTION 1 policy: it stays in Furniture. It is not a pure Bathroom hardware node in any case - its grid sections are 'Rack- coats stands furniture | Rack-clothes furniture | Rack-towell furniture | Room divider furniture', mixing coat stands and room dividers with towel racks. The FR storefront's real bathroom towel-rail node is SALLE DE BAIN > PORTE-SERVIETTES ET PATÈRES (17), which IS recorded.",
+   "link": "https://www.zarahome.com/fr/meubles-portants-n4900"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "BATHROOM > BESTSELLERS",
+   "qty": 0,
+   "issue": "EMPTY NODE and a roll-up. Category 1020322005 'BESTSELLERS' is the node that owns the bare department slug salle-de-bain-n1050 (categoryUrlParam == null), while the department node 1089013 carries categoryUrlParam == 1089013 and 404s on the grid endpoint. Queried directly, 1020322005 returns a completely empty grid: {\"gridElements\":[],\"productIds\":[],\"sortedProductIds\":[],\"products\":{}} - 0 products. It is therefore both a real-but-empty node (never recorded as a zero-qty row) and a bestsellers roll-up over the whole department (rule 25). NOTE this differs from the ES storefront, where the bare bano-n1050 slug is owned by a 'BAÑO > BAÑO' node carrying a curated top-100 cut.",
+   "link": "https://www.zarahome.com/fr/salle-de-bain-n1050"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "BATHROOM > BATH ACCESSORIES > View All",
+   "qty": 51,
+   "issue": "NOT RECORDED - literally named 'Tout afficher' (View All) and it is the viewCategoryId target of the ACCESSOIRES DE BAIN hub (rule 25). It is also demonstrably not a true 'all': its grid sections are 'Accessories bath | Bins bath | Boxes bath | Soap dishes bath | Trays bath', i.e. it omits Distributeurs de savon and Porte-brosses à dents, both of which are recorded separately.",
+   "link": "https://www.zarahome.com/fr/salle-de-bain-accessoires-n2470"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "BATHROOM > BATH ACCESSORIES > Cosmetics Storage",
+   "qty": 19,
+   "issue": "NOT RECORDED - confidence LOW, URL not independently verifiable (rules 27, 29). It is a genuine Bathroom accessory node (grid section 'Boxes bath', 19 products) but it does NOT own its slug: category 1020447630 carries categoryUrlParam == 1020447630 while its sibling 1020708636 SALLE DE BAIN > RANGEMENT owns the bare salle-de-bain-boites-n3886 (categoryUrlParam == null). The disambiguated form would be https://www.zarahome.com/fr/salle-de-bain-boites-n3886?celement=1020447630 - the same ?celement= form Final.xlsx already uses on this storefront - but because every FR PLP is behind the Akamai interstitial I could not render either form to confirm which page each returns, so this is left for the run owner rather than guessed into rows[]. The bare slug is not in the FR category sitemap either. Same call the ES worker made on the identical node.",
+   "link": "https://www.zarahome.com/fr/salle-de-bain-boites-n3886?celement=1020447630"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "BATHROOM > EMBROIDERY COLLECTION",
+   "qty": 21,
+   "issue": "NOT RECORDED - branded capsule / collection page (rule 25). Grid sections 'Camarinas towels bath | Heritage capsulas'; it is a capsule re-cut of towels already counted under SALLE DE BAIN > SERVIETTES DE BAIN, and those are Textile anyway.",
+   "link": "https://www.zarahome.com/fr/bathroom-capsule-collection-n5294"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "BATHROOM > PERSONALIZATION",
+   "qty": 23,
+   "issue": "NOT RECORDED - embroidery/customisation service cut (rule 25). Sections 'Heritage capsulas' + 'Bathrobe bath | Towels bath', i.e. it re-lists bathrobes and towels already counted elsewhere, and those route to Textile. Note this node returned 24 raw ccIds but only 23 unique productIds - the single duplicate is why the unique figure is quoted; it is the only node in the whole FR sweep where raw != unique.",
+   "link": "https://www.zarahome.com/fr/salle-de-bain-personnalisation-n1416"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "BATHROOM > BATH TOWELS",
+   "qty": 135,
+   "issue": "ROUTED TO TEXTILE: bath and hand towels (rules 15, 20). Grid sections 'Towels basic bath | Towels bath'.",
+   "link": "https://www.zarahome.com/fr/salle-de-bain-serviettes-de-bain-n1051"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "BATHROOM > ESSENTIAL BATH TOWELS",
+   "qty": 37,
+   "issue": "ROUTED TO TEXTILE: everyday towels, sectioned by weight (Gms 500/600/650/700/800 towels basic bath) (rule 15).",
+   "link": "https://www.zarahome.com/fr/salle-de-bain-serviettes-de-bain-basiques-n1817"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "BATHROOM > BEACH TOWELS",
+   "qty": 3,
+   "issue": "ROUTED TO TEXTILE: beach towels - textile and not bathroom at all (rule 15); listed for completeness because it is a child of the SALLE DE BAIN department. Section 'Towelsbeach beachwear capsulas'.",
+   "link": "https://www.zarahome.com/fr/salle-de-bain-serviettes-de-bain-plage-n1335"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "BATHROOM > BATH MATS",
+   "qty": 53,
+   "issue": "ROUTED TO TEXTILE: textile bath mats, not rubber/anti-slip bathroom accessories (rule 16). Grid section is 'Bath mats bath' and the products are tufted/woven cotton mats.",
+   "link": "https://www.zarahome.com/fr/salle-de-bain-tapis-n1052"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "BATHROOM > BATHROBES & SLIPPERS",
+   "qty": 53,
+   "issue": "ROUTED TO TEXTILE: bathrobes and bath slippers (rule 20). Sections 'Bath slippers man shoes and accesories | Bath slippers woman shoes and accesories | Bathrobe bath'.",
+   "link": "https://www.zarahome.com/fr/salle-de-bain-peignoirs-n1053"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "BATHROOM > SHOWER CURTAINS",
+   "qty": 9,
+   "issue": "ROUTED TO TEXTILE: shower curtains (rule 20). Section 'Bath curtains bath'.",
+   "link": "https://www.zarahome.com/fr/salle-de-bain-rideaux-n1414"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "BATHROOM > LIGHTING",
+   "qty": 4,
+   "issue": "ROUTED TO LIGHTING: primary product type is lighting (rules 11, 19). Grid section is literally 'Bath-wall-lamps bath' - bathroom wall lamps. The slug luminaire-lampes-salle-de-bain-n5792 is newer than the published FR category sitemap and does not appear in its 664 URLs, which is a further reason not to put it in rows[].",
+   "link": "https://www.zarahome.com/fr/luminaire-lampes-salle-de-bain-n5792"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "BATHROOM > SOAPS AND CREAMS",
+   "qty": null,
+   "issue": "ROUTED TO DECOR / FRAGRANCES: soaps and hand/body creams (rule 21 - toiletries, not bathroom fittings or accessories). The hub node 1020750983 carries categoryUrlParam == 1020750983 and returns HTTP 404 from the grid endpoint (no grid of its own, hence qty null). It is duplicated verbatim as PARFUMS D'AMBIANCE > SAVONS ET CRÈMES, which is where the products really live and which owns the bare slug. Its children are listed below.",
+   "link": "https://www.zarahome.com/fr/parfums-savons-cremes-n5045"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "BATHROOM > SOAPS AND CREAMS > View All",
+   "qty": 64,
+   "issue": "ROUTED TO DECOR / FRAGRANCES and a 'Tout afficher' page (rules 21, 25). Sections 'Body mist bruma fragrances | Creams fragrances | Soaps fragrances | Soaps-creams fragrances'.",
+   "link": "https://www.zarahome.com/fr/parfums-savons-cremes-n5045"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "BATHROOM > SOAPS AND CREAMS > Hand and Body Soap",
+   "qty": 44,
+   "issue": "ROUTED TO DECOR / FRAGRANCES: bar and liquid soaps are consumable toiletries, not bathroom accessories (rule 21). Section 'Soaps fragrances'.",
+   "link": "https://www.zarahome.com/fr/parfums-savon-n1420"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "BATHROOM > SOAPS AND CREAMS > Hand and Body Cream",
+   "qty": 18,
+   "issue": "ROUTED TO DECOR / FRAGRANCES: hand and body lotion (rule 21). Sections 'Body mist bruma fragrances | Creams fragrances'.",
+   "link": "https://www.zarahome.com/fr/parfums-cremes-n1063"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "BATHROOM > TOILETRY BAGS",
+   "qty": 41,
+   "issue": "NOT BATHROOM: wash bags / toiletry bags. Primary product type is a bag - grid sections are the materials Piel / Atemporal / Seda y satén / Invernal / Otros (leather, silk and satin) - and the node carries categoryUrlParam == 1020631421, i.e. it does not own the slug: VÊTEMENTS ET CHAUSSURES > TROUSSES DE TOILETTE ET SACS > Trousses de toilette (1020327003, categoryUrlParam == null) does. Belongs with Clothing and Accessories, not Bathroom (rule 2). The ES and UK passes made the same call.",
+   "link": "https://www.zarahome.com/fr/salle-de-bains-trousses-de-toilette-n4748"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "BATHROOM > BODY CARE",
+   "qty": 32,
+   "issue": "NOT BATHROOM: self-care / spa consumables and grooming items (section 'Selfcare capsulas'). Primary product type is toiletries and personal care, not bathroom fixtures, storage or accessories (rules 2, 21).",
+   "link": "https://www.zarahome.com/fr/salle-de-bain-spa-n1418"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "PRICE DROP > BATHROOM",
+   "qty": 15,
+   "issue": "NOT RECORDED - promotional / markdown page (rule 25). Sections 'Bath | PVPs'; it re-lists discounted items already counted in the real SALLE DE BAIN nodes. It also carries categoryUrlParam == 1020461936 so it does not own the salle-de-bain-n1050 slug.",
+   "link": "https://www.zarahome.com/fr/salle-de-bain-n1050?celement=1020461936"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "KIDS AND BABIES > BATHROOM",
+   "qty": 77,
+   "issue": "ROUTED TO TEXTILE: kids' bath towels (slug enfants-serviettes-de-bain-n1140, rules 15, 20). Sits in the KIDS AND BABY department, not the SALLE DE BAIN department.",
+   "link": "https://www.zarahome.com/fr/enfants-serviettes-de-bain-n1140"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "KIDS AND BABIES > BABIES > Bathroom",
+   "qty": 26,
+   "issue": "ROUTED TO TEXTILE: baby bath textiles - hooded towels, mini towels, muslins - plus combs and bath thermometers (sections 'Bath-hooded-newborn bath-hooded-kids kids and baby | Bath-mini-towels kids and baby | Bath-towel-baby kids and baby | Comb kids and baby | Muslins kids and baby | Thermometres kids and baby'). Predominantly textile and baby care, not bathroom fittings (rules 2, 20).",
+   "link": "https://www.zarahome.com/fr/bebe-bain-n3950"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "LAUNDRY AND HOUSEHOLD > BASKETS AND STORAGE",
+   "qty": 55,
+   "issue": "NOT BATHROOM: it shares the salle-de-bain-corbeilles-paniers-n4142 slug but sits in the LAUNDRY AND HOUSEHOLD department and its grid section is 'Organizationlaundry laundry room capsulas'. It carries categoryUrlParam == 1020696138 so it does not own the bare slug - SALLE DE BAIN > RANGEMENT > Corbeilles (1020708638, categoryUrlParam == null, 43 products, sections 'Laundry baskets bath | Storage baskets bath') does, and that is the node recorded. Listed here so the duplicate slug is not silently conflated.",
+   "link": "https://www.zarahome.com/fr/salle-de-bain-corbeilles-paniers-n4142?celement=1020696138"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "BEDROOM > DRESSING ROOM > Storage",
+   "qty": null,
+   "issue": "NOT BATHROOM - third holder of the salle-de-bain-corbeilles-paniers-n4142 slug (category 1020742395, categoryUrlParam == 1020742395, i.e. it needs ?celement too). It is a bedroom-dressing storage node. Recorded here only to document the full slug collision on n4142; not queried for a count because it is out of scope either way.",
+   "link": "https://www.zarahome.com/fr/salle-de-bain-corbeilles-paniers-n4142?celement=1020742395"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "DECORATION > MIRRORS",
+   "qty": 40,
+   "issue": "NOT BATHROOM: decorative mirrors (grid section 'Mirrors decoration'), the DÉCORATION department hub whose children are Miroirs / Miroirs irréguliers / Miroirs muraux / Miroirs rectangulaires / Miroirs de table - Wall Decor, not Bathroom (rules 2, 11, 21). Zara Home France's bathroom mirrors are the separate node SALLE DE BAIN > MIROIRS (12, section 'Mirrors bath'), which IS recorded. Note it also has valid children, so it is a parent URL and unrecordable under rule 24 regardless.",
+   "link": "https://www.zarahome.com/fr/decoration-miroirs-salon-n993"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "DECORATION > MIRRORS > WALL MIRRORS",
+   "qty": 15,
+   "issue": "NOT BATHROOM (decorative wall mirrors, section 'Wallmirror mirrors decoration') AND A DEDUP BLIND SPOT (b) - LOCALE VARIANT: the Home Decor pass already took this exact node for Zara Home France as 'Wall mirrors' at https://www.zarahome.com/fr/en/bedroom-mirrors-wall-n4888, the ENGLISH /fr/en/ form of the identical category id 1020620911, so already_extracted() returns None for the French /fr/ form. Called out explicitly rather than left as a silent miss. The /fr/en/* path is in any case robots-disallowed for us.",
+   "link": "https://www.zarahome.com/fr/chambre-miroirs-muraux-n4888"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "DECORATION > MIRRORS > Standing Mirrors",
+   "qty": 12,
+   "issue": "NOT BATHROOM (decorative full-length mirrors, section 'Stand up mirrors decoration') AND THE SAME LOCALE-VARIANT DEDUP BLIND SPOT: Final.xlsx holds it as 'Full length mirrors' at https://www.zarahome.com/fr/en/bedroom-full-length-mirrors-n4889 (same category id 1020620912).",
+   "link": "https://www.zarahome.com/fr/chambre-miroirs-sur-pied-n4889"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "DECORATION > MIRRORS > Table Mirrors",
+   "qty": 2,
+   "issue": "NOT BATHROOM (decorative table mirrors, section 'Tablemirror mirrors decoration') AND THE SAME LOCALE-VARIANT DEDUP BLIND SPOT: Final.xlsx holds it as 'Table mirrors' at https://www.zarahome.com/fr/en/bedroom-mirrors-table-n4890 (same category id 1020620913).",
+   "link": "https://www.zarahome.com/fr/chambre-miroirs-de-table-n4890"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "DECORATION > MIRRORS > MIRRORS",
+   "qty": 13,
+   "issue": "NOT BATHROOM: decorative bedroom mirrors, section 'Bedroommirror mirrors decoration' (rules 2, 21). Not in the exclusion index under any locale form, so flagged here for completeness - it is Wall Decor, not Bathroom.",
+   "link": "https://www.zarahome.com/fr/chambre-miroirs-n965"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "DECORATION > MIRRORS > Irregular Mirrors",
+   "qty": 4,
+   "issue": "NOT BATHROOM: decorative irregular-shaped mirrors, section 'Irregular mirrors decoration' (rules 2, 21).",
+   "link": "https://www.zarahome.com/fr/miroirs-irreguliers-n4963"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "DECORATION > HOOKS",
+   "qty": 18,
+   "issue": "LOW CONFIDENCE - NOT RECORDED. This DÉCORATION node's grid sections are 'Hooks bath | Hooks decoration | Hooks kids and baby', so it genuinely mixes bathroom hooks with decorative and children's hooks across three rooms. Zara Home's bathroom-designated hook node is SALLE DE BAIN > PORTE-SERVIETTES ET PATÈRES (17, sections 'Hooks bath | Toilet paper holders bath | Towel racks bath'), which IS recorded; recording this one alongside it would double-count the 'Hooks bath' products under a Decor parent. Left for the run owner (rules 2, 29).",
+   "link": "https://www.zarahome.com/fr/pateres-n4857"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "DECORATION > BASKETS",
+   "qty": 36,
+   "issue": "NOT BATHROOM: decorative baskets in the DÉCORATION department (section 'Baskets decoration'), general Storage/Decor rather than bathroom storage (rules 12, 33 - hierarchy decides, and this hierarchy is Decor). Zara Home's bathroom baskets are SALLE DE BAIN > RANGEMENT > Corbeilles (43), which IS recorded.",
+   "link": "https://www.zarahome.com/fr/decoration-paniers-n997"
+  }
+ ],
+ "_reconstructed_from": "Bathroom.xlsx delivered 2026-09-01 (checkpoint), not original worker JSON"
+}

@@ -1,0 +1,16 @@
+{
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "Access: direct HTTP GET throughout, no WAF/bot-protection encountered (confirms prior pass's finding). robots.txt has no Claude-specific disallow; site even publishes agents.md/llms.txt/llms-full.txt (Fynd Commerce platform) explicitly naming 'Shop Best Sellers'. Checked: robots.txt, agents.md, llms.txt, llms-full.txt, sitemap.xml -> collections.sitemap.xml (511 collection URLs grepped for best/sell/notable/popular/trending/favorite terms), homepage embedded nav JSON (header mega-menu + footer, all sub_navigation arrays), and site search (/products/?q=). Found the site's own stably-named Bestsellers PLP at /collection/new-and-notable-bestsellers -- its own og:title is literally 'Shop Best Sellers | Bestsellers | Most Loved Products | West Elm India', confirming it is the genuine, self-described Bestsellers merchandising concept, not just a page mentioning bestsellers in passing. qty taken from the page's own embedded 'item_total' JSON field (same field/method that reproduced the prior pass's verified qty=18 for Chandeliers), consistent across 2 occurrences on the page = 213. IMPORTANT CAVEAT FOUND: the live homepage mega-menu's 'Shop Best Sellers' nav LINK currently (2026-09-09) points instead to /collection/summer-collection (og:title 'Summer Collection | Summer Season with West Elm', item_total=71) -- a seasonal campaign page with no 'bestseller' wording anywhere in its own title/content. A prior crawl snapshot (llms-full.txt, generated 2026-09-04, only 5 days earlier) shows that same nav label 'Shop Best Sellers' pointing to /collection/new-and-notable-bestsellers instead. This proves the site rotates which page the 'Shop Best Sellers' marketing copy links to (likely Dynamic Yield personalization/campaign slot -- 'DY Prefetch & Preconnect' script tag present in page head), while /collection/new-and-notable-bestsellers is the stable, permanently-named URL that itself claims to be the Bestsellers listing. Per brief section 3 (page must genuinely represent the concept, not merely be linked with that label transiently), I extracted the stably-self-titled page and excluded summer-collection as a seasonal campaign with no bestseller self-identification. No 'best-dining-table'/'best-office-chair'/'best-desk-chair' style buying-guide collections were treated as Bestsellers PLPs (these are comparison/buying-guide pages, not popularity merchandising, per EXCLUDE rule). No sub-structure (e.g. 'Furniture Bestsellers') exists -- single undifferentiated Bestsellers listing only.",
+  "rows": [
+    {
+      "category": "Bestsellers",
+      "sub_category": "Bestsellers",
+      "qty": 213,
+      "link": "https://westelm.in/collection/new-and-notable-bestsellers",
+      "is_group": false,
+      "evidence": "embedded page JSON \"item_total\":213 (og:title \"Shop Best Sellers | Bestsellers | Most Loved Products | West Elm India\")",
+      "flag": null
+    }
+  ]
+}

@@ -1,0 +1,66 @@
+{
+  "sr": 180,
+  "company": "David Jones Home",
+  "brand_site": "davidjones.com",
+  "country": "Australia",
+  "site_url": "https://www.davidjones.com/",
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "ACCESS: Claude-in-Chrome only. First load of https://www.davidjones.com/ in my own MCP tab (tabId 1961715496) returned the Imperva/Incapsula 'Pardon Our Interruption' shell (6,284 bytes) that defeated every HTTP route in the prior Home-Decor pass; the challenge script completed by itself inside the real Chrome session on the same navigation and the page resolved to the real homepage (575 KB) with no further interstitial. All subsequent reads were same-origin fetch() from that page context via javascript_tool, paced ~1.5s apart; no block, 403 or rate-limit was seen at any point. robots.txt (fetched same-origin, HTTP 200, 2,013 bytes): user-agents named are *, AdsBot-Google, AhrefsSiteAudit, AhrefsBot, MJ12bot, Yandexbot, Baiduspider, SeznamBot, Slurp, Pinterestbot - no anthropic-ai / ClaudeBot / Claude-Web / Claude-User / Claude-SearchBot entry at all, so no Claude-specific disallow.\n\nTREE: took the union of (a) the category sitemap https://www.davidjones.com/sitemaps/plp-sitemap.xml (1,752 PLP URLs, 261 of them under /home), (b) the rendered mega-menu (255 unique /home anchors harvested from the DOM), and (c) each category page's own child links. The two sources agree exactly: the Home & Food department is flat - room/type nodes (Bedroom, Bathroom & Laundry, Home Decor, Dining, Kitchen, Outdoor & BBQ, Barware, Books, Stationery, Pets, Arts & Crafts, Games, Gym & Fitness) each with a one-level child list and no deeper branching under any furniture node. There is NO top-level Furniture department; furniture is scattered as single nodes inside Home Decor, Outdoor & BBQ and Bedroom. I also swept the whole PLP sitemap outside /home for furniture slugs (furniture|sofa|chair|table|bed|desk|cabinet|wardrobe|stool|bench|dresser|bookcase|shelving|seating|outdoor) - the only non-/home hits were /sale/* and /designer/* re-cuts of the same nodes (excluded as promotional/brand-tier facets per section 3), /toys/outdoor (play equipment), /appliances/personal-care/massagers/massage-chairs (appliance) and /kids/.../highchairs (kept, see below).\n\nCOUNTS: every PLP is server-rendered and carries both a visible 'N Results' header and a schema.org ItemList with numberOfItems; the two agree on every node I read, so I quote the rendered header per Rule 1 and name the corroborating JSON-LD figure. Exhaustion check on Furniture (54): pages 1 and 2 return 24 JSON-LD Product entries each, page 3 returns 6 (24+24+6 = 54 exactly) and page 4 returns HTTP 404 - the field is the true exhaustive total, not an inflated index count. This reproduces the pagination-boundary result the prior Home-Decor pass got on Dinnerware and Candle Holders on the same template. Bad-slug trap tested: /home/decor/furniture-zzq-test returns a clean HTTP 404, so this platform does NOT silently serve the parent listing under a 200 - every leaf below was additionally confirmed by its own h1 and canonical matching the slug requested.\n\nSTRUCTURE OF THE BEDS BRANCH: /home/bedroom/beds (h1 'Beds & Mattresses', 160) is a roll-up whose product list is the union of three sibling-slug nodes - /home/bedroom/mattresses (58), /home/bedroom/bed-bases (66) and /home/bedroom/bedheads (34, h1 'Bed Heads'). Per Rule 2 the parent is emitted as a grouping row and only its extractable children are recorded. Mattresses is excluded outright (bedding, explicit exclude). Bed Bases IS recorded but flagged: title sampling shows they are mattress-brand ensemble and adjustable-foundation bases (Sealy PostureSeries/Posture Base, Tempur Motion/Ergo/Ease, A.H. Beard Acclaim/Exquisite, Element/Apex/Ascent Adjustable Foundation) - in Australian retail the base IS the bed frame and excluding it would leave David Jones selling no beds at all, but it sits inside the mattress department and the brief lists 'bed bases sold as bedding' as an exclude, so a human should confirm. Note 58+66+34 = 158 against the parent's 160, i.e. the parent holds 2 products not present in the three children; I did not attempt to attribute them and did not sum anything into a qty.\n\nEXCLUDED, WITH REASONS: /home/bedroom/mattresses (58) mattresses, bedding. /home/bedroom/storage (14, h1 'Bedroom Storage') - title scan is entirely clothes hangers, shoe racks, hanging rails, stackable shoe-storage boxes and drying hangers: standalone storage goods, not storage furniture. /home/bathroom/caddies-shelves (7) - suction baskets/hooks, shower caddies and bathroom storage caddies, i.e. bathroom accessories, not vanity units; there is no bathroom-furniture node anywhere on the site. /home/laundry (58, 'Laundry: Baskets, Ironing, Detergent & More') - baskets, ironing and laundry chemicals. /kids/baby-care-essentials/nursery (55) - despite the name, title scan is musical boxes, playmats, bouncers, keepsake/photo boxes and brush sets: no cots, cribs, changing tables or nursery furniture of any kind. All of /home/dining (64 nodes) and /home/kitchen (64 nodes) are tableware/cookware; /home/decor's other children are decor or textiles; /home/bedroom's remainder is bed linen; /home/outdoor's remainder is BBQs, gardening, picnicware and beach/pool. Designer and Sale re-cuts (/designer/home/*, /sale/home/*) are brand-tier and promotional facet subsets of the same catalogues, dropped per section 3.\n\nSANITY CHECKS: counts differ per node (54 / 12 / 160 / 66 / 34 / 58 / 14 / 7), so no site-wide constant; none is a suspiciously round display cap; each h1 and canonical matched the slug fetched; node identity was keyed on the slug, not the display label (relevant here because 'Furniture' at /home/decor/furniture and 'Outdoor Furniture' at /home/outdoor/furniture share four products - the &Tradition outdoor tables and the Capri umbrella foot - and are genuinely different listings).",
+  "rows": [
+    {
+      "category": "Furniture",
+      "sub_category": "Furniture",
+      "qty": 54,
+      "link": "https://www.davidjones.com/home/decor/furniture",
+      "is_group": false,
+      "evidence": "rendered listing header '54 Results'; corroborated by schema.org ItemList numberOfItems=54 in the SSR HTML, and by exhaustion (24+24+6 JSON-LD Product entries on pages 1-3, page 4 = HTTP 404)",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Outdoor Furniture",
+      "qty": 12,
+      "link": "https://www.davidjones.com/home/outdoor/furniture",
+      "is_group": false,
+      "evidence": "rendered listing header '12 Results'; corroborated by schema.org ItemList numberOfItems=12 in the SSR HTML; h1 'Outdoor Furniture' matches the slug",
+      "flag": "MANUAL REVIEW: mixed 12-item node - majority is outdoor furniture (&Tradition spacer/corner modules, outdoor tables high/low, Pelagus lounge chair, Riviera sunbed) but it also carries 3-4 umbrella items (Messina square umbrella, premium beach umbrella, Capri umbrella foot) that are not furniture; site files them all under Outdoor Furniture"
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Beds & Mattresses",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Bed Bases",
+      "qty": 66,
+      "link": "https://www.davidjones.com/home/bedroom/bed-bases",
+      "is_group": false,
+      "evidence": "rendered listing header '66 Results'; corroborated by schema.org ItemList numberOfItems=66 in the SSR HTML; h1 'Bed Bases' matches the slug",
+      "flag": "MANUAL REVIEW: bed frame vs bedding line - products are mattress-brand ensemble and adjustable-foundation bases (Sealy PostureSeries, Tempur Motion/Ergo/Ease, A.H. Beard Acclaim/Exquisite, Element/Apex/Ascent Adjustable Foundation). In AU retail the base is the bed frame and DJ has no separate bed-frame node, but the brief excludes 'bed bases sold as bedding'"
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Bed Heads",
+      "qty": 34,
+      "link": "https://www.davidjones.com/home/bedroom/bedheads",
+      "is_group": false,
+      "evidence": "rendered listing header '34 Results'; corroborated by schema.org ItemList numberOfItems=34 in the SSR HTML; h1 'Bed Heads' matches the /home/bedroom/bedheads slug",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Highchairs",
+      "qty": 0,
+      "link": "https://www.davidjones.com/kids/baby-care-essentials/baby-and-toddler-feeding/highchairs",
+      "is_group": false,
+      "evidence": "live HTTP 200 page, h1 'Highchairs', schema.org ItemList numberOfItems=0 and zero JSON-LD Product entries in the SSR HTML - currently an empty category",
+      "flag": "MANUAL REVIEW: only kids-seating node on the site and currently empty (0 products); it is filed under Kids > Baby Care Essentials > Baby & Toddler Feeding, not under any furniture department, so drop if baby feeding chairs are out of scope"
+    }
+  ]
+}

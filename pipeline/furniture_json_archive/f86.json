@@ -1,0 +1,291 @@
+{
+ "sr": 86,
+ "company": "Loaf",
+ "brand_site": "loaf.com",
+ "country": "UK",
+ "site_url": "https://loaf.com/",
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ACCESS: plain direct fetch of loaf.com throughout (probe.py / requests) - no WAF, no proxy needed, every URL HTTP 200. robots.txt names no Claude/anthropic-ai/ClaudeBot agent. TREE: taken from the rendered mega-menu in the homepage HTML (nav.header__navigation), cross-checked against https://loaf.com/sitemap.xml (943 locs) and against each listing page's own 'type' facet. Six top departments: Sofas & Chairs, Beds & Mattresses, 'Tables, Chairs & Storage', Homewares, Discover More, OUTLET. QTY METHOD: every listing embeds a data-data JSON blob carrying \"totalResults\". On the paginated listings the rendered header ('1-33 of 82 results' on /all-sofas, '1-34 of 38 results' on /all-footstools) matched totalResults exactly. On every leaf I additionally enumerated all product tiles (the data-ee id on each listing-card__media-link, following ?page= to the end) and the tile count equalled totalResults on all 25 leaves - so each qty is verified three ways where paginated, two ways otherwise. Every leaf was then re-fetched in a separate second pass: zero drift. h1 and rel=canonical were checked on each leaf to rule out silent parent-serving; the one mismatch is /bedroom-furniture/dressing-tables-and-stools, whose canonical is /bedroom-furniture/desk-dressing-table (same 2 products, same h1) - the canonical is what I recorded. NOT USED: the facet option counts inside the same JSON are stock-item (product x fabric x size) counts and are wildly inflated (e.g. type 'standard-sofas': 35167 inside an 82-product listing) - never used for any qty. HIERARCHY: Sitting room (25+18+2+2=47), Kitchen (12+31=43), Bedroom (4+18+3+2+5=32) and Chairs (10+30+24=64) children each sum exactly to their parent total and match the parent's own type facet, so those parents are grouping rows. The Beds children (9+6+28+3) union to exactly the 40 items of /all-beds - French beds crosscuts Wooden/Upholstered, which is why the raw sum is 46 - so they are recorded as children under a Beds grouping row. Sofas children (modular 16, corner 22, chaise 20, sofa beds 13; union 60 distinct) do NOT cover all 82 of /all-sofas: the site's own type facet has a 'Standard sofa' bucket with no navigable URL, so roughly 22 standard sofas are not represented by any leaf row. /all-sofas was still kept as a grouping row per the parent-is-never-a-leaf rule rather than double-counting. Footstools and Headboards are recorded as leaves because their sub-pages are stale attribute views (see their flags); those two standalone leaves are emitted FIRST, ahead of every grouping row, so that positional reading cannot mistake them for children of an unrelated group. EXCLUDED and why: Mattresses /all-beds/mattresses (5) - bedding per brief. All 'In-stock ...' pages (in-stock sofas 325, chairs 97, beds 182, footstools 37, headboards 17, /furniture/in-stock-furniture 120) - availability filters, and they count stock items not catalogue products, a different unit entirely. OUTLET / Bag-a-bargain branch - clearance. /all-wooden-furniture (104) and /all-sofas/velvet-sofas (70) - material filter views. /tables (57, h1 '15% off all tables'), /sofas-chairs (168), the colour pages (/blue-sofas etc), /2-3-seater-sofas and /4-5-6-7-seater-sofas, and all /edits/* and /discover/* - promotional, size, colour and editorial landing pages. /all-headboards/curved-headboards and the seven footstool attribute pages - see flags. /additional-covers (21) - furniture covers/parts. /underbed-storage-new (2) - standalone storage, not in the nav. The whole Homewares branch is out of scope (its type facet is Soft furnishings / Kitchen & Tableware / Soft accessories / Home accessories): rugs, cushions, seat pads, beanbags, bedding, bed linen, duvets, blankets, quilts, slippers, socks, hot water bottles, mugs, trays, mirrors, storage baskets, dog beds. COVERAGE CHECK: grepped all 943 sitemap locs for garden/outdoor/patio/office/kids/nursery/crib/bookcase/cabinet/dresser/console/dining/vanity/bathroom - Loaf has no outdoor, office, kids or bathroom furniture line at all, so nothing is missing on those fronts.",
+ "rows": [
+  {
+   "category": "Furniture",
+   "sub_category": "Footstools",
+   "qty": 38,
+   "link": "https://loaf.com/all-footstools",
+   "is_group": false,
+   "evidence": "rendered listing header '1-34 of 38 results' on /all-footstools; matches data-data \"totalResults\":38 and 38 unique product tiles enumerated across both pages",
+   "flag": "MANUAL REVIEW: recorded at parent level. The seven footstool sub-pages in the nav/sitemap (buttoned, rectangular, round, square, storage, multi-purpose, hidden-beds) are stale attribute views, not a taxonomy: four return 0 products, the three populated ones overlap (multi-purpose fully contains hidden-beds) and together cover only 13 of the 38 footstools, and none of their slugs matches the listing's own type facet (Standard Footstools / Fold-out bed / Storage / Table)."
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Headboards",
+   "qty": 9,
+   "link": "https://loaf.com/all-headboards",
+   "is_group": false,
+   "evidence": "listing JSON on /all-headboards: data-data ...\"totalResults\":9 ; page renders exactly 9 product tiles with no pagination control (single page, fully enumerated)",
+   "flag": "MANUAL REVIEW: recorded at parent level. The only sub-page, /all-headboards/curved-headboards (8), is not in the nav, is a strict subset of the 9, and does not match the listing's own type facet (Upholstered / Winged)."
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sofas",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Modular sofas",
+   "qty": 16,
+   "link": "https://loaf.com/all-sofas/modular-sofas",
+   "is_group": false,
+   "evidence": "listing JSON on /all-sofas/modular-sofas: data-data ...\"totalResults\":16 ; page renders exactly 16 product tiles with no pagination control (single page, fully enumerated)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Corner sofas",
+   "qty": 22,
+   "link": "https://loaf.com/all-sofas/corner-sofas",
+   "is_group": false,
+   "evidence": "listing JSON on /all-sofas/corner-sofas: data-data ...\"totalResults\":22 ; page renders exactly 22 product tiles with no pagination control (single page, fully enumerated)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Chaise sofas",
+   "qty": 20,
+   "link": "https://loaf.com/all-sofas/chaise-sofas",
+   "is_group": false,
+   "evidence": "listing JSON on /all-sofas/chaise-sofas: data-data ...\"totalResults\":20 ; page renders exactly 20 product tiles with no pagination control (single page, fully enumerated)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sofa beds",
+   "qty": 13,
+   "link": "https://loaf.com/all-sofas/sofa-beds",
+   "is_group": false,
+   "evidence": "listing JSON on /all-sofas/sofa-beds: data-data ...\"totalResults\":13 ; page renders exactly 13 product tiles with no pagination control (single page, fully enumerated)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Chairs",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Armchairs",
+   "qty": 10,
+   "link": "https://loaf.com/all-chairs/armchairs",
+   "is_group": false,
+   "evidence": "listing JSON on /all-chairs/armchairs: data-data ...\"totalResults\":10 ; page renders exactly 10 product tiles with no pagination control (single page, fully enumerated)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Love seats",
+   "qty": 30,
+   "link": "https://loaf.com/all-chairs/love-seats",
+   "is_group": false,
+   "evidence": "listing JSON on /all-chairs/love-seats: data-data ...\"totalResults\":30 ; page renders exactly 30 product tiles with no pagination control (single page, fully enumerated)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Accent chairs",
+   "qty": 24,
+   "link": "https://loaf.com/all-chairs/accent-chairs",
+   "is_group": false,
+   "evidence": "listing JSON on /all-chairs/accent-chairs: data-data ...\"totalResults\":24 ; page renders exactly 24 product tiles with no pagination control (single page, fully enumerated)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Beds",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Upholstered beds",
+   "qty": 9,
+   "link": "https://loaf.com/all-beds/upholstered-beds",
+   "is_group": false,
+   "evidence": "listing JSON on /all-beds/upholstered-beds: data-data ...\"totalResults\":9 ; page renders exactly 9 product tiles with no pagination control (single page, fully enumerated)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "French beds",
+   "qty": 6,
+   "link": "https://loaf.com/all-beds/french-beds",
+   "is_group": false,
+   "evidence": "listing JSON on /all-beds/french-beds: data-data ...\"totalResults\":6 ; page renders exactly 6 product tiles with no pagination control (single page, fully enumerated)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Wooden beds",
+   "qty": 28,
+   "link": "https://loaf.com/all-beds/wooden-beds",
+   "is_group": false,
+   "evidence": "listing JSON on /all-beds/wooden-beds: data-data ...\"totalResults\":28 ; page renders exactly 28 product tiles with no pagination control (single page, fully enumerated)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Divan and storage beds",
+   "qty": 3,
+   "link": "https://loaf.com/all-beds/storage-beds",
+   "is_group": false,
+   "evidence": "listing JSON on /all-beds/storage-beds: data-data ...\"totalResults\":3 ; page renders exactly 3 product tiles with no pagination control (single page, fully enumerated)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Daybeds and guest beds",
+   "qty": 9,
+   "link": "https://loaf.com/all-beds/daybeds-guest-beds",
+   "is_group": false,
+   "evidence": "listing JSON on /all-beds/daybeds-guest-beds: data-data ...\"totalResults\":9 ; page renders exactly 9 product tiles with no pagination control (single page, fully enumerated)",
+   "flag": "MANUAL REVIEW: mixed node - 3 of the 7 distinct products are daybeds (furniture), 4 are fold-out floor mattresses / guest-bed mattresses (bedding). Kept whole because the site files it under All beds and offers no split."
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sitting room furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Coffee tables",
+   "qty": 25,
+   "link": "https://loaf.com/sitting-room-furniture/coffee-tables",
+   "is_group": false,
+   "evidence": "listing JSON on /sitting-room-furniture/coffee-tables: data-data ...\"totalResults\":25 ; page renders exactly 25 product tiles with no pagination control (single page, fully enumerated)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Side tables",
+   "qty": 18,
+   "link": "https://loaf.com/sitting-room-furniture/side-tables",
+   "is_group": false,
+   "evidence": "listing JSON on /sitting-room-furniture/side-tables: data-data ...\"totalResults\":18 ; page renders exactly 18 product tiles with no pagination control (single page, fully enumerated)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "TV stands and media units",
+   "qty": 2,
+   "link": "https://loaf.com/sitting-room-furniture/tv-stands-media-units",
+   "is_group": false,
+   "evidence": "listing JSON on /sitting-room-furniture/tv-stands-media-units: data-data ...\"totalResults\":2 ; page renders exactly 2 product tiles with no pagination control (single page, fully enumerated)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sideboards",
+   "qty": 2,
+   "link": "https://loaf.com/sitting-room-furniture/sideboards",
+   "is_group": false,
+   "evidence": "listing JSON on /sitting-room-furniture/sideboards: data-data ...\"totalResults\":2 ; page renders exactly 2 product tiles with no pagination control (single page, fully enumerated)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Kitchen furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Kitchen tables",
+   "qty": 12,
+   "link": "https://loaf.com/kitchen-furniture/kitchen-tables",
+   "is_group": false,
+   "evidence": "listing JSON on /kitchen-furniture/kitchen-tables: data-data ...\"totalResults\":12 ; page renders exactly 12 product tiles with no pagination control (single page, fully enumerated)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Chairs, benches and stools",
+   "qty": 31,
+   "link": "https://loaf.com/kitchen-furniture/kitchen-chairs",
+   "is_group": false,
+   "evidence": "listing JSON on /kitchen-furniture/kitchen-chairs: data-data ...\"totalResults\":31 ; page renders exactly 31 product tiles with no pagination control (single page, fully enumerated)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bedroom furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Chests of drawers",
+   "qty": 4,
+   "link": "https://loaf.com/bedroom-furniture/chests-of-drawers",
+   "is_group": false,
+   "evidence": "listing JSON on /bedroom-furniture/chests-of-drawers: data-data ...\"totalResults\":4 ; page renders exactly 4 product tiles with no pagination control (single page, fully enumerated)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bedside tables",
+   "qty": 18,
+   "link": "https://loaf.com/bedroom-furniture/bedside-tables",
+   "is_group": false,
+   "evidence": "listing JSON on /bedroom-furniture/bedside-tables: data-data ...\"totalResults\":18 ; page renders exactly 18 product tiles with no pagination control (single page, fully enumerated)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Wardrobes",
+   "qty": 3,
+   "link": "https://loaf.com/bedroom-furniture/wardrobes",
+   "is_group": false,
+   "evidence": "listing JSON on /bedroom-furniture/wardrobes: data-data ...\"totalResults\":3 ; page renders exactly 3 product tiles with no pagination control (single page, fully enumerated)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dressing tables and stools",
+   "qty": 2,
+   "link": "https://loaf.com/bedroom-furniture/desk-dressing-table",
+   "is_group": false,
+   "evidence": "listing JSON on /bedroom-furniture/dressing-tables-and-stools (rel=canonical /bedroom-furniture/desk-dressing-table): data-data ...\"totalResults\":2 ; page renders exactly 2 product tiles with no pagination control (single page, fully enumerated)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Ottomans and storage boxes",
+   "qty": 5,
+   "link": "https://loaf.com/bedroom-furniture/ottomans-storage-boxes",
+   "is_group": false,
+   "evidence": "listing JSON on /bedroom-furniture/ottomans-storage-boxes: data-data ...\"totalResults\":5 ; page renders exactly 5 product tiles with no pagination control (single page, fully enumerated)",
+   "flag": "MANUAL REVIEW: 3 of the 4 distinct products are ottoman benches / storage ottomans (furniture); one is an underbed storage drawer. Site files the node under Bedroom furniture."
+  }
+ ]
+}

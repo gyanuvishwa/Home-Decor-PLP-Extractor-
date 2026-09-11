@@ -1,0 +1,228 @@
+{
+  "sr": 66,
+  "company": "The Inside",
+  "brand_site": "theinside.com",
+  "country": "USA",
+  "site_url": "https://www.theinside.com/",
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "TRADING CHECK FIRST: theinside.com is fully live and trading as of 2026-08-19 - homepage returns HTTP 200 with a live Stripe key (pk_live_...), live PayPal client id, an active site-wide 25% sale banner, and a footer copyright of 2026. It remains a Havenly-owned brand (footer lists Havenly, Interior Define, The Citizenry, St. Frank, Burrow). No wind-down. robots.txt is 'User-agent: * / Disallow:' (fully permissive, no Claude-specific rule).\n\nACCESS: The site is a Laravel + React SPA behind Cloudflare; raw curl of any page returns only the app shell, and WebFetch/Googlebot-UA also get only the shell (no prerender service is triggered). r.jina.ai was NOT usable this session - it returned a Cloudflare 'Just a moment...' interstitial (HTTP 403) on every attempt across three retries, so the route that carried the prior Home-Decor pass was unavailable. Two routes were used instead: (1) I pulled /js/app.js plus all 171 lazy chunks from /js/chunks/, which contain the hard-coded mega-menu arrays and a canonical category-URL map, and (2) the site's own unauthenticated GraphQL endpoint https://www.theinside.com/graphql (Apollo uri:'/graphql' found in app.js), which serves the exact payloads the listing pages render: categoryProductsBySlug(slug) for /c/<seo>/<slug> pages and merchandiserBySlug(slug) for /collections/<handle> pages. Every count was then re-verified by rendering the real page in Chrome and counting distinct /products/ tiles.\n\nCATEGORY TREE SOURCE: the live mega-menu, extracted verbatim from app.js (arrays 'no' = Furniture menu with columns Bedroom / Living Room / Dining Room / Quick Ship, and 'oo' = Outdoor menu with a column titled 'Furniture'), cross-checked against the Shop-All category tile map in chunk 160.js (v/x objects) which adds an Office column containing Desk Chairs. Nav labels rendered in the browser confirm the top-level bar: New, Furniture, Decor, Window, Bedding, Outdoor, Fabric, Inspiration, Free Swatches, Trade.\n\nQTY METHOD: the site publishes NO product count anywhere - no 'N products/items/results' string exists on any listing page (regex-checked on every page rendered in Chrome, all returned zero matches), no pagination and no Load-More control. So qty is §4 method 3, full enumeration. The listing pages are not paginated: they render one tile per subcategory that has stock (a bed model is one tile with a size selector, not four size rows) plus every product in the page's featuredProducts block, which renders inline in the same grid (verified NOT a carousel - zero product links sit inside a .slick-slider on any page). I therefore computed tiles = (subcategories with >=1 product) + featuredProducts from the GraphQL payload and then verified the number against a live Chrome render for all 18 leaves; every single one matched exactly. Independent corroboration: the same GraphQL method returns 33 for /collections/lighting, identical to the 33 the prior Home-Decor pass established by three separate rendered fetches.\n\nWHAT I REJECTED AND WHY:\n- Algolia (app U5ARNXNU5F, index production_products, key in page source) reports 75,241 hits and category facets like Beds=63,625. That index is fabric x size variant-level and bears no relation to what any page displays - not used for any qty.\n- Mattresses & Foundations (/c/bedroom-furniture/mattresses-and-foundations, 2 tiles: The Euro Top Mattress, The Foundation) excluded per the brief - mattresses and bed foundations are bedding, and Beds is a separate node so no forced take applies.\n- 'End of Bed Benches' in the Bedroom column points at the very same URL as Living Room > Benches (/c/living-room-furniture/benches); recorded once only, under Living Room, to avoid the duplicate-link defect. /c/bedroom-furniture/benches is a third SEO alias for the identical page (the route's first path segment is cosmetic and ignored by the router).\n- §3 roll-ups dropped: /collections/furniture (Shop All Furniture, 17), /collections/new-furniture (46), /collections/new-arrivals, /collections/bestsellers, /collections/outdoorliving, /collections/the-bedroom-edit, /collections/decor.\n- Non-furniture nav nodes dropped: Throw Pillows, Curtains, Bedding, Wallpaper, Table Linens, Throw Blankets, Rugs, Lighting, Fabric by the Yard, Outdoor Pillows, Outdoor Rugs, Pickleball Paddles (a product page).\n- Categories that exist in the schema but are dead or unreachable, so not emitted: Room Dividers (/c/home-decor/room-dividers, 0 products), Cabana Stools and Cabana Bundles (/c/outdoor-furniture/..., 0 products each), Accent Tables and Nightstands as /c/ categories (0 products - the nav routes these to /collections/ pages instead), Bed Foundations (0), Mattresses (0). Bedroom Sets is a live category holding 6 furniture sets, but it has NO site-published category URL - it is absent from the mega-menu, from the Shop-All map and from every chunk, and sitemap-bedroom-sets.xml lists only the 6 product URLs - so rather than invent a /c/<segment>/bedroom-sets URL I left it out; flagged here for manual review.\n- Quick Ship is a genuine nav column, not a filter view: its five category pages carry a completely different frame assortment from the made-to-order pages (e.g. Quick Ship Beds = Tailored Platform / Art Deco / Square Back / Classic Wingback / Regency, none of which appear on the Beds page), so they are recorded as real leaves with no double counting of frames.\n\nOVERLAP TO BE AWARE OF: /collections/coffee-tables-and-side-tables (38) is composed of 22 Accent Tables + 2 Coffee Tables + the same 14 Nightstands that the Nightstands leaf counts. Both are separate nav leaves so both are recorded; the 14 nightstands are counted twice across those two rows because the site itself lists them on both pages. A parallel merchandiser page /collections/accent-tables (35 = 21 accent tables + 14 nightstands) exists and is used by the Shop-All page, but the primary mega-menu points at coffee-tables-and-side-tables, so that is the URL recorded.\n\nSANITY CHECKS RUN: (a) counts differ per category, never constant; (b) the h1 of every page loaded was read and matches the category requested (no silent parent fallback); (c) no round/capped numbers; (d) no page has pagination or a Load More, and scrolling to the bottom added nothing; (e) the featured blocks were confirmed to be in-category products rendered in the main grid, not a cross-sell carousel; (f) every leaf was counted twice - once via GraphQL, once via a live DOM render - and all 18 agreed.",
+  "rows": [
+    {
+      "category": "Furniture",
+      "sub_category": "Bedroom",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Beds",
+      "qty": 11,
+      "link": "https://www.theinside.com/c/bedroom-furniture/beds",
+      "is_group": false,
+      "evidence": "No count published on the page. Full enumeration: 11 distinct /products/ tiles counted in the rendered DOM (h1 'Custom Upholstered Beds'), matching GraphQL categoryProductsBySlug(slug:\"beds\") = 11 subcategories with products + 0 featuredProducts. No pagination or Load More.",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Headboards",
+      "qty": 7,
+      "link": "https://www.theinside.com/c/bedroom-furniture/headboards",
+      "is_group": false,
+      "evidence": "No count published. Full enumeration: 7 distinct /products/ tiles in the rendered DOM (h1 'Custom Upholstered Headboards'), matching GraphQL categoryProductsBySlug(slug:\"headboards\") = 7 stocked subcategories + 0 featured.",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Nightstands",
+      "qty": 14,
+      "link": "https://www.theinside.com/collections/nightstands",
+      "is_group": false,
+      "evidence": "No count published. Full enumeration: 14 distinct /products/ tiles in the rendered DOM (h1 'Nightstands'), matching GraphQL merchandiserBySlug(slug:\"/collections/nightstands\").availableProducts = 14, all in category 'Nightstands'.",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Living Room",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Sofas & Sectionals",
+      "qty": 7,
+      "link": "https://www.theinside.com/c/living-room-furniture/sofas",
+      "is_group": false,
+      "evidence": "No count published. Full enumeration: 7 distinct /products/ tiles in the rendered DOM (h1 'Custom Upholstered Sofas & Sectionals'), matching GraphQL categoryProductsBySlug(slug:\"sofas\") = 5 stocked subcategories + 2 featuredProducts under the in-grid heading 'Skirted Sofas'.",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Accent Chairs",
+      "qty": 17,
+      "link": "https://www.theinside.com/c/living-room-furniture/chairs",
+      "is_group": false,
+      "evidence": "No count published. Full enumeration: 17 distinct /products/ tiles in the rendered DOM (h1 'Custom Upholstered Chairs'), matching GraphQL categoryProductsBySlug(slug:\"chairs\") = 10 stocked subcategories + 7 featuredProducts under the in-grid heading 'Best Sellers' (all chairs, zero inside a .slick-slider carousel).",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Ottomans",
+      "qty": 13,
+      "link": "https://www.theinside.com/c/living-room-furniture/ottomans",
+      "is_group": false,
+      "evidence": "No count published. Full enumeration: 13 distinct /products/ tiles in the rendered DOM (h1 'Custom Upholstered Ottomans'), matching GraphQL categoryProductsBySlug(slug:\"ottomans\") = 6 stocked subcategories + 7 featuredProducts under the in-grid heading 'In Stock - Delivers in 1-2 weeks'.",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Cocktail Ottomans",
+      "qty": 3,
+      "link": "https://www.theinside.com/c/living-room-furniture/cocktail-ottomans",
+      "is_group": false,
+      "evidence": "No count published. Full enumeration: 3 distinct /products/ tiles in the rendered DOM (h1 'Custom Upholstered Cocktail Ottomans'), matching GraphQL categoryProductsBySlug(slug:\"cocktail-ottomans\") = 3 stocked subcategories + 0 featured.",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Benches",
+      "qty": 12,
+      "link": "https://www.theinside.com/c/living-room-furniture/benches",
+      "is_group": false,
+      "evidence": "No count published. Full enumeration: 12 distinct /products/ tiles in the rendered DOM (h1 'Custom Upholstered Benches'), matching GraphQL categoryProductsBySlug(slug:\"benches\") = 4 stocked subcategories + 8 featuredProducts under the in-grid heading 'Best Sellers' (all benches).",
+      "flag": "MANUAL REVIEW: the Furniture > Bedroom menu item 'End of Bed Benches' points at this identical URL; recorded once here to avoid a duplicate-link row. /c/bedroom-furniture/benches is a third SEO alias for the same page."
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Coffee & Accent Tables",
+      "qty": 38,
+      "link": "https://www.theinside.com/collections/coffee-tables-and-side-tables",
+      "is_group": false,
+      "evidence": "No count published. Full enumeration: 38 distinct /products/ tiles in the rendered DOM (h1 'Coffee and Accent Tables'), matching GraphQL merchandiserBySlug(slug:\"/collections/coffee-tables-and-side-tables\").availableProducts = 38. No Load More; scrolled to the page end.",
+      "flag": "MANUAL REVIEW: this page's 38 items break down as 22 Accent Tables + 2 Coffee Tables + the same 14 Nightstands counted on the Nightstands row, so those 14 are counted twice across the two rows - that is the site's own overlap, not an aggregation by me."
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Dining Room",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Dining Chairs",
+      "qty": 4,
+      "link": "https://www.theinside.com/c/dining-room/dining-chairs",
+      "is_group": false,
+      "evidence": "No count published. Full enumeration: 4 distinct /products/ tiles in the rendered DOM (h1 'Custom Upholstered Dining Chairs': Signature Dining Chair, Arco Dining Chair, Slipcovered Signature Dining Chair, Slipcovered Signature Dining Chair - Cover Only), matching GraphQL categoryProductsBySlug(slug:\"dining-chairs\") = 4 stocked subcategories + 0 featured.",
+      "flag": "MANUAL REVIEW: 1 of the 4 tiles is 'Slipcovered Signature Dining Chair - Cover Only', a replacement slipcover rather than a chair; the site counts it in this category so it is included in the 4."
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Bar & Counter Stools",
+      "qty": 4,
+      "link": "https://www.theinside.com/c/categories/bar-and-counter-stools",
+      "is_group": false,
+      "evidence": "No count published. Full enumeration: 4 distinct /products/ tiles in the rendered DOM (h1 'Bar + Counter Stools'), matching GraphQL categoryProductsBySlug(slug:\"bar-and-counter-stools\") = 2 stocked subcategories + 2 featuredProducts under the in-grid heading 'Ready to Ship Bar + Counter Stools'.",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Office",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Desk Chairs",
+      "qty": 2,
+      "link": "https://www.theinside.com/c/office-furniture/desk-chairs",
+      "is_group": false,
+      "evidence": "No count published. Full enumeration: 2 distinct /products/ tiles in the rendered DOM (h1 'Custom Upholstered Desk Chairs': Tailored Task Chair, Modern Task Chair), matching GraphQL categoryProductsBySlug(slug:\"desk-chairs\") = 2 stocked subcategories + 0 featured. URL taken from the site's own Shop-All category map in js/chunks/160.js (deskChairs:'/c/office-furniture/desk-chairs').",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Outdoor",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Cabana Chairs",
+      "qty": 2,
+      "link": "https://www.theinside.com/c/outdoor-furniture/cabana-chairs",
+      "is_group": false,
+      "evidence": "No count published. Full enumeration: 2 distinct /products/ tiles in the rendered DOM (h1 'Custom Cabana Chairs': Teak Cabana Chair, Teak Cabana Chair - Sling Only), matching GraphQL categoryProductsBySlug(slug:\"cabana-chairs\") = 2 stocked subcategories + 0 featured.",
+      "flag": "MANUAL REVIEW: 1 of the 2 tiles is 'Teak Cabana Chair - Sling Only', a replacement sling rather than a chair; the site lists it in this category so it is included in the 2. The sibling Outdoor nodes Cabana Stools and Cabana Bundles are now empty (0 products) and were not emitted."
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Quick Ship",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Quick Ship Beds",
+      "qty": 9,
+      "link": "https://www.theinside.com/c/bedroom-furniture/quick-ship-beds",
+      "is_group": false,
+      "evidence": "No count published. Full enumeration: 9 distinct /products/ tiles in the rendered DOM (h1 'Quick Ship Beds'), matching GraphQL categoryProductsBySlug(slug:\"quick-ship-beds\") = 5 stocked subcategories + 4 featuredProducts under the in-grid heading 'Best Sellers'.",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Quick Ship Headboards",
+      "qty": 11,
+      "link": "https://www.theinside.com/c/bedroom-furniture/quick-ship-headboards",
+      "is_group": false,
+      "evidence": "No count published. Full enumeration: 11 distinct /products/ tiles in the rendered DOM (h1 'Quick Ship Headboards'), matching GraphQL categoryProductsBySlug(slug:\"quick-ship-headboards\") = 7 stocked subcategories + 4 featuredProducts under the in-grid heading 'Best Sellers'.",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Quick Ship Accent Chairs",
+      "qty": 11,
+      "link": "https://www.theinside.com/c/bedroom-furniture/quick-ship-accent-chairs",
+      "is_group": false,
+      "evidence": "No count published. Full enumeration: 11 distinct /products/ tiles in the rendered DOM (h1 'Quick Ship Accent Chairs'), matching GraphQL categoryProductsBySlug(slug:\"quick-ship-accent-chairs\") = 5 stocked subcategories + 6 featuredProducts under the in-grid heading 'Best Sellers'.",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Quick Ship Ottomans",
+      "qty": 14,
+      "link": "https://www.theinside.com/c/bedroom-furniture/quick-ship-ottomans",
+      "is_group": false,
+      "evidence": "No count published. Full enumeration: 14 distinct /products/ tiles in the rendered DOM (h1 'Quick Ship Ottomans'), matching GraphQL categoryProductsBySlug(slug:\"quick-ship-ottomans\") = 5 stocked subcategories + 9 featuredProducts under the in-grid heading 'Best Sellers'.",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Quick Ship Dining Chairs",
+      "qty": 6,
+      "link": "https://www.theinside.com/c/bedroom-furniture/quick-ship-dining-chairs",
+      "is_group": false,
+      "evidence": "No count published. Full enumeration: 6 distinct /products/ tiles in the rendered DOM (h1 'Quick Ship Dining Chairs'), matching GraphQL categoryProductsBySlug(slug:\"quick-ship-dining-chairs\") = 6 stocked subcategories + 0 featured.",
+      "flag": null
+    }
+  ]
+}

@@ -1,0 +1,56 @@
+{
+  "sr": 275,
+  "company": "Argos Home",
+  "status_at_checkpoint": "blocked mid-run by Akamai after ~24 successful Chrome navigations",
+  "block_detail": "Akamai edge 'Access Denied' (errors.edgesuite.net) on /browse/home-and-furniture/living-room-furniture/console-tables/c:29884/ and /nest-of-tables/c:797720/ during a browser_batch of 5 rapid back-to-back navigations with no pacing gap. Retried console-tables standalone -> same Access Denied (same reference #, cached). Tried a NEVER-before-fetched URL (sideboards/c:29883/) standalone -> Access Denied with a NEW reference # (18.6e69c317.1787569865.1754a0da), confirming this is a live, persistent edge block, not a browser cache artifact. Stopped all further requests to argos.co.uk per hard block rule.",
+  "site_reachability": "Confirmed Chrome CAN reach argos.co.uk live (contradicts the prior HTTP-only pass's full block) -- robots.txt, homepage __INITIAL_HEADER_STATE__ taxonomy, and ~20 category/leaf pages all loaded successfully before the rate limit triggered. Root cause of the block: insufficient pacing (ran 5 navigate+get_page_text pairs back-to-back inside one browser_batch, i.e. much faster than the brief's 5-8s/request guidance).",
+  "tree_source": "window.__INITIAL_HEADER_STATE__.taxonomy on homepage (mega-menu, full JSON, not just visible DOM) for Home & Furniture and Garden & DIY departments; cross-checked against each hub category page's own tile links via same-origin fetch+regex (categoryData relationships) for Bedroom and Living Room -- this surfaced additional real children beyond the mega-menu (7b Rule #1 confirmed: mega-menu showed only 6 Living Room links, the category page itself had 18).",
+  "qty_method": "Rendered listing header text e.g. '425 products' via get_page_text after navigate. NOTE: same-origin fetch of __NEXT_DATA__.props.pageProps.categoryData.attributes.productsInCategory was tested and found UNRELIABLE (311 vs rendered 425 for Bed frames, c:29867) -- do not use it, rendered header is source of truth here.",
+  "verified_leaf_data": {
+    "Bedroom furniture (c:29366)": {
+      "Wardrobes (c:29601)": 338,
+      "Chest of Drawers (c:29598)": 408,
+      "Bedside Tables (c:29603)": 385,
+      "Beds (c:29865, hub -- has Beds-by-Type and Beds-by-Size cross-facets; used by-type only to avoid double count)": {
+        "Bed frames (c:29867)": 425,
+        "Divan beds (c:29866)": 85,
+        "Ottoman and storage beds (c:823758)": 663,
+        "Folding and guest beds (c:29868)": 75,
+        "Kids beds (c:29869)": 382,
+        "Day beds (c:783885)": 46,
+        "Headboards (c:1043143)": 137
+      }
+    },
+    "Living Room furniture (c:29368)": {
+      "Sofas (c:29643)": 1059,
+      "TV Units and Stands (c:29885)": 306,
+      "Armchairs and Chairs (c:29641)": 673,
+      "Side Tables (c:797721)": 139,
+      "Sofa Beds (c:29644)": 376,
+      "Coffee Tables (c:29887)": 291,
+      "Footstools (c:29642)": 162,
+      "Sofa Sets (c:29645)": 116,
+      "Bean Bags (c:798594)": 203,
+      "Drinks Trolleys (c:824629)": 8
+    }
+  },
+  "living_room_still_needed": [
+    "Console Tables c:29884",
+    "Nest of Tables c:797720",
+    "Sideboards c:29883",
+    "Display Cabinets c:29886",
+    "Bookcases and Shelving c:29894",
+    "CD and DVD Storage c:29895 (verify furniture vs standalone storage before including)",
+    "Living Room Furniture Sets c:29882",
+    "Wall Mounted and Floating Shelves c:29896 (likely EXCLUDE per shelving rule, verify)"
+  ],
+  "other_departments_identified_not_yet_verified": {
+    "Dining Room (c:29369)": "Dining Table Sets c:29647, Dining Tables c:29648, Dining Chairs c:29649 + hub may have more per 7b rule 1",
+    "Kitchen Furniture (c:29917)": "hub, children unknown",
+    "Storage & Organisation (c:29365)": "Bookcases & Shelving c:29890 (furniture), Storage Units c:29590 (check furniture vs standalone), Cube Storage c:1000065 (check), Shoe Storage c:29596 (check) -- Plastic Storage Boxes/Storage Baskets & Boxes EXCLUDE (standalone storage)",
+    "Office Furniture (c:29861)": "Desks c:29863, Office Chairs c:29862 + hub may have more (filing cabinets etc)",
+    "Bathroom Furniture (c:29858)": "Bathroom Cabinets/freestanding-bathroom-cabinets c:29859 + hub may have more (vanity units)",
+    "Kids Room (c:29371)": "Kids Beds c:29873 (may dup Bedroom>Beds>Kids beds c:29869 -- different IDs, needs check), Kids Furnishings c:1000172 (check furniture content)",
+    "Garden Furniture (c:29353, Garden & DIY dept)": "Garden Table & Chair Sets c:29391, Garden Chairs & Sun Loungers c:29392, Garden Benches and Arbours c:29394 -- Gazebos c:29397 and Parasols c:29396 and Outdoor Cushions EXCLUDE (not furniture per brief)"
+  }
+}

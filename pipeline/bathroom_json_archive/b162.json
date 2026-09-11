@@ -1,0 +1,100 @@
+{
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ROBOTS (www.serax.com): fetched FIRST, before any other request on the host - HTTP 200, 3,602 bytes. It is a Shopify storefront file with three groups: a long comment header, 'User-agent: *' (which opens with 'Allow: /'), and 'User-agent: adsbot-google'. NO Claude agent is named anywhere - a case-insensitive search for claude, anthropic, Claude-Web, ClaudeBot, Content-Signal and Crawl-delay returns NOTHING - so there is no hard stop and no crawl-delay beyond probe.py's own 2 s per-host gap. We fall under '*' = Allow: /. The '*' disallows that bear on this work are /admin, /cart/, /checkout, /checkouts/, /orders, /account, /services, /sf_*, /cart.js, /recommendations/products, and the filter/sort crawl traps /collections/*sort_by*, /collections/*+*, /collections/*%2B*, /collections/*filter*&*filter*, plus /*?*preview_theme_id=*. I requested NONE of them: every URL fetched here is a bare https://www.serax.com/collections/<handle> path or its /products.json sibling, with no sort_by, no filter, no '+' facet. NOTE the robots header explicitly invites agents ('Agent instructions: https://serax.com/agents.md', 'UCP/MCP endpoint') - I did not transact, only read public collection data. HOSTS TOUCHED: www.serax.com and serax.com only (the sitemap is served from the apex). No API host, no CDN host, no reader, no proxy, no browser automation, no campaign parameters. The hreflang alternates name a SEPARATE HOST, us.serax.com; I did not fetch it (no second robots file was therefore owed) but I DID dedup-check it - see DEDUP below. ACCESS: plain HTTP 200 on every request through probe.fetch(); no bot wall, no 403, no rate limiting. TREE SOURCE - the site's OWN mega-menu, cross-checked against the FULL collections sitemap, exactly as rule 36 requires for a near-absence. (1) Mega-menu on the homepage (parsed from work/162/home.html): four departments - Tableware, Lighting, Home accessories, Furniture. Home accessories expands to 'decorative accessories / vases / pottery & urban jungle / BATHROOM ACCESSORIES / mirrors / candles & tealight holders'. So Serax's single bathroom entry point is Home accessories > bathroom accessories, and it is a genuine nav node, not an orphan. (2) I then did NOT stop at the mega-menu (Ferm Living / Nkuku precedent): I pulled BOTH collection sitemaps - sitemap_collections_1.xml and sitemap_collections_2.xml off sitemap.xml - giving 3,121 collection URLs, cached at work/162/collections.txt, and grepped the whole set case-insensitively for bath, bad, badkamer, salle-de-bain, bagno, shower, douche, soap, dispenser, toothbrush, brush, towel, mirror, toilet, wc, sanitar, basin, sink, tap, faucet, vanity, hook, robe, caddy, sponge, hygien, wellness, spa. The COMPLETE set of bathroom-relevant hits is 12 URLs and they reduce to only three distinct catalogue nodes: /collections/bathroom-accessories, /collections/towel-racks and /collections/mirrors - everything else is a <designer>-by-<name>-<department>-<category> cross-slice of those same three. There is no basin, tap, shower, toilet, bath or sanitaryware node anywhere in Serax's 3,121 collections: Serax is a design house selling tableware, lighting, furniture and decorative accessories, and its bathroom presence is exactly one accessories capsule. QTY: the Serax PLP grid is CLIENT-RENDERED by Algolia InstantSearch - the served HTML contains an EMPTY <div id=\"algolia-product-grid\"> and an empty <div id=\"algolia-pagination\">, and there is no rendered total anywhere on the page. A COUNT TRAP I fell into and corrected, recorded here deliberately: my first pass counted .m-product-card elements in the served HTML and got 8 for bathroom-accessories AND 8 for its parent interior-accessories - identical, and obviously wrong for a parent department. Those 8 cards are a 'featured collection' swiper, not the grid. ?page=2 and ?page=3 return the same 8 cards, so pagination is not server-side either. I therefore enumerated to exhaustion on the storefront's OWN first-party Shopify listing endpoint, /collections/<handle>/products.json?limit=250&page=N, on the same host, looping until a short page: bathroom-accessories returns 18 products on page 1 and page 2 is empty, towel-racks returns 1, mirrors returns 14. This is rule 26's 'paginate and count unique product cards' route, not an estimate: every product is enumerated by id and title, not read off a total field. VERIFICATION. (a) DISCRIMINATION: the endpoint returns 18 / 14 / 1 / 49 / 2 / 0 across the nodes queried - no site-wide constant, and it correctly returns 0 for two real-but-empty designer nodes, which a fabricated or capped source would not. (b) Every returned id is unique within its collection (18 distinct ids, 1 distinct id). (c) H1 and <title> were read on each page and match the node: bathroom-accessories H1 'Bathroom accessories'; towel-racks <title> 'Discover all Serax towel racks - SERAX'; mirrors H1 'Mirrors'. (d) Product titles were read on every recorded leaf to confirm the content matches the label - Bathroom accessories = 'Soap dispenser beige Cose', 'Soap dispenser dark grey Cose', six 'Box with lid round/oval S/L' and ten 'Tray square/rectangular S/M/L' pieces, all from Bertrand Lejoly's Cose bathroom capsule; Towel racks = 'Wall towel rack black Juno' (body copy: 'made of iron, the tall Juno towel rack', designer Evelien Bleumink). (e) rel=canonical was read on both recorded leaves and each equals the URL written into rows[] (https://serax.com/collections/bathroom-accessories, https://serax.com/collections/towel-racks), so there is no canonical-alias dedup blind spot on any row. DEDUP - blind spots (a), (b) and (c) all worked through, not just the bare URL. already_extracted() was run on: both recorded leaves in www and apex form; the rel=canonical target of each; every one of the SIX hreflang locale alternates of each (/nl/collections/badkamer-accessoires, /fr/collections/accessoires-de-salle-de-bain, /de/collections/badaccessoires, /it/collections/accessori-bagno, /es/collections/accesorios-de-bano, and the nl/fr/de/it/es towel-rack slugs handoekrekken / porte-serviettes / handtuchhalter / portasciugamani / toalleros); and the CROSS-HOST en-US alternates on us.serax.com. ALL returned None - bathroom-accessories and towel-racks are genuinely new. The index does hold 37 Serax collection URLs, so the domain is well covered by the prior passes and these two are real gaps, not index blindness. ONE REAL HIT: /collections/mirrors is ALREADY EXTRACTED in Final.xlsx (Home Decor pass) as 'Mirrors' - it is in review[], never in rows[], per OPTION 1. That node is in any case decorative wall/table mirrors merchandised under Home accessories beside vases and candles (Marie Michielssen, Bea Mombaers, Rosie), not bathroom mirrors, so rule 11 does not pull it into Bathroom either; both reasons point the same way. THE DESIGNER AXIS - measured, not assumed. Serax re-slices the same catalogue by designer/collection (<designer>-by-<name>-<department>-<category>). I extracted product ids on both sides rather than trusting the naming: /collections/cose-by-bertrand-lejoly-interior-accessories-bathroom-accessories returns EXACTLY the same 18 product ids as /collections/bathroom-accessories (id-set equality, not merely equal counts), and /collections/juno-by-evelien-bleumink-furniture-indoor-towel-racks returns the same single id 8426316824852 as /collections/towel-racks. Both are therefore duplicate views of a recorded leaf under rule 28 and are in review[], never in rows[] - recording them would have doubled 18 products and 1 product. THE TOWEL-RACK JUDGEMENT, disclosed rather than smoothed over. /collections/towel-racks is an ORPHAN node: it is in the collections sitemap and serves a real listing page, but it is linked from NO menu - I checked the homepage mega-menu and fetched /collections/furniture and /collections/furniture-indoor and neither links it (this is exactly the Nkuku orphan case the batch brief warns about, and it is why I did not stop at the mega-menu). Its designer-slice sibling is named '...-FURNITURE-INDOOR-towel-racks', so Serax's own hierarchy files towel racks under Furniture > Indoor, not under Bathroom. I recorded it as Bathroom anyway because the rule priority is PRIMARY PRODUCT TYPE > FUNCTION > HIERARCHY > ROOM: a wall towel rack is towel HARDWARE, which rule 15 splits explicitly to BATHROOM ('Hardware (Towel Rail/Bar/Ring/Hook) -> BATHROOM') and rule 17 lists again ('Towel Rails/Bars ... metal is fine' - it is iron). Hierarchy is the third-priority signal and loses. Flagging it here so the run owner can move it to Furniture if they read the hierarchy signal as decisive. It is dedup-clean either way. Note also that /collections/racks (a different node, 'Rack James black') IS already in Furniture.xlsx as 'Racks', so the Furniture pass saw the shelving family and did not take towel-racks. EMPTY NODES -> review[], never zero-qty rows: /collections/metal-sculptures-furniture-by-antonino-sciortino-furniture-indoor-towel-racks (200 OK, 0 products), /collections/ann-demeulemeester-various-interior-accessories-mirrors (0) and /collections/cover-up-by-grint-interior-accessories-mirrors (0). NO AGGREGATION: the 18 and the 1 are separate nodes and are never summed. I also checked the obvious cross-contamination risk - the Cose capsule contains ten 'Tray' products and Final.xlsx already holds /collections/trays - and measured it: /collections/trays returns 49 products with ZERO id overlap against the 18 bathroom-accessories ids, so there is no double-count between the two files. EXCLUDED and why: /collections/mirrors and its five designer mirror slices (decorative mirrors, and the parent is already extracted); /collections/interior-accessories (parent department - rule 24 forbids recording a parent when a valid child listing exists, and it is in any case a decor node); every 'View all' link in the mega-menu (rule 25); no search, facet, sort_by, collection-promo or product-detail URL is recorded anywhere. RESULT: 1 grouping row + 2 leaf rows = 20 products; 9 review entries.",
+ "rows": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathroom Accessories",
+   "qty": 18,
+   "link": "https://serax.com/collections/bathroom-accessories",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Towel Racks",
+   "qty": 1,
+   "link": "https://serax.com/collections/towel-racks",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  }
+ ],
+ "review": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Mirrors",
+   "qty": 14,
+   "issue": "ALREADY EXTRACTED IN Final.xlsx (Home Decor pass) as 'Mirrors'. Also decorative: merchandised under Home accessories beside vases and candles (Marie Michielssen / Bea Mombaers / Rosie wall and table mirrors), not a bathroom mirror node, so rule 11 does not pull it into Bathroom either.",
+   "link": "https://serax.com/collections/mirrors"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Cose by Bertrand Lejoly > Interior accessories > Bathroom accessories",
+   "qty": 18,
+   "issue": "DUPLICATE OF RECORDED LEAF (rule 28): designer-axis re-slice returning EXACTLY the same 18 product ids as /collections/bathroom-accessories (id-set equality proved by extraction, not inferred from equal counts). Withheld to avoid double-counting 18 products.",
+   "link": "https://serax.com/collections/cose-by-bertrand-lejoly-interior-accessories-bathroom-accessories"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Juno by Evelien Bleumink > Furniture indoor > Towel racks",
+   "qty": 1,
+   "issue": "DUPLICATE OF RECORDED LEAF (rule 28): designer-axis re-slice returning the same single product id 8426316824852 as /collections/towel-racks.",
+   "link": "https://serax.com/collections/juno-by-evelien-bleumink-furniture-indoor-towel-racks"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Metal Sculptures by Antonino Sciortino > Furniture indoor > Towel racks",
+   "qty": 0,
+   "issue": "EMPTY NODE: page returns HTTP 200 but the collection enumerates 0 products. Not recorded as a zero-qty row, not silently dropped.",
+   "link": "https://serax.com/collections/metal-sculptures-furniture-by-antonino-sciortino-furniture-indoor-towel-racks"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Ann Demeulemeester > Interior accessories > Mirrors",
+   "qty": 0,
+   "issue": "EMPTY NODE (HTTP 200, 0 products) AND decor axis. Listed so the mirror family is not silently skipped.",
+   "link": "https://serax.com/collections/ann-demeulemeester-various-interior-accessories-mirrors"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Cover Up by Grint > Interior accessories > Mirrors",
+   "qty": 0,
+   "issue": "EMPTY NODE (HTTP 200, 0 products) AND decor axis.",
+   "link": "https://serax.com/collections/cover-up-by-grint-interior-accessories-mirrors"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Marie by Marie Michielssen > Interior accessories > Mirrors",
+   "qty": 12,
+   "issue": "ROUTED TO DECOR: decorative wall mirrors, designer-axis subset of /collections/mirrors which is itself ALREADY EXTRACTED in Final.xlsx as 'Mirrors'. Not bathroom-presented anywhere in Serax's hierarchy.",
+   "link": "https://serax.com/collections/marie-by-marie-michielssen-interior-accessories-mirrors"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Mirrors by Bea Mombaers",
+   "qty": 2,
+   "issue": "ROUTED TO DECOR: decorative mirrors, designer-axis subset of the already-extracted /collections/mirrors. Three identical-content aliases exist (mirrors-by-bea-mombaers, -interior-accessories, -interior-accessories-mirrors), each returning the same 2 products; recorded here once under rule 28.",
+   "link": "https://serax.com/collections/mirrors-by-bea-mombaers"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Home Accessories (parent department)",
+   "qty": null,
+   "issue": "PARENT NOT RECORDED (rule 24): valid child listings exist beneath it. Also a decor department, not Bathroom. Listed only to document the nav path Home accessories > bathroom accessories.",
+   "link": "https://serax.com/collections/interior-accessories"
+  }
+ ],
+ "_reconstructed_from": "Bathroom.xlsx delivered 2026-09-01 (checkpoint), not original worker JSON"
+}

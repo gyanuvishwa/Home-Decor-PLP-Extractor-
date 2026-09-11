@@ -1,0 +1,84 @@
+{
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ROBOTS: https://seletti.it/robots.txt fetched FIRST, before any other request on the host (HTTP 200, 3622 bytes, profile safari15_5). Standard Shopify storefront file. A regex sweep of the FULL text for 'claude' and 'anthropic' returns ZERO matches - no 'User-agent: ClaudeBot', no 'anthropic-ai', no 'Claude-Web', no Content-Signal line. Two groups only: 'User-agent: *' (Allow: / plus private/transactional Disallows - /admin, /cart/, /checkout, /checkouts/, /orders, /account, /services, /sf_*, /79959327067, /cdn/wpm/*.js, /cart.js, /recommendations/products) and 'User-agent: adsbot-google'. Crawl traps disallowed under '*': '/collections/*sort_by*', '/collections/*+*', '/collections/*%2B*', '/collections/*filter*&*filter*', '/*?*ls=*&ls=*', '/*?*oseid=*', '/*?*preview_theme_id=*', '/*?*preview_script*'. No Crawl-delay. I requested NONE of those: every collection URL was the bare /collections/<handle> form, and the only query string used anywhere was the plain '?page=N' pagination parameter (not covered by any Disallow) during the mirror-overlap enumeration, plus Shopify's own from=/to= sitemap params. Shopify's header steers agents to a UCP/MCP endpoint; that is a commerce/checkout channel and was NOT used - everything below is ordinary server-rendered HTML. ACCESS: clean. probe.fetch() returned HTTP 200 on the first or second fingerprint every time (chrome124, safari15_5, safari18_0_ios); no bot wall, no challenge, no 403, no 429. 2s per-host pacing left in force. TREE: taken from Seletti's OWN mega-menu, which is fully server-rendered in the homepage HTML, and cross-checked against its OWN collections sitemap. Top-level departments: Tableware, Lighting, Furniture, Objects, Outdoor, plus designer-collab and price/gift entries. THERE IS NO BATHROOM / BAGNO DEPARTMENT. The bathroom finding is one leaf inside OBJECTS. The full Objects child list, verbatim from the menu, is: Art Toy, Candles, Candleholders, Cases, Dustbin, Flower Holder - Vases, Home accessories, Letters, Mats, Mirrors, Notebooks, Photo frames, SOAP DISH, Smoke Tray, Terracotta, Thermal Bottles, Travel, Textiles. 'Soap Dish' is a genuine product-type nav node - Seletti's menu labels several nodes by product type while pointing them at a designer-collab collection handle (the same pattern gives 'Textiles' -> /collections/dondi-x-seletti). I verified the label is not an English-only accident: the Italian storefront at https://www.seletti.it/it/ carries the node-for-node identical menu with the label 'PORTASAPONE' pointing at /it/collections/brain-wash-seletti-x-propaganda. A keyword sweep of the IT homepage HTML for 'bagno' returns ZERO hits, so there is no Bagno / Accessori bagno node to walk. NOT STOPPING AT THE MENU (BATCH_BRIEF s5 - orphan collections): I read the full collections sitemap https://www.seletti.it/sitemap_collections_1.xml?from=612230725979&to=679452508507 (HTTP 200), which enumerates ALL 161 collections on the storefront, and grepped every handle for bath/bagno/soap/sapon/shower/doccia/toothbrush/spazzol/towel/asciugam/toilet/carta-igien/mirror/specchi/wash/lavabo/basin/sink/rubinett/faucet/bidet/wc/vasca/portasapone/dispenser/holder. There is NO bathroom collection at any depth, orphan or otherwise; the only hits were the four mirror collections handled in review[] and the collab handle 'toiletpaper-home-1' (the Toiletpaper magazine art collaboration - a NAME, not toilet paper: rule 2, do not classify on a word). I also read the products sitemaps (sitemap_products_1 + _2, 1,670 products in total) and ran the same sweep at PRODUCT level, which is the strongest possible evidence of what Seletti actually sells: soap -> 7 hits, of which the only bathroom objects are brain-wash-white / brain-wash-black (both captured by the recorded node) and the rest are enamel plates/mugs printed 'soap', a Toiletpaper Beauty soap kit and soap bars; shower -> 2 hits, 'toiletpaper-beauty-shower-gel' (a cosmetic) and 'aquart-shower'; bath -> 7 hits, six Toiletpaper PETS bath mats and 'supershelf-bathroom-blue-grid'; toothbrush/towel rail/toilet roll holder/basin/tap/bidet/WC/vasca -> ZERO. QTY AND ITS PROOF: Seletti runs the Shopify Dawn-derived theme, which prints the collection's own total in <p id=\"ProductCount\" role=\"status\">. The recorded leaf's page renders '4 products' and the same page carries data-total=\"4\" on the grid container. I verified the string is the grid's real total and not a constant on 13 collections of deliberately different size: Soap Dish 4, reflecting-mirror 2, dustbin 7, small-mirrors 19, mirrors-1 19, travel 19, mats 20, beauty 25, mirrors 42, wall-mirrors 44, terracotta 55, cases 61, objects 479 - it discriminates fully. For the recorded leaf I also counted the tiles inside <ul id=\"product-grid\"> myself: exactly 4 distinct product handles (brain-wash-white, brain-wash-black, brain-wash-soap-bar-green, brain-wash-soap-bar-green-copia), matching the printed total. For the four orphan mirror collections I enumerated every page (16 tiles/page) and compared handle sets, which is how the subset findings in review[] were proved. Nothing is estimated, inferred from a parent, or summed from siblings; no product API was used. WHAT THE RECORDED NODE CONTAINS AND WHY IT IS BATHROOM (rules 2, 13, 18): the node's own name in both locales is a bathroom accessory type (Soap Dish / Portasapone). Its 4 products are the Brain Wash pieces by Propaganda x Seletti: 'Brain wash - White' and 'Brain wash - Black', whose own JSON-LD description reads 'Soap Holder + Soap' (SKU 13501, cm 15 x 11 x 7.5) - i.e. soap dishes/holders, squarely rule 13 'Soap Dispensers/Dishes/Holders' and rule 18 - plus two Brain wash soap-bar refills for the same holder. DISCLOSED: 2 of the 4 are the soap bars themselves, which are consumables rather than accessories; the qty 4 is the listing page's OWN total and rule 26 forbids adjusting it, so it is recorded verbatim with the composition stated here. Primary product type of the node is a soap dish, so it goes to Bathroom, not to Decor. NO OTHER BATHROOM NODE EXISTS: there is no bath, shower, enclosure, tap, basin, toilet, bidet, vanity, bathroom cabinet, bathroom storage, towel rail, toilet-roll holder or toothbrush holder category anywhere on the site. The one shower-shaped item, 'Aquart Shower' (/products/aquart-shower), is a single PRODUCT with JSON-LD category 'Objects' and a description that begins 'Who said that you have to take a shower in the bathroom? ... Do it outdoors' - a concrete-and-copper 220cm GARDEN shower. It has no category node of its own, and rules 24/27 forbid recording a product-detail URL, so it is not recorded; noted here so it is not silently skipped. Likewise 'SUPERSHELF BATHROOM BLUE GRID' is a single Superfurniture shelf whose own JSON-LD category is 'Furniture'. DEDUP: already_extracted() was run on every candidate leaf and every review node. Hard hits: small-mirrors (Final.xlsx 'Mirrors') and wall-mirrors (Final.xlsx 'Wall Mirrors') - both banked in review[], never in rows[]. The recorded Soap Dish URL returns None, and so does its /it/ form. Locale blind spots (b) and (c) checked, not assumed: the PDP and PLP hreflang blocks list exactly three alternates - x-default, en and it - ALL on www.seletti.it (e.g. x-default/en https://www.seletti.it/collections/brain-wash-seletti-x-propaganda, it https://www.seletti.it/it/collections/brain-wash-seletti-x-propaganda). There is no separate country domain, so there is no cross-HOST alternate that could be hiding in the index; and all 41 Seletti URLs already in Furniture.xlsx and Final.xlsx are on the bare EN path form, matching what I checked. rel=canonical on the recorded leaf is self-canonical. EXCLUDED AND WHY: Lighting and its 7 children (rule 19; 5 already in Final.xlsx); Tableware and its 11 children (Kitchen & Dining, already in Final.xlsx); Furniture and its 20 children (Furniture.xlsx); Vases/Candles/Candleholders/Home accessories/Letters/Photo frames/Art Toy (rule 21 Decor, already in Final.xlsx); Curtains and Cushions (rule 20 Textile); Outdoor, Pets, Jewelry, Sunglasses, Spare Parts (out of scope); Christmas, Black Friday, gift-guide, price-band, New Arrival, Best Seller, Sales and the ~60 designer/series collections (rule 25 promotional). Mats, Cases, Beauty and Dustbin were each opened and inspected rather than dismissed by name - see review[]. CONCLUSION: Seletti is an Italian design brand with no bathroom department, but it does merchandise one explicit bathroom-accessory node, 'Soap Dish' / 'Portasapone' (4 products), which is recorded. Everything else that touches bathroom territory is either already extracted, an orphan subset of an already-extracted node, or a non-bathroom node, and is banked in review[]. This is NOT a robots exclusion and NOT an access block - robots.txt names no Claude agent and every request returned HTTP 200.",
+ "rows": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Soap Dish",
+   "qty": 4,
+   "link": "https://www.seletti.it/collections/brain-wash-seletti-x-propaganda",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  }
+ ],
+ "review": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Objects > Mirrors",
+   "qty": 19,
+   "issue": "ALREADY EXTRACTED IN Final.xlsx (Home Decor pass) as 'Mirrors' (company 'Seletti'). already_extracted('https://www.seletti.it/collections/small-mirrors') is an EXACT URL match - a hard dedup hit, not a judgement call. Not re-extracted under OPTION 1. Independently these are decorative art-object mirrors (Selfie Mirror, Poker Mirror, Circus Mirror, Melted Heart, Toiletpaper gold-frame mirrors), not bathroom mirrors, and the node sits in Objects beside Vases and Candleholders with no bathroom parent.",
+   "link": "https://www.seletti.it/collections/small-mirrors"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Furniture > Wall Mirrors",
+   "qty": 44,
+   "issue": "ALREADY EXTRACTED IN Final.xlsx (Home Decor pass) as 'Wall Mirrors' (company 'Seletti'). already_extracted('https://www.seletti.it/collections/wall-mirrors') is an EXACT URL match. Not re-extracted under OPTION 1. Also not a bathroom node - it is a child of Furniture and its products are large decorative wall mirrors (Sausages, Space Cowboy, Baroque, Liberty, Connection, Cut'n'Paste, Tetris).",
+   "link": "https://www.seletti.it/collections/wall-mirrors"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Mirrors (orphan roll-up)",
+   "qty": 42,
+   "issue": "ORPHAN ROLL-UP - NOT RECORDED (rule 24/28 + BATCH_BRIEF s5 overlapping roll-up). /collections/mirrors appears in the collections sitemap but is linked from NO menu in either the EN or the IT navigation. I enumerated it to exhaustion (?page=1..3, 16 tiles/page) and all 42 handles are contained in the union of the two already-extracted nav nodes above (small-mirrors 19 + wall-mirrors 44 = 63 distinct): products outside that union = 0. Recording it would double-count 42 products already held in Final.xlsx.",
+   "link": "https://www.seletti.it/collections/mirrors"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Mirrors-1 / Reflecting Mirror / Pixel Mirror (orphan series collections)",
+   "qty": null,
+   "issue": "ORPHAN SERIES COLLECTIONS - NOT RECORDED. Three further mirror collections exist in the sitemap and in no menu: /collections/mirrors-1 (19 products), /collections/reflecting-mirror (2), /collections/pixel-mirror (6). Each was enumerated to exhaustion and each is a STRICT SUBSET of the small-mirrors + wall-mirrors union (products outside the union: 0, 0 and 0 respectively) - they are product-series landing pages, not taxonomy nodes. No qty/link recorded because recording any of them would duplicate already-extracted content; URLs given here so nothing is silently skipped: https://www.seletti.it/collections/mirrors-1 , https://www.seletti.it/collections/reflecting-mirror , https://www.seletti.it/collections/pixel-mirror",
+   "link": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Objects > Mats (Tappetini)",
+   "qty": 20,
+   "issue": "NOT BATHROOM - doormats, and the bath-mat members are textile pet mats (rules 15/16/20). The node is 20 mats: 14 Toiletpaper doormats (Mat Shit, Snakes, Lipstick, Seagirl, Two of Spades, Milky Boots, Spaghetti, Revolver, Eye and Mouth, Pills, Roses With Eyes, Globe...) plus 6 'TOILETPAPER PETS BATH MAT' items (Nerdy Dog, Cat Surprise, Polycats, Angry Cat, BFF, Dog Call Center) which are textile PET mats, not anti-slip bathroom accessories. Rule 16 sends textile bath mats to Textile, and the node as a whole is a doormat node with no bathroom parent, so it is neither recorded in rows[] nor routed as a bathroom textile.",
+   "link": "https://www.seletti.it/collections/mats"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Objects > Cases (Astucci)",
+   "qty": 61,
+   "issue": "NOT RECORDED - mixed travel/desk accessory node (rules 2, 29). It does contain six 'Wash Bag' items (Seagirl, Revolver, Snakes, Lipstick Black, Stripes Hands with Snakes, Shit Stripes) which are toiletry bags, but a toiletry bag is a soft travel case, not one of the bathroom accessory types listed in rule 13, and the node's other 55 products are pouches, laptop bags, pencil cases and beauty cases. No bathroom parent anywhere. Rule 26 forbids adjusting the listing's own total of 61, so recording it would put 55 non-bathroom products into Bathroom. Flagged, not guessed.",
+   "link": "https://www.seletti.it/collections/cases"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Beauty",
+   "qty": 25,
+   "issue": "NOT BATHROOM - personal-care consumables and cosmetics, not bathroom fixtures/accessories (rule 3 scope). Contents inspected: Toiletpaper Beauty Shampoo, Shower Gel, Hand Wash, Cleansing Hand Gel, Body Lotion, Soap Kit, Solid Kit, Dish Shop, three Fragrance Diffusers, Fabric Fragrance, plus Beauty Cases (Lipsticks, Shit, Snakes) and the two Brain wash soap bars. The only rule-13 objects in it (the Brain Wash soap HOLDERS) are already captured by the recorded Soap Dish node, so recording Beauty as well would duplicate them and add 20+ cosmetics.",
+   "link": "https://www.seletti.it/collections/beauty"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Objects > Dustbin (Pattumiere)",
+   "qty": 7,
+   "issue": "NOT BATHROOM - general waste bins with no bathroom designation (rule 2: hierarchy + function, not room). Seven products, all Toiletpaper-print Dustbin 5L and 12L (Roses, Shit, Snakes, Pills, Spaghetti). The site files them in Objects beside Ashtrays and Notebooks; nothing on the PLP or the PDPs designates them as bathroom bins, so rule 13's 'Bathroom Baskets/Containers' does not reach them.",
+   "link": "https://www.seletti.it/collections/dustbin"
+  }
+ ],
+ "_reconstructed_from": "Bathroom.xlsx delivered 2026-09-01 (checkpoint), not original worker JSON"
+}

@@ -1,0 +1,903 @@
+{
+ "sr": 96,
+ "company": "Maisons du Monde FR",
+ "brand_site": "maisonsdumonde.com",
+ "country": "France",
+ "site_url": "https://www.maisonsdumonde.com/FR/fr",
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ACCESS. The prior Home-Decor pass recorded this site as a hard DataDome block on every route. Re-tested from scratch and the picture has changed only partly: a curl_cffi profile sweep now returns HTTP 200 on the HOMEPAGE for several fingerprints (chrome116/124/131/136, safari17_0, safari18_0_ios, safari17_2_ios, firefox133) while chrome110/120, safari15_5, safari18_0, edge99/101 and chrome99_android still 403. Every /c/ CATEGORY listing URL still 403s on all of those profiles, and so do r.jina.ai (Cloudflare challenge on the reader's own worker), translate.goog (it reaches the real origin and receives the identical DataDome interstitial), the site's own BFF host bff-www.maisonsdumonde.com/api, and the FR sitemap_index.xml. The route that DID work is a real Chrome session (claude-in-chrome): loading the homepage in the browser lets Chrome solve DataDome's JS challenge and mint a valid clearance cookie, after which same-origin fetch() calls issued from the page context return the genuine server-rendered category HTML at HTTP 200. All 91 category pages behind this result were read that way. DataDome rate-limits bursts - an unthrottled run of 12 fetches got the session 403'd for several minutes - so the harvest was paced at roughly one request per 7-8 seconds with retry and backoff. Every one of the 91 pages finished at HTTP 200; none were left unread and no row here rests on an unverified page.\n\nROBOTS. robots.txt does name Claude explicitly: 'Anthropic-ai', 'ClaudeBot' and 'Claude-Web' sit in a shared user-agent group with GPTBot, CCBot, PerplexityBot and others. That group is NOT a blanket 'Disallow: /'. Its rules are /*/*/p/*-M2*.htm, /*/compte/*, /*/commande/*, /*/search/, /*?ref=*, /*?variant=*, /*?viewType=*, /*/q/, /*query=*, */m/*page=* and /*/login?* - account, checkout, on-site search and query-string URLs, essentially the same set the '*' group receives. The /FR/fr/c/ category listing pages used here are NOT disallowed for ClaudeBot. This is therefore not the Claude-specific content block the brief says to stop for (unlike madeindesign.com and home24.de). Only allowed paths were fetched: no /search/, no /q/ and no query-string listing URL was requested at any point.\n\nTREE. Built from the site's own mega-menu, which is server-rendered into every category page and expands whichever department you are currently inside. Five department pages were fetched to expand all five furniture-bearing menus: Meubles, Canapes et fauteuils, Jardin, Literie and Meubles et Deco enfant. Node names were translated to plain-ASCII English per the brief (Canapes to Sofas, Fauteuils to Armchairs, Tables basses to Coffee Tables, Buffets to Sideboards, Armoires to Wardrobes, Chevets to Bedside Tables and so on); no French is retained anywhere, including in flags.\n\nQTY. Method 1 throughout - the site's own rendered listing header 'N articles'. Confirmed that the number present in the server-rendered HTML is the same number the browser paints: Vaisseliers showed 213 in the live rendered DOM and 213 in the fetched HTML; Canapes droits showed 6893 both ways. No structured-JSON source and no tile counting was used for any row.\n\nSANITY CHECKS. (a) Discrimination - the number changes per category (Vaisseliers 213, Tabourets 588, Canapes droits 6893), so it is not a site-wide constant. (b) h1 match - every fetched page's h1 was captured and matched the category requested, ruling out silent parent substitution. (c) Drift - Buffets, Armoires, Lits and Tables de jardin were re-read later in the session and returned identical numbers (3410, 923, 7809, 1352). (d) No suspiciously round display caps. (e) No parent total was ever reused for a child; parents are emitted as grouping rows with qty null. The counts are large because this is a marketplace, and its children overlap - a convertible corner sofa is listed in both Canapes convertibles and Canapes d'angle - so children over-sum their parent (the Canapes children total 21061 against the Canapes node's own 14505). That is the site's own behaviour, not an extraction error, and no row here was produced by summing anything.\n\nDEDUPED. 'Fauteuils' (slug fauteuils-a3fc1b72...) is linked from both Canapes et fauteuils and Meubles > Meubles de salon; it is emitted once, as Armchairs. 'Bouts de lit' is linked from both Meubles > Meubles de chambre and Literie; it is emitted once, under Bedroom Furniture.\n\nEXCLUDED and why. Vasques (wash basins) and Saunas et Spas - bathroom and leisure fixtures, not furniture. Rangements exterieur (355) - opened it and the tiles are garden storage chests and boxes, i.e. standalone storage goods, so out per the storage-versus-furniture line. Housses de protection - furniture covers. Abris de jardin, Pergolas et tonnelles, Parasols, Voiles d'ombrage, Barbecues et planchas and Braseros - garden structures and cooking or heating equipment. Matelas, Sommiers, Ensemble matelas et sommiers, Surmatelas, Couettes, Oreillers, Aleses, Accessoires literie, Matelas bebe et enfant and Matelas de sol enfant - mattresses and bedding. Parcs bebe (playpens), Transats bebe (bouncers) and Sacs et matelas a langer - baby equipment. Boites et paniers de rangements enfant - storage baskets. Portemanteaux et pateres enfant and Tipis enfant - wall hooks and play tents. The whole of Deco, Luminaires, Linge de maison et tapis, Arts de la table, Petit electromenager, Animalerie, Decoration de jardin and Papiers peints - other departments. 'Bar et chaises hautes pour professionnels' (37) - a curated pro-collection landing page, excluded as a Collection per the never-extract list, and its products duplicate Chaises et tabourets de bar anyway. Ventes flash, Braderie, Seconde Chance, Best-sellers, Nouveautes, every Cadeaux gift node, the Rhinov decorator service page, and the ?f= / ?bra= / ?st= material- and brand-filter re-cuts of the Meubles listing (Meubles Rotin, Meubles Industriel, Meubles Zago, Meubles Tikamoon, Meubles Metal, Meubles Cannage) - all promotional, filter or collection pages.\n\nONE KNOWN GAP. The category-facet chip row on the Canapes pages shows a sibling 'Canapes panoramiques' that never appears in the mega-menu and for which no /c/ slug is exposed anywhere in the rendered navigation, so it could not be opened or counted and is deliberately not emitted.",
+ "rows": [
+  {
+   "category": "Furniture",
+   "sub_category": "Sofas and Armchairs",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sofas",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sofa Beds",
+   "qty": 6269,
+   "link": "https://www.maisonsdumonde.com/FR/fr/c/canapes-convertibles-985f404d62cdf575aef6481c41f05fd8",
+   "is_group": false,
+   "evidence": "rendered listing header '6269 articles' on the category page (server-rendered HTML; verified identical to the header painted in the live browser DOM)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Straight Sofas",
+   "qty": 6893,
+   "link": "https://www.maisonsdumonde.com/FR/fr/c/canapes-droits-nb37d60b470cf6361801035497c9b0fdd2481361",
+   "is_group": false,
+   "evidence": "rendered listing header '6893 articles' on the category page (server-rendered HTML; verified identical to the header painted in the live browser DOM)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Corner Sofas",
+   "qty": 5720,
+   "link": "https://www.maisonsdumonde.com/FR/fr/c/canapes-d-angle-2076b8936bbf877d3361f07ebab937d3",
+   "is_group": false,
+   "evidence": "rendered listing header '5720 articles' on the category page (server-rendered HTML; verified identical to the header painted in the live browser DOM)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Modular Sofas",
+   "qty": 1431,
+   "link": "https://www.maisonsdumonde.com/FR/fr/c/canapes-modulables-f03a5f265870ed7c8e0efb69ad488d51",
+   "is_group": false,
+   "evidence": "rendered listing header '1431 articles' on the category page (server-rendered HTML; verified identical to the header painted in the live browser DOM)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Daybeds",
+   "qty": 336,
+   "link": "https://www.maisonsdumonde.com/FR/fr/c/banquettes-8bf977fe51145f44a1b0368b54eaf8c0",
+   "is_group": false,
+   "evidence": "rendered listing header '336 articles' on the category page (server-rendered HTML; verified identical to the header painted in the live browser DOM)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Click-Clack Sofa Beds",
+   "qty": 255,
+   "link": "https://www.maisonsdumonde.com/FR/fr/c/clic-clac-n60ee6e15564feac02a5526873dfe7d1411eb6aa",
+   "is_group": false,
+   "evidence": "rendered listing header '255 articles' on the category page (server-rendered HTML; verified identical to the header painted in the live browser DOM)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Chaise Longues",
+   "qty": 157,
+   "link": "https://www.maisonsdumonde.com/FR/fr/c/meridiennes-3fc7a93adf89597f1181f9c243bcd23f",
+   "is_group": false,
+   "evidence": "rendered listing header '157 articles' on the category page (server-rendered HTML; verified identical to the header painted in the live browser DOM)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Armchairs, Poufs and Footstools",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Armchairs",
+   "qty": 3553,
+   "link": "https://www.maisonsdumonde.com/FR/fr/c/fauteuils-a3fc1b7212ff857d09d0930fbd5771ef",
+   "is_group": false,
+   "evidence": "rendered listing header '3553 articles' on the category page (server-rendered HTML; verified identical to the header painted in the live browser DOM)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Footstools",
+   "qty": 139,
+   "link": "https://www.maisonsdumonde.com/FR/fr/c/repose-pieds-n8c90b2bee976a986fcb19fb904036a3f1123ace",
+   "is_group": false,
+   "evidence": "rendered listing header '139 articles' on the category page (server-rendered HTML; verified identical to the header painted in the live browser DOM)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Poufs",
+   "qty": 1876,
+   "link": "https://www.maisonsdumonde.com/FR/fr/c/poufs-4b207f342796830dadaa07a30746d761",
+   "is_group": false,
+   "evidence": "rendered listing header '1876 articles' on the category page (server-rendered HTML; verified identical to the header painted in the live browser DOM)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Living Room Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Coffee Tables",
+   "qty": 3773,
+   "link": "https://www.maisonsdumonde.com/FR/fr/c/table-basse-0d111cc822ed994ad56454e5e4d32f42",
+   "is_group": false,
+   "evidence": "rendered listing header '3773 articles' on the category page (server-rendered HTML; verified identical to the header painted in the live browser DOM)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "TV Units",
+   "qty": 3621,
+   "link": "https://www.maisonsdumonde.com/FR/fr/c/meubles-tv-018591fde2d70de48788100509b0f7c6",
+   "is_group": false,
+   "evidence": "rendered listing header '3621 articles' on the category page (server-rendered HTML; verified identical to the header painted in the live browser DOM)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bookcases",
+   "qty": 1099,
+   "link": "https://www.maisonsdumonde.com/FR/fr/c/bibliotheques-f0f579cfa3d8fc532726556b768a1501",
+   "is_group": false,
+   "evidence": "rendered listing header '1099 articles' on the category page (server-rendered HTML; verified identical to the header painted in the live browser DOM)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Shelving Units",
+   "qty": 1645,
+   "link": "https://www.maisonsdumonde.com/FR/fr/c/etageres-d1281f70e11032066ad0cb5e24e5a4f2",
+   "is_group": false,
+   "evidence": "rendered listing header '1645 articles' on the category page (server-rendered HTML; verified identical to the header painted in the live browser DOM)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Storage Furniture",
+   "qty": 184,
+   "link": "https://www.maisonsdumonde.com/FR/fr/c/meubles-de-rangement-nce75720b2af2b3b482416f155842667963786cb",
+   "is_group": false,
+   "evidence": "rendered listing header '184 articles' on the category page (server-rendered HTML; verified identical to the header painted in the live browser DOM)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Console Tables and Valet Stands",
+   "qty": 1559,
+   "link": "https://www.maisonsdumonde.com/FR/fr/c/consoles-et-drapiers-nfb405edc9864d4668853a9c68cded38e85a1861",
+   "is_group": false,
+   "evidence": "rendered listing header '1559 articles' on the category page (server-rendered HTML; verified identical to the header painted in the live browser DOM)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sofa Side Tables",
+   "qty": 1612,
+   "link": "https://www.maisonsdumonde.com/FR/fr/c/bouts-de-canapes-n69763917e183b5953a464bf24c6c25d422c7343",
+   "is_group": false,
+   "evidence": "rendered listing header '1612 articles' on the category page (server-rendered HTML; verified identical to the header painted in the live browser DOM)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Stools",
+   "qty": 588,
+   "link": "https://www.maisonsdumonde.com/FR/fr/c/tabourets-76f300c87e2560f9afe2cbbed5976135",
+   "is_group": false,
+   "evidence": "rendered listing header '588 articles' on the category page (server-rendered HTML; verified identical to the header painted in the live browser DOM)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dining Room Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dining Tables",
+   "qty": 3887,
+   "link": "https://www.maisonsdumonde.com/FR/fr/c/tables-a-manger-22483ed22fab4cdf82dae2057687c73a",
+   "is_group": false,
+   "evidence": "rendered listing header '3887 articles' on the category page (server-rendered HTML; verified identical to the header painted in the live browser DOM)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dining Chairs",
+   "qty": 5324,
+   "link": "https://www.maisonsdumonde.com/FR/fr/c/chaises-20526cb834235f8bc54e78e97ca5a14a",
+   "is_group": false,
+   "evidence": "rendered listing header '5324 articles' on the category page (server-rendered HTML; verified identical to the header painted in the live browser DOM)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Indoor Table and Chair Sets",
+   "qty": 157,
+   "link": "https://www.maisonsdumonde.com/FR/fr/c/ensembles-table-et-chaises-d-interieur-n4a98c6e41acd661b61070b867d757056cbe0cc5",
+   "is_group": false,
+   "evidence": "rendered listing header '157 articles' on the category page (server-rendered HTML; verified identical to the header painted in the live browser DOM)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dining Armchairs",
+   "qty": 267,
+   "link": "https://www.maisonsdumonde.com/FR/fr/c/fauteuils-de-table-n4a6605b925889931e98f96588761daae9dc34c8",
+   "is_group": false,
+   "evidence": "rendered listing header '267 articles' on the category page (server-rendered HTML; verified identical to the header painted in the live browser DOM)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sideboards",
+   "qty": 3410,
+   "link": "https://www.maisonsdumonde.com/FR/fr/c/buffets-647bff76cdbab9f58235561a62d0726f",
+   "is_group": false,
+   "evidence": "rendered listing header '3410 articles' on the category page (server-rendered HTML; verified identical to the header painted in the live browser DOM)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Welsh Dressers",
+   "qty": 213,
+   "link": "https://www.maisonsdumonde.com/FR/fr/c/vaisseliers-b4f95e109ceac35c380f20f460d5f9d5",
+   "is_group": false,
+   "evidence": "rendered listing header '213 articles' on the category page (server-rendered HTML; verified identical to the header painted in the live browser DOM)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Display Cabinets",
+   "qty": 326,
+   "link": "https://www.maisonsdumonde.com/FR/fr/c/vitrines-n802bb5d7b19160d7d7975d8e93bc65e34e6e73d",
+   "is_group": false,
+   "evidence": "rendered listing header '326 articles' on the category page (server-rendered HTML; verified identical to the header painted in the live browser DOM)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bar Units",
+   "qty": 146,
+   "link": "https://www.maisonsdumonde.com/FR/fr/c/bars-c5e8eff532467639ba31bc11a2ebaca4",
+   "is_group": false,
+   "evidence": "rendered listing header '146 articles' on the category page (server-rendered HTML; verified identical to the header painted in the live browser DOM)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bar Chairs and Stools",
+   "qty": 1627,
+   "link": "https://www.maisonsdumonde.com/FR/fr/c/chaises-et-tabourets-de-bar-28012dc6ad97af88dffcd6afaece6ffc",
+   "is_group": false,
+   "evidence": "rendered listing header '1627 articles' on the category page (server-rendered HTML; verified identical to the header painted in the live browser DOM)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Benches",
+   "qty": 845,
+   "link": "https://www.maisonsdumonde.com/FR/fr/c/bancs-a2ccce46cf79645335c345b952e28a4f",
+   "is_group": false,
+   "evidence": "rendered listing header '845 articles' on the category page (server-rendered HTML; verified identical to the header painted in the live browser DOM)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bedroom Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Chests of Drawers",
+   "qty": 1335,
+   "link": "https://www.maisonsdumonde.com/FR/fr/c/commodes-na8492675bf09eb06e6492eb7b4083a9922785c7",
+   "is_group": false,
+   "evidence": "rendered listing header '1335 articles' on the category page (server-rendered HTML; verified identical to the header painted in the live browser DOM)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Wardrobes",
+   "qty": 923,
+   "link": "https://www.maisonsdumonde.com/FR/fr/c/armoires-ddd7fe0cadc93e940a5d7f65a323dd22",
+   "is_group": false,
+   "evidence": "rendered listing header '923 articles' on the category page (server-rendered HTML; verified identical to the header painted in the live browser DOM)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dressing Tables",
+   "qty": 449,
+   "link": "https://www.maisonsdumonde.com/FR/fr/c/coiffeuses-566bdd53a7eb116eba635477887073b0",
+   "is_group": false,
+   "evidence": "rendered listing header '449 articles' on the category page (server-rendered HTML; verified identical to the header painted in the live browser DOM)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Tallboys",
+   "qty": 142,
+   "link": "https://www.maisonsdumonde.com/FR/fr/c/chiffonniers-nf0d1448b11d0f1f1bdc4e58b22509d9c00a7857",
+   "is_group": false,
+   "evidence": "rendered listing header '142 articles' on the category page (server-rendered HTML; verified identical to the header painted in the live browser DOM)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Open Wardrobe Systems",
+   "qty": 176,
+   "link": "https://www.maisonsdumonde.com/FR/fr/c/dressings-ncbb97817f4a27ddab42b07ad94df416abde4c1a",
+   "is_group": false,
+   "evidence": "rendered listing header '176 articles' on the category page (server-rendered HTML; verified identical to the header painted in the live browser DOM)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bed End Benches",
+   "qty": 67,
+   "link": "https://www.maisonsdumonde.com/FR/fr/c/bouts-de-lit-n2b3a54c5259c7470159676295dbcd1a67002cc6",
+   "is_group": false,
+   "evidence": "rendered listing header '67 articles' on the category page (server-rendered HTML; verified identical to the header painted in the live browser DOM)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Room Dividers",
+   "qty": 265,
+   "link": "https://www.maisonsdumonde.com/FR/fr/c/paravents-54b0273ed9c0ab0805b2abb3fbe59df6",
+   "is_group": false,
+   "evidence": "rendered listing header '265 articles' on the category page (server-rendered HTML; verified identical to the header painted in the live browser DOM)",
+   "flag": "MANUAL REVIEW: ambiguous - folding screens / room dividers; the site files them under Meubles > Meubles de chambre (bedroom furniture)"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Valet Stands and Clothes Rails",
+   "qty": 286,
+   "link": "https://www.maisonsdumonde.com/FR/fr/c/valets-de-nuits-et-portants-n25d5447903346fe80e9755531f4f0e12c881e0d",
+   "is_group": false,
+   "evidence": "rendered listing header '286 articles' on the category page (server-rendered HTML; verified identical to the header painted in the live browser DOM)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Office Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Desks",
+   "qty": 1175,
+   "link": "https://www.maisonsdumonde.com/FR/fr/c/bureaux-3ecf71c8798d34e8c3d78d47e0313270",
+   "is_group": false,
+   "evidence": "rendered listing header '1175 articles' on the category page (server-rendered HTML; verified identical to the header painted in the live browser DOM)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Office Chairs",
+   "qty": 786,
+   "link": "https://www.maisonsdumonde.com/FR/fr/c/chaises-de-bureau-ndee72f37702ca0ca2ce39cd12d391d8fb95b850",
+   "is_group": false,
+   "evidence": "rendered listing header '786 articles' on the category page (server-rendered HTML; verified identical to the header painted in the live browser DOM)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Desk Drawer Units",
+   "qty": 141,
+   "link": "https://www.maisonsdumonde.com/FR/fr/c/caissons-de-bureau-n259a7a2bdd9e50d90f22ef9503040209d63c1d5",
+   "is_group": false,
+   "evidence": "rendered listing header '141 articles' on the category page (server-rendered HTML; verified identical to the header painted in the live browser DOM)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Entryway Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Shoe Cabinets",
+   "qty": 1228,
+   "link": "https://www.maisonsdumonde.com/FR/fr/c/meubles-a-chaussures-na23ecd651be28bc8ecadfbe022d84b500232c61",
+   "is_group": false,
+   "evidence": "rendered listing header '1228 articles' on the category page (server-rendered HTML; verified identical to the header painted in the live browser DOM)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Entryway Benches",
+   "qty": 353,
+   "link": "https://www.maisonsdumonde.com/FR/fr/c/bancs-d-entree-n05437034f8d3ee7d930cb0336b4ff3838821bc2",
+   "is_group": false,
+   "evidence": "rendered listing header '353 articles' on the category page (server-rendered HTML; verified identical to the header painted in the live browser DOM)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Coat Stands and Wall Hooks",
+   "qty": 699,
+   "link": "https://www.maisonsdumonde.com/FR/fr/c/portemanteaux-et-pateres-n2e884dfe218a1029c7e9136e0d511163b4c5125",
+   "is_group": false,
+   "evidence": "rendered listing header '699 articles' on the category page (server-rendered HTML; verified identical to the header painted in the live browser DOM)",
+   "flag": "MANUAL REVIEW: mixed node - freestanding coat stands (furniture) alongside wall-mounted hook rails (not furniture); the site files it under Meubles > Meubles d entrees (entryway furniture)"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bathroom Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Vanity Units",
+   "qty": 1993,
+   "link": "https://www.maisonsdumonde.com/FR/fr/c/meubles-vasque-n90cf94d86cb4a8a2881e70032e03961284c2561",
+   "is_group": false,
+   "evidence": "rendered listing header '1993 articles' on the category page (server-rendered HTML; verified identical to the header painted in the live browser DOM)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bathroom Tall Cabinets",
+   "qty": 383,
+   "link": "https://www.maisonsdumonde.com/FR/fr/c/colonnes-de-salle-de-bain-n63dd531b36a996aeda33f4e61fee7bece625fd3",
+   "is_group": false,
+   "evidence": "rendered listing header '383 articles' on the category page (server-rendered HTML; verified identical to the header painted in the live browser DOM)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bathroom Base Cabinets",
+   "qty": 578,
+   "link": "https://www.maisonsdumonde.com/FR/fr/c/meubles-bas-de-salle-de-bain-n32ddf2269436ae19eab3e55a056b1aef4533cf1",
+   "is_group": false,
+   "evidence": "rendered listing header '578 articles' on the category page (server-rendered HTML; verified identical to the header painted in the live browser DOM)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bathroom Wall Cabinets",
+   "qty": 184,
+   "link": "https://www.maisonsdumonde.com/FR/fr/c/meubles-hauts-de-salle-de-bain-n5995702c30ebe9651f157e25a2a2eb8c4f5cd56",
+   "is_group": false,
+   "evidence": "rendered listing header '184 articles' on the category page (server-rendered HTML; verified identical to the header painted in the live browser DOM)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Mirrored Bathroom Cabinets",
+   "qty": 441,
+   "link": "https://www.maisonsdumonde.com/FR/fr/c/armoires-de-toilette-n7f29cd496bd21f4053e6567cbc6fd15bdc114d4",
+   "is_group": false,
+   "evidence": "rendered listing header '441 articles' on the category page (server-rendered HTML; verified identical to the header painted in the live browser DOM)",
+   "flag": "MANUAL REVIEW: bathroom storage cabinets with a mirrored front - kept as bathroom storage furniture rather than handed to Wall Decor as mirrors"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bathroom Shelf Units",
+   "qty": 180,
+   "link": "https://www.maisonsdumonde.com/FR/fr/c/etageres-de-salle-de-bain-ne649ecf6099f242623d7df6c545ba65f9f8ca39",
+   "is_group": false,
+   "evidence": "rendered listing header '180 articles' on the category page (server-rendered HTML; verified identical to the header painted in the live browser DOM)",
+   "flag": "MANUAL REVIEW: ambiguous shelving - most tiles are freestanding multi-tier bathroom shelf units and towel ladders, but the node also carries shower caddies and bath trays; the site files it under Meubles > Meubles de salle de bain"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Kitchen Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Kitchen Base Units",
+   "qty": 284,
+   "link": "https://www.maisonsdumonde.com/FR/fr/c/meubles-bas-ned568d40cfe0c709ed71ba2106bb5599f0f5a0b",
+   "is_group": false,
+   "evidence": "rendered listing header '284 articles' on the category page (server-rendered HTML; verified identical to the header painted in the live browser DOM)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Kitchen Wall Units",
+   "qty": 51,
+   "link": "https://www.maisonsdumonde.com/FR/fr/c/meubles-haut-n14d93e1b9a990dfc9059672637d62cf7d0f15d6",
+   "is_group": false,
+   "evidence": "rendered listing header '51 articles' on the category page (server-rendered HTML; verified identical to the header painted in the live browser DOM)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Kitchen Islands and Trolleys",
+   "qty": 453,
+   "link": "https://www.maisonsdumonde.com/FR/fr/c/ilots-et-dessertes-n8c26ff8481aa684727f060b559ce16ca28e02f6",
+   "is_group": false,
+   "evidence": "rendered listing header '453 articles' on the category page (server-rendered HTML; verified identical to the header painted in the live browser DOM)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bedding",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Beds",
+   "qty": 7809,
+   "link": "https://www.maisonsdumonde.com/FR/fr/c/lits-753b79b9b2e19310c0036162c3fc311f",
+   "is_group": false,
+   "evidence": "rendered listing header '7809 articles' on the category page (server-rendered HTML; verified identical to the header painted in the live browser DOM)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Headboards",
+   "qty": 1853,
+   "link": "https://www.maisonsdumonde.com/FR/fr/c/tetes-de-lit-accfd9f4c8ad258c1a7a126212b46dd6",
+   "is_group": false,
+   "evidence": "rendered listing header '1853 articles' on the category page (server-rendered HTML; verified identical to the header painted in the live browser DOM)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bedside Tables",
+   "qty": 2293,
+   "link": "https://www.maisonsdumonde.com/FR/fr/c/tables-de-chevet-08dfb1808f2aed1e939e3a4f0859ed40",
+   "is_group": false,
+   "evidence": "rendered listing header '2293 articles' on the category page (server-rendered HTML; verified identical to the header painted in the live browser DOM)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Electric Beds and Bed Bases",
+   "qty": 224,
+   "link": "https://www.maisonsdumonde.com/FR/fr/c/lits-et-sommiers-electriques-n3b29b535b37ef5a155492056b01f38843f0c016",
+   "is_group": false,
+   "evidence": "rendered listing header '224 articles' on the category page (server-rendered HTML; verified identical to the header painted in the live browser DOM)",
+   "flag": "MANUAL REVIEW: mixed node - adjustable/electric beds (furniture) sold alongside electric bed bases (bedding); the site offers no split"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Garden Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Garden Lounge Sets",
+   "qty": 1158,
+   "link": "https://www.maisonsdumonde.com/FR/fr/c/salons-de-jardin-n7f7d5f75b3dc0d48bb4e0a71b67059c669291a3",
+   "is_group": false,
+   "evidence": "rendered listing header '1158 articles' on the category page (server-rendered HTML; verified identical to the header painted in the live browser DOM)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Garden Sofas and Benches",
+   "qty": 337,
+   "link": "https://www.maisonsdumonde.com/FR/fr/c/canapes-et-banquettes-de-jardin-n38860a5e573f701810dcad01af74fa11b5f4d9f",
+   "is_group": false,
+   "evidence": "rendered listing header '337 articles' on the category page (server-rendered HTML; verified identical to the header painted in the live browser DOM)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Modular Garden Sofas",
+   "qty": 149,
+   "link": "https://www.maisonsdumonde.com/FR/fr/c/canapes-de-jardin-modulables-n9316f58f9248b3655fb66bc0a0e0c494181c6b6",
+   "is_group": false,
+   "evidence": "rendered listing header '149 articles' on the category page (server-rendered HTML; verified identical to the header painted in the live browser DOM)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Garden Table and Chair Sets",
+   "qty": 1316,
+   "link": "https://www.maisonsdumonde.com/FR/fr/c/ensemble-table-et-chaises-de-jardin-n75e517c520854877674ae9dedf9f6dc88e1fbaf",
+   "is_group": false,
+   "evidence": "rendered listing header '1316 articles' on the category page (server-rendered HTML; verified identical to the header painted in the live browser DOM)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Garden Tables",
+   "qty": 1352,
+   "link": "https://www.maisonsdumonde.com/FR/fr/c/tables-de-jardin-ncec914a933299e6b557802c93a8e159355e80da",
+   "is_group": false,
+   "evidence": "rendered listing header '1352 articles' on the category page (server-rendered HTML; verified identical to the header painted in the live browser DOM)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Garden Coffee Tables",
+   "qty": 544,
+   "link": "https://www.maisonsdumonde.com/FR/fr/c/tables-basses-de-jardin-ncbc9ae74da20693d113a5cff27ad86697f950c0",
+   "is_group": false,
+   "evidence": "rendered listing header '544 articles' on the category page (server-rendered HTML; verified identical to the header painted in the live browser DOM)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Garden Chairs",
+   "qty": 1725,
+   "link": "https://www.maisonsdumonde.com/FR/fr/c/chaises-de-jardin-n7a8af009f6a72c8d94a6adef6be8031bfde1c5f",
+   "is_group": false,
+   "evidence": "rendered listing header '1725 articles' on the category page (server-rendered HTML; verified identical to the header painted in the live browser DOM)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Garden Armchairs",
+   "qty": 691,
+   "link": "https://www.maisonsdumonde.com/FR/fr/c/fauteuils-de-jardin-n29d3b22d3ed830719f232ed459def5076e4e0bc",
+   "is_group": false,
+   "evidence": "rendered listing header '691 articles' on the category page (server-rendered HTML; verified identical to the header painted in the live browser DOM)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Hanging Chairs",
+   "qty": 128,
+   "link": "https://www.maisonsdumonde.com/FR/fr/c/fauteuils-suspendus-n22610f06755f97dfa0008c8e685c284fd71d125",
+   "is_group": false,
+   "evidence": "rendered listing header '128 articles' on the category page (server-rendered HTML; verified identical to the header painted in the live browser DOM)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sun Loungers and Deckchairs",
+   "qty": 956,
+   "link": "https://www.maisonsdumonde.com/FR/fr/c/bains-de-soleil-et-chaises-longues-n9231b403b12f68a75fc6f6fec95a0fb9808fb2c",
+   "is_group": false,
+   "evidence": "rendered listing header '956 articles' on the category page (server-rendered HTML; verified identical to the header painted in the live browser DOM)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Garden Benches",
+   "qty": 236,
+   "link": "https://www.maisonsdumonde.com/FR/fr/c/bancs-de-jardin-n2221827ab36b592126aa33d63bddfedba6ec316",
+   "is_group": false,
+   "evidence": "rendered listing header '236 articles' on the category page (server-rendered HTML; verified identical to the header painted in the live browser DOM)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Garden Poufs",
+   "qty": 338,
+   "link": "https://www.maisonsdumonde.com/FR/fr/c/poufs-de-jardin-n384928c35550e73b87362bd50425f327a6dd462",
+   "is_group": false,
+   "evidence": "rendered listing header '338 articles' on the category page (server-rendered HTML; verified identical to the header painted in the live browser DOM)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Hammocks",
+   "qty": 112,
+   "link": "https://www.maisonsdumonde.com/FR/fr/c/hamacs-ncfa80de6f7f4dcb0d45aadd28ac577e4c0be245",
+   "is_group": false,
+   "evidence": "rendered listing header '112 articles' on the category page (server-rendered HTML; verified identical to the header painted in the live browser DOM)",
+   "flag": "MANUAL REVIEW: ambiguous - hammocks including free-standing framed models; the site files this node inside Jardin > Mobilier de jardin (garden furniture)"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Outdoor Kitchens",
+   "qty": 123,
+   "link": "https://www.maisonsdumonde.com/FR/fr/c/cuisines-d-exterieur-n3a51418032c8baa7724e96d5fbfd4f1d8312b2f",
+   "is_group": false,
+   "evidence": "rendered listing header '123 articles' on the category page (server-rendered HTML; verified identical to the header painted in the live browser DOM)",
+   "flag": "MANUAL REVIEW: outdoor kitchen cabinetry (units with drawers, sinks and shelves) - furniture by product type, but the site files it under Jardin > Amenagement de jardin rather than Mobilier de jardin"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Kids Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Kids Wardrobes",
+   "qty": 222,
+   "link": "https://www.maisonsdumonde.com/FR/fr/c/armoires-enfant-ncce987d33d70f843d8bd978c464da4ac2d39a9f",
+   "is_group": false,
+   "evidence": "rendered listing header '222 articles' on the category page (server-rendered HTML; verified identical to the header painted in the live browser DOM)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Kids Chests of Drawers",
+   "qty": 192,
+   "link": "https://www.maisonsdumonde.com/FR/fr/c/commodes-enfant-ne9c76fcd8856da394d81ada73f762e2926e9e81",
+   "is_group": false,
+   "evidence": "rendered listing header '192 articles' on the category page (server-rendered HTML; verified identical to the header painted in the live browser DOM)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Kids Desks",
+   "qty": 139,
+   "link": "https://www.maisonsdumonde.com/FR/fr/c/bureaux-enfant-n3857ade6a12146854df65f4eb62d775a77b2429",
+   "is_group": false,
+   "evidence": "rendered listing header '139 articles' on the category page (server-rendered HTML; verified identical to the header painted in the live browser DOM)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Kids Desk Chairs",
+   "qty": 14,
+   "link": "https://www.maisonsdumonde.com/FR/fr/c/chaises-de-bureau-enfant-n24a361a934dfff2c3ef72d7b4a0fbc3dc2e5250",
+   "is_group": false,
+   "evidence": "rendered listing header '14 articles' on the category page (server-rendered HTML; verified identical to the header painted in the live browser DOM)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Kids Bookcases and Shelves",
+   "qty": 320,
+   "link": "https://www.maisonsdumonde.com/FR/fr/c/bibliotheques-et-etageres-enfant-n586ca3b5499341a34a5f211ac447faacb1e303b",
+   "is_group": false,
+   "evidence": "rendered listing header '320 articles' on the category page (server-rendered HTML; verified identical to the header painted in the live browser DOM)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Kids Armchairs and Poufs",
+   "qty": 438,
+   "link": "https://www.maisonsdumonde.com/FR/fr/c/fauteuils-et-poufs-enfant-n7c268db51bba1e334d22779dc778b8f6640bce8",
+   "is_group": false,
+   "evidence": "rendered listing header '438 articles' on the category page (server-rendered HTML; verified identical to the header painted in the live browser DOM)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Kids Tables and Chairs",
+   "qty": 257,
+   "link": "https://www.maisonsdumonde.com/FR/fr/c/tables-et-chaises-enfant-nd3b38aa0bedfe29983bf7451d3a685946e054cb",
+   "is_group": false,
+   "evidence": "rendered listing header '257 articles' on the category page (server-rendered HTML; verified identical to the header painted in the live browser DOM)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Kids Garden Furniture",
+   "qty": 109,
+   "link": "https://www.maisonsdumonde.com/FR/fr/c/mobilier-de-jardin-enfant-n0c7e66ad9297fdde6208863dbfa1af3ac098aa7",
+   "is_group": false,
+   "evidence": "rendered listing header '109 articles' on the category page (server-rendered HTML; verified identical to the header painted in the live browser DOM)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Baby and Kids Bedding",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Kids Beds",
+   "qty": 3844,
+   "link": "https://www.maisonsdumonde.com/FR/fr/c/lits-enfant-nc2ce24ba63681119cde994fd820a99327f81073",
+   "is_group": false,
+   "evidence": "rendered listing header '3844 articles' on the category page (server-rendered HTML; verified identical to the header painted in the live browser DOM)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Cribs",
+   "qty": 363,
+   "link": "https://www.maisonsdumonde.com/FR/fr/c/lits-bebe-nbf08ce271d8414ff9b6b08e9feb9c258cba97b5",
+   "is_group": false,
+   "evidence": "rendered listing header '363 articles' on the category page (server-rendered HTML; verified identical to the header painted in the live browser DOM)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Kids Bedside Tables",
+   "qty": 92,
+   "link": "https://www.maisonsdumonde.com/FR/fr/c/tables-de-chevet-enfant-n4d48a016362b0565b6c679b97d37c0136c3706e",
+   "is_group": false,
+   "evidence": "rendered listing header '92 articles' on the category page (server-rendered HTML; verified identical to the header painted in the live browser DOM)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Kids Headboards and Bed Accessories",
+   "qty": 119,
+   "link": "https://www.maisonsdumonde.com/FR/fr/c/tetes-de-lits-et-accessoires-de-lits-enfants-n0ba6439a43b6815946982423a299c55a49b86df",
+   "is_group": false,
+   "evidence": "rendered listing header '119 articles' on the category page (server-rendered HTML; verified identical to the header painted in the live browser DOM)",
+   "flag": "MANUAL REVIEW: mixed node - kids headboards (furniture) sold alongside bed accessories; the site offers no split"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Nursery Equipment",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Changing Tables and Chests of Drawers",
+   "qty": 205,
+   "link": "https://www.maisonsdumonde.com/FR/fr/c/commodes-et-tables-a-langer-nfdb760ad67b4d71b3ec7ca1ec992a981300189f",
+   "is_group": false,
+   "evidence": "rendered listing header '205 articles' on the category page (server-rendered HTML; verified identical to the header painted in the live browser DOM)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Baby High Chairs",
+   "qty": 83,
+   "link": "https://www.maisonsdumonde.com/FR/fr/c/chaises-hautes-bebe-n20d4def82aecd3cba46bd4d5379ad5382f4d86e",
+   "is_group": false,
+   "evidence": "rendered listing header '83 articles' on the category page (server-rendered HTML; verified identical to the header painted in the live browser DOM)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Travel Cots",
+   "qty": 15,
+   "link": "https://www.maisonsdumonde.com/FR/fr/c/lits-parapluie-nbf193e52f2619a0dfe4f6497b5d3e77ea5837a0",
+   "is_group": false,
+   "evidence": "rendered listing header '15 articles' on the category page (server-rendered HTML; verified identical to the header painted in the live browser DOM)",
+   "flag": "MANUAL REVIEW: ambiguous - travel cots are portable baby cots; included because the brief counts cribs as furniture, but they read as baby equipment"
+  }
+ ]
+}

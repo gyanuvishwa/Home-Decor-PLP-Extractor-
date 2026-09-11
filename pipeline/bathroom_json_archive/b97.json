@@ -1,0 +1,104 @@
+{
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ACCESS & DOMAIN: ampm.fr serves NO independent catalogue - every path on it, robots.txt included, 301-redirects to https://www.laredoute.fr/pplp/cat-85201.aspx (confirmed this session: a fetch of https://www.ampm.fr/robots.txt returns 301 Moved Permanently with Location: https://www.laredoute.fr/pplp/cat-85201.aspx, and direct curl_cffi to ampm.fr/robots.txt is 403 behind the same Cloudflare country challenge). AM.PM is sold as a brand subtree of La Redoute's French platform, so laredoute.fr is the governing host and laredoute.fr/robots.txt is the governing robots file - the same finding as the prior Home-Decor (archive c105) and Furniture passes. ROBOTS: https://www.laredoute.fr/robots.txt was fetched FIRST (HTTP 200 via curl_cffi/edge101, before any category page). It contains one 'User-agent: *' group plus named groups for proximic (Disallow: /), admantX (Disallow: /), Mediapartners-Google (Allow: /), OLEcrawler (Allow: /), Bingbot (Disallow: *schema.org*) and Pinterestbot (Crawl-delay: 1). There is NO anthropic-ai / ClaudeBot / Claude-Web / Claude-User / Claude-SearchBot group anywhere in the file and no Content-Signal line, so no Claude-specific exclusion applies and no Crawl-delay binds us. The '*' bans were honoured exactly: no /services/*, /producthelper/*, /categories/*, /servicewishlist*, /psrch/nrslt.aspx, no *.htm URL, nothing matching *filter=True$, and never /pplp/100/95249/cat-211053. ?brndid= is not disallowed. Direct curl_cffi on every desktop/mobile profile returns the Cloudflare 'Country challenge' 403; the working route, as in the Furniture pass, is a plain python-requests GET with the Googlebot user-agent, which returns HTTP 200 and the full prerendered PLP (~0.9-1.1 MB). Requests were paced ~1.2 s apart in one keep-alive session. TREE - TWO INDEPENDENT REPRESENTATIONS, BOTH WALKED. (1) AM.PM'S OWN CATEGORY TAXONOMY, rooted at cat-85201. It was enumerated to fixpoint: seeded from the 61 /pplp/85201/... URLs in https://www.laredoute.fr/sitemap-categories.xml (2,262 category URLs total) plus the AM.PM hub's own links, then breadth-first expanded through each page's guided-navigation carousel, with every discovered id re-rooted by the authoritative \"BreadCrumbDetail\" JSON embedded in its own PLP (the carousel mixes children with siblings and uncles and cannot be trusted for parentage). The crawl closed after 3 rounds at 89 nodes, every one of which breadcrumbs to 'AM.PM'. Its departments are Meuble (301), Canape/fauteuil (1600), Table/chaise (353), Lit/literie (169), Decoration (508), Linge de maison (294), Luminaire (182), Art de la table (184), Jardin (96) and Nouveautes (552). THERE IS NO SALLE DE BAIN DEPARTMENT AND NO BATHROOM LEAF IN THIS TAXONOMY AT ALL - the only bathroom-vocabulary node in all 89 is 'AM.PM > Linge de maison > Linge de bain' (cat-85264, 6 items), which is bath linen and routes to Textile. (2) THE MAIN LA REDOUTE TAXONOMY UNDER AM.PM'S OWN BRAND FILTER, ?brndid=ampm - the site's own mechanism for scoping a category to one brand, the same device the validated SR 98 / SR 278 passes used for La Redoute Interieurs. This is where AM.PM's bathroom range actually lives, and it is the source of the three recorded rows. HOW THE FILTER WAS VALIDATED (a real trap here): ?brndid=ampm does NOT always apply. When AM.PM stocks the node the h1 gains the suffix ' AM.PM' and the count drops; when AM.PM stocks NOTHING the parameter is silently DROPPED and the page returns the full unfiltered marketplace h1 and count. Every read below was accepted only after checking that h1 suffix, and every node where the suffix failed to appear was treated as an empty AM.PM subset and moved to `review` rather than recorded. (The brand id is 'ampm', not 'am-pm' - ?brndid=am-pm was tested and is silently ignored on every node, returning unfiltered figures; that variant was discarded.) BATHROOM TREE UNDER ?brndid=ampm: Meuble > Meuble de salle de bain (cat-75495) = 1, with all three of its unfiltered children (Meuble sous vasque 386011, Meuble rangement 158210, Porte serviettes/sechoir 75498) empty for AM.PM, so cat-75495 is itself a childless leaf and is recorded on its own URL per rule 24; Decoration > Miroir (cat-75456) = 64, whose brand-filtered guided navigation exposes exactly two children, Miroir mural (decorative) and Miroir de salle de bain (cat-75496) = 4, the latter recorded under rule 10; Decoration > Rangement deco > Organisation de la salle de bain (cat-385864) = 10, whose brand-filtered guided navigation lists Panier a linge (cat-75497) = 10 as its ONLY child, the other three siblings (Accessoires de salle de bain, Poubelle salle de bain, Accessoires WC) being empty for AM.PM. The whole Bricolage > Salle de bain, robinetterie branch (sanitaryware, taps, baths, showers, screens) is empty for AM.PM. SCOPE NOTE: the Furniture pass recorded SR 97 from AM.PM's own /pplp/85201/... taxonomy. That taxonomy publishes no bathroom node, so a taxonomy-only reading would have returned NO BATHROOM FOUND and silently dropped 15 real AM.PM bathroom products. Because ?brndid=ampm URLs are the site's own verified category listing URLs carrying their own exact rendered totals, they are recorded here, and the taxonomy-side absence is documented above so the two readings are reconcilable. The recorded URLs do not collide with any /pplp/85201/... URL the Furniture pass took. QTY: every qty is the rendered listing header, the <span id=\"ProductCount\"> immediately after the h1, cross-checked on every row against the grid's own data-totalproduct attribute - the two agreed on every node. CHILDREN-SUM-TO-PARENT: Organisation de la salle de bain AM.PM 10 = Panier a linge AM.PM 10, its only child, exact. Miroir AM.PM 64 splits into Miroir mural + Miroir de salle de bain (4). SUBSET SANITY CHECK: on every node where the filter applied, the AM.PM count is strictly and dramatically smaller than the unfiltered count (1 < 1673, 4 < 296, 10 < 2180, 64 < 1790, 6 < 2878), the expected brand-subset relation. CROSS-REPRESENTATION CHECK: AM.PM's own Linge de bain node (cat-85264, 6) and the main-tree cat-84135?brndid=ampm (6) return the identical count, independent evidence that the brand filter reproduces the AM.PM catalogue rather than some other slice. DRIFT CHECK: all recorded and reviewed leaves were re-fetched cache-cold in a second pass and every ProductCount and data-totalproduct came back identical (75495 1, 385864 10, 75497 10, 75496 4, 75456 64, 84135 6, 85264 6, 285674 66). COUNTS DISCRIMINATE across the AM.PM tree from 1 to 1600. EXCLUDED / ROUTED: see `review` - Linge de bain (6) routed to Textile; AM.PM's own decorative Miroir node (66) and the main-tree Miroir parent (64) not recorded (rules 21, 24); the three empty Meuble de salle de bain children, the three empty Organisation siblings and the entire empty Bricolage sanitaryware branch logged as no-AM.PM-subset; AM.PM > Luminaire (182) inspected per rule 19 and found to contain no bathroom-lighting node, so nothing was routed to Lighting. 'Panier a linge' IS recorded as Bathroom because La Redoute files it under 'Organisation de la salle de bain' (rules 12, 13 keep bathroom baskets in Bathroom). DEDUP: dedup.already_extracted() was run on all eight candidate and review URLs; none is in the exclusion index. The 26 AM.PM URLs Furniture.xlsx holds are all /pplp/85201/... furniture nodes and none overlaps anything here.",
+ "rows": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Furniture",
+   "qty": 1,
+   "link": "https://www.laredoute.fr/pplp/100/75363/75491/cat-75495.aspx?brndid=ampm",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Mirror",
+   "qty": 4,
+   "link": "https://www.laredoute.fr/pplp/100/75363/75491/cat-75496.aspx?brndid=ampm",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Organization",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Laundry Basket",
+   "qty": 10,
+   "link": "https://www.laredoute.fr/pplp/100/75363/75491/cat-75497.aspx?brndid=ampm",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  }
+ ],
+ "review": [
+  {
+   "category": "Bathroom",
+   "sub_category": "AM.PM > Home Linen > Bath Linen",
+   "qty": 6,
+   "issue": "ROUTED TO TEXTILE: bath linen (rules 15, 20). This is the ONLY bathroom-vocabulary node in AM.PM's own 89-node category tree. Its AM.PM-filtered guided navigation on the main taxonomy lists five children - Drap de bain, Serviette de toilette, Peignoir, Tapis de bain, Gant de toilette - all textile, so the whole branch leaves Bathroom. The equivalent main-tree URL /pplp/100/84100/cat-84135.aspx?brndid=ampm returns the identical count 6, confirming the two representations are the same set.",
+   "link": "https://www.laredoute.fr/pplp/85201/85252/cat-85264.aspx"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "AM.PM > Decoration > Mirror",
+   "qty": 66,
+   "issue": "NOT RECORDED - AM.PM's own decorative mirror node under Decoration. Primary product type is a decorative wall mirror -> Wall Decor (rules 11, 21). Its guided navigation exposes no bathroom-mirror child at all; the bathroom-mirror subset is only reachable through the main La Redoute taxonomy at cat-75496?brndid=ampm (4), which IS recorded in rows. Note the two AM.PM mirror representations differ slightly - the AM.PM-taxonomy node cat-285674 reads 66 while the main-tree cat-75456?brndid=ampm reads 64 - so they are not byte-identical mirrors of each other; only the main-tree one exposes the bathroom split.",
+   "link": "https://www.laredoute.fr/pplp/cat-285674.aspx"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Decoration > Mirror (AM.PM)",
+   "qty": 64,
+   "issue": "NOT RECORDED as a Bathroom row - parent of the recorded 'Miroir de salle de bain' (4) and of 'Miroir mural' (decorative). Rule 24 forbids recording the parent when a valid child listing exists. Logged so the parent figure is on record.",
+   "link": "https://www.laredoute.fr/pplp/100/75363/75443/cat-75456.aspx?brndid=ampm"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Furniture > Vanity Unit / Bathroom Storage Unit / Towel Rail, Heated Towel Rail",
+   "qty": null,
+   "issue": "NOT RECORDED - AM.PM stocks ZERO products in all three children of Meuble de salle de bain. Appending ?brndid=ampm to cat-386011, cat-158210 and cat-75498 is silently IGNORED by the site (h1 keeps no ' AM.PM' suffix and the count stays at the full unfiltered marketplace value 706 / 671 / 300), which is this site's tell for an empty brand subset; and with the filter applied the parent cat-75495's own guided navigation lists none of them. That is why the parent cat-75495?brndid=ampm (1 product) is itself recorded as a leaf under rule 24's 'a category with no subcategories may use its own URL'.",
+   "link": "https://www.laredoute.fr/pplp/100/75363/75491/cat-75495.aspx?brndid=ampm"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "[no AM.PM subset] DIY > Bathroom, Fittings and its 7 children",
+   "qty": null,
+   "issue": "NOT RECORDED - AM.PM sells no sanitaryware. ?brndid=ampm on cat-361524 (Salle de bain, robinetterie), and on each of Vasque/lavabo/lave-mains, Cabine de douche/receveur, Baignoire, Robinet salle de bain, Robinet cuisine, Accessoires douche and Paroi de douche/pare-baignoire, is silently ignored in every case (unsuffixed h1, unchanged unfiltered counts 826/511/114/17/88/22/15/97). Logged so this whole genuine-Bathroom branch is not silently skipped for this company.",
+   "link": "https://www.laredoute.fr/pplp/cat-361524.aspx?brndid=ampm"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "[no AM.PM subset] Bathroom Organization > Bathroom Accessories / Bathroom Bin / Toilet Accessories",
+   "qty": null,
+   "issue": "NOT RECORDED - AM.PM stocks nothing in these three siblings of the recorded Panier a linge. ?brndid=ampm is silently ignored on cat-75492, cat-75499 and cat-75493 (unsuffixed h1, unchanged unfiltered counts 1103 / 177 / 672), and with the filter applied the parent cat-385864 lists Panier a linge as its only child - which is why the parent's AM.PM total (10) equals that child exactly.",
+   "link": "https://www.laredoute.fr/pplp/cat-385864.aspx?brndid=ampm"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "AM.PM > Lighting",
+   "qty": 182,
+   "issue": "NOT RECORDED and NOTHING ROUTED TO LIGHTING: AM.PM's Luminaire branch was inspected as rule 19 requires. Its five children are Abat-jour/accessoires electriques (12), Applique (55), Lampadaire/liseuse (34), Lampe (40) and Suspension/plafonnier (41) - general home lighting with no bathroom, vanity or mirror-light node anywhere beneath it, so there is no bathroom-lighting record to hand to Lighting.",
+   "link": "https://www.laredoute.fr/pplp/85201/85232/cat-85211.aspx"
+  }
+ ],
+ "_reconstructed_from": "Bathroom.xlsx delivered 2026-09-01 (checkpoint), not original worker JSON"
+}

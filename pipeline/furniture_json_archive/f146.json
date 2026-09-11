@@ -1,0 +1,192 @@
+{
+  "sr": 146,
+  "company": "Zara Home France",
+  "brand_site": "zarahome.com",
+  "country": "France",
+  "site_url": "https://www.zarahome.com/fr/",
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "ACCESS: reached exclusively through the Claude-in-Chrome connector in my own tab (tabId 1961714878); no curl/requests/WebFetch/proxy at any point. The Akamai interstitial that the prior HTTP-based Home-Decor pass had to solve never appeared in a real Chrome session, and no 403/challenge/rate-limit was seen at any point. robots.txt for this host was already read in full twice in this project (5840 bytes; the user-agent blocks are only HTTrack, Slurp, MJ12bot, proximic and the Amazon bots - zero occurrences of 'claude' or 'anthropic'), so there is no Claude-specific disallow and I did not re-fetch it. TREE SOURCE: the site's own category tree API, fetched same-origin from the loaded page with javascript_tool: /itxrest/2/catalog/store/84009901/80209919/category?languageId=-2&appId=1 (storeId 84009901 / catalogId 80209919 / languageId -2 = the FR store/catalog pair confirmed by the prior Home-Decor pass, a genuinely separate catalogue from the ES store 84009900/80290093 done as SR 117). 737 nodes total. There is a single top-level FURNITURE department, id 1020564154 'MEUBLES' (categoryUrl meubles-tout-n4143), with 28 non-EMPTY children and NO deeper level - the furniture menu is genuinely flat, the 'empty'/'EMPTY' children being mega-menu separators. Hierarchy is therefore two levels (department -> leaf) and there are no grouping rows to emit. TRAP 1 CROSS-CHECK: I keyword-swept all 737 nodes (meuble/mobilier/chaise/fauteuil/canape/table/lit/bureau/armoire/etagere/buffet/vitrine/tabouret/banc/banquette/console/commode/biblioth/penderie/dressing/rangement/pouf/exterieur/jardin/chevet plus the English equivalents) for furniture filed outside MEUBLES: the only hits were duplicates of MEUBLES nodes reached through room departments (CHAMBRE > LITS ET TETES DE LIT = the same chambre-cadres-de-lit-n4166 page; ENFANTS ET BEBES > MEUBLES and > RENTREE DES CLASSES > Bureaux et chaises = the same enfants-meubles-n1122 page; CHAMBRE > DRESSING > Meubles = the meubles-n4104 department landing), plus the VINCENT VAN DUYSEN designer page and a HOME OFFICE stationery editorial. I also loaded the department landing https://www.zarahome.com/fr/meubles-n4104 in the tab and diffed every '-nNNNN' anchor rendered on it against the taxonomy: zero sub-category nodes the API tree did not already have. (meubles-tout-n4143 itself redirects to /fr/error.html - it is a menu-only node with no listing page, so it is not a row.) QTY METHOD: Zara Home FR renders NO 'N articles/produits/resultats' header anywhere in its grid (I scanned the rendered listing body text for any such string and found none), so per rule 2 counts come from the site's own listing endpoint /itxrest/3/catalog/store/84009901/80209919/category/<internalCategoryId>/product?showProducts=false&showNoStock=false&withSubCategories=false&languageId=-2&appId=1, taking productIds.length. This is the same method f117 established and validated on the ES sibling. VALIDATION of that method on FR (one, not twenty): I loaded https://www.zarahome.com/fr/meubles-rangement-n4111 in the tab, scrolled the grid to the end and counted unique product tiles by their ?pelement=<id> parameter -> exactly 22 unique tiles, identical to the API's productIds.length of 22 for that node; canonical and title on that page matched the node. (The same response's 'products' object is capped at 10 detail records and 'gridElements' is a layout array - neither is a count; productIds and sortedProductIds are the full list and agree.) DRIFT CHECK: all 20 leaf counts were read twice in separate passes minutes apart and every value was identical. No count is suspiciously round and every count differs by category (the site-wide furniture total is 319, which none of the leaves report). Node identity comes from the site's own taxonomy: each categoryUrl is the slug the API itself publishes for that internal categoryId, so no slug was invented and the bad-slug/parent-serving trap does not apply; the pages I did load resolved to their own canonical. DEDUP / WHAT I DROPPED, decided by product-ID set arithmetic on the API's productIds, not by name: the MEUBLES department also carries room-rollup children that are cross-cutting views over the same product-type leaves. Against the union of the 18 adult product-type leaves (255 unique ids), MEUBLES DE CUISINE (kitchen furniture, cuisine-meubles-n1409, 19) was 19/19 contained, MEUBLES DE SALLE DE BAINS (bathroom furniture, salle-de-bain-meubles-n2469, 22) was 22/22 contained, MEUBLES DE CHAMBRE (bedroom furniture, chambre-meubles-tout-n4130, 34) was 31/34, the hidden dining-furniture rollup E-I-A_MUEBLES_COMEDOR_OCULTA (salle-a-manger-meubles-tout-n4740, 23) was 20/23 and BUREAU (office furniture, furniture-office-n5761, 19) was 16/19 - all dropped as parent rollups whose children I already record, per the deepest-URL rule. This reproduces exactly the pattern SR 117 found on the ES sibling. Also dropped: 'TOUT AFFICHER' and 'BESTSELLERS' (both meubles-n4104, 319 products) as See-All / bestseller pages per rule 3, meubles-tout-n4143 as the menu-only department node with no listing page, and 'VINCENT VAN DUYSEN' (vincent-van-duysen-furniture-n3879) as a designer collection page per rule 3. KEPT despite being room-named, because their populations are genuinely distinct rather than duplicates: SALON DE JARDIN (outdoor furniture, 27) shares only 3 ids with the adult product-type union, and ENFANTS (kids furniture, 55) shares only 5 - both are separate product populations, and kids and outdoor furniture are explicitly in scope. SIBLING OVERLAP among the leaves I kept, all left in place as genuinely different site listings and flagged where material: Sofas vs Poufs share 10 of 18; Side Tables vs Bedside Tables share 6 of 25; Sideboards vs Console Tables share 5 of 9; Shelving Units vs Sideboards share 4; Stools vs Poufs share 3; Benches vs Storage Furniture share 3. AMBIGUITY RESOLVED ON PRODUCT EVIDENCE, not on the facet: I pulled full product-name lists for the five judgement-call nodes via /itxrest/3/catalog/store/84009901/80209919/productsArray?productIds=...&languageId=-2&appId=1 (nameEn field) rather than opening 128 product pages. Storage-vs-furniture line: RANGEMENTS is kept because its 22 products are storage FURNITURE (display cabinet with glass doors, storage units, wall storage unit, shoe benches, storage bench, waiter trolley, step stools) with no baskets or bins; standalone baskets/boxes live in separate nodes (salle-de-bain-corbeilles-paniers-n4142, enfant-rangement-n3831, cuisine-rangement-n3835, salle-de-bain-boites-n3886) which I did not take. EXCLUDED BY RULESET, not furniture: everything under DECORATION (mirrors, lamps, vases, candles, frames, furniture knobs and hooks), CUISINE ET SALLE A MANGER (tableware, glassware, table linen), CHAMBRE bed linen and bedspreads, SALLE DE BAIN towels/fixtures/storage boxes, PARFUMS D AMBIANCE, BUANDERIE ET MENAGE, VETEMENTS ET CHAUSSURES, COLLECTION ANIMAUX DE COMPAGNIE, LIFESTYLE, and all editorial/TRENDS/CULINARY STORIES branches. NAMING: sub_category names are the English of the FR node's own menu label (FAUTEUILS -> Armchairs, CANAPES -> Sofas, BANQUETTES -> Benches, BUFFETS ET VITRINES -> Sideboards and Display Cabinets, RANGEMENTS -> Storage Furniture). These are the same internal category ids as the ES sibling but the FR menu labels differ slightly, so a few English names differ from f117 even though the id is identical.",
+  "rows": [
+    {
+      "category": "Furniture",
+      "sub_category": "Outdoor Furniture",
+      "qty": 27,
+      "link": "https://www.zarahome.com/fr/meubles-exterieur-n4250",
+      "is_group": false,
+      "evidence": "site listing API productIds.length=27 for internal categoryId 1020742389 at /itxrest/3/catalog/store/84009901/80209919/category/1020742389/product?showProducts=false&showNoStock=false&withSubCategories=false&languageId=-2&appId=1 (Zara Home FR renders NO 'N items/articles' header anywhere in its grid - checked the rendered listing directly - so this is a rule-2 structured-data fallback; method validated tile-for-tile on meubles-rangement-n4111 where the scrolled-to-end grid gave exactly 22 unique ?pelement= tiles against the API's 22); read twice in separate passes, 27 both times",
+      "flag": "MANUAL REVIEW: primary product type is outdoor furniture (folding and teak loungers, woven and forged-metal chairs/armchairs, outdoor benches, outdoor tables, folding stools, rattan couch) but 2 of the 27 are non-furniture - a striped topper with piping and a striped seat cushion"
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Armchairs",
+      "qty": 18,
+      "link": "https://www.zarahome.com/fr/meubles-fauteuils-n4106",
+      "is_group": false,
+      "evidence": "site listing API productIds.length=18 for internal categoryId 1020564655 at /itxrest/3/catalog/store/84009901/80209919/category/1020564655/product?showProducts=false&showNoStock=false&withSubCategories=false&languageId=-2&appId=1 (Zara Home FR renders NO 'N items/articles' header anywhere in its grid - checked the rendered listing directly - so this is a rule-2 structured-data fallback; method validated tile-for-tile on meubles-rangement-n4111 where the scrolled-to-end grid gave exactly 22 unique ?pelement= tiles against the API's 22); read twice in separate passes, 18 both times",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Sofas",
+      "qty": 39,
+      "link": "https://www.zarahome.com/fr/meubles-canapes-fauteuils-n4113",
+      "is_group": false,
+      "evidence": "site listing API productIds.length=39 for internal categoryId 1020564658 at /itxrest/3/catalog/store/84009901/80209919/category/1020564658/product?showProducts=false&showNoStock=false&withSubCategories=false&languageId=-2&appId=1 (Zara Home FR renders NO 'N items/articles' header anywhere in its grid - checked the rendered listing directly - so this is a rule-2 structured-data fallback; method validated tile-for-tile on meubles-rangement-n4111 where the scrolled-to-end grid gave exactly 22 unique ?pelement= tiles against the API's 22); read twice in separate passes, 39 both times",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Stools",
+      "qty": 30,
+      "link": "https://www.zarahome.com/fr/meubles-tabourets-n4892",
+      "is_group": false,
+      "evidence": "site listing API productIds.length=30 for internal categoryId 1020615411 at /itxrest/3/catalog/store/84009901/80209919/category/1020615411/product?showProducts=false&showNoStock=false&withSubCategories=false&languageId=-2&appId=1 (Zara Home FR renders NO 'N items/articles' header anywhere in its grid - checked the rendered listing directly - so this is a rule-2 structured-data fallback; method validated tile-for-tile on meubles-rangement-n4111 where the scrolled-to-end grid gave exactly 22 unique ?pelement= tiles against the API's 22); read twice in separate passes, 30 both times",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Benches",
+      "qty": 14,
+      "link": "https://www.zarahome.com/fr/meubles-banquettes-n4891",
+      "is_group": false,
+      "evidence": "site listing API productIds.length=14 for internal categoryId 1020615412 at /itxrest/3/catalog/store/84009901/80209919/category/1020615412/product?showProducts=false&showNoStock=false&withSubCategories=false&languageId=-2&appId=1 (Zara Home FR renders NO 'N items/articles' header anywhere in its grid - checked the rendered listing directly - so this is a rule-2 structured-data fallback; method validated tile-for-tile on meubles-rangement-n4111 where the scrolled-to-end grid gave exactly 22 unique ?pelement= tiles against the API's 22); read twice in separate passes, 14 both times",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Chairs",
+      "qty": 23,
+      "link": "https://www.zarahome.com/fr/meubles-chaises-n4105",
+      "is_group": false,
+      "evidence": "site listing API productIds.length=23 for internal categoryId 1020564155 at /itxrest/3/catalog/store/84009901/80209919/category/1020564155/product?showProducts=false&showNoStock=false&withSubCategories=false&languageId=-2&appId=1 (Zara Home FR renders NO 'N items/articles' header anywhere in its grid - checked the rendered listing directly - so this is a rule-2 structured-data fallback; method validated tile-for-tile on meubles-rangement-n4111 where the scrolled-to-end grid gave exactly 22 unique ?pelement= tiles against the API's 22); read twice in separate passes, 23 both times",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Poufs",
+      "qty": 18,
+      "link": "https://www.zarahome.com/fr/meubles-poufs-n4843",
+      "is_group": false,
+      "evidence": "site listing API productIds.length=18 for internal categoryId 1020615413 at /itxrest/3/catalog/store/84009901/80209919/category/1020615413/product?showProducts=false&showNoStock=false&withSubCategories=false&languageId=-2&appId=1 (Zara Home FR renders NO 'N items/articles' header anywhere in its grid - checked the rendered listing directly - so this is a rule-2 structured-data fallback; method validated tile-for-tile on meubles-rangement-n4111 where the scrolled-to-end grid gave exactly 22 unique ?pelement= tiles against the API's 22); read twice in separate passes, 18 both times",
+      "flag": "MANUAL REVIEW: separate menu node but overlaps the Sofas listing - 10 of these 18 product ids also appear in meubles-canapes-fauteuils-n4113; both kept because the site presents them as two distinct listings"
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Side Tables",
+      "qty": 25,
+      "link": "https://www.zarahome.com/fr/meubles-tables-dappoint-n4895",
+      "is_group": false,
+      "evidence": "site listing API productIds.length=25 for internal categoryId 1020615418 at /itxrest/3/catalog/store/84009901/80209919/category/1020615418/product?showProducts=false&showNoStock=false&withSubCategories=false&languageId=-2&appId=1 (Zara Home FR renders NO 'N items/articles' header anywhere in its grid - checked the rendered listing directly - so this is a rule-2 structured-data fallback; method validated tile-for-tile on meubles-rangement-n4111 where the scrolled-to-end grid gave exactly 22 unique ?pelement= tiles against the API's 22); read twice in separate passes, 25 both times",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Coffee Tables",
+      "qty": 9,
+      "link": "https://www.zarahome.com/fr/meubles-tables-basses-n4896",
+      "is_group": false,
+      "evidence": "site listing API productIds.length=9 for internal categoryId 1020615419 at /itxrest/3/catalog/store/84009901/80209919/category/1020615419/product?showProducts=false&showNoStock=false&withSubCategories=false&languageId=-2&appId=1 (Zara Home FR renders NO 'N items/articles' header anywhere in its grid - checked the rendered listing directly - so this is a rule-2 structured-data fallback; method validated tile-for-tile on meubles-rangement-n4111 where the scrolled-to-end grid gave exactly 22 unique ?pelement= tiles against the API's 22); read twice in separate passes, 9 both times",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Bedside Tables",
+      "qty": 19,
+      "link": "https://www.zarahome.com/fr/meubles-tables-de-chevet-n4110",
+      "is_group": false,
+      "evidence": "site listing API productIds.length=19 for internal categoryId 1020564159 at /itxrest/3/catalog/store/84009901/80209919/category/1020564159/product?showProducts=false&showNoStock=false&withSubCategories=false&languageId=-2&appId=1 (Zara Home FR renders NO 'N items/articles' header anywhere in its grid - checked the rendered listing directly - so this is a rule-2 structured-data fallback; method validated tile-for-tile on meubles-rangement-n4111 where the scrolled-to-end grid gave exactly 22 unique ?pelement= tiles against the API's 22); read twice in separate passes, 19 both times",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Desks",
+      "qty": 8,
+      "link": "https://www.zarahome.com/fr/bureaux-n5104",
+      "is_group": false,
+      "evidence": "site listing API productIds.length=8 for internal categoryId 1020379215 at /itxrest/3/catalog/store/84009901/80209919/category/1020379215/product?showProducts=false&showNoStock=false&withSubCategories=false&languageId=-2&appId=1 (Zara Home FR renders NO 'N items/articles' header anywhere in its grid - checked the rendered listing directly - so this is a rule-2 structured-data fallback; method validated tile-for-tile on meubles-rangement-n4111 where the scrolled-to-end grid gave exactly 22 unique ?pelement= tiles against the API's 22); read twice in separate passes, 8 both times",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Dining Tables",
+      "qty": 7,
+      "link": "https://www.zarahome.com/fr/tables-a-manger-n4743",
+      "is_group": false,
+      "evidence": "site listing API productIds.length=7 for internal categoryId 1020689624 at /itxrest/3/catalog/store/84009901/80209919/category/1020689624/product?showProducts=false&showNoStock=false&withSubCategories=false&languageId=-2&appId=1 (Zara Home FR renders NO 'N items/articles' header anywhere in its grid - checked the rendered listing directly - so this is a rule-2 structured-data fallback; method validated tile-for-tile on meubles-rangement-n4111 where the scrolled-to-end grid gave exactly 22 unique ?pelement= tiles against the API's 22); read twice in separate passes, 7 both times",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Shelving Units",
+      "qty": 15,
+      "link": "https://www.zarahome.com/fr/meubles-etageres-n4898",
+      "is_group": false,
+      "evidence": "site listing API productIds.length=15 for internal categoryId 1020615414 at /itxrest/3/catalog/store/84009901/80209919/category/1020615414/product?showProducts=false&showNoStock=false&withSubCategories=false&languageId=-2&appId=1 (Zara Home FR renders NO 'N items/articles' header anywhere in its grid - checked the rendered listing directly - so this is a rule-2 structured-data fallback; method validated tile-for-tile on meubles-rangement-n4111 where the scrolled-to-end grid gave exactly 22 unique ?pelement= tiles against the API's 22); read twice in separate passes, 15 both times",
+      "flag": "MANUAL REVIEW: ambiguous shelving - the node sits in the Furniture department and 13 of the 15 are freestanding shelving units, sideboards and a rotating bookcase, but 2 tiles are named simply 'shelf' (acacia wood shelf, metal mesh shelf) and may be wall-mounted"
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Sideboards and Display Cabinets",
+      "qty": 21,
+      "link": "https://www.zarahome.com/fr/meubles-buffets-n4899",
+      "is_group": false,
+      "evidence": "site listing API productIds.length=21 for internal categoryId 1020615415 at /itxrest/3/catalog/store/84009901/80209919/category/1020615415/product?showProducts=false&showNoStock=false&withSubCategories=false&languageId=-2&appId=1 (Zara Home FR renders NO 'N items/articles' header anywhere in its grid - checked the rendered listing directly - so this is a rule-2 structured-data fallback; method validated tile-for-tile on meubles-rangement-n4111 where the scrolled-to-end grid gave exactly 22 unique ?pelement= tiles against the API's 22); read twice in separate passes, 21 both times",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Storage Furniture",
+      "qty": 22,
+      "link": "https://www.zarahome.com/fr/meubles-rangement-n4111",
+      "is_group": false,
+      "evidence": "site listing API productIds.length=22 for internal categoryId 1020564157 at /itxrest/3/catalog/store/84009901/80209919/category/1020564157/product?showProducts=false&showNoStock=false&withSubCategories=false&languageId=-2&appId=1 (Zara Home FR renders NO 'N items/articles' header anywhere in its grid - checked the rendered listing directly - so this is a rule-2 structured-data fallback; method validated tile-for-tile on meubles-rangement-n4111 where the scrolled-to-end grid gave exactly 22 unique ?pelement= tiles against the API's 22); read twice in separate passes, 22 both times; page loaded in the tab returns 200 with rel=canonical https://www.zarahome.com/fr/meubles-rangement-n4111 and title 'Meubles de rangement | Zara Home France'",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Coat Stands and Towel Racks",
+      "qty": 9,
+      "link": "https://www.zarahome.com/fr/meubles-portants-n4900",
+      "is_group": false,
+      "evidence": "site listing API productIds.length=9 for internal categoryId 1020615416 at /itxrest/3/catalog/store/84009901/80209919/category/1020615416/product?showProducts=false&showNoStock=false&withSubCategories=false&languageId=-2&appId=1 (Zara Home FR renders NO 'N items/articles' header anywhere in its grid - checked the rendered listing directly - so this is a rule-2 structured-data fallback; method validated tile-for-tile on meubles-rangement-n4111 where the scrolled-to-end grid gave exactly 22 unique ?pelement= tiles against the API's 22); read twice in separate passes, 9 both times",
+      "flag": "MANUAL REVIEW: mixed node filed under Furniture - 6 of the 9 are hall/bedroom furniture (clothes racks, coat stand, valet stand, folding screen, metal and wood rack) but 3 are freestanding towel racks that could be read as bathroom accessories"
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Console Tables",
+      "qty": 9,
+      "link": "https://www.zarahome.com/fr/consoles-n5062",
+      "is_group": false,
+      "evidence": "site listing API productIds.length=9 for internal categoryId 1020448936 at /itxrest/3/catalog/store/84009901/80209919/category/1020448936/product?showProducts=false&showNoStock=false&withSubCategories=false&languageId=-2&appId=1 (Zara Home FR renders NO 'N items/articles' header anywhere in its grid - checked the rendered listing directly - so this is a rule-2 structured-data fallback; method validated tile-for-tile on meubles-rangement-n4111 where the scrolled-to-end grid gave exactly 22 unique ?pelement= tiles against the API's 22); read twice in separate passes, 9 both times",
+      "flag": "MANUAL REVIEW: separate menu node but overlaps the Sideboards and Display Cabinets listing - 5 of these 9 product ids also appear in meubles-buffets-n4899; both kept because the site presents them as two distinct listings"
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Headboards",
+      "qty": 6,
+      "link": "https://www.zarahome.com/fr/chambre-tetes-de-lit-n960",
+      "is_group": false,
+      "evidence": "site listing API productIds.length=6 for internal categoryId 1020564657 at /itxrest/3/catalog/store/84009901/80209919/category/1020564657/product?showProducts=false&showNoStock=false&withSubCategories=false&languageId=-2&appId=1 (Zara Home FR renders NO 'N items/articles' header anywhere in its grid - checked the rendered listing directly - so this is a rule-2 structured-data fallback; method validated tile-for-tile on meubles-rangement-n4111 where the scrolled-to-end grid gave exactly 22 unique ?pelement= tiles against the API's 22); read twice in separate passes, 6 both times",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Bed Frames",
+      "qty": 5,
+      "link": "https://www.zarahome.com/fr/chambre-cadres-de-lit-n4166",
+      "is_group": false,
+      "evidence": "site listing API productIds.length=5 for internal categoryId 1020567657 at /itxrest/3/catalog/store/84009901/80209919/category/1020567657/product?showProducts=false&showNoStock=false&withSubCategories=false&languageId=-2&appId=1 (Zara Home FR renders NO 'N items/articles' header anywhere in its grid - checked the rendered listing directly - so this is a rule-2 structured-data fallback; method validated tile-for-tile on meubles-rangement-n4111 where the scrolled-to-end grid gave exactly 22 unique ?pelement= tiles against the API's 22); read twice in separate passes, 5 both times",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Kids Furniture",
+      "qty": 55,
+      "link": "https://www.zarahome.com/fr/enfants-meubles-n1122",
+      "is_group": false,
+      "evidence": "site listing API productIds.length=55 for internal categoryId 1020576160 at /itxrest/3/catalog/store/84009901/80209919/category/1020576160/product?showProducts=false&showNoStock=false&withSubCategories=false&languageId=-2&appId=1 (Zara Home FR renders NO 'N items/articles' header anywhere in its grid - checked the rendered listing directly - so this is a rule-2 structured-data fallback; method validated tile-for-tile on meubles-rangement-n4111 where the scrolled-to-end grid gave exactly 22 unique ?pelement= tiles against the API's 22); read twice in separate passes, 55 both times",
+      "flag": "MANUAL REVIEW: primary product type is kids and nursery furniture (cots and mini cots, kids desks and desk chairs, chest of drawers, bedside tables, consoles, shelving units, kids couch, headboard, high chair) but roughly 10 of the 55 are non-furniture - six cot/mini-cot mattresses, a rocking-horse toy, a baby gym, a wooden blackboard, wall coat racks/hooks and changing-mat baskets"
+    }
+  ]
+}

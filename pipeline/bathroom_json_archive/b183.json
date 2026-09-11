@@ -1,0 +1,303 @@
+{
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ROBOTS (www.house.com.au): fetched FIRST, before any other request on the host - HTTP 200, 1,542 bytes - and read by GROUP BOUNDARY. Six groups: Googlebot, AdsBot-Google, Googlebot-Image, AhrefsBot and AhrefsSiteAudit (all empty/allow-only), 'User-agent: Nutch / Disallow: /', and 'User-agent: *'. NO Claude agent is named: a case-insensitive search for claude, anthropic, ClaudeBot, Claude-Web and anthropic-ai returns ZERO hits, and there is NO Crawl-delay anywhere in the file, so we fall under '*' with no delay owed beyond probe.py's 2 s per-host gap. The '*' disallows that bear on this work are /search, /wishlist, /collections/*sort_by*, /*/collections/*sort_by*, /collections/*+*, /collections/*%2B*, /collections/*%2b*, /*?*mfield_custom_material=, /*?*variant_size=, /*?*vendor=, /*?*variant_mfield_custom_basic_color=, /*?*ss_price=, /*?SearchID=, /*?productsearch=, /collections/age-verification, /stores/*/products/, /policies/ and the cart/checkout/account/orders paths. I requested NONE of them: no internal search, no sort_by, no SearchSpring facet parameter (ss_price / SearchID / productsearch), no vendor or variant filter, no wishlist. Every URL I fetched is a bare https://www.house.com.au/collections/<handle> path with NO query string at all, plus the two sitemap files. NOTE that plain /collections/<handle> is NOT disallowed - only the sort_by and '+' encoded facet forms are - so the whole walk is permitted. ONE HOST ONLY: www.house.com.au. The storefront's product data is served by SearchSpring, but I never called searchspring.io - the pagination payload I used is EMBEDDED IN THE SERVER-RENDERED HTML of the collection page itself ('initialSearchspringResponse'), so no second host was touched and no second robots file was owed. No API host, no CDN host, no proxy, no r.jina.ai, no browser automation, no campaign parameters. ACCESS: plain HTTP 200 on every request through probe.fetch(); no bot wall, no interstitial, no 403, no 429. 37 collection pages plus sitemap.xml, sitemap-0.xml, the home page and 4 pagination probes were fetched; the collection pages are cached under work/183/pages/. TREE SOURCE - HOUSE'S OWN NAVIGATION, cross-checked against its own sitemap. Primary source: the home-page mega-menu, which server-renders the full category tree as collection hrefs. House encodes the whole hierarchy in the collection handle itself ('bedroom-bathroom-bathroom-bathroom-accessories-soap-dispensers'), and each collection page independently confirms its own parentage with a rendered breadcrumb string in the page payload - e.g. 'BEDROOM & BATHROOM>BATHROOM>BATHROOM ACCESSORIES>SOAP DISPENSERS' - so parentage comes from the page's own breadcrumb, not from URL shape guessing (BATCH_BRIEF s5). MEGA-MENU TRUNCATION CAUGHT AND RESOLVED: the mega-menu exposes 27 handles under the Bathroom branch, but https://www.house.com.au/sitemap-0.xml (9,178 URLs, 863 of them /collections/) holds 30 - the three extra being bedroom-bathroom-bathroom-kids-bathroom and its two children. I chased all three rather than ignoring them, and PROVED they are retired/aliased handles, not real nodes: each returns HTTP 200 but renders the DEPARTMENT (H1 'Bedroom & Bathroom', totalResults 1226, totalPages 31) and each carries <link rel=canonical> to /collections/bedroom-bathroom rather than to itself. Recording them would have created three phantom leaves each carrying a 1226-product department count. All three are in review[] with that proof. In the other direction, every mega-menu handle also exists in the sitemap (set difference empty), so nothing in the menu is a dead link. BRIEF-SPECIFIC CHECK - 'judge on primary product type, not the room word'. House is an AU kitchenware and homewares chain, so I did NOT stop at the Bathroom branch. I keyword-swept ALL 863 collection handles for soap, dispenser, mirror, hook, rail, toilet, shower, wash, sanitary, tap, faucet, basin, sink, vanity, caddy/caddies, organiser, scale, bin, tissue, robe, bidet and tub. Outside the Bathroom branch the only hits are kitchen and pet nodes (juice jars & dispensers, cereal dispensers, water dispensers & filters, kitchen bins & compost bins, kitchen scales, pantry organisation, dog toileting aids) whose primary product type is kitchen, appliance or pet - none of them Bathroom - plus LIVING>DECOR>CLOCKS & MIRRORS and LIVING>LAUNDRY, both of which are logged in review[]. The soap dispensers, soap dishes and vanity organisers that ARE Bathroom under rules 13/18 all sit inside the Bathroom branch and are recorded, including the ones from kitchen-first brands (Joseph Joseph Slim Compact Soap Pump, Kilner Liquid Soap & Hand Lotion Dispenser 500ml, Umbra Joey Soap Pump) - judged on primary product type, not on the vendor. QTY: every quantity here is the LISTING PAGE'S OWN RENDERED EXACT TOTAL (rule 26). Each collection page prints '<n> Products' in the visible header AND server-renders the SearchSpring payload it was built from, as \"pagination\":{\"totalResults\":n,\"begin\":..,\"end\":..,\"currentPage\":1,\"totalPages\":..,\"perPage\":40}. No estimate, no aggregation, no parent's number reused for a child, no pagination multiplication. VERIFICATION. (a) TWO INDEPENDENT RENDERED SOURCES AGREE on all 37 nodes: the visible '<n> Products' string equals pagination.totalResults, 37/37, zero mismatches (the one node with no visible string is Hooded Beach Towels, which has totalResults 0 and renders no product UI at all - which is itself the empty-node proof). (b) ENUMERATION TO EXHAUSTION on every node that fits one page: for all 18 nodes with totalResults <= 40 the payload reports begin=1, end=totalResults, totalPages=1 AND contains exactly that many product result rows - 1/1, 2/2, 5/5, 7/7, 7/7, 8/8, 8/8, 9/9, 10/10, 11/11, 11/11, 12/12, 12/12, 13/13, 17/17, 21/21, 23/23, 24/24, 31/31. Among the 8 RECORDED leaves that is exhaustive proof for 7 of them (8, 12, 31, 12, 23, 9, 7); the eighth, Bathroom Storage 43, spills to a second page and is verified by (a) and (c) instead. (c) PAGE-COUNT CROSS-CHECK, the BATCH_BRIEF s3 test for a capped total: totalPages == ceil(totalResults/40) on ALL 37 nodes - 43->2, 162->5, 179->5, 136->4, 412->11, 332->9, 1226->31, and so on. No round-number cap anywhere (no 100, 500 or 1000 appears), and the totals are not a site-wide constant. (d) DISCRIMINATION: 27 distinct totals across the 37 nodes - 0, 1, 2, 5, 7, 8, 9, 10, 11, 12, 13, 17, 21, 23, 24, 31, 41, 43, 52, 55, 59, 73, 79, 136, 162, 179, 332, 412, 1226. (e) H1 and the payload breadcrumb were read on every page and match the node requested - which is precisely how the three phantom kids-bathroom handles were caught. (f) rel=canonical on EVERY recorded leaf equals the URL written into rows[] - 8/8 self-canonical - so there is no canonical-alias dedup blind spot on any row (BATCH_BRIEF s4a). (g) Product titles were read on every recorded leaf: Bathroom Bins = Salt & Pepper Manhattan and Hepburn 5L bins, Joseph Joseph EasyStore 5L bathroom bin and pedal bins, Porto Utility soft-closing pedal bin; Bathroom Caddies = Joseph Joseph EasyStore Large Bathroom Caddy and steel toothbrush caddy, Adorn Living Alma Shower Caddy, Umbra Flex adhesive corner bin; Bathroom Cleaning = Joseph Joseph EasyStore compact shower squeegee, Cleantech detail brushes and cleaning-tool storage rail, Enzyme Wizard Bathroom & Toilet Cleaner; Bathroom Storage = Joseph Joseph EasyStore toilet roll holder, toothbrush caddy and bathroom storage basket, Salt & Pepper Tide 3-piece bathroom set, Porto Ellis glass tumbler, Lenoxx heated towel rail/rack; Soap Dish & Holders = MyHouse Cedar and Margot soap dishes, Umbra Step soap dish, MyHouse Stripe/Peony trays, Ardor Dri Stone sink mat; Soap Dispensers = Porto Ellis/Plaza/Hudson/York/Soho/Perry/Hamilton dispensers, MyHouse Cedar/Shell/Margot/Ribbed dispensers, Joseph Joseph Slim Compact Soap Pump and EasyStore Luxe pump, Umbra Joey pump, Kilner liquid soap dispenser, Salt & Pepper Tide bathroom tumbler; Toilet Brush & Holders = Salt & Pepper Spot toilet brush and roll holder set, Joseph Joseph Flex Smart / Flex Lite toilet brushes and Easy-Store toilet paper stand, Lorraine Lea bamboo toilet brush; Vanity Trays & Organisers = Joseph Joseph Viva cosmetic organisers, makeup drawer organiser set and brush pot. Every one is a bathroom accessory, storage, hardware or toilet accessory under rules 12, 13, 14 and 17. *** COUNT TRAP FOUND AND DISCLOSED - THE RENDERED TOTAL IS COLOURWAY-LEVEL, NOT PRODUCT-HANDLE-LEVEL. *** On most nodes the number of SearchSpring result rows exceeds the number of distinct Shopify product handles, because a product sold in several colourways contributes one row per colourway. Proved on Bathroom Bins: totalResults 8 and exactly 8 result rows in the payload, but only 6 distinct handles - salt-pepper-manhattan-bin-5l and porto-utility-soft-closing-pedal-bin-5l each appear twice. Same shape on Soap Dispensers (23 rows / 21 handles), Soap Dish & Holders (12/9), Bathroom Caddies (12/11), Toilet Brush & Holders (9/8), Bathroom Storage (40 rows on page 1 / 38 handles), while Bathroom Cleaning and Vanity Trays & Organisers are 1:1 (31/31 and 7/7). I have recorded the figure the LISTING PAGE ITSELF SHOWS, which is what rule 26 requires ('142 Products -> 142'), and I am flagging here that it is a colourway-level count - the same disclosure BATCH_BRIEF s3 asks for on Mango's totalItems. I did NOT substitute my own handle count for the site's number. SECOND TRAP AVOIDED: /collections/<handle>/page/2 does NOT exist on this storefront - it returns a non-200 for every node I tried, including nodes whose totalPages is 1 - so pagination cannot be walked by URL and no figure here rests on multiplying a page size. DEDUP - OPTION 1, run on every one of the 37 walked URLs and on every rel=canonical target. ZERO hits inside the Bathroom branch: not one of the 30 bathroom-branch collections, and none of the 8 recorded leaves, appears in the exclusion index. The index holds 75 house.com.au keys, and they are concentrated in Dining (barware, drinkware, tableware, servingware), Living (decor, home fragrance, furniture) and the BEDROOM half of the Bedroom & Bathroom department (bedroom-decor, bedroom-decor-lighting, bedroom-decor-wall-art, bedroom-furniture-beds) - i.e. the Home Decor and Furniture passes took Dining, Living and Bedroom and never touched Bathroom. The ONE hit anywhere near this work is living-decor-clocks-mirrors (Final.xlsx, 'Clocks & Mirrors', 43), which is in review[] and is in any case LIVING>DECOR, not Bathroom. House has NO bathroom-vanity, bathroom-cabinet or mirror-cabinet node at all, so the usual OPTION 1 collision simply does not arise here. Blind spots (b) and (c): house.com.au is a single-locale, single-host AU storefront - the sitemap contains no locale-prefixed collection paths, the collection pages emit no hreflang alternates, and the index contains no house.com.au variant host - so there is no locale or cross-host alternate to miss. WHAT IS ABSENT FROM THIS RETAILER, stated so it is not read as a miss: House is a homewares and kitchenware chain, not a bathroom-fitting retailer. It sells NO baths or bathtubs, NO toilets/WCs, NO bidets, NO basins or wash-basins, NO bathroom taps or faucets, NO showers, shower heads, shower mixers, shower enclosures or screens, NO bathroom vanity units or bathroom cabinets, and NO bathroom mirrors or mirror cabinets. That is a confirmed absence, evidenced by: the full mega-menu walk of the Bedroom & Bathroom department, the full 863-collection sitemap sweep, and the 22-term keyword sweep described above - none of which surfaces a single fixture, tap, shower, enclosure, vanity or bathroom-mirror node. What House does carry in Bathroom is accessories, storage, hardware, toilet accessories and cleaning, and that is exactly what is recorded. OVERLAPPING SIBLINGS - NEVER SUMMED. Bathroom (412) has five children summing to 504, and Bathroom Accessories (162) has nine summing to 146; both discrepancies are stated in review[] rather than reconciled by arithmetic. Each recorded figure is the storefront's own number for its own node (rule 28) and they must not be added. NO VIEW ALL / SHOP ALL / COLLECTIONS / SEARCH / SALE / FACET / PDP URL is recorded anywhere - /collections/bathroom-sale (332) is explicitly excluded under rule 25 and logged in review[]. NO parent URL is recorded where valid children exist. Every URL in rows[] and review[] is a bare canonical collection path with no query string. RESULT: 2 grouping rows + 8 leaf rows; 29 review entries (1 empty node, 3 phantom/aliased handles, 1 rule-29 ambiguity, 1 dedup hit, 1 sale page, and 22 routed-out or parent-excluded nodes).",
+ "rows": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathroom Accessories",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathroom Accessories > Bathroom Bins",
+   "qty": 8,
+   "link": "https://www.house.com.au/collections/bedroom-bathroom-bathroom-bathroom-accessories-bathroom-bins",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathroom Accessories > Bathroom Caddies",
+   "qty": 12,
+   "link": "https://www.house.com.au/collections/bedroom-bathroom-bathroom-bathroom-accessories-bathroom-caddies",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathroom Accessories > Bathroom Cleaning",
+   "qty": 31,
+   "link": "https://www.house.com.au/collections/bedroom-bathroom-bathroom-bathroom-accessories-bathroom-cleaning",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathroom Accessories > Bathroom Storage",
+   "qty": 43,
+   "link": "https://www.house.com.au/collections/bedroom-bathroom-bathroom-bathroom-accessories-bathroom-storage",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathroom Accessories > Soap Dish & Holders",
+   "qty": 12,
+   "link": "https://www.house.com.au/collections/bedroom-bathroom-bathroom-bathroom-accessories-soap-dish-holders",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathroom Accessories > Soap Dispensers",
+   "qty": 23,
+   "link": "https://www.house.com.au/collections/bedroom-bathroom-bathroom-bathroom-accessories-soap-dispensers",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathroom Accessories > Toilet Brush & Holders",
+   "qty": 9,
+   "link": "https://www.house.com.au/collections/bedroom-bathroom-bathroom-bathroom-accessories-toilet-brush-holders",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathroom Accessories > Vanity Trays & Organisers",
+   "qty": 7,
+   "link": "https://www.house.com.au/collections/bedroom-bathroom-bathroom-bathroom-accessories-vanity-trays-organisers",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  }
+ ],
+ "review": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom (department landing)",
+   "qty": 412,
+   "issue": "EXCLUDED AS PARENT URL (rule 24): it has five extractable children (Bath & Body 73, Bathroom Towels 179, Bathroom Accessories 162, Bath Towels 79, Beach Towels 11). Recorded in rows[] as the top grouping row with blank qty and blank link (rule 38). Its own breadcrumb string in the page payload is 'BEDROOM & BATHROOM>BATHROOM'.",
+   "link": "https://www.house.com.au/collections/bedroom-bathroom-bathroom"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Accessories (parent)",
+   "qty": 162,
+   "issue": "EXCLUDED AS PARENT URL (rule 24): it has nine extractable children and is recorded in rows[] as a grouping row with blank qty and blank link (rule 38). RULE-24 RESIDUE, DISCLOSED per BATCH_BRIEF s5: its nine children total 8+12+31+1+43+12+23+9+7 = 146 against the parent's own rendered 162, so roughly 16 result rows sit in the parent and in no child. They could not be identified individually because the parent runs to 5 pages of 40 and only page 1 is server-rendered. Flagged as a known structural gap, not silently dropped.",
+   "link": "https://www.house.com.au/collections/bedroom-bathroom-bathroom-bathroom-accessories"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Accessories > Bathroom Scales",
+   "qty": 1,
+   "issue": "AMBIGUOUS - HELD FOR REVIEW UNDER RULE 29, NOT GUESSED. Site hierarchy is unambiguous ('BEDROOM & BATHROOM>BATHROOM>BATHROOM ACCESSORIES>BATHROOM SCALES'), but rule 2 puts PRIMARY PRODUCT TYPE above website hierarchy and the node's single product is a 'Lenoxx Smart Body Scale' - an electronic personal weighing appliance, not a bathroom fixture, accessory or piece of hardware in the rule-3/13/17 sense (scales appear nowhere in the Bathroom inclusion lists). Confidence LOW, so it goes to review rather than into rows[]. Exact rendered figure and canonical URL supplied so the run owner can place it.",
+   "link": "https://www.house.com.au/collections/bedroom-bathroom-bathroom-bathroom-accessories-bathroom-scales"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath & Body (parent)",
+   "qty": 73,
+   "issue": "NOT BATHROOM ON PRIMARY PRODUCT TYPE (rule 2 - primary product type and function beat room/location). Personal care and bodywear branch: robes, eye masks, grooming, massage/wellness, slippers. Recorded here with its exact rendered total so nothing is silently skipped.",
+   "link": "https://www.house.com.au/collections/bedroom-bathroom-bathroom-bath-body"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath & Body > Bath Robes",
+   "qty": 21,
+   "issue": "ROUTED TO TEXTILE: bathrobes are explicitly Textile under rule 20 (MyHouse Waffle Robe, MyHouse Terry Robe, Bambury Microplush Robe, Bambury Channel Fleece Robe).",
+   "link": "https://www.house.com.au/collections/bedroom-bathroom-bathroom-bath-body-bath-robes"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath & Body > Eye Masks",
+   "qty": 8,
+   "issue": "NOT BATHROOM ON PRIMARY PRODUCT TYPE (rule 2 - primary product type and function beat room/location). Silk and satin sleep eye masks (MySilk Silk Eyemask, Alex Liddy Satin Eye Mask) - sleep/personal textiles, not bathroom.",
+   "link": "https://www.house.com.au/collections/bedroom-bathroom-bathroom-bath-body-eye-masks"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath & Body > Grooming",
+   "qty": 17,
+   "issue": "NOT BATHROOM ON PRIMARY PRODUCT TYPE (rule 2 - primary product type and function beat room/location). Cosmetic and toiletry bags, guest soaps, hand cream sets, drawer liners, hair wraps - personal care consumables and bags, not bathroom fixtures, accessories or hardware.",
+   "link": "https://www.house.com.au/collections/bedroom-bathroom-bathroom-bath-body-grooming"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath & Body > Massage & Wellness",
+   "qty": 11,
+   "issue": "NOT BATHROOM ON PRIMARY PRODUCT TYPE (rule 2 - primary product type and function beat room/location). Neck wraps, rose-quartz and ice face rollers, hand-cream tins - body-care and wellness products.",
+   "link": "https://www.house.com.au/collections/bedroom-bathroom-bathroom-bath-body-massage-wellness"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath & Body > Slippers",
+   "qty": 7,
+   "issue": "NOT BATHROOM ON PRIMARY PRODUCT TYPE (rule 2 - primary product type and function beat room/location). Slippers and socks - footwear/apparel.",
+   "link": "https://www.house.com.au/collections/bedroom-bathroom-bathroom-bath-body-slippers"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Towels (parent)",
+   "qty": 179,
+   "issue": "ROUTED TO TEXTILE: primary product type is a textile (rules 15, 20). Parent of the towel branch; five extractable children. The matching bathroom HARDWARE and ACCESSORIES stay in Bathroom under Bathroom Accessories (bins, caddies, storage incl. the Joseph Joseph toilet-roll holder and heated towel rail, soap dishes, soap dispensers, toilet brushes, vanity trays) - exactly the split rule 15 asks for.",
+   "link": "https://www.house.com.au/collections/bedroom-bathroom-bathroom-bath-towels"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Towels > Bath Mats",
+   "qty": 136,
+   "issue": "ROUTED TO TEXTILE: primary product type is a textile (rules 15, 20). Rule 16 applies and was checked product by product rather than assumed: the node is dominated by TEXTILE bath mats, bath runners and plush mat sets (MyHouse Cove Bath Mat, MyHouse Ezra Bath Mat and Bath Runner, Adorn Living Toggle Bath Runner, Algodon Lawson Plush Bath Mat Collection), so it routes to Textile as a whole. DISCLOSED: it also carries a small number of NON-textile diatomite stone mats (Algodon Dri Bath Stone, and Ardor Dri Stone Sink Mat sits in Soap Dish & Holders), which rule 16 would place in Bathroom; they are not separable into their own listing URL, so the whole node is routed on its dominant type.",
+   "link": "https://www.house.com.au/collections/bedroom-bathroom-bathroom-bath-towels-bath-mats"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Towels > Bath Sheets",
+   "qty": 59,
+   "issue": "ROUTED TO TEXTILE: primary product type is a textile (rules 15, 20). ",
+   "link": "https://www.house.com.au/collections/bedroom-bathroom-bathroom-bath-towels-bath-sheets"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Towels > Bath Towel Sets",
+   "qty": 13,
+   "issue": "ROUTED TO TEXTILE: primary product type is a textile (rules 15, 20). ",
+   "link": "https://www.house.com.au/collections/bedroom-bathroom-bathroom-bath-towels-bath-towel-sets"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Towels > Face Towels",
+   "qty": 52,
+   "issue": "ROUTED TO TEXTILE: primary product type is a textile (rules 15, 20). ",
+   "link": "https://www.house.com.au/collections/bedroom-bathroom-bathroom-bath-towels-face-towels"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Towels > Hand Towels",
+   "qty": 55,
+   "issue": "ROUTED TO TEXTILE: primary product type is a textile (rules 15, 20). ",
+   "link": "https://www.house.com.au/collections/bedroom-bathroom-bathroom-bath-towels-hand-towels"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Towels",
+   "qty": 79,
+   "issue": "ROUTED TO TEXTILE: primary product type is a textile (rules 15, 20). A SECOND, SEPARATE towel node whose handle carries a 'bathroom-towels' path segment rather than the 'bath-towels' one used by the node above; it is a distinct URL with its own rendered total, present in both the mega-menu and the sitemap, and it is NOT a duplicate of Bathroom Towels > Bath Sheets/Hand Towels etc. Routed out either way.",
+   "link": "https://www.house.com.au/collections/bedroom-bathroom-bathroom-bathroom-towels-bath-towels"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Beach Towels (parent)",
+   "qty": 11,
+   "issue": "ROUTED TO TEXTILE: primary product type is a textile (rules 15, 20). Beach towels; two extractable children.",
+   "link": "https://www.house.com.au/collections/bedroom-bathroom-bathroom-beach-towels"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Beach Towels > Hooded Beach Towels",
+   "qty": 0,
+   "issue": "EMPTY NODE - real category, ZERO products. Its SearchSpring pagination payload reads totalResults 0 / totalPages 0 and the page renders no '<n> Products' string and no product cards at all. Recorded here as an EMPTY NODE per BATCH_BRIEF s5 rather than as a zero-qty row or a silent drop. It would in any case have ROUTED TO TEXTILE.",
+   "link": "https://www.house.com.au/collections/bedroom-bathroom-bathroom-beach-towels-hooded-beach-towels"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Beach Towels > Kids Beach Towels",
+   "qty": 2,
+   "issue": "ROUTED TO TEXTILE: primary product type is a textile (rules 15, 20). ",
+   "link": "https://www.house.com.au/collections/bedroom-bathroom-bathroom-beach-towels-kids-beach-towels"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Kids Bathroom",
+   "qty": null,
+   "issue": "NOT A REAL NODE - RETIRED/ALIASED HANDLE, PROVED. The handle exists in House's own sitemap-0.xml but the storefront does NOT serve a Kids Bathroom listing for it: the page returns HTTP 200 rendering the DEPARTMENT instead - H1 'Bedroom & Bathroom', rendered total 1226, totalPages 31 - and its <link rel=canonical> points at https://www.house.com.au/collections/bedroom-bathroom, not at itself. All three kids-bathroom handles behave identically. Recording any of them would have created three phantom leaves each carrying the 1226-product department count. Not recorded. (Found because the mega-menu TRUNCATES: these three handles are the only bathroom-branch handles in the sitemap that the home-page mega-menu omits - BATCH_BRIEF s5 - so they were chased down rather than ignored.)",
+   "link": "https://www.house.com.au/collections/bedroom-bathroom-bathroom-kids-bathroom"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Kids Bathroom > Kids Bath Mats",
+   "qty": null,
+   "issue": "NOT A REAL NODE - RETIRED/ALIASED HANDLE, PROVED. The handle exists in House's own sitemap-0.xml but the storefront does NOT serve a Kids Bathroom listing for it: the page returns HTTP 200 rendering the DEPARTMENT instead - H1 'Bedroom & Bathroom', rendered total 1226, totalPages 31 - and its <link rel=canonical> points at https://www.house.com.au/collections/bedroom-bathroom, not at itself. All three kids-bathroom handles behave identically. Recording any of them would have created three phantom leaves each carrying the 1226-product department count. Not recorded. (Found because the mega-menu TRUNCATES: these three handles are the only bathroom-branch handles in the sitemap that the home-page mega-menu omits - BATCH_BRIEF s5 - so they were chased down rather than ignored.)",
+   "link": "https://www.house.com.au/collections/bedroom-bathroom-bathroom-kids-bathroom-kids-bath-mats"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Kids Bathroom > Kids Bath Towels",
+   "qty": null,
+   "issue": "NOT A REAL NODE - RETIRED/ALIASED HANDLE, PROVED. The handle exists in House's own sitemap-0.xml but the storefront does NOT serve a Kids Bathroom listing for it: the page returns HTTP 200 rendering the DEPARTMENT instead - H1 'Bedroom & Bathroom', rendered total 1226, totalPages 31 - and its <link rel=canonical> points at https://www.house.com.au/collections/bedroom-bathroom, not at itself. All three kids-bathroom handles behave identically. Recording any of them would have created three phantom leaves each carrying the 1226-product department count. Not recorded. (Found because the mega-menu TRUNCATES: these three handles are the only bathroom-branch handles in the sitemap that the home-page mega-menu omits - BATCH_BRIEF s5 - so they were chased down rather than ignored.)",
+   "link": "https://www.house.com.au/collections/bedroom-bathroom-bathroom-kids-bathroom-kids-bath-towels"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Sale",
+   "qty": 332,
+   "issue": "NEVER RECORDED - PROMOTIONAL / SALE PAGE (rule 25). '/collections/bathroom-sale' is a cross-cutting sale cut of the same bathroom catalogue (its page-1 cards are the same MyHouse and Bambury towel collections that fill the Bathroom department), not a subcategory. Logged with its exact rendered total only so it is visibly excluded rather than missed.",
+   "link": "https://www.house.com.au/collections/bathroom-sale"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bedroom & Bathroom (top department)",
+   "qty": 1226,
+   "issue": "OUT OF SCOPE AS A NODE: this is the combined Bedroom + Bathroom department. Its Bathroom half is the 412-product 'Bathroom' collection which IS the entry point walked here; its Bedroom half is bed linen, bedding, pillows, bedroom furniture and bedroom decor, several of which are already in Furniture.xlsx and Final.xlsx. Recording it would aggregate unrelated categories (rule 26) and re-record a parent over valid children (rule 24).",
+   "link": "https://www.house.com.au/collections/bedroom-bathroom"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Laundry (Living > Laundry)",
+   "qty": 41,
+   "issue": "ROUTED TO STORAGE / LAUNDRY: primary product type is laundry equipment and laundry storage, and the site places it under LIVING>LAUNDRY, not under Bathroom. Logged so the branch is visibly considered and not silently skipped. ",
+   "link": "https://www.house.com.au/collections/living-laundry"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Laundry > Laundry Accessories",
+   "qty": 24,
+   "issue": "ROUTED TO STORAGE / LAUNDRY: primary product type is laundry equipment and laundry storage, and the site places it under LIVING>LAUNDRY, not under Bathroom. Logged so the branch is visibly considered and not silently skipped. ",
+   "link": "https://www.house.com.au/collections/living-laundry-laundry-accessories"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Laundry > Laundry Hampers",
+   "qty": 5,
+   "issue": "ROUTED TO STORAGE / LAUNDRY: primary product type is laundry equipment and laundry storage, and the site places it under LIVING>LAUNDRY, not under Bathroom. Logged so the branch is visibly considered and not silently skipped. ",
+   "link": "https://www.house.com.au/collections/living-laundry-laundry-hampers"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Laundry > Ironing & Steamers",
+   "qty": 10,
+   "issue": "ROUTED TO STORAGE / LAUNDRY: primary product type is laundry equipment and laundry storage, and the site places it under LIVING>LAUNDRY, not under Bathroom. Logged so the branch is visibly considered and not silently skipped. ",
+   "link": "https://www.house.com.au/collections/living-laundry-ironing-steamers"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Clocks & Mirrors (Living > Decor)",
+   "qty": 43,
+   "issue": "ALREADY EXTRACTED IN Final.xlsx (Home Decor pass) as 'Clocks & Mirrors' - confirmed URL-exact by dedup.already_extracted(), and the page's own rel=canonical is that same URL. It is ALSO not Bathroom on the merits: its breadcrumb is 'LIVING>DECOR>CLOCKS & MIRRORS', it mixes wall clocks with decorative wall mirrors, and House exposes NO bathroom-mirror or vanity-mirror node anywhere. Checked explicitly because rule 10 forbids skipping bathroom mirrors and BATCH_BRIEF s6 warns that 'mirror' is a false-positive magnet.",
+   "link": "https://www.house.com.au/collections/living-decor-clocks-mirrors"
+  }
+ ],
+ "_reconstructed_from": "Bathroom.xlsx delivered 2026-09-01 (checkpoint), not original worker JSON"
+}

@@ -1,0 +1,29 @@
+{
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "Access: direct HTTP curl (tier 1), no JS needed. robots.txt for libertylondon.com has no Claude/anthropic-specific disallow (only User-Agent:* with unrelated path exclusions, and a Pinterestbot crawl-delay) -> not blocked. Tree source: crawled /uk/department/home/ nav + home-furnishings + home-accessories + shop-by-room sub-trees via direct HTTP fetch of each category page and its embedded nav links (cgid= params). Full Home taxonomy = Home Accessories (candles, decorative-plates-and-trays, lighting, ornaments, stationery-and-games, storage, vases, wall-art), Home Furnishings (bathroom-towels, bedding, cushions, footstools, furnishing-fabrics, throws, wallpaper), Kitchen and Dining, Tabletop, Shop By Room (bedroom/bathroom/kitchen/living-room), Brands, Featured, Discover. No standalone Bathroom Fixtures/Baths/Showers/Enclosures/Taps/Furniture/Storage/Hardware/Ceramics category exists anywhere in this taxonomy -- Liberty London Home is a homeware/fashion/beauty department store (fabric, tableware, decor, candles) with no sanitaryware/bathroom-fixtures assortment. Two bathroom-labelled nodes found and both excluded (see review[]): (1) /uk/department/home/home-furnishings/bathroom-towels/ = Bathroom Towels, textile per rule 20/15, belongs to Textile.xlsx not Bathroom. (2) /uk/department/home/shop-by-room/bathroom/ (cgid=home_shop-by-room_bathroom) = a curated cross-department 'Shop By Room' merchandising collection, NOT a genuine bathroom product-type node; verified via direct SFCC Search-UpdateGrid endpoint (https://www.libertylondon.com/on/demandware.store/Sites-liberty-Site/default/Search-UpdateGrid?cgid=home_shop-by-room_bathroom&prefn1=canShipTo&prefv1=GB&start=0&sz=96 -> total-number-of-results = '228 Results') and its GA4 item_category data layer: contents are Womens Perfume, Beauty Gifts (wash bags), Day/Night Cream, Facial Serum/Oil, Toner, Diffusers, Storage (decor boxes), Bathroom Towels, Bath Robes/Sleepwear -- i.e. Beauty + Textile + Decor, no bathroom fixtures/furniture/hardware/accessories of the type this ruleset defines, so it fails the PRIMARY PRODUCT TYPE test and is excluded as a room-based promotional collection (rule 25), not recorded as a Bathroom leaf. Cross-checked with the Algolia public search-only index (applicationID Z519VQ03VH, index production_emea_libertyltd_demandware_net__liberty__products__default) via direct HTTP: text queries for basin/shower enclosure/toilet/vanity unit/bathroom mirror/toilet roll holder returned only fuzzy-matched unrelated products (baking dishes, shower gels, eau de toilette, vanity cases/bags, body oil, candle holders) -- zero genuine bathroom fixtures in the catalog. 'soap dish' (4 hits) resolved to real PRODUCT_TYPE Soap Dishes but website hierarchy places them under Home Accessories > Decorative Plates & Trays and Home Accessories > Storage, not any Bathroom node -- excluded per rule 2 (website hierarchy) and rule 30-33 (no crossover). Checked cross_category_url_index.json for both excluded URLs -- neither present (not a dedup hit, a category-boundary exclusion). Conclusion: confirmed absence of Bathroom category on this site. Status = NO_CATEGORY equivalent -> rows: [].",
+  "rows": [],
+  "review": [
+    {
+      "category": "Bathroom",
+      "sub_category": "Bathroom Towels (Home Furnishings)",
+      "qty": null,
+      "issue": "Textile, not Bathroom per rule 15/20 (Bath/Hand Towels, Bath Sheets, Face Cloths, Bathrobes belong to TEXTILE). Routed out, not recorded here.",
+      "link": "https://www.libertylondon.com/uk/department/home/home-furnishings/bathroom-towels/"
+    },
+    {
+      "category": "Bathroom",
+      "sub_category": "Shop By Room > Bathroom",
+      "qty": 228,
+      "issue": "Curated cross-department 'shop by room' merchandising collection (verified via SFCC Search-UpdateGrid total-number-of-results=228), not a genuine bathroom product-type node. Contents are perfume, skincare, wash bags, diffusers, storage boxes, bath towels/robes -- Beauty/Textile/Decor, no bathroom fixtures/furniture/hardware. Excluded as a promotional room-collection page (rule 25), fails PRIMARY PRODUCT TYPE test.",
+      "link": "https://www.libertylondon.com/uk/department/home/shop-by-room/bathroom/"
+    },
+    {
+      "category": "Bathroom",
+      "sub_category": "Soap Dishes",
+      "qty": 4,
+      "issue": "Genuine PRODUCT_TYPE facet value exists (4 items) but website hierarchy places them under Home Accessories > Decorative Plates & Trays / Home Accessories > Storage, not any Bathroom node. Excluded per website-hierarchy rule (rule 2/29); no separate Bathroom Accessories listing URL exists for these.",
+      "link": null
+    }
+  ]
+}

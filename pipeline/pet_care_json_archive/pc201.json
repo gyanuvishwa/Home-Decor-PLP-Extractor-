@@ -1,0 +1,52 @@
+{
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "SISTER-BRAND INDEPENDENCE: AllModern runs on Wayfair Inc.'s platform (same as Wayfair/Birch Lane/Joss & Main) but the Pet catalog is genuinely independent (own category-ID namespace c1875651-c1875657, own counts) -- extracted as its own company, not copied from Wayfair. ACCESS: plain requests.get() to homepage/category pages returned 429 PerimeterX; curl_cffi impersonate=safari17_0 (chrome131 works for robots.txt/sitemaps but 429'd on HTML pages) reached all pages at HTTP 200, ordinary IPv4, no proxy needed. robots.txt has only a generic User-agent:* policy (no Claude-specific disallow). DISCOVERY: searched the full site-wide mega-nav on the homepage (631KB HTML) for 'pet' -- found exactly ONE distinct Pet link: 'Pet Accessories' (https://www.allmodern.com/decor-pillows/cat/pet-accessories-c1875651.html), filed under the Home Accessories/decor-pillows section. This cat page is a real parent hub (H1/title 'Pet Accessories', resultCount=63 from embedded metadata JSON + rendered '63 Items' text) whose own body links to 6 child sb0 listing pages with sequential category IDs 1875652-1875657: Dog Beds(33), Pet Bowls + Feeders(22), Pet Food Storage + Treat Jars(7), Dog Houses(0), Pet Gates(2), Pet Crates + Carriers(64, ANOMALY). CROSS-CHECK: excluding the anomalous Pet Crates + Carriers URL, true children sum to 33+22+7+0+2=64 vs parent's 63 -- within 1 unit of an exact match (real-time catalog drift between separate fetches seconds apart), confirming Pet Accessories is a genuine aggregate hub -> kept as is_group:true/qty:null, children kept as leaves, no double count. ANOMALY -- Pet Crates + Carriers (https://www.allmodern.com/decor-pillows/sb0/pet-crates-carriers-c1875657.html) returns HTTP 200 with resultCount=64, but its own <title> and <h1> both read 'Pet Accessories' (not 'Pet Crates + Carriers'), and the product titles visible on it are Dog Beds/Pet Food Bowls/Containers (0 'Carrier' mentions, 2 stray 'Crate' mentions) -- this URL is stale/orphaned in the sitemap and now silently serves the general Pet Accessories hub content, not a distinct crates/carriers category. Excluded as not a genuine standalone Pet Care listing (would have been a straight duplicate of the parent hub, not additive). Dog Houses (https://www.allmodern.com/decor-pillows/sb0/dog-houses-c1875655.html) verified resultCount=0 and '0 Items' rendered -- dropped per the zero-product rule. ABSENCE CHECK ELSEWHERE ON SITE: fetched robots.txt-listed sitemaps (seo-category-index.xml -> seo-category-sitemap~0.xml, 79 category URLs; seo-sb0-index.xml -> seo-sb0-sitemap~0.xml, 281 listing URLs) and grepped both (360 URLs total) for pet/dog/cat-/leash/harness/kennel/scratch/litter/puppy/kitten/aquarium/terrarium/bird-cage -- no matches outside the 5 URLs already found in the decor-pillows/Pet Accessories branch (Furniture, Outdoor, Bathroom, Kitchen & Dining, Lighting, Wall Decor sections carry no pet-specific nodes). Pet Food Storage + Treat Jars products are storage containers (e.g. 'Yamazaki Home Pet Food Container', 'Janelle Treat Jar', 'Lulu Dog Food Jar') not the food/treats themselves, so Tier-1 in-scope with no consumable flag needed. Pet Gates verified as literal pet gates ('Clear Zig Zag Wall-Mounted Pet Gate') not baby gates.",
+  "rows": [
+    {
+      "category": "Pet Care",
+      "sub_category": "Pet Accessories",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Dog Beds",
+      "qty": 33,
+      "link": "https://www.allmodern.com/decor-pillows/sb0/dog-beds-c1875652.html",
+      "is_group": false,
+      "evidence": "embedded JSON metadata resultCount:33 and rendered '33 Items' text",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Pet Bowls + Feeders",
+      "qty": 22,
+      "link": "https://www.allmodern.com/decor-pillows/sb0/pet-bowls-feeders-c1875653.html",
+      "is_group": false,
+      "evidence": "embedded JSON metadata resultCount:22 and rendered '22 Items' text",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Pet Food Storage + Treat Jars",
+      "qty": 7,
+      "link": "https://www.allmodern.com/decor-pillows/sb0/pet-food-storage-treat-jars-c1875654.html",
+      "is_group": false,
+      "evidence": "embedded JSON metadata resultCount:7 and rendered '7 Items' text",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Pet Gates",
+      "qty": 2,
+      "link": "https://www.allmodern.com/decor-pillows/sb0/pet-gates-c1875656.html",
+      "is_group": false,
+      "evidence": "embedded JSON metadata resultCount:2 and rendered '2 Items' text",
+      "flag": null
+    }
+  ]
+}

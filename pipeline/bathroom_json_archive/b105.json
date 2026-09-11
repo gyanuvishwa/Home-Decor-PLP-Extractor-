@@ -1,0 +1,462 @@
+{
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ROBOTS: https://www.xxxlutz.de/robots.txt fetched FIRST, before any other request on the host (saved at work/w105_108/xxl_robots.txt, HTTP 200, 725 bytes) and re-verified by me rather than taken from the previous worker's dump. It contains exactly ONE user-agent group, 'User-agent: *', so there is no named-bot group at all and therefore no ClaudeBot / anthropic-ai / Claude-Web directive, no Content-Signal line and no Crawl-delay. The '*' disallows are /account, /checkout, /e-billing, /error, /cart, three /feedexport/export/... feeds, /mpp/register, /newsletter, /reservation, /return, /wishlist, /s?encodedfhlink=*, /api/tracking, /s/, /h/ and /orders/. Every URL I requested is a bare root-level category slug of the form /<slug>-C<id> (plus the five declared sitemaps and three /c/ CMS pages), so nothing I fetched touches a disallowed path. In particular I did NOT use /s/ (the internal search) at any point, and I did not follow any of the faceted category URLs. Only one host was used, www.xxxlutz.de; the one third-party host I tried, r.jina.ai, is discussed under ACCESS and returned 403 on both its robots.txt and the read itself, so nothing was taken from it. ACCESS - HONEST ACCOUNT: XXXLutz sits behind a Dynatrace/JS challenge that fires intermittently. A blocked response is unmistakable and is never mistaken for data here: HTTP 200 with a 4,495-4,497 byte body whose only content is a ruxitagentjs script tag and rewritten script types, with no 'Artikel' string and no product grid. My fetcher treats such a body as a failure, discards it, and retries with a fresh fingerprint; probe.MIN_GAP was raised from 2 s to 7 s for this host to reduce the trigger rate. On that basis 33 category pages were fetched successfully. TWO URLs are deterministically blocked rather than intermittently: /baden-duschen-C4C9 and /foehnhalter-C27C1C9. Between them I made roughly 35 attempts across all ten curl_cffi profiles, the bare URL, a trailing slash, a non-campaign parameter ?x=1 and a campaign parameter ?utm_source=newsletter (utm_* is not disallowed by this robots.txt) - all four forms returned the identical 4,495-byte stub in the same minute in which sibling URLs returned full 1 MB pages, so the campaign-parameter route is NOT deterministic here and no count was taken from it. The r.jina.ai reader rung returned HTTP 403 on both https://r.jina.ai/robots.txt and the read itself, so that rung is closed. I did NOT use browser automation and did NOT route through any CORS proxy. Both blocked nodes are handled in review[] as ACCESS-blocked with their exact URLs and NO invented quantity. This is an access obstacle on two URLs, NOT a robots exclusion, and the company as a whole is not blocked - hence status BATHROOM FOUND rather than BLOCKED. TREE: XXXLutz encodes its taxonomy in the category id itself (/badspiegel-C4C3C3 = department C4, child C3, grandchild C3), which makes the hierarchy verifiable rather than inferred. I built the tree from three independent sources and reconciled them. (1) The category sitemap declared in robots.txt, https://www.xxxlutz.de/sitemap-categories.xml (5,674 URLs, 1,256 of them distinct unfaceted category URLs), parsed into an id-keyed map. (2) Each page's own child-category nav (a._ZNBRd_svC50LpEHf cards). (3) Each page's BreadcrumbList JSON-LD, read on every single fetch and used as the authority on who owns a node. TRUNCATION IS REAL ON THIS SITE AND WAS HANDLED: the category sitemap is demonstrably incomplete - it lists 29 C4* nodes but omits the entire 'Baden & Duschen' hub C4C9, and omits two of that hub's live children (Badewannengriffe C4C9C3 and Duschköpfe & Duschschläuche C4C9C9) which I recovered from the cross-link blocks on sibling PLPs. Conversely the department nav on /badezimmer-C4 DOES name baden-duschen-C4C9, which is how the branch was found at all. Neither source alone is complete; the union is what this file is built on, and the residual gap (ids C4C9C2/C4/C5/C6/C7, for which no slug exists in any source I could reach) is declared in review[] rather than papered over or guessed. The bathroom tree spans two departments that the site's own bathroom nav joins: Badezimmer (C4) and Badaccessoires (C27), the latter cross-linked as the tenth card on the C4 department page. Both are represented as grouping rows. QTY: every quantity is the LISTING PAGE'S OWN RENDERED EXACT TOTAL - the 'N Artikel' string XXXLutz prints in the sort/filter toolbar of the PLP itself (German thousands separator stripped, e.g. '2.552 Artikel' -> 2552). Nothing is estimated, nothing is taken from a meta description or a nav badge, no parent number is reused for a child, and no siblings are summed anywhere. VERIFICATION: (a) INTERNAL CONSISTENCY - the count is extracted as the SET of all distinct 'N Artikel' values on the page, not the first match. Every single recorded node returned a one-element set, i.e. every occurrence of the pattern on that page agrees with every other; had a stale nav badge disagreed with the toolbar total, the set would have had two members and the node would have gone to review instead. (b) IDENTITY - H1 and JSON-LD breadcrumb were read on every page and match the node asked for; the breadcrumb is what decided the routings rather than the node name, e.g. Duschvorhänge breadcrumbs to 'Startseite > Produkte > Badtextilien' and Wäschekörbe & Tonnen to 'Startseite > Produkte > Ordnen & Aufbewahren', so both were routed out despite appearing in the Badaccessoires nav, while all five Baden & Duschen leaves breadcrumb to 'Startseite > Produkte > Badezimmer > Baden & Duschen', which is what let me reconstruct a hub I could never load. (c) DISCRIMINATION - the 33 counts read are 11, 18, 30, 39, 47, 57, 60, 65, 83, 84, 131, 132, 146, 158, 181, 181, 193, 207, 223, 246, 267, 299, 421, 477, 477, 516, 566, 648, 655, 683, 797, 801, 957, 987, 1083, 1317, 2076, 2428, 2552, 3550, 3945, 5580, 6307, 10060, 14427, 26805 - a wide spread with no site-wide constant. The one coincidence, Badezimmerregale 477 == Badregale 477, is not noise: it is the proof that the child is the parent's whole assortment under a second URL, and it is why that node is withheld. (d) CONTENT - ambiguous nodes were resolved by reading their actual product tiles, not their names: Wanneneinlagen is plastic BADEWANNENEINLAGE / DUSCHEINLAGE anti-slip tub and shower inlays (Wenko, Kleine Wolke), so it is Bathroom under rule 16 rather than a textile mat; Badeinrichtungen turned out to be towel holders, towel dryers and shower shelves overlapping two nodes already in rows[], which is why it is withheld; Badspiegel is BADEZIMMERSPIEGEL and LED BADSPIEGEL tiles, confirming rule 10 content. DEDUP: already_extracted() was run on all 55 candidate URLs. ELEVEN hits, every one Furniture.xlsx / 'XXXLutz DE' at the identical URL: badmoebelsets-badmoebelserien-C4C1, waschtischkombinationen-C4C2C1, waschbeckenunterschraenke-C4C2C2, haengeschraenke-C4C2C4, hochschraenke-C4C2C5, midischraenke-C4C2C6, bad-unterschraenke-C4C2C7, medizinschraenke-C4C2C8, spiegelschraenke-C4C3C1, badezimmerregale-C4C4, gaeste-wc-C4C8. All are in review[], none in rows[]. That is the whole of XXXLutz's bathroom FURNITURE - vanity units, base/wall/tall/midi cabinets, medicine cabinets, mirror cabinets, bathroom shelves and guest-WC vanities - and under OPTION 1 it stays in Furniture. I additionally withheld two nodes the index does NOT flag, because flagging them would have been an artefact of URL-exactness rather than of scope: Badmöbel-Set C4C1C1 (5,580 of its already-extracted parent's 6,307) and Badregale C4C4C2 (477, identical to its already-extracted parent). What remains in rows[] is the part the Furniture pass did not touch: mirrors, basins, vanity tops, taps, WC equipment, baths, shower fittings and the whole Badaccessoires hardware and accessories tree. DEDUP BLIND SPOT, STATED EXPLICITLY: Final.xlsx (the Home Decor pass) holds three nodes from XXXLutz's Spiegel department C24 - wandspiegel-C24C1, standspiegel-C24C2 and ganzkoerperspiegel-C24C6 - but NOT schminkspiegel-C24C3. I record Schminkspiegel (246) as a Bathroom row because rule 10 names vanity and magnifying mirrors as Bathroom and says the word 'Vanity' must never cause exclusion, and because the site itself surfaces it as a child of both Badezimmerspiegel and Badaccessoires > Waschplatzzubehör. Its OWN breadcrumb, however, is 'Startseite > Produkte > Spiegel', so if the run owner treats department C24 as Decor-owned, this one row moves. This is the same call I made on IKEA DE's 'Make-up- & Vergrößerungsspiegel', so the two files are consistent with each other. CROSS-LINKED NODES RECORDED ONCE (rule 28): three nodes are reachable from two nav paths each and appear exactly once in rows[]. Schminkspiegel C24C3 is listed under both Badezimmerspiegel and Waschplatzzubehör -> recorded under Badezimmerspiegel. WC Ausstattung C4C7 is listed under both the Badezimmer department and Badaccessoires -> its three children are recorded under Badezimmer. Handtuchhalter C27C3C1 and Duschablagen C4C9C10 are both listed under Badeinrichtungen as well as under their own parents -> recorded under their own breadcrumb parents, and Badeinrichtungen itself is withheld as the overlapping roll-up. EXCLUDED: the Badezimmer department (26,805) and Badaccessoires (3,945) are grouping rows, as are Badezimmerspiegel (2,076), Waschbecken & Armaturen (2,684), WC Ausstattung (1,317), Baden & Duschen (access-blocked), Waschplatzzubehör (2,428) and Duschzubehör (797) - all have live child listings, so no parent URL is recorded (rule 24) and all carry blank qty and blank link (rule 38). Badezimmerschränke has no grouping row at all because all seven of its children are OPTION 1 exclusions. The /c/badezimmerserien CMS range page is a collection (rule 25). Faceted URLs (?ec_brand=, ?p_color=, ?pa_*=) appear in the category sitemap in large numbers and none is recorded - they are filter pages, not categories. Route-outs (Badtextilien department 14,427 and Duschvorhänge 3,550 -> Textile), not-bathroom nodes (Personenwaagen 11, Wäschekörbe & Tonnen 987), the withheld roll-up Badeinrichtungen (146) and the two access-blocked nodes are all in review[] with their exact quantities and exact URLs, so nothing is silently skipped.",
+ "rows": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathroom Mirrors",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathroom Mirrors > Bathroom Mirrors",
+   "qty": 801,
+   "link": "https://www.xxxlutz.de/badspiegel-C4C3C3",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathroom Mirrors > Illuminated Mirrors",
+   "qty": 193,
+   "link": "https://www.xxxlutz.de/beleuchtete-spiegel-C4C3C2",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathroom Mirrors > Vanity Mirrors",
+   "qty": 246,
+   "link": "https://www.xxxlutz.de/schminkspiegel-C24C3",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Washbasins & Taps",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Washbasins & Taps > Washbasins",
+   "qty": 957,
+   "link": "https://www.xxxlutz.de/waschbecken-C4C5C1",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Washbasins & Taps > Washstands",
+   "qty": 648,
+   "link": "https://www.xxxlutz.de/waschtische-C4C5C2",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Washbasins & Taps > Bathroom Taps",
+   "qty": 1083,
+   "link": "https://www.xxxlutz.de/badarmaturen-C4C5C3",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Toilet Fittings",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Toilet Fittings > Toilet Seats",
+   "qty": 421,
+   "link": "https://www.xxxlutz.de/wc-sitze-C4C7C1",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Toilet Fittings > Toilet Brush Sets",
+   "qty": 683,
+   "link": "https://www.xxxlutz.de/wc-buerstengarnituren-C4C7C2",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Toilet Fittings > Toilet Paper Holders",
+   "qty": 84,
+   "link": "https://www.xxxlutz.de/toilettenpapierhalter-C4C7C3",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathing & Showering",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathing & Showering > Bathtubs",
+   "qty": 2552,
+   "link": "https://www.xxxlutz.de/badewannen-C4C9C1",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathing & Showering > Bathtub Grab Handles",
+   "qty": 30,
+   "link": "https://www.xxxlutz.de/badewannengriffe-C4C9C3",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathing & Showering > Shower Taps",
+   "qty": 207,
+   "link": "https://www.xxxlutz.de/duscharmaturen-C4C9C8",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathing & Showering > Shower Heads & Shower Hoses",
+   "qty": 566,
+   "link": "https://www.xxxlutz.de/duschkoepfe-duschschlaeuche-C4C9C9",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathing & Showering > Shower Shelves",
+   "qty": 181,
+   "link": "https://www.xxxlutz.de/duschablagen-C4C9C10",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Accessories",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Accessories > Washstand Accessories",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Accessories > Washstand Accessories > Cosmetic Bins & Waste Bins",
+   "qty": 132,
+   "link": "https://www.xxxlutz.de/kosmetik-abfalleimer-C27C1C1",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Accessories > Washstand Accessories > Cosmetic Jars",
+   "qty": 223,
+   "link": "https://www.xxxlutz.de/kosmetikdosen-C27C1C3",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Accessories > Washstand Accessories > Tissue Boxes",
+   "qty": 39,
+   "link": "https://www.xxxlutz.de/taschentuchboxen-C27C1C4",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Accessories > Washstand Accessories > Towel Hooks",
+   "qty": 655,
+   "link": "https://www.xxxlutz.de/handtuchhaken-C27C1C5",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Accessories > Washstand Accessories > Soap Dishes",
+   "qty": 181,
+   "link": "https://www.xxxlutz.de/seifenschalen-C27C1C6",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Accessories > Washstand Accessories > Toothbrush Cups",
+   "qty": 299,
+   "link": "https://www.xxxlutz.de/zahnputzbecher-C27C1C7",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Accessories > Washstand Accessories > Soap Dispensers",
+   "qty": 516,
+   "link": "https://www.xxxlutz.de/seifenspender-C27C1C8",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Accessories > Shower Accessories",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Accessories > Shower Accessories > Towel Holders",
+   "qty": 267,
+   "link": "https://www.xxxlutz.de/handtuchhalter-C27C3C1",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Accessories > Shower Accessories > Shower Caddies",
+   "qty": 65,
+   "link": "https://www.xxxlutz.de/duschkoerbe-C27C3C2",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Accessories > Shower Accessories > Bath Stools",
+   "qty": 47,
+   "link": "https://www.xxxlutz.de/badhocker-C27C3C3",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Accessories > Shower Accessories > Non-Slip Bath Mats",
+   "qty": 131,
+   "link": "https://www.xxxlutz.de/wanneneinlagen-C27C3C4",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Accessories > Shower Accessories > Shower Squeegees",
+   "qty": 18,
+   "link": "https://www.xxxlutz.de/duschabzieher-C27C3C5",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Accessories > Shower Accessories > Shower Shelf",
+   "qty": 57,
+   "link": "https://www.xxxlutz.de/duschregal-C27C3C6",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Accessories > Shower Accessories > Towel Ladder",
+   "qty": 60,
+   "link": "https://www.xxxlutz.de/handtuchleiter-C27C3C7",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Accessories > Shower Accessories > Towel Stand",
+   "qty": 158,
+   "link": "https://www.xxxlutz.de/handtuchstaender-C27C3C8",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  }
+ ],
+ "review": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathroom Furniture Sets & Ranges",
+   "qty": 6307,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Bathroom Furniture Sets & Ranges' (company 'XXXLutz DE', identical URL). OPTION 1 - stays in Furniture.",
+   "link": "https://www.xxxlutz.de/badmoebelsets-badmoebelserien-C4C1"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathroom Furniture Sets & Ranges > Bathroom Furniture Set",
+   "qty": 5580,
+   "issue": "NOT RECORDED - it is the sole product child of Badmöbelsets & Badmöbelserien (6,307), which Furniture.xlsx already holds; recording it would re-extract 5,580 of the same 6,307 bathroom furniture articles into Bathroom. OPTION 1 keeps the branch in Furniture. Not in the exclusion index only because the index is URL-exact and the Furniture pass recorded the parent.",
+   "link": "https://www.xxxlutz.de/badmoebel-sets-C4C1C1"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathroom Furniture Sets & Ranges > Bathroom Ranges",
+   "qty": null,
+   "issue": "NOT RECORDED - /c/badezimmerserien is a CMS range/collection landing page (the /c/ path is the editorial namespace, listed in sitemap-cms.xml, not in sitemap-categories.xml) and carries no category id and no product grid (rule 25).",
+   "link": "https://www.xxxlutz.de/c/badezimmerserien"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathroom Cabinets",
+   "qty": 10060,
+   "issue": "NOT RECORDED - parent withheld under rule 24, and every one of its seven children is already in Furniture.xlsx, so the whole branch is out of Bathroom scope under OPTION 1 and there is no grouping row for it. Children and their Furniture.xlsx names: Waschtischkombinationen C4C2C1 -> 'Vanity Unit Combinations'; Waschbeckenunterschränke C4C2C2 -> 'Vanity Base Cabinets'; Hängeschränke C4C2C4 -> 'Bathroom Wall Cabinets'; Hochschränke C4C2C5 -> 'Bathroom Tall Cabinets'; Midischränke C4C2C6 -> 'Bathroom Midi Cabinets'; Bad Unterschränke C4C2C7 -> 'Bathroom Base Cabinets'; Medizinschränke C4C2C8 -> 'Medicine Cabinets'. Its eighth nav card, Spiegelschränke C4C3C1, is owned by the Badezimmerspiegel branch and is also already extracted.",
+   "link": "https://www.xxxlutz.de/badezimmerschraenke-C4C2"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathroom Mirrors > Mirror Cabinets",
+   "qty": null,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Mirror Cabinets' (company 'XXXLutz DE', identical URL). OPTION 1 - stays in Furniture, even though rule 10 explicitly names mirrored cabinets as Bathroom. Its three sibling mirror leaves are NOT in the index and are recorded in rows[].",
+   "link": "https://www.xxxlutz.de/spiegelschraenke-C4C3C1"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathroom Shelving",
+   "qty": 477,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Bathroom Shelves' (company 'XXXLutz DE', identical URL). OPTION 1.",
+   "link": "https://www.xxxlutz.de/badezimmerregale-C4C4"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathroom Shelving > Bathroom Shelves",
+   "qty": 477,
+   "issue": "NOT RECORDED - its rendered total (477 Artikel) is IDENTICAL to that of its already-extracted parent Badezimmerregale (477 Artikel), i.e. it is the same assortment under a second URL. Recording it would re-extract into Bathroom exactly what Furniture.xlsx holds as 'Bathroom Shelves'. Withheld under OPTION 1; the identical count is the evidence.",
+   "link": "https://www.xxxlutz.de/badregale-C4C4C2"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Guest WC",
+   "qty": 83,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Guest WC Vanity Units' (company 'XXXLutz DE', identical URL). OPTION 1.",
+   "link": "https://www.xxxlutz.de/gaeste-wc-C4C8"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathroom Furnishings",
+   "qty": 146,
+   "issue": "NOT RECORDED - overlapping roll-up, withheld. Reading its own product tiles shows it holds towel holders, towel dryers and shower shelves (HANDTUCHHALTER Schwarz - Sadena / Wenko / Moeve, HANDTUCHTROCKNER, 'Duschablage schwarz zwei Faecher'), and the only two category cards it renders point at Handtuchhalter (C27C3C1, 267, recorded) and Duschablagen (C4C9C10, 181, recorded). So its 146 articles are a curated cut across two nodes that are already rows[] entries, and recording it alongside them would double-count. Named here with its exact quantity and URL rather than dropped.",
+   "link": "https://www.xxxlutz.de/badeinrichtungen-C4C6"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathing & Showering (hub page)",
+   "qty": null,
+   "issue": "ACCESS-BLOCKED NODE, NOT a robots exclusion. The hub page https://www.xxxlutz.de/baden-duschen-C4C9 deterministically returns a 4,495-byte Dynatrace/JS challenge stub instead of the PLP - about 20 attempts across all ten curl_cffi fingerprints, bare URL, trailing slash, ?x=1 and ?utm_source=newsletter, and the r.jina.ai reader (HTTP 403). Its own children answer 200 normally in the same minute, so this is a per-URL edge state, not a rate limit and not a robots rule (robots.txt has no Claude group and does not disallow this path). No quantity is asserted for it. It is recorded in rows[] as a grouping row with blank qty and blank link, which is what rule 38 requires of it anyway, and its five recovered children carry the data.",
+   "link": "https://www.xxxlutz.de/baden-duschen-C4C9"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathing & Showering (possible unrecovered children)",
+   "qty": null,
+   "issue": "INCOMPLETE BRANCH, STATED PLAINLY. XXXLutz encodes the tree in the category id, and the ids recovered under C4C9 are C4C9C1, C4C9C3, C4C9C8, C4C9C9 and C4C9C10 - all five recorded. The gaps C4C9C2, C4C9C4, C4C9C5, C4C9C6 and C4C9C7 may be retired ids or may be live nodes whose slugs I could not recover: sitemap-categories.xml lists only three of the five I found (C4C9C3 and C4C9C9 are absent from it), the hub page that would name them is access-blocked, the mega-menu is client-rendered and the home page HTML contains no C4 references at all. I recovered what I could from the sibling cross-link blocks on the child PLPs. I did NOT guess a slug for the gaps - inventing a URL is forbidden - so this branch is flagged as possibly incomplete rather than silently presented as closed.",
+   "link": "https://www.xxxlutz.de/baden-duschen-C4C9"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Accessories > Washstand Accessories > Hairdryer Holders",
+   "qty": null,
+   "issue": "ACCESS-BLOCKED NODE, NOT a robots exclusion. Föhnhalter is a real leaf - it is named in the Waschplatzzubehör nav and listed in sitemap-categories.xml - but https://www.xxxlutz.de/foehnhalter-C27C1C9 deterministically returns the same 4,495-byte Dynatrace/JS challenge stub as the Baden & Duschen hub, across roughly 15 attempts on all ten fingerprints while its siblings answered 200 in the same minute. No count could be read and none is invented, so it is named here with its exact URL instead of being recorded with a guessed quantity or dropped.",
+   "link": "https://www.xxxlutz.de/foehnhalter-C27C1C9"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Accessories > Bathroom Scales",
+   "qty": 11,
+   "issue": "NOT BATHROOM: bathroom scales. Primary product type is a weighing appliance, not bathroom equipment, fixture, storage or hardware (rule 2 puts PRIMARY PRODUCT TYPE above website hierarchy). It sits in the Badaccessoires department, so it is named here rather than silently skipped.",
+   "link": "https://www.xxxlutz.de/personenwaagen-C27C5"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Textiles (department)",
+   "qty": 14427,
+   "issue": "ROUTED TO TEXTILE: XXXLutz has a whole Badtextilien department (C82) with 13 children - Strandtücher C82C1, Duschtücher C82C2, Handtücher C82C3, Gästehandtücher C82C4, Waschlappen C82C5, Bademäntel C82C6 (with Damen/Herren/Kinder sub-nodes), Badematten C82C7, Duschvorhänge C82C8, WC-Vorleger C82C9, Badetücher C82C10, Handtuch-Sets C82C11. All are towels, robes, textile bath mats and curtains (rules 15, 16, 20). The whole department is routed out; the child ids are listed here so the Textile pass can pick them up.",
+   "link": "https://www.xxxlutz.de/badtextilien-C82"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Accessories > Shower Curtains",
+   "qty": 3550,
+   "issue": "ROUTED TO TEXTILE: shower curtains (rule 20). Cross-linked into the Badaccessoires nav, but its own breadcrumb is Startseite > Produkte > Badtextilien, i.e. the site files it as textile.",
+   "link": "https://www.xxxlutz.de/duschvorhaenge-C82C8"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Accessories > Laundry Baskets & Bins",
+   "qty": 987,
+   "issue": "NOT BATHROOM: laundry baskets and bins. Cross-linked into the Badaccessoires nav, but its own breadcrumb is Startseite > Produkte > Ordnen & Aufbewahren (C26), the general storage department, so general storage keeps it (rules 30-33). Flagged because Zara Home DE's laundry-basket node DID sit inside its bathroom department and was recorded there; here the site's own hierarchy says storage.",
+   "link": "https://www.xxxlutz.de/waeschekoerbe-tonnen-C26C4"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom (department roll-up)",
+   "qty": 26805,
+   "issue": "NOT RECORDED as a leaf - it is the department roll-up over every branch below it and is recorded in rows[] as the top grouping row with blank qty and blank link (rules 24, 38). Its rendered total, 26.805 Artikel, is noted here only as evidence that the figure exists and discriminates against its children, never as a row quantity and never summed with anything.",
+   "link": "https://www.xxxlutz.de/badezimmer-C4"
+  }
+ ],
+ "_reconstructed_from": "Bathroom.xlsx delivered 2026-09-01 (checkpoint), not original worker JSON"
+}

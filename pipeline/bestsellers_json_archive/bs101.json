@@ -1,0 +1,16 @@
+{
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "Direct HTTP fetch throughout (no WAF, no proxy needed, matching prior-pass access notes). Site is headless Shopify on custom Next.js/Vercel frontend with Algolia-powered PLPs (SSR RSC payload contains nbHits/nbPages/hitsPerPage/exhaustiveNbHits and a filters=collectionsHandles:\"<handle>\" param). Checked: full main-nav dump (all 'children' label strings in the nav JSON-LD + RSC nav tree), footer, and the site's own /api/collections-sitemap.xml (268 unique /collections/<handle> URLs across locales) for Bestsellers-type terms (best, top, popul, favor, coup-de-coeur, prefer) in both English and French. No nav item labeled Bestsellers/Best Sellers/Top Sellers exists. Nav item 'Most popular' links to a blog/magazine article (/en-eu/media/familles_articles-les-plus-lus), not a PLP -- excluded as editorial per brief Sec.3 EXCLUDE. However /en-eu/collections/ldg-les-iconiques ('Most-wanted pieces') is a genuine Algolia-backed PLP (real product grid, breadcrumb, H1='Most-wanted pieces', meta description 'Your favorite pieces of lighting, furniture, decor and home textiles are found here') matching the brief's 'Customer Favorites'/'Most Popular' target terms. It is also reused sitewide as the homepage's primary 'E-shop' CTA and the empty-cart recommendation-widget link, which the PRIOR Home-Decor pass treated as noise for category-extraction purposes -- but as its own standalone URL it is a real, distinct, breadcrumbed PLP, so it is recorded here with a flag rather than silently dropped. qty=67 verified via nbHits=67, nbPages=3, hitsPerPage=24 (ceil(67/24)=3, consistent), exhaustiveNbHits:true, and filters scoped exactly to collectionsHandles:\"ldg-les-iconiques\". No other candidate collection handle (checked iconiques-en-livraison-rapide='In-stock signature pieces', notre-selection-de-la-semaine='Our selection of the week', retrospective/retrospective-1) carries a bestseller/popularity concept -- all excluded as unrelated (ready-to-ship, weekly editorial curation, and a book/tax dummy collection respectively).",
+  "rows": [
+    {
+      "category": "Bestsellers",
+      "sub_category": "Most-Wanted Pieces",
+      "qty": 67,
+      "link": "https://www.thesocialitefamily.com/en-eu/collections/ldg-les-iconiques",
+      "is_group": false,
+      "evidence": "Embedded Algolia RSC payload: \\\"nbHits\\\":67,\\\"page\\\":0,\\\"nbPages\\\":3,\\\"hitsPerPage\\\":24, exhaustiveNbHits\\\":true, filters scoped to collectionsHandles:\\\"ldg-les-iconiques\\\"",
+      "flag": "MANUAL REVIEW: page title 'Most-wanted pieces' / meta description 'your favorite pieces...are found here' matches brief's Customer-Favorites/Most-Popular target terms, but the same URL also serves as the site's default 'E-shop' nav CTA and empty-cart product-recommendation link -- confirm it represents genuine sales-popularity merchandising rather than a general curated-highlights hub reused as the shop entry point."
+    }
+  ]
+}

@@ -1,0 +1,54 @@
+{
+  "sr": 162,
+  "company": "Serax",
+  "brand_site": "serax.com",
+  "country": "Belgium",
+  "site_url": "https://www.serax.com/",
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "ACCESS: tier (a) direct HTTP (curl, Chrome UA) throughout - robots.txt (serax.com/robots.txt) is 'User-agent: * / Allow: /' with no ClaudeBot/anthropic-ai block, so tier (a)/(b)/(c) all permitted; site is Shopify (canonical host serax.com, www redirects 301). No block encountered. TREE: built from union of (1) main mega-nav (Products > Tableware/Lighting/Home accessories/Furniture, each with a sub-link strip - no Textile or dedicated Storage top-level nav item), (2) full XML sitemap (sitemap_collections_1/2.xml, ~3100 collection URLs, mostly per-designer crossover landing pages), and (3) the site's own Algolia search index, whose public search-only key/appId are exposed client-side (XUFFBC8HV6 / 6d681c4a4b77554afb664c08758c3269) and expose meta.custom.category/meta.custom.subcategory facets that drive every /collections/<subcategory> listing page (confirmed by rendering /collections/baskets with Playwright and capturing the live network calls: the page's own product grid queries facetFilters=[[\"meta.custom.subcategory:baskets\"]] against index shopify_products - i.e. the subcategory facet count IS the number the collection page itself displays). QTY: obtained a full-catalog facet breakdown via one direct Algolia query (POST to https://xuffbc8hv6-dsn.algolia.net/1/indexes/shopify_products/query, hitsPerPage=0, facets=[meta.custom.category,meta.custom.subcategory]) - this is the site's own exact per-subcategory product count (2697 total catalog products across 10 top categories, 56 subcategories), verified against Playwright-rendered page/network captures for spot checks (baskets, deco-cushions, loose-cushions, towel-racks, shelves). Every candidate subcategory's actual product titles were pulled and read (not inferred) before classifying. EXCLUDED (reviewed, not textile/storage): baskets (10 - bread-serving baskets/decorative papier-mache boxes, e.g. 'Iron bread basket', 'Basket with lid + linen bag' - serveware/decorative, no storage/organizing function); place mats & coasters (6 - actually cutlery blocks/rests and wood coasters, no fabric placemats exist on this site - Kitchen&Dining, not Textile; not drawer organizers either); bathroom accessories (18 - ceramic 'Cose' set: soap dispensers, lidded boxes, trays - decorative vanity accessories, no towels/bath textiles and boxes are decorative trinket boxes not organizational storage); food storage & organising (8 - glass domes and 'Bonbonniere' candy dishes, decorative glassware/dinnerware, no standalone /collections/ URL exists for this tag, only two designer-crossover combo pages); small storage & organisers (3 - all 'Sugar bowl' items, Dinnerware category - Kitchen&Dining tableware, not organizational storage); storage & organisation (3 - decorative lidded ceramic pots, Dinnerware category, no standalone collection URL); racks (1 - 'Rack James black', explicit product_type/category = Furniture Indoor, description confirms a general-purpose wheeled rack/trolley but site places it under Furniture - per storage.md Sec21/27 an explicit Furniture-categorized item is kept as Furniture); trays, Sets, vases, candle & tea light holders, flower pots & planters, decorative objects, mirrors, plates/bowls/cups/glasses/dishes/saucers/serveware/cake stands/jugs/tea pots/cutlery/cookware/knives/ovenware = Kitchen&Dining or Decorative Home Accessories or Furniture or Lighting per rules, out of scope for this task. No Bedding, Curtains, Rugs, Towels(as textile), Tablecloths, Napkins, or Blankets exist anywhere in the catalog - Serax's assortment is tableware/glassware/lighting/furniture/decor plus a small cushion range; confirmed by scanning the complete subcategory facet list (56 values) - none match those product types. INCLUDED - Textile: Deco Cushions (45) and Loose Cushions (17), both genuine fabric cushions (velvet/coco/linen-blend indoor deco cushions; outdoor lounge-chair and sun-lounger seat cushions) each with their own dedicated, canonical-verified collection page. INCLUDED - Storage: Towel Racks (1, 'Wall towel rack black Juno' - matches storage.md Sec19 Racks 'Towel Storage Racks' explicitly, MEDIUM confidence flagged because the product's top-level site category tag is Furniture Indoor while its own dedicated subcategory/collection is explicitly 'towel racks'); Shelves & Storage (0, nav item literally labelled 'Shelves & Storage' under the Furniture menu, dedicated collection page /collections/shelves confirmed via canonical+og:title, but currently shows 'There are no products matching your filter criteria' - zero-product category per storage.md Sec39, LOW confidence/flagged for Furniture-vs-Storage boundary once repopulated).",
+  "textile_rows": [
+    {
+      "category": "Textile",
+      "sub_category": "Deco Cushions",
+      "qty": 45,
+      "link": "https://serax.com/collections/deco-cushions",
+      "is_group": false,
+      "evidence": "Algolia index shopify_products facet meta.custom.subcategory:'deco cushions' nbHits=45 (same facetFilters query the live /collections/deco-cushions product grid issues; canonical=https://serax.com/collections/deco-cushions, og:title='Discover all Serax deco cushions')",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Loose Cushions",
+      "qty": 17,
+      "link": "https://serax.com/collections/loose-cushions",
+      "is_group": false,
+      "evidence": "Algolia index shopify_products facet meta.custom.subcategory:'loose cushions' nbHits=17 (same facetFilters query the live /collections/loose-cushions product grid issues; canonical=https://serax.com/collections/loose-cushions, og:title='Discover all Serax loose cushions')",
+      "flag": null,
+      "confidence": "HIGH"
+    }
+  ],
+  "storage_rows": [
+    {
+      "category": "Storage",
+      "sub_category": "Towel Racks",
+      "qty": 1,
+      "link": "https://serax.com/collections/towel-racks",
+      "is_group": false,
+      "evidence": "Algolia index shopify_products facet meta.custom.subcategory:'towel racks' nbHits=1 (product 'Wall towel rack black Juno'); canonical=https://serax.com/collections/towel-racks, og:title='Discover all Serax towel racks'",
+      "flag": "MANUAL REVIEW: product's top-level meta.custom.category tag is 'Furniture Indoor', but it has its own dedicated 'towel racks' subcategory/collection matching storage.md Sec19 Racks example ('Towel Storage Racks' -> Storage) - kept as Storage on primary-function grounds, confidence lowered for the category-tag conflict.",
+      "confidence": "MEDIUM"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Shelves & Storage",
+      "qty": 0,
+      "link": "https://serax.com/collections/shelves",
+      "is_group": false,
+      "evidence": "Main-nav Furniture sub-link literally labelled 'Shelves & Storage' (href /collections/shelves); page canonical=https://serax.com/collections/shelves confirmed, but rendered product grid is empty and shows the site's own 'There are no products matching your filter criteria' message; Algolia facet meta.custom.subcategory has no 'shelves' value in the current catalog (0 hits) - genuine zero-product category per storage.md Sec39.",
+      "flag": "MANUAL REVIEW: zero-product category - Furniture-vs-Storage boundary unresolved because no live products currently carry this tag to inspect; re-check if/when the collection is repopulated.",
+      "confidence": "LOW"
+    }
+  ]
+}

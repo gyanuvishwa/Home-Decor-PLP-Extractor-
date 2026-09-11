@@ -1,0 +1,399 @@
+{
+ "sr": 81,
+ "company": "Graham and Green",
+ "brand_site": "grahamandgreen.co.uk",
+ "country": "UK",
+ "site_url": "https://www.grahamandgreen.co.uk/",
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ACCESS: plain direct fetch (probe.py requests session) worked for every URL; no WAF, no proxy needed, same as the prior Home-Decor pass. Platform is Magento 2. TREE: taken from the rendered mega-menu in the homepage HTML (nav.site-nav -> div.subnav), cross-checked against media/sitemap/sitemap-1-{1..4}.xml (3,926 URLs). Furniture lives in four places: the Furniture department (/furniture, with Seating/Tables/Storage/Bedroom columns), the standalone Sofas department (/sofas), Garden Furniture under the Garden department (/outdoors/garden-furniture), and Vintage Furniture (/vintage-collection/furniture). COUNTS: the site publishes NO product-count header anywhere - probe.py count found zero text or JSON count candidates, there is no 'N products' string and no Magento toolbar-amount value. Every qty is therefore a full enumeration: fetch ?p=1..N counting li.product-list__item tiles until a page returns zero, confirm unique product-URL count == summed tile count, and confirm page N+1 is empty (exhaustion check). Page size is 48. I deliberately did NOT count data-product-id / data-price-amount (the method the prior Home-Decor pass used) because it undercounts: 'Coming soon' tiles carry no price box (Table Lamps p2 has 48 tiles but only 47 priced). Counts were read twice for Coffee Tables, Armchairs, Bedside Tables, Sideboards, Side Tables and Vintage Furniture with zero drift, and Coffee Tables (14) was independently confirmed by a rendered WebFetch, which returned the same 14 product names and the same '1 / 1' pagination. REDIRECT TRAPS (Magento silently 301s dead slugs to an ancestor instead of 404ing): /furniture/hallway, /furniture/home-office and /furniture/sitting-room all land on /furniture (455 items, h1 'Furniture'); /furniture/seating/benches and /furniture/hallway/hallway-benches land on ottomans-and-benches; /furniture/storage/bookcases-cabinets lands on cabinets-and-cupboards; /furniture/kitchen/kitchen-dining-stools lands on dining-chairs; /furniture/kitchen/kitchen-storage lands on /furniture/storage; /sofas/sofa-size/footstools-ottomans lands on /furniture/seating/footstools. All dropped as duplicates - the final URL and h1 of every page was checked before the count was accepted. SOFAS: /sofas and /sofas/sofa-size are CMS landing pages with zero product tiles, so Sofas is a grouping row and the six sofa-size nodes carry the counts (union 30 distinct listings). Excluded /sofas/made-to-order-sofas (10) and /sofas/ready-to-deliver-sofas (13) as fulfilment/availability splits of the same catalogue - recording them would double-count the size nodes. Excluded /sofas/colour/* (10 nodes) and /sofas/fabric/* (6 nodes) as colour and material filter pages. /sofas/sofa-size/2-5-seater-sofa-bed is identical to /sofas/sofa-size/sofa-beds (same h1 'Sofa Beds', same 2 products) - dropped. PARENT-vs-CHILD: /furniture/seating/armchairs/made-to-order-armchairs (10) is a strict subset of Armchairs (59), verified by slug set, so only Armchairs is recorded. /furniture/kitchen (53, 'Kitchen & Dining Room Furniture') is a room roll-up not present in the mega-menu whose own children redirect into the type tree; dropped to avoid double counting. EXCLUDED as out of scope: /furniture/bedroom/mattresses (3) per the mattresses rule; /outdoors/garden-furniture/garden-parasols (0 products anyway) and /outdoors/garden-accessories/fire-pits-and-bowls as non-furniture - note the Garden Furniture parent (16) contains 7 fire bowls / patio heaters / log burners that appear in no child node, which is why the three children sum to 9 rather than 16. Also excluded per section 3: View All Furniture, /furniture/view-all-furniture, New In Furniture, /sale/furniture, /furniture/mother-of-pearl-inlay-furniture, /furniture/furniture-collections/esben-collection (marketing collections), plus the Sofas menu's PDF size guide and showroom page. ORPHAN CHECK: the 18 products in /furniture/seating that are in no Seating child are all sofas (covered by the Sofas branch) plus 2 upholstered fire fenders, so no category is missing. Vintage Furniture (43) overlaps the main /furniture tree (455) by exactly 1 SKU, so it is a genuinely separate branch rather than a duplicate listing.",
+ "rows": [
+  {
+   "category": "Furniture",
+   "sub_category": "Seating",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Armchairs",
+   "qty": 59,
+   "link": "https://www.grahamandgreen.co.uk/furniture/seating/armchairs",
+   "is_group": false,
+   "evidence": "full enumeration of the Magento grid (48/page): pages 1-2 returned 48+11 tiles (li.product-list__item), 59 unique product URLs; page 3 returned 0 tiles (exhaustion check). Toolbar read '1 / 2'. Site publishes no product-count header.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Benches & Ottomans",
+   "qty": 9,
+   "link": "https://www.grahamandgreen.co.uk/furniture/seating/ottomans-and-benches",
+   "is_group": false,
+   "evidence": "full enumeration of the Magento grid (48/page): pages 1-1 returned 9 tiles (li.product-list__item), 9 unique product URLs; page 2 returned 0 tiles (exhaustion check). Toolbar read '1 / 1'. Site publishes no product-count header.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Accent Chairs",
+   "qty": 9,
+   "link": "https://www.grahamandgreen.co.uk/furniture/seating/accent-chairs",
+   "is_group": false,
+   "evidence": "full enumeration of the Magento grid (48/page): pages 1-1 returned 9 tiles (li.product-list__item), 9 unique product URLs; page 2 returned 0 tiles (exhaustion check). Toolbar read '1 / 1'. Site publishes no product-count header.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Desk Chairs",
+   "qty": 4,
+   "link": "https://www.grahamandgreen.co.uk/furniture/seating/desk-chairs",
+   "is_group": false,
+   "evidence": "full enumeration of the Magento grid (48/page): pages 1-1 returned 4 tiles (li.product-list__item), 4 unique product URLs; page 2 returned 0 tiles (exhaustion check). Toolbar read '1 / 1'. Site publishes no product-count header.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dining Chairs & Benches",
+   "qty": 41,
+   "link": "https://www.grahamandgreen.co.uk/furniture/seating/dining-chairs",
+   "is_group": false,
+   "evidence": "full enumeration of the Magento grid (48/page): pages 1-1 returned 41 tiles (li.product-list__item), 41 unique product URLs; page 2 returned 0 tiles (exhaustion check). Toolbar read '1 / 1'. Site publishes no product-count header.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Footstools",
+   "qty": 8,
+   "link": "https://www.grahamandgreen.co.uk/furniture/seating/footstools",
+   "is_group": false,
+   "evidence": "full enumeration of the Magento grid (48/page): pages 1-1 returned 8 tiles (li.product-list__item), 8 unique product URLs; page 2 returned 0 tiles (exhaustion check). Toolbar read '1 / 1'. Site publishes no product-count header.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Pouffes & Beanbags",
+   "qty": 18,
+   "link": "https://www.grahamandgreen.co.uk/furniture/seating/pouffes-bean-bags",
+   "is_group": false,
+   "evidence": "full enumeration of the Magento grid (48/page): pages 1-1 returned 18 tiles (li.product-list__item), 18 unique product URLs; page 2 returned 0 tiles (exhaustion check). Toolbar read '1 / 1'. Site publishes no product-count header.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bar Stools",
+   "qty": 26,
+   "link": "https://www.grahamandgreen.co.uk/furniture/seating/stools",
+   "is_group": false,
+   "evidence": "full enumeration of the Magento grid (48/page): pages 1-1 returned 26 tiles (li.product-list__item), 26 unique product URLs; page 2 returned 0 tiles (exhaustion check). Toolbar read '1 / 1'. Site publishes no product-count header.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Tables",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Coffee Tables",
+   "qty": 14,
+   "link": "https://www.grahamandgreen.co.uk/furniture/tables/coffee-tables",
+   "is_group": false,
+   "evidence": "full enumeration of the Magento grid (48/page): pages 1-1 returned 14 tiles (li.product-list__item), 14 unique product URLs; page 2 returned 0 tiles (exhaustion check). Toolbar read '1 / 1'. Site publishes no product-count header.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Console Tables",
+   "qty": 10,
+   "link": "https://www.grahamandgreen.co.uk/furniture/tables/console-tables",
+   "is_group": false,
+   "evidence": "full enumeration of the Magento grid (48/page): pages 1-1 returned 10 tiles (li.product-list__item), 10 unique product URLs; page 2 returned 0 tiles (exhaustion check). Toolbar read '1 / 1'. Site publishes no product-count header.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Desks",
+   "qty": 7,
+   "link": "https://www.grahamandgreen.co.uk/furniture/tables/desks",
+   "is_group": false,
+   "evidence": "full enumeration of the Magento grid (48/page): pages 1-1 returned 7 tiles (li.product-list__item), 7 unique product URLs; page 2 returned 0 tiles (exhaustion check). Toolbar read '1 / 1'. Site publishes no product-count header.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dining Tables",
+   "qty": 15,
+   "link": "https://www.grahamandgreen.co.uk/furniture/tables/dining-tables",
+   "is_group": false,
+   "evidence": "full enumeration of the Magento grid (48/page): pages 1-1 returned 15 tiles (li.product-list__item), 15 unique product URLs; page 2 returned 0 tiles (exhaustion check). Toolbar read '1 / 1'. Site publishes no product-count header.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dressing Tables & Chairs",
+   "qty": 10,
+   "link": "https://www.grahamandgreen.co.uk/furniture/tables/dressing-tables",
+   "is_group": false,
+   "evidence": "full enumeration of the Magento grid (48/page): pages 1-1 returned 10 tiles (li.product-list__item), 10 unique product URLs; page 2 returned 0 tiles (exhaustion check). Toolbar read '1 / 1'. Site publishes no product-count header.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Freestanding Kitchen Islands",
+   "qty": 6,
+   "link": "https://www.grahamandgreen.co.uk/furniture/tables/kitchen-islands",
+   "is_group": false,
+   "evidence": "full enumeration of the Magento grid (48/page): pages 1-1 returned 6 tiles (li.product-list__item), 6 unique product URLs; page 2 returned 0 tiles (exhaustion check). Toolbar read '1 / 1'. Site publishes no product-count header.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Side Tables",
+   "qty": 47,
+   "link": "https://www.grahamandgreen.co.uk/furniture/tables/side-tables",
+   "is_group": false,
+   "evidence": "full enumeration of the Magento grid (48/page): pages 1-1 returned 47 tiles (li.product-list__item), 47 unique product URLs; page 2 returned 0 tiles (exhaustion check). Toolbar read '1 / 1'. Site publishes no product-count header.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Storage Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Cupboards & Cabinets",
+   "qty": 23,
+   "link": "https://www.grahamandgreen.co.uk/furniture/storage/cabinets-and-cupboards",
+   "is_group": false,
+   "evidence": "full enumeration of the Magento grid (48/page): pages 1-1 returned 23 tiles (li.product-list__item), 23 unique product URLs; page 2 returned 0 tiles (exhaustion check). Toolbar read '1 / 1'. Site publishes no product-count header.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Chests of Drawers",
+   "qty": 26,
+   "link": "https://www.grahamandgreen.co.uk/furniture/storage/chests-of-drawers",
+   "is_group": false,
+   "evidence": "full enumeration of the Magento grid (48/page): pages 1-1 returned 26 tiles (li.product-list__item), 26 unique product URLs; page 2 returned 0 tiles (exhaustion check). Toolbar read '1 / 1'. Site publishes no product-count header.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Drinks Trolleys & Bars",
+   "qty": 7,
+   "link": "https://www.grahamandgreen.co.uk/furniture/storage/drinks-trolleys-bars",
+   "is_group": false,
+   "evidence": "full enumeration of the Magento grid (48/page): pages 1-1 returned 7 tiles (li.product-list__item), 7 unique product URLs; page 2 returned 0 tiles (exhaustion check). Toolbar read '1 / 1'. Site publishes no product-count header.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Hallway Storage",
+   "qty": 11,
+   "link": "https://www.grahamandgreen.co.uk/furniture/storage/hallway-storage",
+   "is_group": false,
+   "evidence": "full enumeration of the Magento grid (48/page): pages 1-1 returned 11 tiles (li.product-list__item), 11 unique product URLs; page 2 returned 0 tiles (exhaustion check). Toolbar read '1 / 1'. Site publishes no product-count header.",
+   "flag": "MANUAL REVIEW: mixed node - 7 of 11 are furniture (upholstered/linen/leather benches, shoe locker, shoe rack, clothes rail), 4 are hall accessories (umbrella stand, welly stand, luggage rack, coat rack); kept because the site files it under Furniture > Storage"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Shelves & Bookcases",
+   "qty": 23,
+   "link": "https://www.grahamandgreen.co.uk/furniture/storage/shelves-and-shelving-units",
+   "is_group": false,
+   "evidence": "full enumeration of the Magento grid (48/page): pages 1-1 returned 23 tiles (li.product-list__item), 23 unique product URLs; page 2 returned 0 tiles (exhaustion check). Toolbar read '1 / 1'. Site publishes no product-count header.",
+   "flag": "MANUAL REVIEW: ambiguous shelving - 23 tiles split roughly 15 decorative wall shelves (Bobbin Double Wall Shelf, Floating Wood Shelf, Henry Gold Wall Shelf) vs 8 freestanding shelving units/racks (Evander Shelving Unit, Valentina Shelving Unit, Recycled Teak Shelving Rack, Clara Showcase Cabinet); not separable at this URL, kept because the site files it under Furniture > Storage"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sideboards & TV Stands",
+   "qty": 22,
+   "link": "https://www.grahamandgreen.co.uk/furniture/storage/sideboards",
+   "is_group": false,
+   "evidence": "full enumeration of the Magento grid (48/page): pages 1-1 returned 22 tiles (li.product-list__item), 22 unique product URLs; page 2 returned 0 tiles (exhaustion check). Toolbar read '1 / 1'. Site publishes no product-count header.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Wardrobes & Rails",
+   "qty": 6,
+   "link": "https://www.grahamandgreen.co.uk/furniture/storage/wardrobes",
+   "is_group": false,
+   "evidence": "full enumeration of the Magento grid (48/page): pages 1-1 returned 6 tiles (li.product-list__item), 6 unique product URLs; page 2 returned 0 tiles (exhaustion check). Toolbar read '1 / 1'. Site publishes no product-count header.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bedroom Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Beds & Headboards",
+   "qty": 13,
+   "link": "https://www.grahamandgreen.co.uk/furniture/bedroom/beds",
+   "is_group": false,
+   "evidence": "full enumeration of the Magento grid (48/page): pages 1-1 returned 13 tiles (li.product-list__item), 13 unique product URLs; page 2 returned 0 tiles (exhaustion check). Toolbar read '1 / 1'. Site publishes no product-count header.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bedside Tables",
+   "qty": 38,
+   "link": "https://www.grahamandgreen.co.uk/furniture/bedroom/bedside-tables",
+   "is_group": false,
+   "evidence": "full enumeration of the Magento grid (48/page): pages 1-1 returned 38 tiles (li.product-list__item), 38 unique product URLs; page 2 returned 0 tiles (exhaustion check). Toolbar read '1 / 1'. Site publishes no product-count header.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Blanket Boxes",
+   "qty": 2,
+   "link": "https://www.grahamandgreen.co.uk/furniture/bedroom/blanket-boxes",
+   "is_group": false,
+   "evidence": "full enumeration of the Magento grid (48/page): pages 1-1 returned 2 tiles (li.product-list__item), 2 unique product URLs; page 2 returned 0 tiles (exhaustion check). Toolbar read '1 / 1'. Site publishes no product-count header.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Room Dividers",
+   "qty": 4,
+   "link": "https://www.grahamandgreen.co.uk/furniture/bedroom/room-dividers",
+   "is_group": false,
+   "evidence": "full enumeration of the Magento grid (48/page): pages 1-1 returned 4 tiles (li.product-list__item), 4 unique product URLs; page 2 returned 0 tiles (exhaustion check). Toolbar read '1 / 1'. Site publishes no product-count header.",
+   "flag": "MANUAL REVIEW: 4 folding screens / room dividers (bamboo, rattan, painted panel); site files them under Furniture > Bedroom Furniture, but screens are furniture-adjacent rather than a listed furniture type"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sofas",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Two Seater Sofas",
+   "qty": 8,
+   "link": "https://www.grahamandgreen.co.uk/sofas/sofa-size/2-seater-sofa",
+   "is_group": false,
+   "evidence": "full enumeration of the Magento grid (48/page): pages 1-1 returned 8 tiles (li.product-list__item), 8 unique product URLs; page 2 returned 0 tiles (exhaustion check). Toolbar read '1 / 1'. Site publishes no product-count header.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Three Seater Sofas",
+   "qty": 7,
+   "link": "https://www.grahamandgreen.co.uk/sofas/sofa-size/3-seater-sofa",
+   "is_group": false,
+   "evidence": "full enumeration of the Magento grid (48/page): pages 1-1 returned 7 tiles (li.product-list__item), 7 unique product URLs; page 2 returned 0 tiles (exhaustion check). Toolbar read '1 / 1'. Site publishes no product-count header.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Four Seater Sofas",
+   "qty": 6,
+   "link": "https://www.grahamandgreen.co.uk/sofas/sofa-size/4-seater-sofa",
+   "is_group": false,
+   "evidence": "full enumeration of the Magento grid (48/page): pages 1-1 returned 6 tiles (li.product-list__item), 6 unique product URLs; page 2 returned 0 tiles (exhaustion check). Toolbar read '1 / 1'. Site publishes no product-count header.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Corner and Chaise Sofas",
+   "qty": 5,
+   "link": "https://www.grahamandgreen.co.uk/sofas/sofa-size/corner-sofas",
+   "is_group": false,
+   "evidence": "full enumeration of the Magento grid (48/page): pages 1-1 returned 5 tiles (li.product-list__item), 5 unique product URLs; page 2 returned 0 tiles (exhaustion check). Toolbar read '1 / 1'. Site publishes no product-count header.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sofa Beds",
+   "qty": 2,
+   "link": "https://www.grahamandgreen.co.uk/sofas/sofa-size/sofa-beds",
+   "is_group": false,
+   "evidence": "full enumeration of the Magento grid (48/page): pages 1-1 returned 2 tiles (li.product-list__item), 2 unique product URLs; page 2 returned 0 tiles (exhaustion check). Toolbar read '1 / 1'. Site publishes no product-count header.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Loveseats",
+   "qty": 2,
+   "link": "https://www.grahamandgreen.co.uk/sofas/sofa-size/loveseats",
+   "is_group": false,
+   "evidence": "full enumeration of the Magento grid (48/page): pages 1-1 returned 2 tiles (li.product-list__item), 2 unique product URLs; page 2 returned 0 tiles (exhaustion check). Toolbar read '1 / 1'. Site publishes no product-count header.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Garden Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Garden Seating",
+   "qty": 6,
+   "link": "https://www.grahamandgreen.co.uk/outdoors/garden-furniture/garden-chairs",
+   "is_group": false,
+   "evidence": "full enumeration of the Magento grid (48/page): pages 1-1 returned 6 tiles (li.product-list__item), 6 unique product URLs; page 2 returned 0 tiles (exhaustion check). Toolbar read '1 / 1'. Site publishes no product-count header.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Garden Tables & Sets",
+   "qty": 3,
+   "link": "https://www.grahamandgreen.co.uk/outdoors/garden-furniture/garden-tables",
+   "is_group": false,
+   "evidence": "full enumeration of the Magento grid (48/page): pages 1-1 returned 3 tiles (li.product-list__item), 3 unique product URLs; page 2 returned 0 tiles (exhaustion check). Toolbar read '1 / 1'. Site publishes no product-count header.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sun Loungers & Hammocks",
+   "qty": 0,
+   "link": "https://www.grahamandgreen.co.uk/outdoors/garden-furniture/garden-benches-sun-loungers",
+   "is_group": false,
+   "evidence": "listing page renders its own empty state \"We can't find products matching the selection.\" under h1 'Sun Loungers'; 0 product tiles, no toolbar pagination",
+   "flag": "MANUAL REVIEW: live nav category currently holding zero products (verified empty state, not a fetch failure)"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Vintage Collection",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Vintage Furniture",
+   "qty": 43,
+   "link": "https://www.grahamandgreen.co.uk/vintage-collection/furniture",
+   "is_group": false,
+   "evidence": "full enumeration of the Magento grid (48/page): pages 1-1 returned 43 tiles (li.product-list__item), 43 unique product URLs; page 2 returned 0 tiles (exhaustion check). Toolbar read '1 / 1'. Site publishes no product-count header.",
+   "flag": null
+  }
+ ]
+}

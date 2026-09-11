@@ -1,0 +1,94 @@
+{
+ "sr": 292,
+ "company": "Chumbak",
+ "brand_site": "chumbak.com",
+ "country": "India",
+ "site_url": "https://www.chumbak.com/",
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "Access route: direct fetch worked initially (nav, footer sitemap, mega-menu, collection HTML), then the session hit Shopify/Cloudflare's 'Verifying your connection' challenge (HTTP 429) on plain requests/r.jina.ai; switched to curl_cffi with chrome131 TLS impersonation, which bypassed it cleanly for all subsequent /collections/<handle>/products.json calls. Count method: EXACT via Shopify /collections/<handle>/products.json?limit=250, paged and ID-deduped (RULE 1) -- never the collections.json 'products_count' metafield, which is confirmed inflated here (e.g. table-wall-decor metafield=1362 vs enumerated unique products=94, a 14.5x inflation; dining-table-accessories metafield=2126 vs its real children being far smaller). Chumbak is a Shopify store with ~550 collections, the vast majority being sale/discount/gift/price-tier/occasion marketing collections (e.g. '50% Discount', 'Gifts Under 1000', 'Black Friday') -- these were excluded per the Shop-All/Sale/Gift-Guide rule. Category taxonomy used: the real customer-facing mega-menu + footer SEO-link sitemap (Dining group: Dining Table Accessories/Crockery Set/Tableware/Coffee Mugs/Storage Jars/Bakeware; Decor & Living group: Table & Wall Decor/Planters/Trunks & Storage/Rugs & Carpets), plus two orphaned-but-live named collections not in nav (glassware, wall-clocks) that were confirmed real via products.json (non-empty, 200 OK) and match required scope buckets (Glassware, Clocks). Exclusions applied: Storage Jars and Bakeware (kitchen storage/cookware) dropped entirely; Trunks & Storage and Rugs & Carpets dropped (furniture/textiles); within Serving & Tableware, 5 kitchen storage-jar/lunch-box SKUs and 1 souvenir-magnet SKU were dropped via per-SKU product_type+title inspection (129 raw -> 123 in-scope); within Table & Wall Decor, 17 non-decor SKUs were dropped (storage boxes, desk calendars, an organiser gift set, seagrass laundry baskets, a picnic-cutlery basket, bamboo/rattan storage boxes, a dinnerware trinket dish) via per-SKU product_type+title inspection (94 raw -> 77 in-scope), then 4 wall-clock SKUs within that bucket were further subtracted to avoid double-representing the same 4 SKUs already reported under the dedicated Clocks row (77 -> 73 final). Candles collection (15 SKUs) was inspected and dropped entirely: titles are dominated by 'Soy Wax', scent-named candles (Apple & Cinnamon, Citrus & Sweet, Orange Blossom, Pomegranate) i.e. Home Fragrance, which is out of scope, and the collection could not be cleanly split into a genuine unscented-only subset. Rule 0 gains: bobble-head novelty figurines (bobble-heads-figurines collection) counted as Figurines despite the whimsical name; ceramic tea-light holders (found inside the Table & Wall Decor bucket, product_type 'Candles & Home Fragrances') counted as decorative candle holders, not excluded as fragrance, since the holder itself (not a scented candle) is explicitly in scope. Mirrors and Lighting/lamps: confirmed absent, not a false-nav-absence -- checked both by scanning the full ~550-collection handle/title list (zero matches for 'mirror', zero genuine matches for 'lamp'/'light' fixtures; only 'Candles & Light' exists and is a candles collection) and via on-site search (site's own search page reports '6 results for mirror', a real server-rendered count, but Chumbak sells no dedicated mirror product line -- it is a dinnerware/drinkware/bags/fashion-accessory brand with a small decor vertical, consistent with the near-total absence of any mirror or lighting-fixture SKUs across all inspected collections). No duplicate-company concern: Chumbak is a single, unambiguous, well-known Indian D2C brand (Chumbak Design Pvt Ltd), chumbak.com is its sole storefront.",
+ "rows": [
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Kitchen & Dining",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Dinnerware & Crockery Sets",
+   "qty": 289,
+   "link": "https://www.chumbak.com/collections/dining-and-drinkware-crockery-sets",
+   "evidence": "Exact via /collections/dining-and-drinkware-crockery-sets/products.json paged x2 (250+39), unique product IDs deduped. product_type breakdown: 149 Drinkware, 78 Dinnerware, 40 Serveware, 16 Dining and Entertaining, 6 misc bottles/gift sets -- all in-scope, no exclusions needed.",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Serving & Tableware",
+   "qty": 123,
+   "link": "https://www.chumbak.com/collections/serving-tableware",
+   "evidence": "Exact via /collections/serving-tableware/products.json paged x1, 129 unique IDs; 6 dropped after per-SKU inspection (5 kitchen storage-jar/lunch-box SKUs product_type 'Storage Jars and Boxes', 1 souvenir bottle-opener magnet) leaving 123 in-scope dinnerware/serveware/drinkware.",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Coffee Mugs",
+   "qty": 79,
+   "link": "https://www.chumbak.com/collections/coffee-mugs",
+   "evidence": "Exact via /collections/coffee-mugs/products.json paged x1, 79 unique IDs, all quirky printed ceramic mugs (drinkware/tableware) -- no exclusions.",
+   "flag": null
+  },
+  {
+   "category": "Glassware",
+   "sub_category": "Glassware",
+   "qty": 10,
+   "link": "https://www.chumbak.com/collections/glassware",
+   "evidence": "Exact via /collections/glassware/products.json paged x1, 10 unique IDs -- glass pitchers, tumblers, martini/flute glass gift sets, all functional+decorative glassware.",
+   "flag": null
+  },
+  {
+   "category": "Clocks",
+   "sub_category": "Clocks",
+   "qty": 4,
+   "link": "https://www.chumbak.com/collections/wall-clocks",
+   "evidence": "Exact via /collections/wall-clocks/products.json paged x1, 4 unique IDs (Teal by Chumbak 11-inch wall clocks, 4 designs). Collection is live (200 OK, non-empty) though currently unlinked from main nav/footer; also independently found embedded (same 4 SKUs) inside the Table & Wall Decor listing.",
+   "flag": null
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Home Decor",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Table & Wall Decor",
+   "qty": 73,
+   "link": "https://www.chumbak.com/collections/table-wall-decor",
+   "evidence": "Exact via /collections/table-wall-decor/products.json paged x1, 94 unique IDs; per-SKU product_type+title inspection dropped 17 non-decor SKUs (storage/trinket boxes, desk calendars, an organiser gift set, seagrass laundry baskets, a picnic-cutlery basket, bamboo/rattan storage boxes, one dinnerware trinket dish) leaving 77 decorative-accessory SKUs (figurines, photo frames, wall art/plates/canvases, dream catchers, memo boards, vases, ceramic tea-light candle holders, trinket/jewellery boxes), then subtracted 4 wall-clock SKUs already reported under the dedicated Clocks row above -> 73.",
+   "flag": null
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Planters",
+   "qty": 17,
+   "link": "https://www.chumbak.com/collections/pots-planters",
+   "evidence": "Exact via /collections/pots-planters/products.json paged x1, 17 unique IDs, all decorative planters (ceramic/metal/hanging) -- no exclusions.",
+   "flag": null
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Figurines",
+   "qty": 4,
+   "link": "https://www.chumbak.com/collections/bobble-heads-figurines",
+   "evidence": "Exact via /collections/bobble-heads-figurines/products.json paged x1, 5 unique IDs; 1 dropped (a desk calendar, product_type mismatch) leaving 4 bobble-head novelty figurines.",
+   "flag": null
+  }
+ ]
+}

@@ -1,0 +1,1332 @@
+{
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ACCESS: https://www.walmart.com/ reached DIRECTLY with probe.fetch()/curl_cffi - HTTP 200 on the homepage, robots.txt, sitemap_category.xml, sitemap_browse_fst.xml and ~195 /browse/ category pages. No proxy, no reader, no browser automation, no campaign parameter. Walmart's bot management did intermittently serve a 'Robot or human?' interstitial; that was handled by detecting the string and retrying on a different curl_cffi fingerprint after a back-off, never by defeating a challenge. Roughly 15 of ~195 page fetches needed a retry. ROBOTS: https://www.walmart.com/robots.txt fetched FIRST (HTTP 200). NO ClaudeBot / anthropic-ai / Claude-Web group exists; the only named agents are Adsbot-Google, Mediapartners-Google (both empty groups) and Slurp (Crawl-delay: 5, not us). No Crawl-delay applies to us; probe.py's 2s/host gap was honoured throughout. The governing 'User-agent: *' group disallows /api/, /search, /search/api/wpa, */api/wpa, */midas/*, /store/category/, /store/ajax/*, /store/electrode/api/*, /cp/-201, /cp/-302, /cp/-306, /cp/-309, /cp/-506, /cp/-509, /cp/api/*, /electrode/api/logger, /typeahead/, /giftregistry/, /account/, /orders, /es/, /feeds/*, /sp/*, /c/kp/*/page/*, /solutions/, /wmflows/, /tealeaf, /msp, */undefined/*, /store/*/search and /storeLocator/. NONE of those was requested: no /api/ endpoint, no /search path and no /cp/-NNN page was ever fetched. Everything used is under /browse/ or /cp/<slug>/<id>, neither of which is disallowed, plus the two sitemaps robots.txt itself advertises. There is no 'Disallow: *?' rule, so the two verification fetches that carried ?max_price= / ?min_price= (below) were permitted; no recorded link carries a parameter. TREE SOURCE: (1) https://www.walmart.com/sitemap_category.xml (12,344 /cp/ hub URLs) and https://www.walmart.com/sitemap_browse_fst.xml (49,252 /browse/ URLs) - both declared in robots.txt - gave the taxonomy id-paths, which Walmart encodes directly in the URL (e.g. 4044_539095_2505058_1549287 = Home > Bath > Bathroom Accessories > Soap Dishes). Two bathroom roots were isolated: 4044_539095 (Home > Bath) and 1072864_1045879 (Home Improvement > Bathroom Renovation). (2) The authoritative navigation came from each page's OWN server-rendered __NEXT_DATA__ - props.pageProps.initialData.contentLayout PillsModule.pillsV2 is Walmart's own category pill nav, and searchResult.shelfData.shelfName is the site's own canonical shelf path. Parentage was taken from shelfName and breadCrumb, never from URL shape - which mattered: /browse/home/towel-bars/4044_539095_1230879_1230856 is served under the Home>Bath id-path but its own shelf is 'Home Improvement:Bathroom Renovation:Bathroom Hardware:Towel Bars'. 195 nodes were crawled; ~165 resolved to a real shelf. COUNT SOURCE AND THE CAP - THE CENTRAL FINDING: Walmart renders its total in the listing H1 as totalItemCountDisplay. Below 1,000 it renders the EXACT figure (verified in raw HTML: the Hookless Shower Curtains page literally contains <h1>Shop Hookless Shower Curtains for Easy Bath(244)</h1>); at or above 1,000 it renders the string '(1000+)' and paginationV2.maxPage is pinned at 25, i.e. the site itself refuses to state a number and caps browsing at ~1,000 items. THE PAYLOAD FIELD IS NOT A SAFE SUBSTITUTE. searchResult.aggregatedCount is PROVEN capped and unreliable at scale by exactly the OTTO test: it returns the identical sentinel 900010 for BOTH the entire Bath department AND its single child 'Shower Curtains & Accessories' - two nodes of visibly different size reporting the same round figure - and it reports 889,003 for 'Fabric Shower Curtains', i.e. 98.8% of the whole department, plus 453,567 for 'Extra Long Shower Curtains'. Those are search-recall numbers, not category memberships. WHAT I DID VERIFY ABOUT IT (disclosed in full): on nodes whose H1 renders an exact figure, aggregatedCount equals that figure exactly (32=32, 244=244, 481=481, 555=555, 618=618, 826=826 ...). And it behaves additively across DISJOINT price facets on two nodes of very different size - Bathroom Tumblers base 1287 vs max_price=15 -> 984 plus min_price=15 -> 316 (sum 1300, +1.0% from boundary/variant pricing), and Soap Dishes base 32547 vs max_price=20 -> 28799 plus min_price=20 -> 3949 (sum 32748, +0.6%). So it is coherent, but coherence is not enough against a proven 900010 sentinel and an 889,003 absurdity. DECISION (rule 26, OTTO precedent): a qty is recorded ONLY where the listing page's own H1 renders an exact number. Every node whose page renders '(1000+)' carries NO qty and sits in review[] with its exact URL and the aggregatedCount quoted as a reference value only, explicitly labelled unreliable. That is why 22 leaves carry counts and ~100 bathroom nodes do not. A plausible wrong number is worse than an honest gap. COUNTS DISCRIMINATE: 24, 32, 32, 51, 57, 65, 92, 115, 122, 146, 149, 279, 315, 340, 416, 465, 481, 555, 618, 667, 718, 826 - no repeats of a round figure, no site-wide constant, and every one matches its own page's H1 and shelfName. DEDUP (OPTION 1): already_extracted() was run on all 195 crawled URLs. ONE exact hit: /browse/home-improvement/bathroom-vanities/1072864_1045879_1230843_9176721 is in Furniture.xlsx for Walmart US as 'Bathroom Vanities'. It stays in Furniture. Blind spot (a) was then worked deliberately: the alias /browse/home/bathroom-vanities/4044_539095_5547362_9176721 resolves to the SAME shelfName and the same total but is absent from the URL-exact index, and so are all the vanity children (Single Sink 430, with Tops 619, without Tops 126, with Mirrors, Small, and the four by-size cuts). Recording any of those would re-extract products the Furniture pass already took, so ALL vanity nodes are in review[], none in rows[]. The index holds 74 walmart.com URLs; no other bathroom node matched any of them. Walmart US is single-locale on this host (the /es/ path is robots-disallowed and was not touched), so blind spots (b)/(c) do not apply. ROUTED OUT: all bath towels, hand towels, washcloths, bath sheets, towel sets, beach towels and beach blankets; all textile bathroom rugs, rug sets and bath-mat runners; all shower curtains, curtain sets, liners and kids' shower curtains -> TEXTILE (rules 15/16/20). Vanity Lights & Bathroom Light Fixtures -> LIGHTING (rule 19), confirmed by its own shelf 'Home:Decor:Lighting & Light Fixtures:Wall Lights & Fixtures'. Where an exact rendered qty existed for a routed node it is carried into review[] so the Textile pass can use it. KEPT IN BATHROOM despite a textile-ish name: Bathtub Mats (non-slip PVC/suction in-tub mats, rule 16) - capped, so no qty; Curved Shower Curtain Rods and the Shower Hooks & Rods / Shower Curtain Hooks & Rings nodes (hardware, rule 17); Towel Bars, Racks, Rings, Hooks, Warmers and Hand Towel Holders (hardware, rule 15/17). EXCLUDED AS NOT BATHROOM (each named in review[] so nothing is silently skipped): the whole Bathroom Plumbing supply branch (pipes, valves, drains, hoses, faucet/sink/shower spares, plumbing tools), water heaters, Waste & Sewage Equipment, Utility Fixtures (laundry sinks/faucets/countertops), Utility Sinks, Bath Fans, Backsplashes (whose own shelf is Kitchen Renovation), toilet cistern spares, and the Household Essentials cleaning lines (toilet brushes, plungers). Kids' Bathroom is a shop-by-room re-cut of already-covered bath products and is withheld under rule 28. Facet, finish, brand, size and material re-cuts (Bathroom Sinks by Brand/Finish, Kraus, Copper/Stainless sinks, Ceramic/Gold soap dispensers, Ceramic Toothbrush Holder, the four vanity size cuts, Fabric/White/Extra Long/Christmas shower curtains) are NOT subcategories and are withheld to avoid double counting. KNOWN GAPS, STATED HONESTLY: (a) ~100 genuine Bathroom nodes carry no qty because Walmart caps its own displayed total at '(1000+)'; that includes large, clearly-real categories such as Bathroom Mirrors, Medicine Cabinets, Shower Doors, Shower Heads, Shower Enclosures, Toilet Paper Holders, Towel Bars, Soap Dishes, Soap Dispensers, Toothbrush Holders, Bathroom Shelves and Bathroom Cabinets. (b) Several catIds harvested from the SEO browse sitemap return an empty result at the slug/id combination the sitemap publishes (all-toilet-seats, hard-toilet-seat, children-toilet-seats, bidet-toilet-seats, toilet-seats-and-lids, toilet-bowls, pipes-fittings, plumbing-tools, aerators-and-adaptors, shower-head-replacement-parts and ~10 others); they are stale SEO paths, so the Toilet Seats branch is represented only by Cushioned Toilet Seats (32), the one child that resolved. (c) Kid's Bath Rugs renders two different exact totals (228 and 236) at two catIds for the same shelf, so no figure is asserted for it. COUNT VOLATILITY DISCLOSED: Walmart's totals are live marketplace inventory and drift by the minute. Every one of the 22 recorded leaves was RE-READ a second time at the end of the session and each row now carries that second, single-window reading. The drift observed between the two readings was small and one-directional-random: Wall Mounted Bathroom Sinks 416->418, Bidet Faucets 315->316, Alcove Bathtubs 115->114, Freestanding Tubs 618->617, Shower Stalls 279->282, Bidets 481->480, One Piece Toilets 667->668, Cushioned Toilet Seats 32->33, Automatic Soap Dispensers 718->716, Curved Shower Curtain Rods 555->557, Undermount Bathroom Sinks 149->148; the other eleven were identical. One node, Bathroom Trash Cans, was seen at 39 in an intermediate read and 32 in both the first and final reads, so it is the most volatile of the set. These are real inventory movements, not measurement error - stated so the figures are read as a point-in-time snapshot (2026-09-01).",
+ "rows": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Cabinets & Fixtures",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Sinks",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Sinks by Type",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Drop-In Bathroom Sinks",
+   "qty": 24,
+   "link": "https://www.walmart.com/browse/home-improvement/drop-in-bathroom-sinks/1072864_1045879_1230843_1071504_4797694_9015858",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Pedestal Bathroom Sinks",
+   "qty": 465,
+   "link": "https://www.walmart.com/browse/home-improvement/pedestal-bathroom-sinks/1072864_1045879_1230843_1071504_4797694_6782909",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Undermount Bathroom Sinks",
+   "qty": 148,
+   "link": "https://www.walmart.com/browse/home-improvement/undermount-bathroom-sinks/1072864_1045879_1230843_1071504_4797694_7600564",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Wall Mounted Bathroom Sinks",
+   "qty": 418,
+   "link": "https://www.walmart.com/browse/home-improvement/wall-mounted-bathroom-sinks/1072864_1045879_1230843_1071504_4797694_4372274",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Faucets",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bidet Faucets",
+   "qty": 316,
+   "link": "https://www.walmart.com/browse/home-improvement/bidet-faucets/1072864_1045879_1230843_4083683_1727121",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower Faucets",
+   "qty": 826,
+   "link": "https://www.walmart.com/browse/home-improvement/shower-faucets/1072864_1045879_1230843_4083683_5498118",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathtubs",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Air Bathtubs",
+   "qty": 92,
+   "link": "https://www.walmart.com/browse/home-improvement/air-bathtubs/1072864_1045879_1230843_9758781_5129843",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Alcove Bathtubs",
+   "qty": 114,
+   "link": "https://www.walmart.com/browse/home-improvement/alcove-bathtubs/1072864_1045879_1230843_9758781_6410229",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Drop In Tubs",
+   "qty": 122,
+   "link": "https://www.walmart.com/browse/home-improvement/drop-in-tubs/1072864_1045879_1230843_9758781_7191536",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Freestanding Tubs",
+   "qty": 617,
+   "link": "https://www.walmart.com/browse/home-improvement/freestanding-tubs/1072864_1045879_1230843_9758781_2078601",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Walk-in Bathtubs",
+   "qty": 57,
+   "link": "https://www.walmart.com/browse/home-improvement/walk-in-bathtubs/1072864_1045879_1230843_9758781_8175045",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Whirlpool Tubs",
+   "qty": 51,
+   "link": "https://www.walmart.com/browse/home-improvement/whirlpool-tubs/1072864_1045879_1230843_9758781_2276087",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Showers",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower Stalls",
+   "qty": 282,
+   "link": "https://www.walmart.com/browse/home-improvement/shower-stalls/1072864_1045879_1230843_9501273_9815564",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Steam Showers",
+   "qty": 65,
+   "link": "https://www.walmart.com/browse/home-improvement/steam-showers/1072864_1045879_1230843_9501273_2737075",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Toilets and Bidets",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bidets",
+   "qty": 480,
+   "link": "https://www.walmart.com/browse/home-improvement/bidets/1072864_1045879_5533759_6108305",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "One Piece Toilets",
+   "qty": 668,
+   "link": "https://www.walmart.com/browse/home-improvement/one-piece-toilets/1072864_1045879_5533759_4630895",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Two Piece Toilets",
+   "qty": 340,
+   "link": "https://www.walmart.com/browse/home-improvement/two-piece-toilets/1072864_1045879_5533759_6157716",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Urinals",
+   "qty": 146,
+   "link": "https://www.walmart.com/browse/home-improvement/urinals/1072864_1406684_3247335_4894950_2259548_4608054",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Cushioned Toilet Seats",
+   "qty": 33,
+   "link": "https://www.walmart.com/browse/home-improvement/cushioned-toilet-seat/1072864_1045879_5533759_6982244_4485289",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Wood Toilet Seats",
+   "qty": 903,
+   "link": "https://www.walmart.com/browse/home-improvement/wood-toilet-seats/1072864_1045879_5533759_4289910_6982244_9650127",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Hard Toilet Seats",
+   "qty": 524,
+   "link": "https://www.walmart.com/browse/home-improvement/hard-toilet-seats/1072864_1045879_5533759_4289910_6982244_6857367",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Children Toilet Seats",
+   "qty": 598,
+   "link": "https://www.walmart.com/browse/home-improvement/children-toilet-seats/1072864_1045879_5533759_4289910_6982244_4435706",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bidet Toilet Seats",
+   "qty": 923,
+   "link": "https://www.walmart.com/browse/toilet-bowls-seats/bidet-toilet-seats/1072864_1406684_3247335_4894950_4875377_1964652",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Heated Toilet Seats",
+   "qty": 392,
+   "link": "https://www.walmart.com/browse/toilet-bowls-seats/heated-toilet-seats/1072864_1406684_3247335_4894950_4875377_7681017",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Elongated Toilet Bowls",
+   "qty": 258,
+   "link": "https://www.walmart.com/browse/toilet-bowls-seats/elongated-toilet-bowls/1072864_1406684_3247335_4894950_4875377_9994415",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Round Toilet Bowls",
+   "qty": 56,
+   "link": "https://www.walmart.com/browse/toilet-bowls-seats/round-toilet-bowls/1072864_1406684_3247335_4894950_4875377_5603703",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Nightlight Toilet Seats",
+   "qty": 27,
+   "link": "https://www.walmart.com/browse/toilet-bowls-seats/nightlight-toilet-seats/1072864_1406684_3247335_4894950_4875377_9038840",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Accessories",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Automatic Soap Dispensers",
+   "qty": 716,
+   "link": "https://www.walmart.com/browse/home/automatic-soap-dispensers/4044_539095_2505058_3350673",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Soap Dispenser Set",
+   "qty": 494,
+   "link": "https://www.walmart.com/browse/home/bathroom-soap-dispenser-set/4044_539095_2505058_6077944",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Trash Cans",
+   "qty": 32,
+   "link": "https://www.walmart.com/browse/home/wastebaskets/4044_539095_2505058_3725341",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower Hooks & Rods",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Curved Shower Curtain Rods",
+   "qty": 557,
+   "link": "https://www.walmart.com/browse/home/curved-shower-rods/4044_539095_9096357",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  }
+ ],
+ "review": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath (department)",
+   "qty": null,
+   "issue": "CAPPED / NO QTY: the listing page's own H1 renders \"(1000+)\" instead of a number, so the site itself states no total. The payload field aggregatedCount is NOT usable as a substitute at this scale - it is demonstrably capped and unreliable (it returns the identical sentinel 900010 for BOTH the whole Bath department and its child Shower Curtains & Accessories, and 889,003 for 'Fabric Shower Curtains' - i.e. nearly the entire department). Recorded with no qty rather than a plausible wrong number. aggregatedCount for reference only = 900010.",
+   "link": "https://www.walmart.com/browse/home/bath/4044_539095"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Renovation (Home Improvement department)",
+   "qty": null,
+   "issue": "CAPPED / NO QTY: the listing page's own H1 renders \"(1000+)\" instead of a number, so the site itself states no total. The payload field aggregatedCount is NOT usable as a substitute at this scale - it is demonstrably capped and unreliable (it returns the identical sentinel 900010 for BOTH the whole Bath department and its child Shower Curtains & Accessories, and 889,003 for 'Fabric Shower Curtains' - i.e. nearly the entire department). Recorded with no qty rather than a plausible wrong number. aggregatedCount for reference only = 442679.",
+   "link": "https://www.walmart.com/browse/home-improvement/bathroom-renovation/1072864_1045879"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Cabinets & Fixtures",
+   "qty": null,
+   "issue": "CAPPED / NO QTY: the listing page's own H1 renders \"(1000+)\" instead of a number, so the site itself states no total. The payload field aggregatedCount is NOT usable as a substitute at this scale - it is demonstrably capped and unreliable (it returns the identical sentinel 900010 for BOTH the whole Bath department and its child Shower Curtains & Accessories, and 889,003 for 'Fabric Shower Curtains' - i.e. nearly the entire department). Recorded with no qty rather than a plausible wrong number. aggregatedCount for reference only = 165307.",
+   "link": "https://www.walmart.com/browse/home-improvement/bathroom-fixtures-materials/1072864_1045879_1230843"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Sinks",
+   "qty": null,
+   "issue": "CAPPED / NO QTY: the listing page's own H1 renders \"(1000+)\" instead of a number, so the site itself states no total. The payload field aggregatedCount is NOT usable as a substitute at this scale - it is demonstrably capped and unreliable (it returns the identical sentinel 900010 for BOTH the whole Bath department and its child Shower Curtains & Accessories, and 889,003 for 'Fabric Shower Curtains' - i.e. nearly the entire department). Recorded with no qty rather than a plausible wrong number. aggregatedCount for reference only = 6651.",
+   "link": "https://www.walmart.com/browse/home-improvement/bath-sinks/1072864_1045879_1230843_1071504"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Vessel Bathroom Sinks",
+   "qty": null,
+   "issue": "CAPPED / NO QTY: the listing page's own H1 renders \"(1000+)\" instead of a number, so the site itself states no total. The payload field aggregatedCount is NOT usable as a substitute at this scale - it is demonstrably capped and unreliable (it returns the identical sentinel 900010 for BOTH the whole Bath department and its child Shower Curtains & Accessories, and 889,003 for 'Fabric Shower Curtains' - i.e. nearly the entire department). Recorded with no qty rather than a plausible wrong number. aggregatedCount for reference only = 1491.",
+   "link": "https://www.walmart.com/browse/home-improvement/vessel-bathroom-sinks/1072864_1045879_1230843_1071504_4797694_8649131"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Faucets",
+   "qty": null,
+   "issue": "CAPPED / NO QTY: the listing page's own H1 renders \"(1000+)\" instead of a number, so the site itself states no total. The payload field aggregatedCount is NOT usable as a substitute at this scale - it is demonstrably capped and unreliable (it returns the identical sentinel 900010 for BOTH the whole Bath department and its child Shower Curtains & Accessories, and 889,003 for 'Fabric Shower Curtains' - i.e. nearly the entire department). Recorded with no qty rather than a plausible wrong number. aggregatedCount for reference only = 17286.",
+   "link": "https://www.walmart.com/browse/home-improvement/bathroom-faucets/1072864_1045879_1230843_4083683"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Sink Faucets",
+   "qty": null,
+   "issue": "CAPPED / NO QTY: the listing page's own H1 renders \"(1000+)\" instead of a number, so the site itself states no total. The payload field aggregatedCount is NOT usable as a substitute at this scale - it is demonstrably capped and unreliable (it returns the identical sentinel 900010 for BOTH the whole Bath department and its child Shower Curtains & Accessories, and 889,003 for 'Fabric Shower Curtains' - i.e. nearly the entire department). Recorded with no qty rather than a plausible wrong number. aggregatedCount for reference only = 10120.",
+   "link": "https://www.walmart.com/browse/home-improvement/bathroom-sink-faucets/1072864_1045879_1230843_4083683_5981136"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathtub Faucets",
+   "qty": null,
+   "issue": "CAPPED / NO QTY: the listing page's own H1 renders \"(1000+)\" instead of a number, so the site itself states no total. The payload field aggregatedCount is NOT usable as a substitute at this scale - it is demonstrably capped and unreliable (it returns the identical sentinel 900010 for BOTH the whole Bath department and its child Shower Curtains & Accessories, and 889,003 for 'Fabric Shower Curtains' - i.e. nearly the entire department). Recorded with no qty rather than a plausible wrong number. aggregatedCount for reference only = 2699.",
+   "link": "https://www.walmart.com/browse/home-improvement/bathtub-faucets/1072864_1045879_1230843_4083683_5183380"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Tub and Shower Faucets",
+   "qty": null,
+   "issue": "CAPPED / NO QTY: the listing page's own H1 renders \"(1000+)\" instead of a number, so the site itself states no total. The payload field aggregatedCount is NOT usable as a substitute at this scale - it is demonstrably capped and unreliable (it returns the identical sentinel 900010 for BOTH the whole Bath department and its child Shower Curtains & Accessories, and 889,003 for 'Fabric Shower Curtains' - i.e. nearly the entire department). Recorded with no qty rather than a plausible wrong number. aggregatedCount for reference only = 3345.",
+   "link": "https://www.walmart.com/browse/home-improvement/tub-and-shower-faucets/1072864_1045879_1230843_4083683_2060600"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathtubs",
+   "qty": null,
+   "issue": "CAPPED / NO QTY: the listing page's own H1 renders \"(1000+)\" instead of a number, so the site itself states no total. The payload field aggregatedCount is NOT usable as a substitute at this scale - it is demonstrably capped and unreliable (it returns the identical sentinel 900010 for BOTH the whole Bath department and its child Shower Curtains & Accessories, and 889,003 for 'Fabric Shower Curtains' - i.e. nearly the entire department). Recorded with no qty rather than a plausible wrong number. aggregatedCount for reference only = 5366.",
+   "link": "https://www.walmart.com/browse/home-improvement/bathtubs/1072864_1045879_1230843_9758781"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Showers",
+   "qty": null,
+   "issue": "CAPPED / NO QTY: the listing page's own H1 renders \"(1000+)\" instead of a number, so the site itself states no total. The payload field aggregatedCount is NOT usable as a substitute at this scale - it is demonstrably capped and unreliable (it returns the identical sentinel 900010 for BOTH the whole Bath department and its child Shower Curtains & Accessories, and 889,003 for 'Fabric Shower Curtains' - i.e. nearly the entire department). Recorded with no qty rather than a plausible wrong number. aggregatedCount for reference only = 1749.",
+   "link": "https://www.walmart.com/browse/home-improvement/showers/1072864_1045879_1230843_9501273"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower Doors",
+   "qty": null,
+   "issue": "CAPPED / NO QTY: the listing page's own H1 renders \"(1000+)\" instead of a number, so the site itself states no total. The payload field aggregatedCount is NOT usable as a substitute at this scale - it is demonstrably capped and unreliable (it returns the identical sentinel 900010 for BOTH the whole Bath department and its child Shower Curtains & Accessories, and 889,003 for 'Fabric Shower Curtains' - i.e. nearly the entire department). Recorded with no qty rather than a plausible wrong number. aggregatedCount for reference only = 8488.",
+   "link": "https://www.walmart.com/browse/home-improvement/shower-doors/1072864_1045879_1230843_9501273_6061612"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower Enclosures",
+   "qty": null,
+   "issue": "CAPPED / NO QTY: the listing page's own H1 renders \"(1000+)\" instead of a number, so the site itself states no total. The payload field aggregatedCount is NOT usable as a substitute at this scale - it is demonstrably capped and unreliable (it returns the identical sentinel 900010 for BOTH the whole Bath department and its child Shower Curtains & Accessories, and 889,003 for 'Fabric Shower Curtains' - i.e. nearly the entire department). Recorded with no qty rather than a plausible wrong number. aggregatedCount for reference only = 3500.",
+   "link": "https://www.walmart.com/browse/home-improvement/shower-enclosures/1072864_1045879_1230843_9501273_1876502"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower Bases",
+   "qty": null,
+   "issue": "CAPPED / NO QTY: the listing page's own H1 renders \"(1000+)\" instead of a number, so the site itself states no total. The payload field aggregatedCount is NOT usable as a substitute at this scale - it is demonstrably capped and unreliable (it returns the identical sentinel 900010 for BOTH the whole Bath department and its child Shower Curtains & Accessories, and 889,003 for 'Fabric Shower Curtains' - i.e. nearly the entire department). Recorded with no qty rather than a plausible wrong number. aggregatedCount for reference only = 1626.",
+   "link": "https://www.walmart.com/browse/home-improvement/shower-bases/1072864_1045879_1230843_9501273_6946712"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower Parts",
+   "qty": null,
+   "issue": "CAPPED / NO QTY: the listing page's own H1 renders \"(1000+)\" instead of a number, so the site itself states no total. The payload field aggregatedCount is NOT usable as a substitute at this scale - it is demonstrably capped and unreliable (it returns the identical sentinel 900010 for BOTH the whole Bath department and its child Shower Curtains & Accessories, and 889,003 for 'Fabric Shower Curtains' - i.e. nearly the entire department). Recorded with no qty rather than a plausible wrong number. aggregatedCount for reference only = 1329.",
+   "link": "https://www.walmart.com/browse/home-improvement/shower-parts/1072864_1045879_1230843_9501273_9151375"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower Steam Generators",
+   "qty": null,
+   "issue": "CAPPED / NO QTY: the listing page's own H1 renders \"(1000+)\" instead of a number, so the site itself states no total. The payload field aggregatedCount is NOT usable as a substitute at this scale - it is demonstrably capped and unreliable (it returns the identical sentinel 900010 for BOTH the whole Bath department and its child Shower Curtains & Accessories, and 889,003 for 'Fabric Shower Curtains' - i.e. nearly the entire department). Recorded with no qty rather than a plausible wrong number. aggregatedCount for reference only = 1326.",
+   "link": "https://www.walmart.com/browse/home-improvement/shower-steam-generators/1072864_1045879_1230843_9501273_9151375_2152185"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower Heads",
+   "qty": null,
+   "issue": "CAPPED / NO QTY: the listing page's own H1 renders \"(1000+)\" instead of a number, so the site itself states no total. The payload field aggregatedCount is NOT usable as a substitute at this scale - it is demonstrably capped and unreliable (it returns the identical sentinel 900010 for BOTH the whole Bath department and its child Shower Curtains & Accessories, and 889,003 for 'Fabric Shower Curtains' - i.e. nearly the entire department). Recorded with no qty rather than a plausible wrong number. aggregatedCount for reference only = 19824.",
+   "link": "https://www.walmart.com/browse/home-improvement/shower-heads/1072864_1045879_1230843_9581595"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower Shelving",
+   "qty": null,
+   "issue": "CAPPED / NO QTY: the listing page's own H1 renders \"(1000+)\" instead of a number, so the site itself states no total. The payload field aggregatedCount is NOT usable as a substitute at this scale - it is demonstrably capped and unreliable (it returns the identical sentinel 900010 for BOTH the whole Bath department and its child Shower Curtains & Accessories, and 889,003 for 'Fabric Shower Curtains' - i.e. nearly the entire department). Recorded with no qty rather than a plausible wrong number. aggregatedCount for reference only = 22708.",
+   "link": "https://www.walmart.com/browse/home-improvement/shower-shelving/1072864_1045879_1230843_7631529"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Corner Shower Shelves",
+   "qty": null,
+   "issue": "CAPPED / NO QTY: the listing page's own H1 renders \"(1000+)\" instead of a number, so the site itself states no total. The payload field aggregatedCount is NOT usable as a substitute at this scale - it is demonstrably capped and unreliable (it returns the identical sentinel 900010 for BOTH the whole Bath department and its child Shower Curtains & Accessories, and 889,003 for 'Fabric Shower Curtains' - i.e. nearly the entire department). Recorded with no qty rather than a plausible wrong number. aggregatedCount for reference only = 7023.",
+   "link": "https://www.walmart.com/browse/home-improvement/corner-shower-shelves/1072864_1045879_1230843_9918273"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower Caddies",
+   "qty": null,
+   "issue": "CAPPED / NO QTY: the listing page's own H1 renders \"(1000+)\" instead of a number, so the site itself states no total. The payload field aggregatedCount is NOT usable as a substitute at this scale - it is demonstrably capped and unreliable (it returns the identical sentinel 900010 for BOTH the whole Bath department and its child Shower Curtains & Accessories, and 889,003 for 'Fabric Shower Curtains' - i.e. nearly the entire department). Recorded with no qty rather than a plausible wrong number. aggregatedCount for reference only = 37576.",
+   "link": "https://www.walmart.com/browse/home-improvement/shower-caddies/1072864_1045879_1230843_7640464"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Mirrors",
+   "qty": null,
+   "issue": "CAPPED / NO QTY: the listing page's own H1 renders \"(1000+)\" instead of a number, so the site itself states no total. The payload field aggregatedCount is NOT usable as a substitute at this scale - it is demonstrably capped and unreliable (it returns the identical sentinel 900010 for BOTH the whole Bath department and its child Shower Curtains & Accessories, and 889,003 for 'Fabric Shower Curtains' - i.e. nearly the entire department). Recorded with no qty rather than a plausible wrong number. aggregatedCount for reference only = 12873.",
+   "link": "https://www.walmart.com/browse/home-improvement/bathroom-mirrors/1072864_1045879_1230843_1230884"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Medicine Cabinets",
+   "qty": null,
+   "issue": "CAPPED / NO QTY: the listing page's own H1 renders \"(1000+)\" instead of a number, so the site itself states no total. The payload field aggregatedCount is NOT usable as a substitute at this scale - it is demonstrably capped and unreliable (it returns the identical sentinel 900010 for BOTH the whole Bath department and its child Shower Curtains & Accessories, and 889,003 for 'Fabric Shower Curtains' - i.e. nearly the entire department). Recorded with no qty rather than a plausible wrong number. aggregatedCount for reference only = 11146.",
+   "link": "https://www.walmart.com/browse/home-improvement/medicine-cabinets/1072864_1045879_1230843_1085464"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Hardware",
+   "qty": null,
+   "issue": "CAPPED / NO QTY: the listing page's own H1 renders \"(1000+)\" instead of a number, so the site itself states no total. The payload field aggregatedCount is NOT usable as a substitute at this scale - it is demonstrably capped and unreliable (it returns the identical sentinel 900010 for BOTH the whole Bath department and its child Shower Curtains & Accessories, and 889,003 for 'Fabric Shower Curtains' - i.e. nearly the entire department). Recorded with no qty rather than a plausible wrong number. aggregatedCount for reference only = 79663.",
+   "link": "https://www.walmart.com/browse/home/bathroom-hardware/4044_539095_1230879"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Towel Bars",
+   "qty": null,
+   "issue": "CAPPED / NO QTY: the listing page's own H1 renders \"(1000+)\" instead of a number, so the site itself states no total. The payload field aggregatedCount is NOT usable as a substitute at this scale - it is demonstrably capped and unreliable (it returns the identical sentinel 900010 for BOTH the whole Bath department and its child Shower Curtains & Accessories, and 889,003 for 'Fabric Shower Curtains' - i.e. nearly the entire department). Recorded with no qty rather than a plausible wrong number. aggregatedCount for reference only = 6429.",
+   "link": "https://www.walmart.com/browse/home/towel-bars/4044_539095_1230879_1230856"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Towel Racks",
+   "qty": null,
+   "issue": "CAPPED / NO QTY: the listing page's own H1 renders \"(1000+)\" instead of a number, so the site itself states no total. The payload field aggregatedCount is NOT usable as a substitute at this scale - it is demonstrably capped and unreliable (it returns the identical sentinel 900010 for BOTH the whole Bath department and its child Shower Curtains & Accessories, and 889,003 for 'Fabric Shower Curtains' - i.e. nearly the entire department). Recorded with no qty rather than a plausible wrong number. aggregatedCount for reference only = 4008.",
+   "link": "https://www.walmart.com/browse/home/towel-racks/4044_539095_1230879_1230855"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Towel Rings",
+   "qty": null,
+   "issue": "CAPPED / NO QTY: the listing page's own H1 renders \"(1000+)\" instead of a number, so the site itself states no total. The payload field aggregatedCount is NOT usable as a substitute at this scale - it is demonstrably capped and unreliable (it returns the identical sentinel 900010 for BOTH the whole Bath department and its child Shower Curtains & Accessories, and 889,003 for 'Fabric Shower Curtains' - i.e. nearly the entire department). Recorded with no qty rather than a plausible wrong number. aggregatedCount for reference only = 1984.",
+   "link": "https://www.walmart.com/browse/home/towel-ring/4044_539095_1230879_1230987"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Towel Hooks",
+   "qty": null,
+   "issue": "CAPPED / NO QTY: the listing page's own H1 renders \"(1000+)\" instead of a number, so the site itself states no total. The payload field aggregatedCount is NOT usable as a substitute at this scale - it is demonstrably capped and unreliable (it returns the identical sentinel 900010 for BOTH the whole Bath department and its child Shower Curtains & Accessories, and 889,003 for 'Fabric Shower Curtains' - i.e. nearly the entire department). Recorded with no qty rather than a plausible wrong number. aggregatedCount for reference only = 14539.",
+   "link": "https://www.walmart.com/browse/home-improvement/towel-hooks/1072864_1045879_1230879_4149464"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Over the Door Towel Racks",
+   "qty": null,
+   "issue": "CAPPED / NO QTY: the listing page's own H1 renders \"(1000+)\" instead of a number, so the site itself states no total. The payload field aggregatedCount is NOT usable as a substitute at this scale - it is demonstrably capped and unreliable (it returns the identical sentinel 900010 for BOTH the whole Bath department and its child Shower Curtains & Accessories, and 889,003 for 'Fabric Shower Curtains' - i.e. nearly the entire department). Recorded with no qty rather than a plausible wrong number. aggregatedCount for reference only = 2109.",
+   "link": "https://www.walmart.com/browse/home-improvement/over-the-door-towel-racks/1072864_1045879_1230879_3691565"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Hand Towel Holders",
+   "qty": null,
+   "issue": "CAPPED / NO QTY: the listing page's own H1 renders \"(1000+)\" instead of a number, so the site itself states no total. The payload field aggregatedCount is NOT usable as a substitute at this scale - it is demonstrably capped and unreliable (it returns the identical sentinel 900010 for BOTH the whole Bath department and its child Shower Curtains & Accessories, and 889,003 for 'Fabric Shower Curtains' - i.e. nearly the entire department). Recorded with no qty rather than a plausible wrong number. aggregatedCount for reference only = 4810.",
+   "link": "https://www.walmart.com/browse/home-improvement/hand-towel-holders/1072864_1045879_1230879_5623018"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Towel Warmers",
+   "qty": null,
+   "issue": "CAPPED / NO QTY: the listing page's own H1 renders \"(1000+)\" instead of a number, so the site itself states no total. The payload field aggregatedCount is NOT usable as a substitute at this scale - it is demonstrably capped and unreliable (it returns the identical sentinel 900010 for BOTH the whole Bath department and its child Shower Curtains & Accessories, and 889,003 for 'Fabric Shower Curtains' - i.e. nearly the entire department). Recorded with no qty rather than a plausible wrong number. aggregatedCount for reference only = 1010.",
+   "link": "https://www.walmart.com/browse/home/towel-warmers/4044_539095_2505058_2497899"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Toilet Paper Holders",
+   "qty": null,
+   "issue": "CAPPED / NO QTY: the listing page's own H1 renders \"(1000+)\" instead of a number, so the site itself states no total. The payload field aggregatedCount is NOT usable as a substitute at this scale - it is demonstrably capped and unreliable (it returns the identical sentinel 900010 for BOTH the whole Bath department and its child Shower Curtains & Accessories, and 889,003 for 'Fabric Shower Curtains' - i.e. nearly the entire department). Recorded with no qty rather than a plausible wrong number. aggregatedCount for reference only = 18995.",
+   "link": "https://www.walmart.com/browse/home-improvement/toilet-paper-holders/1072864_1045879_1230879_1230857"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Toilet Paper Holder Stands",
+   "qty": null,
+   "issue": "CAPPED / NO QTY: the listing page's own H1 renders \"(1000+)\" instead of a number, so the site itself states no total. The payload field aggregatedCount is NOT usable as a substitute at this scale - it is demonstrably capped and unreliable (it returns the identical sentinel 900010 for BOTH the whole Bath department and its child Shower Curtains & Accessories, and 889,003 for 'Fabric Shower Curtains' - i.e. nearly the entire department). Recorded with no qty rather than a plausible wrong number. aggregatedCount for reference only = 3469.",
+   "link": "https://www.walmart.com/browse/home-improvement/toilet-paper-holder-stands/1072864_1045879_1230879_4047093"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Toilet Paper Rollers",
+   "qty": null,
+   "issue": "CAPPED / NO QTY: the listing page's own H1 renders \"(1000+)\" instead of a number, so the site itself states no total. The payload field aggregatedCount is NOT usable as a substitute at this scale - it is demonstrably capped and unreliable (it returns the identical sentinel 900010 for BOTH the whole Bath department and its child Shower Curtains & Accessories, and 889,003 for 'Fabric Shower Curtains' - i.e. nearly the entire department). Recorded with no qty rather than a plausible wrong number. aggregatedCount for reference only = 1110.",
+   "link": "https://www.walmart.com/browse/home-improvement/toilet-paper-rollers/1072864_1045879_1230879_2617181"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Toilets and Bidets",
+   "qty": null,
+   "issue": "CAPPED / NO QTY: the listing page's own H1 renders \"(1000+)\" instead of a number, so the site itself states no total. The payload field aggregatedCount is NOT usable as a substitute at this scale - it is demonstrably capped and unreliable (it returns the identical sentinel 900010 for BOTH the whole Bath department and its child Shower Curtains & Accessories, and 889,003 for 'Fabric Shower Curtains' - i.e. nearly the entire department). Recorded with no qty rather than a plausible wrong number. aggregatedCount for reference only = 10881.",
+   "link": "https://www.walmart.com/browse/home-improvement/toilets-and-bidets/1072864_1045879_5533759"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Toilets",
+   "qty": null,
+   "issue": "CAPPED / NO QTY: the listing page's own H1 renders \"(1000+)\" instead of a number, so the site itself states no total. The payload field aggregatedCount is NOT usable as a substitute at this scale - it is demonstrably capped and unreliable (it returns the identical sentinel 900010 for BOTH the whole Bath department and its child Shower Curtains & Accessories, and 889,003 for 'Fabric Shower Curtains' - i.e. nearly the entire department). Recorded with no qty rather than a plausible wrong number. aggregatedCount for reference only = 1602.",
+   "link": "https://www.walmart.com/browse/home-improvement/toilets/1072864_1045879_5533759_6109208"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Toilet Components",
+   "qty": null,
+   "issue": "CAPPED / NO QTY: the listing page's own H1 renders \"(1000+)\" instead of a number, so the site itself states no total. The payload field aggregatedCount is NOT usable as a substitute at this scale - it is demonstrably capped and unreliable (it returns the identical sentinel 900010 for BOTH the whole Bath department and its child Shower Curtains & Accessories, and 889,003 for 'Fabric Shower Curtains' - i.e. nearly the entire department). Recorded with no qty rather than a plausible wrong number. aggregatedCount for reference only = 5800.",
+   "link": "https://www.walmart.com/browse/home-improvement/toilet-components/1072864_1045879_5533759_4289910"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Toilet, Urinal and Bidet Parts and Repairs",
+   "qty": null,
+   "issue": "CAPPED / NO QTY: the listing page's own H1 renders \"(1000+)\" instead of a number, so the site itself states no total. The payload field aggregatedCount is NOT usable as a substitute at this scale - it is demonstrably capped and unreliable (it returns the identical sentinel 900010 for BOTH the whole Bath department and its child Shower Curtains & Accessories, and 889,003 for 'Fabric Shower Curtains' - i.e. nearly the entire department). Recorded with no qty rather than a plausible wrong number. aggregatedCount for reference only = 2893.",
+   "link": "https://www.walmart.com/browse/home-improvement/toilet-urinal-and-bidet-parts-and-repairs/1072864_1045879_5533759_2953519"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Accessories",
+   "qty": null,
+   "issue": "CAPPED / NO QTY: the listing page's own H1 renders \"(1000+)\" instead of a number, so the site itself states no total. The payload field aggregatedCount is NOT usable as a substitute at this scale - it is demonstrably capped and unreliable (it returns the identical sentinel 900010 for BOTH the whole Bath department and its child Shower Curtains & Accessories, and 889,003 for 'Fabric Shower Curtains' - i.e. nearly the entire department). Recorded with no qty rather than a plausible wrong number. aggregatedCount for reference only = 284621.",
+   "link": "https://www.walmart.com/browse/home/bathroom-accessories/4044_539095_2505058"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Accessories Sets",
+   "qty": null,
+   "issue": "CAPPED / NO QTY: the listing page's own H1 renders \"(1000+)\" instead of a number, so the site itself states no total. The payload field aggregatedCount is NOT usable as a substitute at this scale - it is demonstrably capped and unreliable (it returns the identical sentinel 900010 for BOTH the whole Bath department and its child Shower Curtains & Accessories, and 889,003 for 'Fabric Shower Curtains' - i.e. nearly the entire department). Recorded with no qty rather than a plausible wrong number. aggregatedCount for reference only = 55413.",
+   "link": "https://www.walmart.com/browse/home/bathroom-accessories-sets/4044_539095_2505058_9867329"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Soap Dishes",
+   "qty": null,
+   "issue": "CAPPED / NO QTY: the listing page's own H1 renders \"(1000+)\" instead of a number, so the site itself states no total. The payload field aggregatedCount is NOT usable as a substitute at this scale - it is demonstrably capped and unreliable (it returns the identical sentinel 900010 for BOTH the whole Bath department and its child Shower Curtains & Accessories, and 889,003 for 'Fabric Shower Curtains' - i.e. nearly the entire department). Recorded with no qty rather than a plausible wrong number. aggregatedCount for reference only = 32547.",
+   "link": "https://www.walmart.com/browse/home/soap-dishes/4044_539095_2505058_1549287"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Soap Dispensers",
+   "qty": null,
+   "issue": "CAPPED / NO QTY: the listing page's own H1 renders \"(1000+)\" instead of a number, so the site itself states no total. The payload field aggregatedCount is NOT usable as a substitute at this scale - it is demonstrably capped and unreliable (it returns the identical sentinel 900010 for BOTH the whole Bath department and its child Shower Curtains & Accessories, and 889,003 for 'Fabric Shower Curtains' - i.e. nearly the entire department). Recorded with no qty rather than a plausible wrong number. aggregatedCount for reference only = 32639.",
+   "link": "https://www.walmart.com/browse/home/soap-dispensers/4044_539095_2505058_7681166"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Toothbrush Holders",
+   "qty": null,
+   "issue": "CAPPED / NO QTY: the listing page's own H1 renders \"(1000+)\" instead of a number, so the site itself states no total. The payload field aggregatedCount is NOT usable as a substitute at this scale - it is demonstrably capped and unreliable (it returns the identical sentinel 900010 for BOTH the whole Bath department and its child Shower Curtains & Accessories, and 889,003 for 'Fabric Shower Curtains' - i.e. nearly the entire department). Recorded with no qty rather than a plausible wrong number. aggregatedCount for reference only = 20255.",
+   "link": "https://www.walmart.com/browse/home/toothbrush-holders/4044_539095_2505058_5454317"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Tumblers",
+   "qty": null,
+   "issue": "CAPPED / NO QTY: the listing page's own H1 renders \"(1000+)\" instead of a number, so the site itself states no total. The payload field aggregatedCount is NOT usable as a substitute at this scale - it is demonstrably capped and unreliable (it returns the identical sentinel 900010 for BOTH the whole Bath department and its child Shower Curtains & Accessories, and 889,003 for 'Fabric Shower Curtains' - i.e. nearly the entire department). Recorded with no qty rather than a plausible wrong number. aggregatedCount for reference only = 1287.",
+   "link": "https://www.walmart.com/browse/home/bathroom-tumblers/4044_539095_2505058_6710549"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Apothecary Jars",
+   "qty": null,
+   "issue": "CAPPED / NO QTY: the listing page's own H1 renders \"(1000+)\" instead of a number, so the site itself states no total. The payload field aggregatedCount is NOT usable as a substitute at this scale - it is demonstrably capped and unreliable (it returns the identical sentinel 900010 for BOTH the whole Bath department and its child Shower Curtains & Accessories, and 889,003 for 'Fabric Shower Curtains' - i.e. nearly the entire department). Recorded with no qty rather than a plausible wrong number. aggregatedCount for reference only = 24744.",
+   "link": "https://www.walmart.com/browse/home/apothecary-jars/4044_539095_2505058_1832937"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Storage",
+   "qty": null,
+   "issue": "CAPPED / NO QTY: the listing page's own H1 renders \"(1000+)\" instead of a number, so the site itself states no total. The payload field aggregatedCount is NOT usable as a substitute at this scale - it is demonstrably capped and unreliable (it returns the identical sentinel 900010 for BOTH the whole Bath department and its child Shower Curtains & Accessories, and 889,003 for 'Fabric Shower Curtains' - i.e. nearly the entire department). Recorded with no qty rather than a plausible wrong number. aggregatedCount for reference only = 238608.",
+   "link": "https://www.walmart.com/browse/home/bathroom-storage/4044_539095_6405150"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Cabinets",
+   "qty": null,
+   "issue": "CAPPED / NO QTY: the listing page's own H1 renders \"(1000+)\" instead of a number, so the site itself states no total. The payload field aggregatedCount is NOT usable as a substitute at this scale - it is demonstrably capped and unreliable (it returns the identical sentinel 900010 for BOTH the whole Bath department and its child Shower Curtains & Accessories, and 889,003 for 'Fabric Shower Curtains' - i.e. nearly the entire department). Recorded with no qty rather than a plausible wrong number. aggregatedCount for reference only = 15244.",
+   "link": "https://www.walmart.com/browse/home/bathroom-cabinets/4044_539095_5547362_6685393"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Shelves",
+   "qty": null,
+   "issue": "CAPPED / NO QTY: the listing page's own H1 renders \"(1000+)\" instead of a number, so the site itself states no total. The payload field aggregatedCount is NOT usable as a substitute at this scale - it is demonstrably capped and unreliable (it returns the identical sentinel 900010 for BOTH the whole Bath department and its child Shower Curtains & Accessories, and 889,003 for 'Fabric Shower Curtains' - i.e. nearly the entire department). Recorded with no qty rather than a plausible wrong number. aggregatedCount for reference only = 41725.",
+   "link": "https://www.walmart.com/browse/home/bathroom-shelves/4044_539095_5547362_4119845"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Over the Toilet Storage",
+   "qty": null,
+   "issue": "CAPPED / NO QTY: the listing page's own H1 renders \"(1000+)\" instead of a number, so the site itself states no total. The payload field aggregatedCount is NOT usable as a substitute at this scale - it is demonstrably capped and unreliable (it returns the identical sentinel 900010 for BOTH the whole Bath department and its child Shower Curtains & Accessories, and 889,003 for 'Fabric Shower Curtains' - i.e. nearly the entire department). Recorded with no qty rather than a plausible wrong number. aggregatedCount for reference only = 1194.",
+   "link": "https://www.walmart.com/browse/home/over-the-toilet-storage/4044_539095_4632169_4792254"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Furniture",
+   "qty": null,
+   "issue": "CAPPED / NO QTY: the listing page's own H1 renders \"(1000+)\" instead of a number, so the site itself states no total. The payload field aggregatedCount is NOT usable as a substitute at this scale - it is demonstrably capped and unreliable (it returns the identical sentinel 900010 for BOTH the whole Bath department and its child Shower Curtains & Accessories, and 889,003 for 'Fabric Shower Curtains' - i.e. nearly the entire department). Recorded with no qty rather than a plausible wrong number. aggregatedCount for reference only = 109986.",
+   "link": "https://www.walmart.com/browse/home/bathroom-furniture/4044_539095_5547362"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathtub Mats",
+   "qty": null,
+   "issue": "CAPPED / NO QTY: the listing page's own H1 renders \"(1000+)\" instead of a number, so the site itself states no total. The payload field aggregatedCount is NOT usable as a substitute at this scale - it is demonstrably capped and unreliable (it returns the identical sentinel 900010 for BOTH the whole Bath department and its child Shower Curtains & Accessories, and 889,003 for 'Fabric Shower Curtains' - i.e. nearly the entire department). Recorded with no qty rather than a plausible wrong number. aggregatedCount for reference only = 11012.",
+   "link": "https://www.walmart.com/browse/home/bathtub-mats/4044_539095_920259_2189510"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Sets",
+   "qty": null,
+   "issue": "CAPPED / NO QTY: the listing page's own H1 renders \"(1000+)\" instead of a number, so the site itself states no total. The payload field aggregatedCount is NOT usable as a substitute at this scale - it is demonstrably capped and unreliable (it returns the identical sentinel 900010 for BOTH the whole Bath department and its child Shower Curtains & Accessories, and 889,003 for 'Fabric Shower Curtains' - i.e. nearly the entire department). Recorded with no qty rather than a plausible wrong number. aggregatedCount for reference only = 227192.",
+   "link": "https://www.walmart.com/browse/home/bathroom-sets/4044_539095_1481425"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower Hooks & Rods",
+   "qty": null,
+   "issue": "CAPPED / NO QTY: the listing page's own H1 renders \"(1000+)\" instead of a number, so the site itself states no total. The payload field aggregatedCount is NOT usable as a substitute at this scale - it is demonstrably capped and unreliable (it returns the identical sentinel 900010 for BOTH the whole Bath department and its child Shower Curtains & Accessories, and 889,003 for 'Fabric Shower Curtains' - i.e. nearly the entire department). Recorded with no qty rather than a plausible wrong number. aggregatedCount for reference only = 5119.",
+   "link": "https://www.walmart.com/browse/home/shower-curtain-rods/4044_539095_2141805_9013711"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower Curtain Hooks & Rings",
+   "qty": null,
+   "issue": "CAPPED / NO QTY: the listing page's own H1 renders \"(1000+)\" instead of a number, so the site itself states no total. The payload field aggregatedCount is NOT usable as a substitute at this scale - it is demonstrably capped and unreliable (it returns the identical sentinel 900010 for BOTH the whole Bath department and its child Shower Curtains & Accessories, and 889,003 for 'Fabric Shower Curtains' - i.e. nearly the entire department). Recorded with no qty rather than a plausible wrong number. aggregatedCount for reference only = 18402.",
+   "link": "https://www.walmart.com/browse/home/shower-curtain-hooks-rings/4044_539095_8307770"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Kids' Bath Accessories",
+   "qty": null,
+   "issue": "CAPPED / NO QTY: the listing page's own H1 renders \"(1000+)\" instead of a number, so the site itself states no total. The payload field aggregatedCount is NOT usable as a substitute at this scale - it is demonstrably capped and unreliable (it returns the identical sentinel 900010 for BOTH the whole Bath department and its child Shower Curtains & Accessories, and 889,003 for 'Fabric Shower Curtains' - i.e. nearly the entire department). Recorded with no qty rather than a plausible wrong number. aggregatedCount for reference only = 8451.",
+   "link": "https://www.walmart.com/browse/home/kids-bath-accessories/4044_1154295_1143252_1143256"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Towels",
+   "qty": null,
+   "issue": "ROUTED TO TEXTILE (rules 15/16/20): primary product type is a bath/beach towel, textile bath rug or shower curtain. Also carries NO QTY - the page renders \"(1000+)\" and aggregatedCount is capped/unreliable (reference value 191896).",
+   "link": "https://www.walmart.com/browse/home/bath-towels/4044_539095_1030320"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Towel Sets",
+   "qty": null,
+   "issue": "ROUTED TO TEXTILE (rules 15/16/20): primary product type is a bath/beach towel, textile bath rug or shower curtain. Also carries NO QTY - the page renders \"(1000+)\" and aggregatedCount is capped/unreliable (reference value 41608).",
+   "link": "https://www.walmart.com/browse/home/bath-towel-sets/4044_539095_7211899_1350842"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Sheets",
+   "qty": null,
+   "issue": "ROUTED TO TEXTILE (rules 15/16/20): primary product type is a bath/beach towel, textile bath rug or shower curtain. Also carries NO QTY - the page renders \"(1000+)\" and aggregatedCount is capped/unreliable (reference value 18881).",
+   "link": "https://www.walmart.com/browse/home/bath-sheets/4044_539095_7211899_3917301"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Hand Towels",
+   "qty": null,
+   "issue": "ROUTED TO TEXTILE (rules 15/16/20): primary product type is a bath/beach towel, textile bath rug or shower curtain. Also carries NO QTY - the page renders \"(1000+)\" and aggregatedCount is capped/unreliable (reference value 39537).",
+   "link": "https://www.walmart.com/browse/home/hand-towels/4044_539095_7211899_8928938"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Washcloths",
+   "qty": null,
+   "issue": "ROUTED TO TEXTILE (rules 15/16/20): primary product type is a bath/beach towel, textile bath rug or shower curtain. Also carries NO QTY - the page renders \"(1000+)\" and aggregatedCount is capped/unreliable (reference value 60926).",
+   "link": "https://www.walmart.com/browse/home/washcloths/4044_539095_7211899_8363319"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Turkish Towels",
+   "qty": null,
+   "issue": "ROUTED TO TEXTILE (rules 15/16/20): primary product type is a bath/beach towel, textile bath rug or shower curtain. Also carries NO QTY - the page renders \"(1000+)\" and aggregatedCount is capped/unreliable (reference value 2727).",
+   "link": "https://www.walmart.com/browse/home/turkish-towels/4044_539095_5022810"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Beach Towels",
+   "qty": null,
+   "issue": "ROUTED TO TEXTILE (rules 15/16/20): primary product type is a bath/beach towel, textile bath rug or shower curtain. Also carries NO QTY - the page renders \"(1000+)\" and aggregatedCount is capped/unreliable (reference value 80095).",
+   "link": "https://www.walmart.com/browse/home/beach-towels/4044_539095_1113072"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Oversized Beach Towels",
+   "qty": null,
+   "issue": "ROUTED TO TEXTILE (rules 15/16/20): primary product type is a bath/beach towel, textile bath rug or shower curtain. Also carries NO QTY - the page renders \"(1000+)\" and aggregatedCount is capped/unreliable (reference value 28945).",
+   "link": "https://www.walmart.com/browse/home/oversized-beach-towels/4044_539095_6634322_5095329"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Kids' Beach Towels",
+   "qty": null,
+   "issue": "ROUTED TO TEXTILE (rules 15/16/20): primary product type is a bath/beach towel, textile bath rug or shower curtain. Also carries NO QTY - the page renders \"(1000+)\" and aggregatedCount is capped/unreliable (reference value 26424).",
+   "link": "https://www.walmart.com/browse/home/kids-beach-towels/4044_539095_6634322_8780679"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Beach Blankets",
+   "qty": null,
+   "issue": "ROUTED TO TEXTILE (rules 15/16/20): primary product type is a bath/beach towel, textile bath rug or shower curtain. Also carries NO QTY - the page renders \"(1000+)\" and aggregatedCount is capped/unreliable (reference value 44592).",
+   "link": "https://www.walmart.com/browse/home/beach-blankets/4044_539095_6634322_9558262"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Rugs & Bath Mats",
+   "qty": null,
+   "issue": "ROUTED TO TEXTILE (rules 15/16/20): primary product type is a bath/beach towel, textile bath rug or shower curtain. Also carries NO QTY - the page renders \"(1000+)\" and aggregatedCount is capped/unreliable (reference value 346413).",
+   "link": "https://www.walmart.com/browse/home/bath-rugs-mats/4044_539095_920259"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Rugs",
+   "qty": null,
+   "issue": "ROUTED TO TEXTILE (rules 15/16/20): primary product type is a bath/beach towel, textile bath rug or shower curtain. Also carries NO QTY - the page renders \"(1000+)\" and aggregatedCount is capped/unreliable (reference value 250504).",
+   "link": "https://www.walmart.com/browse/home/bathroom-rugs/4044_539095_920259_2453408"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Rug Sets",
+   "qty": null,
+   "issue": "ROUTED TO TEXTILE (rules 15/16/20): primary product type is a bath/beach towel, textile bath rug or shower curtain. Also carries NO QTY - the page renders \"(1000+)\" and aggregatedCount is capped/unreliable (reference value 43405).",
+   "link": "https://www.walmart.com/browse/home/bathroom-rug-sets/4044_539095_920259_1753813"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Mats Runner",
+   "qty": null,
+   "issue": "ROUTED TO TEXTILE (rules 15/16/20): primary product type is a bath/beach towel, textile bath rug or shower curtain. Also carries NO QTY - the page renders \"(1000+)\" and aggregatedCount is capped/unreliable (reference value 7384).",
+   "link": "https://www.walmart.com/browse/home/bath-mats-runner/4044_539095_920259_5792957"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower Curtains & Accessories",
+   "qty": null,
+   "issue": "ROUTED TO TEXTILE (rules 15/16/20): primary product type is a bath/beach towel, textile bath rug or shower curtain. Also carries NO QTY - the page renders \"(1000+)\" and aggregatedCount is capped/unreliable (reference value 900010).",
+   "link": "https://www.walmart.com/browse/home/shower-curtains-accessories/4044_539095_2141805"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower Curtain Sets",
+   "qty": null,
+   "issue": "ROUTED TO TEXTILE (rules 15/16/20): primary product type is a bath/beach towel, textile bath rug or shower curtain. Also carries NO QTY - the page renders \"(1000+)\" and aggregatedCount is capped/unreliable (reference value 91160).",
+   "link": "https://www.walmart.com/browse/home/shower-curtain-sets/4044_539095_2141805_2005808"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower Curtain Liners",
+   "qty": null,
+   "issue": "ROUTED TO TEXTILE (rules 15/16/20): primary product type is a bath/beach towel, textile bath rug or shower curtain. Also carries NO QTY - the page renders \"(1000+)\" and aggregatedCount is capped/unreliable (reference value 2919).",
+   "link": "https://www.walmart.com/browse/home/shower-curtain-liners/4044_539095_2141805_3396784"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Standard Shower Curtains",
+   "qty": null,
+   "issue": "ROUTED TO TEXTILE (rules 15/16/20): primary product type is a bath/beach towel, textile bath rug or shower curtain. Also carries NO QTY - the page renders \"(1000+)\" and aggregatedCount is capped/unreliable (reference value 349422).",
+   "link": "https://www.walmart.com/browse/home/standard-shower-curtains/4044_539095_2141805_3274407"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Kids' Towels",
+   "qty": null,
+   "issue": "ROUTED TO TEXTILE (rules 15/16/20): primary product type is a bath/beach towel, textile bath rug or shower curtain. Also carries NO QTY - the page renders \"(1000+)\" and aggregatedCount is capped/unreliable (reference value 7521).",
+   "link": "https://www.walmart.com/browse/home/kids-towels/4044_1154295_1143252_1143253"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Kids' Hooded Towels",
+   "qty": null,
+   "issue": "ROUTED TO TEXTILE (rules 15/16/20): primary product type is a bath/beach towel, textile bath rug or shower curtain. Also carries NO QTY - the page renders \"(1000+)\" and aggregatedCount is capped/unreliable (reference value 4642).",
+   "link": "https://www.walmart.com/browse/home/kids-hooded-towels/4044_1154295_1143252_9264092"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Monogrammed Towels",
+   "qty": 342,
+   "issue": "ROUTED TO TEXTILE (rules 15/20): towel / shower-curtain textile. Exact qty IS available here (the page's H1 renders it) and is given so the Textile pass can use it directly.",
+   "link": "https://www.walmart.com/browse/home/monogrammed-towels/4044_539095_7211899_2227734"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Turkish Beach Towels",
+   "qty": 626,
+   "issue": "ROUTED TO TEXTILE (rules 15/20): towel / shower-curtain textile. Exact qty IS available here (the page's H1 renders it) and is given so the Textile pass can use it directly.",
+   "link": "https://www.walmart.com/browse/home/turkish-beach-towels/4044_539095_6634322_8174292"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Hookless Shower Curtains",
+   "qty": 244,
+   "issue": "ROUTED TO TEXTILE (rules 15/20): towel / shower-curtain textile. Exact qty IS available here (the page's H1 renders it) and is given so the Textile pass can use it directly.",
+   "link": "https://www.walmart.com/browse/home/hookless-shower-curtains/4044_539095_2141805_8546121"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Kids' Shower Curtains",
+   "qty": 711,
+   "issue": "ROUTED TO TEXTILE (rules 15/20): towel / shower-curtain textile. Exact qty IS available here (the page's H1 renders it) and is given so the Textile pass can use it directly.",
+   "link": "https://www.walmart.com/browse/home/kids-shower-curtains/4044_1154295_1143252_1143255"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Kid's Bath Rugs",
+   "qty": null,
+   "issue": "ROUTED TO TEXTILE (rule 16): textile kids' bath rugs. NO QTY RECORDED DELIBERATELY - the same shelf is served at two catIds that render DIFFERENT exact totals in the same session, /browse/home/kids-bath-rugs/4044_1154295_1143252_1143254 = (228) and /browse/home/kids-bath-rugs/4044_539095_5586777_6667078 = (236). An unresolved 8-product discrepancy, so no figure is asserted.",
+   "link": "https://www.walmart.com/browse/home/kids-bath-rugs/4044_1154295_1143252_1143254"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Kids' Bathroom Sets",
+   "qty": 494,
+   "issue": "MIXED-CONTENT NODE, NOT RECORDED: a kids' bath 'set' bundle mixing textile (shower curtain, rug, towels) with accessories, so no single primary product type governs (rules 2/29). Exact rendered qty given for reference. The same total (494) is served at a second catId /browse/home/kids-bathroom-sets/4044_539095_5586777_8157787.",
+   "link": "https://www.walmart.com/browse/home/kids-bathroom-sets/4044_1154295_1143252_3260701"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Vanities",
+   "qty": null,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Bathroom Vanities' (exact URL match) - stays in Furniture under the OPTION 1 policy and is NOT re-extracted into Bathroom (master guide s13, rule 9). Its alias /browse/home/bathroom-vanities/4044_539095_5547362_9176721 resolves to the SAME shelf and the same total and is treated as the same record (dedup blind spot (a)).",
+   "link": "https://www.walmart.com/browse/home-improvement/bathroom-vanities/1072864_1045879_1230843_9176721"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Single Sink Bathroom Vanities",
+   "qty": 430,
+   "issue": "NOT RECORDED - COVERED BY AN ALREADY-EXTRACTED PARENT: this is a child of Bathroom Vanities, which Furniture.xlsx already holds. Recording it would re-extract products that stay in Furniture (OPTION 1). Exact rendered qty kept here for audit only.",
+   "link": "https://www.walmart.com/browse/home-improvement/single-sink-bathroom-vanities/1072864_1045879_1230843_9176721_1626137"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Vanities with Tops",
+   "qty": 619,
+   "issue": "NOT RECORDED - COVERED BY AN ALREADY-EXTRACTED PARENT: this is a child of Bathroom Vanities, which Furniture.xlsx already holds. Recording it would re-extract products that stay in Furniture (OPTION 1). Exact rendered qty kept here for audit only.",
+   "link": "https://www.walmart.com/browse/home/bathroom-vanities-with-tops/4044_539095_5547362_9176721_4566098"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Vanities without Tops",
+   "qty": 126,
+   "issue": "NOT RECORDED - COVERED BY AN ALREADY-EXTRACTED PARENT: this is a child of Bathroom Vanities, which Furniture.xlsx already holds. Recording it would re-extract products that stay in Furniture (OPTION 1). Exact rendered qty kept here for audit only.",
+   "link": "https://www.walmart.com/browse/home/bathroom-vanities-without-tops/4044_539095_5547362_9176721_5790629"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Vanities with Mirrors",
+   "qty": null,
+   "issue": "NOT RECORDED: a size/format re-cut of Bathroom Vanities, which is ALREADY EXTRACTED in Furniture.xlsx (OPTION 1), and in any case capped - the page renders \"(1000+)\" (aggregatedCount reference 4385).",
+   "link": "https://www.walmart.com/browse/home/bathroom-vanities-with-mirrors/4044_539095_5547362_9176721_8450168"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Small Bathroom Vanities",
+   "qty": null,
+   "issue": "NOT RECORDED: a size/format re-cut of Bathroom Vanities, which is ALREADY EXTRACTED in Furniture.xlsx (OPTION 1), and in any case capped - the page renders \"(1000+)\" (aggregatedCount reference 7472).",
+   "link": "https://www.walmart.com/browse/home-improvement/small-bathroom-vanities/1072864_1045879_1230843_9176721_1449241"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "24 Inch Bathroom Vanities",
+   "qty": null,
+   "issue": "NOT RECORDED: a size/format re-cut of Bathroom Vanities, which is ALREADY EXTRACTED in Furniture.xlsx (OPTION 1), and in any case capped - the page renders \"(1000+)\" (aggregatedCount reference 4314).",
+   "link": "https://www.walmart.com/browse/home-improvement/24-inch-bathroom-vanities/1072864_1045879_1230843_9176721_7805827_9404972"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "36 Inch Bathroom Vanities",
+   "qty": null,
+   "issue": "NOT RECORDED: a size/format re-cut of Bathroom Vanities, which is ALREADY EXTRACTED in Furniture.xlsx (OPTION 1), and in any case capped - the page renders \"(1000+)\" (aggregatedCount reference 4008).",
+   "link": "https://www.walmart.com/browse/home-improvement/36-inch-bathroom-vanities/1072864_1045879_1230843_9176721_7805827_4112402"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "48 Inch Bathroom Vanities",
+   "qty": null,
+   "issue": "NOT RECORDED: a size/format re-cut of Bathroom Vanities, which is ALREADY EXTRACTED in Furniture.xlsx (OPTION 1), and in any case capped - the page renders \"(1000+)\" (aggregatedCount reference 2632).",
+   "link": "https://www.walmart.com/browse/home-improvement/48-inch-bathroom-vanities/1072864_1045879_1230843_9176721_7805827_3094773"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "60 Inch Bathroom Vanities",
+   "qty": null,
+   "issue": "NOT RECORDED: a size/format re-cut of Bathroom Vanities, which is ALREADY EXTRACTED in Furniture.xlsx (OPTION 1), and in any case capped - the page renders \"(1000+)\" (aggregatedCount reference 2787).",
+   "link": "https://www.walmart.com/browse/home-improvement/60-inch-bathroom-vanities/1072864_1045879_1230843_9176721_7805827_2022674"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Sinks by Brand",
+   "qty": 594,
+   "issue": "NOT RECORDED: a SHOP-BY-BRAND hub, not a product subcategory (rules 25/27). Exact rendered qty kept for audit.",
+   "link": "https://www.walmart.com/browse/home-improvement/shop-bathroom-sinks-by-brand/1072864_1045879_1230843_1071504_9550294"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Kraus Bathroom Sinks",
+   "qty": 32,
+   "issue": "NOT RECORDED: a single-BRAND page, not a category (rules 25/27). Exact rendered qty kept for audit.",
+   "link": "https://www.walmart.com/browse/home-improvement/kraus-bathroom-sinks/1072864_1045879_1230843_1071504_9550294_6647826"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Sinks by Finish",
+   "qty": 277,
+   "issue": "NOT RECORDED: a SHOP-BY-FINISH hub whose children are material re-cuts that overlap the by-Type children (Nordic Nest facet-overlap precedent). Exact rendered qty kept for audit.",
+   "link": "https://www.walmart.com/browse/home-improvement/shop-bathroom-sinks-by-finish/1072864_1045879_1230843_1071504_3287316"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Copper Bathroom Sinks",
+   "qty": 203,
+   "issue": "NOT RECORDED: a FINISH facet re-cut of Bathroom Sinks that overlaps the recorded by-Type leaves; material never excludes (rule 22) but a finish cut is not a subcategory. Exact rendered qty kept for audit.",
+   "link": "https://www.walmart.com/browse/home-improvement/copper-bathroom-sinks/1072864_1045879_1230843_1071504_3287316_5286681"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Stainless Steel Bathroom Sinks",
+   "qty": 87,
+   "issue": "NOT RECORDED: a FINISH facet re-cut that overlaps the recorded by-Type leaves. Exact rendered qty kept for audit.",
+   "link": "https://www.walmart.com/browse/home-improvement/stainless-steel-bathroom-sinks/1072864_1045879_1230843_1071504_3287316_7089220"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Ceramic Toothbrush Holder",
+   "qty": 918,
+   "issue": "NOT RECORDED: a MATERIAL re-cut of Toothbrush Holders; recording it beside its parent would double-count. Exact rendered qty kept for audit.",
+   "link": "https://www.walmart.com/browse/home/ceramic-toothbrush-holder/4044_539095_2505058_2270632"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Smart Toilets",
+   "qty": 718,
+   "issue": "NOT RECORDED: reached from the Toilets & Bidets pill labelled 'Smart Toilets & Bidets'; it sits on a DIFFERENT id-path branch (1072864_1406684_...) and its overlap with the recorded Bidets (481) and One/Two Piece Toilets could not be proved, so it is withheld rather than risk double-counting. Exact rendered qty kept for audit.",
+   "link": "https://www.walmart.com/browse/home-improvement/smart-toilets/1072864_1406684_3247335_4894950_2259548_4722674"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Waste & Sewage Equipment",
+   "qty": 74,
+   "issue": "NOT BATHROOM / OUT OF SCOPE: sewage ejector/waste equipment - plumbing infrastructure, not a bathroom fixture, fitting, furniture or accessory (rule 2). Sits under Home Improvement > Bathroom Renovation in the site tree but fails the primary-product-type test. Exact rendered qty kept for audit.",
+   "link": "https://www.walmart.com/browse/home-improvement/waste-sewage-equipment/1072864_1045879_1230835_1043923"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Laundry Sinks",
+   "qty": 599,
+   "issue": "NOT BATHROOM / OUT OF SCOPE: utility/laundry-room sink, not a bathroom basin (rule 2: primary function). Sits under Home Improvement > Bathroom Renovation in the site tree but fails the primary-product-type test. Exact rendered qty kept for audit.",
+   "link": "https://www.walmart.com/browse/home-improvement/laundry-sinks/1072864_1045879_3861937_3105584"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Laundry Faucets",
+   "qty": 474,
+   "issue": "NOT BATHROOM / OUT OF SCOPE: utility/laundry-room tap, not a bathroom tap. Sits under Home Improvement > Bathroom Renovation in the site tree but fails the primary-product-type test. Exact rendered qty kept for audit.",
+   "link": "https://www.walmart.com/browse/home-improvement/laundry-faucets/1072864_1045879_3861937_9383766"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Laundry Countertops",
+   "qty": 140,
+   "issue": "NOT BATHROOM / OUT OF SCOPE: laundry-room worktops. Sits under Home Improvement > Bathroom Renovation in the site tree but fails the primary-product-type test. Exact rendered qty kept for audit.",
+   "link": "https://www.walmart.com/browse/home-improvement/laundry-countertops/1072864_1045879_3861937_7031157"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Electric Water Heaters",
+   "qty": 461,
+   "issue": "NOT BATHROOM / OUT OF SCOPE: water-heating appliance. Sits under Home Improvement > Bathroom Renovation in the site tree but fails the primary-product-type test. Exact rendered qty kept for audit.",
+   "link": "https://www.walmart.com/browse/home-improvement/electric-water-heaters/1072864_1045879_1230835_9088580"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Gas Water Heaters",
+   "qty": 117,
+   "issue": "NOT BATHROOM / OUT OF SCOPE: water-heating appliance. Sits under Home Improvement > Bathroom Renovation in the site tree but fails the primary-product-type test. Exact rendered qty kept for audit.",
+   "link": "https://www.walmart.com/browse/home-improvement/gas-water-heaters/1072864_1045879_1230835_3249241"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Toilet Tank Balls & Rods",
+   "qty": 197,
+   "issue": "NOT BATHROOM / OUT OF SCOPE: cistern replacement parts - plumbing spares, not a toilet or toilet accessory under rule 14. Sits under Home Improvement > Bathroom Renovation in the site tree but fails the primary-product-type test. Exact rendered qty kept for audit.",
+   "link": "https://www.walmart.com/browse/home-improvement/toilet-plumbing-replacement-parts/1072864_1045879_5533759_2953519_7017768"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Utility Sinks",
+   "qty": null,
+   "issue": "NOT BATHROOM / OUT OF SCOPE: utility/garage sink, not a bathroom basin (rule 2). Also capped - page renders \"(1000+)\", aggregatedCount reference 2271.",
+   "link": "https://www.walmart.com/browse/home-improvement/utility-sinks/1072864_1045879_1230843_1071504_4797694_3446417"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Plumbing",
+   "qty": null,
+   "issue": "NOT BATHROOM / OUT OF SCOPE: plumbing supply department - pipes, fittings, valves, tools (rule 2). Also capped - page renders \"(1000+)\", aggregatedCount reference 193981.",
+   "link": "https://www.walmart.com/browse/home-improvement/bathroom-plumbing/1072864_1045879_1230835"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Plumbing Parts and Repairs",
+   "qty": null,
+   "issue": "NOT BATHROOM / OUT OF SCOPE: plumbing spares (rule 2). Also capped - page renders \"(1000+)\", aggregatedCount reference 188079.",
+   "link": "https://www.walmart.com/browse/home-improvement/plumbing-parts-and-repairs/1072864_1045879_1230835_9138460"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Drains",
+   "qty": null,
+   "issue": "NOT BATHROOM / OUT OF SCOPE: plumbing drains (rule 2). Also capped - page renders \"(1000+)\", aggregatedCount reference 47377.",
+   "link": "https://www.walmart.com/browse/home-improvement/drains/1072864_1045879_1230835_9138460_1230836"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Plumbing Valves",
+   "qty": null,
+   "issue": "NOT BATHROOM / OUT OF SCOPE: plumbing valves (rule 2). Also capped - page renders \"(1000+)\", aggregatedCount reference 63344.",
+   "link": "https://www.walmart.com/browse/home-improvement/plumbing-valves/1072864_1045879_1230835_9138460_2463380"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Faucet Parts and Repairs",
+   "qty": null,
+   "issue": "NOT BATHROOM / OUT OF SCOPE: tap spares (rule 2). Also capped - page renders \"(1000+)\", aggregatedCount reference 31446.",
+   "link": "https://www.walmart.com/browse/home-improvement/faucet-parts-and-repairs/1072864_1045879_1230835_9138460_7636351"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Sink Parts and Repairs",
+   "qty": null,
+   "issue": "NOT BATHROOM / OUT OF SCOPE: sink spares (rule 2). Also capped - page renders \"(1000+)\", aggregatedCount reference 6307.",
+   "link": "https://www.walmart.com/browse/home-improvement/sink-parts-and-repairs/1072864_1045879_1230835_9138460_8190143"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower Parts and Repairs",
+   "qty": null,
+   "issue": "NOT BATHROOM / OUT OF SCOPE: shower spares (rule 2). Also capped - page renders \"(1000+)\", aggregatedCount reference 2671.",
+   "link": "https://www.walmart.com/browse/home-improvement/shower-parts-repairs/1072864_1045879_1230835_9138460_4016380"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Hoses and Connectors",
+   "qty": null,
+   "issue": "NOT BATHROOM / OUT OF SCOPE: supply hoses (rule 2). Also capped - page renders \"(1000+)\", aggregatedCount reference 1179.",
+   "link": "https://www.walmart.com/browse/home-improvement/hoses-connectors/1072864_1045879_1230835_9138460_7136894"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Tankless Water Heaters",
+   "qty": null,
+   "issue": "NOT BATHROOM / OUT OF SCOPE: water-heating appliance (rule 2). Also capped - page renders \"(1000+)\", aggregatedCount reference 1531.",
+   "link": "https://www.walmart.com/browse/home-improvement/tankless-water-heaters/1072864_1045879_1230835_8114351"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Fans",
+   "qty": null,
+   "issue": "NOT BATHROOM / OUT OF SCOPE: extractor/ventilation fan - an electrical appliance, not a bathroom fixture under rules 3-8 (rule 2). Also capped - page renders \"(1000+)\", aggregatedCount reference 1590.",
+   "link": "https://www.walmart.com/browse/home-improvement/bath-fans/1072864_1045879_1230843_1230845"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Backsplashes",
+   "qty": null,
+   "issue": "NOT BATHROOM / OUT OF SCOPE: the page's own shelf is Home Improvement:Kitchen Renovation:Kitchen Fixtures and Materials - tiling material, and kitchen-shelved (rule 2). Also capped - page renders \"(1000+)\", aggregatedCount reference 3796.",
+   "link": "https://www.walmart.com/browse/home-improvement/backsplashes/1072864_1045879_1230843_1230881"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Utility Fixtures",
+   "qty": null,
+   "issue": "NOT BATHROOM / OUT OF SCOPE: laundry/utility-room fixtures (rule 2). Also capped - page renders \"(1000+)\", aggregatedCount reference 1193.",
+   "link": "https://www.walmart.com/browse/home-improvement/utility-fixtures/1072864_1045879_3861937"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Kids' Bathroom",
+   "qty": null,
+   "issue": "NOT BATHROOM / OUT OF SCOPE: a shop-by-room kids edit whose shelf is Home:Kids' Rooms:Kids' Bathroom; its content is the same bath textiles and accessories already covered, so recording it would double-count (rule 28) (rule 2). Also capped - page renders \"(1000+)\", aggregatedCount reference 9080.",
+   "link": "https://www.walmart.com/browse/home/kids-bathroom/4044_1154295_1143252"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Toilet Brushes",
+   "qty": null,
+   "issue": "NOT BATHROOM / OUT OF SCOPE: shelved by Walmart under Household Essentials:Bathroom Cleaning Supplies, i.e. as a cleaning consumable line rather than a bathroom accessory; flagged rather than recorded because rule 14 would otherwise claim it - the run owner may want it (rule 2). Also capped - page renders \"(1000+)\", aggregatedCount reference 14738.",
+   "link": "https://www.walmart.com/browse/household-essentials/toilet-brushes/1115193_1071966_1025741_4732216_6148203"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Toilet Plungers",
+   "qty": null,
+   "issue": "NOT BATHROOM / OUT OF SCOPE: shelved under Household Essentials:Cleaning Supplies:Cleaning Tools - a cleaning tool (rule 2). Also capped - page renders \"(1000+)\", aggregatedCount reference 2425.",
+   "link": "https://www.walmart.com/browse/household-essentials/toilet-plungers/1115193_1071966_1025741_6498065"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Vanity Lights & Bathroom Light Fixtures",
+   "qty": null,
+   "issue": "ROUTED TO LIGHTING (rule 11/19): primary product type is lighting. The page's own shelf confirms it - Home:Decor:Lighting & Light Fixtures:Wall Lights & Fixtures. Capped, no qty (aggregatedCount reference 28049).",
+   "link": "https://www.walmart.com/browse/home-improvement/vanity-lights-bathroom-light-fixtures/1072864_1045879_1230843_8759605"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Fabric Shower Curtains",
+   "qty": null,
+   "issue": "NOT RECORDED - SEO/ATTRIBUTE RE-CUT of Shower Curtains (textile in any case, rule 20) and a demonstration of the count trap: aggregatedCount here is 889003, which for 'Fabric Shower Curtains' is 889,003 against a whole-Bath-department sentinel of 900,010. Proof the field is not a category count at this scale.",
+   "link": "https://www.walmart.com/browse/home/fabric-shower-curtains/4044_539095_2141805_8715072"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Extra Long Shower Curtains",
+   "qty": null,
+   "issue": "NOT RECORDED - SEO/ATTRIBUTE RE-CUT of Shower Curtains (textile in any case, rule 20) and a demonstration of the count trap: aggregatedCount here is 453567, which for 'Fabric Shower Curtains' is 889,003 against a whole-Bath-department sentinel of 900,010. Proof the field is not a category count at this scale.",
+   "link": "https://www.walmart.com/browse/home/extra-long-shower-curtains/4044_539095_2141805_9227153"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "White Shower Curtains",
+   "qty": null,
+   "issue": "NOT RECORDED - SEO/ATTRIBUTE RE-CUT of Shower Curtains (textile in any case, rule 20) and a demonstration of the count trap: aggregatedCount here is 101653, which for 'Fabric Shower Curtains' is 889,003 against a whole-Bath-department sentinel of 900,010. Proof the field is not a category count at this scale.",
+   "link": "https://www.walmart.com/browse/home/white-shower-curtains/4044_539095_2141805_5102000"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Christmas Shower Curtains",
+   "qty": null,
+   "issue": "NOT RECORDED - SEO/ATTRIBUTE RE-CUT of Shower Curtains (textile in any case, rule 20) and a demonstration of the count trap: aggregatedCount here is 53578, which for 'Fabric Shower Curtains' is 889,003 against a whole-Bath-department sentinel of 900,010. Proof the field is not a category count at this scale.",
+   "link": "https://www.walmart.com/browse/home/christmas-shower-curtains/4044_539095_9864004"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Ceramic Soap Dispenser",
+   "qty": null,
+   "issue": "NOT RECORDED - MATERIAL/FORMAT re-cut of a recorded-or-capped Bathroom Accessories child; overlaps its parent and would double-count. Capped anyway, page renders \"(1000+)\" (aggregatedCount reference 3845).",
+   "link": "https://www.walmart.com/browse/home/ceramic-soap-dispenser/4044_539095_2505058_4608654"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Gold Soap Dispenser",
+   "qty": null,
+   "issue": "NOT RECORDED - MATERIAL/FORMAT re-cut of a recorded-or-capped Bathroom Accessories child; overlaps its parent and would double-count. Capped anyway, page renders \"(1000+)\" (aggregatedCount reference 2056).",
+   "link": "https://www.walmart.com/browse/home/gold-soap-dispenser/4044_539095_2505058_8742081"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Draining Soap Dish",
+   "qty": null,
+   "issue": "NOT RECORDED - MATERIAL/FORMAT re-cut of a recorded-or-capped Bathroom Accessories child; overlaps its parent and would double-count. Capped anyway, page renders \"(1000+)\" (aggregatedCount reference 31884).",
+   "link": "https://www.walmart.com/browse/home/draining-soap-dish/4044_539095_2505058_2755225"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Soap Dish For Shower",
+   "qty": null,
+   "issue": "NOT RECORDED - MATERIAL/FORMAT re-cut of a recorded-or-capped Bathroom Accessories child; overlaps its parent and would double-count. Capped anyway, page renders \"(1000+)\" (aggregatedCount reference 31701).",
+   "link": "https://www.walmart.com/browse/home/soap-dish-for-shower/4044_539095_2505058_7753461"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Toothbrush Holder Set",
+   "qty": null,
+   "issue": "NOT RECORDED - MATERIAL/FORMAT re-cut of a recorded-or-capped Bathroom Accessories child; overlaps its parent and would double-count. Capped anyway, page renders \"(1000+)\" (aggregatedCount reference 1665).",
+   "link": "https://www.walmart.com/browse/home/toothbrush-holder-set/4044_539095_2505058_3088292"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Toilet Seats and Lids",
+   "qty": null,
+   "issue": "TOP-UP 2026-09-05 (coverage-gap follow-up): a genuinely MISSING grouping node found via the live PillsModule nav on the 'Bathroom Renovation' root, distinct from the stale sitemap catId the original pass tried for this same slug (note (b) above). The working id-path is 1072864_1045879_5533759_4289910_6982244 (shelf 'Home Improvement:Bathroom Renovation:Toilets and Bidets:Toilet Components:Toilet Seats and Lids'). Never recorded as a leaf per rule 24 (valid subcategories exist - see the 8 children now split between rows[] and this review[]). CAPPED / NO QTY: H1 renders \"(1000+)\"; aggregatedCount reference only = 5495.",
+   "link": "https://www.walmart.com/browse/home-improvement/toilet-seats-and-lids/1072864_1045879_5533759_4289910_6982244"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Elongated Toilet Seats",
+   "qty": null,
+   "issue": "TOP-UP 2026-09-05: genuine child of the newly-found Toilet Seats and Lids node (previously entirely absent). CAPPED / NO QTY: H1 renders \"(1000+)\" (\"Elongated Toilet Seats in Toilet Bowls & Seats\"); aggregatedCount reference only = 1408. This is the accepted qty-unavailable trade-off, not a further gap.",
+   "link": "https://www.walmart.com/browse/home-improvement/elongated-toilet-seats/1072864_1045879_5533759_4289910_6982244_3605832"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Round Toilet Seats",
+   "qty": null,
+   "issue": "TOP-UP 2026-09-05: genuine child of the newly-found Toilet Seats and Lids node (previously entirely absent). CAPPED / NO QTY: H1 renders \"(1000+)\"; aggregatedCount reference only = 1382. This is the accepted qty-unavailable trade-off, not a further gap.",
+   "link": "https://www.walmart.com/browse/home-improvement/round-toilet-seats/1072864_1045879_5533759_4289910_6982244_6475029"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Toilet Seat Parts and Repairs",
+   "qty": 162,
+   "issue": "TOP-UP 2026-09-05: genuine child of the newly-found Toilet Seats and Lids node. NOT RECORDED - NOT BATHROOM / OUT OF SCOPE for consistency with every other 'Parts and Repairs' node already excluded in this file (Faucet/Sink/Shower Parts and Repairs, Toilet Tank Balls & Rods): a spares/repair-parts line, not a fixture itself (rule 2). Exact rendered qty kept for audit.",
+   "link": "https://www.walmart.com/browse/home-improvement/toilet-seat-parts-repairs/1072864_1045879_5533759_4289910_6982244_3690052"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Toilet Bowls & Seats",
+   "qty": null,
+   "issue": "TOP-UP 2026-09-05 (coverage-gap follow-up): a genuinely MISSING grouping node, sibling-listed in the original notes as the stale 'toilet-bowls' sitemap slug (note (b)) but actually live under Home Improvement > Plumbing > Shop Plumbing by Fixture > Toilet Plumbing at id-path 1072864_1406684_3247335_4894950_4875377. Never recorded as a leaf per rule 24 (valid subcategories exist - Bidet/Heated Toilet Seats, Elongated/Round Toilet Bowls, Nightlight Toilet Seats now in rows[]; Elongated/Soft-Close Toilet Seats capped, listed separately). CAPPED / NO QTY: H1 renders \"(1000+)\" (\"Toilet Bowls and Seats for Bathroom Plumbing\"); aggregatedCount reference only = 3334.",
+   "link": "https://www.walmart.com/browse/toilet-plumbing/toilet-bowls-seats/1072864_1406684_3247335_4894950_4875377"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Soft-Close Toilet Seats",
+   "qty": null,
+   "issue": "TOP-UP 2026-09-05: genuine child of the newly-found Toilet Bowls & Seats node (previously entirely absent), explicitly named as Bathroom-include by rule 14 (\"Soft-Close Seats\"). CAPPED / NO QTY: H1 renders \"(1000+)\"; aggregatedCount reference only = 1164. This is the accepted qty-unavailable trade-off, not a further gap.",
+   "link": "https://www.walmart.com/browse/toilet-bowls-seats/soft-close-toilet-seats/1072864_1406684_3247335_4894950_4875377_6509211"
+  }
+ ],
+ "_reconstructed_from": "Bathroom.xlsx delivered 2026-09-01 (checkpoint), not original worker JSON",
+ "_topup_2026-09-05": "Targeted follow-up on the '~100 no-qty nodes' flag. VERIFIED: that flag is the already-documented, ACCEPTED qty-unavailable trade-off (rule 26/OTTO precedent) - every one of the ~100 review[] entries carries a node the site itself refuses to total ('(1000+)'), not a missing category, and no qty was forced onto any of them here. SEPARATELY, re-walked the live PillsModule nav on both bathroom roots (Home>Bath 4044_539095 and Home Improvement>Bathroom Renovation 1072864_1045879) via HTTP (curl_cffi/requests, no browser) and found ONE genuine coverage gap the original pass missed: the 'Toilet Seats and Lids' branch (Bathroom Renovation > Toilets and Bidets > Toilet Components) plus its cross-linked sibling branch 'Toilet Bowls & Seats' (Home Improvement > Plumbing > Shop Plumbing by Fixture > Toilet Plumbing). The original notes had already flagged the SLUGS for this branch (toilet-seats-and-lids, hard-toilet-seat, children-toilet-seats, bidet-toilet-seats, toilet-bowls, etc.) as 'stale SEO paths that return empty' (gap (b)) - true for the sitemap's own catId, but the site's own live pill nav carries a DIFFERENT, working id-path for the same slugs, so the branch was never actually a dead end. Walked it fully: 9 children under Toilet Seats and Lids (Elongated, Round, Cushioned [already recorded], Bidet, Wood, Heated, Hard, Children, Parts&Repairs) plus 7 children under Toilet Bowls & Seats (Elongated Seats [dup of the Toilet-Seats-and-Lids one, same catId], Soft-Close, Bidet [dup], Heated [dup], Elongated Bowls, Round Bowls, Nightlight). NET NEW: 8 leaves added to rows[] with exact H1 counts (Wood 903, Hard 524, Children 598, Bidet 923, Heated 392, Elongated Bowls 258, Round Bowls 56, Nightlight 27); 6 nodes added to review[] (2 hub/grouping pages withheld under rule 24, 3 capped '(1000+)' children withheld under rule 26, 1 parts/repairs child withheld as out-of-scope per rule 2). All 8 new leaf URLs and the 2 hub URLs were checked against cross_category_url_index.json - zero hits, no dedup conflict with Furniture/Storage/Wall_Decor/Textile.xlsx. No other missing branch was found: the rest of both root pills (Get it today, $10&under, Bath towels, Shower curtains&liners, Bath rugs&mats, Beach towels, Bath accessories, Bath storage&furniture, Kids bath, Shop all guest ready, Shower heads, Toilet paper holders, Drain snakes&augers [plumbing tool, out of scope], Toilets&bidets, Bathroom faucets/sinks/vanities/mirrors, Medicine cabinets, Bathroom cabinets, Bathtubs, Showers, Shower doors, Towel racks/warmers, Bath fans, Bathroom hardware, Bathroom plumbing, Plumbing parts&repairs, Utility fixtures, Tile/Paint/Kitchen renovation [non-bathroom]) all already resolve to a row or review entry already present in this file."
+}

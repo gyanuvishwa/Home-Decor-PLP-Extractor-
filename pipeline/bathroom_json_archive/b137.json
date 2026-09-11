@@ -1,0 +1,187 @@
+{
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ROBOTS (royaldesign.com): fetched FIRST, before any other request. HTTP 200, 67 bytes, verbatim and complete: 'User-Agent: *' / 'Allow: /' / blank / 'Sitemap: http://royaldesign.com/sitemap.xml'. That is the ENTIRE file. There is NO group naming ClaudeBot, Claude-Web, anthropic-ai or any other AI agent, no Disallow of any kind and no Crawl-delay, so there is no section-5 hard stop and nothing to work around; the only directive is a site-wide Allow. probe.py's 2 s per-host gap was applied to every request regardless. ONE HOST ONLY - every request in this pass went to royaldesign.com (www.royaldesign.com 301s to the same origin); no API host, no CDN host, no proxy and no r.jina.ai was used, so no second robots check was owed. LOCALE - the manifest site is royaldesign.com and the country is Sweden, but royaldesign.com does NOT serve a /se/ storefront: its sitemap index (https://royaldesign.com/sitemap.xml) declares exactly six locales - /us/, /au/, /eu/, /at/, /ch/, /nl/ - and www.royaldesign.com geo-lands on /us/. Both prior validated passes for this company used the /eu/ (English) storefront: Furniture.xlsx holds 58 royaldesign.com/eu/ furniture leaves and Final.xlsx holds the /eu/ lighting and home-decor leaves. I stayed on /eu/ so the dedup index stays URL-exact and so the Bathroom rows join the existing RoyalDesign records on the same locale. I explicitly checked the exclusion index for the locale blind spot the brief warns about: all 134 royaldesign keys in the index are /eu/ (a set() over the locale segment returns exactly {'eu'}), and there are zero royaldesign.se keys, so no recorded row here is a locale-variant duplicate of an already-extracted URL. TREE SOURCE - the site's own category sitemap, not guessed patterns: https://royaldesign.com/sitemap.xml -> https://royaldesign.com/eu/sitemap.xml -> eu/sitemap_pages_0.xml, 3,442 URLs. I swept all 3,442 for bath, bad, mirror, spegl, toilet, shower, towel, sauna, wc, sink, basin, tap and faucet vocabulary. The complete bathroom surface of the /eu/ storefront is: Home Décor > Bathroom Décor (7 children), Textiles & Rugs > Bathroom Textiles (4 children), Lighting > Wall lights > Bathroom lighting, Home Décor > Mirrors (3 children), and the shop-by-room page /eu/room/bathroom. The 7 children of Bathroom Décor were then CONFIRMED against the site's own rendered subcategory nav on the parent page (document order in the category nav block: Laundry Baskets, Soap dishes, Soap dispensers, Toilet brushes, Toilet roll holders, Toothbrush holders, Towel racks & holders) - exactly the same seven, so the mega-menu is not truncating a branch behind a 'More' link and nothing is hidden. Rows are emitted in that nav order. QTY SOURCE - RoyalDesign is a React storefront: the product grid is hydrated client-side and the visible 'N products' label is NOT in the served HTML (I grepped the pre-hydration body for the literal totals and they are absent), so the rendered-text route does not exist here. The authoritative figure is the storefront's OWN server-side payload that the PLP renders from: window.__INITIAL_STATE__.productsContainer['<path>'].totalProducts, alongside totalPages and the variants array of product ids. No number was taken from JSON-LD numberOfItems, from a nav attribute or from a meta description - the three traps named in the brief - and none was estimated, inferred or reused from a parent. VERIFICATION - EXHAUSTIVE ENUMERATION, not a spot check. For every node whose figure appears anywhere in this file I walked ?page=1..totalPages, concatenated the variants arrays and counted UNIQUE ids. Every single one matched totalProducts exactly, with no paging repeats and no shortfall: soap dispensers 109 = 48+48+13 across 3 pages, 109 unique; toothbrush holders 56 (2 pages) 56 unique; toilet brushes 69 (2) 69; laundry baskets 80 (2) 80; toilet roll holders 32 (1) 32; soap dishes 21 (1) 21; towel racks & holders 18 (1) 18; parent Bathroom Décor 382 (8) 382; room/bathroom 38 (1) 38; handtowels 448 (10) 448; bathroom rugs 76 (2) 76; shower curtains 33 (1) 33; bathrobes 22 (1) 22; bathroom lighting 72 (2) 72; mirrors 271 (6) 271; storage baskets 336 (7) 336; waste bins 171 (4) 171; soaps 35 (1) 35. That is 18 of 18 nodes where the payload total equals the exhaustively enumerated unique-id count, which is the strongest available proof of equivalence and removes any reliance on a single field. DISCRIMINATION - the counts are node-specific, not a site-wide constant: within the seven recorded siblings they run 18, 21, 32, 56, 69, 80, 109, and across the wider set 8 (floor mirrors) to 448 (handtowels). H1 / CANONICAL CHECK - every recorded leaf was verified to carry its own matching h1 and a self-referential rel=canonical equal to the URL written into rows[]: 'Soap dispensers', 'Soap dishes', 'Toothbrush holders', 'Toilet brushes', 'Toilet roll holders', 'Towel racks & holders', 'Laundry Baskets'. No canonical points elsewhere, so there is no canonical-alias dedup blind spot on any recorded row. NO PARENT RECORDED - Bathroom Décor (382) has 7 valid children, so per rule 24 only the children are rows; the parent is the grouping row with blank qty and blank link, and its number sits in review with the containment proof. NO AGGREGATION - the seven leaf totals are each the site's own figure for its own node and are never summed; note in particular that they overlap slightly (soap dispensers/toothbrush holders share 5 ids, soap dishes/toothbrush holders 3, toilet brushes/toilet roll holders 5 - multi-function accessory sets tagged into two nodes), which is exactly why summing would be wrong. CLASSIFICATION CALLS. (a) Laundry Baskets (80) is RECORDED as Bathroom. The site itself makes it a child of Bathroom Décor and it appears nowhere under Storage in the nav; rule 12 and rule 30-33 ('Bathroom > Bathroom Baskets = Bathroom') therefore put it in Bathroom. I did not take this on hierarchy alone - I enumerated the general Storage node /eu/storage/small-storage/baskets (336) and the two sets share only 2 ids, so this is a genuinely distinct bathroom-owned assortment rather than the Storage catalogue reached through a bathroom path. This is the mirror image of the SR 123 H&M Home IT call, where the bathroom laundry node and the Storage laundry node returned the IDENTICAL count and were therefore routed to Storage. (b) Towel racks & holders (18) is Bathroom hardware, not textile - rule 15 splits the rail from the towel. (c) Toilet brushes and toilet roll holders are toilet accessories, rule 14. (d) Soap dispensers and soap dishes are rule 13 / rule 21 Bathroom, while the SOAP itself (/fragrance--body-care/soaps, 35) is a consumable and is not recorded. DEDUP - dedup.already_extracted() was run on all 21 candidate and review URLs. Exactly 3 hits, all three mirror leaves, all in Final.xlsx (Home Decor pass): wall-mirrors 'Wall Mirrors', floor-mirrors 'Floor Mirrors', dressing-table-mirrors 'Dressing Table Mirrors'. They are in review, never in rows. ZERO hits on any of the 7 recorded rows - the earlier RoyalDesign passes took furniture (tables, chairs, sofas, storage furniture, outdoor) and lighting/decor leaves, and touched no /home-dcor/bathroom-dcor/ URL at all. OPTION 1 is not engaged here because RoyalDesign sells no vanity units, bathroom cabinets or medicine cabinets for Furniture.xlsx to have taken. NOT FOUND ON THIS SITE (checked across the full 3,442-URL sitemap, genuinely absent rather than skipped): no sanitaryware, no toilets or bidets, no basins or sinks, no baths or bathtubs, no showers, shower systems or shower heads, no enclosures or screens, no taps or faucets, no bathroom vanity units, no bathroom wall cabinets, no bathroom mirrors of any kind (including LED / illuminated / demister / mirror cabinets), and no rubber or anti-slip bath mat. RoyalDesign is a design-goods retailer, not a bathroom-fitting retailer; its bathroom offer is accessories plus one storage node, with the textiles and the wall lights routed out. RESULT: 1 grouping row + 7 leaf rows; 15 review entries.",
+ "rows": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Decor",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Laundry Baskets",
+   "qty": 80,
+   "link": "https://royaldesign.com/eu/home-dcor/bathroom-dcor/laundry-baskets",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Soap Dishes",
+   "qty": 21,
+   "link": "https://royaldesign.com/eu/home-dcor/bathroom-dcor/soap-dishes",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Soap Dispensers",
+   "qty": 109,
+   "link": "https://royaldesign.com/eu/home-dcor/bathroom-dcor/soap-dispensers",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Toilet Brushes",
+   "qty": 69,
+   "link": "https://royaldesign.com/eu/home-dcor/bathroom-dcor/toilet-brushes",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Toilet Roll Holders",
+   "qty": 32,
+   "link": "https://royaldesign.com/eu/home-dcor/bathroom-dcor/toilet-roll-holders",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Toothbrush Holders",
+   "qty": 56,
+   "link": "https://royaldesign.com/eu/home-dcor/bathroom-dcor/toothbrush-holders",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Towel Racks & Holders",
+   "qty": 18,
+   "link": "https://royaldesign.com/eu/home-dcor/bathroom-dcor/towel-racks--holders",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  }
+ ],
+ "review": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Decor (parent)",
+   "qty": 382,
+   "issue": "EXCLUDED AS PARENT URL (rule 24): h1 'Bathroom Décor', canonical self. It has exactly 7 live children, all recorded above as leaves. PROOF it is a pure roll-up and not an extra assortment: I enumerated its 382 product ids to exhaustion (8 pages x 48) and the union of the 7 children's ids is 372, of which 372/372 are inside the parent set and 0 are outside it; the parent carries only 10 additional ids that no child holds. Its 382 is not recorded and never summed.",
+   "link": "https://royaldesign.com/eu/home-dcor/bathroom-dcor"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom (shop-by-room roll-up)",
+   "qty": 38,
+   "issue": "EXCLUDED AS OVERLAPPING ROLL-UP (rules 24/25/28): RoyalDesign runs a second, room-shaped nav axis at /eu/room/<room>. This page's h1 is 'Bathroom' and it renders a flat 38-product grid with NO children. It is a curated cross-department selection, not a catalogue node: I enumerated all 38 ids and traced where each also lives - 8 in the recorded Bathroom Décor leaves, 5 in Handtowels & Bathtowels, 4 in Waste bins & pedal bins, 3 in Mirrors, 3 in Bathroom rugs, 3 in Soaps, 2 in Shower curtains, 1 in Bathroom lighting, 1 in Storage baskets, 8 unresolved among the remaining departments. Recording it alongside the seven product-axis leaves it overlaps would double count, so it is not a row.",
+   "link": "https://royaldesign.com/eu/room/bathroom"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Textiles (parent)",
+   "qty": 579,
+   "issue": "ROUTED TO TEXTILE + EXCLUDED AS PARENT (rules 20/24): sits under Textiles & Rugs, h1 'Bathroom Textiles'. Four children, all listed below and all textile.",
+   "link": "https://royaldesign.com/eu/textiles--rugs/bathroom-textiles"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Textiles > Handtowels & Bathtowels",
+   "qty": 448,
+   "issue": "ROUTED TO TEXTILE: hand towels and bath towels/sheets (rule 15). Count verified by enumeration to exhaustion - 10 pages, 448 unique ids, equal to the payload's totalProducts.",
+   "link": "https://royaldesign.com/eu/textiles--rugs/bathroom-textiles/handtowels--bathtowels"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Textiles > Bathroom Rugs",
+   "qty": 76,
+   "issue": "ROUTED TO TEXTILE (rule 16): the site itself files this node under Textiles & Rugs > Bathroom Textiles, and website hierarchy decides when a bath mat is ambiguous. RoyalDesign has no separate rubber / anti-slip bath-mat node anywhere in the /eu/ sitemap, so no non-textile bath mat is being skipped. 76 ids enumerated to exhaustion.",
+   "link": "https://royaldesign.com/eu/textiles--rugs/bathroom-textiles/bathroom-rugs"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Textiles > Shower Curtains",
+   "qty": 33,
+   "issue": "ROUTED TO TEXTILE: shower curtains (rule 20). 33 ids enumerated to exhaustion. Note: this is the curtain itself; the site sells no shower rails/rods node that would be Bathroom hardware.",
+   "link": "https://royaldesign.com/eu/textiles--rugs/bathroom-textiles/shower-curtains"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Textiles > Bathrobes & Slippers",
+   "qty": 22,
+   "issue": "ROUTED TO TEXTILE: bathrobes (rule 20). 22 ids enumerated to exhaustion.",
+   "link": "https://royaldesign.com/eu/textiles--rugs/bathroom-textiles/bathrobes--slippers"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Wall Lights > Bathroom Lighting",
+   "qty": 72,
+   "issue": "ROUTED TO LIGHTING (rules 11/19): primary product type is lighting. Inspected and not skipped, per rule 19. It sits under Lighting > Wall lights, h1 'Bathroom lighting'. 72 ids enumerated to exhaustion.",
+   "link": "https://royaldesign.com/eu/lighting/wall-lights/bathroom-lighting"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Mirrors (parent)",
+   "qty": 271,
+   "issue": "ROUTED TO DECOR + EXCLUDED AS PARENT (rules 11/21/24). Inspected in full and NOT skipped, per rule 10. RoyalDesign has no bathroom / vanity / LED / illuminated / demister / mirror-cabinet node anywhere: the whole 3,442-URL /eu/ sitemap contains exactly three mirror leaves, all decorative, and the Bathroom Décor nav has no mirror child at all. All three children are additionally ALREADY EXTRACTED, listed below.",
+   "link": "https://royaldesign.com/eu/home-dcor/mirrors"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Mirrors > Wall Mirrors",
+   "qty": 254,
+   "issue": "ALREADY EXTRACTED IN Final.xlsx (Home Decor pass) as 'Wall Mirrors'. Also decorative rather than bathroom (rules 11/21), so it would be routed out even if it were new.",
+   "link": "https://royaldesign.com/eu/home-dcor/mirrors/wall-mirrors"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Mirrors > Floor Mirrors",
+   "qty": 8,
+   "issue": "ALREADY EXTRACTED IN Final.xlsx (Home Decor pass) as 'Floor Mirrors'. Also decorative rather than bathroom.",
+   "link": "https://royaldesign.com/eu/home-dcor/mirrors/floor-mirrors"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Mirrors > Dressing Table Mirrors",
+   "qty": 10,
+   "issue": "ALREADY EXTRACTED IN Final.xlsx (Home Decor pass) as 'Dressing Table Mirrors'. Dressing-table (vanity-table) mirrors are bedroom furniture accessories here, not bathroom vanity mirrors; routed to Decor in any case.",
+   "link": "https://royaldesign.com/eu/home-dcor/mirrors/dressing-table-mirrors"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Small Storage > Baskets",
+   "qty": 336,
+   "issue": "ROUTED TO STORAGE (rules 12/30-33): the general Storage department's basket node, not a bathroom node. Logged only as the EVIDENCE for the opposite call on Laundry Baskets: I enumerated both to exhaustion and the two sets share only 2 of 80 / 336 ids, so the 80-item Laundry Baskets node under Bathroom Décor is a distinct, bathroom-owned assortment and not the Storage assortment reached through a bathroom path. Contrast SR 123 H&M Home IT, where the two counts were identical and the call went the other way.",
+   "link": "https://royaldesign.com/eu/storage/small-storage/baskets"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Small Storage > Waste Bins & Pedal Bins",
+   "qty": 171,
+   "issue": "NOT RECORDED - general Storage node (rules 12/30-33). Checked because pedal bins are often bathroom-merchandised; it sits under Storage > Small storage with no bathroom qualifier and is not a child of Bathroom Décor. 4 of its ids surface in the curated /eu/room/bathroom page, which is why it is logged rather than silently dropped.",
+   "link": "https://royaldesign.com/eu/storage/small-storage/waste-bins-pedal-bins"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Fragrance & Body Care > Soaps",
+   "qty": 35,
+   "issue": "NOT RECORDED - consumable body-care product (soap bars and liquid soap), not bathroom furniture, fixtures, hardware or accessories. Rule 2: primary product type decides. The soap DISPENSER and soap DISH nodes are recorded as rows; the soap itself is not. Logged because 3 of its ids appear in the curated /eu/room/bathroom page.",
+   "link": "https://royaldesign.com/eu/home-dcor/fragrance--body-care/soaps"
+  }
+ ],
+ "_reconstructed_from": "Bathroom.xlsx delivered 2026-09-01 (checkpoint), not original worker JSON"
+}

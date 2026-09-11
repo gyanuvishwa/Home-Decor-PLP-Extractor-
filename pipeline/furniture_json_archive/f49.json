@@ -1,0 +1,408 @@
+{
+ "sr": 49,
+ "company": "Swoon",
+ "brand_site": "swooneditions.com",
+ "country": "UK",
+ "site_url": "https://www.swooneditions.com/",
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ACCESS: the storefront is a client-side React SPA (empty shell to plain curl and to WebFetch), but the Magento 2 backend behind it exposes an UNAUTHENTICATED GraphQL endpoint at https://www.swooneditions.com/graphql (POST, curl_cffi impersonate=chrome; no proxy, no impersonation sweep, no interstitial work needed), which is the site's own data layer. Route confirmed by notes/49.md from the prior Home-Decor pass. TREE: pulled all 1115 category nodes with categories(pageSize:300,currentPage:N,filters:{}) paged 4x, cross-checked against the rendered mega-menu obtained through r.jina.ai (which renders the SPA nav). The mega-menu's own 'BY TYPE' lists under Storage, Tables, Chairs, Sofas, Footstools and Beds are exactly the leaf set emitted here. COUNTS: this storefront publishes NO rendered 'N products' header anywhere - not in the mega-menu, not on category landing pages, not on the listing grids (checked storage/sideboards and chairs/armchairs rendered through r.jina.ai). Method 1 is therefore unobtainable, so I used methods 2+3 together: products(filter:{category_id:{eq:ID}}).total_count, AND for every one of the 37 leaves I enumerated the category to exhaustion at pageSize 100 following page_info.total_pages and counted unique SKUs. In all 37 the unique-SKU count equalled total_count exactly and also equalled the categories.product_count field, so the Magento product_count that the brief flags as inflated elsewhere survives an exhaustion check on this store. Every leaf was then re-read about 40 minutes later: zero drift on all 37. URL VALIDATION: every emitted URL was resolved through route(url:...) and returns the CategoryTree expected; a control path ('zzz-not-a-real-page') returns null, so the resolver genuinely discriminates rather than always answering. That resolver also exposed stale alias nodes whose stored url_path is not their canonical one - /tables/desks and /study/desks both resolve to cat 675 ('desks'), /sleeping/sofa-beds resolves to cat 668 ('sofas/sofa-beds'), /dining-room/dining-chairs resolves to cat 21 ('chairs/dining-chairs'), /dining-room/dining-tables to cat 159 and /bedroom/beds to cat 666. Those aliases are collapsed rather than emitted twice. ROOM TREE EXCLUDED, WITH PROOF: Swoon has a 'Shop by > BY ROOM' nav (Living room, Bedroom, Dining room, Hallway, Home office, Kitchen, Bathroom, Outdoor). I enumerated every furniture child of it and compared SKU sets against the union of the 37 emitted type leaves (1361 unique SKUs). They are pure room facets - products unique to each, out of its own total: Living Room Chairs 0/99, LR Sofas 0/219, LR Storage 1/357, LR Tables 1/214, Dining Room Storage 0/184, Hallway Storage 1/189, Hallway Tables 0/35, Hallway Chairs 0/24, Bedroom Storage 1/170, Bedroom Tables 0/200, Bedroom Chairs 0/48, Home Office Chairs 0/7, Home Office Storage 0/166, Kitchen 0/118. Each contributes 0 or 1 products not already covered, so emitting them would double-count the same catalogue. /bathrooms resolves to a CMS page, not a category - there is no bathroom furniture. Kitchen (cat 201, 118) is genuinely kitchen furniture by content (url_key scan: 33 shelving, 27 cabinets, 13 stools, 11 trolleys, 9 tables, 1 bench, plus 17 lighting and 2 mirrors mis-tagged in) but is 100% contained in the type leaves, so it is a room re-cut too. OTHER FACETS DROPPED, EACH PROVEN BY SKU-SET COMPARISON RATHER THAN BY NAME: Bespoke sofas (210) is 210/210 inside the seat-count+corner+sofa-bed union; Bespoke chairs (61) is 61/61 inside Armchairs+Occasional chairs+Love seats; Bespoke Footstools (33) sits entirely inside Footstools/Ottomans; the whole 'Bespoke furniture' department (cat 163, 306) duplicates those same nodes. Velvet Sofas (208) is 208/208 inside the sofa union (material facet). Chesterfield sofas (10) is a style cut absent from the mega-menu. 'Patterned Furniture' (16) is a marketing collection and 15 of its 16 are already covered. All level-4 nodes under coffee/side/console/bedside/dining tables, bed frames, corner sofas, TV stands, sideboards, cabinets, chests of drawers, wardrobes, shelving and desks are colour/material/shape/size filter re-cuts (Black/White/Grey/Wooden/Marble/Glass/Round/Small/Large/Tall/Slim/King size/Double/Super king/Upholstered/Metal/Left-Hand/Right-Hand) and are dropped per the filter-page rule, with their parents kept as the leaves. Delivery/availability facets (Speedy sofas/chairs/tables/storage/desks/footstools, In Stock *, Clearance beds) and marketing nodes (New In, Bestsellers, Flash SALE, Clearance, Delivery by Christmas, Almost/Not Perfect, Collections, Editions, the 628-node Range and Swoon Selects range pages, The Essentials, EmilySixty Edit, Made in Britain, Get Some Space, Influencer gifting, the style branches Art deco/Mid-century/Industrial/Classic/Contemporary/Scandi, Gift cards, Swatches and 'Test & Utility cat') are excluded per section 3. NON-FURNITURE EXCLUDED: Lighting and all its children and room cuts, Mirrors, Rugs, Curtains, Bedding and the Accessories nodes - those belong to the Lighting / Wall Decor / textile tasks. Storage boxes (cat 174, /storage/storage-boxes, 3 SKUs: 2 storage boxes + 1 ottoman) excluded as standalone storage goods per the storage-vs-furniture line. Swoon sells no mattresses. COMPLETENESS: I keyword-swept all 1115 category nodes for furniture slugs (sofa|chair|table|desk|bed|stool|bench|cabinet|sideboard|chest|wardrobe|shelv|shelf|bookcase|console|dresser|tv-stand|media|footstool|ottoman|pouffe|seat|storage|furnitur|trolley|armoire|nightstand|vanity|cot|crib|nursery|rack) after stripping the known marketing/filter/delivery branches; the survivors are exactly the nodes accounted for above, so nothing furniture-shaped in the catalogue is unhandled. Swoon has no kids/nursery furniture and no bathroom furniture.",
+ "rows": [
+  {
+   "category": "Furniture",
+   "sub_category": "Sofas",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Corner sofas",
+   "qty": 94,
+   "link": "https://www.swooneditions.com/sofas/corner-sofas",
+   "is_group": false,
+   "evidence": "Magento GraphQL products(filter:{category_id:{eq:\"442\"}}).total_count=94; enumerated to exhaustion at pageSize 100 following page_info.total_pages and got 94/94 unique SKUs; agrees with categories.product_count=94; re-read ~40 min later unchanged. This storefront publishes no rendered 'N products' header anywhere, so the site's own GraphQL data layer is the only count source.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Two-seater sofas",
+   "qty": 64,
+   "link": "https://www.swooneditions.com/sofas/two-seater-sofas",
+   "is_group": false,
+   "evidence": "Magento GraphQL products(filter:{category_id:{eq:\"475\"}}).total_count=64; enumerated to exhaustion at pageSize 100 following page_info.total_pages and got 64/64 unique SKUs; agrees with categories.product_count=64; re-read ~40 min later unchanged. This storefront publishes no rendered 'N products' header anywhere, so the site's own GraphQL data layer is the only count source.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Three-seater sofas",
+   "qty": 83,
+   "link": "https://www.swooneditions.com/sofas/three-seater-sofas",
+   "is_group": false,
+   "evidence": "Magento GraphQL products(filter:{category_id:{eq:\"658\"}}).total_count=83; enumerated to exhaustion at pageSize 100 following page_info.total_pages and got 83/83 unique SKUs; agrees with categories.product_count=83; re-read ~40 min later unchanged. This storefront publishes no rendered 'N products' header anywhere, so the site's own GraphQL data layer is the only count source.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Four-seater sofas",
+   "qty": 29,
+   "link": "https://www.swooneditions.com/sofas/four-seater-sofas",
+   "is_group": false,
+   "evidence": "Magento GraphQL products(filter:{category_id:{eq:\"476\"}}).total_count=29; enumerated to exhaustion at pageSize 100 following page_info.total_pages and got 29/29 unique SKUs; agrees with categories.product_count=29; re-read ~40 min later unchanged. This storefront publishes no rendered 'N products' header anywhere, so the site's own GraphQL data layer is the only count source.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Five-seater sofas",
+   "qty": 15,
+   "link": "https://www.swooneditions.com/sofas/five-seater-sofas",
+   "is_group": false,
+   "evidence": "Magento GraphQL products(filter:{category_id:{eq:\"470\"}}).total_count=15; enumerated to exhaustion at pageSize 100 following page_info.total_pages and got 15/15 unique SKUs; agrees with categories.product_count=15; re-read ~40 min later unchanged. This storefront publishes no rendered 'N products' header anywhere, so the site's own GraphQL data layer is the only count source.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sofa beds",
+   "qty": 8,
+   "link": "https://www.swooneditions.com/sofas/sofa-beds",
+   "is_group": false,
+   "evidence": "Magento GraphQL products(filter:{category_id:{eq:\"668\"}}).total_count=8; enumerated to exhaustion at pageSize 100 following page_info.total_pages and got 8/8 unique SKUs; agrees with categories.product_count=8; re-read ~40 min later unchanged. This storefront publishes no rendered 'N products' header anywhere, so the site's own GraphQL data layer is the only count source.",
+   "flag": "MANUAL REVIEW: the Beds department's /sleeping/sofa-beds (cat 124, product_count 6) resolves via the Magento route resolver to this same category 668, whose canonical url_path is sofas/sofa-beds, so it is emitted once here with the authoritative 8."
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Chairs",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Armchairs",
+   "qty": 59,
+   "link": "https://www.swooneditions.com/chairs/armchairs",
+   "is_group": false,
+   "evidence": "Magento GraphQL products(filter:{category_id:{eq:\"462\"}}).total_count=59; enumerated to exhaustion at pageSize 100 following page_info.total_pages and got 59/59 unique SKUs; agrees with categories.product_count=59; re-read ~40 min later unchanged. This storefront publishes no rendered 'N products' header anywhere, so the site's own GraphQL data layer is the only count source.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dining chairs",
+   "qty": 36,
+   "link": "https://www.swooneditions.com/chairs/dining-chairs",
+   "is_group": false,
+   "evidence": "Magento GraphQL products(filter:{category_id:{eq:\"21\"}}).total_count=36; enumerated to exhaustion at pageSize 100 following page_info.total_pages and got 36/36 unique SKUs; agrees with categories.product_count=36; re-read ~40 min later unchanged. This storefront publishes no rendered 'N products' header anywhere, so the site's own GraphQL data layer is the only count source.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Occasional chairs",
+   "qty": 29,
+   "link": "https://www.swooneditions.com/chairs/occasional-chairs",
+   "is_group": false,
+   "evidence": "Magento GraphQL products(filter:{category_id:{eq:\"110\"}}).total_count=29; enumerated to exhaustion at pageSize 100 following page_info.total_pages and got 29/29 unique SKUs; agrees with categories.product_count=29; re-read ~40 min later unchanged. This storefront publishes no rendered 'N products' header anywhere, so the site's own GraphQL data layer is the only count source.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Love seats",
+   "qty": 25,
+   "link": "https://www.swooneditions.com/chairs/love-seats",
+   "is_group": false,
+   "evidence": "Magento GraphQL products(filter:{category_id:{eq:\"17\"}}).total_count=25; enumerated to exhaustion at pageSize 100 following page_info.total_pages and got 25/25 unique SKUs; agrees with categories.product_count=25; re-read ~40 min later unchanged. This storefront publishes no rendered 'N products' header anywhere, so the site's own GraphQL data layer is the only count source.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Desk chairs",
+   "qty": 28,
+   "link": "https://www.swooneditions.com/chairs/desk-chairs",
+   "is_group": false,
+   "evidence": "Magento GraphQL products(filter:{category_id:{eq:\"770\"}}).total_count=28; enumerated to exhaustion at pageSize 100 following page_info.total_pages and got 28/28 unique SKUs; agrees with categories.product_count=28; re-read ~40 min later unchanged. This storefront publishes no rendered 'N products' header anywhere, so the site's own GraphQL data layer is the only count source.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Benches",
+   "qty": 18,
+   "link": "https://www.swooneditions.com/chairs/benches",
+   "is_group": false,
+   "evidence": "Magento GraphQL products(filter:{category_id:{eq:\"33\"}}).total_count=18; enumerated to exhaustion at pageSize 100 following page_info.total_pages and got 18/18 unique SKUs; agrees with categories.product_count=18; re-read ~40 min later unchanged. This storefront publishes no rendered 'N products' header anywhere, so the site's own GraphQL data layer is the only count source.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Stools",
+   "qty": 15,
+   "link": "https://www.swooneditions.com/chairs/stools",
+   "is_group": false,
+   "evidence": "Magento GraphQL products(filter:{category_id:{eq:\"38\"}}).total_count=15; enumerated to exhaustion at pageSize 100 following page_info.total_pages and got 15/15 unique SKUs; agrees with categories.product_count=15; re-read ~40 min later unchanged. This storefront publishes no rendered 'N products' header anywhere, so the site's own GraphQL data layer is the only count source.",
+   "flag": "MANUAL REVIEW: kept as the leaf rather than its two children - Kitchen stools (7) and Bar stools (3) share 2 SKUs and together cover only 8 of the 15 stools, so they are partial overlapping facets, not a clean split."
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Tables",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Coffee tables",
+   "qty": 86,
+   "link": "https://www.swooneditions.com/tables/coffee-tables",
+   "is_group": false,
+   "evidence": "Magento GraphQL products(filter:{category_id:{eq:\"374\"}}).total_count=86; enumerated to exhaustion at pageSize 100 following page_info.total_pages and got 86/86 unique SKUs; agrees with categories.product_count=86; re-read ~40 min later unchanged. This storefront publishes no rendered 'N products' header anywhere, so the site's own GraphQL data layer is the only count source.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dining tables",
+   "qty": 95,
+   "link": "https://www.swooneditions.com/tables/dining-tables",
+   "is_group": false,
+   "evidence": "Magento GraphQL products(filter:{category_id:{eq:\"159\"}}).total_count=95; enumerated to exhaustion at pageSize 100 following page_info.total_pages and got 95/95 unique SKUs; agrees with categories.product_count=95; re-read ~40 min later unchanged. This storefront publishes no rendered 'N products' header anywhere, so the site's own GraphQL data layer is the only count source.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bedside tables",
+   "qty": 108,
+   "link": "https://www.swooneditions.com/tables/bedside-tables",
+   "is_group": false,
+   "evidence": "Magento GraphQL products(filter:{category_id:{eq:\"670\"}}).total_count=108; enumerated to exhaustion at pageSize 100 following page_info.total_pages and got 108/108 unique SKUs; agrees with categories.product_count=108; re-read ~40 min later unchanged. This storefront publishes no rendered 'N products' header anywhere, so the site's own GraphQL data layer is the only count source.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Console tables",
+   "qty": 34,
+   "link": "https://www.swooneditions.com/tables/console-tables",
+   "is_group": false,
+   "evidence": "Magento GraphQL products(filter:{category_id:{eq:\"471\"}}).total_count=34; enumerated to exhaustion at pageSize 100 following page_info.total_pages and got 34/34 unique SKUs; agrees with categories.product_count=34; re-read ~40 min later unchanged. This storefront publishes no rendered 'N products' header anywhere, so the site's own GraphQL data layer is the only count source.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Side tables",
+   "qty": 101,
+   "link": "https://www.swooneditions.com/tables/side-tables",
+   "is_group": false,
+   "evidence": "Magento GraphQL products(filter:{category_id:{eq:\"477\"}}).total_count=101; enumerated to exhaustion at pageSize 100 following page_info.total_pages and got 101/101 unique SKUs; agrees with categories.product_count=101; re-read ~40 min later unchanged. This storefront publishes no rendered 'N products' header anywhere, so the site's own GraphQL data layer is the only count source.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dressing tables",
+   "qty": 11,
+   "link": "https://www.swooneditions.com/tables/dressing-tables",
+   "is_group": false,
+   "evidence": "Magento GraphQL products(filter:{category_id:{eq:\"143\"}}).total_count=11; enumerated to exhaustion at pageSize 100 following page_info.total_pages and got 11/11 unique SKUs; agrees with categories.product_count=11; re-read ~40 min later unchanged. This storefront publishes no rendered 'N products' header anywhere, so the site's own GraphQL data layer is the only count source.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Nest of tables",
+   "qty": 6,
+   "link": "https://www.swooneditions.com/tables/nest-of-tables",
+   "is_group": false,
+   "evidence": "Magento GraphQL products(filter:{category_id:{eq:\"1432\"}}).total_count=6; enumerated to exhaustion at pageSize 100 following page_info.total_pages and got 6/6 unique SKUs; agrees with categories.product_count=6; re-read ~40 min later unchanged. This storefront publishes no rendered 'N products' header anywhere, so the site's own GraphQL data layer is the only count source.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sofa tables",
+   "qty": 2,
+   "link": "https://www.swooneditions.com/tables/sofa-tables",
+   "is_group": false,
+   "evidence": "Magento GraphQL products(filter:{category_id:{eq:\"1601\"}}).total_count=2; enumerated to exhaustion at pageSize 100 following page_info.total_pages and got 2/2 unique SKUs; agrees with categories.product_count=2; re-read ~40 min later unchanged. This storefront publishes no rendered 'N products' header anywhere, so the site's own GraphQL data layer is the only count source.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Desks",
+   "qty": 61,
+   "link": "https://www.swooneditions.com/desks",
+   "is_group": false,
+   "evidence": "Magento GraphQL products(filter:{category_id:{eq:\"675\"}}).total_count=61; enumerated to exhaustion at pageSize 100 following page_info.total_pages and got 61/61 unique SKUs; agrees with categories.product_count=61; re-read ~40 min later unchanged. This storefront publishes no rendered 'N products' header anywhere, so the site's own GraphQL data layer is the only count source.",
+   "flag": "MANUAL REVIEW: three desk nodes exist - /tables/desks (cat 126, product_count 55) and /study/desks (cat 814, product_count 61) both resolve through the Magento route resolver to this category 675, whose canonical url_path is 'desks'. Emitted once at the canonical URL with 61."
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Storage Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "TV stands",
+   "qty": 83,
+   "link": "https://www.swooneditions.com/storage/tv-stands",
+   "is_group": false,
+   "evidence": "Magento GraphQL products(filter:{category_id:{eq:\"88\"}}).total_count=83; enumerated to exhaustion at pageSize 100 following page_info.total_pages and got 83/83 unique SKUs; agrees with categories.product_count=83; re-read ~40 min later unchanged. This storefront publishes no rendered 'N products' header anywhere, so the site's own GraphQL data layer is the only count source.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sideboards",
+   "qty": 98,
+   "link": "https://www.swooneditions.com/storage/sideboards",
+   "is_group": false,
+   "evidence": "Magento GraphQL products(filter:{category_id:{eq:\"93\"}}).total_count=98; enumerated to exhaustion at pageSize 100 following page_info.total_pages and got 98/98 unique SKUs; agrees with categories.product_count=98; re-read ~40 min later unchanged. This storefront publishes no rendered 'N products' header anywhere, so the site's own GraphQL data layer is the only count source.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Chests of drawers",
+   "qty": 105,
+   "link": "https://www.swooneditions.com/storage/chests-of-drawers",
+   "is_group": false,
+   "evidence": "Magento GraphQL products(filter:{category_id:{eq:\"653\"}}).total_count=105; enumerated to exhaustion at pageSize 100 following page_info.total_pages and got 105/105 unique SKUs; agrees with categories.product_count=105; re-read ~40 min later unchanged. This storefront publishes no rendered 'N products' header anywhere, so the site's own GraphQL data layer is the only count source.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Cabinets",
+   "qty": 44,
+   "link": "https://www.swooneditions.com/storage/cabinets",
+   "is_group": false,
+   "evidence": "Magento GraphQL products(filter:{category_id:{eq:\"204\"}}).total_count=44; enumerated to exhaustion at pageSize 100 following page_info.total_pages and got 44/44 unique SKUs; agrees with categories.product_count=44; re-read ~40 min later unchanged. This storefront publishes no rendered 'N products' header anywhere, so the site's own GraphQL data layer is the only count source.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Drinks cabinets",
+   "qty": 14,
+   "link": "https://www.swooneditions.com/storage/drinks-cabinets",
+   "is_group": false,
+   "evidence": "Magento GraphQL products(filter:{category_id:{eq:\"454\"}}).total_count=14; enumerated to exhaustion at pageSize 100 following page_info.total_pages and got 14/14 unique SKUs; agrees with categories.product_count=14; re-read ~40 min later unchanged. This storefront publishes no rendered 'N products' header anywhere, so the site's own GraphQL data layer is the only count source.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Wardrobes",
+   "qty": 9,
+   "link": "https://www.swooneditions.com/storage/wardrobes",
+   "is_group": false,
+   "evidence": "Magento GraphQL products(filter:{category_id:{eq:\"719\"}}).total_count=9; enumerated to exhaustion at pageSize 100 following page_info.total_pages and got 9/9 unique SKUs; agrees with categories.product_count=9; re-read ~40 min later unchanged. This storefront publishes no rendered 'N products' header anywhere, so the site's own GraphQL data layer is the only count source.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Shelving",
+   "qty": 67,
+   "link": "https://www.swooneditions.com/storage/shelving",
+   "is_group": false,
+   "evidence": "Magento GraphQL products(filter:{category_id:{eq:\"92\"}}).total_count=67; enumerated to exhaustion at pageSize 100 following page_info.total_pages and got 67/67 unique SKUs; agrees with categories.product_count=67; re-read ~40 min later unchanged. This storefront publishes no rendered 'N products' header anywhere, so the site's own GraphQL data layer is the only count source.",
+   "flag": "MANUAL REVIEW: ambiguous shelving - a url_key scan of all 67 SKUs gives 47 freestanding/ladder/wooden/metal shelving units and 4 console-style shelf units (furniture), but also 11 wall-mounted 'floating shelves' plus 9 lighting SKUs and 1 mirror that Swoon has mis-tagged into this category. Kept as furniture on primary product type; the 67 is the site's own total and is not decomposable."
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Shoe racks",
+   "qty": 3,
+   "link": "https://www.swooneditions.com/storage/shoe-racks",
+   "is_group": false,
+   "evidence": "Magento GraphQL products(filter:{category_id:{eq:\"455\"}}).total_count=3; enumerated to exhaustion at pageSize 100 following page_info.total_pages and got 3/3 unique SKUs; agrees with categories.product_count=3; re-read ~40 min later unchanged. This storefront publishes no rendered 'N products' header anywhere, so the site's own GraphQL data layer is the only count source.",
+   "flag": "MANUAL REVIEW: 3 SKUs, all shoe racks / shoe storage units - included as hall storage furniture per the shoe-cabinet rule, but they sit close to the standalone-storage line."
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Drinks trolleys",
+   "qty": 16,
+   "link": "https://www.swooneditions.com/storage/drinks-trolleys",
+   "is_group": false,
+   "evidence": "Magento GraphQL products(filter:{category_id:{eq:\"131\"}}).total_count=16; enumerated to exhaustion at pageSize 100 following page_info.total_pages and got 16/16 unique SKUs; agrees with categories.product_count=16; re-read ~40 min later unchanged. This storefront publishes no rendered 'N products' header anywhere, so the site's own GraphQL data layer is the only count source.",
+   "flag": "MANUAL REVIEW: url_key scan shows 13 of the 16 are drinks/serving trolleys (furniture); 2 mirrors and 1 light are mis-tagged into the category by Swoon. The 16 is the site's own total."
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Footstools",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Footstools",
+   "qty": 41,
+   "link": "https://www.swooneditions.com/footstools/footstools",
+   "is_group": false,
+   "evidence": "Magento GraphQL products(filter:{category_id:{eq:\"621\"}}).total_count=41; enumerated to exhaustion at pageSize 100 following page_info.total_pages and got 41/41 unique SKUs; agrees with categories.product_count=41; re-read ~40 min later unchanged. This storefront publishes no rendered 'N products' header anywhere, so the site's own GraphQL data layer is the only count source.",
+   "flag": "MANUAL REVIEW: Swoon multi-tags footstool SKUs, so this node is a near-superset of its siblings - it contains 31 of the 33 Ottomans and all 14 Pouffes. All four footstool rows are genuine separate nav nodes with their own exact totals, but their products overlap heavily."
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Ottomans",
+   "qty": 33,
+   "link": "https://www.swooneditions.com/footstools/ottomans",
+   "is_group": false,
+   "evidence": "Magento GraphQL products(filter:{category_id:{eq:\"633\"}}).total_count=33; enumerated to exhaustion at pageSize 100 following page_info.total_pages and got 33/33 unique SKUs; agrees with categories.product_count=33; re-read ~40 min later unchanged. This storefront publishes no rendered 'N products' header anywhere, so the site's own GraphQL data layer is the only count source.",
+   "flag": "MANUAL REVIEW: 31 of these 33 SKUs also appear in Footstools (cat 621) - overlapping product-type tagging, not a disjoint split."
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Pouffes",
+   "qty": 14,
+   "link": "https://www.swooneditions.com/footstools/pouffes",
+   "is_group": false,
+   "evidence": "Magento GraphQL products(filter:{category_id:{eq:\"702\"}}).total_count=14; enumerated to exhaustion at pageSize 100 following page_info.total_pages and got 14/14 unique SKUs; agrees with categories.product_count=14; re-read ~40 min later unchanged. This storefront publishes no rendered 'N products' header anywhere, so the site's own GraphQL data layer is the only count source.",
+   "flag": "MANUAL REVIEW: all 14 SKUs also appear in Footstools (cat 621)."
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Benches",
+   "qty": 4,
+   "link": "https://www.swooneditions.com/footstools/benches",
+   "is_group": false,
+   "evidence": "Magento GraphQL products(filter:{category_id:{eq:\"686\"}}).total_count=4; enumerated to exhaustion at pageSize 100 following page_info.total_pages and got 4/4 unique SKUs; agrees with categories.product_count=4; re-read ~40 min later unchanged. This storefront publishes no rendered 'N products' header anywhere, so the site's own GraphQL data layer is the only count source.",
+   "flag": "MANUAL REVIEW: a second 'Benches' node, distinct from Chairs > Benches (cat 33, 18 items); 2 of these 4 SKUs also appear there."
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Beds",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bed frames",
+   "qty": 19,
+   "link": "https://www.swooneditions.com/sleeping/bed-frames",
+   "is_group": false,
+   "evidence": "Magento GraphQL products(filter:{category_id:{eq:\"666\"}}).total_count=19; enumerated to exhaustion at pageSize 100 following page_info.total_pages and got 19/19 unique SKUs; agrees with categories.product_count=19; re-read ~40 min later unchanged. This storefront publishes no rendered 'N products' header anywhere, so the site's own GraphQL data layer is the only count source.",
+   "flag": "MANUAL REVIEW: the Beds department's other nav child 'Ottoman beds' (cat 1377, /sleeping/ottoman-beds) and all three of its size children return total_count 0, so no ottoman-bed row is emitted. 'Bedding' (cat 58) is 0 and is textiles anyway."
+  },
+  {
+   "category": "Outdoor Furniture",
+   "sub_category": "Outdoor Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Outdoor Furniture",
+   "sub_category": "Outdoor Dining Chairs & Tables",
+   "qty": 5,
+   "link": "https://www.swooneditions.com/outdoor-furniture/outdoor-dining-chairs-tables",
+   "is_group": false,
+   "evidence": "Magento GraphQL products(filter:{category_id:{eq:\"1995\"}}).total_count=5; enumerated to exhaustion at pageSize 100 following page_info.total_pages and got 5/5 unique SKUs; agrees with categories.product_count=5; re-read ~40 min later unchanged. This storefront publishes no rendered 'N products' header anywhere, so the site's own GraphQL data layer is the only count source.",
+   "flag": "MANUAL REVIEW: Swoon's entire outdoor range is these same 5 SKUs presented three ways - /outdoor-furniture (cat 1990) has an identical SKU set, /chairs/outdoor-chairs (cat 1989) is identical, and /tables/outdoor-tables (cat 1991) is a 4-SKU subset. Emitted once here to avoid triple-counting."
+  }
+ ]
+}

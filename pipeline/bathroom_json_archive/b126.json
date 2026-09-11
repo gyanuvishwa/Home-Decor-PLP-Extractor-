@@ -1,0 +1,105 @@
+{
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ROBOTS: https://www.anthropologie.com/robots.txt fetched FIRST, before any other request on the host - HTTP 200, 962 bytes, profile chrome131, quoted in full below in substance. It names NO Claude agent: there is no ClaudeBot, Claude-Web, Claude-User, Claude-SearchBot or anthropic-ai group anywhere in the file, so there is no named-agent Disallow and no hard stop. Exactly two groups exist. 'User-agent: *' opens 'Allow: /' and then disallows /orchestration/, /api/, /cgi-bin/, /blog/wp-content/, /homepage, /en-gb/homepage, /fr-fr/homepage, /de-de/homepage, '/*search?', /claims, /order-tracking, /order/, /password/reset, and carries 'Crawl-delay: 10'. The only other group is 'User-agent: Pinterest' with Crawl-delay 120, which is not us. COMPLIANCE: probe.MIN_GAP was raised to 10.0 s for this host for the whole session, so every request honoured the declared Crawl-delay 10 (probe.py's 2 s default would have breached it). '/api/' is disallowed, so NO storefront product API was called at any point - every count below comes from the server-rendered listing HTML instead. No '*search?' URL, no /homepage, no /order or /account path was ever requested. ACCESS: plain direct probe.py curl_cffi fetches (chrome131, chrome120, firefox133, safari17_0, safari17_2_ios, safari18_0, safari18_0_ios) - no proxy, no r.jina.ai, no campaign parameter, no browser automation; zero 403s and no bot wall. UK STOREFRONT IDENTIFICATION - this was the first thing established, because anthropologie.com is a shared host and a prior pass already covered the US storefront. The UK storefront is the /en-gb/ locale path: robots.txt itself advertises a separate 'Sitemap: https://www.anthropologie.com/en-gb/sitemapindex.xml' beside the bare US one, that index yields /en-gb/categories_sitemap.xml (1,093 category URLs, 787 of them non-facet), pages under it render prices in GBP with the 'English (£)' locale switch, and titles end '| Anthropologie UK'. Every URL in rows[] and review[] is an /en-gb/ path except the single US entry that is explicitly labelled out of scope. TREE SOURCE - the site's own 'Shop by Category' strip on each PLP plus its own category sitemap, never a guessed pattern. (a) /en-gb/home ('Homeware | Décor & Accessories', 3876 products) lists the Home & Decor children: New In, Halloween Décor, Bestsellers, BATHROOM TEXTILES, Bedding, Books/Stationery, Candles, Curtains, Cushions & Throws, Furniture, Glassware & Bar, Gourmet Food, Home Décor, Kitchen & Dining, Kids, Lighting, Mugs & Teacups, Mirrors, Rugs, Soft Furnishings, Wall Art. (b) /en-gb/home-decor-all ('Home Décor', 1393) lists Books, Decorative Objects, Doormats, HARDWARE, Mirrors, Paint, Paintings & Prints, Shelves & Storage, Vases, Wallpaper. (c) The Hardware node /en-gb/hardware-knobs-hooks ('Door Handles, Knobs & Hooks', 218) lists Handles & Knobs, Hooks, BATHROOM HARDWARE, Curtain Holdbacks - this third level is where the only recordable Bathroom leaf lives, and the rendered breadcrumb on it reads 'Home & Decor > Home Décor > Hardware > Bathroom Hardware'. (d) /en-gb/furniture-all lists the Furniture children (Armchairs, Bedside & Side Tables, Beds & Headboards, Cabinets & Storage, Chairs & Benches, Coffee Tables, Dining Tables, Garden Furniture, Lighting, Mirrors, Sofas, Stools & Ottomans) - there is NO bathroom vanity category in the UK furniture nav. (e) The 1,093-URL en-gb category sitemap was regex-swept for bath|shower|toilet|soap|basin|sink|tap|faucet|vanity|mirror|towel|wash|dispenser|toothbrush|sanitar|bidet|robe|hamper|apothecary: 20 hits, all triaged - the only real bathroom nodes are bathroom-hardware, bathroom-textiles, shop-by-room-bathroom and shop-by-room-bathroom-1; the rest are beauty bath-body collections, decor-mirrors facets, 'eau de toilette', make-up/wash bags, jean washes and wardrobe edits. HIDDEN NODES THE SITEMAP MISSED, recovered from the site's own body links: /en-gb/bathroom (a 'bathroom decor' link on /en-gb/home) which <link rel=canonical>s to /en-gb/shop-by-room-bathroom, and /en-gb/shop-by-room-bathroom-1. QTY SOURCE: the exact figure printed by the listing page itself, verbatim 'N products', rendered server-side in the HTML - no API (robots forbids /api/), no JSON-LD numberOfItems (a documented trap that caps at 100), no meta-description number, no nav-attribute count. VERIFICATION - every count was reconciled against a direct count of the page's own product tiles, div.o-pwa-product-tile, page by page. Bathroom Hardware: header '138 products'; page 1 renders 72 tiles, page 2 renders 66, page 3 renders 0 - 72+66 = 138 exactly, so the recorded 138 is a full enumeration, not a first-page artifact, and the page size is 72. Bathroom Textiles: header '123 products'; 72 + 51 + 0 = 123 exactly. Storage: header 116, 72 tiles on page 1 (consistent with the 72 page size). US Bath Vanities: header 19, 19 tiles - single page, exact. The two room curations FAILED this reconciliation and were rejected for it (see review): Shop by Room: Bathroom prints 276 but its own grid yields 253 tiles / 217 distinct products over 4 pages with 36 cross-page repeats. DISCRIMINATION: the counts differ node by node across the 16 listings fetched (19, 35, 39, 45, 68, 93, 116, 123, 125, 138, 218, 276, 696, 1393, 3876) - no site-wide constant - and each page's H1 matched the node requested ('Bathroom Hardware', 'Bathroom Textiles', 'Handles & Knobs', 'Hooks', 'Curtain Accessories | Poles & Tiebacks', 'Storage', 'Bathroom Vanities'). CONTENT CHECK ON THE RECORDED LEAF: all 133 distinct product names in Bathroom Hardware were enumerated - towel bars, towel rails, towel rings, towel hooks and racks, bath hooks, toilet roll / toilet paper holders (wall and standing), a bath caddy, a two-tier bathroom shelf and a soap bracket, in brass, mixed metal and bamboo. Rule 17 names towel rails/bars, toilet roll holders, bathroom hooks, bathroom shelves and mounting accessories explicitly, and rule 8/22 confirm metal is no bar. Unambiguously Bathroom. WHY ONLY ONE LEAF: Anthropologie UK is not a bathroom retailer - it has no sanitaryware, no basins, sinks, toilets or bidets, no baths, no showers or shower systems, no enclosures or screens, no taps or mixers, no bathroom mirror category and no bathroom storage category. Its bathroom offer splits three ways and only one third stays in Bathroom: hardware (recorded), textiles (routed to Textile), and vanities/mirrored bathroom cabinets which the site itself files under Furniture > Cabinets & Storage - a node already taken by Furniture.xlsx, so Option 1 keeps them there. DEDUP: dedup.already_extracted() was run on all 15 candidate and review URLs AND on every rel=canonical target returned by the pages, because of the documented canonical-alias blind spot. Results: /en-gb/decor-mirrors HIT (Final.xlsx, 'Mirrors', company 'Anthropologie UK'); /en-gb/furniture-bookcases-storage HIT (Furniture.xlsx, 'Cabinets & Storage'); anthropologie.com/bathroom-vanities HIT (Furniture.xlsx, 'Bath Vanities', company 'Anthropologie Home'); the recorded leaf /en-gb/bathroom-hardware and all remaining UK candidates MISS. The index holds 44 anthropologie.com URLs, 20 on the bare US path and 24 on /en-gb/, confirming both storefronts were touched by earlier passes. THREE INDEX BLIND SPOTS OBSERVED AND FLAGGED, not worked around silently: (1) CANONICAL ALIAS - /bathroom-vanities canonicalises to /anthrohome/collection-bathroom-vanities, which is absent from the index, so that alias would return a false miss on an already-extracted node; (2) LOCALE VARIANT - the index's US /bathroom-vanities does not match any /en-gb/ form, and here the /en-gb/ form is a genuine 404, so the miss is real rather than a blind spot in this one case; (3) TWO NAV PATHS, ONE PAGE - /en-gb/bathroom and /en-gb/shop-by-room-bathroom are the same node under rule 28 and are reported once, under the canonical. DRIFT REPORTED, NOT CORRECTED: Anthropologie Bath Vanities reads 19 products live today (header and 19 rendered tiles agree) against 20 recorded in Furniture.xlsx. Both figures are stated; neither file was edited. RESULT: 1 grouping row + 1 leaf row (138), 11 review entries.",
+ "rows": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Hardware",
+   "qty": 138,
+   "link": "https://www.anthropologie.com/en-gb/bathroom-hardware",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  }
+ ],
+ "review": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Home & Decor > Bathroom Textiles",
+   "qty": 123,
+   "issue": "ROUTED TO TEXTILE (rules 15/16/20). H1 'Bathroom Textiles', a direct child of Home & Decor in the site's own 'Shop by Category' strip on /en-gb/home. All 123 tiles were enumerated across 2 pages (72 + 51 = 123, exactly the header) and the node is cotton towel collections, hand/bath towels, tufted and woven bath mats and cotton shower curtains - i.e. every rule-20 textile class. Not one towel rail, ring, bar or hook is inside it; Anthropologie keeps that hardware in the separate Bathroom Hardware node recorded in rows, so the rule-15 split is clean and nothing is lost.",
+   "link": "https://www.anthropologie.com/en-gb/bathroom-textiles"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shop by Room: Bathroom",
+   "qty": 276,
+   "issue": "EXCLUDED AS AN OVERLAPPING ROOM ROLL-UP, and its count is not trustworthy. H1 'Shop by Room: Bathroom'; it is the room-axis page reached from 'Explore All Rooms', and its own 'Shop by Category' strip lists SIBLING ROOMS (Bedroom, Bathroom, Dining Room, Living Room, Office, Small Spaces, Uni Room), not children - so it is a leaf-shaped roll-up sitting across Bathroom Hardware and Bathroom Textiles rather than above them. Measured overlap: of its 217 distinct products, 26 are inside Bathroom Hardware and 64 inside Bathroom Textiles, so recording it beside them would double-count. COUNT INSTABILITY, measured not assumed: the page prints '276 products' on every page, but walking pages 1-5 rendered 66+67+65+55+0 = 253 tiles containing only 217 distinct products (36 repeats across pages) - the grid is personalised and reshuffles between requests, and 276 appears to be a colourway-level figure. A number that cannot be reproduced by the page's own grid is not a rule-26 exact total, so it is reported here and never recorded. Note also that /en-gb/bathroom redirects here - <link rel=canonical> on that URL is https://www.anthropologie.com/en-gb/shop-by-room-bathroom - so the two nav paths are ONE node under rule 28, not two.",
+   "link": "https://www.anthropologie.com/en-gb/shop-by-room-bathroom"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom (room curation variant)",
+   "qty": 68,
+   "issue": "EXCLUDED AS AN OVERLAPPING ROLL-UP (second, near-duplicate room node). H1 'Bathroom', self-canonical, 68 tiles / 67 distinct products, no child strip at all. It is almost entirely a re-cut of its siblings: 29 of its products are inside Bathroom Hardware, 23 inside Bathroom Textiles and 32 inside Shop by Room: Bathroom - only FOUR are unique to it, and all four are beauty toiletries (Verden hand & body wash, Grown Alchemist body cleanser, two Kitsch hair bars), not bathroom goods. Recorded nowhere, but reported because Anthropologie's own product BreadcrumbList JSON-LD points bathroom ACCESSORY SKUs at this URL (see notes) - it is the site's declared category home for soap dishes, canisters and trays even though its rendered grid does not actually contain most of them.",
+   "link": "https://www.anthropologie.com/en-gb/shop-by-room-bathroom-1"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Furniture > Cabinets & Storage",
+   "qty": 116,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Cabinets & Storage' - OPTION 1, stays in Furniture, not re-extracted into Bathroom. This is the node that matters most on this site: Anthropologie UK's bathroom vanities and mirrored bathroom wall cabinets have NO bathroom-side category of their own, and the site's own product JSON-LD BreadcrumbList puts them here - 'Hale Canvas Single Bathroom Vanity' and 'Colca Arch Mirrored Bathroom Wall Cabinet' both return breadcrumb Furniture > Cabinets & Storage with @id https://www.anthropologie.com/en-gb/furniture-bookcases-storage. Rules 9/10/12 would otherwise class them as Bathroom; the dedup index (exact hit) and the Option-1 decision keep them in Furniture. Live H1 'Storage', '116 products'.",
+   "link": "https://www.anthropologie.com/en-gb/furniture-bookcases-storage"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Home Decor > Mirrors",
+   "qty": null,
+   "issue": "ALREADY EXTRACTED IN Final.xlsx (Home Decor pass) as 'Mirrors' - exact index hit, recorded against this same company 'Anthropologie UK'. Inspected under rule 10 rather than skipped; not re-extracted. It is Anthropologie's general decorative mirror node under Home & Decor > Home Décor > Mirrors, with facet variants ?itemType=Wall+Mirror / Mantle+Mirror / Floor+Mirror in the sitemap that are filters, not nav children, and were not recorded. No qty taken - the node is out of scope for this pass.",
+   "link": "https://www.anthropologie.com/en-gb/decor-mirrors"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Home Decor > Hardware (parent)",
+   "qty": 218,
+   "issue": "EXCLUDED AS PARENT URL (rule 24). H1 'Door Handles, Knobs & Hooks'. It is the parent of the recorded Bathroom Hardware leaf; its own strip lists the four children Handles & Knobs (125), Hooks (45), Bathroom Hardware (138) and Curtain Holdbacks (35). Its 218 is neither recorded nor summed - note 125+45+138+35=343 != 218, which is exactly why sibling counts are never added on this site.",
+   "link": "https://www.anthropologie.com/en-gb/hardware-knobs-hooks"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Home Decor > Hardware > Hooks",
+   "qty": 45,
+   "issue": "NOT BATHROOM (rules 2/29) - opened rather than assumed because rule 17 names bathroom hooks. H1 'Hooks'; it is the general Home Décor hardware hooks node (Brass Rose Hook, Ferm Living Comber Rock Hook, Limoncello Hook, Forestry Hook). It does contain a few bath hooks (Alister Bath Hook, Tibetan Fan Bath Hook) but those exact products are already inside the recorded Bathroom Hardware node, so nothing bathroom is lost by leaving this node out; recording it too would duplicate them.",
+   "link": "https://www.anthropologie.com/en-gb/hardware-hooks"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Home Decor > Hardware > Handles & Knobs",
+   "qty": 125,
+   "issue": "NOT BATHROOM (rule 2): sibling of Bathroom Hardware, inspected and rejected. H1 'Handles & Knobs' - cabinet and door knobs and pulls (Bristol Knobs, Old Havana Knob, Rumi Stoneware Knobs, Elea Kitchen Knob). Furniture/door hardware, not bathroom fittings.",
+   "link": "https://www.anthropologie.com/en-gb/knobs-hooks"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Home Decor > Hardware > Curtain Holdbacks",
+   "qty": 35,
+   "issue": "NOT BATHROOM (rule 2): sibling of Bathroom Hardware, inspected and rejected. H1 'Curtain Accessories | Poles & Tiebacks' - curtain rods, tiebacks and holdbacks. Window hardware, not bathroom.",
+   "link": "https://www.anthropologie.com/en-gb/curtain-hardware"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Beauty > Bath & Body",
+   "qty": 93,
+   "issue": "NOT BATHROOM (rules 2/3): opened because of the word 'Bath'. H1 'Bath & Body Products' - shower foams, bath and shower gels, hand creams, body oils from L'Occitane, Neal's Yard, Sundae. Cosmetics/toiletries under Beauty, not bathroom fixtures, furniture, accessories or hardware. Its sale sibling /en-gb/sale-bath-beauty is the same content and is a sale page besides (rule 25).",
+   "link": "https://www.anthropologie.com/en-gb/bath-body"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "US STOREFRONT NOTE - Bath Vanities (not a UK node)",
+   "qty": 19,
+   "issue": "OUT OF SCOPE FOR SR 126 (US storefront, already covered by a prior pass) AND ALREADY EXTRACTED IN Furniture.xlsx as 'Bath Vanities' under company 'Anthropologie Home'. Checked because the run brief flagged a drift on it. LIVE FIGURE TODAY: the page prints '19 products' and renders exactly 19 product tiles; Furniture.xlsx records 20. Reporting both, correcting neither. TWO DEDUP BLIND SPOTS FOUND HERE AND FLAGGED: (a) canonical alias - this page's <link rel=canonical> is https://www.anthropologie.com/anthrohome/collection-bathroom-vanities, which is NOT in the exclusion index, so a worker arriving via the /anthrohome/ form would get a false dedup MISS on an already-extracted node; (b) locale variant - the UK equivalent path https://www.anthropologie.com/en-gb/bathroom-vanities returns HTTP 404, i.e. it genuinely does not exist, so the UK storefront's vanities live under Furniture > Cabinets & Storage instead (see that entry above). The US Bath tree (Bath Mats, Shower Curtains, Bath Accessories, Towels, Bath Hardware, Bath Vanities, Wall Storage & Hooks, Bath Mirrors, Cleaning Products) has NO en-gb counterpart and was deliberately not extracted here.",
+   "link": "https://www.anthropologie.com/bathroom-vanities"
+  }
+ ],
+ "_reconstructed_from": "Bathroom.xlsx delivered 2026-09-01 (checkpoint), not original worker JSON"
+}

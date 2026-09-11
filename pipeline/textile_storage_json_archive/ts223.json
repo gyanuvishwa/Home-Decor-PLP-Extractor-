@@ -1,0 +1,214 @@
+{
+  "sr": 223,
+  "company": "Ajio",
+  "brand_site": "ajio.com",
+  "country": "India",
+  "site_url": "https://www.ajio.com/",
+  "status": "ok",
+  "failure_reason": "RESOLVED 2026-08-30 (qty backfill pass): originally every rendered page (homepage and every /c/<slug>/c/<code> category page) returned an Akamai 'Access Denied' edge block (403, edgesuite.net reference id) across all four attempted access routes: tier (a) curl_cffi direct HTTP, tier (b) Playwright headless Chromium (also retried non-headless with channel=chrome and --disable-blink-features=AutomationControlled), tier (c) Claude-in-Chrome (the shared real browser session), and the WebFetch tool. On retry via tier (c) Claude-in-Chrome (2026-08-30) the block had cleared - all 13 null-qty textile rows and the 1 null-qty storage row rendered normally and their real 'N Items Found' counts were captured; see each row's evidence field. No page load was blocked on this retry pass.",
+  "notes": "ACCESS: robots.txt (https://www.ajio.com/robots.txt, tier a, HTTP 200) has generic 'User-agent: *' Disallow rules for /my-account,/cart,/checkout,/wishlist,/api,/search etc and lists Sitemap: https://www.ajio.com/cms/sitemap/rilfnl/sitemap.xml.gz; it names no anthropic-ai/ClaudeBot/Claude-* rule, so no tier is pre-blocked by robots.txt. Tier (a) curl_cffi (impersonate=chrome124): robots.txt and every sitemap .xml.gz file returned clean 200s, but the homepage and every category page tested (multiple distinct /c/ URLs) returned an instant Akamai Access Denied 403. Tier (b) Playwright (headless chromium with a real Chrome UA, then retried with channel='chrome' non-headless plus --disable-blink-features=AutomationControlled): identical instant Access Denied title/body on the same URLs, ruling out a curl-fingerprint-only block. Tier (c) Claude-in-Chrome (shared, already-connected real browser tab): same Access Denied Akamai page on both a specific category URL and the bare homepage itself, confirming a full-site edge block rather than JS/automation detection. Also tried the WebFetch tool as an independent network path - also 403. Per the brief's per-tier block-progression rule, work stopped after tier (c) failed (status=partial rather than blocked, because a real category tree was still obtained from static sitemap assets not covered by this edge rule, so this is not the 'fully blocked before any tree was built' case).\n\nTREE: built entirely from AJIO's own category XML sitemap (https://www.ajio.com/cms/sitemap/rilfnl/sitemap.xml.gz -> category/sitemap-0.xml.gz, 758 URLs total site-wide, fetched cleanly via tier a since sitemap files sit outside the Akamai rule that blocks HTML pages). Every URL encodes AJIO's own hierarchical category code (e.g. /home-kitchen-bedsheets/c/831201007: L1 code 8312 = Home & Kitchen root, L2 code 831201 = Furnishings, L3 code 831201007 = Bedsheets), so parent/child structure is read directly from the site's own code prefixes, not inferred or guessed. Scope restricted to the 8312xx (Home & Kitchen) branch per the assignment; grepped the full 758-URL sitemap for curtain/cushion/rug/carpet/quilt/bedsheet/towel/blanket/duvet/dohar/pillow/napkin/placemat/table-cover/table-runner/mattress/bath-mat/bathrobe/fabric/linen/organiser/organizer/storage/tapestry/runner and confirmed no qualifying Textile or Storage node exists anywhere outside the Home & Kitchen (8312) branch (the only other hits were unrelated apparel like 'girls-jackets-shrugs' and an Electronics 'tech-data-storage' node). Could not render/confirm h1 or canonical on any leaf because every page load was blocked (see failure_reason); node existence/naming relies solely on the sitemap slug plus lastmod=2026-08-24 (same day as this extraction, so the freshest available signal of a live node). The 'webcategory' sitemap (16646 URLs) was also checked and found to contain only promotional/curated landing pages (e.g. /c/home-decor-*, /c/home-and-living-*, numeric-ID-suffixed collection URLs like /c/home-4523-28241) - these are merchandising collections, not the stable navigational category tree, and were excluded per the View-All/Collections rule.\n\nQTY: not obtainable for any row - every category page load needed to read a rendered product count was blocked (see failure_reason). All leaf rows carry qty=null and a MANUAL REVIEW flag; no number was estimated, inferred, or copied from a sibling/parent.\n\nEXCLUDED: Home & Kitchen > Kitchen & Dining branch (831202) leaves cutlery, serveware/drinkware, cookware, bakeware, kitchen appliances, kitchen tools, serveware, drinkware, dinnerware, barware, tea/coffee serveware, tableware - all excluded as Kitchen & Dining products (not textile, not storage) per each ruleset's Kitchen & Dining boundary section. Home & Kitchen > Decor & Gifting branch (831203: wall/table decor, showpieces/figurines, festive gifts, gardening/planters, home fragrances, lighting, mirrors, photo frames, vases, table accents) excluded entirely as Decorative Home Accessories/Lighting per both rulesets' boundary sections. Its 'Stationery Organisers' leaf (831203003) was specifically weighed for Storage but excluded: it sits inside the Decor & Gifting group rather than any Storage/Organization group, the site's own hierarchy signal points to decorative desk stationery rather than genuine home storage, and the block prevented product-level verification - left out per storage.md's 'do not force ambiguous products into storage' rather than guessed in. Home & Kitchen > Furniture branch (831205: living-room-study, bed-room, dining, mattresses) excluded entirely as Furniture. Home & Kitchen > Home Needs branch (831206: home-essentials, house-keeping) excluded - both slugs are too generic to confirm a genuine storage/organization product mix without visiting the page (blocked), so left out rather than guessed in ('house-keeping' could plausibly be cleaning tools, which storage.md #30 explicitly excludes, or storage items - unresolvable without a live page). Home & Kitchen > Books (831207) excluded as unrelated merchandise. Home & Kitchen > Kitchen Appliances branch (831209: juicers, mixer grinders, food processors, microwave, air fryers, food makers, rice cookers, electric kettles, egg boilers, coffee makers, cooktops, tools/accessories) excluded as kitchen appliances. Bath & Laundry > Bathroom Accessories (831204003) excluded - a generic name distinct from the sibling Bath Mats/Bath Curtains/Towels leaves, most likely non-textile fixtures/accessories (dispensers, hooks, caddies) and unverifiable due to the block, so excluded rather than guessed in. tech-smart-home (830901004, Electronics branch) and electronics-appliances-home-audio (831314, Electronics branch) excluded as electronics despite containing the word 'home'. All apparel/footwear/beauty/electronics branches and every 'webcategory' promotional/curated collection URL were excluded as out of scope or non-navigational per the View-All/Collections rule.",
+  "textile_rows": [
+    {
+      "category": "Textile",
+      "sub_category": "Home & Kitchen",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Furnishings",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Rugs, Carpets & Dhurries",
+      "qty": 4890,
+      "link": "https://www.ajio.com/home-kitchen-rugs-carpets-dhurries/c/831201001",
+      "is_group": false,
+      "evidence": "rendered header text: '4,890 Items Found' (retried via tier c 2026-08-30, Akamai block resolved)",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Curtains & Accessories",
+      "qty": 11253,
+      "link": "https://www.ajio.com/home-kitchen-curtains-accessories/c/831201002",
+      "is_group": false,
+      "evidence": "rendered header text: '11,253 Items Found' (retried via tier c 2026-08-30, Akamai block resolved)",
+      "flag": "Node name combines Curtains with 'Accessories' (curtain rods/rails/hooks are hardware, not textile per textile.md sec.5) - the live listing is dominated by fabric curtains/shower curtains/mosquito nets with no dedicated hardware-only sub-leaf split visible, but residual classification ambiguity remains for this mixed node.",
+      "confidence": "MEDIUM"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Cushions & Pillows",
+      "qty": 7978,
+      "link": "https://www.ajio.com/home-kitchen-cushions-pillows/c/831201003",
+      "is_group": false,
+      "evidence": "rendered header text: '7,978 Items Found' (retried via tier c 2026-08-30, Akamai block resolved)",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Covers & Protectors",
+      "qty": 21822,
+      "link": "https://www.ajio.com/home-kitchen-covers-protectors/c/831201004",
+      "is_group": false,
+      "evidence": "rendered header text: '21,822 Items Found' (retried via tier c 2026-08-30, Akamai block resolved)",
+      "flag": "Grouped inside the fabric Furnishings branch alongside cushions/curtains/rugs; the live listing confirms fabric sofa covers, mattress protectors, duvet covers, and cushion covers dominate the mix (Textile per textile.md sec.21), consistent with the original classification.",
+      "confidence": "MEDIUM"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Blankets, Dohars & Quilts",
+      "qty": 2915,
+      "link": "https://www.ajio.com/home-kitchen-blankets-dohars-quilts/c/831201005",
+      "is_group": false,
+      "evidence": "rendered header text: '2,915 Items Found' (retried via tier c 2026-08-30, Akamai block resolved)",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Furnishing Fabrics",
+      "qty": 1055,
+      "link": "https://www.ajio.com/home-kitchen-furnishing-fabrics/c/831201006",
+      "is_group": false,
+      "evidence": "rendered header text: '1,055 Items Found' (retried via tier c 2026-08-30, Akamai block resolved)",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Bedsheets",
+      "qty": 17419,
+      "link": "https://www.ajio.com/home-kitchen-bedsheets/c/831201007",
+      "is_group": false,
+      "evidence": "rendered header text: '17,419 Items Found' (retried via tier c 2026-08-30, Akamai block resolved)",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Kitchen & Dining",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Table Covers, Runners & Slipcovers",
+      "qty": 32380,
+      "link": "https://www.ajio.com/home-kitchen-table-covers-runners-slipcovers/c/831202001",
+      "is_group": false,
+      "evidence": "rendered header text: '32,380 Items Found' (retried via tier c 2026-08-30, Akamai block resolved)",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Table Napkins, Coasters & Placemats",
+      "qty": 2659,
+      "link": "https://www.ajio.com/home-kitchen-table-napkins-coasters-placemats/c/831202002",
+      "is_group": false,
+      "evidence": "rendered header text: '2,659 Items Found' (retried via tier c 2026-08-30, Akamai block resolved)",
+      "flag": "Node name mixes textile items (napkins, placemats) with non-textile coasters/trivets (wood/cork) in one leaf with no separate sub-URL to split them; the live listing confirms this mix - a mostly-textile leaf with a nontrivial share of non-textile coaster/trivet products bundled in under the site's own category.",
+      "confidence": "MEDIUM"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Kitchen Linen",
+      "qty": 59743,
+      "link": "https://www.ajio.com/home-kitchen-kitchen-linen/c/831202003",
+      "is_group": false,
+      "evidence": "rendered header text: '59,743 Items Found' (retried via tier c 2026-08-30, Akamai block resolved)",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Bath & Laundry",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Bath Curtains",
+      "qty": 197,
+      "link": "https://www.ajio.com/home-kitchen-bath-curtains/c/831204001",
+      "is_group": false,
+      "evidence": "rendered header text: '197 Items Found' (retried via tier c 2026-08-30, Akamai block resolved)",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Towels & Bath Robes",
+      "qty": 6282,
+      "link": "https://www.ajio.com/home-kitchen-towels-bath-robes/c/831204002",
+      "is_group": false,
+      "evidence": "rendered header text: '6,282 Items Found' (retried via tier c 2026-08-30, Akamai block resolved)",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Bath Mats",
+      "qty": 1899,
+      "link": "https://www.ajio.com/home-kitchen-bath-mats/c/831204004",
+      "is_group": false,
+      "evidence": "rendered header text: '1,899 Items Found' (retried via tier c 2026-08-30, Akamai block resolved)",
+      "flag": null,
+      "confidence": "HIGH"
+    }
+  ],
+  "storage_rows": [
+    {
+      "category": "Storage",
+      "sub_category": "Home & Kitchen",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Kitchen & Dining",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Kitchen Organisers",
+      "qty": 8117,
+      "link": "https://www.ajio.com/home-kitchen-kitchen-organisers/c/831202010",
+      "is_group": false,
+      "evidence": "rendered header text: '8,117 Items Found' (retried via tier c 2026-08-30, Akamai block resolved)",
+      "flag": null,
+      "confidence": "HIGH"
+    }
+  ]
+}

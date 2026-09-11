@@ -1,0 +1,84 @@
+{
+  "sr": 110,
+  "company": "Butlers",
+  "brand_site": "butlers.com",
+  "country": "Germany",
+  "site_url": "https://www.butlers.com/",
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "Reached entirely through the Claude-in-Chrome connector in my own tab (tabId 1961714704); no HTTP/proxy route used. robots.txt read via same-origin fetch from the loaded page: standard Shopify robots, single 'User-agent: *' block, no Claude/Anthropic/ClaudeBot directive and no full-site disallow. Site is a Shopify storefront (butlers.com, de/EUR). Category tree taken from the rendered header mega-menu (details/summary structure): departments are GARTEN, DEKO & WOHNEN, TISCH & KUECHE, INSPIRATION. Furniture lives in exactly three places: GARTEN > Outdoormoebel (with children Balkonmoebel, Gartenmoebel & Lounges, Gartentische, Gartenstuehle), DEKO & WOHNEN > Bad & Wellness > Badmoebel, and DEKO & WOHNEN > Wohnaccessoires > Moebel. To make sure nothing was hidden from the nav I enumerated all 164 collection handles via same-origin fetch of /collections.json (limit=250, paged) and title-scanned them for furniture terms (moebel, tisch, stuhl, bank, regal, schrank, sofa, bett, hocker, kommode). That surfaced one extra furniture collection not present in the mega-menu: 'beistelltische' (Side Tables) - it renders a real category page (h1 'Beistelltische', breadcrumb 'Startseite > Beistelltische', i.e. the site treats it as top-level, not as a child of Moebel), so it is emitted as its own leaf rather than nested. QTY METHOD: primary source is the rendered listing header '<N> Produkte' on each collection page, read from the page HTML fetched same-origin from the loaded storefront context; cross-validated for every row against full enumeration of unique product IDs from /collections/<handle>/products.json?limit=250 paged to exhaustion. Header and exhaustion agreed exactly on all 7 non-empty rows (moebel 16=16, beistelltische 4=4, badmoebel 3=3, outdoormobel 3=3, balkonmobel 2=2, gartenmoebel-und-lounges 3=3, gartentische 2=2). Per the prior Home-Decor pass the Shopify collections.json 'products_count' field is inflated on this store, so it was deliberately NOT used. SANITY CHECKS: counts vary per category (not a site-wide constant); two independent reads of every count taken minutes apart returned identical numbers (no drift); page <title>/h1 matched the intended category on every page (no silent parent fallback). HIERARCHY: Outdoormoebel has four extractable nav children so it is emitted as a grouping row and its own 3-product listing is not recorded as a leaf (its 3 products are identical to Gartenmoebel & Lounges). Moebel has no children on the site (no sub-category links on its page, and Beistelltische does not breadcrumb under it), so it is a leaf. EXCLUDED and why: Sonnenschirme & Schirmstaender (parasols/umbrella stands - shade accessories, not furniture; also currently 0 products); Koerbe (storage baskets - standalone storage goods per the storage-vs-furniture line); Bad-Accessoires and Duschvorhaenge (bathroom fixtures/accessories and shower curtains); Wohnaccessoires parent (mixed roll-up department, its only furniture child is Moebel which is captured); Garten parent (11 mixed items - dried flowers, plant sprayer, picnic basket - not furniture); 'outdoor-dining' collection (checked its 21 product titles: glassware, plates, vases, picnic basket, placemats, lantern, cutting boards - a seasonal marketing collection, not furniture, excluded under the marketing-collection rule); all seasonal/style collections (cozy-vibes, iconic-seventies, glacier-glow, cloud-dancer, garden-bbq, spring-picnic, cocktail-party, brunch-breakfast-club, peanuts, halloween, silvester, weihnachts-*, neu, bestseller, sale, geschenkideen and its price tiers); all tax_* and manual_* internal collections; all lighting, textiles, tableware, glassware, kitchen, fragrance and decor branches. NOTE on Moebel contents (16 items, title-checked): 4 wine racks (Weinregal), 3-4 side tables (Beistelltisch), 5 chairs (Stuhl), 1 serving trolley (Servierwagen), 1 stool (Hocker), 1 room divider (Paravent) and 1 window mirror (FINESTRA Fensterspiegel) - overwhelmingly furniture, so the node is included whole; the single mirror is the site's own filing and is not separable from the count. Beistelltische overlaps Moebel: 3 of its 4 products also appear in Moebel (the 4th, PIECES Beistelltisch Travertin-Look, does not) - flagged. Butlers is primarily a decor/tableware retailer; its furniture line is genuinely small and the outdoor sub-lines are near-empty in August (end of season), which is why the numbers are low - these are the site's own exact figures, not a partial read.",
+  "rows": [
+    {
+      "category": "Furniture",
+      "sub_category": "Furniture",
+      "qty": 16,
+      "link": "https://www.butlers.com/collections/moebel",
+      "is_group": false,
+      "evidence": "rendered listing header '16 Produkte' on https://www.butlers.com/collections/moebel (h1 'Moebel'); confirmed by exhaustion of /collections/moebel/products.json?limit=250 = 16 unique product IDs; second read minutes later also 16",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Side Tables",
+      "qty": 4,
+      "link": "https://www.butlers.com/collections/beistelltische",
+      "is_group": false,
+      "evidence": "rendered listing header '4 Produkte' on https://www.butlers.com/collections/beistelltische (h1 'Beistelltische'); confirmed by exhaustion of /collections/beistelltische/products.json?limit=250 = 4 unique product IDs",
+      "flag": "MANUAL REVIEW: SEO/landing collection not present in the mega-menu; breadcrumb is 'Startseite > Beistelltische' so the site files it top-level, but 3 of its 4 products also appear in the Moebel (Furniture) row - partial overlap with that count"
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Bathroom Furniture",
+      "qty": 3,
+      "link": "https://www.butlers.com/collections/badmoebel",
+      "is_group": false,
+      "evidence": "rendered listing header '3 Produkte' on https://www.butlers.com/collections/badmoebel; confirmed by exhaustion of /collections/badmoebel/products.json?limit=250 = 3 unique product IDs (2x WHITE SANDS Waschbeckenunterschrank vanity units, BIG BAMBOO Regal mit Waeschekorb shelf unit)",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Outdoor Furniture",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Balcony Furniture",
+      "qty": 2,
+      "link": "https://www.butlers.com/collections/balkonmobel",
+      "is_group": false,
+      "evidence": "rendered listing header '2 Produkte' on https://www.butlers.com/collections/balkonmobel; confirmed by exhaustion of /collections/balkonmobel/products.json?limit=250 = 2 unique product IDs",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Garden Furniture & Lounges",
+      "qty": 3,
+      "link": "https://www.butlers.com/collections/gartenmoebel-und-lounges",
+      "is_group": false,
+      "evidence": "rendered listing header '3 Produkte' on https://www.butlers.com/collections/gartenmoebel-und-lounges; confirmed by exhaustion of /collections/gartenmoebel-und-lounges/products.json?limit=250 = 3 unique product IDs",
+      "flag": "MANUAL REVIEW: its 3 products are identical to the parent Outdoormoebel listing (also 3), i.e. this child currently mirrors the whole outdoor furniture range"
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Garden Tables",
+      "qty": 2,
+      "link": "https://www.butlers.com/collections/gartentische",
+      "is_group": false,
+      "evidence": "rendered listing header '2 Produkte' on https://www.butlers.com/collections/gartentische; confirmed by exhaustion of /collections/gartentische/products.json?limit=250 = 2 unique product IDs",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Garden Chairs",
+      "qty": 0,
+      "link": "https://www.butlers.com/collections/gartenstuhle",
+      "is_group": false,
+      "evidence": "collection page https://www.butlers.com/collections/gartenstuhle (h1 'Gartenstuehle') renders no count header and states 'Diese Kategorie enthaelt derzeit keine Produkte' ('this category currently contains no products'); /collections/gartenstuhle/products.json?limit=250 returns 0 products",
+      "flag": "MANUAL REVIEW: live nav category with 0 products at time of extraction (end of outdoor season) - real category, empty stock"
+    }
+  ]
+}

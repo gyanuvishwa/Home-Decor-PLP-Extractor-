@@ -1,0 +1,183 @@
+{
+  "sr": 214,
+  "company": "Terrain",
+  "brand_site": "shopterrain.com",
+  "country": "USA",
+  "site_url": "https://www.shopterrain.com/",
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "ACCESS: Tier (a) direct HTTP (curl_cffi impersonate=chrome) worked for most of the pass - robots.txt (User-agent: * Allow: /, no ClaudeBot/anthropic-ai disallow) and categories_sitemap.xml (273 category URLs) fetched cleanly, plus full HTML+embedded urbnInitialPiniaState JSON for kitchen-linens, throws-pillows, storage-utility, doormats, decor-baskets. After ~10 rapid HTTP requests (site's own robots.txt lists Crawl-delay: 10, which was exceeded) the host started returning 403 on every path; a tier-(b) Playwright load of /wall-decor then hit a live DataDome CAPTCHA iframe (geo.captcha-delivery.com) confirming a real bot-detection wall, not a one-off fluke - stopped hitting HTTP/Playwright for that host per STEP1 rule4/tier escalation and moved to tier (c) Claude-in-Chrome (real extension-backed Chrome session) for the small number of remaining lookups (wall-decor Wall Storage check, throws-pillows/outdoor-living Throw Blankets facet, storage-utility itemType product-name spot checks); Chrome tier loaded pages normally (no CAPTCHA), so tier (c) supplied the rest without any blocked node. TREE METHOD: union of categories_sitemap.xml (273 URLs) + top-level mega-nav (superNav.navItems.shopping-root inside the pinia state: New/Halloween/Kitchen+Tabletop/Decor/Outdoor Living/Furniture/Planters+Garden Utility/Candles/Gifts/Sale) + each candidate category page's own Item Type / Product Type facet strip (site is a URBN-family PWA storefront - same corporate family as SR7 Anthropologie US / SR126 Anthropologie UK - exposing an embedded JSON state with exact facet refinement counts). Terrain is overwhelmingly a garden/plant/furniture/gift/holiday-decor brand; textile and storage surface area is small. QTY METHOD: category.totalRecordCount and category.facets[*].refinements[].count read directly from the page's embedded urbnInitialPiniaState JSON blob (a script tag, not an API call) - spot-verified 3 of these facet counts by loading the exact filtered URL directly (throws-pillows?itemType=Throw+Pillows -> 6, kitchen-linens?itemType=Tablecloth -> 29, kitchen-linens?itemType=Aprons -> 6, throws-pillows?attributionProductType=Throw+Blankets -> 14) and all matched the parent page's facet count exactly, confirming facet count == exact page total for that filter, not an estimate. INCLUDED (Textile): Kitchen + Table Linens (h1-confirmed, 182 total) itemType leaves Aprons/Dish Towels/Hand Towel/Napkin/Oven Mitt/Placemat/Runner/Tablecloth - all genuine linen/cotton kitchen-and-table textiles per textile.md SS7-8 (verified product names for Aprons and Tablecloth by direct page load - all linen/cotton). Throws + Pillows (h1-confirmed, 30 total) itemType leaves Bench Cushion/Chair Cushion/Floor Pillows/Lumbar Pillow/Throw Pillows plus its attributionProductType=Throw Blankets leaf (14, product names verified: wool/alpaca/linen-cotton throws) per textile.md SS3-4/12. Doormats + Rugs (h1-confirmed, 25 total, no itemType/attributionProductType facet on this page - already the deepest node) recorded as a single leaf on its own base URL per textile.md S25 (no subcategories exist). EXCLUDED and why: kitchen-linens itemType Napkin Rings(3)/Garden Apparel(1)/Crafts(1)/Outdoor Games(1) - not textile (rings=hardware/decor, apparel/crafts/games=out of scope). outdoor-living?attributionProductType=Throw Blankets (11 products, h1 'Outdoor Throw Blankets') - same underlying TBCo/alpaca/wool throw-blanket SKUs already counted under the Throws+Pillows attributionProductType=Throw Blankets leaf (14), just reached via a second nav path with a re-scoped count; treated as a duplicate view per rule 30 and NOT added as a second row to avoid double counting the same physical products. storage-utility ('Outdoor Storage + Organization', breadcrumb literally reads 'Furniture > Storage + Utility', 13 total) - spot-checked itemType Garden Storage(7)/Cabinet(2)/Bar Storage(1) product names via Chrome: every single item is a Teak Work Station, Plant Stand, Outdoor Teak Trolley, Console Table, or Palladio Reclaimed Teak Buffet Table (one 'Conservatory Teak Storage Cabinet' aside) - i.e. genuine site-classified Furniture, not standalone storage containers/organizers; excluded from Storage entirely per storage.md S21/27 (site's own Furniture breadcrumb + primary-function test both point to Furniture, out of this task's scope) rather than force a mislabeled 'Garden Storage'/'Bar Storage' tag into Storage. decor-baskets ('Baskets + Trays' under Decor, 39 total) - itemType Baskets(5) product names are Woven Seagrass Harvest Basket / Hanging Vine Sphere / leather baskets sold as decor pieces (no storage marketing), Jewelry Box(6) are novelty 'Divining Box'/keepsake decor boxes, Garden Storage(1) turned out to be a decorative Brass Boot Tray (not a container) - whole category is Decorative Home Accessories merchandising, not a Storage/Organization section; excluded entirely (Storage Box(2)/Storage Caddy(1) sub-buckets also mixed decorative items in with the same tag and were not force-split). wall-decor?attributionProductType=Wall+Storage (present in categories_sitemap.xml) resolves to the site's 'not found' page (base /wall-decor slug does not exist as a live category) - stale sitemap entry, no such node exists on the live site; excluded, not fabricated. kitchen-pantry is actually 'Gourmet Food + Drink' (candy/cocktail-mixer/jam/honey products) - food, not kitchen/pantry storage; excluded. No genuine Storage & Organization section (boxes, bins, baskets marketed as storage, organizers, shelving) was found anywhere on the site after checking every storage/organization/basket/utility-named node in the category sitemap - storage_rows is therefore empty, which is a correct answer for this heavily garden/furniture/gift-oriented brand, not a missed search.",
+  "textile_rows": [
+    {
+      "category": "Textile",
+      "sub_category": "Kitchen + Table Linens",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Aprons",
+      "qty": 6,
+      "link": "https://www.shopterrain.com/kitchen-linens?itemType=Aprons",
+      "is_group": false,
+      "evidence": "Item Type facet count on kitchen-linens page (category.facets[itemType].refinements[value=Aprons].count=6); confirmed by direct load of the filtered URL -> '6 products', all linen/cotton kitchen aprons",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Dish Towels",
+      "qty": 69,
+      "link": "https://www.shopterrain.com/kitchen-linens?itemType=Dish+Towels",
+      "is_group": false,
+      "evidence": "Item Type facet count on kitchen-linens page (category.facets[itemType].refinements[value=Dish Towels].count=69)",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Hand Towel",
+      "qty": 1,
+      "link": "https://www.shopterrain.com/kitchen-linens?itemType=Hand+Towel",
+      "is_group": false,
+      "evidence": "Item Type facet count on kitchen-linens page (category.facets[itemType].refinements[value=Hand Towel].count=1)",
+      "flag": null,
+      "confidence": "MEDIUM"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Napkin",
+      "qty": 29,
+      "link": "https://www.shopterrain.com/kitchen-linens?itemType=Napkin",
+      "is_group": false,
+      "evidence": "Item Type facet count on kitchen-linens page (category.facets[itemType].refinements[value=Napkin].count=29)",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Oven Mitt",
+      "qty": 2,
+      "link": "https://www.shopterrain.com/kitchen-linens?itemType=Oven+Mitt",
+      "is_group": false,
+      "evidence": "Item Type facet count on kitchen-linens page (category.facets[itemType].refinements[value=Oven Mitt].count=2)",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Placemat",
+      "qty": 23,
+      "link": "https://www.shopterrain.com/kitchen-linens?itemType=Placemat",
+      "is_group": false,
+      "evidence": "Item Type facet count on kitchen-linens page (category.facets[itemType].refinements[value=Placemat].count=23)",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Runner",
+      "qty": 19,
+      "link": "https://www.shopterrain.com/kitchen-linens?itemType=Runner",
+      "is_group": false,
+      "evidence": "Item Type facet count on kitchen-linens page (category.facets[itemType].refinements[value=Runner].count=19)",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Tablecloth",
+      "qty": 29,
+      "link": "https://www.shopterrain.com/kitchen-linens?itemType=Tablecloth",
+      "is_group": false,
+      "evidence": "Item Type facet count on kitchen-linens page (category.facets[itemType].refinements[value=Tablecloth].count=29); confirmed by direct load of the filtered URL -> h1 'Kitchen Tablecloths', '29 products', all linen/cotton tablecloths",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Throws + Pillows",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Bench Cushion",
+      "qty": 3,
+      "link": "https://www.shopterrain.com/throws-pillows?itemType=Bench+Cushion",
+      "is_group": false,
+      "evidence": "Item Type facet count on throws-pillows page (category.facets[itemType].refinements[value=Bench Cushion].count=3)",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Chair Cushion",
+      "qty": 5,
+      "link": "https://www.shopterrain.com/throws-pillows?itemType=Chair+Cushion",
+      "is_group": false,
+      "evidence": "Item Type facet count on throws-pillows page (category.facets[itemType].refinements[value=Chair Cushion].count=5)",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Floor Pillows",
+      "qty": 3,
+      "link": "https://www.shopterrain.com/throws-pillows?itemType=Floor+Pillows",
+      "is_group": false,
+      "evidence": "Item Type facet count on throws-pillows page (category.facets[itemType].refinements[value=Floor Pillows].count=3)",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Lumbar Pillow",
+      "qty": 4,
+      "link": "https://www.shopterrain.com/throws-pillows?itemType=Lumbar+Pillow",
+      "is_group": false,
+      "evidence": "Item Type facet count on throws-pillows page (category.facets[itemType].refinements[value=Lumbar Pillow].count=4)",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Throw Pillows",
+      "qty": 6,
+      "link": "https://www.shopterrain.com/throws-pillows?itemType=Throw+Pillows",
+      "is_group": false,
+      "evidence": "Item Type facet count on throws-pillows page (category.facets[itemType].refinements[value=Throw Pillows].count=6); confirmed by direct load of the filtered URL -> '6 products'",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Throw Blankets",
+      "qty": 14,
+      "link": "https://www.shopterrain.com/throws-pillows?attributionProductType=Throw+Blankets",
+      "is_group": false,
+      "evidence": "Product Type (attributionProductType) facet count on throws-pillows page, confirmed by direct load of the filtered URL -> h1 'Throws + Pillows', '14 products', all wool/alpaca/linen-cotton throw blankets (TBCo, Sunset Check Merino Wool, Waffle Linen + Cotton, Autumn Plaid Alpaca, etc.)",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Doormats + Rugs",
+      "qty": 25,
+      "link": "https://www.shopterrain.com/doormats",
+      "is_group": false,
+      "evidence": "Rendered result-count text '25 products' on the doormats category page (h1 'Doormats + Rugs'); page has no itemType/attributionProductType facet, so this is already the deepest valid node",
+      "flag": null,
+      "confidence": "HIGH"
+    }
+  ],
+  "storage_rows": []
+}

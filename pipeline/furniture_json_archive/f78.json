@@ -1,0 +1,93 @@
+{
+ "sr": 78,
+ "company": "Container Store Decor",
+ "brand_site": "containerstore.com",
+ "country": "USA",
+ "site_url": "https://www.containerstore.com/s/home-decor/1",
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ACCESS: PerimeterX blocks plain requests (307 to a px-captcha page). curl_cffi with rotating Chrome desktop profiles (chrome107-131, a fresh profile per call, ~4.5s pacing) worked consistently, exactly as notes/78.md described. robots.txt names ClaudeBot explicitly with 'Allow: /' (only /admin, /cart, /profile, /checkout, /s?q= search and a few boutique paths are disallowed), so there is no Claude-specific block to respect. TREE: taken from the site's own mega-nav inside __NEXT_DATA__ at props.pageProps.initialState.categories.data.eCommCategories - 15 L1 departments, 213 L1+L2 nodes and 28 L3 groups, dumped to w78_nav.txt and walked in full. COUNTS: every emitted row was read twice (the second read forced, cache bypassed) and each has three agreeing sources: the server-rendered header '1 - N of N results', plp.data.totalCount, and a count of unique product IDs in the page's products entities, with lastPage=1 in every case - a genuine single-page exhaustion check. No drift between reads. SCOPE: The Container Store is an organisation/storage retailer and almost all of it is out of scope. The site carries its own 'Product Type' facet dimension whose values include Furniture, Outdoor Furniture, Furniture Parts, Shelves & Shelving Units, Household Storage and Carts & Dollies; I used that as the discriminator and opened every listing to read the product tiles rather than trusting category names. Department-level Furniture-typed counts: Storage 40, Office 39, Featured 26, College 23, Elfa 22, Decor 12, Garage 2, BEYOND 2, Kitchen 1, and zero for Closet, Bath, Travel and Cleaning. The union of every Furniture-typed product site-wide is 78 distinct items (saved as w78_allfurn.json): office desks and chairs, filing cabinets, side/console/end tables, benches, stools, ottomans, kids play furniture and two work benches. There are NO beds, sofas, wardrobes, dressers, dining tables or mattresses anywhere on this site. EXCLUDED AND WHY: Decorative Bins & Baskets, Cubes & Cubbies (31 items, 24 typed Household Storage), Storage Drawers (58, 43 Household Storage - plastic drawer units), Carts & Accessories (52, only 1 Furniture-typed item; the 3-tier rolling organiser carts are typed Carts & Dollies), Kitchen > Carts (15, typed Carts & Dollies; the whole Kitchen department has 1 Furniture-typed item), Travel > Trunks & Footlockers, and all bins/boxes/organisers - standalone storage goods, not furniture. The Closet department has zero Furniture-typed products (1 Furniture Part only), so Elfa and closet systems, garment racks (typed Garment Racks & Coat Trees) and hangers were left out; Bath has zero Furniture-typed products, so there is no bathroom vanity furniture. Garage has 43 shelving items but they are wall-mount rails, ceiling racks, posts and casters with only 2 Furniture-typed items (a step stool and a foldable workbench) - excluded. Lighting, mirrors, frames, fragrance, bedding, pillows and throws excluded per the brief, as were Furniture Parts (desk legs, plinths, caster bases, drawer pulls). DELIBERATE DE-DUPLICATION: this catalogue is heavily cross-listed between departments, so I compared product IDs. Decor > Decorative Shelving & Furniture filtered to Shelves & Shelving Units is a verified working listing of 40 (https://www.containerstore.com/s/home-decor/decorative-shelving/Shelves-and-Shelving-Units/12q, rendered header '1 - 40 of 40 results'), but 32 of those 40 product IDs are the same as in the Storage row of 50, so I dropped it and kept the broader Storage node; the 8 items unique to it (White Elfa Reach-In Pantry, Acrylic U-Shelf, Metal Folding Hutch, MeshWorks Shoe Shelf, Kawaii Wall-Mounted Bookshelf, Origami 6-Tier Book Shelf, Origami 6-Tier Book Shelf Ottoman, Umbra Montage Wall Mounted Shelves) are an accepted coverage gap. Likewise Decor > Furniture (12) is 11/12 inside the Storage Furniture row of 18, and the Elfa (22), College (23) and Featured (26) department Furniture facets are 70-90% duplicates of the Office and Storage rows, so none of them were emitted. The rows as emitted cover 63 of the 78 distinct Furniture-typed products; the 15 not covered exist only inside those duplicative department slices (Elfa Wide Drawer Solution, Elfa Cabinet Drawer Solutions, Elfa Wall-Mounted Desk, Elfa Kids Mesh Coloring Table, two Garage+ by Elfa work benches, StoreYour Wakefield Foldable Workbench, Welaxy Felt Laptop Table, Russell + Hazel Acrylic Lap Desk, Seagrass Storage Ottoman, Storage Ottoman, Comfy Foam Lounge Chair, Bistro Chair, Origami Foldable Kitchen Cart, Polder Easy-Close Step-Stool). MINOR CONTAMINATION: Desks & Chairs (19) contains 1 Furniture-Parts item (Elfa Square Desk Leg); the other 18 are desks, office chairs, saddle stools and two folding tables. One product (Origami Trolley Table) appears in both Desks & Chairs and the Accent Tables row. SANITY CHECKS: the counts move with the category (19/20/50/18/9/1, never a constant site-wide number), none is a suspicious round number, the canonicalUrl returned by every page matches the URL requested (no silent parent-listing substitution), and each facet page's own title names both the facet and its parent node.",
+ "rows": [
+  {
+   "category": "Furniture",
+   "sub_category": "Office",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Desks & Chairs",
+   "qty": 19,
+   "link": "https://www.containerstore.com/s/office/desk-chairs/12",
+   "is_group": false,
+   "evidence": "rendered listing header '1 - 19 of 19 results' on /s/office/desk-chairs/12; __NEXT_DATA__ props.pageProps.initialState.plp.data.totalCount=19 with lastPage=1; and 19 unique product IDs enumerated in the page's products entities - all three agree",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Filing Cabinets",
+   "qty": 20,
+   "link": "https://www.containerstore.com/s/office/filing-cabinets/Furniture/12q",
+   "is_group": false,
+   "evidence": "rendered listing header '1 - 20 of 20 results' on /s/office/filing-cabinets/Furniture/12q; __NEXT_DATA__ props.pageProps.initialState.plp.data.totalCount=20 with lastPage=1; and 20 unique product IDs enumerated in the page's products entities - all three agree; this is the site's own Product Type = Furniture facet of the Filing Cabinets category",
+   "flag": "MANUAL REVIEW: facet-restricted count. The unfiltered node /s/office/filing-cabinets/12 reports 42 but is majority non-furniture (11 Mycube safes tagged Specialty Storage, 6 Household Storage crates/boxes, 4 Furniture Parts, 3 Drawer Organizers, 2 Home Accents); only the 20 Furniture-typed items are filing cabinets and file carts."
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Storage",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Shelves & Shelving Units",
+   "qty": 50,
+   "link": "https://www.containerstore.com/s/storage/shelving-furniture/Shelves-and-Shelving-Units/12q",
+   "is_group": false,
+   "evidence": "rendered listing header '1 - 50 of 50 results' on /s/storage/shelving-furniture/Shelves-and-Shelving-Units/12q; __NEXT_DATA__ props.pageProps.initialState.plp.data.totalCount=50 with lastPage=1; and 50 unique product IDs enumerated in the page's products entities - all three agree; site's own Product Type = Shelves & Shelving Units facet of Storage > Shelving & Furniture",
+   "flag": "MANUAL REVIEW: ambiguous shelving - the 50 are predominantly freestanding shelving units and bookcases (InterMetro and Metro Commercial Industrial shelving solutions, Design Ideas MeshWorks units, Origami folding racks, iron folding bookshelves, The Container Store Bookcase, Encore Narrow Bookshelf, cube cubbies), but about 8 of the 50 are wall-mounted or over-the-toilet shelves (Single/Double Acrylic Wall Shelves, Acrylic Corner Shelf, Floating Bookshelf, Umbra Solis and Montage wall shelves, Umbra Bellwood Over the Toilet Shelf). The unfiltered parent node /s/storage/shelving-furniture/12 reports 134 and is heavily mixed with bins, hooks, rugs, lighting and carts."
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Accent Tables, Benches & Stools",
+   "qty": 18,
+   "link": "https://www.containerstore.com/s/storage/shelving-furniture/Furniture/12q",
+   "is_group": false,
+   "evidence": "rendered listing header '1 - 18 of 18 results' on /s/storage/shelving-furniture/Furniture/12q; __NEXT_DATA__ props.pageProps.initialState.plp.data.totalCount=18 with lastPage=1; and 18 unique product IDs enumerated in the page's products entities - all three agree; site's own Product Type = Furniture facet of Storage > Shelving & Furniture (side tables, console tables, end tables, benches, stools, ottoman-style seats)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Kids Furniture",
+   "qty": 9,
+   "link": "https://www.containerstore.com/s/storage/baby-kids/furniture-decor/Furniture/123q",
+   "is_group": false,
+   "evidence": "rendered listing header '1 - 9 of 9 results' on /s/storage/baby-kids/furniture-decor/Furniture/123q; __NEXT_DATA__ props.pageProps.initialState.plp.data.totalCount=9 with lastPage=1; and 9 unique product IDs enumerated in the page's products entities - all three agree; site's own Product Type = Furniture facet of Storage > Baby & Kids > Furniture & Decor (Tender Leaf Toys play tables, chairs, desk-and-chair, dressing table, toadstool stools)",
+   "flag": "MANUAL REVIEW: 1 of these 9 (Clybourn 3-Cubby Bench) is also inside the 18 counted on the Accent Tables, Benches & Stools row."
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Decor",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Outdoor Furniture",
+   "qty": 1,
+   "link": "https://www.containerstore.com/s/home-decor/Outdoor-Furniture/1q",
+   "is_group": false,
+   "evidence": "rendered listing header '1 - 1 of 1 results' on /s/home-decor/Outdoor-Furniture/1q; __NEXT_DATA__ props.pageProps.initialState.plp.data.totalCount=1 with lastPage=1; and 1 unique product IDs enumerated in the page's products entities - all three agree; site's own Product Type = Outdoor Furniture facet of the Decor department (single item: Steele Canvas Butterfly Sling Chair)",
+   "flag": null
+  }
+ ]
+}

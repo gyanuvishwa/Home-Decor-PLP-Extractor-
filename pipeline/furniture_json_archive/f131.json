@@ -1,0 +1,2028 @@
+{
+ "sr": 131,
+ "company": "OTTO Home",
+ "brand_site": "otto.de",
+ "country": "Germany",
+ "site_url": "https://www.otto.de/",
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ACCESS: Claude-in-Chrome only. One dedicated tab on www.otto.de; the whole extraction ran as same-origin fetch() calls issued from a loaded otto.de page via javascript_tool, paced 450-600ms. ~730 requests in total, every one HTTP 200 - no 403, DataDome, Akamai, CAPTCHA or rate limit at any point. robots.txt re-read: no Claude/anthropic-ai/ClaudeBot group; the generic User-agent:* group disallows only /gate/, /onex/, /cdn-cgi/ and one hashed path, none of which are category pages.\n\nSCOPE: otto.de is a general marketplace. Only the furniture departments were taken: /moebel/ (Moebel) and /garten/gartenmoebel/ (Gartenmoebel, emitted under category 'Outdoor Furniture'). Everything else (fashion, electronics, appliances, /dekoration/, /heimtextilien/, /lampen/, /baumarkt/) was left alone.\n\nTREE: union of three sources, per the mandatory cross-check. (1) the category sitemap https://www.otto.de/category-sitemap/sitemap_moebel.xml.gz (gzip decompressed in-page with DecompressionStream) -> 335 clean category paths, plus sitemap_garten.xml.gz -> 25 paths under /garten/gartenmoebel/. (2) a BFS closure over every page's own local-navigation widget (li.nav_local-link > .nav_link-title + .nav_link-count[data-count] + a[href]), which lists that node's direct children (or, on a leaf page, its sibling group). 299 nodes were fetched this way, 0 errors. (3) the /moebel/ department page. The sitemap alone was NOT enough - it is missing /moebel/badmoebel/badmoebel-sets/ and /garten/gartenmoebel/balkonmoebel/, both of which only the nav widget exposes.\n\nQTY - the important finding. OTTO's rendered listing header (.reptile-item-count__item-count, 'N Produkte') is PADDED and must not be used as-is: for any category with fewer than roughly 500 products OTTO tops the result set up with similar products and reports the padded number. Proven directly on /moebel/garderoben/wandgarderoben/garderobenhaken/hutablagen/ - h1 'Hutablagen', the site's own nav count is 7, the header reads '500 Produkte', and the page's embedded JSON carries rankedCount 3436 / displayCount 3437, with the 'Warum zeigen wir dir diese Produkte?' expansion hint. Same pattern on Badhocker (247 -> 500), Poufs (399 -> 500), Sitzwuerfel (62 -> 500), Feuerwehrbetten (23 -> 476), Kufenstuehle (20 -> 311). So qty is taken from OTTO's own per-category nav data-count, which is generated from the same live search index. It was validated against the rendered header on all 194 counted leaves: above ~600 products the two agree to within 6% everywhere (Polsterhocker 1033 = 1033, Sofas 75476 vs 75479, Fusshocker 679 vs 676, Barhocker 7160 vs 7213, Bettgestelle 80925 vs 80985), and the only nine disagreements are all sub-500 nodes where the header is the padded number. Counts drift by a fraction of a percent between reads within the session (live inventory).\n\nLEAF VERIFICATION (bad-slug trap): all 202 candidate leaf URLs were re-fetched and checked for HTTP 200 plus rel=canonical identity. All 202 returned 200. Eight of them turned out to be filter/search re-cuts whose canonical is a query URL, and were dropped: Stauraumbetten (-> /moebel/betten/?s=mit-stauraum), Klappbetten (?s=klappbar), Fernsehsessel (?zubehoerfuer=fernseher), Klappstuehle (?s=klappbar), Klapptische (?s=klappbar), Laptoptische (?zubehoerfuer=laptops), Garderobenschraenke (?raum=garderobe-flur), Klapphochstuehle (?s=klappbar). One survivor, /moebel/kommoden-sideboards/kommoden/, canonicalises to its own parent but serves a genuinely different, smaller listing - kept and flagged.\n\nFACET DEPARTMENTS THAT MIRROR THE MAIN TAXONOMY (the trap flagged in the assignment) - all dropped: /moebel/badmoebel/ is not a department, it redirects to /moebel/?raum=badezimmer and its 'children' are ?raum=badezimmer cuts of Schraenke/Tische/Regale/Sofas/etc; /garten/gartenmoebel/balkonmoebel/ canonicalises to /moebel/?raum=balkon; /garten/gartenmoebel/loungemoebel/ redirects to /moebel/?s=lounge and its Lounge-Sets (51779) is essentially the same population as Gartenmoebel-Sets (51860); /moebel/regale/regalwuerfel/ canonicalises to /moebel/regale/?s=wuerfel; /moebel/kindermoebel/ and /moebel/babyzimmer/ are room roll-ups whose children are ?altersgruppe= facets. Inside /garten/gartenmoebel/ the nav entries Gartensessel, Gartenliegen, Gartenbaenke, Gartensofas, Gartenhocker are likewise ?raum=garten cuts of the indoor tree and were dropped; only the real path children were kept. Bathroom furniture is still represented - Badmoebel-Sets is a real node, and the actual bathroom furniture types (Spiegelschraenke, Waschbeckenunterschraenke, Hoch-/Midi-/Unter-/Haengeschraenke, Badhocker) sit under Schraenke/Hocker and are emitted there.\n\nOTHER EXCLUSIONS: /moebel/zubehoer/ (74 nodes of furniture parts - legs, castors, handles, fittings, shelf inserts, bed slats), /moebel/messlatten/ (height charts), /moebel/halterungen/ (TV/wall mounts), /moebel/premium-moebel/ (price/brand re-cut), /moebel/inspiration/. /moebel/truhen/ was dropped because its rel=canonical is /dekoration/aufbewahrung/truhen/ - it belongs to the Decoration > Storage department, not furniture. Material/style re-cuts dropped per the rules: Rattanstuehle, Chesterfield-Sofas, Chesterfield-Sessel, Stoffschraenke, Baumkantentische, Mosaiktische, Ledersofas. Textiles and covers dropped: Gartenmoebel-Auflagen and its 3 children, Gartenmoebel-Schutzhuellen and its 6 children, Babybettausstattung, Outdoor-Kissen. Standalone storage dropped: Auflagenboxen (cushion boxes), Spielzeugkisten. Hardware dropped: the whole Wandgarderoben hooks-and-rails branch (Garderobenhaken, Kleiderhaken, Tuerhaken, Klapphaken, Hutablagen, Garderobenleisten, Garderobenstangen) - only Garderobenpaneele was kept, flagged as ambiguous. Luftbetten (air mattresses) dropped as bedding. Accessory sub-nodes under Hochstuehle (Sitzverkleinerer, Zubehoer, Auflagen) dropped.\n\nGROUP vs LEAF: applied the numerical test. Where a node's children genuinely partition it (children sum >= ~60% of the parent and are distinct product types) the parent is a grouping row. Where the children are overlapping form/shape re-cuts covering only a fraction, the PARENT is kept as the leaf and the slivers are dropped - this is why Kommoden (44% covered), Nachttische (6.5%), Kleiderschraenke (35%), Sitzbaenke (24%), Couchtische (0.1%), Esstische (6%), Buecherregale (<1%), Wandregale (29%), TV-Boards (<1%) and XXL-Sofas (10%) are leaves rather than grouping rows. Each of those carries a flag stating the coverage.",
+ "rows": [
+  {
+   "category": "Furniture",
+   "sub_category": "Beds",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Co-Sleeper Beds",
+   "qty": 164,
+   "link": "https://www.otto.de/moebel/betten/beistellbetten/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"164\"; the node's own rendered header is NOT usable here - OTTO pads categories below ~500 products with similar items up to a 500 floor (proven on Hutablagen: data-count 7 vs header 500)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bed Frames",
+   "qty": 80925,
+   "link": "https://www.otto.de/moebel/betten/bettgestelle/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"80925\"; corroborated by the node's own rendered listing header (.reptile-item-count__item-count data-item-count, \"N Produkte\") within live-inventory drift (<6%)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Boxspring Beds",
+   "qty": 14841,
+   "link": "https://www.otto.de/moebel/betten/boxspringbetten/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"14841\"; corroborated by the node's own rendered listing header (.reptile-item-count__item-count data-item-count, \"N Produkte\") within live-inventory drift (<6%)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Single Beds",
+   "qty": 5353,
+   "link": "https://www.otto.de/moebel/betten/einzelbetten/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"5353\"; corroborated by the node's own rendered listing header (.reptile-item-count__item-count data-item-count, \"N Produkte\") within live-inventory drift (<6%)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bunk Beds",
+   "qty": 2394,
+   "link": "https://www.otto.de/moebel/betten/etagenbetten/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"2394\"; corroborated by the node's own rendered listing header (.reptile-item-count__item-count data-item-count, \"N Produkte\") within live-inventory drift (<6%)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Camp Beds",
+   "qty": 154,
+   "link": "https://www.otto.de/moebel/betten/feldbetten/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"154\"; the node's own rendered header is NOT usable here - OTTO pads categories below ~500 products with similar items up to a 500 floor (proven on Hutablagen: data-count 7 vs header 500)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Functional Beds",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Cabin Beds",
+   "qty": 174,
+   "link": "https://www.otto.de/moebel/betten/funktionsbetten/kojenbetten/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"174\"; the node's own rendered header is NOT usable here - OTTO pads categories below ~500 products with similar items up to a 500 floor (proven on Hutablagen: data-count 7 vs header 500)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Wall Beds",
+   "qty": 332,
+   "link": "https://www.otto.de/moebel/betten/funktionsbetten/schrankbetten/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"332\"; the node's own rendered header is NOT usable here - OTTO pads categories below ~500 products with similar items up to a 500 floor (proven on Hutablagen: data-count 7 vs header 500)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Senior Beds",
+   "qty": 1023,
+   "link": "https://www.otto.de/moebel/betten/funktionsbetten/seniorenbetten/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"1023\"; corroborated by the node's own rendered listing header (.reptile-item-count__item-count data-item-count, \"N Produkte\") within live-inventory drift (<6%)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Stackable Beds",
+   "qty": 31,
+   "link": "https://www.otto.de/moebel/betten/funktionsbetten/stapelbetten/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"31\"; the node's own rendered header is NOT usable here - OTTO pads categories below ~500 products with similar items up to a 500 floor (proven on Hutablagen: data-count 7 vs header 500)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Futon Beds",
+   "qty": 121,
+   "link": "https://www.otto.de/moebel/betten/futonbetten/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"121\"; the node's own rendered header is NOT usable here - OTTO pads categories below ~500 products with similar items up to a 500 floor (proven on Hutablagen: data-count 7 vs header 500)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Guest Beds",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Upholstered Loungers",
+   "qty": 27,
+   "link": "https://www.otto.de/moebel/betten/gaestebetten/polsterliegen/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"27\"; the node's own rendered header is NOT usable here - OTTO pads categories below ~500 products with similar items up to a 500 floor (proven on Hutablagen: data-count 7 vs header 500)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Daybeds",
+   "qty": 947,
+   "link": "https://www.otto.de/moebel/betten/gaestebetten/tagesbetten/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"947\"; corroborated by the node's own rendered listing header (.reptile-item-count__item-count data-item-count, \"N Produkte\") within live-inventory drift (<6%)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Cot Beds",
+   "qty": 497,
+   "link": "https://www.otto.de/moebel/betten/gitterbetten/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"497\"; the node's own rendered header is NOT usable here - OTTO pads categories below ~500 products with similar items up to a 500 floor (proven on Hutablagen: data-count 7 vs header 500)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Four-Poster Beds",
+   "qty": 76,
+   "link": "https://www.otto.de/moebel/betten/himmelbetten/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"76\"; the node's own rendered header is NOT usable here - OTTO pads categories below ~500 products with similar items up to a 500 floor (proven on Hutablagen: data-count 7 vs header 500)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Loft Beds",
+   "qty": 2295,
+   "link": "https://www.otto.de/moebel/betten/hochbetten/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"2295\"; corroborated by the node's own rendered listing header (.reptile-item-count__item-count data-item-count, \"N Produkte\") within live-inventory drift (<6%)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Complete Baby Beds",
+   "qty": 62,
+   "link": "https://www.otto.de/moebel/betten/komplett-babybetten/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"62\"; the node's own rendered header is NOT usable here - OTTO pads categories below ~500 products with similar items up to a 500 floor (proven on Hutablagen: data-count 7 vs header 500)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Pallet Beds",
+   "qty": 330,
+   "link": "https://www.otto.de/moebel/betten/palettenbetten/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"330\"; the node's own rendered header is NOT usable here - OTTO pads categories below ~500 products with similar items up to a 500 floor (proven on Hutablagen: data-count 7 vs header 500)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Upholstered Beds",
+   "qty": 10577,
+   "link": "https://www.otto.de/moebel/betten/polsterbetten/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"10577\"; corroborated by the node's own rendered listing header (.reptile-item-count__item-count data-item-count, \"N Produkte\") within live-inventory drift (<6%)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Travel Cots",
+   "qty": 183,
+   "link": "https://www.otto.de/moebel/betten/reisebetten/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"183\"; the node's own rendered header is NOT usable here - OTTO pads categories below ~500 products with similar items up to a 500 floor (proven on Hutablagen: data-count 7 vs header 500)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Round Beds",
+   "qty": 152,
+   "link": "https://www.otto.de/moebel/betten/rundbetten/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"152\"; the node's own rendered header is NOT usable here - OTTO pads categories below ~500 products with similar items up to a 500 floor (proven on Hutablagen: data-count 7 vs header 500)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Play Beds",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Adventure Beds",
+   "qty": 343,
+   "link": "https://www.otto.de/moebel/betten/spielbetten/abenteuerbetten/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"343\"; the node's own rendered header is NOT usable here - OTTO pads categories below ~500 products with similar items up to a 500 floor (proven on Hutablagen: data-count 7 vs header 500)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Car Beds",
+   "qty": 244,
+   "link": "https://www.otto.de/moebel/betten/spielbetten/autobetten/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"244\"; the node's own rendered header is NOT usable here - OTTO pads categories below ~500 products with similar items up to a 500 floor (proven on Hutablagen: data-count 7 vs header 500)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Fire Engine Beds",
+   "qty": 23,
+   "link": "https://www.otto.de/moebel/betten/spielbetten/feuerwehrbetten/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"23\"; the node's own rendered header is NOT usable here - OTTO pads categories below ~500 products with similar items up to a 500 floor (proven on Hutablagen: data-count 7 vs header 500)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Princess Beds",
+   "qty": 24,
+   "link": "https://www.otto.de/moebel/betten/spielbetten/prinzessin-betten/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"24\"; the node's own rendered header is NOT usable here - OTTO pads categories below ~500 products with similar items up to a 500 floor (proven on Hutablagen: data-count 7 vs header 500)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sofas",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sofa Suites",
+   "qty": 14640,
+   "link": "https://www.otto.de/moebel/sofas/couchgarnituren/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"14640\"; corroborated by the node's own rendered listing header (.reptile-item-count__item-count data-item-count, \"N Produkte\") within live-inventory drift (<6%)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Corner Sofas",
+   "qty": 10178,
+   "link": "https://www.otto.de/moebel/sofas/ecksofas/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"10178\"; corroborated by the node's own rendered listing header (.reptile-item-count__item-count data-item-count, \"N Produkte\") within live-inventory drift (<6%)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Single Sofas",
+   "qty": 7438,
+   "link": "https://www.otto.de/moebel/sofas/einzelsofas/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"7438\"; corroborated by the node's own rendered listing header (.reptile-item-count__item-count data-item-count, \"N Produkte\") within live-inventory drift (<6%)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Inflatable Sofas",
+   "qty": 24,
+   "link": "https://www.otto.de/moebel/sofas/luftsofas/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"24\"; the node's own rendered header is NOT usable here - OTTO pads categories below ~500 products with similar items up to a 500 floor (proven on Hutablagen: data-count 7 vs header 500)",
+   "flag": "MANUAL REVIEW: inflatable air sofas - seating, but not conventional furniture"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Recamiers",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Chaise Longues",
+   "qty": 370,
+   "link": "https://www.otto.de/moebel/sofas/recamieren/chaiselongues/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"370\"; the node's own rendered header is NOT usable here - OTTO pads categories below ~500 products with similar items up to a 500 floor (proven on Hutablagen: data-count 7 vs header 500)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Long Chairs",
+   "qty": 82,
+   "link": "https://www.otto.de/moebel/sofas/recamieren/longchairs/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"82\"; the node's own rendered header is NOT usable here - OTTO pads categories below ~500 products with similar items up to a 500 floor (proven on Hutablagen: data-count 7 vs header 500)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Ottomans",
+   "qty": 54,
+   "link": "https://www.otto.de/moebel/sofas/recamieren/ottomanen/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"54\"; the node's own rendered header is NOT usable here - OTTO pads categories below ~500 products with similar items up to a 500 floor (proven on Hutablagen: data-count 7 vs header 500)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Modular Sofa Elements",
+   "qty": 4383,
+   "link": "https://www.otto.de/moebel/sofas/sofaelemente/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"4383\"; corroborated by the node's own rendered listing header (.reptile-item-count__item-count data-item-count, \"N Produkte\") within live-inventory drift (<6%)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sectional Sofa Landscapes",
+   "qty": 3871,
+   "link": "https://www.otto.de/moebel/sofas/wohnlandschaften/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"3871\"; corroborated by the node's own rendered listing header (.reptile-item-count__item-count data-item-count, \"N Produkte\") within live-inventory drift (<6%)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "XXL Sofas",
+   "qty": 4718,
+   "link": "https://www.otto.de/moebel/sofas/xxl-sofas/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"4718\"; corroborated by the node's own rendered listing header (.reptile-item-count__item-count data-item-count, \"N Produkte\") within live-inventory drift (<6%)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Armchairs",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Cocktail Armchairs",
+   "qty": 146,
+   "link": "https://www.otto.de/moebel/sessel/cocktailsessel/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"146\"; the node's own rendered header is NOT usable here - OTTO pads categories below ~500 products with similar items up to a 500 floor (proven on Hutablagen: data-count 7 vs header 500)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Single Armchairs",
+   "qty": 10313,
+   "link": "https://www.otto.de/moebel/sessel/einzelsessel/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"10313\"; corroborated by the node's own rendered listing header (.reptile-item-count__item-count data-item-count, \"N Produkte\") within live-inventory drift (<6%)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Recliner Armchairs",
+   "qty": 1101,
+   "link": "https://www.otto.de/moebel/sessel/funktionssessel/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"1101\"; corroborated by the node's own rendered listing header (.reptile-item-count__item-count data-item-count, \"N Produkte\") within live-inventory drift (<6%)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Hanging Chairs",
+   "qty": 567,
+   "link": "https://www.otto.de/moebel/sessel/haengesessel/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"567\"; the node's own rendered header is NOT usable here - OTTO pads categories below ~500 products with similar items up to a 500 floor (proven on Hutablagen: data-count 7 vs header 500)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Massage Chairs",
+   "qty": 1824,
+   "link": "https://www.otto.de/moebel/sessel/massagesessel/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"1824\"; corroborated by the node's own rendered listing header (.reptile-item-count__item-count data-item-count, \"N Produkte\") within live-inventory drift (<6%)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Wing Chairs",
+   "qty": 1051,
+   "link": "https://www.otto.de/moebel/sessel/ohrensessel/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"1051\"; corroborated by the node's own rendered listing header (.reptile-item-count__item-count data-item-count, \"N Produkte\") within live-inventory drift (<6%)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Rocking Armchairs",
+   "qty": 145,
+   "link": "https://www.otto.de/moebel/sessel/schaukelsessel/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"145\"; the node's own rendered header is NOT usable here - OTTO pads categories below ~500 products with similar items up to a 500 floor (proven on Hutablagen: data-count 7 vs header 500)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bean Bags",
+   "qty": 710,
+   "link": "https://www.otto.de/moebel/sessel/sitzsaecke/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"710\"; corroborated by the node's own rendered listing header (.reptile-item-count__item-count data-item-count, \"N Produkte\") within live-inventory drift (<6%)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "XXL Armchairs",
+   "qty": 68,
+   "link": "https://www.otto.de/moebel/sessel/xxl-sessel/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"68\"; the node's own rendered header is NOT usable here - OTTO pads categories below ~500 products with similar items up to a 500 floor (proven on Hutablagen: data-count 7 vs header 500)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Chairs",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Four-Leg Chairs",
+   "qty": 269,
+   "link": "https://www.otto.de/moebel/stuehle/4-fuss-stuehle/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"269\"; the node's own rendered header is NOT usable here - OTTO pads categories below ~500 products with similar items up to a 500 floor (proven on Hutablagen: data-count 7 vs header 500)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bistro Chairs",
+   "qty": 337,
+   "link": "https://www.otto.de/moebel/stuehle/bistrostuehle/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"337\"; the node's own rendered header is NOT usable here - OTTO pads categories below ~500 products with similar items up to a 500 floor (proven on Hutablagen: data-count 7 vs header 500)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Office Chairs",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Visitor Chairs",
+   "qty": 1257,
+   "link": "https://www.otto.de/moebel/stuehle/buerostuehle/besucherstuehle/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"1257\"; corroborated by the node's own rendered listing header (.reptile-item-count__item-count data-item-count, \"N Produkte\") within live-inventory drift (<6%)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Executive Chairs",
+   "qty": 504,
+   "link": "https://www.otto.de/moebel/stuehle/buerostuehle/chefsessel/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"504\"; the node's own rendered header is NOT usable here - OTTO pads categories below ~500 products with similar items up to a 500 floor (proven on Hutablagen: data-count 7 vs header 500)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Swivel Chairs",
+   "qty": 6647,
+   "link": "https://www.otto.de/moebel/stuehle/buerostuehle/drehstuehle/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"6647\"; corroborated by the node's own rendered listing header (.reptile-item-count__item-count data-item-count, \"N Produkte\") within live-inventory drift (<6%)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Cantilever Chairs",
+   "qty": 435,
+   "link": "https://www.otto.de/moebel/stuehle/freischwinger/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"435\"; the node's own rendered header is NOT usable here - OTTO pads categories below ~500 products with similar items up to a 500 floor (proven on Hutablagen: data-count 7 vs header 500)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sled-Base Chairs",
+   "qty": 20,
+   "link": "https://www.otto.de/moebel/stuehle/kufenstuehle/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"20\"; the node's own rendered header is NOT usable here - OTTO pads categories below ~500 products with similar items up to a 500 floor (proven on Hutablagen: data-count 7 vs header 500)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Upholstered Chairs",
+   "qty": 2077,
+   "link": "https://www.otto.de/moebel/stuehle/polsterstuehle/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"2077\"; corroborated by the node's own rendered listing header (.reptile-item-count__item-count data-item-count, \"N Produkte\") within live-inventory drift (<6%)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Director Chairs",
+   "qty": 13,
+   "link": "https://www.otto.de/moebel/stuehle/regiestuehle/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"13\"; the node's own rendered header is NOT usable here - OTTO pads categories below ~500 products with similar items up to a 500 floor (proven on Hutablagen: data-count 7 vs header 500)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Shell Chairs",
+   "qty": 83,
+   "link": "https://www.otto.de/moebel/stuehle/schalenstuehle/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"83\"; the node's own rendered header is NOT usable here - OTTO pads categories below ~500 products with similar items up to a 500 floor (proven on Hutablagen: data-count 7 vs header 500)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Rocking Chairs",
+   "qty": 802,
+   "link": "https://www.otto.de/moebel/stuehle/schaukelstuehle/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"802\"; corroborated by the node's own rendered listing header (.reptile-item-count__item-count data-item-count, \"N Produkte\") within live-inventory drift (<6%)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Stacking Chairs",
+   "qty": 174,
+   "link": "https://www.otto.de/moebel/stuehle/stapelstuehle/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"174\"; the node's own rendered header is NOT usable here - OTTO pads categories below ~500 products with similar items up to a 500 floor (proven on Hutablagen: data-count 7 vs header 500)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sit-Stand Perch Stools",
+   "qty": 260,
+   "link": "https://www.otto.de/moebel/stuehle/stehhilfen/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"260\"; the node's own rendered header is NOT usable here - OTTO pads categories below ~500 products with similar items up to a 500 floor (proven on Hutablagen: data-count 7 vs header 500)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Stools",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bathroom Stools",
+   "qty": 247,
+   "link": "https://www.otto.de/moebel/hocker/badhocker/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"247\"; the node's own rendered header is NOT usable here - OTTO pads categories below ~500 products with similar items up to a 500 floor (proven on Hutablagen: data-count 7 vs header 500)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bar Stools",
+   "qty": 7160,
+   "link": "https://www.otto.de/moebel/hocker/barhocker/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"7160\"; corroborated by the node's own rendered listing header (.reptile-item-count__item-count data-item-count, \"N Produkte\") within live-inventory drift (<6%)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Swivel Stools",
+   "qty": 406,
+   "link": "https://www.otto.de/moebel/hocker/drehhocker/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"406\"; the node's own rendered header is NOT usable here - OTTO pads categories below ~500 products with similar items up to a 500 floor (proven on Hutablagen: data-count 7 vs header 500)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Footstools",
+   "qty": 679,
+   "link": "https://www.otto.de/moebel/hocker/fusshocker/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"679\"; corroborated by the node's own rendered listing header (.reptile-item-count__item-count data-item-count, \"N Produkte\") within live-inventory drift (<6%)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Upholstered Stools",
+   "qty": 1033,
+   "link": "https://www.otto.de/moebel/hocker/polsterhocker/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"1033\"; corroborated by the node's own rendered listing header (.reptile-item-count__item-count data-item-count, \"N Produkte\") within live-inventory drift (<6%)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Poufs",
+   "qty": 399,
+   "link": "https://www.otto.de/moebel/hocker/poufs/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"399\"; the node's own rendered header is NOT usable here - OTTO pads categories below ~500 products with similar items up to a 500 floor (proven on Hutablagen: data-count 7 vs header 500)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Roller Stools",
+   "qty": 52,
+   "link": "https://www.otto.de/moebel/hocker/rollhocker/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"52\"; the node's own rendered header is NOT usable here - OTTO pads categories below ~500 products with similar items up to a 500 floor (proven on Hutablagen: data-count 7 vs header 500)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Seating Stools",
+   "qty": 3917,
+   "link": "https://www.otto.de/moebel/hocker/sitzhocker/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"3917\"; corroborated by the node's own rendered listing header (.reptile-item-count__item-count data-item-count, \"N Produkte\") within live-inventory drift (<6%)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Seat Cubes",
+   "qty": 62,
+   "link": "https://www.otto.de/moebel/hocker/sitzwuerfel/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"62\"; the node's own rendered header is NOT usable here - OTTO pads categories below ~500 products with similar items up to a 500 floor (proven on Hutablagen: data-count 7 vs header 500)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Step Stools",
+   "qty": 143,
+   "link": "https://www.otto.de/moebel/hocker/tritthocker/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"143\"; the node's own rendered header is NOT usable here - OTTO pads categories below ~500 products with similar items up to a 500 floor (proven on Hutablagen: data-count 7 vs header 500)",
+   "flag": "MANUAL REVIEW: step stools - utility item, filed by OTTO under Furniture > Stools"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Benches",
+   "qty": 8908,
+   "link": "https://www.otto.de/moebel/sitzbaenke/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"8908\"; corroborated by the node's own rendered listing header (.reptile-item-count__item-count data-item-count, \"N Produkte\") within live-inventory drift (<6%)",
+   "flag": "MANUAL REVIEW: parent kept as leaf - its 7 sub-types (bed/corner/dining/hanging/upholstered/shoe/chest benches) cover only 24% of the node"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Seating Suites",
+   "qty": 340,
+   "link": "https://www.otto.de/moebel/sitzgarnituren/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"340\"; the node's own rendered header is NOT usable here - OTTO pads categories below ~500 products with similar items up to a 500 floor (proven on Hutablagen: data-count 7 vs header 500)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Seating Groups",
+   "qty": 1604,
+   "link": "https://www.otto.de/moebel/sitzgruppen/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"1604\"; corroborated by the node's own rendered listing header (.reptile-item-count__item-count data-item-count, \"N Produkte\") within live-inventory drift (<6%)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Loungers and Daybeds",
+   "qty": 3103,
+   "link": "https://www.otto.de/moebel/liegen/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"3103\"; corroborated by the node's own rendered listing header (.reptile-item-count__item-count data-item-count, \"N Produkte\") within live-inventory drift (<6%)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Tables",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Work Tables",
+   "qty": 846,
+   "link": "https://www.otto.de/moebel/tische/arbeitstische/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"846\"; corroborated by the node's own rendered listing header (.reptile-item-count__item-count data-item-count, \"N Produkte\") within live-inventory drift (<6%)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bar Tables",
+   "qty": 2109,
+   "link": "https://www.otto.de/moebel/tische/bartische/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"2109\"; corroborated by the node's own rendered listing header (.reptile-item-count__item-count data-item-count, \"N Produkte\") within live-inventory drift (<6%)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Side Tables",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Occasional Tables",
+   "qty": 10177,
+   "link": "https://www.otto.de/moebel/tische/beistelltische/ablagetische/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"10177\"; corroborated by the node's own rendered listing header (.reptile-item-count__item-count data-item-count, \"N Produkte\") within live-inventory drift (<6%)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Serving Trolleys",
+   "qty": 984,
+   "link": "https://www.otto.de/moebel/tische/beistelltische/beistellwagen/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"984\"; corroborated by the node's own rendered listing header (.reptile-item-count__item-count data-item-count, \"N Produkte\") within live-inventory drift (<6%)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Console Tables",
+   "qty": 3610,
+   "link": "https://www.otto.de/moebel/tische/beistelltische/konsolentische/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"3610\"; corroborated by the node's own rendered listing header (.reptile-item-count__item-count data-item-count, \"N Produkte\") within live-inventory drift (<6%)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Nesting Tables",
+   "qty": 1075,
+   "link": "https://www.otto.de/moebel/tische/beistelltische/satztische/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"1075\"; corroborated by the node's own rendered listing header (.reptile-item-count__item-count data-item-count, \"N Produkte\") within live-inventory drift (<6%)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Tray Tables",
+   "qty": 82,
+   "link": "https://www.otto.de/moebel/tische/beistelltische/tabletttische/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"82\"; the node's own rendered header is NOT usable here - OTTO pads categories below ~500 products with similar items up to a 500 floor (proven on Hutablagen: data-count 7 vs header 500)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Telephone Tables",
+   "qty": 32,
+   "link": "https://www.otto.de/moebel/tische/beistelltische/telefontische/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"32\"; the node's own rendered header is NOT usable here - OTTO pads categories below ~500 products with similar items up to a 500 floor (proven on Hutablagen: data-count 7 vs header 500)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Chest Tables",
+   "qty": 12,
+   "link": "https://www.otto.de/moebel/tische/beistelltische/truhentische/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"12\"; the node's own rendered header is NOT usable here - OTTO pads categories below ~500 products with similar items up to a 500 floor (proven on Hutablagen: data-count 7 vs header 500)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Coffee Tables",
+   "qty": 21965,
+   "link": "https://www.otto.de/moebel/tische/couchtische/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"21965\"; corroborated by the node's own rendered listing header (.reptile-item-count__item-count data-item-count, \"N Produkte\") within live-inventory drift (<6%)",
+   "flag": "MANUAL REVIEW: parent kept as leaf - its 2 sub-types (opium tables 19, chest coffee tables 12) cover 0.1% of the node"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Corner Bench Dining Groups",
+   "qty": 162,
+   "link": "https://www.otto.de/moebel/tische/eckbankgruppen/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"162\"; the node's own rendered header is NOT usable here - OTTO pads categories below ~500 products with similar items up to a 500 floor (proven on Hutablagen: data-count 7 vs header 500)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Reception Counters",
+   "qty": 913,
+   "link": "https://www.otto.de/moebel/tische/empfangstheken/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"913\"; corroborated by the node's own rendered listing header (.reptile-item-count__item-count data-item-count, \"N Produkte\") within live-inventory drift (<6%)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dining Sets",
+   "qty": 18182,
+   "link": "https://www.otto.de/moebel/tische/essgruppen/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"18182\"; corroborated by the node's own rendered listing header (.reptile-item-count__item-count data-item-count, \"N Produkte\") within live-inventory drift (<6%)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dining Tables",
+   "qty": 15286,
+   "link": "https://www.otto.de/moebel/tische/esstische/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"15286\"; corroborated by the node's own rendered listing header (.reptile-item-count__item-count data-item-count, \"N Produkte\") within live-inventory drift (<6%)",
+   "flag": "MANUAL REVIEW: parent kept as leaf - its 4 sub-types cover 6% of the node"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dining Room Sets",
+   "qty": 2510,
+   "link": "https://www.otto.de/moebel/tische/esszimmer-sets/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"2510\"; corroborated by the node's own rendered listing header (.reptile-item-count__item-count data-item-count, \"N Produkte\") within live-inventory drift (<6%)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dressing Tables",
+   "qty": 3830,
+   "link": "https://www.otto.de/moebel/tische/schminktische/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"3830\"; corroborated by the node's own rendered listing header (.reptile-item-count__item-count data-item-count, \"N Produkte\") within live-inventory drift (<6%)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Desks",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Office Furniture Sets",
+   "qty": 1963,
+   "link": "https://www.otto.de/moebel/tische/schreibtische/bueromoebel-sets/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"1963\"; corroborated by the node's own rendered listing header (.reptile-item-count__item-count data-item-count, \"N Produkte\") within live-inventory drift (<6%)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Office Tables",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Meeting Tables",
+   "qty": 2287,
+   "link": "https://www.otto.de/moebel/tische/schreibtische/buerotische/besprechungstische/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"2287\"; corroborated by the node's own rendered listing header (.reptile-item-count__item-count data-item-count, \"N Produkte\") within live-inventory drift (<6%)",
+   "flag": "MANUAL REVIEW: identical count to Conference Tables (2287) - the two slugs appear to serve the same population"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Conference Tables",
+   "qty": 2287,
+   "link": "https://www.otto.de/moebel/tische/schreibtische/buerotische/konferenztische/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"2287\"; corroborated by the node's own rendered listing header (.reptile-item-count__item-count data-item-count, \"N Produkte\") within live-inventory drift (<6%)",
+   "flag": "MANUAL REVIEW: identical count to Meeting Tables (2287) - the two slugs appear to serve the same population"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Standing Desks",
+   "qty": 91,
+   "link": "https://www.otto.de/moebel/tische/schreibtische/buerotische/stehpulte/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"91\"; the node's own rendered header is NOT usable here - OTTO pads categories below ~500 products with similar items up to a 500 floor (proven on Hutablagen: data-count 7 vs header 500)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Computer Cabinets",
+   "qty": 103,
+   "link": "https://www.otto.de/moebel/tische/schreibtische/computerschraenke/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"103\"; the node's own rendered header is NOT usable here - OTTO pads categories below ~500 products with similar items up to a 500 floor (proven on Hutablagen: data-count 7 vs header 500)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Computer Desks",
+   "qty": 522,
+   "link": "https://www.otto.de/moebel/tische/schreibtische/computertische/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"522\"; the node's own rendered header is NOT usable here - OTTO pads categories below ~500 products with similar items up to a 500 floor (proven on Hutablagen: data-count 7 vs header 500)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Corner Desks",
+   "qty": 1414,
+   "link": "https://www.otto.de/moebel/tische/schreibtische/eckschreibtische/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"1414\"; corroborated by the node's own rendered listing header (.reptile-item-count__item-count data-item-count, \"N Produkte\") within live-inventory drift (<6%)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Shelf Desks",
+   "qty": 52,
+   "link": "https://www.otto.de/moebel/tische/schreibtische/regal-schreibtische/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"52\"; the node's own rendered header is NOT usable here - OTTO pads categories below ~500 products with similar items up to a 500 floor (proven on Hutablagen: data-count 7 vs header 500)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Secretary Desks",
+   "qty": 219,
+   "link": "https://www.otto.de/moebel/tische/schreibtische/sekretaere/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"219\"; the node's own rendered header is NOT usable here - OTTO pads categories below ~500 products with similar items up to a 500 floor (proven on Hutablagen: data-count 7 vs header 500)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Standing Tables",
+   "qty": 374,
+   "link": "https://www.otto.de/moebel/tische/stehtische/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"374\"; the node's own rendered header is NOT usable here - OTTO pads categories below ~500 products with similar items up to a 500 floor (proven on Hutablagen: data-count 7 vs header 500)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Chests of Drawers and Sideboards",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Highboards",
+   "qty": 4202,
+   "link": "https://www.otto.de/moebel/kommoden-sideboards/highboards/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"4202\"; corroborated by the node's own rendered listing header (.reptile-item-count__item-count data-item-count, \"N Produkte\") within live-inventory drift (<6%)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Chests of Drawers",
+   "qty": 17251,
+   "link": "https://www.otto.de/moebel/kommoden-sideboards/kommoden/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"17251\"; corroborated by the node's own rendered listing header (.reptile-item-count__item-count data-item-count, \"N Produkte\") within live-inventory drift (<6%)",
+   "flag": "MANUAL REVIEW: parent kept as leaf - its 4 sub-types (corner/combination/drawer/door chests) cover 44% of the node | MANUAL REVIEW: this node's rel=canonical points at its parent /moebel/kommoden-sideboards/, although it serves a distinct, smaller listing (17251 vs 44557)"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Lowboards",
+   "qty": 6142,
+   "link": "https://www.otto.de/moebel/kommoden-sideboards/lowboards/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"6142\"; corroborated by the node's own rendered listing header (.reptile-item-count__item-count data-item-count, \"N Produkte\") within live-inventory drift (<6%)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bedside Tables",
+   "qty": 12676,
+   "link": "https://www.otto.de/moebel/kommoden-sideboards/nachttische/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"12676\"; corroborated by the node's own rendered listing header (.reptile-item-count__item-count data-item-count, \"N Produkte\") within live-inventory drift (<6%)",
+   "flag": "MANUAL REVIEW: parent kept as leaf - its 2 sub-types cover 6.5% of the node"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sideboards",
+   "qty": 18330,
+   "link": "https://www.otto.de/moebel/kommoden-sideboards/sideboards/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"18330\"; corroborated by the node's own rendered listing header (.reptile-item-count__item-count data-item-count, \"N Produkte\") within live-inventory drift (<6%)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Cabinets",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Apothecary Cabinets",
+   "qty": 332,
+   "link": "https://www.otto.de/moebel/schraenke/apothekerschraenke/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"332\"; the node's own rendered header is NOT usable here - OTTO pads categories below ~500 products with similar items up to a 500 floor (proven on Hutablagen: data-count 7 vs header 500)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bar Cabinets",
+   "qty": 288,
+   "link": "https://www.otto.de/moebel/schraenke/barschraenke/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"288\"; the node's own rendered header is NOT usable here - OTTO pads categories below ~500 products with similar items up to a 500 floor (proven on Hutablagen: data-count 7 vs header 500)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Book Cabinets",
+   "qty": 6339,
+   "link": "https://www.otto.de/moebel/schraenke/buecherschraenke/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"6339\"; corroborated by the node's own rendered listing header (.reptile-item-count__item-count data-item-count, \"N Produkte\") within live-inventory drift (<6%)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Office Cabinets",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Filing Cabinets",
+   "qty": 3012,
+   "link": "https://www.otto.de/moebel/schraenke/bueroschraenke/aktenschraenke/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"3012\"; corroborated by the node's own rendered listing header (.reptile-item-count__item-count data-item-count, \"N Produkte\") within live-inventory drift (<6%)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Suspension File Cabinets",
+   "qty": 329,
+   "link": "https://www.otto.de/moebel/schraenke/bueroschraenke/haengeregisterschraenke/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"329\"; the node's own rendered header is NOT usable here - OTTO pads categories below ~500 products with similar items up to a 500 floor (proven on Hutablagen: data-count 7 vs header 500)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Mobile Pedestals",
+   "qty": 670,
+   "link": "https://www.otto.de/moebel/schraenke/bueroschraenke/rollcontainer/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"670\"; corroborated by the node's own rendered listing header (.reptile-item-count__item-count data-item-count, \"N Produkte\") within live-inventory drift (<6%)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Roller Shutter Cabinets",
+   "qty": 66,
+   "link": "https://www.otto.de/moebel/schraenke/bueroschraenke/rollladenschraenke/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"66\"; the node's own rendered header is NOT usable here - OTTO pads categories below ~500 products with similar items up to a 500 floor (proven on Hutablagen: data-count 7 vs header 500)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Fixed Pedestals",
+   "qty": 276,
+   "link": "https://www.otto.de/moebel/schraenke/bueroschraenke/standcontainer/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"276\"; the node's own rendered header is NOT usable here - OTTO pads categories below ~500 products with similar items up to a 500 floor (proven on Hutablagen: data-count 7 vs header 500)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Buffet Cabinets",
+   "qty": 1351,
+   "link": "https://www.otto.de/moebel/schraenke/buffetschraenke/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"1351\"; corroborated by the node's own rendered listing header (.reptile-item-count__item-count data-item-count, \"N Produkte\") within live-inventory drift (<6%)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Wall Cabinets",
+   "qty": 5318,
+   "link": "https://www.otto.de/moebel/schraenke/haengeschraenke/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"5318\"; corroborated by the node's own rendered listing header (.reptile-item-count__item-count data-item-count, \"N Produkte\") within live-inventory drift (<6%)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Tall Cabinets",
+   "qty": 4864,
+   "link": "https://www.otto.de/moebel/schraenke/hochschraenke/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"4864\"; corroborated by the node's own rendered listing header (.reptile-item-count__item-count data-item-count, \"N Produkte\") within live-inventory drift (<6%)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Wardrobes",
+   "qty": 12630,
+   "link": "https://www.otto.de/moebel/schraenke/kleiderschraenke/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"12630\"; corroborated by the node's own rendered listing header (.reptile-item-count__item-count data-item-count, \"N Produkte\") within live-inventory drift (<6%)",
+   "flag": "MANUAL REVIEW: parent kept as leaf - its 6 sub-types are door-mechanism/shape/material re-cuts covering 35% of the node"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Medicine Cabinets",
+   "qty": 159,
+   "link": "https://www.otto.de/moebel/schraenke/medizinschraenke/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"159\"; the node's own rendered header is NOT usable here - OTTO pads categories below ~500 products with similar items up to a 500 floor (proven on Hutablagen: data-count 7 vs header 500)",
+   "flag": "MANUAL REVIEW: filed by OTTO under Furniture > Cabinets, but its own page groups it with home first-aid"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Multipurpose Cabinets",
+   "qty": 2213,
+   "link": "https://www.otto.de/moebel/schraenke/mehrzweckschraenke/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"2213\"; corroborated by the node's own rendered listing header (.reptile-item-count__item-count data-item-count, \"N Produkte\") within live-inventory drift (<6%)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Midi Cabinets",
+   "qty": 736,
+   "link": "https://www.otto.de/moebel/schraenke/midischraenke/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"736\"; corroborated by the node's own rendered listing header (.reptile-item-count__item-count data-item-count, \"N Produkte\") within live-inventory drift (<6%)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Jewellery Cabinets",
+   "qty": 106,
+   "link": "https://www.otto.de/moebel/schraenke/schmuckschraenke/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"106\"; the node's own rendered header is NOT usable here - OTTO pads categories below ~500 products with similar items up to a 500 floor (proven on Hutablagen: data-count 7 vs header 500)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Shoe Cabinets",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Tall Shoe Cabinets",
+   "qty": 343,
+   "link": "https://www.otto.de/moebel/schraenke/schuhschraenke/schuhhochschraenke/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"343\"; the node's own rendered header is NOT usable here - OTTO pads categories below ~500 products with similar items up to a 500 floor (proven on Hutablagen: data-count 7 vs header 500)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Shoe Tipper Cabinets",
+   "qty": 379,
+   "link": "https://www.otto.de/moebel/schraenke/schuhschraenke/schuhkipper/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"379\"; the node's own rendered header is NOT usable here - OTTO pads categories below ~500 products with similar items up to a 500 floor (proven on Hutablagen: data-count 7 vs header 500)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Shoe Chests",
+   "qty": 241,
+   "link": "https://www.otto.de/moebel/schraenke/schuhschraenke/schuhkommoden/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"241\"; the node's own rendered header is NOT usable here - OTTO pads categories below ~500 products with similar items up to a 500 floor (proven on Hutablagen: data-count 7 vs header 500)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Shoe Racks",
+   "qty": 1920,
+   "link": "https://www.otto.de/moebel/schraenke/schuhschraenke/schuhregale/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"1920\"; corroborated by the node's own rendered listing header (.reptile-item-count__item-count data-item-count, \"N Produkte\") within live-inventory drift (<6%)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Shoe Storage Benches",
+   "qty": 6,
+   "link": "https://www.otto.de/moebel/schraenke/schuhschraenke/schuhtruhen/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"6\"; the node's own rendered header is NOT usable here - OTTO pads categories below ~500 products with similar items up to a 500 floor (proven on Hutablagen: data-count 7 vs header 500)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Mirror Cabinets",
+   "qty": 5708,
+   "link": "https://www.otto.de/moebel/schraenke/spiegelschraenke/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"5708\"; corroborated by the node's own rendered listing header (.reptile-item-count__item-count data-item-count, \"N Produkte\") within live-inventory drift (<6%)",
+   "flag": "MANUAL REVIEW: bathroom mirror-door storage cabinets - cabinet furniture rather than a mirror"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Lockers",
+   "qty": 255,
+   "link": "https://www.otto.de/moebel/schraenke/spinde/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"255\"; the node's own rendered header is NOT usable here - OTTO pads categories below ~500 products with similar items up to a 500 floor (proven on Hutablagen: data-count 7 vs header 500)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sink Base Cabinets",
+   "qty": 505,
+   "link": "https://www.otto.de/moebel/schraenke/spuelenschraenke/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"505\"; the node's own rendered header is NOT usable here - OTTO pads categories below ~500 products with similar items up to a 500 floor (proven on Hutablagen: data-count 7 vs header 500)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Appliance Housing Cabinets",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Oven Housing Cabinets",
+   "qty": 310,
+   "link": "https://www.otto.de/moebel/schraenke/umbauschraenke/backofenumbauschraenke/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"310\"; the node's own rendered header is NOT usable here - OTTO pads categories below ~500 products with similar items up to a 500 floor (proven on Hutablagen: data-count 7 vs header 500)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Cooker Housing Cabinets",
+   "qty": 266,
+   "link": "https://www.otto.de/moebel/schraenke/umbauschraenke/herdumbauschraenke/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"266\"; the node's own rendered header is NOT usable here - OTTO pads categories below ~500 products with similar items up to a 500 floor (proven on Hutablagen: data-count 7 vs header 500)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Hob Housing Cabinets",
+   "qty": 121,
+   "link": "https://www.otto.de/moebel/schraenke/umbauschraenke/kochfeldumbauschraenke/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"121\"; the node's own rendered header is NOT usable here - OTTO pads categories below ~500 products with similar items up to a 500 floor (proven on Hutablagen: data-count 7 vs header 500)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Fridge Housing Cabinets",
+   "qty": 78,
+   "link": "https://www.otto.de/moebel/schraenke/umbauschraenke/kuehlschrankumbauschraenke/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"78\"; the node's own rendered header is NOT usable here - OTTO pads categories below ~500 products with similar items up to a 500 floor (proven on Hutablagen: data-count 7 vs header 500)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Vanity Units",
+   "qty": 2995,
+   "link": "https://www.otto.de/moebel/schraenke/umbauschraenke/waschbeckenunterschraenke/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"2995\"; corroborated by the node's own rendered listing header (.reptile-item-count__item-count data-item-count, \"N Produkte\") within live-inventory drift (<6%)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Washing Machine Housing Cabinets",
+   "qty": 472,
+   "link": "https://www.otto.de/moebel/schraenke/umbauschraenke/waschmaschinenumbauschraenke/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"472\"; the node's own rendered header is NOT usable here - OTTO pads categories below ~500 products with similar items up to a 500 floor (proven on Hutablagen: data-count 7 vs header 500)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Base Cabinets",
+   "qty": 6916,
+   "link": "https://www.otto.de/moebel/schraenke/unterschraenke/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"6916\"; corroborated by the node's own rendered listing header (.reptile-item-count__item-count data-item-count, \"N Produkte\") within live-inventory drift (<6%)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Display Cabinets",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Corner Display Cabinets",
+   "qty": 139,
+   "link": "https://www.otto.de/moebel/schraenke/vitrinen/eckvitrinen/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"139\"; the node's own rendered header is NOT usable here - OTTO pads categories below ~500 products with similar items up to a 500 floor (proven on Hutablagen: data-count 7 vs header 500)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Wall-Mounted Display Cabinets",
+   "qty": 353,
+   "link": "https://www.otto.de/moebel/schraenke/vitrinen/haengevitrinen/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"353\"; the node's own rendered header is NOT usable here - OTTO pads categories below ~500 products with similar items up to a 500 floor (proven on Hutablagen: data-count 7 vs header 500)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Freestanding Display Cabinets",
+   "qty": 545,
+   "link": "https://www.otto.de/moebel/schraenke/vitrinen/standvitrinen/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"545\"; the node's own rendered header is NOT usable here - OTTO pads categories below ~500 products with similar items up to a 500 floor (proven on Hutablagen: data-count 7 vs header 500)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Display Cabinet Units",
+   "qty": 4882,
+   "link": "https://www.otto.de/moebel/schraenke/vitrinen/vitrinenschraenke/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"4882\"; corroborated by the node's own rendered listing header (.reptile-item-count__item-count data-item-count, \"N Produkte\") within live-inventory drift (<6%)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Pantry Cabinets",
+   "qty": 373,
+   "link": "https://www.otto.de/moebel/schraenke/vorratsschraenke/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"373\"; the node's own rendered header is NOT usable here - OTTO pads categories below ~500 products with similar items up to a 500 floor (proven on Hutablagen: data-count 7 vs header 500)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Tool Cabinets",
+   "qty": 400,
+   "link": "https://www.otto.de/moebel/schraenke/werkzeugschraenke/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"400\"; the node's own rendered header is NOT usable here - OTTO pads categories below ~500 products with similar items up to a 500 floor (proven on Hutablagen: data-count 7 vs header 500)",
+   "flag": "MANUAL REVIEW: workshop tool cabinets, filed by OTTO under Furniture > Cabinets"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Shelving",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "File Shelving",
+   "qty": 257,
+   "link": "https://www.otto.de/moebel/regale/aktenregale/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"257\"; the node's own rendered header is NOT usable here - OTTO pads categories below ~500 products with similar items up to a 500 floor (proven on Hutablagen: data-count 7 vs header 500)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bookshelves",
+   "qty": 6338,
+   "link": "https://www.otto.de/moebel/regale/buecherregale/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"6338\"; corroborated by the node's own rendered listing header (.reptile-item-count__item-count data-item-count, \"N Produkte\") within live-inventory drift (<6%)",
+   "flag": "MANUAL REVIEW: parent kept as leaf - its 2 sub-types cover under 1% of the node"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Corner Shelves",
+   "qty": 620,
+   "link": "https://www.otto.de/moebel/regale/eckregale/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"620\"; corroborated by the node's own rendered listing header (.reptile-item-count__item-count data-item-count, \"N Produkte\") within live-inventory drift (<6%)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bottle Racks",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Wine Racks",
+   "qty": 1070,
+   "link": "https://www.otto.de/moebel/regale/flaschenregale/weinregale/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"1070\"; corroborated by the node's own rendered listing header (.reptile-item-count__item-count data-item-count, \"N Produkte\") within live-inventory drift (<6%)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Ladder Shelves",
+   "qty": 85,
+   "link": "https://www.otto.de/moebel/regale/leiterregale/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"85\"; the node's own rendered header is NOT usable here - OTTO pads categories below ~500 products with similar items up to a 500 floor (proven on Hutablagen: data-count 7 vs header 500)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Room Divider Shelves",
+   "qty": 1059,
+   "link": "https://www.otto.de/moebel/regale/raumteiler-regale/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"1059\"; corroborated by the node's own rendered listing header (.reptile-item-count__item-count data-item-count, \"N Produkte\") within live-inventory drift (<6%)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Shelving Systems",
+   "qty": 164,
+   "link": "https://www.otto.de/moebel/regale/regalsysteme/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"164\"; the node's own rendered header is NOT usable here - OTTO pads categories below ~500 products with similar items up to a 500 floor (proven on Hutablagen: data-count 7 vs header 500)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Heavy-Duty Shelving",
+   "qty": 2640,
+   "link": "https://www.otto.de/moebel/regale/schwerlastregale/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"2640\"; corroborated by the node's own rendered listing header (.reptile-item-count__item-count data-item-count, \"N Produkte\") within live-inventory drift (<6%)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Freestanding Shelf Units",
+   "qty": 2022,
+   "link": "https://www.otto.de/moebel/regale/standregale/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"2022\"; corroborated by the node's own rendered listing header (.reptile-item-count__item-count data-item-count, \"N Produkte\") within live-inventory drift (<6%)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Plug-In Shelving",
+   "qty": 545,
+   "link": "https://www.otto.de/moebel/regale/steckregale/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"545\"; the node's own rendered header is NOT usable here - OTTO pads categories below ~500 products with similar items up to a 500 floor (proven on Hutablagen: data-count 7 vs header 500)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Step Shelves",
+   "qty": 20,
+   "link": "https://www.otto.de/moebel/regale/stufenregale/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"20\"; the node's own rendered header is NOT usable here - OTTO pads categories below ~500 products with similar items up to a 500 floor (proven on Hutablagen: data-count 7 vs header 500)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Telescopic Shelves",
+   "qty": 53,
+   "link": "https://www.otto.de/moebel/regale/teleskopregale/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"53\"; the node's own rendered header is NOT usable here - OTTO pads categories below ~500 products with similar items up to a 500 floor (proven on Hutablagen: data-count 7 vs header 500)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Under-Counter Shelving",
+   "qty": 19,
+   "link": "https://www.otto.de/moebel/regale/unterstellregale/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"19\"; the node's own rendered header is NOT usable here - OTTO pads categories below ~500 products with similar items up to a 500 floor (proven on Hutablagen: data-count 7 vs header 500)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Wall Shelves",
+   "qty": 6756,
+   "link": "https://www.otto.de/moebel/regale/wandregale/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"6756\"; corroborated by the node's own rendered listing header (.reptile-item-count__item-count data-item-count, \"N Produkte\") within live-inventory drift (<6%)",
+   "flag": "MANUAL REVIEW: wall shelves sit in OTTO's Furniture > Shelving department, not Wall Decor; parent kept as leaf - its 4 sub-types cover 29%"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Changing Shelves",
+   "qty": 15,
+   "link": "https://www.otto.de/moebel/regale/wickelregale/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"15\"; the node's own rendered header is NOT usable here - OTTO pads categories below ~500 products with similar items up to a 500 floor (proven on Hutablagen: data-count 7 vs header 500)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Office Pedestal Units",
+   "qty": 944,
+   "link": "https://www.otto.de/moebel/container/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"944\"; corroborated by the node's own rendered listing header (.reptile-item-count__item-count data-item-count, \"N Produkte\") within live-inventory drift (<6%)",
+   "flag": "MANUAL REVIEW: same population as Office Cabinets > Mobile Pedestals (670) + Fixed Pedestals (276) = 946, published under a second path"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Wall Units",
+   "qty": 7994,
+   "link": "https://www.otto.de/moebel/wohnwaende/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"7994\"; corroborated by the node's own rendered listing header (.reptile-item-count__item-count data-item-count, \"N Produkte\") within live-inventory drift (<6%)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "TV Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "CD Racks",
+   "qty": 74,
+   "link": "https://www.otto.de/moebel/tv-moebel/cd-regale/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"74\"; the node's own rendered header is NOT usable here - OTTO pads categories below ~500 products with similar items up to a 500 floor (proven on Hutablagen: data-count 7 vs header 500)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Media Shelves",
+   "qty": null,
+   "link": "https://www.otto.de/moebel/tv-moebel/medienregale/",
+   "is_group": false,
+   "evidence": null,
+   "flag": "MANUAL REVIEW: no exact count obtainable - the node publishes no nav data-count and its rendered header shows OTTO's padded 500 floor"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "TV Boards",
+   "qty": 23727,
+   "link": "https://www.otto.de/moebel/tv-moebel/tv-boards/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"23727\"; corroborated by the node's own rendered listing header (.reptile-item-count__item-count data-item-count, \"N Produkte\") within live-inventory drift (<6%)",
+   "flag": "MANUAL REVIEW: parent kept as leaf - its single sub-type (TV racks, 163) covers under 1%"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "TV Shelves",
+   "qty": 125,
+   "link": "https://www.otto.de/moebel/tv-moebel/tv-regale/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"125\"; the node's own rendered header is NOT usable here - OTTO pads categories below ~500 products with similar items up to a 500 floor (proven on Hutablagen: data-count 7 vs header 500)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "TV Cabinets",
+   "qty": 10395,
+   "link": "https://www.otto.de/moebel/tv-moebel/tv-schraenke/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"10395\"; corroborated by the node's own rendered listing header (.reptile-item-count__item-count data-item-count, \"N Produkte\") within live-inventory drift (<6%)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "TV Wall Units",
+   "qty": 11249,
+   "link": "https://www.otto.de/moebel/tv-moebel/tv-waende/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"11249\"; corroborated by the node's own rendered listing header (.reptile-item-count__item-count data-item-count, \"N Produkte\") within live-inventory drift (<6%)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Hallway Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Hallway Furniture Sets",
+   "qty": 3702,
+   "link": "https://www.otto.de/moebel/garderoben/garderoben-sets/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"3702\"; corroborated by the node's own rendered listing header (.reptile-item-count__item-count data-item-count, \"N Produkte\") within live-inventory drift (<6%)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Coat Stands",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Valet Stands",
+   "qty": 136,
+   "link": "https://www.otto.de/moebel/garderoben/garderobenstaender/herrendiener/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"136\"; the node's own rendered header is NOT usable here - OTTO pads categories below ~500 products with similar items up to a 500 floor (proven on Hutablagen: data-count 7 vs header 500)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Clothes Stands",
+   "qty": 1874,
+   "link": "https://www.otto.de/moebel/garderoben/garderobenstaender/kleiderstaender/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"1874\"; corroborated by the node's own rendered listing header (.reptile-item-count__item-count data-item-count, \"N Produkte\") within live-inventory drift (<6%)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Clothes Rail Trolleys",
+   "qty": 215,
+   "link": "https://www.otto.de/moebel/garderoben/garderobenstaender/kleiderwagen/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"215\"; the node's own rendered header is NOT usable here - OTTO pads categories below ~500 products with similar items up to a 500 floor (proven on Hutablagen: data-count 7 vs header 500)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Compact Hallway Units",
+   "qty": 226,
+   "link": "https://www.otto.de/moebel/garderoben/kompaktgarderoben/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"226\"; the node's own rendered header is NOT usable here - OTTO pads categories below ~500 products with similar items up to a 500 floor (proven on Hutablagen: data-count 7 vs header 500)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Coat Rack Panels",
+   "qty": 3958,
+   "link": "https://www.otto.de/moebel/garderoben/wandgarderoben/garderobenpaneele/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"3958\"; corroborated by the node's own rendered listing header (.reptile-item-count__item-count data-item-count, \"N Produkte\") within live-inventory drift (<6%)",
+   "flag": "MANUAL REVIEW: ambiguous - wall-mounted coat panel units; the rest of OTTO's wall coat-rack branch (hooks, rails, hat shelves) was excluded as hardware"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Kitchen Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dressers",
+   "qty": 269,
+   "link": "https://www.otto.de/moebel/kuechenmoebel/anrichten/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"269\"; the node's own rendered header is NOT usable here - OTTO pads categories below ~500 products with similar items up to a 500 floor (proven on Hutablagen: data-count 7 vs header 500)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Kitchen Islands",
+   "qty": 937,
+   "link": "https://www.otto.de/moebel/kuechenmoebel/kuecheninseln/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"937\"; corroborated by the node's own rendered listing header (.reptile-item-count__item-count data-item-count, \"N Produkte\") within live-inventory drift (<6%)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Kitchen Trolleys",
+   "qty": 1283,
+   "link": "https://www.otto.de/moebel/kuechenmoebel/kuechenwagen/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"1283\"; corroborated by the node's own rendered listing header (.reptile-item-count__item-count data-item-count, \"N Produkte\") within live-inventory drift (<6%)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Fitted Kitchen Units",
+   "qty": 4479,
+   "link": "https://www.otto.de/moebel/kuechenmoebel/kuechenzeilen/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"4479\"; corroborated by the node's own rendered listing header (.reptile-item-count__item-count data-item-count, \"N Produkte\") within live-inventory drift (<6%)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "L-Shaped Kitchens",
+   "qty": 619,
+   "link": "https://www.otto.de/moebel/kuechenmoebel/l-kuechen/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"619\"; corroborated by the node's own rendered listing header (.reptile-item-count__item-count data-item-count, \"N Produkte\") within live-inventory drift (<6%)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Pantry Kitchens",
+   "qty": 128,
+   "link": "https://www.otto.de/moebel/kuechenmoebel/pantrykuechen/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"128\"; the node's own rendered header is NOT usable here - OTTO pads categories below ~500 products with similar items up to a 500 floor (proven on Hutablagen: data-count 7 vs header 500)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Single-Wall Kitchens",
+   "qty": 47,
+   "link": "https://www.otto.de/moebel/kuechenmoebel/singlekuechen/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"47\"; the node's own rendered header is NOT usable here - OTTO pads categories below ~500 products with similar items up to a 500 floor (proven on Hutablagen: data-count 7 vs header 500)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Complete Room Sets",
+   "qty": 10844,
+   "link": "https://www.otto.de/moebel/komplettzimmer/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"10844\"; corroborated by the node's own rendered listing header (.reptile-item-count__item-count data-item-count, \"N Produkte\") within live-inventory drift (<6%)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Baby Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Baby Furniture Ranges",
+   "qty": 3046,
+   "link": "https://www.otto.de/moebel/babymoebel/babymoebel-serien/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"3046\"; corroborated by the node's own rendered listing header (.reptile-item-count__item-count data-item-count, \"N Produkte\") within live-inventory drift (<6%)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Baby Furniture Sets",
+   "qty": 189,
+   "link": "https://www.otto.de/moebel/babymoebel/babymoebel-sets/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"189\"; the node's own rendered header is NOT usable here - OTTO pads categories below ~500 products with similar items up to a 500 floor (proven on Hutablagen: data-count 7 vs header 500)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "High Chairs",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Combination High Chairs",
+   "qty": 54,
+   "link": "https://www.otto.de/moebel/babymoebel/hochstuehle/kombihochstuehle/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"54\"; the node's own rendered header is NOT usable here - OTTO pads categories below ~500 products with similar items up to a 500 floor (proven on Hutablagen: data-count 7 vs header 500)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Adjustable Growing High Chairs",
+   "qty": 161,
+   "link": "https://www.otto.de/moebel/babymoebel/hochstuehle/mitwachsende-hochstuehle/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"161\"; the node's own rendered header is NOT usable here - OTTO pads categories below ~500 products with similar items up to a 500 floor (proven on Hutablagen: data-count 7 vs header 500)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Table-Mounted Seats",
+   "qty": 25,
+   "link": "https://www.otto.de/moebel/babymoebel/hochstuehle/tischsitze/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"25\"; the node's own rendered header is NOT usable here - OTTO pads categories below ~500 products with similar items up to a 500 floor (proven on Hutablagen: data-count 7 vs header 500)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bassinets",
+   "qty": 33,
+   "link": "https://www.otto.de/moebel/babymoebel/stubenwagen/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"33\"; the node's own rendered header is NOT usable here - OTTO pads categories below ~500 products with similar items up to a 500 floor (proven on Hutablagen: data-count 7 vs header 500)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bathroom Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bathroom Furniture Sets",
+   "qty": 8455,
+   "link": "https://www.otto.de/moebel/badmoebel/badmoebel-sets/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"8455\"; corroborated by the node's own rendered listing header (.reptile-item-count__item-count data-item-count, \"N Produkte\") within live-inventory drift (<6%)",
+   "flag": null
+  },
+  {
+   "category": "Outdoor Furniture",
+   "sub_category": "Garden Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Outdoor Furniture",
+   "sub_category": "Garden Furniture Sets",
+   "qty": 51860,
+   "link": "https://www.otto.de/garten/gartenmoebel/gartenmoebel-sets/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"51860\"; corroborated by the node's own rendered listing header (.reptile-item-count__item-count data-item-count, \"N Produkte\") within live-inventory drift (<6%)",
+   "flag": null
+  },
+  {
+   "category": "Outdoor Furniture",
+   "sub_category": "Garden Chairs",
+   "qty": 6955,
+   "link": "https://www.otto.de/garten/gartenmoebel/gartenstuehle/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"6955\"; corroborated by the node's own rendered listing header (.reptile-item-count__item-count data-item-count, \"N Produkte\") within live-inventory drift (<6%)",
+   "flag": null
+  },
+  {
+   "category": "Outdoor Furniture",
+   "sub_category": "Garden Tables",
+   "qty": 5367,
+   "link": "https://www.otto.de/garten/gartenmoebel/gartentische/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"5367\"; corroborated by the node's own rendered listing header (.reptile-item-count__item-count data-item-count, \"N Produkte\") within live-inventory drift (<6%)",
+   "flag": null
+  },
+  {
+   "category": "Outdoor Furniture",
+   "sub_category": "Balcony Furniture Sets",
+   "qty": 520,
+   "link": "https://www.otto.de/garten/gartenmoebel/balkonmoebel/balkonmoebel-sets/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"520\"; the node's own rendered header is NOT usable here - OTTO pads categories below ~500 products with similar items up to a 500 floor (proven on Hutablagen: data-count 7 vs header 500)",
+   "flag": null
+  },
+  {
+   "category": "Outdoor Furniture",
+   "sub_category": "Beer Garden Table Sets",
+   "qty": 144,
+   "link": "https://www.otto.de/garten/gartenmoebel/bierzeltgarnituren/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"144\"; the node's own rendered header is NOT usable here - OTTO pads categories below ~500 products with similar items up to a 500 floor (proven on Hutablagen: data-count 7 vs header 500)",
+   "flag": null
+  },
+  {
+   "category": "Outdoor Furniture",
+   "sub_category": "Garden Bars",
+   "qty": 334,
+   "link": "https://www.otto.de/garten/gartenmoebel/gartenbars/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"334\"; the node's own rendered header is NOT usable here - OTTO pads categories below ~500 products with similar items up to a 500 floor (proven on Hutablagen: data-count 7 vs header 500)",
+   "flag": null
+  },
+  {
+   "category": "Outdoor Furniture",
+   "sub_category": "Hammocks",
+   "qty": 923,
+   "link": "https://www.otto.de/garten/gartenmoebel/haengematten/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"923\"; corroborated by the node's own rendered listing header (.reptile-item-count__item-count data-item-count, \"N Produkte\") within live-inventory drift (<6%)",
+   "flag": "MANUAL REVIEW: hammocks, filed by OTTO under Garden Furniture"
+  },
+  {
+   "category": "Outdoor Furniture",
+   "sub_category": "Garden Swing Seats",
+   "qty": 503,
+   "link": "https://www.otto.de/garten/gartenmoebel/hollywoodschaukeln/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"503\"; the node's own rendered header is NOT usable here - OTTO pads categories below ~500 products with similar items up to a 500 floor (proven on Hutablagen: data-count 7 vs header 500)",
+   "flag": null
+  },
+  {
+   "category": "Outdoor Furniture",
+   "sub_category": "Outdoor Kitchens",
+   "qty": 207,
+   "link": "https://www.otto.de/garten/gartenmoebel/outdoor-kuechen/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"207\"; the node's own rendered header is NOT usable here - OTTO pads categories below ~500 products with similar items up to a 500 floor (proven on Hutablagen: data-count 7 vs header 500)",
+   "flag": "MANUAL REVIEW: outdoor kitchen units, filed by OTTO under Garden Furniture; some items are grill stations"
+  },
+  {
+   "category": "Outdoor Furniture",
+   "sub_category": "Sun Islands",
+   "qty": 11,
+   "link": "https://www.otto.de/garten/gartenmoebel/sonneninseln/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"11\"; the node's own rendered header is NOT usable here - OTTO pads categories below ~500 products with similar items up to a 500 floor (proven on Hutablagen: data-count 7 vs header 500)",
+   "flag": null
+  },
+  {
+   "category": "Outdoor Furniture",
+   "sub_category": "Beach Chairs",
+   "qty": 656,
+   "link": "https://www.otto.de/garten/gartenmoebel/strandkoerbe/",
+   "is_group": false,
+   "evidence": "OTTO's own local-navigation product count for this category node: li.nav_local-link > span.nav_link-count data-count=\"656\"; corroborated by the node's own rendered listing header (.reptile-item-count__item-count data-item-count, \"N Produkte\") within live-inventory drift (<6%)",
+   "flag": null
+  }
+ ]
+}

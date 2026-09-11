@@ -1,0 +1,53 @@
+{
+  "sr": 218,
+  "company": "Cello World",
+  "brand_site": "celloworld.com",
+  "country": "India",
+  "site_url": "https://celloworld.com/",
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "ACCESS: Tier (a) direct HTTP (curl_cffi impersonating Chrome) succeeded throughout. robots.txt (User-agent: * Allow: / with only /api/*, /account/*, /cart/*, /thankyou/*, *.json$, */order/* disallowed) does not block any bot including Claude-family agents. Site is a Next.js storefront (React Server Component streaming payload) backed by a standard Shopify Storefront GraphQL API at f3eba2.myshopify.com, reached via a public storefront access token observed in the site's own client-side network calls (not a secret/bypass - the same token the site's browser JS uses for every visitor). TREE METHOD: fetched sitemap.xml (486 URLs, almost entirely /collections/ handles) and parsed the full mega-menu (hamburger nav JSON embedded in the homepage RSC payload) to get the authoritative top-level structure: Hydration, Personalize, Tableware, Kitchen, Tiffin Boxes, Cookware, Appliances, Kidzbee, Porcelain, Glassware, Cleaning Essential, Gifting - each with their real sub-menus. Cross-checked every sitemap URL against keyword list (storage, container, jar, basket, organiz, bin, crate, box, rack, shelf, wardrobe, cabinet, drawer, textile, curtain, towel, cushion, blanket, rug, bedding, linen, mop, dustbin, bathroom, wiper, trunk, trolley, cart) - no hits outside what the nav already covered. QTY METHOD: collection pages render only a partial product grid server-side with client-side pagination that does not reliably trigger via scroll/network capture in this session, and some visible product-card links on rendered pages were cross-sell/related-collection carousel items, not the true category grid (confirmed by inspecting the embedded collectionData JSON, which showed a separate 'related_collection' block pulling in unrelated products like a mixer-grinder and a dinner set). To get an exact, non-contaminated count, queried the site's own Shopify Storefront GraphQL endpoint directly (collection(handle) { products(first:250) { edges/pageInfo } }, paginated to hasNextPage=false) for each candidate collection - this is the same API and token the site's own frontend uses, just called directly instead of via browser rendering, per HTTP-first tier (a). EXCLUDED AND WHY: No Textile category/node exists anywhere on this site - it is a pure kitchenware/houseware/hydration/appliances/kids-goods brand (dinnerware, cookware, bottles/flasks, tiffins, small appliances, glassware) with zero bedding, curtains, towels, rugs, cushions, or any fabric-based home-furnishing category in nav or sitemap. For Storage: excluded 'Dustbin' (/collections/dustbin, 2 items) - waste bins are a cleaning/utility product, not organization/storage per storage.md scope. Excluded 'Storage set' under Gifting (/collections/storage-set-gifting) - a promotional gift-bundle collection (0 products live) explicitly excluded under the Collections/Gifting rule regardless of name. Excluded three sitemap-only orphan collections with 'storage'/'container' in their handle that are not reachable from any nav menu or category sub-strip and are empty or pure duplicates of an already-counted live subcategory: /collections/storage-set (0 products), /collections/glass-containers (0 products), /collections/glass-containers-1 (0 products), and /collections/plastic-containers (5 products, all 5 of which are a strict subset of the live, nav-linked 'Plastics Jars & Containers' collection) - these are stale/legacy Shopify collection objects, not part of the actual browsable site hierarchy. Excluded the parent 'Jar and Containers' node's own URL per the parent-URL rule since it has two live, nav-linked subcategories (Glass, Plastics); its own GraphQL product count (10) is not recorded as a row. INCLUDED: Kitchen > 'Jar and Containers' (grouping row) > 'Glass Jars & Containers' (3 products: Modustack Glassy Storage Jar, Classic Glass Canister, Fit and Fresh Glass Container - all explicitly named/typed as storage jars/containers, storage.md Sec 13) and 'Plastics Jars & Containers' (8 products: Stack Lock storage jar sets, Modustack PET Container set, Checkers set, Onion/Potato Keeper - same basis). Kidzbee > 'Storage' (site label; recorded as 'Kidzbee Storage' for clarity, 5 products: ToyNest Kids Multipurpose Storage/Stool/Laundry Basket, and four kids storage cupboards/cabinets - confirmed via Shopify productType field = 'Storage' on spot-checked items) per storage.md Sec 32 (Baby/Children's Storage). No Kidzbee parent grouping row was added since Kidzbee's other siblings (Bottles, Lunch Boxes, Bathroom Set, Tableware, Backpacks, Kidzbee Jr.) are all non-qualifying kids-goods categories, not Storage/Textile.",
+  "textile_rows": [],
+  "storage_rows": [
+    {
+      "category": "Storage",
+      "sub_category": "Jar and Containers",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Glass Jars & Containers",
+      "qty": 3,
+      "link": "https://celloworld.com/collections/glass-jars-containers",
+      "is_group": false,
+      "evidence": "Shopify Storefront GraphQL: collection(handle:'glass-jars-containers').products(first:250) returned 3 edges, pageInfo.hasNextPage=false (Modustack Glassy Storage Jar, Classic Glass Canister, Fit and Fresh Glass Container)",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Plastics Jars & Containers",
+      "qty": 8,
+      "link": "https://celloworld.com/collections/plastics-jars-containers",
+      "is_group": false,
+      "evidence": "Shopify Storefront GraphQL: collection(handle:'plastics-jars-containers').products(first:250) returned 8 edges, pageInfo.hasNextPage=false",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Kidzbee Storage",
+      "qty": 5,
+      "link": "https://celloworld.com/collections/kidzbee-storage-nw",
+      "is_group": false,
+      "evidence": "Shopify Storefront GraphQL: collection(handle:'kidzbee-storage-nw').products(first:250) returned 5 edges, pageInfo.hasNextPage=false; spot-checked productType field = 'Storage' on 'Mega Frozen Series Cupboard' and 'ToyNest Kids Multipurpose Storage, Stool & Laundry Basket'",
+      "flag": null,
+      "confidence": "HIGH"
+    }
+  ]
+}

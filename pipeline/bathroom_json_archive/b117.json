@@ -1,0 +1,295 @@
+{
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ROBOTS: https://www.zarahome.com/robots.txt fetched FIRST, before any other request on the host. NO Claude agent is named anywhere in it - there is no 'User-agent: ClaudeBot', 'anthropic-ai' or 'Claude-Web' group, and no Content-Signal line. The named-bot groups are HTTrack, Slurp, MJ12bot, AmazonProductDiscoverybot and AmazonProductBot (all 'Disallow: /') plus proximic ('Disallow: /itxrest/*'). We fall under 'User-agent: *', which does NOT disallow /es/ or /itxrest/ - only proximic is barred from /itxrest/*. The '*' disallows cover checkout/account/wishlist, /*search.html*, /*share*, /*shop-the-look*, the /ki /ax /wa /wy /wz /we /wm /xx /xy /ru stores, secondary-language paths INCLUDING '/es/en/*' (so the English ES storefront is off-limits and every URL here is the Spanish /es/ form), *hidden/*, *contact-swatches*, and a parameter list (pricePrecedence, catalogId, isMobile, modeView, gclid, keyWord, dir, wedding, keyWordCatentry, subid, epik, y_source, parentId) that does NOT include celement. No Crawl-delay is declared; probe.py's 2s per-host pacing plus explicit sleeps were used throughout. ACCESS - HONEST ACCOUNT: every HTML page on www.zarahome.com (home page, /es/, and every /es/<slug>-nNNNN PLP) is served an Akamai Bot Manager JS interstitial - a 2.2 KB stub with a meta-refresh to ?bm-verify=..., an /interstitial/ic.html iframe and a POST to /_sec/verify?provider=interstitial. That is an ACCESS obstacle, NOT a robots exclusion, and the two are not conflated here. I worked the documented fallback ladder: (1) all ten curl_cffi fingerprints in probe.PROFILES individually (chrome120/124/131, edge101, firefox133, safari15_5/17_0/17_2_ios/18_0/18_0_ios) - all ten returned the interstitial; (2) a persistent curl_cffi Session with es-ES Accept-Language, Referer and Upgrade-Insecure-Requests on /es/ then the PLP - interstitial; (3) the r.jina.ai reader prefix - HTTP 403; (4) trailing-slash, /es (no slash), /ww/es/ and ?ajax=true variants - all interstitial. I did NOT attempt to solve or circumvent the bot-detection challenge. (5) The rung that worked: the site's own sitemap and API hosts, which are NOT behind the interstitial and are robots-permitted for us. https://www.zarahome.com/8/info/sitemaps/sitemap-index-home-categories-zh.xml -> sitemap-home-categories-zh-es-0.xml.gz (1,665 URLs, 332 of them Spanish /es/ category URLs) returned 200 on the first try, and the Inditex storefront APIs /itxrest/... and /api/storefront/... answer plain 200 JSON with no cookie, no session and no challenge. STORE (discovered, not assumed): /itxrest/2/catalog/store/<id> was walked over 84009900-84009959 and returns each store's own identity document. 84009900 = countryCode ES, countryName 'España', storeDefaultLanguageId -5 (Español, es_ES), catalogs[type 1] = {id: 80290093, identifier 'ZH_ONT_ES_SEASON'}. This is a genuinely separate Inditex catalogue from Zara Home UK/SR 90 (84009906 / 80290024 'ZH_UK_SEASON') and from Zara Home DE/SR 106 (84009904 / 80290000 'ZH_POZ_NOR_SEASON'), so this is the ES storefront's own assortment, not a sibling's. Language -5 (Spanish) was used for every call so the node names and slugs are the Spanish ones. TREE: the storefront's own category tree, /itxrest/2/catalog/store/84009900/80290093/category?languageId=-5&appId=1 (1.26 MB, 687 nodes walked), cross-checked node-for-node against the rendered mega-menu /api/storefront/1/stores/84009900/menu?language=es-ES&clientId=web-zh&catalogId=80290093. The two agree EXACTLY for the BAÑO department (id 1089013, categoryUrl bano-n1050): same 24 children in the same order, including the four 'empty' spacer nodes, which were dropped. Every slug comes from the node's own categoryUrl field - none was guessed - and every recorded slug was additionally confirmed present in the site's published ES category sitemap. I also keyword-swept all 687 nodes for baño|bath|espejo|mirror|toalla|towel|ducha|shower|inodoro|toilet|lavabo|basin|sink|jabon|soap|grifo|tap|vanit|neceser|albornoz|alfombra (68 hits), which surfaced the bathroom content filed OUTSIDE the BAÑO department: MUEBLES > BAÑO (bathroom furniture, recorded), MUEBLES > PERCHEROS Y TOALLEROS (already in Furniture.xlsx), NIÑOS Y BEBÉS > BAÑO and > BEBÉS > Baño, SPECIAL PRICES > BAÑO, LAVANDERÍA > CESTAS Y ORGANIZACIÓN, FRAGANCIAS > JABONES Y CREMAS and DECORACIÓN > ESPEJOS - all handled in review[]. Zara Home is a textiles-and-accessories retailer: it sells no baths, toilets, basins, taps, showers or enclosures, so rules 4-8 have no nodes on this storefront. DUPLICATE-SLUG RULE (derived from the data, and load-bearing): several nodes share one categoryUrl. In every collision exactly ONE node has categoryUrlParam == null and the others carry categoryUrlParam == their own id - i.e. the null node owns the bare slug and the others need ?celement=<id>. Examples: bano-cajas-n3886 is owned by BAÑO > ALMACENAJE (1020708636) while ACCESORIOS DE BAÑO > Cajas y botes (1020447630) needs the param; bano-cestas-cajas-n4142 is owned by BAÑO > ALMACENAJE > Cestas (1020708638) while LAVANDERÍA > CESTAS Y ORGANIZACIÓN and DORMITORIO > VESTIDOR > Organización need it; bano-n1050 is owned by BAÑO > BAÑO (1020704134), not by the department node. Two independent confirmations: Final.xlsx already records this storefront with exactly that URL form (/es/en/lighting-lamps-cordless-n5192?celement=1020692636), and the Zara Home UK pass independently observed the bare bano-cajas slug rendering STORAGE rather than Cosmetic Storage. ONLY nodes that own their bare slug outright were put in rows[]; every ?celement-dependent node was put in review[] instead. QTY: Zara Home publishes no 'N artículos' / 'Mostrando 1-N de M' header anywhere on the site, and numberOfProducts is null for every node in the category tree, so there is no rendered total to read. The quantity is therefore an EXHAUSTIVE ENUMERATION of the node's own grid - the unique ccIds returned by the endpoint the PLP itself renders from, /itxrest/3/catalog/store/84009900/80290093/category/<id>/product?languageId=-5&appId=1&showProducts=true&showNoStock=false&withSubCategories=false. That endpoint returns the whole grid in one response (no pagination), so counting it IS enumeration to exhaustion, not a header taken on trust. VERIFICATION: (a) on every recorded node the three independent figures in the payload agree exactly - unique ccIds == total ccIds across all gridElements == len(set(productIds)): 16/16/16, 26/26/26, 24/24/24, 24/24/24, 17/17/17, 14/14/14, 42/42/42, 16/16/16, 12/12/12, 22/22/22. The only node anywhere in the sweep where unique != raw is PERSONALIZACIÓN (23 unique vs 24 raw), and it is not recorded. (b) Each node's grid 'section' names identify the node independently of its id and match it: 'Bins bath', 'Dispensers bath', 'Toothbrush holders bath', 'Soap dishes bath', 'Trays bath', 'Laundry baskets bath', 'Laundry baskets bath | Storage baskets bath', 'Hooks bath | Toilet paper holders bath | Towel racks bath', 'Mirrors bath', 'Fbathroom furniture'. (c) The two hub nodes BAÑO (1089013) and ACCESORIOS DE BAÑO (1020447624) both return ERR_CATEGORY_NOT_FOUND from the product endpoint - they have no grid of their own - which independently confirms they are grouping rows and not leaves. (d) Counts discriminate: 3, 4, 9, 12, 14, 15, 16, 17, 18, 19, 20, 22, 23, 24, 26, 31, 36, 37, 40, 42, 43, 50, 51, 54, 62, 63, 75, 100, 130 - no site-wide constant. LIMITATION STATED PLAINLY: the Zara Home UK pass was able to cross-check this same API against each PLP's own embedded transfer-state and got an exact match on 21/21 and 9/9 recorded leaves; I could NOT repeat that cross-check for ES because the SEO PLPs are behind the Akamai interstitial, so the ES evidence is the exhaustive grid enumeration plus the three-way internal agreement and the section-name identification above. No count here is estimated, inferred from a parent, or summed from siblings. DEDUP: already_extracted() run on all sixteen candidate URLs. Exactly one hit - /es/muebles-toalleros-galanes-n4900 -> Furniture.xlsx 'Zara Home ES / Coat Stands and Towel Racks' - moved to review[], not rows[]. All eleven recorded URLs returned None, including /es/bano-muebles-n2469: the index holds the GB, DE and AE siblings of that node (bathroom-furniture-n2469 / badmoebel-n2469) but NOT the ES one, so under the OPTION 1 URL-keyed policy Zara Home ES bathroom furniture is unextracted and is recorded here (rule 9). One dedup blind spot is called out explicitly in review[]: the Home Decor pass took DECORACIÓN > ESPEJOS as '/es/en/home-decor-mirrors-living-room-n993', the English form of the same node, so the Spanish /es/decoracion-espejos-salon-n993 does not match the index; that node is decorative wall mirrors and is routed out to Decor regardless. EXCLUDED: BAÑO (1089013) and ACCESORIOS DE BAÑO (1020447624) are grouping rows with blank qty and blank link (rule 24 + the 404 proof above). ALMACENAJE is a grouping row because its child Cestas is a live listing. The four 'empty' spacer nodes (1020031168, 1020031169, 1020699666, 1020699667) carry no name and no URL and were dropped. 'Ver todo' nodes (bano-n1050 100, bano-accesorios-n2470 51, fragancias-jabones-cremas 63), the EMBROIDERY COLLECTION capsule (20), PERSONALIZACIÓN (23) and SPECIAL PRICES > BAÑO (15) are View All / collection / promotional pages and are not recorded (rule 25). Route-outs (six towel/mat/robe/curtain nodes -> Textile, bathroom wall lamps -> Lighting, soaps and creams -> Decor/Fragrances, kids and baby bath -> Textile) and the not-bathroom nodes (neceseres, cuidado personal, laundry baskets organisation, decorative mirrors) are all in review[] so nothing is silently skipped.",
+ "rows": [
+  {
+   "category": "Bathroom",
+   "sub_category": "BATHROOM",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "BATHROOM > BATHROOM ACCESSORIES",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "BATHROOM > BATHROOM ACCESSORIES > Bathroom Bins",
+   "qty": 16,
+   "link": "https://www.zarahome.com/es/bano-papeleras-n3827",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "BATHROOM > BATHROOM ACCESSORIES > Soap Dispensers",
+   "qty": 26,
+   "link": "https://www.zarahome.com/es/bano-dispensadores-jabon-n3882",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "BATHROOM > BATHROOM ACCESSORIES > Toothbrush Cups",
+   "qty": 24,
+   "link": "https://www.zarahome.com/es/bano-vasos-cepillo-dientes-n3883",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "BATHROOM > BATHROOM ACCESSORIES > Soap Dishes",
+   "qty": 24,
+   "link": "https://www.zarahome.com/es/bano-jaboneras-n3884",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "BATHROOM > BATHROOM ACCESSORIES > Trays",
+   "qty": 17,
+   "link": "https://www.zarahome.com/es/bano-bandejas-n3885",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "BATHROOM > LAUNDRY BASKETS",
+   "qty": 14,
+   "link": "https://www.zarahome.com/es/bano-cestos-ropa-sucia-n3891",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "BATHROOM > STORAGE",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "BATHROOM > STORAGE > Baskets",
+   "qty": 42,
+   "link": "https://www.zarahome.com/es/bano-cestas-cajas-n4142",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "BATHROOM > TOWEL RAILS AND HOOKS",
+   "qty": 16,
+   "link": "https://www.zarahome.com/es/bano-toalleros-n4615",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "BATHROOM > MIRRORS",
+   "qty": 12,
+   "link": "https://www.zarahome.com/es/bano-espejos-n2468",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "FURNITURE > BATHROOM FURNITURE",
+   "qty": 22,
+   "link": "https://www.zarahome.com/es/bano-muebles-n2469",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  }
+ ],
+ "review": [
+  {
+   "category": "Bathroom",
+   "sub_category": "FURNITURE > COAT STANDS AND TOWEL RACKS",
+   "qty": 9,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Coat Stands and Towel Racks' (company 'Zara Home ES', same /es/ URL). OPTION 1 policy - stays in Furniture. Its grid sections are 'Rack- coats stands furniture | Rack-clothes furniture | Rack-towell furniture | Room divider furniture', i.e. it mixes coat stands and room dividers with towel rails, so it is not a pure Bathroom hardware node in any case.",
+   "link": "https://www.zarahome.com/es/muebles-toalleros-galanes-n4900"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "BATHROOM > BATHROOM (View All)",
+   "qty": 100,
+   "issue": "NOT RECORDED - View All for the BAÑO department (rule 25). Category 1020704134 owns the bare slug bano-n1050 (the department node 1089013 carries categoryUrlParam=1089013 and 404s on the grid endpoint). Its grid sections are 'Bath | Bathroom | No Travel | TOP 100' and 'TOP 5', i.e. a curated top-100 cut, not a real leaf.",
+   "link": "https://www.zarahome.com/es/bano-n1050"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "BATHROOM > BATHROOM ACCESSORIES > View All",
+   "qty": 51,
+   "issue": "NOT RECORDED - explicitly named 'Ver todo' and is the viewCategoryId target of the ACCESORIOS DE BAÑO hub (rule 25). Also demonstrably not a true all: its sections are 'Accessories bath | Bins bath | Boxes bath | Soap dishes bath | Trays bath' and it omits Dispensers and Toothbrush holders.",
+   "link": "https://www.zarahome.com/es/bano-accesorios-n2470"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "BATHROOM > BATHROOM ACCESSORIES > Boxes and Jars (Cosmetic Storage)",
+   "qty": 19,
+   "issue": "NOT RECORDED - confidence LOW, URL not independently verifiable (rules 27, 29). It is a genuine Bathroom accessory node (sections 'Boxes bath', 19 products) but it does NOT own its slug: category 1020447630 carries categoryUrlParam=1020447630 while sibling node 1020708636 BAÑO > ALMACENAJE owns the bare bano-cajas-n3886. The disambiguated form would be https://www.zarahome.com/es/bano-cajas-n3886?celement=1020447630 (the same ?celement= form Final.xlsx already uses for this storefront, e.g. /es/en/lighting-lamps-cordless-n5192?celement=1020692636), and the Zara Home UK worker independently observed that the bare bano-cajas slug renders STORAGE rather than Cosmetic Storage. Because the ES SEO PLP is unreachable behind the Akamai interstitial I could not render either form to confirm, so this is left for the run owner rather than guessed into rows[].",
+   "link": "https://www.zarahome.com/es/bano-cajas-n3886?celement=1020447630"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "BATHROOM > EMBROIDERY COLLECTION",
+   "qty": 20,
+   "issue": "NOT RECORDED - capsule/collection page (rule 25). Grid section 'Camarinas towels bath | Heritage capsulas'; it is a branded capsule re-cut of towels already counted in BAÑO > TOALLAS.",
+   "link": "https://www.zarahome.com/es/bathroom-capsule-collection-n5294"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "BATHROOM > TOWELS",
+   "qty": 130,
+   "issue": "ROUTED TO TEXTILE: bath and hand towels (rules 15, 20). Grid sections 'Towels basic bath | Towels bath'.",
+   "link": "https://www.zarahome.com/es/bano-toallas-n1051"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "BATHROOM > BASIC TOWELS",
+   "qty": 37,
+   "issue": "ROUTED TO TEXTILE: everyday towels, sectioned by gsm (500/600/650/700/800) (rule 15).",
+   "link": "https://www.zarahome.com/es/bano-toallas-basicas-n1817"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "BATHROOM > BEACH TOWELS",
+   "qty": 3,
+   "issue": "ROUTED TO TEXTILE: beach towels - textile and not bathroom at all (rule 15); listed for completeness because it is a child of the BAÑO department.",
+   "link": "https://www.zarahome.com/es/bano-toallas-playa-n1335"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "BATHROOM > BATH MATS",
+   "qty": 50,
+   "issue": "ROUTED TO TEXTILE: textile bath mats, not rubber/anti-slip bathroom accessories (rule 16). Grid section is 'Bath mats bath' and the products are tufted/woven cotton mats.",
+   "link": "https://www.zarahome.com/es/bano-alfombras-n1052"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "BATHROOM > BATHROBES AND SLIPPERS",
+   "qty": 50,
+   "issue": "ROUTED TO TEXTILE: bathrobes and bath slippers (rule 20). Sections 'Bathrobe bath' plus 'Bath slippers man/woman shoes and accesories'.",
+   "link": "https://www.zarahome.com/es/bano-albornoces-n1053"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "BATHROOM > SHOWER CURTAINS",
+   "qty": 9,
+   "issue": "ROUTED TO TEXTILE: shower curtains (rule 20). Section 'Bath curtains bath'.",
+   "link": "https://www.zarahome.com/es/bano-cortinas-ducha-n1414"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "BATHROOM > LIGHTING",
+   "qty": 4,
+   "issue": "ROUTED TO LIGHTING: primary product type is lighting (rules 11, 19). Grid section is literally 'Bath-wall-lamps bath' - bathroom wall lamps. Slug bano-lamparas-iluminacion-n5792 is newer than the ES category sitemap snapshot and does not appear in it, which is a further reason not to put it in rows[].",
+   "link": "https://www.zarahome.com/es/bano-lamparas-iluminacion-n5792"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "BATHROOM > SOAPS AND CREAMS",
+   "qty": null,
+   "issue": "ROUTED TO DECOR / FRAGRANCES: soaps, hand and body creams (rule 21 - toiletries, not bathroom fittings or accessories). The hub node 1020750983 returns ERR_CATEGORY_NOT_FOUND from the grid endpoint (no qty, hence null) and is duplicated verbatim as FRAGANCIAS > JABONES Y CREMAS, which is where the products really live. Its children are listed below.",
+   "link": "https://www.zarahome.com/es/fragancias-jabones-cremas-n5045"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "BATHROOM > SOAPS AND CREAMS > View All",
+   "qty": 63,
+   "issue": "ROUTED TO DECOR / FRAGRANCES and a 'Ver todo' page (rules 21, 25). Sections 'Body mist bruma fragrances | Creams fragrances | Soaps fragrances'.",
+   "link": "https://www.zarahome.com/es/fragancias-jabones-cremas-n5045"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "BATHROOM > SOAPS AND CREAMS > Soaps",
+   "qty": 43,
+   "issue": "ROUTED TO DECOR / FRAGRANCES: bar and liquid soaps are consumable toiletries, not bathroom accessories (rule 21). Section 'Soaps fragrances'.",
+   "link": "https://www.zarahome.com/es/fragancias-jabon-n1420"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "BATHROOM > SOAPS AND CREAMS > Hand and Body Creams",
+   "qty": 18,
+   "issue": "ROUTED TO DECOR / FRAGRANCES: hand and body lotion (rule 21). Section 'Body mist bruma fragrances | Creams fragrances'.",
+   "link": "https://www.zarahome.com/es/fragancias-cremas-n1063"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "BATHROOM > TOILETRY BAGS",
+   "qty": 36,
+   "issue": "NOT BATHROOM: wash bags / toiletry bags. Primary product type is a bag (sections Atemporal / Invernal / Piel / Seda y satén - leather, silk and satin), and the same node is duplicated as ROPA Y ZAPATOS > NECESERES Y BOLSOS > Neceseres, which owns the bare slug. Belongs with Clothing and Accessories, not Bathroom (rule 2). The Zara Home UK pass made the same call.",
+   "link": "https://www.zarahome.com/es/bano-neceseres-n4748"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "BATHROOM > PERSONAL CARE",
+   "qty": 31,
+   "issue": "NOT BATHROOM: self-care / spa consumables and personal-care items (section 'Selfcare capsulas'). Primary product type is toiletries and grooming, not bathroom fixtures, storage or accessories (rules 2, 21).",
+   "link": "https://www.zarahome.com/es/bano-spa-n1418"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "BATHROOM > PERSONALISATION",
+   "qty": 23,
+   "issue": "NOT RECORDED - customisation/embroidery service cut (rule 25). Sections 'Bathrobe bath | Towels bath' + 'Heritage capsulas', i.e. it re-lists towels and bathrobes already counted under BAÑO > TOALLAS and BAÑO > ALBORNOCES, and those are Textile anyway. Note this node returned 24 raw ccIds but only 23 unique - the single duplicate is the reason the unique figure is quoted.",
+   "link": "https://www.zarahome.com/es/bano-personalizacion-n1416"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "KIDS AND BABIES > BATHROOM",
+   "qty": 75,
+   "issue": "ROUTED TO TEXTILE: kids' bath towels (slug ninos-bano-toallas-n1140, rules 15, 20). Sits in the KIDS AND BABY department, not the BAÑO department.",
+   "link": "https://www.zarahome.com/es/ninos-bano-toallas-n1140"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "KIDS AND BABIES > BABIES > Bath",
+   "qty": 26,
+   "issue": "ROUTED TO TEXTILE: baby bath textiles - hooded towels, mini towels, muslins - plus combs and bath thermometers (sections 'Bath-hooded-newborn ... | Bath-towel-baby ... | Comb ... | Muslins ... | Thermometres kids and baby'). Predominantly textile and baby-care, not bathroom fittings (rules 2, 20).",
+   "link": "https://www.zarahome.com/es/bebe-bano-n3950"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "SPECIAL PRICES > BATHROOM",
+   "qty": 15,
+   "issue": "NOT RECORDED - promotional / markdown page (rule 25). Sections 'Bath | PVPs'; it re-lists discounted items already counted in the real BAÑO nodes.",
+   "link": "https://www.zarahome.com/es/bano-n1050?celement=1020461936"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "LAUNDRY > BASKETS AND ORGANISATION",
+   "qty": 54,
+   "issue": "NOT BATHROOM: it shares the bano-cestas-cajas-n4142 slug but sits in the LAUNDRY CARE department and its grid section is 'Organizationlaundry laundry room capsulas'. Zara Home's real bathroom basket node is BAÑO > ALMACENAJE > Cestas (42, sections 'Laundry baskets bath | Storage baskets bath'), which owns the bare slug and IS recorded. Recorded here only so the duplicate slug is not silently conflated.",
+   "link": "https://www.zarahome.com/es/bano-cestas-cajas-n4142?celement=1020696138"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "DECORATION > MIRRORS",
+   "qty": 40,
+   "issue": "NOT BATHROOM: decorative living-room mirrors (section 'Mirrors decoration'), sibling of Espejos de pared / de pie / de sobremesa / irregulares in the DECORACIÓN department - Wall Decor, not Bathroom (rules 2, 11, 21). NOTE: this is the same node the Home Decor pass already took for Zara Home Spain as 'MIRRORS' at https://www.zarahome.com/es/en/home-decor-mirrors-living-room-n993; already_extracted() does not flag the /es/ Spanish form because the index holds the /es/en/ English form of the identical category, so it is called out here explicitly. Zara Home's bathroom mirrors are the separate node BAÑO > ESPEJOS (12), which IS recorded.",
+   "link": "https://www.zarahome.com/es/decoracion-espejos-salon-n993"
+  }
+ ],
+ "_reconstructed_from": "Bathroom.xlsx delivered 2026-09-01 (checkpoint), not original worker JSON"
+}

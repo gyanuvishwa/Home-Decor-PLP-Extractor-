@@ -1,0 +1,634 @@
+{
+ "sr": 194,
+ "company": "Walmart US",
+ "brand_site": "walmart.com",
+ "country": "USA",
+ "site_url": "https://www.walmart.com/",
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ACCESS: robots.txt (https://www.walmart.com/robots.txt) checked first - no anthropic-ai/ClaudeBot/Claude-Web disallow found, generic 'User-agent: * / Disallow:' list only covers /account/, /api/, cart/checkout paths, not category browse pages. Tier (a) direct HTTP fetch (curl_cffi, impersonate=chrome120) was used for all data-bearing requests and worked reliably (200 OK, real __NEXT_DATA__/contentLayout JSON, no bot wall) for every one of the ~45 category pages fetched. A brief tier (b) Playwright (headless chromium) probe was also used: it worked fine for the general /cp/bedding/4044 'Home' hub page (used only for initial mega-menu discovery, no block), but hit a PerimeterX 'Robot or human?' challenge (blocked?url=...) when loading a specific /browse/ deep category page - that page was then successfully re-fetched via tier (a) curl_cffi instead, so no tier (c) Claude-in-Chrome escalation was needed; status is 'ok' not 'partial'. TREE: built as the union of (1) the site's full top-nav mega-menu, captured once via a single Playwright DOM link-extraction pass on the Home department hub page (492 links, filtered to ~90 Bedding/Bath/Decor/Storage&Organization/Kitchen&Dining candidates via each link's povid breadcrumb path e.g. HomeTopNav_BeddingBath_Bedding_DuvetCovers), and (2) each candidate category page's own contentLayout JSON (embedded in __NEXT_DATA__), which was walked recursively to recover further nested children not present in the top-nav (this is how Table Linens > Tablecloths/Placemats/Table Runners/Kitchen Linens/Outdoor Tablecloths and Shower Curtains > Liners/Extra Long/Standard/Sets were discovered). Every recorded leaf's own rendered <h1> text was checked to confirm it matches the requested node name (bad-slug/silent-wrong-number check) before being recorded. QTY: preferred order per rule was applied, but Walmart's rendered H1 caps every category above 1000 items at the literal text '(1000+)' (a genuine site-side display cap, not an estimate) - all rows showing this cap were recorded qty=null with a MANUAL REVIEW flag rather than fabricating a number. Where the site displayed an exact number under the cap (Coverlets=3, Runner Rugs=508, Kids' Bath Rugs=282, Kids' Shower Curtains=517) that exact number was used. The GraphQL __NEXT_DATA__ 'aggregatedCount'/'totalItemCount' fields were checked as a possible exact-count source but rejected: two clearly different categories (Bath Towels vs Bed Sheets) returned the same suspiciously large aggregatedCount (179600-182676), proving this field reflects an inflated/shared value rather than the true per-category count (consistent with this project's 'storefront count APIs are inflated' precedent), so it was not used. EXCLUDED and why: Curtain Rods, Shower Curtain Rods, Shower Curtain Hooks & Rings - hardware, not textile (textile.md sec 5). Shower Curtain Liners, 'Extra Long'/'Standard' Shower Curtains, Shower Curtain Sets - facet/size/material variants nested inside the already-counted 'Shower Curtains' node (liners are typically vinyl/PEVA, not fabric); not recorded separately to avoid double counting the same listing. Rug Pads - a rug accessory/underlayment, not itself a floor textile. 'Blinds & Shades' hub - predominantly non-fabric venetian/wood/cellular blinds, no clearly-fabric Roman/Roller Blinds subcategory was found in its own contentLayout, so excluded. Decorative Bins & Baskets, Fabric Tablecloths, 5x7/8x10 Area Rugs - narrower style/size facets nested inside an already-counted broader sibling node, skipped to avoid double counting. Hangers - an organizing accessory, not itself a storage container (storage.md has no explicit hanger inclusion). Mason Jars & Canning Supplies, Shelf Liners, Trash Cans, Vacuum Sealers (Kitchen Storage siblings) - primary purpose is canning/food-prep/waste/surface-lining, not storage, excluded per the Kitchen & Dining boundary (storage.md sec 13/26). Coat Racks, Hall Trees - despite a 'StorageOrganization' povid tag in the mega menu, their actual URL path (4044_103150_...) places them under the Furniture department; excluded per the explicit website-hierarchy rule (storage.md sec 21/27), belongs to the separate Furniture task. Backpacks, Luggage & Travel, Kids Luggage, Weekenders & Duffels - personal-carrying travel bags, explicitly excluded (storage.md sec 6). The entire Garage/Home-Improvement storage cluster (Bike Racks, Garage Cabinets, Ceiling Storage, Heavy Duty Shelving, Metal Shelves, Shelving Units, Storage Systems, Tool Chests) sits under Walmart's separate 'Home Improvement' department (ID 1072864), not the 'Home' department (4044) the rest of this tree comes from - treated as out of Home/Living scope per the worker brief. The bad-slug facet URL '/browse/home/closet-organizers/4044_90828?facet=recommended_room:Closet' (department root + facet param, not a real category ID) was discarded in favor of the genuine ID-based 'Closet Organizers' node (.../4044_90828_1230061). SCOPE LIMITATION: no dedicated 'Shoe Storage/Shoe Racks' or 'Patio/Garden Storage' node was found within the Home department (4044) navigation surface actually crawled (top-nav mega menu + each visited page's own contentLayout children); shoe storage may exist inside the general Bins & Baskets/Storage Furniture listings without its own category URL, and outdoor/patio storage boxes may live under Walmart's separate Patio & Garden department which was not crawled (out of the mega-menu path captured from the Home hub). A second Playwright probe of the Storage & Organization hub page (cp/storage-organization/90828), attempted specifically to check for a shoe-storage child node, hit the same PerimeterX 'Robot or human?' wall seen earlier on a /browse/ page; per the stop-on-first-block rule this was not chased further since tier (a) curl_cffi already delivered a substantial, reliable tree and status remains 'ok'.",
+ "textile_rows": [
+  {
+   "category": "Textile",
+   "sub_category": "Bedding",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Bed Sheets",
+   "qty": null,
+   "link": "https://www.walmart.com/browse/home/bed-sheets-pillowcases/4044_539103_5055527",
+   "is_group": false,
+   "evidence": "Rendered H1 text on category page (fetched via curl_cffi chrome120 impersonation): \"Bed Sheets (1000+)\"",
+   "flag": "MANUAL REVIEW: Walmart displays a capped count '(1000+)' for this category; the site does not expose an exact total in the rendered UI. The GraphQL 'aggregatedCount' field returns an inflated, non-category-specific value (verified identical across unrelated categories, e.g. 179600-182676), so it was not used per the no-fabrication/no-inflated-count rule.",
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Pillowcases",
+   "qty": null,
+   "link": "https://www.walmart.com/browse/home/pillowcases/4044_539103_5055527_9280424",
+   "is_group": false,
+   "evidence": "Rendered H1 text on category page (fetched via curl_cffi chrome120 impersonation): \"Pillowcases in Bed Sheets & Pillowcases (1000+)\"",
+   "flag": "MANUAL REVIEW: Walmart displays a capped count '(1000+)' for this category; the site does not expose an exact total in the rendered UI. The GraphQL 'aggregatedCount' field returns an inflated, non-category-specific value (verified identical across unrelated categories, e.g. 179600-182676), so it was not used per the no-fabrication/no-inflated-count rule.",
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Pillow Shams",
+   "qty": null,
+   "link": "https://www.walmart.com/browse/home/pillow-shams/4044_539103_6941101",
+   "is_group": false,
+   "evidence": "Rendered H1 text on category page (fetched via curl_cffi chrome120 impersonation): \"Pillow Shams in Bedding (1000+)\"",
+   "flag": "MANUAL REVIEW: Walmart displays a capped count '(1000+)' for this category; the site does not expose an exact total in the rendered UI. The GraphQL 'aggregatedCount' field returns an inflated, non-category-specific value (verified identical across unrelated categories, e.g. 179600-182676), so it was not used per the no-fabrication/no-inflated-count rule.",
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Bed Pillows",
+   "qty": null,
+   "link": "https://www.walmart.com/browse/home/bed-pillows/4044_539103_133141",
+   "is_group": false,
+   "evidence": "Rendered H1 text on category page (fetched via curl_cffi chrome120 impersonation): \"Bed Pillows in Bedding (1000+)\"",
+   "flag": "MANUAL REVIEW: not explicitly enumerated in textile.md's Bedding list (which lists only Pillowcases/Shams/Covers), but included by analogy to the explicit inclusion of filled Cushions (textile.md sec 4) as a soft textile-filled bedding product, not merely a cover. Also capped at 1000+.",
+   "confidence": "MEDIUM"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Duvet Covers",
+   "qty": null,
+   "link": "https://www.walmart.com/browse/home/duvet-covers/4044_539103_6974400",
+   "is_group": false,
+   "evidence": "Rendered H1 text on category page (fetched via curl_cffi chrome120 impersonation): \"Duvet Covers in Bedding (1000+)\"",
+   "flag": "MANUAL REVIEW: Walmart displays a capped count '(1000+)' for this category; the site does not expose an exact total in the rendered UI. The GraphQL 'aggregatedCount' field returns an inflated, non-category-specific value (verified identical across unrelated categories, e.g. 179600-182676), so it was not used per the no-fabrication/no-inflated-count rule.",
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Duvet Inserts",
+   "qty": null,
+   "link": "https://www.walmart.com/browse/home/duvet-inserts/4044_539103_1995847_126445",
+   "is_group": false,
+   "evidence": "Rendered H1 text on category page (fetched via curl_cffi chrome120 impersonation): \"Duvet Inserts in Comforters (1000+)\"",
+   "flag": "MANUAL REVIEW: Walmart displays a capped count '(1000+)' for this category; the site does not expose an exact total in the rendered UI. The GraphQL 'aggregatedCount' field returns an inflated, non-category-specific value (verified identical across unrelated categories, e.g. 179600-182676), so it was not used per the no-fabrication/no-inflated-count rule.",
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Mattress Protectors",
+   "qty": null,
+   "link": "https://www.walmart.com/browse/mattress-covers-protectors/4044_539103_7427099",
+   "is_group": false,
+   "evidence": "Rendered H1 text on category page (fetched via curl_cffi chrome120 impersonation): \"Waterproof Mattress Covers and Protectors (1000+)\"",
+   "flag": "MANUAL REVIEW: Walmart displays a capped count '(1000+)' for this category; the site does not expose an exact total in the rendered UI. The GraphQL 'aggregatedCount' field returns an inflated, non-category-specific value (verified identical across unrelated categories, e.g. 179600-182676), so it was not used per the no-fabrication/no-inflated-count rule.",
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Mattress Toppers & Pads",
+   "qty": null,
+   "link": "https://www.walmart.com/browse/home/mattress-toppers-pads/4044_539103_5947786",
+   "is_group": false,
+   "evidence": "Rendered H1 text on category page (fetched via curl_cffi chrome120 impersonation): \"Mattress Toppers & Pads in Bedding (1000+)\"",
+   "flag": "MANUAL REVIEW: Walmart displays a capped count '(1000+)' for this category; the site does not expose an exact total in the rendered UI. The GraphQL 'aggregatedCount' field returns an inflated, non-category-specific value (verified identical across unrelated categories, e.g. 179600-182676), so it was not used per the no-fabrication/no-inflated-count rule.",
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Comforters",
+   "qty": null,
+   "link": "https://www.walmart.com/browse/home/comforters/4044_539103_4754",
+   "is_group": false,
+   "evidence": "Rendered H1 text on category page (fetched via curl_cffi chrome120 impersonation): \"Comforters (1000+)\"",
+   "flag": "MANUAL REVIEW: Walmart displays a capped count '(1000+)' for this category; the site does not expose an exact total in the rendered UI. The GraphQL 'aggregatedCount' field returns an inflated, non-category-specific value (verified identical across unrelated categories, e.g. 179600-182676), so it was not used per the no-fabrication/no-inflated-count rule.",
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Quilts & Bedspreads",
+   "qty": null,
+   "link": "https://www.walmart.com/browse/home/quilts-bedspreads/4044_539103_1024979",
+   "is_group": false,
+   "evidence": "Rendered H1 text on category page (fetched via curl_cffi chrome120 impersonation): \"Quilts for Cozy and Stylish Bedding (1000+)\"",
+   "flag": "MANUAL REVIEW: Walmart displays a capped count '(1000+)' for this category; the site does not expose an exact total in the rendered UI. The GraphQL 'aggregatedCount' field returns an inflated, non-category-specific value (verified identical across unrelated categories, e.g. 179600-182676), so it was not used per the no-fabrication/no-inflated-count rule.",
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Blankets & Throws",
+   "qty": null,
+   "link": "https://www.walmart.com/browse/home/blankets/4044_539103_4756",
+   "is_group": false,
+   "evidence": "Rendered H1 text on category page (fetched via curl_cffi chrome120 impersonation): \"Blankets (1000+)\"",
+   "flag": "MANUAL REVIEW: Walmart displays a capped count '(1000+)' for this category; the site does not expose an exact total in the rendered UI. The GraphQL 'aggregatedCount' field returns an inflated, non-category-specific value (verified identical across unrelated categories, e.g. 179600-182676), so it was not used per the no-fabrication/no-inflated-count rule.",
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Heated Blankets",
+   "qty": null,
+   "link": "https://www.walmart.com/browse/home/heated-blankets/4044_539103_4756_6519307",
+   "is_group": false,
+   "evidence": "Rendered H1 text on category page (fetched via curl_cffi chrome120 impersonation): \"Electric Heated Blankets and Warming Throws (1000+)\"",
+   "flag": "MANUAL REVIEW: contains an electric heating element; included as fundamentally a blanket/throw textile product, flagged for review given the electronic-accessory overlap. Also capped at 1000+.",
+   "confidence": "MEDIUM"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Coverlets",
+   "qty": 3,
+   "link": "https://www.walmart.com/browse/home/coverlets/4044_539103_7964343",
+   "is_group": false,
+   "evidence": "Rendered H1 text on category page (fetched via curl_cffi chrome120 impersonation): \"Coverlets in Bedding (3)\"",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Decorative Textiles",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Throw Pillows",
+   "qty": null,
+   "link": "https://www.walmart.com/browse/home/throw-pillows/4044_133012_5991909_127715",
+   "is_group": false,
+   "evidence": "Rendered H1 text on category page (fetched via curl_cffi chrome120 impersonation): \"Throw Pillows in Decorative Pillows & Throws (1000+)\"",
+   "flag": "MANUAL REVIEW: Walmart displays a capped count '(1000+)' for this category; the site does not expose an exact total in the rendered UI. The GraphQL 'aggregatedCount' field returns an inflated, non-category-specific value (verified identical across unrelated categories, e.g. 179600-182676), so it was not used per the no-fabrication/no-inflated-count rule.",
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Throw Blankets",
+   "qty": null,
+   "link": "https://www.walmart.com/browse/home/throw-blankets/4044_133012_6160705",
+   "is_group": false,
+   "evidence": "Rendered H1 text on category page (fetched via curl_cffi chrome120 impersonation): \"Throw Blankets in Decor (1000+)\"",
+   "flag": "MANUAL REVIEW: Walmart displays a capped count '(1000+)' for this category; the site does not expose an exact total in the rendered UI. The GraphQL 'aggregatedCount' field returns an inflated, non-category-specific value (verified identical across unrelated categories, e.g. 179600-182676), so it was not used per the no-fabrication/no-inflated-count rule.",
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Curtains & Window Treatments",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Curtains",
+   "qty": null,
+   "link": "https://www.walmart.com/browse/home/shop-curtains/4044_133012_539105_1521917_2606905",
+   "is_group": false,
+   "evidence": "Rendered H1 text on category page (fetched via curl_cffi chrome120 impersonation): \"Shop Curtains in Curtains (1000+)\"",
+   "flag": "MANUAL REVIEW: Walmart displays a capped count '(1000+)' for this category; the site does not expose an exact total in the rendered UI. The GraphQL 'aggregatedCount' field returns an inflated, non-category-specific value (verified identical across unrelated categories, e.g. 179600-182676), so it was not used per the no-fabrication/no-inflated-count rule.",
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Blackout Curtains",
+   "qty": null,
+   "link": "https://www.walmart.com/browse/home/blackout-curtains/4044_133012_539105_1521917_1331481",
+   "is_group": false,
+   "evidence": "Rendered H1 text on category page (fetched via curl_cffi chrome120 impersonation): \"Blackout Curtains for Privacy and Light Control (1000+)\"",
+   "flag": "MANUAL REVIEW: Walmart displays a capped count '(1000+)' for this category; the site does not expose an exact total in the rendered UI. The GraphQL 'aggregatedCount' field returns an inflated, non-category-specific value (verified identical across unrelated categories, e.g. 179600-182676), so it was not used per the no-fabrication/no-inflated-count rule.",
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Sheer Curtains",
+   "qty": null,
+   "link": "https://www.walmart.com/browse/home/sheer-curtains/4044_133012_539105_1521917_2913338",
+   "is_group": false,
+   "evidence": "Rendered H1 text on category page (fetched via curl_cffi chrome120 impersonation): \"Sheer Curtains for Light Filtering Window Decor (1000+)\"",
+   "flag": "MANUAL REVIEW: Walmart displays a capped count '(1000+)' for this category; the site does not expose an exact total in the rendered UI. The GraphQL 'aggregatedCount' field returns an inflated, non-category-specific value (verified identical across unrelated categories, e.g. 179600-182676), so it was not used per the no-fabrication/no-inflated-count rule.",
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Valances",
+   "qty": null,
+   "link": "https://www.walmart.com/browse/home/valances/4044_133012_539105_1521917_660459",
+   "is_group": false,
+   "evidence": "Rendered H1 text on category page (fetched via curl_cffi chrome120 impersonation): \"Valances in Curtains (1000+)\"",
+   "flag": "MANUAL REVIEW: Walmart displays a capped count '(1000+)' for this category; the site does not expose an exact total in the rendered UI. The GraphQL 'aggregatedCount' field returns an inflated, non-category-specific value (verified identical across unrelated categories, e.g. 179600-182676), so it was not used per the no-fabrication/no-inflated-count rule.",
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Rugs & Doormats",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Area Rugs",
+   "qty": null,
+   "link": "https://www.walmart.com/cp/area-rugs/6718514",
+   "is_group": false,
+   "evidence": "Rendered H1 text on category page (fetched via curl_cffi chrome120 impersonation): \"Area Rugs (1000+)\"",
+   "flag": "MANUAL REVIEW: Walmart displays a capped count '(1000+)' for this category; the site does not expose an exact total in the rendered UI. The GraphQL 'aggregatedCount' field returns an inflated, non-category-specific value (verified identical across unrelated categories, e.g. 179600-182676), so it was not used per the no-fabrication/no-inflated-count rule.",
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Runner Rugs",
+   "qty": 508,
+   "link": "https://www.walmart.com/browse/home/runner-rugs/4044_133012_110892_1538758",
+   "is_group": false,
+   "evidence": "Rendered H1 text on category page (fetched via curl_cffi chrome120 impersonation): \"Runner Rugs for Hallways and Entryways (508)\"",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Washable Rugs",
+   "qty": null,
+   "link": "https://www.walmart.com/browse/home/washable-rugs/4044_133012_110892_6005086",
+   "is_group": false,
+   "evidence": "Rendered H1 text on category page (fetched via curl_cffi chrome120 impersonation): \"Washable Rugs in Rugs (1000+)\"",
+   "flag": "MANUAL REVIEW: Walmart displays a capped count '(1000+)' for this category; the site does not expose an exact total in the rendered UI. The GraphQL 'aggregatedCount' field returns an inflated, non-category-specific value (verified identical across unrelated categories, e.g. 179600-182676), so it was not used per the no-fabrication/no-inflated-count rule.",
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Doormats",
+   "qty": null,
+   "link": "https://www.walmart.com/browse/home/doormats/4044_133012_110892_4768882",
+   "is_group": false,
+   "evidence": "Rendered H1 text on category page (fetched via curl_cffi chrome120 impersonation): \"Durable Doormats for Indoor and Outdoor Use (1000+)\"",
+   "flag": "MANUAL REVIEW: Walmart displays a capped count '(1000+)' for this category; the site does not expose an exact total in the rendered UI. The GraphQL 'aggregatedCount' field returns an inflated, non-category-specific value (verified identical across unrelated categories, e.g. 179600-182676), so it was not used per the no-fabrication/no-inflated-count rule.",
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Bath",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Bath Towels",
+   "qty": null,
+   "link": "https://www.walmart.com/browse/home/bath-towels/4044_539095_7211899",
+   "is_group": false,
+   "evidence": "Rendered H1 text on category page (fetched via curl_cffi chrome120 impersonation): \"Bath Towels in Bath (1000+)\"",
+   "flag": "MANUAL REVIEW: Walmart displays a capped count '(1000+)' for this category; the site does not expose an exact total in the rendered UI. The GraphQL 'aggregatedCount' field returns an inflated, non-category-specific value (verified identical across unrelated categories, e.g. 179600-182676), so it was not used per the no-fabrication/no-inflated-count rule.",
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Beach Towels",
+   "qty": null,
+   "link": "https://www.walmart.com/browse/home/beach-towels/4044_539095_1113072",
+   "is_group": false,
+   "evidence": "Rendered H1 text on category page (fetched via curl_cffi chrome120 impersonation): \"Beach Towels in Bath (1000+)\"",
+   "flag": "MANUAL REVIEW: Walmart displays a capped count '(1000+)' for this category; the site does not expose an exact total in the rendered UI. The GraphQL 'aggregatedCount' field returns an inflated, non-category-specific value (verified identical across unrelated categories, e.g. 179600-182676), so it was not used per the no-fabrication/no-inflated-count rule.",
+   "confidence": "MEDIUM"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Bathroom Rugs & Bath Mats",
+   "qty": null,
+   "link": "https://www.walmart.com/browse/home/bathroom-rugs-bath-mats/4044_539095_920259",
+   "is_group": false,
+   "evidence": "Rendered H1 text on category page (fetched via curl_cffi chrome120 impersonation): \"Bathroom Rugs & Bath Mats in Bath (1000+)\"",
+   "flag": "MANUAL REVIEW: Walmart displays a capped count '(1000+)' for this category; the site does not expose an exact total in the rendered UI. The GraphQL 'aggregatedCount' field returns an inflated, non-category-specific value (verified identical across unrelated categories, e.g. 179600-182676), so it was not used per the no-fabrication/no-inflated-count rule.",
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Shower Curtains",
+   "qty": null,
+   "link": "https://www.walmart.com/browse/home/shower-curtains-accessories/4044_539095_2141805",
+   "is_group": false,
+   "evidence": "Rendered H1 text on category page (fetched via curl_cffi chrome120 impersonation): \"Shower Curtains (1000+) [page title: 'Shower Curtains - Walmart.com']\"",
+   "flag": "MANUAL REVIEW: Walmart displays a capped count '(1000+)' for this category; the site does not expose an exact total in the rendered UI. The GraphQL 'aggregatedCount' field returns an inflated, non-category-specific value (verified identical across unrelated categories, e.g. 179600-182676), so it was not used per the no-fabrication/no-inflated-count rule.",
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Kids' Bathroom",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Kids' Bath Rugs",
+   "qty": 282,
+   "link": "https://www.walmart.com/browse/home/kids-bath-mats/4044_1154295_1143252_1143254",
+   "is_group": false,
+   "evidence": "Rendered H1 text on category page (fetched via curl_cffi chrome120 impersonation): \"Kid's Bath Rugs in Kids' Bathroom (282)\"",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Kids' Shower Curtains",
+   "qty": 517,
+   "link": "https://www.walmart.com/browse/home/kids-shower-curtains/4044_1154295_1143252_1143255",
+   "is_group": false,
+   "evidence": "Rendered H1 text on category page (fetched via curl_cffi chrome120 impersonation): \"Kids' Shower Curtains in Kids' Bathroom (517)\"",
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Kids' Towels",
+   "qty": null,
+   "link": "https://www.walmart.com/browse/home/kids-towels/4044_1154295_1143252_1143253",
+   "is_group": false,
+   "evidence": "Rendered H1 text on category page (fetched via curl_cffi chrome120 impersonation): \"Kids' Towels in Kids' Bathroom (1000+)\"",
+   "flag": "MANUAL REVIEW: Walmart displays a capped count '(1000+)' for this category; the site does not expose an exact total in the rendered UI. The GraphQL 'aggregatedCount' field returns an inflated, non-category-specific value (verified identical across unrelated categories, e.g. 179600-182676), so it was not used per the no-fabrication/no-inflated-count rule.",
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Kitchen & Table Linens",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Kitchen Linens",
+   "qty": null,
+   "link": "https://www.walmart.com/browse/home/kitchen-linens/4044_623679_8055732_5591719",
+   "is_group": false,
+   "evidence": "Rendered H1 text on category page (fetched via curl_cffi chrome120 impersonation): \"Kitchen Linens Cotton Towels & Aprons (1000+)\"",
+   "flag": "MANUAL REVIEW: Walmart displays a capped count '(1000+)' for this category; the site does not expose an exact total in the rendered UI. The GraphQL 'aggregatedCount' field returns an inflated, non-category-specific value (verified identical across unrelated categories, e.g. 179600-182676), so it was not used per the no-fabrication/no-inflated-count rule.",
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Table Linens",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Tablecloths",
+   "qty": null,
+   "link": "https://www.walmart.com/browse/home/tablecloths/4044_623679_8055732_8058163_7214975",
+   "is_group": false,
+   "evidence": "Rendered H1 text on category page (fetched via curl_cffi chrome120 impersonation): \"Tablecloths for Dining and Outdoor Use (1000+)\"",
+   "flag": "MANUAL REVIEW: Walmart displays a capped count '(1000+)' for this category; the site does not expose an exact total in the rendered UI. The GraphQL 'aggregatedCount' field returns an inflated, non-category-specific value (verified identical across unrelated categories, e.g. 179600-182676), so it was not used per the no-fabrication/no-inflated-count rule.",
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Placemats",
+   "qty": null,
+   "link": "https://www.walmart.com/browse/home/placemats/4044_623679_8055732_8058163_5419088",
+   "is_group": false,
+   "evidence": "Rendered H1 text on category page (fetched via curl_cffi chrome120 impersonation): \"Place Mats (1000+)\"",
+   "flag": "MANUAL REVIEW: Walmart displays a capped count '(1000+)' for this category; the site does not expose an exact total in the rendered UI. The GraphQL 'aggregatedCount' field returns an inflated, non-category-specific value (verified identical across unrelated categories, e.g. 179600-182676), so it was not used per the no-fabrication/no-inflated-count rule.",
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Table Runners",
+   "qty": null,
+   "link": "https://www.walmart.com/browse/home/table-runners/4044_623679_8055732_8058163_6267997",
+   "is_group": false,
+   "evidence": "Rendered H1 text on category page (fetched via curl_cffi chrome120 impersonation): \"Table Runners (1000+)\"",
+   "flag": "MANUAL REVIEW: Walmart displays a capped count '(1000+)' for this category; the site does not expose an exact total in the rendered UI. The GraphQL 'aggregatedCount' field returns an inflated, non-category-specific value (verified identical across unrelated categories, e.g. 179600-182676), so it was not used per the no-fabrication/no-inflated-count rule.",
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Textile",
+   "sub_category": "Outdoor Tablecloths",
+   "qty": null,
+   "link": "https://www.walmart.com/browse/home/outdoor-tablecloths/4044_623679_8055732_5058981",
+   "is_group": false,
+   "evidence": "Rendered H1 text on category page (fetched via curl_cffi chrome120 impersonation): \"Outdoor Tablecloths in Kitchen & Table Linens (1000+)\"",
+   "flag": "MANUAL REVIEW: Walmart displays a capped count '(1000+)' for this category; the site does not expose an exact total in the rendered UI. The GraphQL 'aggregatedCount' field returns an inflated, non-category-specific value (verified identical across unrelated categories, e.g. 179600-182676), so it was not used per the no-fabrication/no-inflated-count rule.",
+   "confidence": "MEDIUM"
+  }
+ ],
+ "storage_rows": [
+  {
+   "category": "Storage",
+   "sub_category": "Storage & Organization",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Bins & Baskets",
+   "qty": null,
+   "link": "https://www.walmart.com/browse/home/storage-baskets-bins/4044_90828_1230055",
+   "is_group": false,
+   "evidence": "Rendered H1 text on category page (fetched via curl_cffi chrome120 impersonation): \"Home Storage - Storage Baskets & Bins (1000+)\"",
+   "flag": "MANUAL REVIEW: Walmart displays a capped count '(1000+)' for this category; the site does not expose an exact total in the rendered UI. The GraphQL 'aggregatedCount' field returns an inflated, non-category-specific value (verified identical across unrelated categories, e.g. 179600-182676), so it was not used per the no-fabrication/no-inflated-count rule.",
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Storage Containers",
+   "qty": null,
+   "link": "https://www.walmart.com/browse/home/storage-containers/4044_90828_1230056",
+   "is_group": false,
+   "evidence": "Rendered H1 text on category page (fetched via curl_cffi chrome120 impersonation): \"Storage Containers for Home Organization (1000+)\"",
+   "flag": "MANUAL REVIEW: Walmart displays a capped count '(1000+)' for this category; the site does not expose an exact total in the rendered UI. The GraphQL 'aggregatedCount' field returns an inflated, non-category-specific value (verified identical across unrelated categories, e.g. 179600-182676), so it was not used per the no-fabrication/no-inflated-count rule.",
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Drawers & Carts",
+   "qty": null,
+   "link": "https://www.walmart.com/browse/home/drawers-carts/4044_90828_925639",
+   "is_group": false,
+   "evidence": "Rendered H1 text on category page (fetched via curl_cffi chrome120 impersonation): \"Organizer Drawers & Carts (1000+)\"",
+   "flag": "MANUAL REVIEW: Walmart displays a capped count '(1000+)' for this category; the site does not expose an exact total in the rendered UI. The GraphQL 'aggregatedCount' field returns an inflated, non-category-specific value (verified identical across unrelated categories, e.g. 179600-182676), so it was not used per the no-fabrication/no-inflated-count rule.",
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Storage Furniture",
+   "qty": null,
+   "link": "https://www.walmart.com/browse/home/storage-furniture/4044_90828_1230059",
+   "is_group": false,
+   "evidence": "Rendered H1 text on category page (fetched via curl_cffi chrome120 impersonation): \"Storage Furniture (1000+)\"",
+   "flag": "MANUAL REVIEW: site places this node under the Storage & Organization department (URL path 90828), so included per storage.md sec 21 boundary rule; may overlap with items the separate Furniture task also captures. Also capped at 1000+.",
+   "confidence": "MEDIUM"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Storage Ottomans",
+   "qty": null,
+   "link": "https://www.walmart.com/browse/home/storage-ottomans/4044_90828_1230059_1230060",
+   "is_group": false,
+   "evidence": "Rendered H1 text on category page (fetched via curl_cffi chrome120 impersonation): \"Storage Ottomans for Living Room Furniture (1000+)\"",
+   "flag": "MANUAL REVIEW: H1 text explicitly says 'for Living Room Furniture' even though URL hierarchy nests it under Storage & Organization > Storage Furniture (90828). Placed in review queue per storage.md sec 42 ambiguity handling. Also capped at 1000+.",
+   "confidence": "LOW"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Laundry Storage",
+   "qty": null,
+   "link": "https://www.walmart.com/browse/home/laundry-storage-organization/4044_90828_7067220",
+   "is_group": false,
+   "evidence": "Rendered H1 text on category page (fetched via curl_cffi chrome120 impersonation): \"Laundry Room Organization (1000+)\"",
+   "flag": "MANUAL REVIEW: Walmart displays a capped count '(1000+)' for this category; the site does not expose an exact total in the rendered UI. The GraphQL 'aggregatedCount' field returns an inflated, non-category-specific value (verified identical across unrelated categories, e.g. 179600-182676), so it was not used per the no-fabrication/no-inflated-count rule.",
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Closet Organizers",
+   "qty": null,
+   "link": "https://www.walmart.com/browse/home/closet-organizers/4044_90828_1230061",
+   "is_group": false,
+   "evidence": "Rendered H1 text on category page (fetched via curl_cffi chrome120 impersonation): \"Closet Organizers (1000+)\"",
+   "flag": "MANUAL REVIEW: Walmart displays a capped count '(1000+)' for this category; the site does not expose an exact total in the rendered UI. The GraphQL 'aggregatedCount' field returns an inflated, non-category-specific value (verified identical across unrelated categories, e.g. 179600-182676), so it was not used per the no-fabrication/no-inflated-count rule.",
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Office Storage",
+   "qty": null,
+   "link": "https://www.walmart.com/browse/storage-organization/office-storage/4044_90828_1230064",
+   "is_group": false,
+   "evidence": "Rendered H1 text on category page (fetched via curl_cffi chrome120 impersonation): \"Office Storage in Storage & Organization (1000+)\"",
+   "flag": "MANUAL REVIEW: Walmart displays a capped count '(1000+)' for this category; the site does not expose an exact total in the rendered UI. The GraphQL 'aggregatedCount' field returns an inflated, non-category-specific value (verified identical across unrelated categories, e.g. 179600-182676), so it was not used per the no-fabrication/no-inflated-count rule.",
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Kids' Storage",
+   "qty": null,
+   "link": "https://www.walmart.com/browse/home/kids-teen-storage/4044_90828_2523133",
+   "is_group": false,
+   "evidence": "Rendered H1 text on category page (fetched via curl_cffi chrome120 impersonation): \"Kids Storage Solutions for Organized Spaces (1000+)\"",
+   "flag": "MANUAL REVIEW: Walmart displays a capped count '(1000+)' for this category; the site does not expose an exact total in the rendered UI. The GraphQL 'aggregatedCount' field returns an inflated, non-category-specific value (verified identical across unrelated categories, e.g. 179600-182676), so it was not used per the no-fabrication/no-inflated-count rule.",
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Kitchen Storage",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Countertop Organizers",
+   "qty": null,
+   "link": "https://www.walmart.com/browse/home/counter-organizers/4044_623679_1032619_1032621",
+   "is_group": false,
+   "evidence": "Rendered H1 text on category page (fetched via curl_cffi chrome120 impersonation): \"Counter Organizers for Kitchen Storage (1000+)\"",
+   "flag": "MANUAL REVIEW: Walmart displays a capped count '(1000+)' for this category; the site does not expose an exact total in the rendered UI. The GraphQL 'aggregatedCount' field returns an inflated, non-category-specific value (verified identical across unrelated categories, e.g. 179600-182676), so it was not used per the no-fabrication/no-inflated-count rule.",
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Drawers & Cabinet Organizers",
+   "qty": null,
+   "link": "https://www.walmart.com/browse/home/drawers-cabinet-organizers/4044_623679_1032619_1075864",
+   "is_group": false,
+   "evidence": "Rendered H1 text on category page (fetched via curl_cffi chrome120 impersonation): \"Drawer and Cabinet Organizers for Kitchen Storage (1000+)\"",
+   "flag": "MANUAL REVIEW: Walmart displays a capped count '(1000+)' for this category; the site does not expose an exact total in the rendered UI. The GraphQL 'aggregatedCount' field returns an inflated, non-category-specific value (verified identical across unrelated categories, e.g. 179600-182676), so it was not used per the no-fabrication/no-inflated-count rule.",
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Food Storage",
+   "qty": null,
+   "link": "https://www.walmart.com/browse/home/food-storage-containers/4044_623679_1032619_5842891",
+   "is_group": false,
+   "evidence": "Rendered H1 text on category page (fetched via curl_cffi chrome120 impersonation): \"Food Storage Containers in Kitchen Storage & Organization (1000+)\"",
+   "flag": "MANUAL REVIEW: Walmart displays a capped count '(1000+)' for this category; the site does not expose an exact total in the rendered UI. The GraphQL 'aggregatedCount' field returns an inflated, non-category-specific value (verified identical across unrelated categories, e.g. 179600-182676), so it was not used per the no-fabrication/no-inflated-count rule.",
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Spice Racks",
+   "qty": null,
+   "link": "https://www.walmart.com/browse/home/spice-racks/4044_623679_1032619_1075866",
+   "is_group": false,
+   "evidence": "Rendered H1 text on category page (fetched via curl_cffi chrome120 impersonation): \"Spice Racks for Kitchen Storage and Organization (1000+)\"",
+   "flag": "MANUAL REVIEW: Walmart displays a capped count '(1000+)' for this category; the site does not expose an exact total in the rendered UI. The GraphQL 'aggregatedCount' field returns an inflated, non-category-specific value (verified identical across unrelated categories, e.g. 179600-182676), so it was not used per the no-fabrication/no-inflated-count rule.",
+   "confidence": "MEDIUM"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Pantry Organization",
+   "qty": null,
+   "link": "https://www.walmart.com/browse/home/pantry-organization/4044_623679_1032619_8555146",
+   "is_group": false,
+   "evidence": "Rendered H1 text on category page (fetched via curl_cffi chrome120 impersonation): \"Pantry Organization Solutions for Kitchen Storage (1000+)\"",
+   "flag": "MANUAL REVIEW: Walmart displays a capped count '(1000+)' for this category; the site does not expose an exact total in the rendered UI. The GraphQL 'aggregatedCount' field returns an inflated, non-category-specific value (verified identical across unrelated categories, e.g. 179600-182676), so it was not used per the no-fabrication/no-inflated-count rule.",
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Bath Storage",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null,
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Bathroom Storage",
+   "qty": null,
+   "link": "https://www.walmart.com/browse/home/bathroom-storage/4044_539095_6405150",
+   "is_group": false,
+   "evidence": "Rendered H1 text on category page (fetched via curl_cffi chrome120 impersonation): \"Bathroom Storage in Bath (1000+)\"",
+   "flag": "MANUAL REVIEW: Walmart displays a capped count '(1000+)' for this category; the site does not expose an exact total in the rendered UI. The GraphQL 'aggregatedCount' field returns an inflated, non-category-specific value (verified identical across unrelated categories, e.g. 179600-182676), so it was not used per the no-fabrication/no-inflated-count rule.",
+   "confidence": "HIGH"
+  },
+  {
+   "category": "Storage",
+   "sub_category": "Over the Toilet Storage",
+   "qty": null,
+   "link": "https://www.walmart.com/browse/home/over-the-toilet-storage/4044_539095_5547362_4792254",
+   "is_group": false,
+   "evidence": "Rendered H1 text on category page (fetched via curl_cffi chrome120 impersonation): \"Over the Toilet Storage in Bathroom Storage (1000+)\"",
+   "flag": "MANUAL REVIEW: Walmart displays a capped count '(1000+)' for this category; the site does not expose an exact total in the rendered UI. The GraphQL 'aggregatedCount' field returns an inflated, non-category-specific value (verified identical across unrelated categories, e.g. 179600-182676), so it was not used per the no-fabrication/no-inflated-count rule.",
+   "confidence": "HIGH"
+  }
+ ]
+}

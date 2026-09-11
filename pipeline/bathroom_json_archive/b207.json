@@ -1,0 +1,32 @@
+{
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "Access: direct HTTP via curl_cffi impersonate=safari17_0 worked for homepage, sitemap_index.xml and category-sitemap, and for the two deepest Bath subcategory pages; only the exact parent URL /c/home/bath returned a persistent DataDome 403 across many retries/impersonation profiles (chrome120/119/edge101/edge99 all 403, safari17_0/15_5/15_3 mixed) even though its own children (bath-accessories, bath-mats, towels) and sibling parents (/c/home, /c/home/kitchen) returned 200 consistently -- treated as a non-issue since rule 24 forbids recording a parent URL when valid subcategories exist, so the parent block never blocked data collection. robots.txt (fetched via safari17_0, 200) has no ClaudeBot/anthropic-ai/Claude-Web/Claude-User/Claude-SearchBot entry at all -- no Claude-specific disallow, proceeding is permitted. Tree source: sitemap_3-category.xml (668KB, 2759 <loc> entries) gives the authoritative full site category tree; filtered to /c/home/* (82 nodes) and confirmed via the rendered mega-nav on the homepage HTML, which independently surfaced the same home/bath link. Saks' entire Bath hierarchy is exactly 3 leaf nodes, no deeper nesting: home/bath/bath-accessories, home/bath/bath-mats, home/bath/towels. Each leaf HTML was fetched directly (200, ~1-1.7MB each), H1 and <link rel=canonical> both matched the requested slug on all three (node-identity check passed). Qty verification: each page carries a real 'data-search-count' attribute plus a matching rendered '<data-search-count> Items' header (both mobile and desktop DOM copies agree) -- bath-accessories=50, bath-mats=6, towels=24; used the rendered header per the qty rule, not a storefront count API (none present -- no Algolia/Constructor/Searchspring/Coveo/Bloomreach/Klevu found in homepage JS, this is native SFCC/Demandware). Classification: bath-accessories product alt-text sample (23 unique) is soap dispensers/dishes, vanity trays, toilet-paper holders/stands, toothbrush holders, tissue boxes, a vanity mirror, and a wastebasket -- all genuine Bathroom Accessories/Hardware per rules 10/13/14/17, no ambiguity, kept in rows[]. bath-mats product alt-text sample (6 of 6) is 'Cotton Bath Mat'/'Bath Rug' items (Ralph Lauren, Missoni, Versace) -- textile fabric mats/rugs per rule 16, routed out. towels node (H1/URL says Towels, Bath category) is bath towels per rule 15/20, routed out. Cross-category dedup: ran the mandated cross_category_url_index.json lookup on all three candidate leaf URLs -- bath-accessories -> None (genuine new Bathroom leaf, kept in rows[]); bath-mats -> ['Textile.xlsx'] (already extracted there, moved to review[] per the mandatory dedup rule, not rows[]); towels -> ['Textile.xlsx'] (same). Also checked the full category-sitemap for any other bath/shower/vanity/faucet/sink/toilet/bidet/mirror-named node sitewide: all other hits are Beauty/Grooming 'Bath & Body' personal-care lines, editorial/gift pages, or Home > Home Decor > Wall Decor & Mirrors (a general decor node, not under the Bath hierarchy at all per the site's own taxonomy -- rule 3 website-hierarchy authority excludes it, and it is Wall_Decor.xlsx's own territory) -- none are additional genuine Bathroom nodes. No fabrication; every qty has page-level evidence.",
+  "rows": [
+    {
+      "category": "Bathroom",
+      "sub_category": "Bath Accessories",
+      "qty": 50,
+      "link": "https://www.saksfifthavenue.com/c/home/bath/bath-accessories",
+      "is_group": false,
+      "evidence": "Page shows data-search-count=\"50\" attribute and rendered \"50 Items\" header (both desktop and mobile DOM copies); H1=\"Bath Accessories\", canonical URL matches exactly. Product sample: soap dispensers/dishes, vanity trays, toilet-paper holders/stands, toothbrush holders, tissue boxes, a vanity mirror, a wastebasket.",
+      "flag": null
+    }
+  ],
+  "review": [
+    {
+      "category": "Bathroom",
+      "sub_category": "Bathroom Rugs & Bath Mats",
+      "qty": 6,
+      "issue": "ALREADY EXTRACTED IN Textile.xlsx",
+      "link": "https://www.saksfifthavenue.com/c/home/bath/bath-mats"
+    },
+    {
+      "category": "Bathroom",
+      "sub_category": "Towels",
+      "qty": 24,
+      "issue": "ALREADY EXTRACTED IN Textile.xlsx",
+      "link": "https://www.saksfifthavenue.com/c/home/bath/towels"
+    }
+  ]
+}

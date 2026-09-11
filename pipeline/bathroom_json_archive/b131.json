@@ -1,0 +1,992 @@
+{
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ROBOTS: https://www.otto.de/robots.txt fetched FIRST (HTTP 200, 2,148 bytes, profile chrome120) before any other request on the host and read in full. It has THREE groups. 'User-agent: *' disallows exactly /gate/, /onex/, /cdn-cgi/ and /149e9513-01fa-4fb0-aad4-566afd725d1b/2d206a39-8ed7-437e-a3be-862e0f06eea3/. 'User-agent: bingbot' adds /suche/. A third group stacks 'User-agent: GPTBot', 'ChatGPT-User', 'OAI-Searchbot', 'PerplexityBot' and 'Perplexity-User' and disallows /kundenbewertungen/, /gate/, /onex/, /cdn-cgi/ and the same UUID path - that group names OTHER vendors' agents, not ours, so it does not apply to us (specificity cuts both ways). There is NO group naming ClaudeBot, Claude-Web, Claude-User, Claude-SearchBot or anthropic-ai anywhere in the file, and no Content-Signal line, so no Claude opt-out exists and there is no hard stop. No Crawl-delay is declared; probe.py's 2 s per-host gap was kept. Nothing disallowed was requested: no /gate/, /onex/, /cdn-cgi/, /suche/ or /kundenbewertungen/ path, and no UUID path. The sitemaps used are the ones robots.txt itself declares and are on the same host (www.otto.de), so no second robots.txt was owed. ACCESS: clean. probe.fetch() returned HTTP 200 on 148 of 149 category requests across rotating fingerprints (chrome120, chrome124, safari18_0_ios, edge101); the single failure is /baumarkt/sanitaer/duschen/rinnen/, an intermediate hub whose only child Duschrinnen was fetched successfully and IS recorded. No WAF, no challenge, no 403, no 429. Pages are server-rendered Svelte ('reptile') of 0.4-0.5 MB carrying the H1, the grid and the total inline. No reader prefix, no campaign parameter, no CORS proxy, no browser automation. TREE: from OTTO's OWN category sitemap, declared in robots.txt - https://www.otto.de/category-sitemap/sitemap_index.xml.gz -> the per-department files sitemap_baumarkt, sitemap_moebel, sitemap_dekoration, sitemap_heimtextilien, sitemap_wohnen, sitemap_haushalt, sitemap_lampen, sitemap_diy, sitemap_koerperpflege (186,173 <loc>s in total, of which only 2,990 are clean path categories - the rest are facet URLs of the shape ?raum=badezimmer&farbe=... which were NEVER requested and are never recorded). The path segments themselves encode OTTO's hierarchy, which is how the tree was walked; each page's own child-link strip was used to fill the three hubs the sitemap slice omits (/baumarkt/sanitaer/halterungen/, /baumarkt/sanitaer/duschen/rinnen/, /baumarkt/sanitaer/badaccessoires/wc-zubehoer/wc-sitze/). The bathroom department is /baumarkt/sanitaer/ ('Bad & Sanitär', 71,276) with 21 level-2 branches; the bathroom mirror branch is /dekoration/spiegel/ and bath furniture is /moebel/badmoebel/ and /moebel/schraenke/. 149 category pages were opened. QTY: the listing page's OWN rendered total - <span class=\"reptile-item-count__item-count\" data-item-count=\"N\">N Produkte</span> - which resolves to the displayCount field of the page's inlined server payload (script data-kestrel-app=\"reptile.dundee\", devalue-flattened). No estimate, no parent number reused, no siblings summed. VERIFICATION AND THE 500 CAP - THE CENTRAL FINDING ON THIS SITE. displayCount is HARD-CAPPED AT 500. This was proved three independent ways and is documented on every affected node in review: (1) on every node rendering exactly 500 the same payload carries a rankedCount strictly above 500 (Duschvorhangstangen 502, Bidets 509, Rasierspiegel 509, Handtuchringe 512, Urinale 545, WC-Becken 677), whereas uncapped nodes show ranked>display without touching 500 (WC-Deckelbezuege 245/241, Seifenschalen 942/808, Handtuchstangen 1882/1691); (2) two DISJOINT colour facets of Handtuchstangen - which unfiltered renders 1,691 - both render exactly '500 Produkte' while ending on different last pages (goldfarben 5, schwarz 7); two different result sets cannot both be exactly 500; (3) for every uncapped node the paging widget's last page equals ceil(displayCount/96) exactly (241->3, 808->9, 1691->18, 2,197->23), and for the 500-nodes it does not. 45 bathroom-relevant nodes render the capped 500 and therefore carry NO qty and sit in review, not rows - a knowingly-capped number is not an exact count (rule 26). They cannot be enumerated either: OTTO's paging is entirely client-side and the listing has no page parameter - ?p=2, ?page=2, ?o=96, ?o=120, ?l=2, ?offset=96, ?seite=2, ?startIndex=120 and ?pageNumber=2 were each tried and every one returned page 1 with an identical set of 116 product links - and browser automation is barred by the run-owner decision. The 37 recorded counts are all uncapped values and discriminate sharply (241, 302, 343, 378, 386, 411, 436, 446, 480, 546, 580, 599, 643, 715, 765, 800, 808, 810, 816, 897, 922, 1,183, 1,202, 1,238, 1,285, 1,367, 1,650, 1,691, 1,788, 1,884, 1,892, 2,024, 2,197, 2,475, 2,494, 4,133, 9,347) - no site-wide constant. Each recorded page's H1 was read and matches the node, and each recorded link is the page's own rel=canonical string. DEDUP AND THE CANONICAL BLIND SPOT: already_extracted() was run on all 37 recorded leaves - ZERO hits remain in rows. Nine already-extracted nodes are in review: Badmöbel-Sets, Waschbeckenunterschränke (twice, see below), Spiegelschränke and Badhocker from Furniture.xlsx, and Wandspiegel, Dekospiegel, Standspiegel, Barock-Spiegel from Final.xlsx. BLIND SPOT (a) BIT HERE: /moebel/badmoebel/waschbeckenunterschraenke/ is NOT in the exclusion index, but its rel=canonical is /moebel/schraenke/umbauschraenke/waschbeckenunterschraenke/, which IS - so it was caught only because rel=canonical was checked before trusting the dedup miss, exactly as the brief instructs. Two further canonical aliases were caught the same way and kept out of rows: /baumarkt/sanitaer/halterungen/ canonicalises to /technik/zubehoer/halterungen/ (a consumer-electronics mounts category, not bathroom) and /moebel/badmoebel/ canonicalises to /moebel/?raum=badezimmer (a room facet of the Möbel department, not a category). /baumarkt/sanitaer/badaccessoires/wc-zubehoer/wc-sitze/ canonicalises to /baumarkt/sanitaer/wc/wc-sitze/ - one node reachable by two nav paths, recorded once under the canonical (rule 28). RULE 24 / ROLL-UPS: 15 nodes carrying their own rendered total are emitted as grouping rows with blank qty and blank link because they have valid children - Bad & Sanitär (71,276), Badezimmer Accessoires (2,938), Bad-Aufbewahrung (2,011), Handtuchhalter (2,612), WC-Zubehör (3,122), Badarmaturen (7,634), Badewannen (2,402), Badewannenzubehör (2,212), Duschen (13,992), Badewannenaufsätze (517), Duschbrausen (1,853), Duschkabinen (2,888), Duschsysteme (2,270), Duschzubehör (2,653), WCs (5,588), WC-Sitze (4,490), Spiegel (5,247) and Kosmetikspiegel (846). Their totals are stated here and deliberately not counted, because a roll-up overlaps its siblings. INCLUDED / JUDGEMENT CALLS: Badspiegel (2,494) and Schminkspiegel (810) are recorded under rules 10/11 - they are mirrors, not lights. Barrierefreies Bad (897) is recorded as a bathroom fixture/accessory node. Waschtische (9,347) and Waschbecken (2,475) are recorded as rule 4 fixtures; neither is in the exclusion index and neither canonicalises into the Furniture tree. Three fixing nodes from the Sanitärinstallation branch are recorded under rule 17 because they are bathroom-fixture-specific - Ablaufgarnituren (715), Duschwannenfüße (302), Waschtischbefestigungen (343) - while the rest of that branch and all of Rohre and Warmwassergeräte are routed out as plumbing/appliance material. This mirrors the treatment of Castorama's /plomberie/ branch in the same batch. EXCLUDED: OTTO's facet URLs (?raum=badezimmer, ?farbe=, ?material=, ?marke=, ?verkaeufer=, ?stil=, ?verwendungsort=) make up the bulk of its category sitemap and are never recorded; a handful were requested ONCE, on Handtuchstangen and Handtuchringe only, purely to prove the 500 cap, and none appears in rows or review. Bathroom lighting exists on OTTO only as /lampen/?raum=badezimmer facet URLs - there is no bathroom-lighting category path - so there is nothing to route to Lighting beyond noting it here.",
+ "rows": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom & Sanitary",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Accessories",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Accessory Sets",
+   "qty": 1202,
+   "link": "https://www.otto.de/baumarkt/sanitaer/badaccessoires/bad-accessoires-sets/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Storage",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Organizer",
+   "qty": 1650,
+   "link": "https://www.otto.de/baumarkt/sanitaer/badaccessoires/badaufbewahrung/bad-organizer/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Towel Holders",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Towel Hooks",
+   "qty": 1788,
+   "link": "https://www.otto.de/baumarkt/sanitaer/badaccessoires/handtuchhalter/handtuchhaken/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Towel Bars",
+   "qty": 1691,
+   "link": "https://www.otto.de/baumarkt/sanitaer/badaccessoires/handtuchhalter/handtuchstangen/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Soap Dishes",
+   "qty": 808,
+   "link": "https://www.otto.de/baumarkt/sanitaer/badaccessoires/seifenschalen/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Soap Dispensers",
+   "qty": 2197,
+   "link": "https://www.otto.de/baumarkt/sanitaer/badaccessoires/seifenspender/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Plugs",
+   "qty": 580,
+   "link": "https://www.otto.de/baumarkt/sanitaer/badaccessoires/stoepsel/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Toilet Accessories",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Toilet Brushes",
+   "qty": 765,
+   "link": "https://www.otto.de/baumarkt/sanitaer/badaccessoires/wc-zubehoer/toilettenbuersten/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Toilet Brush Holders",
+   "qty": 922,
+   "link": "https://www.otto.de/baumarkt/sanitaer/badaccessoires/wc-zubehoer/toilettenbuerstenhalter/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Toilet Paper Holders",
+   "qty": 1238,
+   "link": "https://www.otto.de/baumarkt/sanitaer/badaccessoires/wc-zubehoer/toilettenpapierhalter/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Toothbrush Cups",
+   "qty": 1367,
+   "link": "https://www.otto.de/baumarkt/sanitaer/badaccessoires/zahnputzbecher/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Taps",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathtub Taps",
+   "qty": 1092,
+   "link": "https://www.otto.de/baumarkt/sanitaer/badarmaturen/wannenarmaturen/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Washbasin Taps",
+   "qty": 2024,
+   "link": "https://www.otto.de/baumarkt/sanitaer/badarmaturen/waschtischarmaturen/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathtubs",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathtub Accessories",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathtub Grab Handles",
+   "qty": 436,
+   "link": "https://www.otto.de/baumarkt/sanitaer/badewannen/zubehoer/badewannengriffe/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathtub Sealing Strips",
+   "qty": 386,
+   "link": "https://www.otto.de/baumarkt/sanitaer/badewannen/zubehoer/wannendichtbaender/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Accessible Bathroom",
+   "qty": 897,
+   "link": "https://www.otto.de/baumarkt/sanitaer/barrierefreies-bad/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Showers",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathtub Shower Screens",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Folding Bathtub Shower Screens",
+   "qty": 411,
+   "link": "https://www.otto.de/baumarkt/sanitaer/duschen/badewannenaufsaetze/badewannenfaltwaende/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower Taps",
+   "qty": 1183,
+   "link": "https://www.otto.de/baumarkt/sanitaer/duschen/duscharmaturen/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower Heads",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Hand Showers",
+   "qty": 816,
+   "link": "https://www.otto.de/baumarkt/sanitaer/duschen/duschbrausen/handbrausen/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower Cubicles",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Steam Showers",
+   "qty": 446,
+   "link": "https://www.otto.de/baumarkt/sanitaer/duschen/duschkabinen/dampfduschen/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Corner Showers",
+   "qty": 1285,
+   "link": "https://www.otto.de/baumarkt/sanitaer/duschen/duschkabinen/eckduschen/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Quadrant Showers",
+   "qty": 378,
+   "link": "https://www.otto.de/baumarkt/sanitaer/duschen/duschkabinen/rundduschen/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Walk-In Showers",
+   "qty": 599,
+   "link": "https://www.otto.de/baumarkt/sanitaer/duschen/duschkabinen/walk-in-duschen/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower Systems",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower Sets",
+   "qty": 1884,
+   "link": "https://www.otto.de/baumarkt/sanitaer/duschen/duschsysteme/brausegarnituren/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower Doors",
+   "qty": 643,
+   "link": "https://www.otto.de/baumarkt/sanitaer/duschen/duschtueren/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower Walls",
+   "qty": 1892,
+   "link": "https://www.otto.de/baumarkt/sanitaer/duschen/duschwaende/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower Trays",
+   "qty": 800,
+   "link": "https://www.otto.de/baumarkt/sanitaer/duschen/duschwannen/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower Accessories",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower Squeegees",
+   "qty": 546,
+   "link": "https://www.otto.de/baumarkt/sanitaer/duschen/duschzubehoer/duschabzieher/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower Drains",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower Drains",
+   "qty": 480,
+   "link": "https://www.otto.de/baumarkt/sanitaer/duschen/rinnen/duschrinnen/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Sanitary Installations (Bathroom Fixings)",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Drain Fittings",
+   "qty": 715,
+   "link": "https://www.otto.de/baumarkt/sanitaer/sanitaerinstallation/ablaufgarnituren/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower Tray Feet",
+   "qty": 302,
+   "link": "https://www.otto.de/baumarkt/sanitaer/sanitaerinstallation/duschwannenfuesse/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Washbasin Fixings",
+   "qty": 343,
+   "link": "https://www.otto.de/baumarkt/sanitaer/sanitaerinstallation/waschtischbefestigungen/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Washbasins",
+   "qty": 2475,
+   "link": "https://www.otto.de/baumarkt/sanitaer/waschbecken/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Washstands",
+   "qty": 9347,
+   "link": "https://www.otto.de/baumarkt/sanitaer/waschtische/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Toilets",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Toilet Seats",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Toilet Lids",
+   "qty": 4133,
+   "link": "https://www.otto.de/baumarkt/sanitaer/wc/wc-sitze/toilettendeckel/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Mirrors",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Mirrors",
+   "qty": 2494,
+   "link": "https://www.otto.de/dekoration/spiegel/badspiegel/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Cosmetic Mirrors",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Makeup Mirrors",
+   "qty": 810,
+   "link": "https://www.otto.de/dekoration/spiegel/kosmetikspiegel/schminkspiegel/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  }
+ ],
+ "review": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Towel Rings",
+   "qty": 500,
+   "issue": "COUNT CAPPED AT 500 - NOT RECORDED (rule 26). OTTO prints its listing total from its own displayCount field (<span class=\"reptile-item-count__item-count\" data-item-count=\"500\">500 Produkte</span>) and that field is hard-capped at 500. PROOF: (1) on every node showing exactly 500 the same server payload (script data-kestrel-app=\"reptile.dundee\") carries a rankedCount ABOVE 500 - Duschvorhangstangen 502, Bidets 509, Rasierspiegel 509, Handtuchringe 512, Urinale 545, WC-Becken 677 - while uncapped nodes show ranked>display without hitting 500 (WC-Deckelbezuege 245/241, Seifenschalen 942/808, Handtuchstangen 1882/1691); (2) two DISJOINT colour facets of Handtuchstangen (unfiltered 1,691) both render exactly '500 Produkte' yet their paging widgets end on different last pages (goldfarben 5, schwarz 7) - two different result sets cannot both be exactly 500; (3) for every uncapped node lastPage == ceil(displayCount/96) exactly (241->3, 808->9, 1691->18) but not for the 500-nodes (500->5 or 7). The true total is therefore >500 and unknown. It cannot be enumerated either: OTTO's paging is client-side with no URL parameter - ?p=2, ?page=2, ?o=96, ?o=120, ?l=2, ?offset=96, ?seite=2, ?startIndex=120 and ?pageNumber=2 all return page 1 byte-identically - and browser automation is barred by the run-owner decision. No qty is recorded rather than a knowingly-capped figure.",
+   "link": "https://www.otto.de/baumarkt/sanitaer/badaccessoires/handtuchhalter/handtuchringe/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Towel Clips",
+   "qty": 500,
+   "issue": "COUNT CAPPED AT 500 - NOT RECORDED (rule 26). Same proven displayCount cap as documented on 'Handtuchringe'; true total is >500 and not recoverable without client-side paging.",
+   "link": "https://www.otto.de/baumarkt/sanitaer/badaccessoires/handtuchhalter/handtuchklemmen/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Towel Ladder",
+   "qty": 500,
+   "issue": "COUNT CAPPED AT 500 - NOT RECORDED (rule 26). Same proven displayCount cap as documented on 'Handtuchringe'; true total is >500 and not recoverable without client-side paging.",
+   "link": "https://www.otto.de/baumarkt/sanitaer/badaccessoires/handtuchhalter/handtuchleiter/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Towel Stand",
+   "qty": 500,
+   "issue": "COUNT CAPPED AT 500 - NOT RECORDED (rule 26). Same proven displayCount cap as documented on 'Handtuchringe'; true total is >500 and not recoverable without client-side paging.",
+   "link": "https://www.otto.de/baumarkt/sanitaer/badaccessoires/handtuchhalter/handtuchstaender/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Wet Wipe Boxes",
+   "qty": 500,
+   "issue": "COUNT CAPPED AT 500 - NOT RECORDED (rule 26). Same proven displayCount cap as documented on 'Handtuchringe'; true total is >500 and not recoverable without client-side paging.",
+   "link": "https://www.otto.de/baumarkt/sanitaer/badaccessoires/badaufbewahrung/feuchttuecherboxen/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Hairdryer Holders",
+   "qty": 500,
+   "issue": "COUNT CAPPED AT 500 - NOT RECORDED (rule 26). Same proven displayCount cap as documented on 'Handtuchringe'; true total is >500 and not recoverable without client-side paging.",
+   "link": "https://www.otto.de/baumarkt/sanitaer/badaccessoires/badaufbewahrung/foehnhalter/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Cosmetics Storage",
+   "qty": 500,
+   "issue": "COUNT CAPPED AT 500 - NOT RECORDED (rule 26). Same proven displayCount cap as documented on 'Handtuchringe'; true total is >500 and not recoverable without client-side paging.",
+   "link": "https://www.otto.de/baumarkt/sanitaer/badaccessoires/badaufbewahrung/kosmetik-aufbewahrung/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Tissue Boxes",
+   "qty": 500,
+   "issue": "COUNT CAPPED AT 500 - NOT RECORDED (rule 26). Same proven displayCount cap as documented on 'Handtuchringe'; true total is >500 and not recoverable without client-side paging.",
+   "link": "https://www.otto.de/baumarkt/sanitaer/badaccessoires/badaufbewahrung/taschentuecherboxen/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Cotton Pad Dispensers",
+   "qty": 500,
+   "issue": "COUNT CAPPED AT 500 - NOT RECORDED (rule 26). Same proven displayCount cap as documented on 'Handtuchringe'; true total is >500 and not recoverable without client-side paging.",
+   "link": "https://www.otto.de/baumarkt/sanitaer/badaccessoires/badaufbewahrung/wattepadspender/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Cotton Swab Dispensers",
+   "qty": 500,
+   "issue": "COUNT CAPPED AT 500 - NOT RECORDED (rule 26). Same proven displayCount cap as documented on 'Handtuchringe'; true total is >500 and not recoverable without client-side paging.",
+   "link": "https://www.otto.de/baumarkt/sanitaer/badaccessoires/badaufbewahrung/wattestaebchen-spender/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Washbasin Plugs",
+   "qty": 500,
+   "issue": "COUNT CAPPED AT 500 - NOT RECORDED (rule 26). Same proven displayCount cap as documented on 'Handtuchringe'; true total is >500 and not recoverable without client-side paging.",
+   "link": "https://www.otto.de/baumarkt/sanitaer/badaccessoires/waschbeckenstoepsel/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Children's Toilet Seats",
+   "qty": 500,
+   "issue": "COUNT CAPPED AT 500 - NOT RECORDED (rule 26). Same proven displayCount cap as documented on 'Handtuchringe'; true total is >500 and not recoverable without client-side paging. Reached under both /badaccessoires/wc-zubehoer/wc-sitze/ and the canonical /wc/wc-sitze/ - one node, rule 28.",
+   "link": "https://www.otto.de/baumarkt/sanitaer/badaccessoires/wc-zubehoer/wc-sitze/kindertoilettensitze/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Raised Toilet Seats",
+   "qty": 500,
+   "issue": "COUNT CAPPED AT 500 - NOT RECORDED (rule 26). Same proven displayCount cap as documented on 'Handtuchringe'; true total is >500 and not recoverable without client-side paging.",
+   "link": "https://www.otto.de/baumarkt/sanitaer/badaccessoires/wc-zubehoer/wc-sitze/toilettensitzerhoehungen/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bidet Taps",
+   "qty": 500,
+   "issue": "COUNT CAPPED AT 500 - NOT RECORDED (rule 26). Same proven displayCount cap as documented on 'Handtuchringe'; true total is >500 and not recoverable without client-side paging.",
+   "link": "https://www.otto.de/baumarkt/sanitaer/badarmaturen/bidetarmaturen/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower Arms",
+   "qty": 500,
+   "issue": "COUNT CAPPED AT 500 - NOT RECORDED (rule 26). Same proven displayCount cap as documented on 'Handtuchringe'; true total is >500 and not recoverable without client-side paging.",
+   "link": "https://www.otto.de/baumarkt/sanitaer/badarmaturen/zubehoer/brausearme/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Aerators",
+   "qty": 500,
+   "issue": "COUNT CAPPED AT 500 - NOT RECORDED (rule 26). Same proven displayCount cap as documented on 'Handtuchringe'; true total is >500 and not recoverable without client-side paging. Perlatoren / aerators - rule 8/17 bathroom tap hardware.",
+   "link": "https://www.otto.de/baumarkt/sanitaer/badarmaturen/zubehoer/strahlregler/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathtub Anti-Slip Mats",
+   "qty": 500,
+   "issue": "COUNT CAPPED AT 500 - NOT RECORDED (rule 26). Same proven displayCount cap as documented on 'Handtuchringe'; true total is >500 and not recoverable without client-side paging. Non-textile anti-slip bath inlays - rule 16 Bathroom.",
+   "link": "https://www.otto.de/baumarkt/sanitaer/badewannen/badewanneneinlagen/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathtub Feet",
+   "qty": 500,
+   "issue": "COUNT CAPPED AT 500 - NOT RECORDED (rule 26). Same proven displayCount cap as documented on 'Handtuchringe'; true total is >500 and not recoverable without client-side paging.",
+   "link": "https://www.otto.de/baumarkt/sanitaer/badewannen/zubehoer/badewannenfuesse/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathtub Cushions",
+   "qty": 500,
+   "issue": "COUNT CAPPED AT 500 - NOT RECORDED (rule 26). Same proven displayCount cap as documented on 'Handtuchringe'; true total is >500 and not recoverable without client-side paging.",
+   "link": "https://www.otto.de/baumarkt/sanitaer/badewannen/zubehoer/badewannenkissen/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathtub Panels",
+   "qty": 500,
+   "issue": "COUNT CAPPED AT 500 - NOT RECORDED (rule 26). Same proven displayCount cap as documented on 'Handtuchringe'; true total is >500 and not recoverable without client-side paging.",
+   "link": "https://www.otto.de/baumarkt/sanitaer/badewannen/zubehoer/badewannenschuerzen/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Wall Panels",
+   "qty": 500,
+   "issue": "COUNT CAPPED AT 500 - NOT RECORDED (rule 26). Same proven displayCount cap as documented on 'Handtuchringe'; true total is >500 and not recoverable without client-side paging. Bath back panels - rule 7 Bathroom.",
+   "link": "https://www.otto.de/baumarkt/sanitaer/badrueckwaende/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bidets",
+   "qty": 500,
+   "issue": "COUNT CAPPED AT 500 - NOT RECORDED (rule 26). Same proven displayCount cap as documented on 'Handtuchringe'; true total is >500 and not recoverable without client-side paging. Rule 4 Bathroom fixture.",
+   "link": "https://www.otto.de/baumarkt/sanitaer/bidets/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Urinals",
+   "qty": 500,
+   "issue": "COUNT CAPPED AT 500 - NOT RECORDED (rule 26). Same proven displayCount cap as documented on 'Handtuchringe'; true total is >500 and not recoverable without client-side paging. Rule 4 Bathroom fixture.",
+   "link": "https://www.otto.de/baumarkt/sanitaer/urinale/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Flush Valves",
+   "qty": 500,
+   "issue": "COUNT CAPPED AT 500 - NOT RECORDED (rule 26). Same proven displayCount cap as documented on 'Handtuchringe'; true total is >500 and not recoverable without client-side paging. Flush valves - rule 14 Bathroom. Parent of the two Druckspüler children, which are also capped, so no grouping row is emitted for it either.",
+   "link": "https://www.otto.de/baumarkt/sanitaer/druckspueler/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Urinal Flush Valves",
+   "qty": 500,
+   "issue": "COUNT CAPPED AT 500 - NOT RECORDED (rule 26). Same proven displayCount cap as documented on 'Handtuchringe'; true total is >500 and not recoverable without client-side paging.",
+   "link": "https://www.otto.de/baumarkt/sanitaer/druckspueler/urinal-druckspueler/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Toilet Flush Valves",
+   "qty": 500,
+   "issue": "COUNT CAPPED AT 500 - NOT RECORDED (rule 26). Same proven displayCount cap as documented on 'Handtuchringe'; true total is >500 and not recoverable without client-side paging.",
+   "link": "https://www.otto.de/baumarkt/sanitaer/druckspueler/wc-druckspueler/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Complete Shower Units",
+   "qty": 500,
+   "issue": "COUNT CAPPED AT 500 - NOT RECORDED (rule 26). Same proven displayCount cap as documented on 'Handtuchringe'; true total is >500 and not recoverable without client-side paging. Rule 7 Bathroom.",
+   "link": "https://www.otto.de/baumarkt/sanitaer/duschen/duschkabinen/komplettduschen/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Rain Showers",
+   "qty": 500,
+   "issue": "COUNT CAPPED AT 500 - NOT RECORDED (rule 26). Same proven displayCount cap as documented on 'Handtuchringe'; true total is >500 and not recoverable without client-side paging. Rule 6 Bathroom.",
+   "link": "https://www.otto.de/baumarkt/sanitaer/duschen/duschsysteme/regenduschen/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower Rails",
+   "qty": 500,
+   "issue": "COUNT CAPPED AT 500 - NOT RECORDED (rule 26). Same proven displayCount cap as documented on 'Handtuchringe'; true total is >500 and not recoverable without client-side paging. Rule 6/17 Bathroom.",
+   "link": "https://www.otto.de/baumarkt/sanitaer/duschen/duschzubehoer/brausestangen/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower Anti-Slip Mats",
+   "qty": 500,
+   "issue": "COUNT CAPPED AT 500 - NOT RECORDED (rule 26). Same proven displayCount cap as documented on 'Handtuchringe'; true total is >500 and not recoverable without client-side paging. Non-textile anti-slip shower inlays - rule 16 Bathroom.",
+   "link": "https://www.otto.de/baumarkt/sanitaer/duschen/duschzubehoer/duscheinlagen/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower Curtain Rings",
+   "qty": 500,
+   "issue": "COUNT CAPPED AT 500 - NOT RECORDED (rule 26). Same proven displayCount cap as documented on 'Handtuchringe'; true total is >500 and not recoverable without client-side paging. Shower-curtain RINGS are bathroom hardware (rule 17), not textile - they would have been recorded but for the cap.",
+   "link": "https://www.otto.de/baumarkt/sanitaer/duschen/duschvorhaenge/duschvorhangringe/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower Curtain Rods",
+   "qty": 500,
+   "issue": "COUNT CAPPED AT 500 - NOT RECORDED (rule 26). Same proven displayCount cap as documented on 'Handtuchringe'; true total is >500 and not recoverable without client-side paging. Shower-curtain RODS are bathroom hardware (rule 17), not textile - they would have been recorded but for the cap.",
+   "link": "https://www.otto.de/baumarkt/sanitaer/duschen/duschvorhaenge/duschvorhangstangen/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower Curtain Frames",
+   "qty": 500,
+   "issue": "COUNT CAPPED AT 500 - NOT RECORDED (rule 26). Same proven displayCount cap as documented on 'Handtuchringe'; true total is >500 and not recoverable without client-side paging. Shower-curtain frames/spiders - bathroom hardware (rule 17).",
+   "link": "https://www.otto.de/baumarkt/sanitaer/duschen/duschvorhaenge/duschspinnen/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower Roller Blinds",
+   "qty": 500,
+   "issue": "COUNT CAPPED AT 500 - NOT RECORDED (rule 26). Same proven displayCount cap as documented on 'Handtuchringe'; true total is >500 and not recoverable without client-side paging. Shower roller blinds - would in any case route to TEXTILE with their parent Duschvorhänge.",
+   "link": "https://www.otto.de/baumarkt/sanitaer/duschen/duschvorhaenge/duschrollos/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower Rail Brackets",
+   "qty": 500,
+   "issue": "COUNT CAPPED AT 500 - NOT RECORDED (rule 26). Same proven displayCount cap as documented on 'Handtuchringe'; true total is >500 and not recoverable without client-side paging. Shower-rail brackets - rule 17 Bathroom.",
+   "link": "https://www.otto.de/baumarkt/sanitaer/halterungen/duschstangenhalterungen/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Flush Plates",
+   "qty": 500,
+   "issue": "COUNT CAPPED AT 500 - NOT RECORDED (rule 26). Same proven displayCount cap as documented on 'Handtuchringe'; true total is >500 and not recoverable without client-side paging. Flush plates - rule 14 Bathroom.",
+   "link": "https://www.otto.de/baumarkt/sanitaer/wc/betaetigungsplatten/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Cisterns",
+   "qty": 500,
+   "issue": "COUNT CAPPED AT 500 - NOT RECORDED (rule 26). Same proven displayCount cap as documented on 'Handtuchringe'; true total is >500 and not recoverable without client-side paging. Cisterns - rule 4/14 Bathroom.",
+   "link": "https://www.otto.de/baumarkt/sanitaer/wc/spuelkaesten/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Concealed Cistern Frames",
+   "qty": 500,
+   "issue": "COUNT CAPPED AT 500 - NOT RECORDED (rule 26). Same proven displayCount cap as documented on 'Handtuchringe'; true total is >500 and not recoverable without client-side paging. WC frames - rule 4/17 Bathroom.",
+   "link": "https://www.otto.de/baumarkt/sanitaer/wc/vorwandelemente/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Toilet Bowls",
+   "qty": 500,
+   "issue": "COUNT CAPPED AT 500 - NOT RECORDED (rule 26). Same proven displayCount cap as documented on 'Handtuchringe'; true total is >500 and not recoverable without client-side paging. WC pans - rule 4 Bathroom. This is the single biggest loss to the cap on this site (rankedCount 677).",
+   "link": "https://www.otto.de/baumarkt/sanitaer/wc/wc-becken/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Toilet Sets",
+   "qty": 500,
+   "issue": "COUNT CAPPED AT 500 - NOT RECORDED (rule 26). Same proven displayCount cap as documented on 'Handtuchringe'; true total is >500 and not recoverable without client-side paging. Rule 4 Bathroom.",
+   "link": "https://www.otto.de/baumarkt/sanitaer/wc/wc-sets/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Camping Toilets",
+   "qty": 500,
+   "issue": "COUNT CAPPED AT 500 - NOT RECORDED (rule 26). Same proven displayCount cap as documented on 'Handtuchringe'; true total is >500 and not recoverable without client-side paging. Also NOT clearly Bathroom on the merits: portable camping/chemical toilets are camping equipment by primary product type (rule 2), even though OTTO files them under Sanitär.",
+   "link": "https://www.otto.de/baumarkt/sanitaer/campingtoiletten/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Hand Mirrors",
+   "qty": 500,
+   "issue": "COUNT CAPPED AT 500 - NOT RECORDED (rule 26). Same proven displayCount cap as documented on 'Handtuchringe'; true total is >500 and not recoverable without client-side paging. Hand mirrors - borderline on the merits (a personal accessory rather than a bathroom fitting, rule 2/29) as well as capped.",
+   "link": "https://www.otto.de/dekoration/spiegel/kosmetikspiegel/handspiegel/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shaving Mirrors",
+   "qty": 500,
+   "issue": "COUNT CAPPED AT 500 - NOT RECORDED (rule 26). Same proven displayCount cap as documented on 'Handtuchringe'; true total is >500 and not recoverable without client-side paging. Shaving mirrors - rule 10 names them explicitly, so this would have been a Bathroom row but for the cap.",
+   "link": "https://www.otto.de/dekoration/spiegel/kosmetikspiegel/rasierspiegel/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Furniture Accessories",
+   "qty": 500,
+   "issue": "COUNT CAPPED AT 500 - NOT RECORDED (rule 26). Same proven displayCount cap as documented on 'Handtuchringe'; true total is >500 and not recoverable without client-side paging. Bathroom-furniture accessories.",
+   "link": "https://www.otto.de/moebel/zubehoer/badmoebel-zubehoer/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Water Jets",
+   "qty": 500,
+   "issue": "COUNT CAPPED AT 500 - NOT RECORDED (rule 26). Same proven displayCount cap as documented on 'Handtuchringe'; true total is >500 and not recoverable without client-side paging. Also routed out on the merits: sanitary jets/nozzles are plumbing installation parts.",
+   "link": "https://www.otto.de/baumarkt/sanitaer/wasserduesen/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Hand Dryers",
+   "qty": 500,
+   "issue": "COUNT CAPPED AT 500 - NOT RECORDED (rule 26). Same proven displayCount cap as documented on 'Handtuchringe'; true total is >500 and not recoverable without client-side paging. Also routed out on the merits: electric hand dryers are a washroom appliance, not a rule 3-22 bathroom product type.",
+   "link": "https://www.otto.de/baumarkt/sanitaer/haendetrockner/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Taps",
+   "qty": 9806,
+   "issue": "PARENT ROLL-UP NOT RECORDED: 'Armaturen' (9,806) is OTTO's tap roll-up and overlaps its own Badarmaturen branch (7,634) plus Duscharmaturen (1,183) and the kitchen Spültischarmaturen under /baumarkt/kueche/. It has no children of its own in OTTO's category sitemap. Recording it alongside the recorded Wannenarmaturen / Waschtischarmaturen / Duscharmaturen leaves would double-count (rule 24, no aggregation).",
+   "link": "https://www.otto.de/baumarkt/sanitaer/armaturen/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower Curtains",
+   "qty": 2610,
+   "issue": "ROUTED TO TEXTILE: shower curtains (rule 20). Parent of Duschrollos / Duschspinnen / Duschvorhangringe / Duschvorhangstangen; the rings, rods and frames are bathroom HARDWARE under rule 17 and would have been Bathroom rows, but all four children render the capped 500 (see above).",
+   "link": "https://www.otto.de/baumarkt/sanitaer/duschen/duschvorhaenge/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Toilet Lid Covers",
+   "qty": 241,
+   "issue": "ROUTED TO TEXTILE: fabric WC lid covers (rules 15/20). Sits inside WC-Zubehör but is a soft furnishing by primary product type.",
+   "link": "https://www.otto.de/baumarkt/sanitaer/badaccessoires/wc-zubehoer/wc-deckelbezuege/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Mats",
+   "qty": 4106,
+   "issue": "ROUTED TO TEXTILE: textile bath mats and bath rugs (rules 15/16). Non-textile anti-slip mats are NOT here - they are Badewanneneinlagen and Duscheinlagen under Sanitär, both of which are capped and held above.",
+   "link": "https://www.otto.de/heimtextilien/badematten/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Towels",
+   "qty": 10228,
+   "issue": "ROUTED TO TEXTILE: towels, bath sheets, guest towels (rule 15). Its rel=canonical is /heimtextilien/handtuecher/?ansicht=einstieg, a landing view of the same node.",
+   "link": "https://www.otto.de/heimtextilien/handtuecher/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Pipes",
+   "qty": 7001,
+   "issue": "ROUTED TO PLUMBING / BUILDING MATERIALS - not a rule 3-22 Bathroom product type. Pipework: Abwasserrohre (capped), Fittings (3,935), Rohrleitungen (capped), Verbindungsrohre (capped), Wasserrohre (2,124). Listed so the branch is not silently dropped.",
+   "link": "https://www.otto.de/baumarkt/sanitaer/rohre/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Sanitary Installations",
+   "qty": 13593,
+   "issue": "ROUTED TO PLUMBING / BUILDING MATERIALS (majority of branch). Generic installation material: Absperrventile 3,715, Schläuche 3,585 (incl. Geschirrspüler- and Dunstabzugshauben-Schläuche, i.e. kitchen), Dichtungen 2,246, Ablaufventile, Ab- & Überlaufgarnituren, Druckminderer 525, Siphons 516, Dichtschellen 381, Dichtmittel 284, Flexschläuche, Hebeanlagen, Rückspülfilter, Sicherheitsgruppen, Spülrohre, Spülrohrverbinder, Wasserzähler, WC-Anschlussrohre, WC-Befestigungen, WC-Scharniere. THREE children of this branch ARE recorded in rows because they are bathroom-fixture-specific fixings under rule 17: Ablaufgarnituren (715), Duschwannenfüße (302) and Waschtischbefestigungen (343). The rest stay out.",
+   "link": "https://www.otto.de/baumarkt/sanitaer/sanitaerinstallation/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Water Heaters",
+   "qty": 503,
+   "issue": "ROUTED TO APPLIANCES / HEATING: instantaneous water heaters and wall boilers (Durchlauferhitzer, Wandspeicher, both capped). Not a rule 3-22 Bathroom product type.",
+   "link": "https://www.otto.de/baumarkt/sanitaer/warmwassergeraete/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Sanitary Doors",
+   "qty": 676,
+   "issue": "NOT BATHROOM - inspected and rejected (rule 2): sanitary/wet-room DOORS are a building element (doors), not a bathroom fixture, fitting or accessory.",
+   "link": "https://www.otto.de/baumarkt/sanitaer/sanitaertueren/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Mounting Brackets",
+   "qty": 500,
+   "issue": "ALIAS OF A NON-BATHROOM NODE - NOT RECORDED (rule 28 / canonical check): the page reachable at /baumarkt/sanitaer/halterungen/ declares rel=canonical https://www.otto.de/technik/zubehoer/halterungen/, i.e. it is OTTO's consumer-electronics mounts category surfaced under Sanitär. Only its bathroom-specific child Duschstangenhalterungen is treated as a bathroom node (and that one is capped).",
+   "link": "https://www.otto.de/baumarkt/sanitaer/halterungen/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Furniture",
+   "qty": 23198,
+   "issue": "CANONICAL IS A ROOM FACET, NOT A CATEGORY - NOT RECORDED. 'Badezimmermöbel' (23,198) declares rel=canonical https://www.otto.de/moebel/?raum=badezimmer, i.e. it is the Möbel department filtered by room, not a category of its own; it is also the parent of already-extracted children. Recording it would be a room re-cut of Furniture (rule 28).",
+   "link": "https://www.otto.de/moebel/badmoebel/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Furniture Sets",
+   "qty": 8914,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Bathroom Furniture Sets' (OPTION 1).",
+   "link": "https://www.otto.de/moebel/badmoebel/badmoebel-sets/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Vanity Units",
+   "qty": 2991,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Vanity Units' VIA CANONICAL ALIAS. The URL itself is NOT in the exclusion index, but its rel=canonical is https://www.otto.de/moebel/schraenke/umbauschraenke/waschbeckenunterschraenke/, which IS - exactly the canonical-alias blind spot the brief warns about. Caught by checking rel=canonical before trusting the dedup miss.",
+   "link": "https://www.otto.de/moebel/badmoebel/waschbeckenunterschraenke/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Vanity Units",
+   "qty": 2991,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Vanity Units'. Same node as the /moebel/badmoebel/ path above - one record under the canonical URL (rule 28).",
+   "link": "https://www.otto.de/moebel/schraenke/umbauschraenke/waschbeckenunterschraenke/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Mirror Cabinets",
+   "qty": 5893,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Mirror Cabinets'. Rule 10 would otherwise pull mirror cabinets into Bathroom; OPTION 1 keeps them in Furniture.",
+   "link": "https://www.otto.de/moebel/schraenke/spiegelschraenke/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Stools",
+   "qty": 500,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Bathroom Stools'. (Its count also renders the capped 500.)",
+   "link": "https://www.otto.de/moebel/hocker/badhocker/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Wall Mirrors",
+   "qty": null,
+   "issue": "ALREADY EXTRACTED IN Final.xlsx (Home Decor pass) as 'Wall Mirrors'. Sibling of the recorded Badspiegel node under Dekoration > Spiegel; not re-opened and not re-extracted.",
+   "link": "https://www.otto.de/dekoration/spiegel/wandspiegel/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Decorative Mirrors",
+   "qty": null,
+   "issue": "ALREADY EXTRACTED IN Final.xlsx (Home Decor pass) as 'Decorative Mirrors'. Sibling of the recorded Badspiegel node under Dekoration > Spiegel; not re-opened and not re-extracted.",
+   "link": "https://www.otto.de/dekoration/spiegel/dekospiegel/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Floor Mirrors",
+   "qty": null,
+   "issue": "ALREADY EXTRACTED IN Final.xlsx (Home Decor pass) as 'Floor Mirrors'. Sibling of the recorded Badspiegel node under Dekoration > Spiegel; not re-opened and not re-extracted.",
+   "link": "https://www.otto.de/dekoration/spiegel/standspiegel/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Baroque Mirrors",
+   "qty": null,
+   "issue": "ALREADY EXTRACTED IN Final.xlsx (Home Decor pass) as 'Baroque Mirrors'. Sibling of the recorded Badspiegel node under Dekoration > Spiegel; not re-opened and not re-extracted.",
+   "link": "https://www.otto.de/dekoration/spiegel/barock-spiegel/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Full-Length Mirrors / Mirror Tiles / Pocket Mirrors",
+   "qty": null,
+   "issue": "NOT BATHROOM - the remaining Dekoration > Spiegel children are full-length mirrors, mirror tiles and pocket mirrors, i.e. decor/personal items by primary product type (rule 2). Listed so the mirror branch is demonstrably complete: of the nine children, Badspiegel and Schminkspiegel are recorded, Handspiegel and Rasierspiegel are capped, four are already-extracted Home Decor records, and these three are out of scope.",
+   "link": "https://www.otto.de/dekoration/spiegel/"
+  }
+ ],
+ "_reconstructed_from": "Bathroom.xlsx delivered 2026-09-01 (checkpoint), not original worker JSON"
+}

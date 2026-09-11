@@ -1,0 +1,166 @@
+{
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ACCESS: onekingslane.com HTML serves fine to a plain desktop-Chrome-UA GET, but this session hit a hard edge quirk: EVERY request to https://www.onekingslane.com/robots.txt returns HTTP 421 'Misdirected Request' from Cloudflare - all 10 curl_cffi impersonation fingerprints, plain curl over both HTTP/2 and forced --http1.1, with and without a cache-busting query, and through the r.jina.ai relay (which faithfully relays 'Target URL returned error 421'). The apex host onekingslane.com 302s. So the robots policy could NOT be read this session and no Claude/anthropic-ai/ClaudeBot directive could be confirmed either way - recorded here rather than assumed. To stay conservative only public category listing HTML and the public sitemap were fetched, requests were paced at one per 2s, and no account/cart/checkout/search path was touched. Everything else answered HTTP 200 first try over --http1.1 (curl_cffi's HTTP/2 path also 421s on this host, so plain curl --http1.1 was the working route). TREE: two independent sources, cross-checked. (a) https://www.onekingslane.com/sitemap-plp.xml - 682 category URLs, served unprotected. (b) the site's own mega-nav, read as __NEXT_DATA__ props.pageProps.megaNav off any page (dumped and walked in full - 13 top-level items). The sitemap tree is strictly deeper than the nav, exactly as the prior Furniture pass recorded: the nav shows Bed & Bath > Bath with 4 children, while the sitemap exposes a 5th (Robes, Slippers & Sleepwear) and a whole 4th level under Bath Towels and Bath Accessories. Real parent chains were rebuilt by fetching each candidate and reading __NEXT_DATA__ props.pageProps.breadcrumbs, which the site server-renders on every PLP. The Bathroom-bearing hierarchy is: Furniture (id 119587) > Bathroom (120001, 116) > Vanities (120002, 116); and Bed & Bath (121681, 1221) > Bath (121683, 404) > [Bath Towels 121688 (125) > 7 leaves | Robes, Slippers & Sleepwear 121689 (23) | Shower Curtains 121690 (3) | Bath Mats & Rugs 121691 (20) | Bath Accessories 121692 (233) > Soap Dishes & Dispensers, Waste Baskets, Tissue Box Covers, Trays & Tumblers, Other Bath Accessories]. COMPLETENESS: proved twice. (1) Child-pointer sweep - on 8 sampled listing pages every product carries a category_info[] array of {id, parent_id, name, url}; collecting every entry whose parent_id is 121681 / 121683 / 121688 / 121692 / 120001 / 120002 returned EXACTLY the children listed above and nothing else, i.e. the sitemap tree has no missing nodes and Vanities (120002) and the five accessory leaves are true deepest nodes with no children of their own. (2) Arithmetic - Bath's own total 404 = 125 + 23 + 3 + 20 + 233 exactly, and Bath Accessories' 233 = 51 + 24 + 59 + 62 + 37 exactly, so the direct-child sets are complete and non-overlapping. PARENT-URL RULE: Bath (404), Bath Accessories (233) and Furniture > Bathroom (116) all have children, so they are grouping rows with blank qty and blank link and only their deepest children carry URLs (rule 24). Note Bathroom (116) has exactly one child, Vanities (116), and only the child is recorded. No Shop All / promo / ?sale= / ?condition= / search / PDP URL is recorded, and every recorded link is the bare canonical /c-<id>-<slug> form with no query string (rules 25, 27). QTY: every number is the listing page's own server-rendered header, which OKL prints as 'Results (<!-- -->N<!-- -->)'. That literal rendered string was captured for all 18 pages recorded or routed out here and matched the structured __NEXT_DATA__ props.pageProps.total on 18 of 18 - so the header IS the number recorded, not a separate inflated population. Each page's rel=canonical equalled the URL fetched and each <h1> matched the node name on 18 of 18, so there is no silent parent-serving. VERIFICATION / HONEST CAVEAT: tile-level enumeration matches the header on small nodes (Shower Curtains header 3 -> 3 tiles rendered) but runs slightly SHORT on larger ones (Waste Baskets header 24 -> 23 tiles; Soap Dishes & Dispensers header 51 -> 48 tiles on a 60-per-page grid; Vanities header 116 -> 56 tiles on page 1 + 54 on page 2 = 108 unique, page 3 empty). The shortfall is the storefront suppressing a few unavailable/duplicate tiles from the grid while still counting them; the figure recorded is the one the site itself displays on the listing page, as rule 26 requires, and it is stated here rather than silently smoothed over. Discrimination check: the recorded counts run 24 / 37 / 51 / 59 / 62 / 116 and every sibling differs, so this is no site-wide constant. INCLUDED JUDGEMENT CALLS: Vanities (120002) was sampled product-by-product before inclusion - every title is an explicit bathroom vanity ('Christian 42\" Marble Top Single Sink Bathroom Vanity', 'Charlie 72\" Quartz Top Double Sink Bathroom Vanity Set', 'Briallen Vanity with Oval Undermount Sink'), so it is bathroom furniture under rule 9 and NOT a bedroom dressing table. Waste Baskets, Trays & Tumblers and Tissue Box Covers sit under Bath > Bath Accessories in the site's own hierarchy and are bathroom-intended accessories (rules 13, 12, 30-33), so they are Bathroom rather than general Storage or Decor. EXCLUDED: see review - 10 textile nodes routed to Textile and Bath Lights (705) routed to Lighting. Also inspected and rejected: Furniture > Bedroom > Vanities & Vanity Stools (119632) and its children Vanities & Dressing Tables (119703) / Vanity Stools (119704) - these are bedroom dressing tables, primary product type furniture, site hierarchy Furniture > Bedroom, so they stay in Furniture and were NOT re-cut as Bathroom (rules 2, 29, 30-33); Art & Mirrors > Mirrors > Wall Mirrors (101417) / Floor Mirrors (101418) - general decorative mirrors with no bathroom or vanity-mirror node beneath them; Decor > Home Accents > Baskets & Organization (119238) - general storage; Bed & Bath > Bedding and Pillows & Throws - textile/bedding. || CROSS-FILE DEDUP: 1 leaf record(s) removed as already extracted in a prior category workbook. See Review sheet.",
+ "rows": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Accessories",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Soap Dishes & Dispensers",
+   "qty": 51,
+   "link": "https://www.onekingslane.com/c-121721-soap-dishes-dispensers",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Waste Baskets",
+   "qty": 24,
+   "link": "https://www.onekingslane.com/c-121722-waste-baskets",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Tissue Box Covers",
+   "qty": 59,
+   "link": "https://www.onekingslane.com/c-121723-tissue-box-covers",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Trays & Tumblers",
+   "qty": 62,
+   "link": "https://www.onekingslane.com/c-121724-trays-tumblers",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Other Bath Accessories",
+   "qty": 37,
+   "link": "https://www.onekingslane.com/c-121725-other-bath-accessories",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  }
+ ],
+ "review": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Towels > Towel Sets",
+   "qty": 16,
+   "issue": "ROUTED TO TEXTILE: Bed & Bath > Bath > Bath Towels (125) > Towel Sets; textile towels (rules 15, 20).",
+   "link": "https://www.onekingslane.com/c-121713-towel-sets"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Towels > Bath Towels",
+   "qty": 27,
+   "issue": "ROUTED TO TEXTILE: Bed & Bath > Bath > Bath Towels (125) > Bath Towels; textile towels (rules 15, 20).",
+   "link": "https://www.onekingslane.com/c-121714-bath-towels"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Towels > Bath Sheets",
+   "qty": 17,
+   "issue": "ROUTED TO TEXTILE: Bed & Bath > Bath > Bath Towels (125) > Bath Sheets; textile (rules 15, 20).",
+   "link": "https://www.onekingslane.com/c-121715-bath-sheets"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Towels > Hand Towels",
+   "qty": 23,
+   "issue": "ROUTED TO TEXTILE: Bed & Bath > Bath > Bath Towels (125) > Hand Towels; textile (rules 15, 20).",
+   "link": "https://www.onekingslane.com/c-121716-hand-towels"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Towels > Washcloths",
+   "qty": 22,
+   "issue": "ROUTED TO TEXTILE: Bed & Bath > Bath > Bath Towels (125) > Washcloths; textile (rules 15, 20).",
+   "link": "https://www.onekingslane.com/c-121717-washcloths"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Towels > Guest Towels",
+   "qty": 10,
+   "issue": "ROUTED TO TEXTILE: Bed & Bath > Bath > Bath Towels (125) > Guest Towels; textile (rules 15, 20).",
+   "link": "https://www.onekingslane.com/c-121718-guest-towels"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Towels > Beach Towels",
+   "qty": 26,
+   "issue": "ROUTED TO TEXTILE: Bed & Bath > Bath > Bath Towels (125) > Beach Towels; textile (rules 15, 20).",
+   "link": "https://www.onekingslane.com/c-121720-beach-towels"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Robes, Slippers & Sleepwear",
+   "qty": 23,
+   "issue": "ROUTED TO TEXTILE: Bed & Bath > Bath > Robes, Slippers & Sleepwear; bathrobes and sleepwear are textile/apparel (rule 20).",
+   "link": "https://www.onekingslane.com/c-121689-robes-slippers-sleepwear"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower Curtains",
+   "qty": 3,
+   "issue": "ROUTED TO TEXTILE: Bed & Bath > Bath > Shower Curtains; shower curtains are textile (rule 20).",
+   "link": "https://www.onekingslane.com/c-121690-shower-curtains"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Mats & Rugs",
+   "qty": 20,
+   "issue": "ROUTED TO TEXTILE: Bed & Bath > Bath > Bath Mats & Rugs; the assortment is textile bath rugs/mats, not rubber anti-slip bathroom accessories (rules 16, 20).",
+   "link": "https://www.onekingslane.com/c-121691-bath-mats-rugs"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Lights",
+   "qty": 705,
+   "issue": "ROUTED TO LIGHTING: primary product type is lighting; the node's own breadcrumb is Lighting > Wall Lighting > Bath Lights, i.e. it lives in the Lighting department, not under Bath (rules 11, 19). Not duplicated into Bathroom.",
+   "link": "https://www.onekingslane.com/c-119717-bath-lights"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Vanities",
+   "qty": 116,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Vanities' - excluded from Bathroom per cross-category dedup (master guide s13)",
+   "link": "https://www.onekingslane.com/c-120002-vanities"
+  }
+ ],
+ "_reconstructed_from": "Bathroom.xlsx delivered 2026-09-01 (checkpoint), not original worker JSON"
+}

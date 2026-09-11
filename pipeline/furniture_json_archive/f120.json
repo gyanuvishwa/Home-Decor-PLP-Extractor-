@@ -1,0 +1,264 @@
+{
+  "sr": 120,
+  "company": "Casa Viva",
+  "brand_site": "casaviva.es",
+  "country": "Spain",
+  "site_url": "https://www.casaviva.es/",
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "ACCESS: Claude-in-Chrome connector only (own tab, tabId 1961714728). Homepage loaded directly, no WAF/interstitial. robots.txt names no Claude/anthropic-ai/ClaudeBot agent (only generic UA:* rules); it DOES Disallow /on/demandware.store/*, so the SFCC Search-Refinebar side-door used in the prior Home-Decor pass was deliberately NOT used this time -- all data came from public SEO category URLs. Platform: Salesforce Commerce Cloud (Sites-CasaViva-Site). TREE SOURCE: the rendered mega-menu on the homepage (231 nav links harvested via same-origin DOM scrape) cross-checked against /sitemap_1-category.xml (508 category locs) so nothing outside the nav was missed; each candidate leaf page was then re-fetched same-origin and re-scanned for child category links to confirm it really is a leaf. QTY SOURCE: the site's own rendered result-count header -- element <div class='result-count' data-products-count='N'> whose visible text is literally 'N Resultados' (verified on the live rendered page for Sillas de comedor: data-products-count=60 rendering '60 Resultados'). SANITY CHECKS: (1) exhaustion cross-check on /muebles/sillas-y-taburetes/sillas-de-comedor/?start=0&sz=200 returned exactly 60 unique data-pid values, matching data-products-count=60 -> the counter is exact, not a display cap; same check ran clean on Sofas (17/17) and Mesas de comedor (19/19). (2) the number varies per category (2,3,4,5,7,10,11,15,16,17,19,23,31,60...) so it is not a site-wide constant. (3) h1 of every fetched page matched the intended node; /muebles/muebles-de-dormitorio/ correctly 404s rather than silently serving the parent. (4) Parent nodes are aggregates, exactly as the prior pass warned: /muebles/=218 vs sum of its branches 219 (1 product double-filed), /muebles/mesas/=68 vs 31+19+19=69, /muebles/sillas-y-taburetes/=62 = 60+2 exact, /terraza-y-jardin/muebles-de-jardin-y-exterior/=44 vs children summing 52 (garden sets counted under two nodes). Because of that, NO qty is recorded on any parent -- Tables, Bedroom Furniture, Chairs & Stools and Garden & Outdoor Furniture are grouping rows only. DUPLICATE URL DROPPED: /cocina/muebles-cocina/ returns byte-identical HTML to /muebles/auxiliares-de-cocina/ (same h1 'Muebles auxiliares de cocina', same 5 products, identical 343977-byte response) -- same node under two URLs, only the /muebles/ path is emitted. SEO FACET NODES DROPPED: /muebles/sofas/sofas-cama/ (3), /muebles/sofas/sofas-chaise-longue-esquineros/ (3), /muebles/sofas/sofas-exclusivos-online/ (5), /muebles/mesas/mesas-comedor/mesas-extensibles-comedor/ (2) and /muebles/mesas/mesas-comedor/mesas-redondas-comedor/ (1) exist in the sitemap but are absent from the mega-menu; product-ID set arithmetic proves each is a strict subset of its parent and they overlap one another rather than partitioning it (3+3+5=11 of Sofas' 17, and 'sofas exclusivos online' is a curated/marketing node per rule 3). Sofas and Dining Tables are therefore emitted as leaves with their own exact totals and flagged. EMPTY CATEGORY EXCLUDED: /muebles/sillas-y-taburetes/sillas-de-escritorio/ ('Sillas de escritorio', desk chairs) is a live nav node but currently carries 0 products -- HTTP 200, no result-count element, 0 data-pid tiles, 248006-byte empty-shell response matching the empty-category pattern documented in the prior pass; checked deliberately, not skipped, and excluded rather than emitted as a 0 row. OUT-OF-SCOPE EXCLUSIONS: /orden-del-hogar/almacenaje/ cajas, cestas, cestos-para-la-ropa, organizadores (standalone storage baskets/boxes -> future Storage task); /orden-del-hogar/colgadores-y-percheros/ (1 product, opened and title-checked: 'Perchero de pared con 3 ganchos de madera' = a wall hook rail, not a coat stand -> wall accessory, not furniture); /bano/ accesorios-de-bano, complementos-de-bano (incl. espejos = bathroom mirrors, Wall Decor's job), organizadores-de-bano, textil-de-bano; all of /comedor/ (tableware/glassware), /cocina/ (utensils, appliances, textiles), /salon/decoracion-salon/ (mirrors, wall art, clocks), lighting incl. /terraza-y-jardin/decoracion-de-jardin/iluminacion-exterior/, /terraza-y-jardin/parasoles-y-cenadores/ (parasols and gazebos = shade structures, not furniture), /terraza-y-jardin/textil-de-exterior/, /terraza-y-jardin/barbacoas/ (BBQs = appliances), and all /rebajas/*, /*-black-friday/, /campanas/*, /clau-and-chloe/*, /basicos-para-*/ and /muebles-madera-mango|microcemento|decoracion-azul|ecofriendly/ nodes (sale, seasonal-campaign, designer-collection and material-filter landing pages -> rule 3). JUDGEMENT CALLS INCLUDED: Shoe Racks & Shoe Cabinets sits under Orden del Hogar > Almacenaje but all 4 tiles are shoe cabinets and shoe benches ('Zapatero de madera MDF y acero Bruno', 'Banco zapatero bambu' x2, 'Zapatero de bambu Oliver') -> furniture per the storage-vs-furniture line, flagged; one of its 4 products also appears in Shelving Units. Bathroom Trolleys (/bano/carros-de-bano/) tiles are 'Mueble de bano de bambu 40x30x95cm', 'Carro de bano de bambu Karyl' and 'Estanteria de bambu para toallas 152cm' -> freestanding bathroom furniture, included under an Outdoor/Bathroom-style separate bucket and flagged; the towel shelving unit also appears in Shelving Units. Kitchen Auxiliary Furniture is kept (kitchen trolleys/carts, e.g. 'Carro de cocina negro'). Poufs are kept because the site files them under the Muebles department ('Pufs y reposapies').",
+  "rows": [
+    {
+      "category": "Furniture",
+      "sub_category": "Furniture",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Kitchen Auxiliary Furniture",
+      "qty": 5,
+      "link": "https://www.casaviva.es/muebles/auxiliares-de-cocina/",
+      "is_group": false,
+      "evidence": "rendered result-count header data-products-count=\"5\" rendering text '5 Resultados' on /muebles/auxiliares-de-cocina/ (h1 'Muebles auxiliares de cocina'); 5 unique data-pid tiles confirm",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Consoles & Sideboards",
+      "qty": 15,
+      "link": "https://www.casaviva.es/muebles/consolas-y-aparadores/",
+      "is_group": false,
+      "evidence": "rendered result-count header data-products-count=\"15\" ('15 Resultados') on /muebles/consolas-y-aparadores/ (h1 'Consolas y aparadores'); 15 unique data-pid tiles confirm",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Desks",
+      "qty": 4,
+      "link": "https://www.casaviva.es/muebles/escritorios/",
+      "is_group": false,
+      "evidence": "rendered result-count header data-products-count=\"4\" ('4 Resultados') on /muebles/escritorios/ (h1 'Escritorios'); 4 unique data-pid tiles confirm",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Shelving Units",
+      "qty": 7,
+      "link": "https://www.casaviva.es/muebles/estanterias/",
+      "is_group": false,
+      "evidence": "rendered result-count header data-products-count=\"7\" ('7 Resultados') on /muebles/estanterias/ (h1 'Estanterias'); 7 unique data-pid tiles confirm",
+      "flag": "MANUAL REVIEW: freestanding furniture shelving (tiles include 'Estanteria de metal Ruby', 'Libreria de 2 puertas de madera Ivara', 'Estanteria de 6 niveles negra Ceyra') but the node also re-lists 1 shoe cabinet also counted under Shoe Racks & Shoe Cabinets and 1 towel shelf also counted under Bathroom Trolleys"
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Tables",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Side Tables",
+      "qty": 31,
+      "link": "https://www.casaviva.es/muebles/mesas/mesas-auxiliares/",
+      "is_group": false,
+      "evidence": "rendered result-count header data-products-count=\"31\" ('31 Resultados') on /muebles/mesas/mesas-auxiliares/ (h1 'Mesas auxiliares'); 31 unique data-pid tiles confirm",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Coffee Tables",
+      "qty": 19,
+      "link": "https://www.casaviva.es/muebles/mesas/mesas-de-centro/",
+      "is_group": false,
+      "evidence": "rendered result-count header data-products-count=\"19\" ('19 Resultados') on /muebles/mesas/mesas-de-centro/ (h1 'Mesas de centro'); 19 unique data-pid tiles confirm",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Dining Tables",
+      "qty": 19,
+      "link": "https://www.casaviva.es/muebles/mesas/mesas-de-comedor/",
+      "is_group": false,
+      "evidence": "rendered result-count header data-products-count=\"19\" ('19 Resultados') on /muebles/mesas/mesas-de-comedor/ (h1 'Mesas de comedor'); full enumeration at ?start=0&sz=200 returned exactly 19 unique data-pid values",
+      "flag": "MANUAL REVIEW: two sitemap-only shape-filter sub-nodes exist (mesas-extensibles-comedor=2, mesas-redondas-comedor=1) that are strict subsets of these 19 and are not in the site nav; dropped as filter pages"
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Bedroom Furniture",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Headboards",
+      "qty": 3,
+      "link": "https://www.casaviva.es/muebles/muebles-de-dormitorio/cabeceros/",
+      "is_group": false,
+      "evidence": "rendered result-count header data-products-count=\"3\" ('3 Resultados') on /muebles/muebles-de-dormitorio/cabeceros/ (h1 'Cabeceros de cama'); 3 unique data-pid tiles confirm",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Bedside Tables",
+      "qty": 10,
+      "link": "https://www.casaviva.es/muebles/muebles-de-dormitorio/mesitas-de-noche/",
+      "is_group": false,
+      "evidence": "rendered result-count header data-products-count=\"10\" ('10 Resultados') on /muebles/muebles-de-dormitorio/mesitas-de-noche/ (h1 'Mesitas de noche'); 10 unique data-pid tiles confirm",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "TV Units",
+      "qty": 3,
+      "link": "https://www.casaviva.es/muebles/muebles-de-television/",
+      "is_group": false,
+      "evidence": "rendered result-count header data-products-count=\"3\" ('3 Resultados') on /muebles/muebles-de-television/ (h1 'Muebles de television'); 3 unique data-pid tiles confirm",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Poufs & Footstools",
+      "qty": 2,
+      "link": "https://www.casaviva.es/muebles/pufs/",
+      "is_group": false,
+      "evidence": "rendered result-count header data-products-count=\"2\" ('2 Resultados') on /muebles/pufs/ (h1 'Pufs y reposapies'); 2 unique data-pid tiles confirm",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Chairs & Stools",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Dining Chairs",
+      "qty": 60,
+      "link": "https://www.casaviva.es/muebles/sillas-y-taburetes/sillas-de-comedor/",
+      "is_group": false,
+      "evidence": "rendered result-count header on the live page: <div class=\"result-count\" data-products-count=\"60\"> displaying '60 Resultados'; full enumeration at ?start=0&sz=200 returned exactly 60 unique data-pid values",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Stools",
+      "qty": 2,
+      "link": "https://www.casaviva.es/muebles/sillas-y-taburetes/taburetes/",
+      "is_group": false,
+      "evidence": "rendered result-count header data-products-count=\"2\" ('2 Resultados') on /muebles/sillas-y-taburetes/taburetes/ (h1 'Taburetes'); 2 unique data-pid tiles confirm; parent Sillas y taburetes=62 equals 60+2 exactly",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Armchairs & Accent Chairs",
+      "qty": 23,
+      "link": "https://www.casaviva.es/muebles/sillones-y-butacas/",
+      "is_group": false,
+      "evidence": "rendered result-count header data-products-count=\"23\" ('23 Resultados') on /muebles/sillones-y-butacas/ (h1 'Sillones y butacas'); 23 unique data-pid tiles confirm",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Sofas",
+      "qty": 17,
+      "link": "https://www.casaviva.es/muebles/sofas/",
+      "is_group": false,
+      "evidence": "rendered result-count header data-products-count=\"17\" ('17 Resultados') on /muebles/sofas/ (h1 'Sofas'); full enumeration at ?start=0&sz=200 returned exactly 17 unique data-pid values",
+      "flag": "MANUAL REVIEW: recorded as a leaf although three sitemap/page sub-nodes exist (sofas-cama=3, sofas-chaise-longue-esquineros=3, sofas-exclusivos-online=5); product-ID arithmetic shows each is a strict subset of these 17 and they overlap rather than partition, and none appears in the mega-menu, so they were not emitted as separate leaves"
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Shoe Racks & Shoe Cabinets",
+      "qty": 4,
+      "link": "https://www.casaviva.es/orden-del-hogar/almacenaje/zapateros/",
+      "is_group": false,
+      "evidence": "rendered result-count header data-products-count=\"4\" ('4 Resultados') on /orden-del-hogar/almacenaje/zapateros/ (h1 'Estanterias de zapatos y zapateros'); 4 unique data-pid tiles confirm",
+      "flag": "MANUAL REVIEW: the site files this under Orden del Hogar > Almacenaje (storage), not Muebles, but all 4 tiles are shoe cabinets / shoe benches ('Zapatero de madera MDF y acero Bruno', 'Zapatero de bambu Oliver', 'Banco zapatero gris/blanco Bambu'); 1 of the 4 is also counted under Shelving Units"
+    },
+    {
+      "category": "Outdoor Furniture",
+      "sub_category": "Garden & Outdoor Furniture",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Outdoor Furniture",
+      "sub_category": "Balcony Sets",
+      "qty": 11,
+      "link": "https://www.casaviva.es/terraza-y-jardin/muebles-de-jardin-y-exterior/conjuntos-de-mesas-altas-y-sillas-de-jardin/",
+      "is_group": false,
+      "evidence": "rendered result-count header data-products-count=\"11\" ('11 Resultados') on that URL (h1 'Conjuntos de balcon'); 11 unique data-pid tiles confirm",
+      "flag": null
+    },
+    {
+      "category": "Outdoor Furniture",
+      "sub_category": "Garden Sofa Sets",
+      "qty": 8,
+      "link": "https://www.casaviva.es/terraza-y-jardin/muebles-de-jardin-y-exterior/conjuntos-de-sofas-y-mesas-bajas-para-exterior/",
+      "is_group": false,
+      "evidence": "rendered result-count header data-products-count=\"8\" ('8 Resultados') on that URL (h1 'Conjuntos de sofa de jardin'); 8 unique data-pid tiles confirm",
+      "flag": null
+    },
+    {
+      "category": "Outdoor Furniture",
+      "sub_category": "Garden Tables",
+      "qty": 15,
+      "link": "https://www.casaviva.es/terraza-y-jardin/muebles-de-jardin-y-exterior/mesas-de-jardin/",
+      "is_group": false,
+      "evidence": "rendered result-count header data-products-count=\"15\" ('15 Resultados') on that URL (h1 'Mesas de jardin')",
+      "flag": "MANUAL REVIEW: the site's header says 15 but full enumeration at ?start=0&sz=200 yielded only 14 unique data-pid values; header taken as source of truth per rule 4, discrepancy of 1 unresolved (likely a product hidden from the grid but still counted)"
+    },
+    {
+      "category": "Outdoor Furniture",
+      "sub_category": "Garden Chairs",
+      "qty": 16,
+      "link": "https://www.casaviva.es/terraza-y-jardin/muebles-de-jardin-y-exterior/sillas-de-jardin/",
+      "is_group": false,
+      "evidence": "rendered result-count header data-products-count=\"16\" ('16 Resultados') on that URL (h1 'Sillas de jardin'); 16 unique data-pid tiles confirm",
+      "flag": null
+    },
+    {
+      "category": "Outdoor Furniture",
+      "sub_category": "Hammocks, Sun Loungers & Hanging Chairs",
+      "qty": 2,
+      "link": "https://www.casaviva.es/terraza-y-jardin/muebles-de-jardin-y-exterior/sillones-colgantes-hamacas-y-tumbonas/",
+      "is_group": false,
+      "evidence": "rendered result-count header data-products-count=\"2\" ('2 Resultados') on that URL (h1 'Hamacas para jardin, tumbonas y sillones colgantes'); 2 unique data-pid tiles confirm",
+      "flag": null
+    },
+    {
+      "category": "Bathroom Furniture",
+      "sub_category": "Bathroom Furniture",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Bathroom Furniture",
+      "sub_category": "Bathroom Trolleys & Units",
+      "qty": 3,
+      "link": "https://www.casaviva.es/bano/carros-de-bano/",
+      "is_group": false,
+      "evidence": "rendered result-count header data-products-count=\"3\" ('3 Resultados') on /bano/carros-de-bano/ (h1 'Carros de bano'); 3 unique data-pid tiles confirm",
+      "flag": "MANUAL REVIEW: only freestanding bathroom furniture node on the site (no vanity-unit category exists); tiles are 'Mueble de bano de bambu 40x30x95cm', 'Carro de bano de bambu Karyl' and 'Estanteria de bambu para toallas 152cm' -- the towel shelving unit is also counted under Furniture > Shelving Units"
+    }
+  ]
+}

@@ -1,0 +1,52 @@
+{
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "Site is English by default (no locale switch needed). robots.txt has no Claude-specific disallow (generic User-agent: * block only, no anthropic-ai/ClaudeBot/Claude-Web/Claude-User/Claude-SearchBot rule) - proceeded past tier checks freely. ACCESS: direct HTTP fetch worked for all URLs (HTTP 200) but Connox category pages render products entirely client-side via a React mount (section#products.product-list-react) that is empty in raw HTML/curl output - matches prior Home-Decor pass's documented finding for this same site. Escalated to Playwright (tier 2) to render JS and read the real 'N Items sorted by:' header plus the matching 'Price in €(N)' filter-facet count as corroborating evidence - both numbers agreed on every page, giving a verifiable exact qty (unlike the prior Home-Decor pass, which never tried Playwright and had to null every qty). DISCOVERY: found the site's own dedicated 'Pet supplies' taxonomy at /categories/pet-supplies.html (breadcrumb-confirmed on every leaf: Categories > Pet supplies > <leaf>), with exactly 4 leaf sub-categories: Feeding bowls, Pet accessories, Pet beds, Pet toys - enumerated via full sitemap crawl (8 sitemap-N.xml files, all category folder segments extracted) confirming 'pet-supplies' is the only pet-specific top folder; no stray pet categories exist elsewhere (checked all sitemap URLs matching dog/cat/hund/katze/haustier/puppy/kitten/leash/collar/harness/kennel/crate/litter outside the pet-supplies folder - all were false positives: 'Colour Crate' storage furniture line, 'Collar' brand-name kitchenware (Stelton), dog/cat-themed decorative figurines and posters (pet-themed, correctly excluded per boundary rules), and children's plush toy animals under /kids/ (not pet products)). HUB PAGE: /categories/pet-supplies.html itself also renders a live listing (116 items, breadcrumb Categories > Home Accessories > Pet Supplies) but 116 is LESS than the sum of its 4 children (40+99+93+21=253), indicating cross-listed/overlapping items between children (same cross-listing behavior the prior Home-Decor pass documented site-wide) - so the hub's own count is not a clean union and is NOT reported as a row qty (would violate the no-double-count rule); emitted as an is_group row with qty null instead, per contract. CONTENT CHECK: manually reviewed the full rendered item list on pet-accessories (99 items: dog collars, leashes, harnesses, travel blankets, bowl mats, carrier bag, grooming brush, terry towel) and pet-beds/pet-toys/feeding-bowls (all beds, cushions, cat caves/baskets, toys, bowls/bowl stands) - no pet food/treats/supplements and no medical/veterinary items found in any of the 4 sub-categories, so no PET CONSUMABLE or PET MEDICAL flags apply here. All 4 leaf categories are Tier 1 decisive (Feeding bowls, Pet beds, Pet toys) or Tier 2 contextual-under-pet-parent (Pet accessories, clearly under the 'Pet supplies' pet-specific branch).",
+  "rows": [
+    {
+      "category": "Pet Supplies",
+      "sub_category": "Pet Supplies",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Pet Supplies",
+      "sub_category": "Feeding Bowls",
+      "qty": 40,
+      "link": "https://www.connox.com/categories/pet-supplies/feeding-bowls.html",
+      "is_group": false,
+      "evidence": "Playwright-rendered page header '40 Items sorted by:', corroborated by facet 'Price in €(40), 40 Items'",
+      "flag": null
+    },
+    {
+      "category": "Pet Supplies",
+      "sub_category": "Pet Accessories",
+      "qty": 99,
+      "link": "https://www.connox.com/categories/pet-supplies/pet-accessories.html",
+      "is_group": false,
+      "evidence": "Playwright-rendered page header '99 Items sorted by:', corroborated by facet 'Price in €(99), 99 Items'",
+      "flag": null
+    },
+    {
+      "category": "Pet Supplies",
+      "sub_category": "Pet Beds",
+      "qty": 93,
+      "link": "https://www.connox.com/categories/pet-supplies/pet-beds.html",
+      "is_group": false,
+      "evidence": "Playwright-rendered page header '93 Items sorted by:', corroborated by facet 'Price in €(93), 93 Items'",
+      "flag": null
+    },
+    {
+      "category": "Pet Supplies",
+      "sub_category": "Pet Toys",
+      "qty": 21,
+      "link": "https://www.connox.com/categories/pet-supplies/pet-toys.html",
+      "is_group": false,
+      "evidence": "Playwright-rendered page header '21 Items sorted by:', corroborated by facet 'Price in €(21), 21 Items'",
+      "flag": null
+    }
+  ]
+}

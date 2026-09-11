@@ -1,0 +1,50 @@
+{
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ACCESS: westelm.in is Cloudflare-fronted but plain curl (no impersonation needed) returned HTTP 200 on robots.txt, /agents.md, /llms.txt, /sitemap.xml and every /collection/ page tested. West Elm India runs on Fynd Commerce (confirmed via CSP header 'frame-ancestors ... https://*.fynd.com' on the homepage response AND explicitly stated in /agents.md: 'This store is built on Fynd Commerce'), a completely different stack from westelm.com's Constructor.io/Akamai setup used for SR2 (b2.json) - so no platform assumptions were carried over, per instructions. robots.txt (https://westelm.in/robots.txt) disallows only /dashboard/, /order/, /profile/*, /wishlist/, /cart/bag/, /cart/checkout?*, /thankyou/, /c/store-locator/, /order-tracking/, /products/?*, /brands/?*, /collections?* (plural, query-string form) - none of these match the singular /collection/<slug> listing pages used below, so nothing here is disallowed; Googlebot/Googlebot-image groups are fully open; no AI-crawler-specific block exists. /agents.md additionally invites read-only agent browsing and names /llms.txt, /sitemap.xml and /products/?l1_category=... as sanctioned endpoints. TREE SOURCE: the site's own live mega-menu, extracted from the homepage's server-rendered HTML (embedded content.navigation JSON + rendered <li> nav markup, not a client-fetched API). Cross-checked against category_l1/l2/l3 sitemaps (https://westelm.in/sitemap/category_l1.sitemap.xml etc.) but those sitemaps contain only 3-4 placeholder/example rows each (e.g. literal 'test-l1' entries) and are NOT the real taxonomy - confirmed not to be authoritative and not used for tree-building. Full top-level nav (10 items): New Arrivals(promo), FURNITURE, OUTDOOR & GARDEN, BEDDING & BATH, PILLOWS & DECOR, KITCHEN & DINING, LIGHTING, RUGS, ART & MIRRORS, GIFTS(promo). Bath-relevant content exists ONLY inside BEDDING & BATH > 'Bath Linen & Accessories' (a sub-header with 4 links: 'All Bath Linen & Accessories' view-all + 3 real leaves: Towels, Bath Mats, Bath Accessories). No dedicated Bath/Bathroom top-nav category exists on this India site (unlike westelm.com's full 'Bath' supercat with fixtures/vanities/hardware/faucets) - checked FURNITURE (Living Room/Outdoor/Bedroom/Dining/Home Office/Storage Furniture subcats - no vanity, no bath cabinet, no bath furniture node anywhere) and ART & MIRRORS (single generic 'Mirrors' leaf, 26 items, facets = Anton/Cantilever/Cher/Elodie/Industrial/Metal/Overlapping-Diamond/Peyton/Pierce&Ward/Suri/Thin-Frame/WE-Tate - all decor/wall-mirror lines, zero vanity or bathroom-mirror facet) for any bath-hierarchy pointer; none found - confirms absence of vanities, cabinets, fixtures, taps, showers, toilets, bathroom mirrors and bathroom hardware as separate nodes on this storefront. QTY VERIFICATION (per rule 26): each collection page server-renders a visible header 'N items' (span.LePIm) that matches an internal Redux state field item_total under a cursor-paginated 'page' object; both signals agreed on all 4 pages tested: Towels=13, Bath Mats=6, Bath Accessories=6, parent 'All Bath Linen & Accessories'=25 (=13+6+6, arithmetic cross-check passes, confirming no double-counting). Additionally enumerated the Bath Accessories page to exhaustion by extracting unique /product/<slug> hrefs: 6 unique product slugs found (amalfi-marble-bath-accessories, faceted-porcelain-bath-accessories, fluted-marble-bath-accessories, mari-confetti-glass-bath-accessories, modern-resin-stone-bath-accessories, modern-resin-stone-waste-bin), an exact match to the displayed count. CLASSIFICATION: 'Bath Accessories' (qty 6) kept as Bathroom - its own on-page type facets are 'Large Canister', 'Tank Tray', 'Vanity Mirror', 'Waste Bin' (all genuine bathroom accessory/hardware types per rules 13/17), confirming primary product type = bathroom accessory, not linen. 'Towels' (qty 13, facets: Hand Towel, Wash Cloth - plus the base Bath Towel type) and 'Bath Mats' (qty 6, product lines: Luxe Fibrosoft Bath Mat, Runway Bathmat, Square Ribbed Bathmat - all fiber/ribbed textile mats, no rubber/anti-slip bathroom-accessory mat found) were ROUTED to Textile per rules 15/16/20 - and cross-category dedup lookup against cross_category_url_index.json confirms BOTH URLs are already recorded as leaves in Textile.xlsx, so both are logged to review as ALREADY EXTRACTED, not as fresh rows. The 'Bath Accessories' URL was checked against the same index and returned null (not present in any other category file), so it is recorded fresh in rows[]. EXCLUDED per rule 25: 'All Bath Linen & Accessories' (view-all parent, page total 25, superseded by its 3 children per rule 24) and the 'New Arrivals'/'GIFTS' top-nav promotional/curated-gift sections (no independent bath taxonomy, not inspected further). No BLOCKED pages encountered; no fabrication; no quantity estimation - every number above was read directly from a fetched page.",
+ "rows": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bedding & Bath",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Linen & Accessories",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Accessories",
+   "qty": 6,
+   "link": "https://westelm.in/collection/bedding-and-bath-bath-linen-and-accessories-bath-accessories",
+   "is_group": false,
+   "evidence": "Page header 'LePIm' span reads '6 items'; Redux state item_total=6 (type:cursor) matches; enumerated 6 unique /product/ slugs (amalfi-marble-bath-accessories-10394789, faceted-porcelain-bath-accessories-8625432, fluted-marble-bath-accessories-b281, mari-confetti-glass-bath-accessories-10123176, modern-resin-stone-bath-accessories-8624962, modern-resin-stone-waste-bin-8681998); on-page type facets are Large Canister/Tank Tray/Vanity Mirror/Waste Bin (genuine bathroom accessories per rules 13/17). cross_category_url_index.json lookup = null (not extracted elsewhere).",
+   "flag": null
+  }
+ ],
+ "review": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Towels (Bedding & Bath > Bath Linen & Accessories)",
+   "qty": 13,
+   "issue": "ALREADY EXTRACTED IN Textile.xlsx - bath towels/hand towels/wash cloths (rules 15/20). cross_category_url_index.json confirms this URL is a recorded Textile.xlsx leaf.",
+   "link": "https://westelm.in/collection/bedding-and-bath-bed-linen-and-accessories-bath-towel"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Mats (Bedding & Bath > Bath Linen & Accessories)",
+   "qty": 6,
+   "issue": "ALREADY EXTRACTED IN Textile.xlsx - fiber/ribbed textile bath mats, no rubber/anti-slip variant found (rule 16). cross_category_url_index.json confirms this URL is a recorded Textile.xlsx leaf.",
+   "link": "https://westelm.in/collection/bedding-and-bath-bath-linens-and-accessories-bath-mats"
+  }
+ ]
+}

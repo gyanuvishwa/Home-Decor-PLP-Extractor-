@@ -1,0 +1,52 @@
+{
+  "status": "blocked",
+  "failure_reason": "www.qvc.com is behind Akamai Bot Manager and returns HTTP 418 'currently unavailable' (or a DataDome/Akamai challenge page) for every product-listing or collection-landing URL, confirmed independently across all three access tiers: (1) plain curl and curl_cffi with 4 browser-impersonation profiles (chrome120, safari15_5, edge101, chrome110) all returned 418; (2) Playwright headless Chromium with a real Chrome UA returned HTTP 418 with the Akamai reference-ID error page; (3) Claude-in-Chrome (real logged-in browser) loaded a blank DataDome/Akamai 'Powered and protected by' challenge page with no product content. Only XML sitemaps, robots.txt, and the api.qvc.com JSON search endpoint are unblocked. This matches the prior Home-Decor pass's notes for SR79 (same hard block, same host).",
+  "notes": "Discovery method: robots.txt (200 OK) -> sitemap-us-index.xml -> sitemap-us-collection.xml (QVC's curated landing-page sitemap, unblocked) -> grepped for clearance/outlet/sale/final-sale terms. Also checked sitemap-us-navigation-for-the-home.xml and sitemap-us-navigation-garden-and-outdoor-living.xml (the real category-nav trees) -- no Clearance entries in either, confirming Clearance is not part of QVC's nav-category tree, only its 'collections' landing-page system. Checked sitemap-us-content.xml -- no match. Home/garden department candidates found, applying the Sale-vs-Clearance test from the brief (site's own taxonomy word choice, since page content itself is unreachable to confirm breadcrumb/heading copy): home-clearance.html, home-holiday-clearance.html, home-designer-clearance.html and garden-outdoor-clearance.html all carry the explicit word 'Clearance' in their own URL slug (QVC's collection-URL naming convention consistently mirrors the on-page title, e.g. sibling fashion-clearance-*.html pages), so these are recorded as genuine Clearance candidates. home-final-sale-prices.html uses 'Final Sale Prices', a partial match to the brief's target term 'Final Sale' but also carries generic 'Sale Prices' promotional wording -- recorded but flagged ambiguous per the brief's Clearance-vs-Sale test, since page content could not be opened to see whether it is framed as permanent markdown/outlet stock. EXCLUDED as generic temporary promotional sale (no permanence signal, explicitly generic 'Sale'/seasonal wording): home-sale-prices.html, garden-outdoor-sale.html, home-white-sale.html, home-christmas-in-july-sale.html, home-black-friday-prices.html. EXCLUDED as out-of-scope (not home/garden department, or cross-department hub rather than a home-specific page): deals-clearance.html, deals-final-sale-prices.html, clearance-special-offer.html (last entry in the collection sitemap, no department prefix, presumed site-wide), fashion-*/shoes-*/jewelry-*/electronics-*/kitchen-* clearance pages (separate QVC departments, several of which are covered by other category projects e.g. Furniture/Textile/Storage). No 'Clearance' value exists in the api.qvc.com search facet system (checked the full 'Shop By' and 'Price' facet groups for groupId=lglu/For the Home -- only 'Special Prices', 'Shipping Offers', 'Items Recently On Air', 'Customer Top Rated', 'Best Sellers', 'New Arrivals' appear, no Clearance/Outlet facet), so no API-based cross-check of Clearance counts was possible; the collection pages are QVC's only Clearance surface and all are behind the block.",
+  "rows": [
+    {
+      "category": "Clearance",
+      "sub_category": "Home Clearance",
+      "qty": null,
+      "link": "https://www.qvc.com/collections/home-clearance.html",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: URL confirmed genuine via unblocked sitemap-us-collection.xml; page itself returned HTTP 418 / Akamai-DataDome challenge on every access tier tried (curl, curl_cffi x4 profiles, Playwright headless Chromium, Claude-in-Chrome), so listing content and qty could not be verified."
+    },
+    {
+      "category": "Clearance",
+      "sub_category": "Home Holiday Clearance",
+      "qty": null,
+      "link": "https://www.qvc.com/collections/home-holiday-clearance.html",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: URL confirmed genuine via unblocked sitemap-us-collection.xml; page itself returned HTTP 418 / Akamai-DataDome challenge on every access tier tried, so listing content and qty could not be verified."
+    },
+    {
+      "category": "Clearance",
+      "sub_category": "Home Designer Clearance",
+      "qty": null,
+      "link": "https://www.qvc.com/collections/home-designer-clearance.html",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: URL confirmed genuine via unblocked sitemap-us-collection.xml; page itself returned HTTP 418 / Akamai-DataDome challenge on every access tier tried, so listing content and qty could not be verified."
+    },
+    {
+      "category": "Clearance",
+      "sub_category": "Garden & Outdoor Clearance",
+      "qty": null,
+      "link": "https://www.qvc.com/collections/garden-outdoor-clearance.html",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: URL confirmed genuine via unblocked sitemap-us-collection.xml; page itself returned HTTP 418 / Akamai-DataDome challenge on every access tier tried, so listing content and qty could not be verified."
+    },
+    {
+      "category": "Clearance",
+      "sub_category": "Home Final Sale Prices",
+      "qty": null,
+      "link": "https://www.qvc.com/collections/home-final-sale-prices.html",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: AMBIGUOUS SALE/CLEARANCE - URL slug says 'Final Sale Prices' (partial match to target term 'Final Sale') but also carries generic 'Sale Prices' wording with no independently confirmed permanence signal; page itself is also blocked (HTTP 418 / Akamai-DataDome challenge on every access tier tried), so on-page copy/breadcrumb could not be checked to resolve the ambiguity."
+    }
+  ]
+}

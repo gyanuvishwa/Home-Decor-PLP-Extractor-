@@ -1,0 +1,70 @@
+{
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "JCPenney Home (jcpenney.com), dept20000011 = Home department. Discovery: the Home department page's own server-rendered nav links to '/g/home-store?new_arrivals=view+all+new&id=dept20000011' with analytics tags reading '...NEW-ARRIVALS-_-DEPT_FTH_SALE...' - the site's own explicit New Arrivals concept for Home. Investigated the constructor.io backend directly first (tier 1): confirmed the site's search/browse index (ac.cnstrc.com, key key_xT77K5VmpiVduqnj, same one documented in the prior Home-Decor pass) has NO facet field corresponding to 'new_arrivals' at all (checked the dept's full facet list and several leaf categories' facet lists) - so this filter is not a discoverable Constructor.io facet and its exact count cannot be reverse-engineered from outside; it must be read from the rendered page. Playwright (tier 2) was blocked site-wide (net::ERR_HTTP2_PROTOCOL_ERROR / ERR_CONNECTION_RESET on every jcpenney.com URL including robots.txt, while example.com loaded fine - consistent with headless-Chromium bot detection, not a general outage), so Claude-in-Chrome (tier 3) was used for all New Arrivals evidence. Opened '/g/home-store?new_arrivals=view+all+new&id=dept20000011': page title is 'For the Home New Arrivals | Trending Now' and it renders ONLY 6 circular navigation tiles (Bedding, Window, Bath, Kitchen & Dining, Home Decor, Rugs), each linking to that sub-department's own New Arrivals-filtered listing - no flat product grid or aggregate count exists on this hub page itself, so its own qty is recorded as null (parent kept as a grouping row per the brief's genuine-sub-structure rule, since the site itself presents these 6 as its real children). Each of the 6 child tiles was opened individually and each rendered a real PLP with an active 'View All New' filter chip and an exact 'Filter: N results' count: Bedding 969, Window Treatments 353, Bath 512, Kitchen & Dining 2,853, Home Decor 3,661, Rugs 339. The Kitchen & Dining and Home Decor tile links carry an additional 'view_all=view+all+brands' URL param that renders as a second, co-active 'View All Brands' filter chip alongside 'View All New' - flagged on those two rows since it could not be confirmed whether 'View All Brands' is a true no-op (show-all-brands default) or a mild additional restriction; the count shown is exactly what that tile's own URL produces. Child counts are not expected to sum to any parent total since there is no parent total (hub only). Rugs (339) sits under Home Decor in the site's own breadcrumb (home store > home decor > rugs) and so likely overlaps with/is a subset of the Home Decor row's 3,661 - kept as a separate row per the brief's overlap rule since it is a genuinely distinct URL/listing the site itself surfaces as its own tile. No other New Arrivals-style wording (Just In, Latest, What's New, Recently Added) was found in nav beyond this one 'new_arrivals' taxonomy branch; the global 'New & Trending' mega-menu covers Women's/Men's/seasonal trending only, with no Home-specific New Arrivals entry beyond the one already used here.",
+  "rows": [
+    {
+      "category": "New Arrivals",
+      "sub_category": "For the Home New Arrivals",
+      "qty": null,
+      "link": "https://www.jcpenney.com/g/home-store?new_arrivals=view+all+new&id=dept20000011",
+      "is_group": true,
+      "evidence": "Page title 'For the Home New Arrivals | Trending Now'; rendered page shows only 6 circular navigation tiles (Bedding, Window, Bath, Kitchen & Dining, Home Decor, Rugs) with no product grid or count element of its own",
+      "flag": "MANUAL REVIEW: hub/navigation page only - no own aggregate product count exists on this URL; see the 6 child rows below for each tile's exact site-reported count"
+    },
+    {
+      "category": "New Arrivals",
+      "sub_category": "Bedding New Arrivals",
+      "qty": 969,
+      "link": "https://www.jcpenney.com/g/home/bedroom/all-bedding?new_arrivals=view+all+new&id=cat100250072",
+      "is_group": false,
+      "evidence": "Page title 'All Bedding - Home'; rendered filter panel reads 'Filter / 969 results' with active 'View All New' chip",
+      "flag": null
+    },
+    {
+      "category": "New Arrivals",
+      "sub_category": "Window Treatments New Arrivals",
+      "qty": 353,
+      "link": "https://www.jcpenney.com/g/home/window-treatments?new_arrivals=view+all+new&id=cat100260213",
+      "is_group": false,
+      "evidence": "Page title 'Window Treatments'; rendered filter panel reads 'Filter / 353 results' with active 'View All New' chip",
+      "flag": null
+    },
+    {
+      "category": "New Arrivals",
+      "sub_category": "Bath New Arrivals",
+      "qty": 512,
+      "link": "https://www.jcpenney.com/g/home/all-bath?new_arrivals=view+all+new&id=cat100290078",
+      "is_group": false,
+      "evidence": "Page title 'View All Bath - Bed & Bath'; rendered filter panel reads 'Filter / 512 results' with active 'View All New' chip",
+      "flag": null
+    },
+    {
+      "category": "New Arrivals",
+      "sub_category": "Kitchen & Dining New Arrivals",
+      "qty": 2853,
+      "link": "https://www.jcpenney.com/g/home-store/kitchen-dining?new_arrivals=view+all+new&view_all=view+all+brands&id=cat100240016",
+      "is_group": false,
+      "evidence": "Page title 'Kitchen & Dining'; rendered filter panel reads 'Filter / 2,853 results' with two active chips: 'View All Brands' and 'View All New'",
+      "flag": "MANUAL REVIEW: page carries a second co-active 'View All Brands' filter chip alongside 'View All New' (from the tile's own URL param view_all=view+all+brands); could not confirm whether this is a pure no-op default or narrows the count - reported exactly as the site's own tile link renders it"
+    },
+    {
+      "category": "New Arrivals",
+      "sub_category": "Home Decor New Arrivals",
+      "qty": 3661,
+      "link": "https://www.jcpenney.com/g/home-store/home-decor?new_arrivals=view+all+new&view_all=view+all+brands&id=cat100240022",
+      "is_group": false,
+      "evidence": "Page title 'Home Decor'; rendered filter panel reads 'Filter / 3,661 results' with two active chips: 'View All Brands' and 'View All New'",
+      "flag": "MANUAL REVIEW: page carries a second co-active 'View All Brands' filter chip alongside 'View All New' (from the tile's own URL param view_all=view+all+brands); could not confirm whether this is a pure no-op default or narrows the count - reported exactly as the site's own tile link renders it"
+    },
+    {
+      "category": "New Arrivals",
+      "sub_category": "Rugs New Arrivals",
+      "qty": 339,
+      "link": "https://www.jcpenney.com/g/home-store/home-decor/rugs?new_arrivals=view+all+new&id=cat100240023",
+      "is_group": false,
+      "evidence": "Page title 'Rugs'; rendered filter panel reads 'Filter / 339 results' with active 'View All New' chip",
+      "flag": null
+    }
+  ]
+}

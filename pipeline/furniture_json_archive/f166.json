@@ -1,0 +1,426 @@
+{
+ "sr": 166,
+ "company": "Home R Us UAE",
+ "brand_site": "homesrus.ae",
+ "country": "UAE",
+ "site_url": "https://www.homesrus.ae/",
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "Access: Claude-in-Chrome only, own tab, no HTTP client. Loaded https://www.homesrus.ae/en/ and ran same-origin fetch() from that page context for every category page; parsed the SSR HTML with regex for <h1> and the Magento layered-nav toolbar paragraph (class=toolbar-amount, 'Items X - Y of N results for <Category>'). Zero 403s / challenges / rate limits; robots.txt names no Claude agent (generic '*' group, crawl-delay 10) and only disallows query-string URLs, checkout, catalogsearch and /brands/ - all category paths used here are clean paths. Platform is Magento 2 (Lals Group). Per brief I did NOT use any categoryList.product_count API - every qty is the rendered toolbar header of the category page itself. Counts were stable across two reads of the department pages (Furniture 1655, Sofas & Chairs 375, Living 724, Bedroom 345 on both reads) and vary correctly per category. Tree source = union of (a) the homepage mega-menu, (b) /en/sitemap.xml -> media/hru/sitemap-1-1.xml (5725 URLs, 110 under /furniture), and (c) each category page's own child-link block. (c) added nodes missing from the nav: Living>Coffee & Side Tables' children Coffee Tables and Side & End Tables, Bedroom>Beds' size children, Wardrobe door-count children, Baby & Kids>cribs, Bedroom>bed-base-headboard, Living>screens-partitions, Living>console/storage/tables aliases. TRAP 2 (bad slug serves a plausible wrong number) is endemic here: every 'size/seater/door-count' sub-node returns HTTP 200 with its own <h1> but serves the PARENT's product set and the parent's total - bed sizes all read '93 results for Beds', wardrobe door counts all read '22 results for Wardrobes', dining-table seaters all read '92 results for Dining Tables'. Those were therefore NOT recorded and their parents were kept as leaves (documented per row). Exceptions: /bedroom/beds/double-beds/ does return its own set (6 results for Double Beds) and /bedroom/beds/super-king-sized-bed/ returns 0; both are inconsistent with their siblings so the whole size layer was dropped rather than partially recorded. Dead nodes that 302 to the homepage (not recorded at all): /furniture/sofa-chairs/sofa-sets/, /furniture/living/screens-partitions/, /furniture/baby-kids/cribs/, /furniture/bedroom/bed-base-headboard/, /household/bath-laundry/bathroom-furniture/. Alias/duplicate URLs collapsed: /furniture/sofas/ (canonical) = /furniture/sofa-chairs/ = /furniture/living/sofa-chairs/ (all 'Sofas & Chairs', 375); /furniture/living/console/ = /furniture/living/consoles-sideboards/ (63); /furniture/living/storage/ = /furniture/living/shoe-cabinets-shelves/ (16); /furniture/living/tables/ = /furniture/living/coffee-side-tables/ (285); /furniture/living/home-bars/ = /furniture/dining/home-bars/ (26); /furniture/junior-home/ 302s to /furniture/baby-kids/. OVERLAPPING TAXONOMY - the one judgement call worth reviewing: the site exposes the seating catalogue twice, once as the product-type branch 'Sofas & Chairs' (375: Sofas 134 / Corner 28 / Modular 52 / Sofa Beds 11 / Armchairs 126 / Recliners 23 / Ottomans 32) and once as roll-ups inside 'Living' (/furniture/living/sofas/ = 161, /furniture/living/armchairs/ = 126). living/armchairs and sofa-chairs/armchair report the same 126 and near-identical product titles, and living/sofas (161) is a roll-up of the sofa + corner-sofa split (134+28), so both Living roll-ups were dropped as duplicates and the deeper product-type branch was kept (URL-hierarchy rule + no duplicate rows). Living therefore contributes only Coffee & Side Tables, Consoles & Sideboards, TV Units & Curio Cabinets and Shoe Cabinets & Shelves. Excluded as out of scope: all of /furniture/mattress/ and its size children plus mattress toppers/protectors and /baby-kids/mattress (bedding, per brief); /baby-kids/kids-bedding-bath and /baby-kids/backpacks; /furniture/outdoor/open-sky/, /outdoor/open-skys-collection/ and /outdoor/great-outdoors/ (marketing collections, S3). Checked outside the Furniture department and rejected on product evidence: /household/decor-and-furnishings/garden/garden-pots-stands/ (h1 'Plant Stands', 117 - products are wicker/bamboo/seagrass/metal plant and flower stands filed under Garden Decor, i.e. planter accessories, not furniture) and /household/bath-laundry/bathroom-storage/racks-cabinets/ (h1 'Racks & Cabinets', 34 - products are wall hooks, over-the-door organisers, towel rails and plastic drawer organisers = standalone storage/bathroom accessories). Kids Playroom & Study was product-checked and is genuine furniture (study desks, bookcases, chairs).",
+ "rows": [
+  {
+   "category": "Furniture",
+   "sub_category": "Sofas & Chairs",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sofas",
+   "qty": 134,
+   "link": "https://www.homesrus.ae/en/furniture/sofa-chairs/sofa/",
+   "is_group": false,
+   "evidence": "rendered listing header (Magento toolbar-amount) 'Items 1 - 24 of 134 results for Sofas'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Corner & L-Shaped Sofas",
+   "qty": 28,
+   "link": "https://www.homesrus.ae/en/furniture/sofa-chairs/corner-sofa/",
+   "is_group": false,
+   "evidence": "rendered listing header (Magento toolbar-amount) 'Items 1 - 24 of 28 results for Corner & L-Shaped Sofas'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Modular Sofas",
+   "qty": 52,
+   "link": "https://www.homesrus.ae/en/furniture/sofa-chairs/modular-sofa/",
+   "is_group": false,
+   "evidence": "rendered listing header (Magento toolbar-amount) 'Items 1 - 24 of 52 results for Modular Sofas'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sofa Beds",
+   "qty": 11,
+   "link": "https://www.homesrus.ae/en/furniture/sofa-chairs/sofa-bed/",
+   "is_group": false,
+   "evidence": "rendered listing header (Magento toolbar-amount) 'Items 1 - 11 of 11 results for Sofa Beds'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Armchairs",
+   "qty": 126,
+   "link": "https://www.homesrus.ae/en/furniture/sofa-chairs/armchair/",
+   "is_group": false,
+   "evidence": "rendered listing header (Magento toolbar-amount) 'Items 1 - 24 of 126 results for Armchairs'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Recliner Motion Sofas",
+   "qty": 23,
+   "link": "https://www.homesrus.ae/en/furniture/sofa-chairs/recliners-motion-sofa/",
+   "is_group": false,
+   "evidence": "rendered listing header (Magento toolbar-amount) 'Items 1 - 23 of 23 results for Recliners Motion Sofas'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Ottomans & Stools",
+   "qty": 32,
+   "link": "https://www.homesrus.ae/en/furniture/sofa-chairs/ottomans/",
+   "is_group": false,
+   "evidence": "rendered listing header (Magento toolbar-amount) 'Items 1 - 24 of 32 results for Ottomans & Stools'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Living Room Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Coffee & Side Tables",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Coffee Tables",
+   "qty": 105,
+   "link": "https://www.homesrus.ae/en/furniture/living/coffee-side-tables/coffee-table/",
+   "is_group": false,
+   "evidence": "rendered listing header (Magento toolbar-amount) 'Items 1 - 24 of 105 results for Coffee Tables'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Side & End Tables",
+   "qty": 181,
+   "link": "https://www.homesrus.ae/en/furniture/living/coffee-side-tables/sidetable/",
+   "is_group": false,
+   "evidence": "rendered listing header (Magento toolbar-amount) 'Items 1 - 24 of 181 results for Side & End Tables'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Consoles & Sideboards",
+   "qty": 63,
+   "link": "https://www.homesrus.ae/en/furniture/living/consoles-sideboards/",
+   "is_group": false,
+   "evidence": "rendered listing header (Magento toolbar-amount) 'Items 1 - 24 of 63 results for Consoles & Sideboards'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "TV Units & Curio Cabinets",
+   "qty": 60,
+   "link": "https://www.homesrus.ae/en/furniture/living/entertainment-unit-and-curio-cabinets/",
+   "is_group": false,
+   "evidence": "rendered listing header (Magento toolbar-amount) 'Items 1 - 24 of 60 results for TV Units & Curio Cabinets'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Shoe Cabinets & Shelves",
+   "qty": 16,
+   "link": "https://www.homesrus.ae/en/furniture/living/shoe-cabinets-shelves/",
+   "is_group": false,
+   "evidence": "rendered listing header (Magento toolbar-amount) 'Items 1 - 16 of 16 results for Shoe Cabinets & Shelves'",
+   "flag": "MANUAL REVIEW: its single child /living/shoe-cabinets-shelves/shoe-racks-cabinets/ returns the identical 16-item listing, so only this node was recorded to avoid a duplicate row"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bedroom Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Beds",
+   "qty": 93,
+   "link": "https://www.homesrus.ae/en/furniture/bedroom/beds/",
+   "is_group": false,
+   "evidence": "rendered listing header (Magento toolbar-amount) 'Items 1 - 24 of 93 results for Beds'",
+   "flag": "MANUAL REVIEW: recorded as a leaf - the five bed-size children (single/double/queen/king/super-king) are SEO landing pages that serve this same parent listing ('93 results for Beds'); only double-beds returns its own count (6)"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bedroom Sets",
+   "qty": 25,
+   "link": "https://www.homesrus.ae/en/furniture/bedroom/bedroom-sets/",
+   "is_group": false,
+   "evidence": "rendered listing header (Magento toolbar-amount) 'Items 1 - 24 of 25 results for Bedroom Sets'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bedside Tables",
+   "qty": 51,
+   "link": "https://www.homesrus.ae/en/furniture/bedroom/bedside-tables/",
+   "is_group": false,
+   "evidence": "rendered listing header (Magento toolbar-amount) 'Items 1 - 24 of 51 results for Bedside Tables'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dressing Tables & Mirrors",
+   "qty": 44,
+   "link": "https://www.homesrus.ae/en/furniture/bedroom/dresser-mirror/",
+   "is_group": false,
+   "evidence": "rendered listing header (Magento toolbar-amount) 'Items 1 - 24 of 44 results for Dressing Tables & Mirrors'",
+   "flag": "MANUAL REVIEW: mixed node - dressing tables/dressers (furniture, in scope) listed together with their dresser mirrors (Wall Decor scope); site has no facet to split them"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Chest of Drawers",
+   "qty": 27,
+   "link": "https://www.homesrus.ae/en/furniture/bedroom/chest-of-drawers/",
+   "is_group": false,
+   "evidence": "rendered listing header (Magento toolbar-amount) 'Items 1 - 24 of 27 results for Chest of Drawers'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Wardrobes",
+   "qty": 22,
+   "link": "https://www.homesrus.ae/en/furniture/bedroom/wardrobe/",
+   "is_group": false,
+   "evidence": "rendered listing header (Magento toolbar-amount) 'Items 1 - 22 of 22 results for Wardrobes'",
+   "flag": "MANUAL REVIEW: recorded as a leaf - all five door-count children (2/3/4/6/sliding door) serve this same parent listing ('22 results for Wardrobes')"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bed Benches",
+   "qty": 5,
+   "link": "https://www.homesrus.ae/en/furniture/bedroom/bed-benches/",
+   "is_group": false,
+   "evidence": "rendered listing header (Magento toolbar-amount) 'Items 1 - 5 of 5 results for Bed Benches'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dining Room Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dining Chairs & Benches",
+   "qty": 124,
+   "link": "https://www.homesrus.ae/en/furniture/dining/dining-chair/",
+   "is_group": false,
+   "evidence": "rendered listing header (Magento toolbar-amount) 'Items 1 - 24 of 124 results for Dining Chairs & Benches'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dining Furniture Sets",
+   "qty": 25,
+   "link": "https://www.homesrus.ae/en/furniture/dining/dining-furniture-sets/",
+   "is_group": false,
+   "evidence": "rendered listing header (Magento toolbar-amount) 'Items 1 - 24 of 25 results for Dining Furniture Sets'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dining Tables",
+   "qty": 92,
+   "link": "https://www.homesrus.ae/en/furniture/dining/dining-table/",
+   "is_group": false,
+   "evidence": "rendered listing header (Magento toolbar-amount) 'Items 1 - 24 of 92 results for Dining Tables'",
+   "flag": "MANUAL REVIEW: recorded as a leaf - the 4/6/8-seater children serve this same parent listing ('92 results for Dining Tables')"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Buffets & Hutches",
+   "qty": 25,
+   "link": "https://www.homesrus.ae/en/furniture/dining/buffet-hutch/",
+   "is_group": false,
+   "evidence": "rendered listing header (Magento toolbar-amount) 'Items 1 - 24 of 25 results for Buffets & Hutches'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Serving Trolleys",
+   "qty": 4,
+   "link": "https://www.homesrus.ae/en/furniture/dining/serving-trolley/",
+   "is_group": false,
+   "evidence": "rendered listing header (Magento toolbar-amount) 'Items 1 - 4 of 4 results for Serving Trolleys'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Home Bars",
+   "qty": 26,
+   "link": "https://www.homesrus.ae/en/furniture/dining/home-bars/",
+   "is_group": false,
+   "evidence": "rendered listing header (Magento toolbar-amount) 'Items 1 - 24 of 26 results for Home Bars'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Tea & Bistro Sets",
+   "qty": 0,
+   "link": "https://www.homesrus.ae/en/furniture/dining/tea-bistro-sets/",
+   "is_group": false,
+   "evidence": "rendered listing header (Magento toolbar-amount) 'Items 0 - 0 of 0 results for Tea & Bistro Sets'",
+   "flag": "MANUAL REVIEW: live category page with zero products at time of extraction"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Baby & Kids",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Kids Beds",
+   "qty": 43,
+   "link": "https://www.homesrus.ae/en/furniture/baby-kids/kids-beds/",
+   "is_group": false,
+   "evidence": "rendered listing header (Magento toolbar-amount) 'Items 1 - 24 of 43 results for Kids Beds'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Kids Bedroom Furniture",
+   "qty": 65,
+   "link": "https://www.homesrus.ae/en/furniture/baby-kids/kids-bedroom-furniture/",
+   "is_group": false,
+   "evidence": "rendered listing header (Magento toolbar-amount) 'Items 1 - 24 of 65 results for Kids Bedroom Furniture'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Kids Playroom & Study",
+   "qty": 31,
+   "link": "https://www.homesrus.ae/en/furniture/baby-kids/kids-playroom-study/",
+   "is_group": false,
+   "evidence": "rendered listing header (Magento toolbar-amount) 'Items 1 - 24 of 31 results for Kids Playroom & Study'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Outdoor Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Outdoor Chairs",
+   "qty": 48,
+   "link": "https://www.homesrus.ae/en/furniture/outdoor/outdoor-chairs/",
+   "is_group": false,
+   "evidence": "rendered listing header (Magento toolbar-amount) 'Items 1 - 24 of 48 results for Outdoor Sofas & Chairs'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Outdoor Tables",
+   "qty": 20,
+   "link": "https://www.homesrus.ae/en/furniture/outdoor/outdoor-table/",
+   "is_group": false,
+   "evidence": "rendered listing header (Magento toolbar-amount) 'Items 1 - 20 of 20 results for Outdoor Tables'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Outdoor Sets",
+   "qty": 11,
+   "link": "https://www.homesrus.ae/en/furniture/outdoor/outdoor-sets/",
+   "is_group": false,
+   "evidence": "rendered listing header (Magento toolbar-amount) 'Items 1 - 11 of 11 results for Outdoor Sets'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Canopies & Swings",
+   "qty": 1,
+   "link": "https://www.homesrus.ae/en/furniture/outdoor/canopies-swings/",
+   "is_group": false,
+   "evidence": "rendered listing header (Magento toolbar-amount) 'Items 1 - 1 of 1 results for Canopies & Swings'",
+   "flag": "MANUAL REVIEW: node sits under Outdoor Furniture but its only product is 'Cantilever Water Base' (a parasol base accessory), not furniture"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Daybeds & Loungers",
+   "qty": 2,
+   "link": "https://www.homesrus.ae/en/furniture/outdoor/daybeds-loungers/",
+   "is_group": false,
+   "evidence": "rendered listing header (Magento toolbar-amount) 'Items 1 - 2 of 2 results for Daybeds & Loungers'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Office Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Desks",
+   "qty": 8,
+   "link": "https://www.homesrus.ae/en/furniture/home-office/desks/",
+   "is_group": false,
+   "evidence": "rendered listing header (Magento toolbar-amount) 'Items 1 - 8 of 8 results for Desks'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Office Chairs",
+   "qty": 2,
+   "link": "https://www.homesrus.ae/en/furniture/home-office/chair/",
+   "is_group": false,
+   "evidence": "rendered listing header (Magento toolbar-amount) 'Items 1 - 2 of 2 results for Chairs'",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bookcases",
+   "qty": 8,
+   "link": "https://www.homesrus.ae/en/furniture/home-office/bookcase/",
+   "is_group": false,
+   "evidence": "rendered listing header (Magento toolbar-amount) 'Items 1 - 8 of 8 results for Bookcases'",
+   "flag": null
+  },
+  {
+   "category": "Bathroom Furniture",
+   "sub_category": "Vanity",
+   "qty": 0,
+   "link": "https://www.homesrus.ae/en/household/bath-laundry/bathroom-furniture/vanity-tables/",
+   "is_group": false,
+   "evidence": "rendered listing header (Magento toolbar-amount) 'Items 0 - 0 of 0 results for Vanity'",
+   "flag": "MANUAL REVIEW: only bathroom-furniture node that resolves; it is orphaned (its parent /household/bath-laundry/bathroom-furniture/ 302s to the homepage) and holds 0 products"
+  }
+ ]
+}

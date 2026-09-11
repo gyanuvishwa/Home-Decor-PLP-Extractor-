@@ -1,0 +1,57 @@
+{
+  "sr": 73,
+  "company": "Joybird",
+  "brand_site": "joybird.com",
+  "country": "USA",
+  "site_url": "https://joybird.com/",
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "Joybird is a mid-century-modern furniture DTC brand; the vast majority of the catalogue (sofas, chairs, sectionals, tables, beds, rugs, pillows, throws, mattresses) is furniture/textile and out of scope. Direct fetch worked throughout (no WAF/blocking encountered). Site nav 'Decor' (/decoration-accessories/) top-level item expands (mobile menu) to: Pillows, Throws, Rugs, Poufs & Cubes, Planters, 'Wall Decor & Wallpaper' (href=/wall-art/), Lighting, Mirrors -- Pillows/Throws/Rugs/Poufs excluded as textiles/furniture. The decoration-accessories page itself (177 items) is a MIXED ROLL-UP of all of the above incl. pillows/throws -- dropped per 'drop roll-ups, do not pad'. Counts verified via two independent signals that agreed: (1) rendered '<N> Products' header text and (2) the page's embedded Algolia InstantSearch result blob (nbHits, hitsPerPage:12, nbPages == ceil(nbHits/12)); each category re-fetched live twice (this session, ~15 min apart) with identical nbHits both times -- no drift observed. /all-lighting/ (Lighting, 19) already aggregates all lamp/lighting sub-types (table-lamps, floor-lamps, ceiling-lamps, pendants carry 'all-lighting' as a co-tag on every product) -- those sub-URLs are facet re-cuts of the same population, not counted separately. /wall-art/ (82) product-title-audited: at least 2 of the sampled ~20 unique titles across two page-1 fetches are literally Wallpaper products ('Green Tropical Jungle Wallpaper', 'Modest Geo Wallpaper') bleeding into this nav bucket (matches the mobile nav's own conflated label 'Wall Decor & Wallpaper') -- flagged as MANUAL REVIEW rather than silently padded or silently dropped, because the site itself reports 82 for this URL and the contamination could not be exactly quantified: pagination beyond page 1 is client-side/AJAX (no working ?page= param, no visible pagination links in SSR HTML) so exhaustive enumeration was not reachable without browser automation, which this project disallows. /wall-decor/ (68) was found via sitemap.xml but is NOT linked anywhere in current site navigation (checked home page mega-menu and mobile flyout); its page-1 product IDs overlap ~83% (10/12) with /wall-art/'s page-1 IDs (e.g. product 11455 'Lucky Bird Wall Art' appears verbatim on both) -- treated as a legacy/duplicate reading of the same population per Rule 0.6 (drop when it's the same listing under a second URL at the same level) and NOT emitted as its own row; the overlap is documented here rather than silently discarded. Five sitemap-listed category pages -- /clocks/, /vases-and-bowls/, /tableware/, /glassware/, /serveware/ -- are live (HTTP 200, real per-category title tags and templates) but are NOT linked anywhere in current site navigation and their embedded Algolia blob returns nbHits:0 (verified live twice each, ~15 min apart, no drift) -- reported as genuine qty:0 rows rather than omitted, since the brief specifically asked to check thoroughly before concluding low/zero. /plants-and-planters/ (1 item, 'Penelope Planter', a rattan/cane pot) is a genuine decorative planter, not a faux plant, so kept in scope; a second sitemap URL /plants-and-planters/plants/ (live plants) was excluded as not a decor object. All '/modern/...' prefixed URLs (e.g. /modern/mirrors/, /modern/all-lighting/) are a style-facet re-cut (products carry a co-tag like 'modernwall-decor') of the same canonical categories and were not counted separately. Excluded per standing rules: Pillows, Throws, Rugs, Poufs & Cubes (textiles/furniture), Wallpaper (dedicated /wallpaper/ page, and the wallpaper bleed inside /wall-art/), Art Prints (subset of Wall Art, no separate listing page), all furniture/bedroom/office/outdoor-furniture/mattress lines. Rule 0 gained nothing extra here -- Joybird has no room-organised lighting/mirror sub-trees (Bathroom/Vanity/Outdoor lighting or mirrors); its lighting and mirrors are each a single flat listing."
+  ,
+  "rows": [
+    {"category":"Lighting","sub_category":"Lighting","parent":false,
+     "qty":19,"link":"https://joybird.com/all-lighting/",
+     "evidence":"Rendered header 'Lighting 19 Products' on /all-lighting/; embedded Algolia blob nbHits:19, hitsPerPage:12, nbPages:2 (ceil(19/12)=2, matches); identical on two independent live fetches ~15 min apart. Aggregates all lamp sub-types (table/floor/ceiling lamps, pendants all co-tagged 'all-lighting').",
+     "flag":null},
+
+    {"category":"Wall Decor & Mirrors","sub_category":"Mirrors","parent":false,
+     "qty":6,"link":"https://joybird.com/mirrors/",
+     "evidence":"Rendered header 'Mirrors 6 Products' on /mirrors/; embedded Algolia blob nbHits:6, hitsPerPage:12, nbPages:1 (ceil(6/12)=1, matches); identical on two independent live fetches. Products sampled are 'Floor Mirror' and 'Mirror' type -- genuine decorative wall/floor mirrors.",
+     "flag":null},
+
+    {"category":"Wall Decor & Mirrors","sub_category":"Wall Art","parent":false,
+     "qty":82,"link":"https://joybird.com/wall-art/",
+     "evidence":"Rendered header 'Wall Art 82 Products' on /wall-art/; embedded Algolia blob nbHits:82, hitsPerPage:12, nbPages:7 (ceil(82/12)=7, matches); identical (82) on two independent live fetches.",
+     "flag":"MANUAL REVIEW: product-title audit of the page-1 sample found this listing bleeds in Wallpaper products (e.g. 'Green Tropical Jungle Wallpaper', 'Modest Geo Wallpaper' -- one explicitly typed 'Wallpaper' in the product record), which are excluded per project rules. Could not derive an exact wallpaper-free count: pagination past page 1 is client-side/AJAX with no working query-string param and no pagination links in the static HTML, so exhaustive per-product enumeration wasn't reachable without browser automation (disallowed). qty=82 is the site's own reported total for this URL; true in-scope Wall Art count is somewhat lower."},
+
+    {"category":"Home Accessories","sub_category":"Clocks","parent":false,
+     "qty":0,"link":"https://joybird.com/clocks/",
+     "evidence":"Embedded Algolia blob: filters categories:\"clocks\", hits:[], nbHits:0, nbPages:0; page renders no product tiles and no product-count text. Verified 0 on two independent live fetches ~15 min apart (no drift).",
+     "flag":"Page is live (HTTP 200, real 'Mid Century Modern Clocks' title/template) but not linked anywhere in current site navigation (checked desktop mega-menu and mobile 'Decor' flyout) -- appears to be a discontinued/orphaned product line kept reachable only via sitemap.xml. Genuine zero, not a fetch failure."},
+
+    {"category":"Home Accessories","sub_category":"Vases and Bowls","parent":false,
+     "qty":0,"link":"https://joybird.com/vases-and-bowls/",
+     "evidence":"Embedded Algolia blob: filters categories:\"vases-and-bowls\", hits:[], nbHits:0, nbPages:0. Verified 0 on two independent live fetches.",
+     "flag":"Live page, not linked in current site navigation; genuine zero, same pattern as Clocks/Tableware/Glassware/Serveware."},
+
+    {"category":"Home Accessories","sub_category":"Plants & Planters","parent":false,
+     "qty":1,"link":"https://joybird.com/plants-and-planters/",
+     "evidence":"Rendered header 'Plants & Planters 1 Products'; embedded Algolia blob nbHits:1, nbPages:1. Sole product is 'Penelope Planter', a rattan/cane pot (decorative container, not a faux plant). Verified on two independent live fetches.",
+     "flag":null},
+
+    {"category":"Kitchen & Dining","sub_category":"Tableware","parent":false,
+     "qty":0,"link":"https://joybird.com/tableware/",
+     "evidence":"Embedded Algolia blob: filters categories:\"tableware\", hits:[], nbHits:0, nbPages:0. Verified 0 on two independent live fetches.",
+     "flag":"Live page, not linked in current site navigation; genuine zero."},
+
+    {"category":"Kitchen & Dining","sub_category":"Glassware","parent":false,
+     "qty":0,"link":"https://joybird.com/glassware/",
+     "evidence":"Embedded Algolia blob: filters categories:\"glassware\", hits:[], nbHits:0, nbPages:0. Verified 0 on two independent live fetches.",
+     "flag":"Live page, not linked in current site navigation; genuine zero."},
+
+    {"category":"Kitchen & Dining","sub_category":"Serveware","parent":false,
+     "qty":0,"link":"https://joybird.com/serveware/",
+     "evidence":"Embedded Algolia blob: filters categories:\"serveware\", hits:[], nbHits:0, nbPages:0. Verified 0 on two independent live fetches.",
+     "flag":"Live page, not linked in current site navigation; genuine zero."}
+  ]
+}

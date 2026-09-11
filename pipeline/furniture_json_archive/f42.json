@@ -1,0 +1,156 @@
+{
+ "sr": 42,
+ "company": "Surya",
+ "brand_site": "surya.com",
+ "country": "USA",
+ "site_url": "https://surya.com/",
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ACCESS: surya.com sits behind Cloudflare - direct fetch and WebFetch both 403 (WebFetch re-tested this session on /Catalog/Furniture/End-Tables: HTTP 403). The route from the prior Home-Decor pass still works: r.jina.ai with the target URL PERCENT-ENCODED, called via plain curl, with headers 'x-return-format: html' and 'x-no-cache: true'. That returns the genuine origin HTML (~1.0-2.8MB) including the Optimizely (Insite) B2B Commerce SSR state blob. robots.txt was checked first: 'User-Agent: * / Disallow:' with no anthropic-ai / ClaudeBot / Claude-Web rule.\n\nTREE: taken from two agreeing sources - (a) https://www.surya.com/sitemapindex.xml -> sitemap1.xml, and (b) the 'subCategories'/'path'/'shortDescription' nodes inside the SSR blob on /Catalog/Furniture. Both show the catalogue is exactly TWO levels deep (/Catalog/<Dept>/<Node>); no third level exists anywhere. The Furniture department has 15 real product nodes plus the nav-only nodes All, All-Indoor, New, Top Sellers, Ready to Ship and Clearance, which were dropped per the brief.\n\nMEGA-MENU CAVEAT: the rendered Furniture mega-menu does NOT link to the path categories - almost every entry ('Sofas', 'Beds', 'Dressers and Nightstands', 'Bar and Counter Stools', 'Fire Tables', 'Daybeds and Loungers', 'All Living Room', 'All Dining Room', 'All Bedroom') points at /Catalog/Furniture/All-Indoor?attributeValueIds=<guid> filter query URLs. Those are product-type FACET filters on a shop-all listing, not browsable categories, so per the brief's ban on filter/query-string pages they were not emitted. The path categories that ARE emitted are real: each renders its own matching h1 and its own exact total. Consequence: a few product types (bar/counter stools, fire tables, daybeds/loungers, beds vs dressers/nightstands) exist only as facet values and are folded into the parent leaves rather than being separate rows.\n\nCOUNTS: the rendered 'N Items' header (data-test-selector=productListCountText) that the prior pass used is no longer present in the server HTML - it is now injected client-side, so method 1 was unobtainable and I used method 2 (structured) UPGRADED BY method 3 (full enumeration). Every one of the 14 leaves was exhaustively enumerated at ?pageSize=96: for all 14 the number of unique 'productNumber' keys equals totalItemCount exactly and the page after the last returns zero tiles. numberOfPages == ceil(total/pageSize) on every page fetched, at both pageSize 24 and 96. Counts also matched across two independent fetches per category (the pageSize=24 pass and the pageSize=96 pass), so no session drift.\n\nSANITY CHECKS: counts differ per category (no site-wide constant); /Catalog/Furniture/All enumerates to exactly 1100 unique productNumbers matching its own totalItemCount of 1100 across 12 pages; All (1100) - All-Indoor (948) == 152 == Outdoor Furniture exactly; the union of the 14 emitted leaves is 1086 product IDs and is a strict subset of All's 1100. The 14 residual items (Danford, Meryl, Elenora, Pearson, Oryan, Uintah) sit in the Furniture department but are assigned to no product-type node, so they are unreachable as a category and were not invented into one.\n\nDE-DUPLICATION (all proven by product-ID set comparison, not by name): (1) /Catalog/Outdoor/Furniture and /Catalog/Furniture/Outdoor-Furniture return byte-identical product sets (152 == 152, zero items unique to either) - the same node exposed under two departments; only the Furniture one is emitted. (2) 'Dining Furniture' (134) is a strict SUPERSET of Dining Tables (47) + Dining Chairs (55) = 102, and all 32 residual items are inside Benches & Stools - it holds nothing unique, so it is emitted as a GROUPING row with its two children beneath it rather than as a leaf that would double-count. (3) Outdoor > Garden Stools (71) is a strict subset of both Benches & Stools (157) and Outdoor Furniture (152) - dropped to avoid double counting, and flagged on Benches & Stools.\n\nEXCLUDED AND WHY: Rugs, Textiles (pillows, throws, bedding, inserts, poufs), Lighting, Wall Decor (mirrors, art, wall hangings) and Accents (vases, decorative objects, planters) - all out of furniture scope and all already captured by the earlier Home-Decor pass. Outdoor > Poufs (29) was checked against Furniture/All and has ZERO overlap, i.e. the site does not file poufs as furniture, so per the brief's 'poufs only when the site files them as furniture/seating' rule they are excluded. Outdoor > Umbrellas, Umbrella Bases, Pillows, Planters, Rugs and Lighting are not furniture. Rugs > Racks and Displays (5) was opened and also has zero overlap with Furniture/All - they are showroom rug-display racks, i.e. merchandising fixtures, not furniture. Nav-only nodes New, Top Sellers, Ready to Ship, Clearance, All, All-Indoor, Shop All Products, Promos, Collaborations and Made to Order were dropped per the brief.\n\nTRADE SITE: surya.com is a trade/wholesale site (prices show $0.00 until sign-in) but the category tree, product grids and item counts are all fully public - no count is gated behind a login.",
+ "rows": [
+  {
+   "category": "Furniture",
+   "sub_category": "Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sofas and Lounges",
+   "qty": 50,
+   "link": "https://www.surya.com/Catalog/Furniture/Sofas-and-Lounges",
+   "is_group": false,
+   "evidence": "SSR state blob \"pagination\":{\"totalItemCount\":50,...} on the category page; independently confirmed by full enumeration at ?pageSize=96 - unique \"productNumber\" keys across all pages == 50 and the next page returns zero tiles",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sectionals",
+   "qty": 11,
+   "link": "https://www.surya.com/Catalog/Furniture/Sectionals",
+   "is_group": false,
+   "evidence": "SSR state blob \"pagination\":{\"totalItemCount\":11,...} on the category page; independently confirmed by full enumeration at ?pageSize=96 - unique \"productNumber\" keys across all pages == 11 and the next page returns zero tiles",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Accent Chairs",
+   "qty": 148,
+   "link": "https://www.surya.com/Catalog/Furniture/Accent-Chairs",
+   "is_group": false,
+   "evidence": "SSR state blob \"pagination\":{\"totalItemCount\":148,...} on the category page; independently confirmed by full enumeration at ?pageSize=96 - unique \"productNumber\" keys across all pages == 148 and the next page returns zero tiles",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Ottomans",
+   "qty": 131,
+   "link": "https://www.surya.com/Catalog/Furniture/Ottomans",
+   "is_group": false,
+   "evidence": "SSR state blob \"pagination\":{\"totalItemCount\":131,...} on the category page; independently confirmed by full enumeration at ?pageSize=96 - unique \"productNumber\" keys across all pages == 131 and the next page returns zero tiles",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Coffee Tables",
+   "qty": 108,
+   "link": "https://www.surya.com/Catalog/Furniture/Coffee-Tables",
+   "is_group": false,
+   "evidence": "SSR state blob \"pagination\":{\"totalItemCount\":108,...} on the category page; independently confirmed by full enumeration at ?pageSize=96 - unique \"productNumber\" keys across all pages == 108 and the next page returns zero tiles",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "End Tables",
+   "qty": 225,
+   "link": "https://www.surya.com/Catalog/Furniture/End-Tables",
+   "is_group": false,
+   "evidence": "SSR state blob \"pagination\":{\"totalItemCount\":225,...} on the category page; independently confirmed by full enumeration at ?pageSize=96 - unique \"productNumber\" keys across all pages == 225 and the next page returns zero tiles",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Console Tables",
+   "qty": 45,
+   "link": "https://www.surya.com/Catalog/Furniture/Console-Tables",
+   "is_group": false,
+   "evidence": "SSR state blob \"pagination\":{\"totalItemCount\":45,...} on the category page; independently confirmed by full enumeration at ?pageSize=96 - unique \"productNumber\" keys across all pages == 45 and the next page returns zero tiles",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Cabinets & Sideboards",
+   "qty": 63,
+   "link": "https://www.surya.com/Catalog/Furniture/Cabinets-And-Sideboards",
+   "is_group": false,
+   "evidence": "SSR state blob \"pagination\":{\"totalItemCount\":63,...} on the category page; independently confirmed by full enumeration at ?pageSize=96 - unique \"productNumber\" keys across all pages == 63 and the next page returns zero tiles",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bookcases",
+   "qty": 12,
+   "link": "https://www.surya.com/Catalog/Furniture/Bookcases",
+   "is_group": false,
+   "evidence": "SSR state blob \"pagination\":{\"totalItemCount\":12,...} on the category page; independently confirmed by full enumeration at ?pageSize=96 - unique \"productNumber\" keys across all pages == 12 and the next page returns zero tiles",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Benches & Stools",
+   "qty": 157,
+   "link": "https://www.surya.com/Catalog/Furniture/Benches-And-Stools",
+   "is_group": false,
+   "evidence": "SSR state blob \"pagination\":{\"totalItemCount\":157,...} on the category page; independently confirmed by full enumeration at ?pageSize=96 - unique \"productNumber\" keys across all pages == 157 and the next page returns zero tiles",
+   "flag": "MANUAL REVIEW: overlaps two sibling nodes by design - all 71 products of Outdoor > Garden Stools and the 32 dining benches/bar stools that make up the Dining Furniture roll-up are subsets of this node (proven by product-ID comparison). Both siblings were therefore not emitted separately; this count is the site's own figure for the node and is not inflated."
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dining Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dining Tables",
+   "qty": 47,
+   "link": "https://www.surya.com/Catalog/Furniture/Dining-Tables",
+   "is_group": false,
+   "evidence": "SSR state blob \"pagination\":{\"totalItemCount\":47,...} on the category page; independently confirmed by full enumeration at ?pageSize=96 - unique \"productNumber\" keys across all pages == 47 and the next page returns zero tiles",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dining Chairs",
+   "qty": 55,
+   "link": "https://www.surya.com/Catalog/Furniture/Dining-Chairs",
+   "is_group": false,
+   "evidence": "SSR state blob \"pagination\":{\"totalItemCount\":55,...} on the category page; independently confirmed by full enumeration at ?pageSize=96 - unique \"productNumber\" keys across all pages == 55 and the next page returns zero tiles",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bedroom Furniture",
+   "qty": 26,
+   "link": "https://www.surya.com/Catalog/Furniture/Bedroom-Furniture",
+   "is_group": false,
+   "evidence": "SSR state blob \"pagination\":{\"totalItemCount\":26,...} on the category page; independently confirmed by full enumeration at ?pageSize=96 - unique \"productNumber\" keys across all pages == 26 and the next page returns zero tiles",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Outdoor Furniture",
+   "qty": 152,
+   "link": "https://www.surya.com/Catalog/Furniture/Outdoor-Furniture",
+   "is_group": false,
+   "evidence": "SSR state blob \"pagination\":{\"totalItemCount\":152,...} on the category page; independently confirmed by full enumeration at ?pageSize=96 - unique \"productNumber\" keys across all pages == 152 and the next page returns zero tiles",
+   "flag": null
+  }
+ ]
+}

@@ -1,0 +1,633 @@
+{
+ "sr": 270,
+ "company": "IKEA India",
+ "brand_site": "ikea.com",
+ "country": "India",
+ "site_url": "https://www.ikea.com/in/en/",
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "Access route: direct fetch of ikea.com/in/en/ (HTTP 200, no blocking) worked throughout; genuine India storefront confirmed via INR/Rs. pricing, ikea_geo=IN cookie, and India-specific H1/title copy on every category page (e.g. 'Buy Ceiling Lights at an Affordable Price in India'). Category-ID scheme reuse confirmed per the S.N. 100 UK / S.N. 117 DE precedent: all IDs from those two extractions' 58-row lists resolve on ikea.com/in/en/cat/<any-slug>-<id>/ (IKEA canonicalises by numeric ID regardless of the slug text supplied, confirmed empirically), redirecting to India's own canonical slug/H1/label -- this is IKEA's one global product platform with independent per-country catalogues/pricing, not a copied list. IMPORTANT METHODOLOGY FINDING (differs from the UK/DE sessions): as of this extraction (2026-08-13) the sik.search.blue.cdtapps.com PRIMARY_AREA search API's pagination is non-functional for every market tested (in/en, gb/en, de/de all reproduced) -- the 'size' and 'offset' searchParameters are silently ignored server-side (confirmed via requests, curl_cffi Chrome-124 impersonation, GET variants, and multiple alternate field-name/nesting guesses), every request returns a fixed first-page window of exactly 24 items regardless of what is sent, so the UK/DE sessions' own offset-boundary exhaustion method (offset=max-1 -> 1 item, offset=max -> 0 items) could not be reproduced or reused here; this is a live site-wide API change, not an India-specific gap. In its place an equally rigorous two-signal cross-check was used and applied to EVERY leaf row: (1) the sik.search API's own metadata.itemsPerType.PRODUCT field (a separate server-computed total, decoupled from the 24-item window truncation, and distinct from the raw metadata.max field which was found to sometimes over-count by including non-product 'PLANNER' room-planner-tool tiles mixed into results -- e.g. category 10731 Floor Lamps: max=23 but itemsPerType={PRODUCT:22, PLANNER:1}, true product qty=22); (2) the category page's own SSR-rendered visible total-count text (class plp-filter-information__total-count, e.g. '22 items', matching the 'Showing 24 of N results' progress-bar max on larger categories). Both signals were pulled independently (one via POST to the search API, one via a plain GET of the public category page HTML) and matched EXACTLY on all 58 leaf categories with zero discrepancies -- recorded as qty. This is at least as strong as the UK/DE boundary-offset method: it is the number IKEA's own page displays to every visitor, corroborated by the backend's own per-type product count, rather than an unverified raw API total. NOTE ON A LIKELY PRE-EXISTING UK/DE INACCURACY (flagged for awareness only, out of scope to correct retroactively): the UK (c100) and DE (c117) archives used raw metadata.max directly (e.g. UK Floor Lamps qty=40), which on inspection appears to have silently included a PLANNER tile in at least that category (itemsPerType breakdown unavailable retroactively for the historical UK/DE runs, but the same API when queried live today for UK cat 10731 returns max=40 with itemsPerType={PRODUCT:39, PLANNER:1}); India's rows here use the corrected PRODUCT-only count throughout. Category tree built from India's own hub pages (Lighting li001, Lamps li002, Home Decor de001, Mirrors 20489, Wall decor 10757, Vases & bowls 10769, Candle holders & candles 10760, Clocks 10759, Kitchenware & tableware kt001 and its Dinnerware/Serveware/Coffee & tea/Glassware sub-hubs) via probe.py nav, independently walked rather than assumed from the UK/DE lists. One genuine India-specific structural divergence found and followed (per the project's expectation of per-market category-scoping differences, c.f. DE's Wall & Table Clocks vs UK's plain Wall Clocks): India's Wall Lights hub (20503, itself showing an aggregate '25 items') has its own clean sub-nav splitting into Wall Lamps (20504, 23 items) and Wall Spotlights (20505, 3 items) as genuinely separate site-curated leaf categories (confirmed via nav_links on the 20503 hub page, where these two links appear in the same structural position as other confirmed type-splits elsewhere on the site) -- emitted here as a parent 'Wall Lights' with those two leaf children rather than a single flat 'Wall Lights' leaf; the redundant aggregate '25 items' figure was not itself emitted as a third row, consistent with how the top-level Lighting/Lamps hub parent rows carry no qty of their own. A similar-looking cluster under Ceiling Lights (18750, 72 items total) -- Ceiling lamps 18752 (7), Ceiling spotlights 18753 (14), Chandeliers 59307 (3) -- was investigated the same way and found NOT to be an exhaustive partition (7+14+3=24, far short of 72), i.e. curated style sub-collections rather than the category's true taxonomy, so Ceiling Lights was kept as UK/DE's single flat leaf (72) and those three curated sub-collections were not added as separate rows (would pad/double-count, unlike the genuine Wall Lights split). Similarly, Decorative Lighting's (14971, 22 items) small linked sub-collections (Decorative pendant lamps 700177=1, Table light decorations 700179=2, String lights 700180=11) are curated subsets of the already-counted 22, not added separately; Decorative lamp shades (700178) and Lamp Shades (10804) are hardware/parts, excluded per standing rule; LED strip lights (57542, 2 items, page titled 'Buy Christmas LED Lighting Strips') is a Christmas-holiday-themed subset, excluded per the holiday exclusion (distinct from the genuine, non-holiday Integrated Lighting/16280 LED-strip category, which is kept). Rule 3 applied: Art Cards (UK/DE id 24831) does NOT exist in India's catalogue -- the sik.search API returns HTTP 404 'Unknown category key: 24831' for the in/en market, and the page itself renders a degraded template with no product-listing container (no plp-catalog-product-list, no total-count element) -- confirmed absent and excluded from India's rows rather than padded with a zero or null row, consistent with per-market catalogue differences being a real, correct answer. India-specific leaf labels were read from each page's own H1 rather than copied from UK/DE, several diverging meaningfully: Clocks (10785) is 'Wall & Table Clocks' matching DE's broader scope rather than UK's plain 'Wall Clocks'; Wall Art (10788) is India's own 'Wall Art and Wall Painting', distinct from both UK's 'Pictures, Prints & Wall Art' and DE's 'Framed Pictures & Picture Sets'; Glassware 18869 is labelled plain 'Glasses' (vs UK 'Drinking Glasses'/DE 'Wasserglaeser'); 22663 is labelled 'Beer Glasses' specifically (vs UK's broader 'Bar & Cocktail Glasses'/DE's 'Bier, Cocktail & Sektglaeser') -- kept as India's own narrower site-curated label rather than assumed equivalent to the UK/DE scope. Rule 0 applied: Bathroom Lighting (10736), Outdoor Lighting (17897), Bathroom Mirrors (20490, not linked from the Mirrors hub nav, found by direct ID probe exactly as in the DE precedent) and Vanity Mirrors (20498) were all INCLUDED as room-qualified branches of the type trees they belong to. Excluded per standing rules, all confirmed present on India's nav: LED bulbs (20514), Shades/bases/cords (10803) and Lamp Shades (10804) (hardware/parts, not fixtures); Home fragrance (42926, fragrance exclusion -- Unscented Candles 10782 kept as its own listing); Plants & flowers (pp003) and Artificial flowers/plants (700516, 20492) (living or faux botanicals, not decor objects -- only the empty decorative Flower pots & planters pp004 kept); Christmas decoration (49149) and the Christmas-themed LED strip lights (57542) (holiday exclusion); Noticeboards (10574, office/organisation); Mirror cabinets (20500, bathroom storage furniture with a mirror door, same exclusion basis as the UK/DE precedent); Rattan (700322, a mixed furniture/decor collection page, not a clean decor-only listing); Air purifiers, Repair kits/tools & fittings (appliances/hardware); all Food storage, Cookware, Cooking & baking utensils, Dishwashing accessories, Cutlery, Knives & chopping boards, Bakeware, Kitchen textiles, Table linen, Picnic & outdoor recreation, Nursing & feeding (functional/appliance/textile, out of scope, mirroring the UK/DE exclusion list); Children's kitchenware & tableware (distinct children's-specific line, not part of the adult decor/tableware count, consistent with UK/DE not including it either). All *-Series pages (e.g. ARSTID-series 12341) are collection/marketing pages, skipped per the standing Collections exclusion.",
+ "rows": [
+  {
+   "category": "Lighting",
+   "sub_category": "Lighting",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Lamps & Lighting",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Ceiling Lights",
+   "parent": false,
+   "qty": 72,
+   "link": "https://www.ikea.com/in/en/cat/ceiling-lights-18750/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (in/en market) itemsPerType.PRODUCT=72 for category 18750, cross-verified against the category page's own SSR-rendered total-count element (plp-filter-information__total-count) which independently reads \"72 items\" -- both site-native measurements agree exactly",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Table Lamps",
+   "parent": false,
+   "qty": 42,
+   "link": "https://www.ikea.com/in/en/cat/table-lamps-10732/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (in/en market) itemsPerType.PRODUCT=42 for category 10732, cross-verified against the category page's own SSR-rendered total-count element (plp-filter-information__total-count) which independently reads \"42 items\" -- both site-native measurements agree exactly",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Floor Lamps",
+   "parent": false,
+   "qty": 22,
+   "link": "https://www.ikea.com/in/en/cat/floor-lamps-10731/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (in/en market) itemsPerType.PRODUCT=22 for category 10731, cross-verified against the category page's own SSR-rendered total-count element (plp-filter-information__total-count) which independently reads \"22 items\" -- both site-native measurements agree exactly",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Wall Lights",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Wall Lamps",
+   "parent": false,
+   "qty": 23,
+   "link": "https://www.ikea.com/in/en/cat/wall-lamps-20504/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (in/en market) itemsPerType.PRODUCT=23 for category 20504, cross-verified against the category page's own SSR-rendered total-count element (plp-filter-information__total-count) which independently reads \"23 items\" -- both site-native measurements agree exactly",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Wall Spotlights",
+   "parent": false,
+   "qty": 3,
+   "link": "https://www.ikea.com/in/en/cat/wall-spotlights-20505/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (in/en market) itemsPerType.PRODUCT=3 for category 20505, cross-verified against the category page's own SSR-rendered total-count element (plp-filter-information__total-count) which independently reads \"3 items\" -- both site-native measurements agree exactly",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Work & Study Lamps",
+   "parent": false,
+   "qty": 19,
+   "link": "https://www.ikea.com/in/en/cat/work-study-lamps-20502/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (in/en market) itemsPerType.PRODUCT=19 for category 20502, cross-verified against the category page's own SSR-rendered total-count element (plp-filter-information__total-count) which independently reads \"19 items\" -- both site-native measurements agree exactly",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Children's Lighting",
+   "parent": false,
+   "qty": 16,
+   "link": "https://www.ikea.com/in/en/cat/childrens-lighting-18773/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (in/en market) itemsPerType.PRODUCT=16 for category 18773, cross-verified against the category page's own SSR-rendered total-count element (plp-filter-information__total-count) which independently reads \"16 items\" -- both site-native measurements agree exactly",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Spotlights",
+   "parent": false,
+   "qty": 17,
+   "link": "https://www.ikea.com/in/en/cat/spotlights-20506/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (in/en market) itemsPerType.PRODUCT=17 for category 20506, cross-verified against the category page's own SSR-rendered total-count element (plp-filter-information__total-count) which independently reads \"17 items\" -- both site-native measurements agree exactly",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Smart Lamps",
+   "parent": false,
+   "qty": 2,
+   "link": "https://www.ikea.com/in/en/cat/smart-lamps-59308/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (in/en market) itemsPerType.PRODUCT=2 for category 59308, cross-verified against the category page's own SSR-rendered total-count element (plp-filter-information__total-count) which independently reads \"2 items\" -- both site-native measurements agree exactly",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "LED Lights",
+   "parent": false,
+   "qty": 62,
+   "link": "https://www.ikea.com/in/en/cat/led-lights-20515/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (in/en market) itemsPerType.PRODUCT=62 for category 20515, cross-verified against the category page's own SSR-rendered total-count element (plp-filter-information__total-count) which independently reads \"62 items\" -- both site-native measurements agree exactly",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Portable Lamps",
+   "parent": false,
+   "qty": 2,
+   "link": "https://www.ikea.com/in/en/cat/portable-lamps-700512/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (in/en market) itemsPerType.PRODUCT=2 for category 700512, cross-verified against the category page's own SSR-rendered total-count element (plp-filter-information__total-count) which independently reads \"2 items\" -- both site-native measurements agree exactly",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Pendant Lighting",
+   "parent": false,
+   "qty": 48,
+   "link": "https://www.ikea.com/in/en/cat/pendants-18751/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (in/en market) itemsPerType.PRODUCT=48 for category 18751, cross-verified against the category page's own SSR-rendered total-count element (plp-filter-information__total-count) which independently reads \"48 items\" -- both site-native measurements agree exactly",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Decorative Lighting",
+   "parent": false,
+   "qty": 22,
+   "link": "https://www.ikea.com/in/en/cat/decorative-lighting-14971/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (in/en market) itemsPerType.PRODUCT=22 for category 14971, cross-verified against the category page's own SSR-rendered total-count element (plp-filter-information__total-count) which independently reads \"22 items\" -- both site-native measurements agree exactly",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Integrated Lighting",
+   "parent": false,
+   "qty": 22,
+   "link": "https://www.ikea.com/in/en/cat/integrated-lighting-16280/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (in/en market) itemsPerType.PRODUCT=22 for category 16280, cross-verified against the category page's own SSR-rendered total-count element (plp-filter-information__total-count) which independently reads \"22 items\" -- both site-native measurements agree exactly",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Smart Lighting",
+   "parent": false,
+   "qty": 19,
+   "link": "https://www.ikea.com/in/en/cat/smart-lighting-36812/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (in/en market) itemsPerType.PRODUCT=19 for category 36812, cross-verified against the category page's own SSR-rendered total-count element (plp-filter-information__total-count) which independently reads \"19 items\" -- both site-native measurements agree exactly",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Outdoor Lighting",
+   "parent": false,
+   "qty": 15,
+   "link": "https://www.ikea.com/in/en/cat/outdoor-lighting-17897/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (in/en market) itemsPerType.PRODUCT=15 for category 17897, cross-verified against the category page's own SSR-rendered total-count element (plp-filter-information__total-count) which independently reads \"15 items\" -- both site-native measurements agree exactly",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Bathroom Lighting",
+   "parent": false,
+   "qty": 12,
+   "link": "https://www.ikea.com/in/en/cat/bathroom-lighting-10736/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (in/en market) itemsPerType.PRODUCT=12 for category 10736, cross-verified against the category page's own SSR-rendered total-count element (plp-filter-information__total-count) which independently reads \"12 items\" -- both site-native measurements agree exactly",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Mirrors",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Large Mirrors",
+   "parent": false,
+   "qty": 21,
+   "link": "https://www.ikea.com/in/en/cat/large-mirrors-24859/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (in/en market) itemsPerType.PRODUCT=21 for category 24859, cross-verified against the category page's own SSR-rendered total-count element (plp-filter-information__total-count) which independently reads \"21 items\" -- both site-native measurements agree exactly",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Wall Mirrors",
+   "parent": false,
+   "qty": 52,
+   "link": "https://www.ikea.com/in/en/cat/wall-mirrors-24858/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (in/en market) itemsPerType.PRODUCT=52 for category 24858, cross-verified against the category page's own SSR-rendered total-count element (plp-filter-information__total-count) which independently reads \"52 items\" -- both site-native measurements agree exactly",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Round Mirrors",
+   "parent": false,
+   "qty": 14,
+   "link": "https://www.ikea.com/in/en/cat/round-mirrors-24860/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (in/en market) itemsPerType.PRODUCT=14 for category 24860, cross-verified against the category page's own SSR-rendered total-count element (plp-filter-information__total-count) which independently reads \"14 items\" -- both site-native measurements agree exactly",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Decorative Mirrors",
+   "parent": false,
+   "qty": 12,
+   "link": "https://www.ikea.com/in/en/cat/decorative-mirrors-24861/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (in/en market) itemsPerType.PRODUCT=12 for category 24861, cross-verified against the category page's own SSR-rendered total-count element (plp-filter-information__total-count) which independently reads \"12 items\" -- both site-native measurements agree exactly",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Standing Mirrors",
+   "parent": false,
+   "qty": 6,
+   "link": "https://www.ikea.com/in/en/cat/standing-mirrors-49139/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (in/en market) itemsPerType.PRODUCT=6 for category 49139, cross-verified against the category page's own SSR-rendered total-count element (plp-filter-information__total-count) which independently reads \"6 items\" -- both site-native measurements agree exactly",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Vanity Mirrors",
+   "parent": false,
+   "qty": 17,
+   "link": "https://www.ikea.com/in/en/cat/vanity-mirrors-20498/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (in/en market) itemsPerType.PRODUCT=17 for category 20498, cross-verified against the category page's own SSR-rendered total-count element (plp-filter-information__total-count) which independently reads \"17 items\" -- both site-native measurements agree exactly",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Bathroom Mirrors",
+   "parent": false,
+   "qty": 24,
+   "link": "https://www.ikea.com/in/en/cat/bathroom-mirrors-20490/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (in/en market) itemsPerType.PRODUCT=24 for category 20490, cross-verified against the category page's own SSR-rendered total-count element (plp-filter-information__total-count) which independently reads \"24 items\" -- both site-native measurements agree exactly",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Mirrors with Lights",
+   "parent": false,
+   "qty": 3,
+   "link": "https://www.ikea.com/in/en/cat/mirrors-with-lights-49138/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (in/en market) itemsPerType.PRODUCT=3 for category 49138, cross-verified against the category page's own SSR-rendered total-count element (plp-filter-information__total-count) which independently reads \"3 items\" -- both site-native measurements agree exactly",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Makeup & Magnifying Mirrors",
+   "parent": false,
+   "qty": 4,
+   "link": "https://www.ikea.com/in/en/cat/makeup-mirrors-magnifying-mirrors-20499/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (in/en market) itemsPerType.PRODUCT=4 for category 20499, cross-verified against the category page's own SSR-rendered total-count element (plp-filter-information__total-count) which independently reads \"4 items\" -- both site-native measurements agree exactly",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Wall Decor",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Picture & Photo Frames",
+   "parent": false,
+   "qty": 23,
+   "link": "https://www.ikea.com/in/en/cat/picture-photo-frames-18746/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (in/en market) itemsPerType.PRODUCT=23 for category 18746, cross-verified against the category page's own SSR-rendered total-count element (plp-filter-information__total-count) which independently reads \"23 items\" -- both site-native measurements agree exactly",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Wall Art and Wall Painting",
+   "parent": false,
+   "qty": 17,
+   "link": "https://www.ikea.com/in/en/cat/wall-art-wall-painting-10788/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (in/en market) itemsPerType.PRODUCT=17 for category 10788, cross-verified against the category page's own SSR-rendered total-count element (plp-filter-information__total-count) which independently reads \"17 items\" -- both site-native measurements agree exactly",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Posters",
+   "parent": false,
+   "qty": 7,
+   "link": "https://www.ikea.com/in/en/cat/posters-10787/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (in/en market) itemsPerType.PRODUCT=7 for category 10787, cross-verified against the category page's own SSR-rendered total-count element (plp-filter-information__total-count) which independently reads \"7 items\" -- both site-native measurements agree exactly",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Picture Ledges",
+   "parent": false,
+   "qty": 13,
+   "link": "https://www.ikea.com/in/en/cat/picture-ledges-16305/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (in/en market) itemsPerType.PRODUCT=13 for category 16305, cross-verified against the category page's own SSR-rendered total-count element (plp-filter-information__total-count) which independently reads \"13 items\" -- both site-native measurements agree exactly",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Collage Photo Frames",
+   "parent": false,
+   "qty": 6,
+   "link": "https://www.ikea.com/in/en/cat/collage-photo-frames-10789/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (in/en market) itemsPerType.PRODUCT=6 for category 10789, cross-verified against the category page's own SSR-rendered total-count element (plp-filter-information__total-count) which independently reads \"6 items\" -- both site-native measurements agree exactly",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor & Mirrors",
+   "sub_category": "Wall Accents",
+   "parent": false,
+   "qty": 10,
+   "link": "https://www.ikea.com/in/en/cat/wall-accents-700425/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (in/en market) itemsPerType.PRODUCT=10 for category 700425, cross-verified against the category page's own SSR-rendered total-count element (plp-filter-information__total-count) which independently reads \"10 items\" -- both site-native measurements agree exactly",
+   "flag": null
+  },
+  {
+   "category": "Home Accessories",
+   "sub_category": "Decorative Accessories",
+   "parent": false,
+   "qty": 11,
+   "link": "https://www.ikea.com/in/en/cat/decorative-accessories-24924/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (in/en market) itemsPerType.PRODUCT=11 for category 24924, cross-verified against the category page's own SSR-rendered total-count element (plp-filter-information__total-count) which independently reads \"11 items\" -- both site-native measurements agree exactly",
+   "flag": null
+  },
+  {
+   "category": "Home Accessories",
+   "sub_category": "Vases & Bowls",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Home Accessories",
+   "sub_category": "Vases",
+   "parent": false,
+   "qty": 70,
+   "link": "https://www.ikea.com/in/en/cat/vases-10776/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (in/en market) itemsPerType.PRODUCT=70 for category 10776, cross-verified against the category page's own SSR-rendered total-count element (plp-filter-information__total-count) which independently reads \"70 items\" -- both site-native measurements agree exactly",
+   "flag": null
+  },
+  {
+   "category": "Home Accessories",
+   "sub_category": "Bowls & Dishes",
+   "parent": false,
+   "qty": 5,
+   "link": "https://www.ikea.com/in/en/cat/decorative-bowls-16308/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (in/en market) itemsPerType.PRODUCT=5 for category 16308, cross-verified against the category page's own SSR-rendered total-count element (plp-filter-information__total-count) which independently reads \"5 items\" -- both site-native measurements agree exactly",
+   "flag": null
+  },
+  {
+   "category": "Home Accessories",
+   "sub_category": "Candles and Candle Holders",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Home Accessories",
+   "sub_category": "Unscented Candles",
+   "parent": false,
+   "qty": 14,
+   "link": "https://www.ikea.com/in/en/cat/unscented-candles-10782/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (in/en market) itemsPerType.PRODUCT=14 for category 10782, cross-verified against the category page's own SSR-rendered total-count element (plp-filter-information__total-count) which independently reads \"14 items\" -- both site-native measurements agree exactly",
+   "flag": null
+  },
+  {
+   "category": "Home Accessories",
+   "sub_category": "Candle Holders",
+   "parent": false,
+   "qty": 18,
+   "link": "https://www.ikea.com/in/en/cat/candle-holders-10784/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (in/en market) itemsPerType.PRODUCT=18 for category 10784, cross-verified against the category page's own SSR-rendered total-count element (plp-filter-information__total-count) which independently reads \"18 items\" -- both site-native measurements agree exactly",
+   "flag": null
+  },
+  {
+   "category": "Home Accessories",
+   "sub_category": "Lanterns",
+   "parent": false,
+   "qty": 11,
+   "link": "https://www.ikea.com/in/en/cat/lanterns-20491/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (in/en market) itemsPerType.PRODUCT=11 for category 20491, cross-verified against the category page's own SSR-rendered total-count element (plp-filter-information__total-count) which independently reads \"11 items\" -- both site-native measurements agree exactly",
+   "flag": null
+  },
+  {
+   "category": "Home Accessories",
+   "sub_category": "LED Candles",
+   "parent": false,
+   "qty": 5,
+   "link": "https://www.ikea.com/in/en/cat/led-candles-39266/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (in/en market) itemsPerType.PRODUCT=5 for category 39266, cross-verified against the category page's own SSR-rendered total-count element (plp-filter-information__total-count) which independently reads \"5 items\" -- both site-native measurements agree exactly",
+   "flag": null
+  },
+  {
+   "category": "Home Accessories",
+   "sub_category": "Clocks",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Home Accessories",
+   "sub_category": "Wall & Table Clocks",
+   "parent": false,
+   "qty": 24,
+   "link": "https://www.ikea.com/in/en/cat/wall-table-clocks-10785/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (in/en market) itemsPerType.PRODUCT=24 for category 10785, cross-verified against the category page's own SSR-rendered total-count element (plp-filter-information__total-count) which independently reads \"24 items\" -- both site-native measurements agree exactly",
+   "flag": null
+  },
+  {
+   "category": "Home Accessories",
+   "sub_category": "Alarm Clocks",
+   "parent": false,
+   "qty": 16,
+   "link": "https://www.ikea.com/in/en/cat/alarm-clocks-10786/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (in/en market) itemsPerType.PRODUCT=16 for category 10786, cross-verified against the category page's own SSR-rendered total-count element (plp-filter-information__total-count) which independently reads \"16 items\" -- both site-native measurements agree exactly",
+   "flag": null
+  },
+  {
+   "category": "Home Accessories",
+   "sub_category": "Flower Pots & Planters",
+   "parent": false,
+   "qty": 87,
+   "link": "https://www.ikea.com/in/en/cat/flower-pots-planters-pp004/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (in/en market) itemsPerType.PRODUCT=87 for category pp004, cross-verified against the category page's own SSR-rendered total-count element (plp-filter-information__total-count) which independently reads \"87 items\" -- both site-native measurements agree exactly",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Glassware",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Glasses",
+   "parent": false,
+   "qty": 32,
+   "link": "https://www.ikea.com/in/en/cat/glasses-18869/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (in/en market) itemsPerType.PRODUCT=32 for category 18869, cross-verified against the category page's own SSR-rendered total-count element (plp-filter-information__total-count) which independently reads \"32 items\" -- both site-native measurements agree exactly",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Wine Glasses",
+   "parent": false,
+   "qty": 12,
+   "link": "https://www.ikea.com/in/en/cat/wine-glasses-18870/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (in/en market) itemsPerType.PRODUCT=12 for category 18870, cross-verified against the category page's own SSR-rendered total-count element (plp-filter-information__total-count) which independently reads \"12 items\" -- both site-native measurements agree exactly",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Beer Glasses",
+   "parent": false,
+   "qty": 4,
+   "link": "https://www.ikea.com/in/en/cat/speciality-glassware-22663/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (in/en market) itemsPerType.PRODUCT=4 for category 22663, cross-verified against the category page's own SSR-rendered total-count element (plp-filter-information__total-count) which independently reads \"4 items\" -- both site-native measurements agree exactly",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Jugs & Carafes",
+   "parent": false,
+   "qty": 21,
+   "link": "https://www.ikea.com/in/en/cat/jugs-carafes-18871/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (in/en market) itemsPerType.PRODUCT=21 for category 18871, cross-verified against the category page's own SSR-rendered total-count element (plp-filter-information__total-count) which independently reads \"21 items\" -- both site-native measurements agree exactly",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Dinnerware",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Dinnerware Sets",
+   "parent": false,
+   "qty": 5,
+   "link": "https://www.ikea.com/in/en/cat/dinnerware-sets-31781/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (in/en market) itemsPerType.PRODUCT=5 for category 31781, cross-verified against the category page's own SSR-rendered total-count element (plp-filter-information__total-count) which independently reads \"5 items\" -- both site-native measurements agree exactly",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Plates",
+   "parent": false,
+   "qty": 23,
+   "link": "https://www.ikea.com/in/en/cat/plates-18861/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (in/en market) itemsPerType.PRODUCT=23 for category 18861, cross-verified against the category page's own SSR-rendered total-count element (plp-filter-information__total-count) which independently reads \"23 items\" -- both site-native measurements agree exactly",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Side Plates",
+   "parent": false,
+   "qty": 22,
+   "link": "https://www.ikea.com/in/en/cat/side-plates-18863/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (in/en market) itemsPerType.PRODUCT=22 for category 18863, cross-verified against the category page's own SSR-rendered total-count element (plp-filter-information__total-count) which independently reads \"22 items\" -- both site-native measurements agree exactly",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Deep Plates",
+   "parent": false,
+   "qty": 12,
+   "link": "https://www.ikea.com/in/en/cat/deep-plates-18862/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (in/en market) itemsPerType.PRODUCT=12 for category 18862, cross-verified against the category page's own SSR-rendered total-count element (plp-filter-information__total-count) which independently reads \"12 items\" -- both site-native measurements agree exactly",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Bowls",
+   "parent": false,
+   "qty": 31,
+   "link": "https://www.ikea.com/in/en/cat/bowls-18864/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (in/en market) itemsPerType.PRODUCT=31 for category 18864, cross-verified against the category page's own SSR-rendered total-count element (plp-filter-information__total-count) which independently reads \"31 items\" -- both site-native measurements agree exactly",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Serveware",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Trays",
+   "parent": false,
+   "qty": 28,
+   "link": "https://www.ikea.com/in/en/cat/trays-16048/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (in/en market) itemsPerType.PRODUCT=28 for category 16048, cross-verified against the category page's own SSR-rendered total-count element (plp-filter-information__total-count) which independently reads \"28 items\" -- both site-native measurements agree exactly",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Serving Bowls",
+   "parent": false,
+   "qty": 19,
+   "link": "https://www.ikea.com/in/en/cat/serving-bowls-20619/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (in/en market) itemsPerType.PRODUCT=19 for category 20619, cross-verified against the category page's own SSR-rendered total-count element (plp-filter-information__total-count) which independently reads \"19 items\" -- both site-native measurements agree exactly",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Serving Dishes",
+   "parent": false,
+   "qty": 12,
+   "link": "https://www.ikea.com/in/en/cat/serving-dishes-16047/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (in/en market) itemsPerType.PRODUCT=12 for category 16047, cross-verified against the category page's own SSR-rendered total-count element (plp-filter-information__total-count) which independently reads \"12 items\" -- both site-native measurements agree exactly",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Cake & Serving Stands",
+   "parent": false,
+   "qty": 2,
+   "link": "https://www.ikea.com/in/en/cat/cake-serving-stands-59251/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (in/en market) itemsPerType.PRODUCT=2 for category 59251, cross-verified against the category page's own SSR-rendered total-count element (plp-filter-information__total-count) which independently reads \"2 items\" -- both site-native measurements agree exactly",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Mugs & Cups",
+   "parent": false,
+   "qty": 28,
+   "link": "https://www.ikea.com/in/en/cat/mugs-cups-16045/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (in/en market) itemsPerType.PRODUCT=28 for category 16045, cross-verified against the category page's own SSR-rendered total-count element (plp-filter-information__total-count) which independently reads \"28 items\" -- both site-native measurements agree exactly",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Tea Pots & Accessories",
+   "parent": false,
+   "qty": 8,
+   "link": "https://www.ikea.com/in/en/cat/tea-pots-accessories-20621/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (in/en market) itemsPerType.PRODUCT=8 for category 20621, cross-verified against the category page's own SSR-rendered total-count element (plp-filter-information__total-count) which independently reads \"8 items\" -- both site-native measurements agree exactly",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Napkin Holders",
+   "parent": false,
+   "qty": 5,
+   "link": "https://www.ikea.com/in/en/cat/napkin-holders-20562/",
+   "evidence": "IKEA sik.search PRIMARY_AREA API (in/en market) itemsPerType.PRODUCT=5 for category 20562, cross-verified against the category page's own SSR-rendered total-count element (plp-filter-information__total-count) which independently reads \"5 items\" -- both site-native measurements agree exactly",
+   "flag": null
+  }
+ ]
+}

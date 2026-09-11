@@ -1,0 +1,192 @@
+{
+ "sr": 123,
+ "company": "H&M Home IT",
+ "brand_site": "www2.hm.com",
+ "country": "Italy",
+ "site_url": "https://www2.hm.com/it_it/home.html",
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ROBOTS: www2.hm.com/robots.txt (read in my Chrome tab) groups ClaudeBot / Claude-Web / anthropic-ai with GPTBot, PerplexityBot etc., and that whole UA group ends 'Allow: /'. Only PetalBot is disallowed. H&M explicitly PERMITS Claude - no section-5 stop condition. ACCESS: unlike the UK sibling (SR 89), where every HTML route was Akamai-403, the Claude-in-Chrome connector loaded www2.hm.com/it_it pages normally in a real tab, and same-origin fetch() from that page context returned fully server-rendered HTML with __NEXT_DATA__ intact on all ~90 requests (paced ~1s apart, no 403/429 at any point). No proxy, curl, WebFetch or reader service was used. TREE: taken from two independent site sources that agree - (a) the header mega-menu JSON props.pageProps.headerData (nodeName/href), which gives 'Mobili' at /it_it/home/acquista-per-prodotto/arredamento.html as the ONLY furniture department, and (b) the it_it sitemap set (it_it.sitemap.xml -> 31 x it_it.pages.subdepartment.N.xml, 322 URLs under /it_it/home), which additionally exposed the third level the mega-menu hides. The furniture branch is exactly 22 URLs: the department + view-all + 3 mid-level nodes + 17 leaves. NAMING: every PLP carries plpProps.pills.navigationLinks, whose 'path' is the site's own canonical ENGLISH slug (furnitures/chairs/lounge-chairs, furnitures/tables/side, furnitures/storage/wardrobes, ...) aliased to the Italian URL. Each sub_category here is that canonical English node identity, cross-checked against the Italian PLP heading. This resolved a real IT translation collision: tables/side and tables/coffee BOTH render the Italian label 'Tavolini da salotto' and are distinguishable only by the English slug - they are separate listings with different totals (76 vs 82) and are recorded as Side Tables and Coffee Tables. Likewise the storage branch's Italian label is the bare word 'Mobili', identical to the department name; its English slug is furnitures/storage, so it is emitted as the grouping row 'Storage'. QTY SOURCE: section-4 method 1, the rendered listing header. Verified on the live rendered page that the Italian header text 'N prodotti' is identical to __NEXT_DATA__ props.pageProps.plpProps.productListingSectionProps.productListingData.totalHits (Divani: h1 'DIVANI', header '29 prodotti', totalHits 29), so totalHits was used for every node and the 'N prodotti' string was also regex-matched out of each fetched HTML - it agreed on all 21 nodes. SANITY CHECKS. (1) DISCRIMINATION / SILENT-PARENT TRAP: a bogus slug (arredamento/zzz-non-esiste-12345.html) does NOT 404 - it silently redirects to the PARENT arredamento.html and reports the parent's 459. Every one of the 21 real URLs was therefore checked for redirect and all 21 returned response.url identical to the requested URL, so no row carries a parent's number. Totals also range 0..459 rather than being a site-wide constant. (2) EXHAUSTION: the Furniture department was fully paginated (?page=1..13) and yielded exactly 459 DISTINCT articleCode ids against totalHits=459, so totalHits is exact, not inflated. (3) CHILD-SUM: Chairs & Seating 122 vs children 29+4+3+11+18+8+11+28=112; Tables 255 vs 1+0+1+73+76+82=233; Storage 69 vs 1+28+40=69 exactly. No child exceeds its parent, and the three mid-level totals 122+255+69=446 sit under the department's 459 (the residual ~13 products sit directly on parents with no child node). Parents are grouping rows, so none of these aggregate numbers is written as a qty. (4) DRIFT: two full independent read passes minutes apart returned identical totals on all 21 nodes. ROOM/DEPARTMENT DUPLICATES EXCLUDED, proven by articleCode set-overlap against the enumerated 459-product furniture catalogue rather than assumed: 'Arredo da giardino' (Outdoor Furniture, acquista-per-stanza/vasi-da-esterno/arredi.html, 65 products) - ALL 65 of 65 are already inside the furniture catalogue, so H&M IT has no separate outdoor-furniture assortment; 'Arredamento' (Living-Room Furniture, acquista-per-stanza/soggiorno/arredamento.html, 328) - all 327 unique ids already inside it; 'Mobili per Cameretta' (Kids Room Furniture, 21) - 20 of 21 already inside it, and the node exists twice (under acquista-per-prodotto/bambini-neonati and under acquista-per-stanza/arredamento-cameretta) with the same 21 products. Recording any of these would double-count. 'Scaffali e mobili da parete' (Wall Shelves & Wall Units, acquista-per-prodotto/contenitori/mensole-da-parete.html, 43) excluded on two grounds: 40 of its 43 products are already in the furniture catalogue (essentially the same set as Storage > Shelves), and it sits under the Contenitori (Storage) department as wall-mounted goods. 'Idee per Ingresso casa' (Entryway, 42) excluded after reading all 42 titles - zero id overlap with the furniture catalogue, and the products are rugs, doormats, runners, pendant and floor lamps, a storage basket and a coat-hook set: no furniture at all. ALSO EXCLUDED per sections 1 and 3: arredamento/vedi-tutto.html (View All); 'Cuscini per sedie' (chair cushions - textiles, 15, filed by the site under textiles yet shown as a Mobili nav sibling); the whole Contenitori department (baskets, boxes, wardrobe boxes, laundry bags = standalone storage goods); Illuminazione (lighting); Decorazioni (mirrors, wall decorations, posters, frames, vases, candles, trays); Tende/textiles; Biancheria letto; Cucina e camera da pranzo; Bagno & Doccia; Profumi per la casa; Piante; Abbigliamento da notte; Selezione Premium; Nuovi arrivi; Ultime opportunita; Gift Card; Tutti i marchi; and the global-node-1/global-node-2 marketing placeholder pages. H&M Home IT sells no beds, mattresses, TV/media units, sideboards, chests of drawers or bathroom vanity units - no such node exists in the tree and no such product appears in the enumerated 459.",
+ "rows": [
+  {
+   "category": "Furniture",
+   "sub_category": "Chairs & Seating",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sofas",
+   "qty": 29,
+   "link": "https://www2.hm.com/it_it/home/acquista-per-prodotto/arredamento/poltrone/divani.html",
+   "is_group": false,
+   "evidence": "rendered PLP header '29 prodotti' on Divani (Italian listing header), identical to __NEXT_DATA__ props.pageProps.plpProps.productListingSectionProps.productListingData.totalHits=29. Two independent full reads several minutes apart returned the same value - no drift.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Benches",
+   "qty": 4,
+   "link": "https://www2.hm.com/it_it/home/acquista-per-prodotto/arredamento/poltrone/panchine.html",
+   "is_group": false,
+   "evidence": "rendered PLP header '4 prodotti' on Panchine e Panche (Italian listing header), identical to __NEXT_DATA__ props.pageProps.plpProps.productListingSectionProps.productListingData.totalHits=4. Two independent full reads several minutes apart returned the same value - no drift.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bean Bags",
+   "qty": 3,
+   "link": "https://www2.hm.com/it_it/home/acquista-per-prodotto/arredamento/poltrone/poltrone-a-sacco.html",
+   "is_group": false,
+   "evidence": "rendered PLP header '3 prodotti' on Poltrone a sacco (Italian listing header), identical to __NEXT_DATA__ props.pageProps.plpProps.productListingSectionProps.productListingData.totalHits=3. Two independent full reads several minutes apart returned the same value - no drift.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Stools",
+   "qty": 11,
+   "link": "https://www2.hm.com/it_it/home/acquista-per-prodotto/arredamento/poltrone/sgabelli.html",
+   "is_group": false,
+   "evidence": "rendered PLP header '11 prodotti' on Sgabelli (Italian listing header), identical to __NEXT_DATA__ props.pageProps.plpProps.productListingSectionProps.productListingData.totalHits=11. Two independent full reads several minutes apart returned the same value - no drift.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Pouffes",
+   "qty": 18,
+   "link": "https://www2.hm.com/it_it/home/acquista-per-prodotto/arredamento/poltrone/pouf.html",
+   "is_group": false,
+   "evidence": "rendered PLP header '18 prodotti' on Pouf (Italian listing header), identical to __NEXT_DATA__ props.pageProps.plpProps.productListingSectionProps.productListingData.totalHits=18. Two independent full reads several minutes apart returned the same value - no drift.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Armchairs",
+   "qty": 8,
+   "link": "https://www2.hm.com/it_it/home/acquista-per-prodotto/arredamento/poltrone/poltrone.html",
+   "is_group": false,
+   "evidence": "rendered PLP header '8 prodotti' on Poltrone (Italian listing header), identical to __NEXT_DATA__ props.pageProps.plpProps.productListingSectionProps.productListingData.totalHits=8. Two independent full reads several minutes apart returned the same value - no drift.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Lounge Chairs",
+   "qty": 11,
+   "link": "https://www2.hm.com/it_it/home/acquista-per-prodotto/arredamento/poltrone/poltrone-lounge.html",
+   "is_group": false,
+   "evidence": "rendered PLP header '11 prodotti' on Sedie Lounge e da Salotto (Italian listing header), identical to __NEXT_DATA__ props.pageProps.plpProps.productListingSectionProps.productListingData.totalHits=11. Two independent full reads several minutes apart returned the same value - no drift.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dining Chairs",
+   "qty": 28,
+   "link": "https://www2.hm.com/it_it/home/acquista-per-prodotto/arredamento/poltrone/sedie-da-pranzo.html",
+   "is_group": false,
+   "evidence": "rendered PLP header '28 prodotti' on Sedie per sala da pranzo (Italian listing header), identical to __NEXT_DATA__ props.pageProps.plpProps.productListingSectionProps.productListingData.totalHits=28. Two independent full reads several minutes apart returned the same value - no drift.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Tables",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Pedestal Tables",
+   "qty": 1,
+   "link": "https://www2.hm.com/it_it/home/acquista-per-prodotto/arredamento/tavolini/tavolini-da-appoggio.html",
+   "is_group": false,
+   "evidence": "rendered PLP header '1 prodotti' on Tavolini da appoggio e piedistalli (Italian listing header), identical to __NEXT_DATA__ props.pageProps.plpProps.productListingSectionProps.productListingData.totalHits=1. Two independent full reads several minutes apart returned the same value - no drift.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Desks",
+   "qty": 0,
+   "link": "https://www2.hm.com/it_it/home/acquista-per-prodotto/arredamento/tavolini/scrivanie.html",
+   "is_group": false,
+   "evidence": "rendered PLP header '0 prodotti' on Scrivanie (Italian listing header), identical to __NEXT_DATA__ props.pageProps.plpProps.productListingSectionProps.productListingData.totalHits=0. Two independent full reads several minutes apart returned the same value - no drift.",
+   "flag": "MANUAL REVIEW: live category with zero products - the node is a genuine PLP (own h1 'SCRIVANIE', own page title 'Scrivanie | Moderne, angolari, con cassetti e altro | H&M IT', own SEO copy, and it is listed in the Tables pill nav as furnitures/tables/desks) but the IT assortment currently carries no desks; the site-reported total is exactly 0, not unobtainable."
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bedside Tables",
+   "qty": 1,
+   "link": "https://www2.hm.com/it_it/home/acquista-per-prodotto/arredamento/tavolini/comodini.html",
+   "is_group": false,
+   "evidence": "rendered PLP header '1 prodotti' on Comodini (Italian listing header), identical to __NEXT_DATA__ props.pageProps.plpProps.productListingSectionProps.productListingData.totalHits=1. Two independent full reads several minutes apart returned the same value - no drift.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dining Tables",
+   "qty": 73,
+   "link": "https://www2.hm.com/it_it/home/acquista-per-prodotto/arredamento/tavolini/tavola.html",
+   "is_group": false,
+   "evidence": "rendered PLP header '73 prodotti' on Tavoli da pranzo (Italian listing header), identical to __NEXT_DATA__ props.pageProps.plpProps.productListingSectionProps.productListingData.totalHits=73. Two independent full reads several minutes apart returned the same value - no drift.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Side Tables",
+   "qty": 76,
+   "link": "https://www2.hm.com/it_it/home/acquista-per-prodotto/arredamento/tavolini/lato.html",
+   "is_group": false,
+   "evidence": "rendered PLP header '76 prodotti' on Tavolini da salotto (Italian listing header), identical to __NEXT_DATA__ props.pageProps.plpProps.productListingSectionProps.productListingData.totalHits=76. Two independent full reads several minutes apart returned the same value - no drift.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Coffee Tables",
+   "qty": 82,
+   "link": "https://www2.hm.com/it_it/home/acquista-per-prodotto/arredamento/tavolini/caffe.html",
+   "is_group": false,
+   "evidence": "rendered PLP header '82 prodotti' on Tavolini da salotto e da caffe (Italian listing header), identical to __NEXT_DATA__ props.pageProps.plpProps.productListingSectionProps.productListingData.totalHits=82. Two independent full reads several minutes apart returned the same value - no drift.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Storage",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Wardrobes",
+   "qty": 1,
+   "link": "https://www2.hm.com/it_it/home/acquista-per-prodotto/arredamento/contenitori/armadi.html",
+   "is_group": false,
+   "evidence": "rendered PLP header '1 prodotti' on Armadi (Italian listing header), identical to __NEXT_DATA__ props.pageProps.plpProps.productListingSectionProps.productListingData.totalHits=1. Two independent full reads several minutes apart returned the same value - no drift.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Cabinets",
+   "qty": 28,
+   "link": "https://www2.hm.com/it_it/home/acquista-per-prodotto/arredamento/contenitori/armadietti.html",
+   "is_group": false,
+   "evidence": "rendered PLP header '28 prodotti' on Armadietti (Italian listing header), identical to __NEXT_DATA__ props.pageProps.plpProps.productListingSectionProps.productListingData.totalHits=28. Two independent full reads several minutes apart returned the same value - no drift.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Shelves & Shelving",
+   "qty": 40,
+   "link": "https://www2.hm.com/it_it/home/acquista-per-prodotto/arredamento/contenitori/mensole.html",
+   "is_group": false,
+   "evidence": "rendered PLP header '40 prodotti' on Mensole e Scaffali (Italian listing header), identical to __NEXT_DATA__ props.pageProps.plpProps.productListingSectionProps.productListingData.totalHits=40. Two independent full reads several minutes apart returned the same value - no drift.",
+   "flag": "MANUAL REVIEW: ambiguous shelving - the site files this under Mobili (Furniture) > Storage as furnitures/storage/shelves, but of the 36 product titles read on page 1, 19 say 'Mensola da parete' or 'Portaoggetti da parete' (explicitly WALL shelves) and most of the remaining 'Mensola in legno' items are also wall-mounted; only 3 are freestanding units ('Scaffale da appoggio in rattan', 'Scaffale in legno', 'Scaffale per bambini'). This is the same call as H&M Home UK SR 89 'Shelves' (36 items, 34 wall) - adjudicate the two together. May belong to Wall Decor rather than Furniture."
+  }
+ ]
+}

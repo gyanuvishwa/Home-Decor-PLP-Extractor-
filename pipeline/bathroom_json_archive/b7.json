@@ -1,0 +1,97 @@
+{
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ROBOTS: fetched FIRST, before any other request. https://www.anthropologie.com/robots.txt returned HTTP 200, 962 bytes, curl_cffi profile chrome131. It names NO Claude agent - there is no ClaudeBot, no Claude-Web and no anthropic-ai group anywhere in the file, and no AI-crawler block of any kind. The single generic group is 'User-agent: * / Allow: /' with Disallow on /orchestration/, /api/, /cgi-bin/, /blog/wp-content/, /homepage (and the locale homepages), /*search?, /claims, /order-tracking, /order/, /password/reset, plus 'Crawl-delay: 10'. Every one of those was honoured: no /api/ call was made (which is why counts come from the rendered header, not the internal catalogue API), no search URL was requested, and the fetcher enforced an 11s minimum gap per request against the site's 10s Crawl-delay. Only the plain locale sitemapindex.xml files it advertises would have been alternatives; they were not needed.\nACCESS - READ THIS BEFORE RE-RUNNING. anthropologie.com was completely unreachable for the first ~2 hours of this session: TCP connections to 159.255.219.195:443 (and :80) simply timed out - no TLS handshake, no HTTP response, curl exit 28 / HTTP 000 on 90+ attempts. It was URBN-wide and IP-based, not site-specific: urbanoutfitters.com, freepeople.com, anthropologie.eu and anthropologie.com.au all timed out identically while unrelated hosts answered normally. dns.google confirmed 159.255.219.195 is the only A record and there is no AAAA, so there was no alternate edge to try; r.jina.ai 403s for every target this session. The edge then reopened, at which point plain curl got the DataDome captcha interstitial ('Please enable JS and disable any ad blocker', host geo.captcha-delivery.com) - but curl_cffi with impersonate='chrome131' plus a full browser header set (Accept, Accept-Language, Sec-Fetch-Dest/Mode/Site/User, Upgrade-Insecure-Requests) passed cleanly on the first try and carried the whole job. That matches the SR 7 Furniture ledger exactly. Pacing at 11s kept it clean - no 403 or DataDome challenge occurred after the session was established.\nTREE: taken from the site's OWN embedded navigation JSON, not guessed and not from a search engine. The <script id=\"urbnInitialPiniaState\"> block holds a JSON-encoded JSON string (double-decode required); catchAll.navItem carries slug / displayName / typeCode / childSlugs / navigationItems. The Home & Furniture gateway (/house-home) has 17 nav children, one of which is Bath - displayName 'Bath', slug 'bathroom', typeCode GATEWAY, 13 childSlugs. Loading https://www.anthropologie.com/bathroom gives those 13 children, and EVERY ONE reports childSlugs=[] / navigationItems empty, i.e. they are the deepest nodes and there is no third level. In site order they are: Shop All Bath [bathroom-furniture-decor-and-more], Top-Rated Bath [top-rated-bath], New Bath [EXTERNAL], Back in Stock Bestsellers [EXTERNAL], Bath Mats [bathroom-bathmats], Shower Curtains [bathroom-shower-curtains], Bath Accessories [bathroom-bath-accessories], Towels [bathroom-bath-towels], Bath Hardware [bathroom-hardware], Bath Vanities [bathroom-vanities], Wall Storage & Hooks [bathroom-hooks], Bath Mirrors [bathroom-mirrors], Cleaning Products [cleaning-products]. The four recorded rows follow that site order.\nQTY SOURCE: the listing page's own server-rendered result header, <span class=\"c-pwa-tile-result-count\">N products</span> - the brief's priority-1 source. Product tiles are client-rendered on this site, so tile counting is neither possible nor needed, and the /api/ catalogue endpoint is robots-disallowed and was not touched. VERIFICATION (1) node identity - for every URL fetched, catchAll.navItem.displayName and .slug were read back and matched the node requested (Bath Accessories, Bath Hardware, Wall Storage & Hooks, Bath Mirrors, Bath Mats, Shower Curtains, Towels, Bath Vanities), and the SEO titles corroborate the classification: bathroom-hardware = 'Bathroom Hardware | Towel Bar & Hooks', bathroom-mirrors = 'Bathroom Mirrors - Vanity & Bathroom Safe', bathroom-bathmats = 'Bathmats, Bathroom Rugs & Bath Runners'. VERIFICATION (2) counts discriminate and are not a site-wide constant - Bath Accessories 278, Towels 193, Bath Hardware 143, Bath Mats 80, Bath Mirrors 60, Shower Curtains 37, Wall Storage & Hooks 31, Bath Vanities 19, and for contrast Shop All Bath 610, Top-Rated Bath 249, Art & Mirrors 2,073, Decor Mirrors 166. Nine distinct values across the department. VERIFICATION (3) the Cleaning Products node was fetched twice with the cache cleared in between and its count span was empty both times, while every sibling rendered a number - so the empty value is a property of that node, not a parsing bug. It is therefore in review with no qty rather than being given a made-up one.\nNO AGGREGATION: 278+143+31+60 = 512 and the full leaf set sums to 841, against a Shop All Bath figure of 610 - the leaves overlap (accessory sets are cross-tagged). Shop All Bath was fetched purely as a cross-check reference and is NOT emitted, per rule 25. Nothing was summed anywhere.\nDEDUP: already_extracted() run on all 12 candidate URLs (the gateway, all nine product children, Shop All Bath, and the Decor mirrors node). Exactly ONE hit: https://www.anthropologie.com/bathroom-vanities -> Furniture.xlsx, 'Bath Vanities'. Per the dispatch note it is in review, never in rows. The other four Bathroom leaves are clean - the Furniture pass took only /furniture-* and related nodes plus that one vanity.\nCLASSIFICATION NOTES on the recorded rows: Bath Accessories (278) is rule 13 - soap dispensers/dishes, tumblers, toothbrush holders, trays, canisters and matching bath sets; the site's own SEO frames it as 'Bathroom Decor & Matching Sets' but the primary product type is bathroom accessories, and rule 21 explicitly assigns bathroom soap dispensers to Bathroom. Bath Hardware (143) is rule 17 - the node's own description names towel bars and hooks. Wall Storage & Hooks (31) is rules 12/17 - bathroom-scoped storage and hooks (slug bathroom-hooks, distinct from the Decor department's own home-organization-storage node). Bath Mirrors (60) is rule 10/11 - primary type is mirror, and the node is explicitly bathroom/vanity, so it is Bathroom and is NOT duplicated into Lighting or Decor.\nEXCLUDED and why: Shop All Bath (610) and Top-Rated Bath (249) - rule 25, Shop All and promotional/curated pages. 'New Bath' and 'Back in Stock Bestsellers' - typeCode EXTERNAL, i.e. availability/recency-filtered links, not category listings. The parent /bathroom gateway - rule 24, valid children exist. NOT FOUND ON THIS SITE (checked, genuinely absent): Anthropologie sells no sanitaryware, baths, showers, enclosures, taps/faucets, toilets or basins - the Bath gateway bottoms out at the 13 children listed above and none of them is a fixtures node.",
+ "rows": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Accessories",
+   "qty": 278,
+   "link": "https://www.anthropologie.com/bathroom-bath-accessories",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Hardware",
+   "qty": 143,
+   "link": "https://www.anthropologie.com/bathroom-hardware",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Wall Storage & Hooks",
+   "qty": 31,
+   "link": "https://www.anthropologie.com/bathroom-hooks",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Mirrors",
+   "qty": 60,
+   "link": "https://www.anthropologie.com/bathroom-mirrors",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  }
+ ],
+ "review": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Mats",
+   "qty": 80,
+   "issue": "ROUTED TO TEXTILE: rule 16/69. The node's own SEO title is 'Bathmats, Bathroom Rugs & Bath Runners' and its description reads 'boho bath mat sets, bathroom runners, bath rugs' - textile floor coverings, not a rubber/anti-slip bathroom accessory, so rule 16's Bathroom branch does not apply.",
+   "link": "https://www.anthropologie.com/bathroom-bathmats"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower Curtains",
+   "qty": 37,
+   "issue": "ROUTED TO TEXTILE: rule 20, shower curtains are Textile.",
+   "link": "https://www.anthropologie.com/bathroom-shower-curtains"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Towels",
+   "qty": 193,
+   "issue": "ROUTED TO TEXTILE: rule 15/20. Bath/hand towels and bath sheets are Textile. The hardware half of rule 15 (towel bars, rails, rings, hooks) is a separate node on this site and IS recorded as Bath Hardware.",
+   "link": "https://www.anthropologie.com/bathroom-bath-towels"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Vanities",
+   "qty": 19,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Bath Vanities' - confirmed by lib/dedup.already_extracted(). Per the dispatch note (run owner, OPTION 1) bath vanities already recorded in Furniture stay in Furniture and are NOT re-extracted into Bathroom, even though rule 9 would otherwise class them as Bathroom. Live count today reads 19 products against the 20 recorded in Furniture.xlsx - noted for the owner's awareness, not re-emitted as a Bathroom row.",
+   "link": "https://www.anthropologie.com/bathroom-vanities"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Cleaning Products",
+   "qty": null,
+   "issue": "NO VERIFIABLE COUNT + LOW CONFIDENCE (rule 29). Thirteenth child of the Bath gateway. The page is a real category (pageType 'category', H1 'Cleaning Products') but its <span class=\"c-pwa-tile-result-count\"> renders EMPTY - fetched twice, cache cleared in between, empty both times, while every sibling node renders a number in the same span. Rule 26 forbids estimating, so no qty is recorded. Classification is also genuinely ambiguous: rule 3 lists 'Cleaning Accessories' as Bathroom, but the slug is 'cleaning-products' with no bathroom- prefix (every other Bath child is bathroom-*), which indicates a general household-cleaning node cross-listed into Bath rather than a bathroom-owned one. Left in review rather than guessed either way.",
+   "link": "https://www.anthropologie.com/cleaning-products"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Mirrors (Decor)",
+   "qty": 166,
+   "issue": "ROUTED TO DECOR: checked because rule 10 forbids skipping mirrors. This node sits under Home & Furniture > Art & Mirrors [home-art-mirrors, 2,073], not under Bath, and its primary product type is decorative wall mirrors. The site keeps its bathroom/vanity mirrors in a separate node, 'Bath Mirrors' [bathroom-mirrors], whose own SEO title is 'Bathroom Mirrors - Vanity & Bathroom Safe' - that is the one recorded in rows. No duplication between the two (rule 11).",
+   "link": "https://www.anthropologie.com/home-wall-mirrors"
+  }
+ ],
+ "_reconstructed_from": "Bathroom.xlsx delivered 2026-09-01 (checkpoint), not original worker JSON"
+}

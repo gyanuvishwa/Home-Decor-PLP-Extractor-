@@ -1,0 +1,284 @@
+{
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ACCESS: rejuvenation.com 403s every Chrome curl_cffi fingerprint but serves 200 to Safari/Firefox profiles; safari17_0 / safari18_0 / safari15_5 / firefox133 all worked (the probe.py rotation was pinned to those). Any query string on the origin is 403'd by the WAF, so listing pages were fetched as plain paths only. r.jina.ai returned its own Cloudflare 403 and www-rejuvenation-com.translate.goog returned a 403 from the origin, both retried this session - so no third-party render route exists. The host rate-limits after ~20 page fetches; requests were paced and the affected pages re-read. ROBOTS: https://www.rejuvenation.com/robots.txt fetched FIRST (200). Two named groups: 'User-agent: EasouSpider / Disallow: /' and 'User-agent: Pinterestbot / crawl-delay: 0.2'. There is NO group naming ClaudeBot, Claude-Web, Claude-User, Claude-SearchBot or anthropic-ai anywhere in the file, so the generic 'User-agent: *' group applies. That group Allows /llms.txt and disallows /account/, /checkout/, /shoppingcart/, /services/, /shop_g/, /shop_r/, /products_g/, /products_r/, */minipip, */quicklook, /personalization/, */show-mobile-email-signup, */show-join-email.jsonp, */registry/list.json, */apartment-, /*N=, */order-shipment-tracking, */undefined and /shop/*+*+*. No Crawl-delay for *. Every URL I requested is a plain /shop/<dept>/<id>/ path with no query string, no 'N=' parameter and at most zero '+' segments, so nothing disallowed was fetched; the multi-facet URLs matching /shop/*+*+* were deliberately NOT requested. Sitemaps declared in robots.txt were used (netstorage/sitemaps/shop-sitemap-index.xml -> shop-sitemap-1.xml.gz, 802 URLs). TREE: taken from the site's OWN department side-nav, embedded in each department page's HTML as the JSON object \"ssrSideNav\" (id / type / name per node; type=header for grouping rows, type=subcat for real listings, type=category for collection folders, type=linkcat for cross-department links, plus a boolean \"secret\":true on nodes that are NOT rendered in the nav). ssrSideNav was pulled for /shop/bath/ (111 top-level nodes), /shop/mirrors/ and /shop/organization/. The rendered Bath tree is: [Bath Vanities & Sinks] All Vanities & Sinks | Shop Bath Vanity Collections (14 collection children) | (secret) Vanities; [Bath Plumbing] Bath Faucets, Shower Sets & Tub Faucets, Shower Heads & Arms, Supply Lines Drains & Levers, Shop Bath Plumbing Collections (13 children), All Bath Plumbing; [Bath Mirrors] Pivot Mirrors, Medicine Cabinets, All Bath Mirrors; [Bath Hardware] Toilet Paper Holders, Hooks & Racks, Towel Rings, Towel Bars & Warmers, Shower Hardware & Grab Bars, Shop Bath Hardware Collections (3), New Arrivals (4), Shop All (23), All Bath Hardware, (secret) Shower Grab Bars; [Bath Lighting] Ceiling Lighting, Wall Lighting, All Bath Lighting; [Bath Linens & Rugs] Bath Towels & Shower Curtains, Bath Mats & Rugs; [Bath Furniture & Accessories] Bath Furniture & Storage + a linkcat to Organization; [Bathtubs] All Bathtubs, (secret) All ADA & Accessible Bath; [New & Featured] and [Sale] (merchandising only); then ~60 further 'secret' brand-collection nodes. Cross-department bath nodes were checked too: /shop/mirrors/ has a 'Bath Mirrors' header whose three entries are linkcats pointing back at the SAME /shop/bath/pivot-mirrors, /shop/bath/medicine-cabinets and /shop/bath/bath-mirrors URLs (rule 28 - one record), and /shop/organization/ has a 'Laundry & Bath' header whose entries are linkcats back to Bath Furniture & Storage and the bath hooks/hardware nodes plus the mixed roll-up /shop/organization/all-laundry-bath-organization/. Every recorded URL is present verbatim in the site's own shop-sitemap-1.xml.gz (89 /shop/bath/ URLs listed there). QTY: the listing pages are client-side SPAs - the SSR HTML carries \"totalProductsCount\":0 with no product tiles and no JSON-LD, and the grid is populated from Constructor.io (ac.cnstrc.com, constructorKey key_9BhS51IOFNhJejk4, declared in the page's own config alongside preconnect to https://ac.cnstrc.com). Every qty is response.total_num_results from https://ac.cnstrc.com/browse/group_id/<id>. PROOF THAT THIS IS THE RENDERED 'N Items' HEADER (this is the check the brief demanded): (1) the page config contains \"productCountDisplay\":{\"displayText\":\"Items\",\"isEnabled\":true,...,\"jumpLinkDisplayText\":\"View {{productCount}} Items\"} - so the header literally reads '<N> Items'; (2) in the site's own bundle /.static/shop/202631/595053970/dist/shop.cd506c32.js the component computes productCount as `function(){return (this.$store.state.shop.cat.response.numFound)||0}` and productCountMessage builds the string from that productCount plus productCountDisplayConfig.displayText; (3) the Constructor adapter in the SAME bundle assigns `C.data.response.numFound = e.response.total_num_results` (and again `v.response.numFound = e.response.total_num_results` on the second code path). So rendered header N === Constructor response.total_num_results, by the site's own code. VERIFICATION: (a) group_id <-> URL mapping proven from the site side: each /shop/bath/<id>/ page's SSR payload carries \"categoryId\":\"<id>\" - e.g. /shop/bath/faucets/ carries \"categoryId\":\"faucets\" - and the same payload's breadcrumbData is Home > Bath > <node name>. All 13 leaf pages fetched in one pass returned HTTP 200 with breadcrumbs Home > Bath > Bathroom Faucets / Shower Sets & Tub Faucets / Shower Heads & Arms / Supply Lines, Drains, & Levers / Pivot Mirrors / Medicine Cabinets / Toilet Paper Holders / Towel Hooks & Bath Hooks / Towel Rings / Towel Bars & Towel Warmers / Shower Hardware & Grab Bars / Bath Furniture & Storage / Bathtubs - Clawfoot Tubs & Soaking Tubs. (b) FULL ENUMERATION: every one of those 13 groups was paged through Constructor at num_results_per_page=100 to the last short page and its unique product ids counted; unique-id count == total_num_results on all 13 with zero mismatches (faucets 103, shower-sets-tub-faucets 193, shower-heads-arms 23, supply-lines-drains-levers 68, pivot-mirrors 27, medicine-cabinets 15, toilet-paper-holders 27, bath-hooks 107, towel-rings 22, towel-bars-towel-warmers 47, shower-door-pulls 38, bath-furniture 50, bathtubs 31). (c) DISCRIMINATION: an invented group_id 'ZZZ-not-a-real-group' returns total_num_results=0, so the endpoint is not serving a default; every real group returns its own distinct number (6..387) and none equals the department total (bath = 1265). (d) PARTITION CHECK: the four recorded Bath Plumbing children sum to exactly 387, which is exactly the 'All Bath Plumbing' roll-up - independent evidence that the children are complete and that no plumbing subcategory was missed. (e) NO AGGREGATION: no parent number was reused for a child and no quantities were summed into a row. EXCLUDED: all 'All ...' roll-ups (All Bath Plumbing 387, All Bath Mirrors 82, All Bath Hardware 214) per rules 24/25; ~80 brand/design collection pages under 'Shop Bath Vanity/Plumbing/Hardware Collections', 'New Arrivals' and 'Shop All' per rule 25; the New & Featured and Sale merchandising nodes (In-Stock & Quick Ship Bath, Contract Grade, Bestsellers, Shop All Bath, Shop All Bath Sale); the visualNav facet URLs under the vanity and plumbing nodes (e.g. /shop/bath/single-hole+faucets/type-m-type-ff000712fe20-1) because those are filter URLs, not subcategory listings (rule 27); /shop/mirrors/wall-mirrors and /shop/mirrors/floor-mirrors (decorative mirror hierarchy in the Mirrors department, primary type is decorative wall/floor mirror, not bathroom - rule 11); /shop/kitchen/* sinks and faucets (kitchen, not bathroom). Bath Lighting and Bath Linens & Rugs were inspected in full and routed out to Lighting / Textile in `review` (rules 19/20) rather than skipped. DEDUP: dedup.already_extracted() was called on all 27 candidate /shop/bath/ URLs plus the two /shop/organization/ and two /shop/mirrors/ candidates. Exactly ONE hit: https://www.rejuvenation.com/shop/bath/vanities/ (Furniture.xlsx, 'Vanities') - it is in `review`, never in `rows`. The recorded /shop/bath/vanities-sinks/ is a different URL and is not in the exclusion index; the 13-product overlap with the Furniture row is disclosed in `review`.",
+ "rows": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Sinks & Vanities",
+   "qty": 121,
+   "link": "https://www.rejuvenation.com/shop/bath/vanities-sinks/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Plumbing",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Faucets",
+   "qty": 103,
+   "link": "https://www.rejuvenation.com/shop/bath/faucets/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower Sets & Tub Faucets",
+   "qty": 193,
+   "link": "https://www.rejuvenation.com/shop/bath/shower-sets-tub-faucets/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower Heads & Arms",
+   "qty": 23,
+   "link": "https://www.rejuvenation.com/shop/bath/shower-heads-arms/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Supply Lines, Drains & Levers",
+   "qty": 68,
+   "link": "https://www.rejuvenation.com/shop/bath/supply-lines-drains-levers/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Mirrors",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Pivot Mirrors",
+   "qty": 27,
+   "link": "https://www.rejuvenation.com/shop/bath/pivot-mirrors/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Medicine Cabinets",
+   "qty": 15,
+   "link": "https://www.rejuvenation.com/shop/bath/medicine-cabinets/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Hardware",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Toilet Paper Holders",
+   "qty": 27,
+   "link": "https://www.rejuvenation.com/shop/bath/toilet-paper-holders/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Towel Hooks & Bath Hooks",
+   "qty": 107,
+   "link": "https://www.rejuvenation.com/shop/bath/bath-hooks/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Towel Rings",
+   "qty": 22,
+   "link": "https://www.rejuvenation.com/shop/bath/towel-rings/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Towel Bars & Towel Warmers",
+   "qty": 47,
+   "link": "https://www.rejuvenation.com/shop/bath/towel-bars-towel-warmers/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower Hardware & Grab Bars",
+   "qty": 38,
+   "link": "https://www.rejuvenation.com/shop/bath/shower-door-pulls/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Furniture & Storage",
+   "qty": 50,
+   "link": "https://www.rejuvenation.com/shop/bath/bath-furniture/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathtubs",
+   "qty": 31,
+   "link": "https://www.rejuvenation.com/shop/bath/bathtubs/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  }
+ ],
+ "review": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Vanities",
+   "qty": 13,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Vanities' (identical URL). dedup.already_extracted() hit; per dispatch_note OPTION 1 it stays in Furniture. NOTE: this is a 'secret':true node in the site's own ssrSideNav (not rendered in the nav) holding only 13 items; the visible node for the group is /shop/bath/vanities-sinks/ (121), which is a DIFFERENT URL, is NOT in the exclusion index, and IS recorded above. The 13 items are a subset of those 121, so there is a 13-product overlap between this Bathroom row and the existing Furniture row - flagged here rather than dropped, because excluding vanities-sinks would silently delete the site's entire Bathroom Sinks/Basins range (26 Sink + 7 Sink Stand + 4 Utility per the Constructor 'type' facet), which rule 4 forbids.",
+   "link": "https://www.rejuvenation.com/shop/bath/vanities/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "All Bath Plumbing",
+   "qty": 387,
+   "issue": "EXCLUDED as a shop-all parent (rules 24/25) - valid child listings exist. Cross-check: 103+193+23+68 = 387 = this node exactly, confirming the four recorded children fully partition it and that no plumbing subcategory was missed.",
+   "link": "https://www.rejuvenation.com/shop/bath/bath-plumbing/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "All Bath Mirrors",
+   "qty": 82,
+   "issue": "EXCLUDED as a shop-all parent (rules 24/25) - the site's own children Pivot Mirrors (27) and Medicine Cabinets (15) are recorded instead. Flagged because 27+15=42 leaves 40 bath mirrors that sit only in this roll-up; the site exposes no further child node for them (in /shop/mirrors/ the 'Bath Mirrors' header holds the same three linkcats).",
+   "link": "https://www.rejuvenation.com/shop/bath/bath-mirrors/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "All Bath Hardware",
+   "qty": 214,
+   "issue": "EXCLUDED as a shop-all parent (rules 24/25) - its five recorded children are Toilet Paper Holders 27, Towel Hooks & Bath Hooks 107, Towel Rings 22, Towel Bars & Towel Warmers 47, Shower Hardware & Grab Bars 38.",
+   "link": "https://www.rejuvenation.com/shop/bath/bath-hardware/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Ceiling Lighting",
+   "qty": 64,
+   "issue": "ROUTED TO LIGHTING: primary product type is lighting (rule 19), site node Bath > Bath Lighting > Ceiling Lighting.",
+   "link": "https://www.rejuvenation.com/shop/bath/bath-ceiling-lighting/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Wall Lighting (sconces)",
+   "qty": 80,
+   "issue": "ROUTED TO LIGHTING: vanity lights / bath sconces, primary product type is lighting (rules 11/19).",
+   "link": "https://www.rejuvenation.com/shop/bath/bath-sconces-bath/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "All Bath Lighting",
+   "qty": 155,
+   "issue": "ROUTED TO LIGHTING: shop-all roll-up of the two bath lighting children above (rule 19 + rule 25).",
+   "link": "https://www.rejuvenation.com/shop/bath/all-bath-lighting/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Towels & Shower Curtains",
+   "qty": 36,
+   "issue": "ROUTED TO TEXTILE: bath towels, bath sheets and shower curtains (rules 15/20).",
+   "link": "https://www.rejuvenation.com/shop/bath/bath-towels/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Mats & Rugs",
+   "qty": 54,
+   "issue": "ROUTED TO TEXTILE: textile bath mats and bath rugs (rules 16/20).",
+   "link": "https://www.rejuvenation.com/shop/bath/bath-rugs-bath-mats/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower Curtains",
+   "qty": 6,
+   "issue": "ROUTED TO TEXTILE: shower curtains (rule 20). Node is 'secret':true in ssrSideNav so it is not rendered in the site's nav; recorded here for completeness.",
+   "link": "https://www.rejuvenation.com/shop/bath/shower-curtains/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "All ADA & Accessible Bath",
+   "qty": 109,
+   "issue": "EXCLUDED - merchandising/attribute roll-up ('ADA & Accessible'), not a product-type subcategory; it cuts across the recorded hardware, plumbing and vanity leaves and would aggregate their quantities. Node is 'secret':true and is not rendered in the site's nav.",
+   "link": "https://www.rejuvenation.com/shop/bath/accessible-home-bath/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "All Accessories & Storage",
+   "qty": 112,
+   "issue": "EXCLUDED - 'secret':true node, not rendered in the site's nav, and a roll-up that overlaps the recorded Bath Furniture & Storage (50) and Bath Hardware leaves. Recorded here so it is not silently skipped.",
+   "link": "https://www.rejuvenation.com/shop/bath/bathroom-storage/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Guest Bath",
+   "qty": 246,
+   "issue": "EXCLUDED - 'secret':true room/merchandising edit, not a product-type subcategory, cuts across the recorded leaves (rules 2/25).",
+   "link": "https://www.rejuvenation.com/shop/bath/guest-bath/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "All Laundry & Bath Organization",
+   "qty": 313,
+   "issue": "EXCLUDED - mixed Laundry + Bath roll-up in the Organization department; its bath portion is reached by linkcats that point back at /shop/bath/bath-furniture/ and the bath hooks/hardware nodes already recorded (rule 28, one record per URL).",
+   "link": "https://www.rejuvenation.com/shop/organization/all-laundry-bath-organization/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Teak Bathroom Accessories",
+   "qty": 7,
+   "issue": "EXCLUDED - 'secret':true material/brand collection node in the Organization department, not rendered in any nav (rule 25). Its 7 items sit inside the recorded Bath Furniture & Storage / Bath Hardware leaves.",
+   "link": "https://www.rejuvenation.com/shop/organization/teak-bathroom-accessories/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath brand collection pages (Culver, Colbie, Barnes, Hollis, Cambell, Wallace, Theodora, Esme, Shaw, Islington, Fallon, Ladd, Geneva, Marquam, Trask, Howell, Connor, Rigdon, West Slope, Descanso, Waterhouse, Blair, Tiburon, Miramar, Tolson, Rollins, Montecito, Summit, Donahue, Bradshaw, Ansel, Keller, Eloise, Asher, Bowman, Eastmoreland, Ellis, Posey, Patton, Wren, Yaquina, Hughes, Allenglade, Meadows + ~50 'secret' *-bath-collection / *-vanity-collection nodes)",
+   "qty": null,
+   "issue": "EXCLUDED as collection pages (rule 25). These are the children of the ssrSideNav nodes 'Shop Bath Vanity Collections', 'Shop Bath Plumbing Collections', 'Shop Bath Hardware Collections', 'New Arrivals' and 'Shop All' - design-family collections that cut across the recorded product-type leaves, not subcategories. ~80 URLs, all present in shop-sitemap-1.xml; none recorded and none needed, since every product in them is already inside a recorded product-type leaf.",
+   "link": null
+  }
+ ],
+ "_reconstructed_from": "Bathroom.xlsx delivered 2026-09-01 (checkpoint), not original worker JSON"
+}

@@ -1,0 +1,65 @@
+{
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ACCESS: this is a NetSuite SuiteCommerce Advanced (SCA) storefront, fully client-side rendered. Two routes were used and cross-checked: (1) curl_cffi via probe.py for the server-side HTML and the SCA Items service - HTTP 200 on every request across chrome131/safari15_5/safari17_2_ios; (2) WebFetch for the RENDERED listing headers, which is the only way to read this theme's own '#### N Products' element. ROBOTS: https://www.scullyandscully.com/robots.txt fetched FIRST, before any other request (938 bytes). It names Claude explicitly and ALLOWS it - there are three separate named groups 'User-agent: ClaudeBot / Allow: /', 'User-agent: Claude-Web / Allow: /' and 'User-agent: Claude-SearchBot / Allow: /', under a comment header '# AI/LLM crawlers - explicitly allowed'. No Claude group carries any Disallow, and there is no Crawl-delay. The generic '*' group is 'Allow: /' with Disallow only on /app/site/query/, /search, /checkout, /my_account, /*?*sort= and /*?*filter=. I requested NONE of those: no /search, no sort or filter query URL, and the API endpoint I used is /api/items?... which matches no Disallow pattern (the disallowed service path is /app/site/query/, a different endpoint). probe.py's 2s per-host gap was honoured. TREE: two independent complete sources that agree. (1) The full mega-menu is present server-side in the homepage HTML - 605 anchors parsed with BeautifulSoup, giving 10 departments: Jewelry, Home Decor, Furniture, Tabletop, Collectibles, Herend, Gift Ideas, Inspiration, New Arrivals and Wedding Registry, each expanded to its second and third level. (2) The XML sitemap (sitemap index -> sitemap_www.scullyandscully.com_1690203290_1.xml, 24,365 URLs) of which 391 are multi-segment category paths. I keyword-swept BOTH sources plus all 24,365 sitemap URLs for bath|shower|toilet|vanity|basin|sink|towel|soap|faucet|tap|wc|sanitary|tub|bidet. There is NO Bathroom, Bath, Bath Accessories or Bathroom Accessories category at any level in either source. The Home Decor department's children are Clocks, Holiday Decor, Home Decor Accessories, Leather Accessories, Luxury Lamps, Mirrors, Office Accessories and Picture Frames - no bath node. WHERE THE BATH PRODUCTS LIVE: the sitemap keyword sweep did surface real bath PDPs (eris-pearl-white-marble-bath-accessories, light-green-onyx-bath-collection, botanica-bath-collection, white-marble-bath-accessories, eris-zafferano-verde-onyx-honed-finish-bath-accessories, bamboo-screen-robins-egg-bathroom-accessories, indigo-garden-bathroom-accessories-blue-and-white, eris-black-zebra-marble-wastebaskettissue-box-cover), so I resolved their categories from the storefront's own API rather than guessing: /api/items?url=<slug>&fieldset=details returns a commercecategory.primarypath, and for the Eris Pearl White Marble Bath Accessories it is More Home Accessories (id 686) -> Home Decor Accessories (id 37) -> Home Decor (id 5). A catalogue-wide query /api/items?q=bath returns total 18, of which only 9 are genuine bath accessories and every one of them resolves into Home Decor Accessories. There is no bathroom listing URL to record. QTY METHOD: the SCA Items service, GET /api/items?limit=1&custitem_is_subitem=false&commercecategoryurl=<category path>, field 'total'. CALIBRATION (carried over from the Furniture pass and re-proven here): the RAW api total is inflated because it counts matrix sub-items; adding custitem_is_subitem=false reproduces the site's own rendered header. I re-demonstrated the inflation this session on four categories - More Home Accessories 108 filtered vs 112 raw, Shop All Home Decor Accessories 1279 vs 1329, Vases & Cachepots 206 vs 230, Umbrella Stands 59 vs 60 - so the filter is mandatory and was applied to every figure above. VERIFICATION: every review figure was checked against the RENDERED '#### N Products' listing header via WebFetch, on FIVE pages spanning 22 to 256 items: Round Mirrors API 27 vs rendered 'Round Mirrors / 27 Products'; Nature Mirrors 22 vs '22 Products'; Rectangular Mirrors 80 vs '#### 80 Products'; More Home Accessories 108 vs '108 Products'; Wastebaskets & Tissue Box Covers 256 vs '256 Products'. Five of five exact matches, and each rendered H1 matched the node requested. DISCRIMINATION: 0, 22, 27, 60, 80, 108, 145, 256, 621, 1932 - no site-wide constant. NO AGGREGATION: the Mirrors children overlap (80+60+27+22 = 189 against a Shop All of 145), which is exactly why rule 26's no-aggregation rule matters here; nothing was summed. CONFIRMED ABSENT: Scully & Scully is a Park Avenue luxury gift, furniture, jewellery and tabletop retailer. It sells NO bathroom fixtures or sanitaryware of any kind - no baths, basins, sinks, toilets, bidets, showers, enclosures, screens, taps, faucets, vanity units, bathroom cabinets or bathroom storage - and it has no Bathroom department, no bath accessories listing and no bathroom or vanity mirror. Its only bathroom-typed products are about nine marble and onyx vanity-accessory sets merchandised inside Home Decor > Home Decor Accessories > More Home Accessories, which is a decor node. Per rules 2, 24 and 29 there is no valid Bathroom leaf, so rows is empty and all eight findings are documented in review. CROSS-FILE DEDUP: lib/dedup.already_extracted() was run on all 11 candidate URLs (the five Mirrors nodes, wastebaskets-tissue-covers, more-home-home-accessories, painted-wooden-deco-trays, leather-travel-organizers, bags-cases and the mirrors parent). ZERO hits. The index holds 32 scullyandscully.com URLs, ALL from Furniture.xlsx and all under /furniture/ (seating, cabinets-bookcases-chests, tables, folding-furniture, desks/office, beds, contemporary, miscellaneous); the earlier Home Decor pass (Final.xlsx) contains no scullyandscully.com URL at all, so the Mirrors and Home Decor Accessories nodes above are NOT dedup hits - they are excluded on classification grounds (they belong to Decor/Wall Decor, which is a different category file's problem) rather than on dedup grounds. Nothing was removed from rows for dedup.",
+ "rows": [],
+ "review": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Home Decor > Mirrors > Rectangular Mirrors",
+   "qty": 80,
+   "issue": "ROUTED TO DECOR / WALL DECOR (rules 2/11/29): inspected specifically because rule 10 forbids skipping mirrors. Sits under Home Decor > Mirrors, NOT under any bathroom node, and the products are period decorative wall mirrors (Chippendale, Federal, Adam, Williamsburg, Bilbao, girandole, overmantel). There is no bathroom, vanity, LED, illuminated, backlit, demister, cabinet, shaving or magnifying mirror anywhere in the Mirrors department - I checked the whole department item-by-item and separately queried the catalogue for 'vanity', 'shaving' and 'magnifying' (the only hits are a Burl Wood Vanity Tray, Limoges Vanity Boxes, a lacquered Vanity Tray, an Edwardian Shaving Set, leather grooming kits and sterling magnifying glasses - none a mirror). Primary product type is decorative mirrors.",
+   "link": "https://www.scullyandscully.com/home-decor/mirrors/rectangular-mirrors"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Home Decor > Mirrors > Ornate Mirrors",
+   "qty": 60,
+   "issue": "ROUTED TO DECOR / WALL DECOR (rules 2/11): sibling leaf of the above, same reasoning - gilt Rococo, acanthus, Chippendale and giltwood decorative mirrors under Home Decor.",
+   "link": "https://www.scullyandscully.com/home-decor/mirrors/ornate-mirrors"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Home Decor > Mirrors > Round Mirrors",
+   "qty": 27,
+   "issue": "ROUTED TO DECOR / WALL DECOR (rules 2/11): all 27 enumerated - Sunburst Antique Gold Convex, Stanford White Girandole, Solarburst, Neptune Nickel, Adam Wedgwood Oval, Entwined Dolphins Convex, Tondo Gold Porthole, Nautical Rondel, Williamsburg Governor's Palace, Federal Rondel, Vista Antique Gold etc. Convex/girandole/rondel parlour mirrors, not bathroom mirrors.",
+   "link": "https://www.scullyandscully.com/home-decor/mirrors/round-mirrors"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Home Decor > Mirrors > Nature Mirrors",
+   "qty": 22,
+   "issue": "ROUTED TO DECOR / WALL DECOR (rules 2/11): all 22 enumerated - Handpainted Rooster, Lilybud with Monarch Butterflies, Climbing Hydrangea, Twig & Ivy with Cardinals, Grape Vines, Songbirds, Water Lilies, Strawberry Thief, Martha's Vineyard. Handpainted decorative mirrors.",
+   "link": "https://www.scullyandscully.com/home-decor/mirrors/nature-mirrors"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Home Decor > Mirrors > Shop All Mirrors",
+   "qty": 145,
+   "issue": "VIEW-ALL, NEVER RECORDED (rule 25). Noted only to document that the Mirrors department's four real children (80+60+27+22=189) overlap - a mirror can be both Ornate and Rectangular - so the four counts must never be summed, and the department parent /home-decor/mirrors itself returns total 0 (a pure landing node with no direct products).",
+   "link": "https://www.scullyandscully.com/home-decor/mirrors/shop-all-mirrors"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Home Decor > Home Decor Accessories > More Home Accessories",
+   "qty": 108,
+   "issue": "EXCLUDED - this is where Scully & Scully's genuine bath accessories actually live, and it is a Home Decor node, not a Bathroom node (rules 2/29). I resolved the commercecategory of the bath products directly from the storefront API: /api/items?url=eris-pearl-white-marble-bath-accessories returns primarypath = More Home Accessories -> Home Decor Accessories -> Home Decor. The bath items in it are the marble/onyx vanity sets - Eris Pearl White Marble Bath Accessories, Eris Zafferano Verde Onyx Honed Finish Bath Accessories, White Marble Bath Accessories, Light Green Onyx Bath Collection, Botanica Bath Collection, Bamboo Screen Robin's Egg Bathroom Accessories, Indigo Garden Bathroom Accessories, Black Zebra Marble Bath Accessories, Eris Light Green Onyx Guest Towel Tray - roughly 9 of 108. The other ~99 are burl wood boxes, Limoges vanity/porcelain boxes, vide-poches, lacquer trays, photo frames, brooch wreaths and pocket emptiers. Under rules 13/18 those 9 individual products would be Bathroom accessories, but the NODE's primary product type is miscellaneous decorative home accessories and there is no bathroom child beneath it, so no Bathroom leaf can be recorded here without misclassifying ~99 decor items. Recorded so the bath line is not silently skipped.",
+   "link": "https://www.scullyandscully.com/home-decor/home-decor-accessories/more-home-home-accessories"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Home Decor > Home Decor Accessories > Wastebaskets & Tissue Box Covers",
+   "qty": 256,
+   "issue": "EXCLUDED - primary product type is decorative wastebaskets and tissue box covers under Home Decor (rules 2/29/30-33). Checked in full (all 256 enumerated) because in luxury retail such sets are often merchandised as bath/vanity accessories. They are not here: the node is fabric-covered, tapestry, leather-books, mahogany and William Morris wastebaskets and tissue box covers plus hampers, umbrella stands and buckets, sold as room accessories across the whole house. Only 2 of 256 are bath sets (Black Zebra Marble Bath Accessories, Shagreen and Shell Accessories) plus a few marble wastebaskets from the Eris/Myrtus bath ranges. Under rule 2 the node belongs to Decorative Home Accessories, not Bathroom.",
+   "link": "https://www.scullyandscully.com/home-decor/home-decor-accessories/wastebaskets-tissue-covers"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathrobes / toiletry bags (no node)",
+   "qty": 0,
+   "issue": "ROUTED TO TEXTILE (rule 20) / NOT BATHROOM - noted for completeness. The catalogue contains Derek Rose Men's Luxury Robes and a Derek Rose Aston Navy & Red Velour Robe (textile -> Textile), and Calfskin / Framed / Needlepoint Toiletry Bags and Chervo Calf Cosmetic Toiletry Bags (travel bags -> Leather Goods / Bags, rule 2 primary type = bag). NONE of these has a category listing of its own - they are individual products inside Gift Ideas > Luxury Men's/Women's Gifts and Home Decor > Leather Accessories. qty 0 because there is no listing node; link is the parent department the robes sit under, given only for traceability, and is NOT a recordable Bathroom URL.",
+   "link": "https://www.scullyandscully.com/gift-ideas/luxury-mens-gift/mens-accessories-men-accessories"
+  }
+ ],
+ "_reconstructed_from": "Bathroom.xlsx delivered 2026-09-01 (checkpoint), not original worker JSON"
+}

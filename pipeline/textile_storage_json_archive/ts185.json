@@ -1,0 +1,84 @@
+{
+  "sr": 185,
+  "company": "Castlery Singapore",
+  "brand_site": "castlery.com",
+  "country": "Singapore",
+  "site_url": "https://www.castlery.com/sg",
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "ACCESS: Tier (a) HTTP fetch only (curl with browser UA) - no block encountered, robots.txt (User-agent: * / Disallow: /wishlist,/checkout/,/account/) does not restrict category pages. TREE: built from union of /sg/sitemap.xml (1826 URLs) + each candidate category page's own rendered nav/filter panel (confirmed via a small number of Playwright loads where curl's static HTML lacked nav links). Site is a Next.js app whose category listing pages embed a server-rendered Algolia search response (fields nbHits/nbPages/hitsPerPage/facets/categoryContext) directly in the initial HTML - this gave an exact, site-computed product count for every category without needing to paginate through the UI, except where noted. QTY: read directly from the embedded nbHits field for each page (cross-checked against the rendered product-card count and, for /accessories/poufs-cushions-throws, an exact manual count of listed product names = 24, matching nbHits). Confirmed each page's categoryContext/H1 matches the intended node (guards against the 'bad slug silently serves parent/site-wide total' failure mode described in the brief) - this caught /sg/accessories/rugs/large-rugs, which is a dead/bad slug that silently serves an unfiltered site-wide Algolia fallback (nbHits=1216, includes mattresses) rather than a real large-rugs subcategory; it was discarded entirely (not recorded), and Rugs (27) stands alone with no valid subcategory. Also caught /sg/accessories/cushions and /sg/accessories/throws, both true 404s (old slugs) superseded by /sg/accessories/poufs-cushions-throws (site's real Cushions category, categoryContext=['Accessories','Cushions'], nbHits=24; no throw/blanket products currently listed there). EXCLUDED: entire /sg/storage/* nav section (all-storage, bar-cabinets, shelves-bookcases, sideboards-cabinets, tv-consoles, wooden-tv-units, small/long-tv-units) - manually inspected (nbHits=75 on all-storage, product slugs are sideboards/TV consoles/cabinets/bookcases/a bar cart) and every item is Storage Furniture (storage.md Sec21 'Potential Furniture' list: sideboards, cabinets, bookcases, TV/console units) with zero standalone storage boxes/baskets/bins/organizers anywhere on the site (grepped full sitemap for basket/bin/storage-box/organiz - no matches) - so storage_rows is empty for this company; this is a furniture retailer with a furniture-type 'Storage' collection, not a home-organization retailer. Also excluded as non-textile/non-storage: /sg/accessories/all-accessories, /sg/accessories/lighting, /sg/accessories/mirrors*, /sg/accessories/tableware (Lighting/Wall Decor/Kitchen&Dining boundaries, out of scope), /sg/beds/beds,bedside-tables,dressers,storage-beds (Furniture), /sg/accessories/sofa-accessories item 'Sofa Armrest Table' (furniture, not textile), /sg/outdoor/outdoor-accessories item 'Sorrento Outdoor Bar Cart' (furniture, not textile - identified by paginating all 4 result pages of that category via ?p=1..4 and enumerating all 76 product slugs, since page 1 of the SSR payload alone only exposes 24 of 76). Two accessory categories (Sofa Accessories, Outdoor Accessories) are mixed nodes where the site's own displayed total includes exactly one non-textile item alongside otherwise-textile sofa/furniture covers and headrests; the site's own exact count was kept as qty per the no-estimate rule, flagged for review rather than manually recalculated. Bedding (/sg/beds/bedding, 23) and Pillowcases (/sg/accessories/pillow-cases, 6) are two independently-linked, independently-titled leaf pages reachable from different top-level nav sections (Beds vs Accessories) though Pillowcases' 6 items are a tag-filtered subset of Bedding's 23 in the site's own taxonomy id (all-beddings) - both recorded as siblings since each is a genuine distinct canonical listing URL, not a duplicate of the other."
+  ,
+  "textile_rows": [
+    {
+      "category": "Textile",
+      "sub_category": "Rugs",
+      "qty": 27,
+      "link": "https://www.castlery.com/sg/accessories/rugs",
+      "is_group": false,
+      "evidence": "Embedded Algolia SSR JSON on page: nbHits=27, nbPages=2, category facet accessories/all-rugs:27; H1='Rugs', canonical page title 'Rugs for Living Rooms & Bedrooms'",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Cushions",
+      "qty": 24,
+      "link": "https://www.castlery.com/sg/accessories/poufs-cushions-throws",
+      "is_group": false,
+      "evidence": "Embedded Algolia SSR JSON: nbHits=24, nbPages=1, categoryContext=['Accessories','Cushions']; manually verified by counting 24 distinct product names on the rendered page (all cushions/throw pillows, no poufs or blankets currently listed despite the URL slug)",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Pillowcases",
+      "qty": 6,
+      "link": "https://www.castlery.com/sg/accessories/pillow-cases",
+      "is_group": false,
+      "evidence": "Embedded Algolia SSR JSON: nbHits=6, nbPages=1, category facet accessories/all-beddings:6; H1='Pillowcases'",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Bedding",
+      "qty": 23,
+      "link": "https://www.castlery.com/sg/beds/bedding",
+      "is_group": false,
+      "evidence": "Embedded Algolia SSR JSON: nbHits=23, nbPages=1, category facet beds/all-beddings:23; H1='Bedding', categoryContext=['Accessories','Bedding']",
+      "flag": "Same underlying category id (all-beddings) as Pillowcases; Pillowcases' 6 items are a tag-filtered subset of these 23, both recorded as they are separately linked/titled site pages",
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Sofa Accessories",
+      "qty": 14,
+      "link": "https://www.castlery.com/sg/accessories/sofa-accessories",
+      "is_group": false,
+      "evidence": "Embedded Algolia SSR JSON: nbHits=14, nbPages=1; enumerated all 14 product slugs: 11 sofa/modular covers + 2 sofa headrests (textile/cushion-type) + 1 sofa armrest table (furniture, non-textile)",
+      "flag": "MANUAL REVIEW: site's own category total (14) includes 1 non-textile product (Sofa Armrest Table); 13 of 14 are genuine sofa covers/headrests. Kept the site's exact displayed count per no-estimate rule rather than recalculating.",
+      "confidence": "MEDIUM"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Bed Accessories",
+      "qty": 3,
+      "link": "https://www.castlery.com/sg/accessories/bed-accessories",
+      "is_group": false,
+      "evidence": "Embedded Algolia SSR JSON: nbHits=3, nbPages=1; all 3 product slugs enumerated and verified textile: dawson-bed-cover, esmee-bed-cover, harper-performance-headboard-cushions-set-of-2",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Outdoor Accessories",
+      "qty": 76,
+      "link": "https://www.castlery.com/sg/outdoor/outdoor-accessories",
+      "is_group": false,
+      "evidence": "Embedded Algolia SSR JSON: nbHits=76, nbPages=4, hitsPerPage=24; paginated all 4 pages (?p=1..4) and enumerated all 76 product slugs - 75 are outdoor furniture/sofa/table covers (fabric covers, textile per rules Sec12/Sec21), 1 is 'Sorrento Outdoor Bar Cart' (furniture, non-textile)",
+      "flag": "MANUAL REVIEW: site's own category total (76) includes 1 non-textile product (Sorrento Outdoor Bar Cart); 75 of 76 are genuine outdoor furniture covers. Kept the site's exact displayed count per no-estimate rule rather than recalculating.",
+      "confidence": "MEDIUM"
+    }
+  ],
+  "storage_rows": []
+}

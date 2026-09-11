@@ -1,0 +1,124 @@
+{
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "Etsy DOES expose a real curated Pet category node, not just raw search: https://www.etsy.com/c/pet-supplies is a genuine taxonomy leaf with its own page_title 'Pet Supplies', a curated description ('Collars, toys and custom portraits for pets...'), and an embedded classified_node JSON object (id=1351, path='pet_supplies') listing 14 real children_ids, which matched exactly 14 real subcategory nav cards on the page (name + stable /c/pet-supplies/<slug> URL each). This is the same taxonomy pattern used for Home & Living in the prior pass (verified in notes/199.md), so it is treated the same way -- not the search-only absence case. Access: direct HTTP via curl_cffi impersonate='chrome116' worked cleanly and consistently (matches prior pass's access notes); no blocking encountered (no 403/CAPTCHA/WAF) at any point in this pass. Caveat: this session's egress IP geolocates to India (ipinfo.io confirmed Delhi/Reliance Jio), so etsy.com auto-served the localized 'Etsy India' variant (INR currency, some internal links carry an /in-en/ locale prefix) despite fetching the canonical www.etsy.com URLs with no country override attempted (Accept-Language header did not change it). Etsy is a single global marketplace/catalog (not per-country catalogs), so the category structure and JSON-LD numberOfItems counts read from the canonical (non-locale-prefixed) /c/ URLs are treated as the real site-reported counts, but flagging this geolocation caveat for reviewer awareness since counts could theoretically be availability/ships-to filtered. Depth: fetched and verified the top node (Pet Supplies, 14 children) and all 14 second-level category pages individually via JSON-LD numberOfItems + classified_node id cross-check (each row's classified_node id matched its expected id from the parent's children_ids list, confirming no cross-contamination). Below that, each of these 14 branches has a real, further third-level breakdown (48 leaf nodes total, e.g. Pet Toys > Dog Toys/Cat Toys/Small Animal Toys/Bird Toys) -- confirmed genuine via one clean spot-check fetch of https://www.etsy.com/c/pet-supplies/pet-toys/dog-toys (numberOfItems=4469, classified_node id=1419 'Dog Toys', children_ids=[], og:url matched). A first attempt to bulk-fetch all 48 third-level URLs returned corrupted/wrong data (every response's classified_node fell back to the top-level Pet Supplies node instead of the requested leaf) -- root-caused after the fact to a URL-construction bug in the batch script (missing the '/c/' path segment), not a site block. Given the session's time budget, the 48 third-level leaves were not re-fetched and individually re-verified after the fix, so this pass reports the 14 second-level categories as the practical leaf rows rather than risk emitting unverified qty for the deeper level. This is a coverage tradeoff, not an accuracy one: every qty below is a real site-reported JSON-LD numberOfItems for its own exact URL. A follow-up pass could descend one more level per branch for finer granularity (e.g. splitting Pet Toys into Dog/Cat/Small Animal/Bird Toys) using the now-corrected URL pattern https://www.etsy.com/c/pet-supplies/<parent-slug>/<child-slug>. Scope decisions among the 14 second-level nodes: excluded 'Horse Riding & Farm Animals' (equestrian/livestock tack and farm-animal supplies -- not household/companion pet care, out of this project's Pet Care boundary) and 'Beekeeping' (apiculture/agriculture equipment, unrelated to companion-animal care) -- neither emitted as a row. 'Urns & Memorials' (pet cremation urns, memorial plaques/jewelry, grave markers) is included but flagged for manual review since it is not decisively 'pet ownership/care' under the brief's tier list (it is post-mortem/bereavement, not care of a living pet); sample listing titles confirmed it is genuinely pet-focused (pet urns, pet memorial plaques) with a small amount of noise (a couple of unrelated wall-art/jewelry listings surfaced by search relevance). 'Pet Health & Wellness' (contains Pet Waste, Pet Grooming, Deodorisers & Perfumes, Pet Vitamins & Supplements, Pet Pest Control, Pet Dental) is flagged per the brief's open medical/veterinary policy gap. 'Pet Feeding' is flagged because its own third-level breakdown includes a 'Pet Food & Treats' sub-branch (consumables) that is rolled into this row's count rather than broken out, per the brief's open pet-consumables policy gap -- the remainder of Pet Feeding is genuine feeding equipment (bowls, feeders/waterers, feeding stands, placemats). No zero-result categories encountered; no duplicate-URL merges needed among the 14 second-level nodes.",
+  "rows": [
+    {
+      "category": "Pet Care",
+      "sub_category": "Pet Supplies",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Pet Collars & Leashes",
+      "qty": 104121,
+      "link": "https://www.etsy.com/c/pet-supplies/pet-collars-and-leashes",
+      "is_group": false,
+      "evidence": "JSON-LD ItemList numberOfItems=104121 on https://www.etsy.com/c/pet-supplies/pet-collars-and-leashes; classified_node id=1383 name='Pet Collars & Leashes' confirmed matching parent's children_ids entry",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Pet Furniture",
+      "qty": 14082,
+      "link": "https://www.etsy.com/c/pet-supplies/pet-furniture",
+      "is_group": false,
+      "evidence": "JSON-LD ItemList numberOfItems=14082 on https://www.etsy.com/c/pet-supplies/pet-furniture; classified_node id=1394 name='Pet Furniture' confirmed",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Pet Clothing, Accessories & Shoes",
+      "qty": 113879,
+      "link": "https://www.etsy.com/c/pet-supplies/pet-clothing-accessories-and-shoes",
+      "is_group": false,
+      "evidence": "JSON-LD ItemList numberOfItems=113879 on https://www.etsy.com/c/pet-supplies/pet-clothing-accessories-and-shoes; classified_node id=1368 confirmed",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Urns & Memorials",
+      "qty": 232823,
+      "link": "https://www.etsy.com/c/pet-supplies/urns-and-memorials",
+      "is_group": false,
+      "evidence": "JSON-LD ItemList numberOfItems=232823 on https://www.etsy.com/c/pet-supplies/urns-and-memorials; classified_node id=1425 confirmed; sample listing titles checked (pet cremation urns, memorial plaques, grave markers)",
+      "flag": "MANUAL REVIEW: pet memorial/bereavement category (urns, memorial plaques, grave markers, memorial jewelry for deceased pets) -- not decisively 'pet ownership/care' per the brief's tier list, no exclude/include precedent found"
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Pet Toys",
+      "qty": 14384,
+      "link": "https://www.etsy.com/c/pet-supplies/pet-toys",
+      "is_group": false,
+      "evidence": "JSON-LD ItemList numberOfItems=14384 on https://www.etsy.com/c/pet-supplies/pet-toys; classified_node id=1416 confirmed",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Pet Storage",
+      "qty": 1729,
+      "link": "https://www.etsy.com/c/pet-supplies/pet-storage",
+      "is_group": false,
+      "evidence": "JSON-LD ItemList numberOfItems=1729 on https://www.etsy.com/c/pet-supplies/pet-storage; classified_node id=1415, children_ids=[] confirming this is already a true leaf node",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Pet Feeding",
+      "qty": 16434,
+      "link": "https://www.etsy.com/c/pet-supplies/pet-feeding",
+      "is_group": false,
+      "evidence": "JSON-LD ItemList numberOfItems=16434 on https://www.etsy.com/c/pet-supplies/pet-feeding; classified_node id=1388 confirmed",
+      "flag": "MANUAL REVIEW: PET CONSUMABLE - this rolled-up count includes a 'Pet Food & Treats' sub-branch (not broken out separately); remainder is feeding equipment (bowls, feeders/waterers, feeding stands, placemats)"
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Pet Bedding",
+      "qty": 11533,
+      "link": "https://www.etsy.com/c/pet-supplies/pet-bedding",
+      "is_group": false,
+      "evidence": "JSON-LD ItemList numberOfItems=11533 on https://www.etsy.com/c/pet-supplies/pet-bedding; classified_node id=1353 confirmed",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Pet Gates & Fences",
+      "qty": 631,
+      "link": "https://www.etsy.com/c/pet-supplies/pet-gates-and-fences",
+      "is_group": false,
+      "evidence": "JSON-LD ItemList numberOfItems=631 on https://www.etsy.com/c/pet-supplies/pet-gates-and-fences; classified_node id=1401, children_ids=[] confirming true leaf",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Pet Carriers & Houses",
+      "qty": 19510,
+      "link": "https://www.etsy.com/c/pet-supplies/pet-carriers-and-houses",
+      "is_group": false,
+      "evidence": "JSON-LD ItemList numberOfItems=19510 on https://www.etsy.com/c/pet-supplies/pet-carriers-and-houses; classified_node id=1358 confirmed",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Pet Health & Wellness",
+      "qty": 5412,
+      "link": "https://www.etsy.com/c/pet-supplies/pet-health-and-wellness",
+      "is_group": false,
+      "evidence": "JSON-LD ItemList numberOfItems=5412 on https://www.etsy.com/c/pet-supplies/pet-health-and-wellness; classified_node id=1402 confirmed",
+      "flag": "MANUAL REVIEW: PET MEDICAL / VETERINARY CATEGORY - branch covers Pet Waste, Pet Grooming, Deodorisers & Perfumes, Pet Vitamins & Supplements, Pet Pest Control, Pet Dental (mixed hygiene + health/medical items)"
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Training",
+      "qty": 1114,
+      "link": "https://www.etsy.com/c/pet-supplies/training",
+      "is_group": false,
+      "evidence": "JSON-LD ItemList numberOfItems=1114 on https://www.etsy.com/c/pet-supplies/training; classified_node id=1422 confirmed",
+      "flag": null
+    }
+  ]
+}

@@ -1,0 +1,140 @@
+{
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ROBOTS - THREE HOSTS WERE TOUCHED AND ALL THREE WERE CHECKED SEPARATELY (BATCH_BRIEF s1.3, robots is PER-HOST). (1) www.freedom.com.au - fetched FIRST, before any other request: HTTP 200, 1,367 bytes. Five groups: 'User-agent: *', and Disallow-all groups for CazoodleBot, MJ12bot, dotbot and Gigabot. NO Claude agent is named - a case-insensitive search for claude, anthropic, ClaudeBot, Claude-Web and anthropic-ai returns ZERO hits - so we fall under '*'. THE '*' GROUP CARRIES 'Crawl-delay: 5', WHICH I HONOURED: probe.MIN_GAP was raised from 2.0 to 5.0 s for every request to this host, for the whole company. The '*' disallows are /cart/, /checkout/, /online-payment-details/, /order-confirmation/, /search/, /my-account/, /els/, /medias/, */c/marketplace/, /items/, /*.pdf$ and a long list of query-string forms: ?gclid=, ?utm_source=, ?utm_campaign=, ?query=, ?sortCode=, ?yoReviews=, ?viewall=, ?sortid=, ?pp=, ?button=, ?filter=, ?reflist=, ?spJobID=, ?webSyncID=, ?item=, ?item_group=, ?size=, ?pid=, ?type=, ?in_recruiter=, ?region=, ?in_organid=, ?bvstate=, ?gclsrc=, ?istCompanyId, ?null and ?q=. I requested NONE of them: no /search/, no /medias/, no marketplace path (note the site DOES carry marketplace-* category tags internally - I never fetched a */c/marketplace/ URL), no /items/, and NOT ONE query string of any kind on this host. Every www URL I fetched is a bare path. Note also that '?viewall=' and '?filter=' being disallowed rules out the obvious facet/view-all route to a count - which is part of why the count had to come from the storefront's own product API. (2) api-prod.freedom.com.au - Freedom's own OCC/commerce backend, the host the storefront's own <meta name='occ-backend-base-url'> points at. Its robots.txt returns HTTP 404, i.e. NO robots file exists and nothing is disallowed. Checked before the first request to it. (3) freedomfurnitureproduction1s4nmz28u.org.coveo.com - the Coveo Commerce host the PLP actually renders from. robots.txt HTTP 200. It names NO Claude agent, and its 'User-agent: *' group is an explicit ALLOW-LIST followed by 'Disallow: /': Allow /rest/search, /rest/organizations/*/commerce/v2/listing, /commerce/v2/search, /querySuggest, /productSuggest, /facet, /recommendations. THE ONLY ENDPOINT I USED IS /rest/organizations/*/commerce/v2/listing, WHICH IS EXPLICITLY ALLOWED BY NAME. I requested nothing else on that host. This is the opposite of the SR 145 / QVC situation: it is not a Disallow-all host being reached indirectly, it is a host that explicitly permits exactly the endpoint used. ACCESS: no bot wall, no interstitial, no 403, no 429, no campaign parameters, no r.jina.ai, no browser automation, no third-party proxy. WHY AN API WAS NEEDED AT ALL, AND THE LADDER THAT GOT THERE - documented because it took real work. freedom.com.au is an SAP Spartacus ANGULAR SPA. Its category pages return HTTP 200 with a full <ng-state> transfer-state block, but that block's /cx-state/product slice is EMPTY ({'search':{'results':{}},...}): the product grid, the product count and the pagination are ALL client-rendered. I verified this rather than assuming - I parsed the entire 713 KB ng-state to leaves (14,430 values) and searched every key name for count/total/number/qty: the only matches are defaultNumberOfFilters, shownProductCount, subMenuColumnCount and totalDisplay, none of which is a product total. There is NO rendered '<n> Products' string, no JSON-LD ItemList, no numberOfItems. So per WORKER_BRIEF step 4 the count had to come from 'the storefront's own product API (the one the PLP itself renders from)'. Route 1 - the OCC backend. From the page's occ-backend-base-url meta and the endpoint prefix '/greenlitrest/v2/' found in main-D2JCL3R5.js, the OCC search endpoint is https://api-prod.freedom.com.au/greenlitrest/v2/freedomfurniture/products/search. It is REACHABLE and the host is open (a control call to .../products/13328545?fields=DEFAULT returns HTTP 200 with a full product), but EVERY form of the search call returns HTTP 400 {'message':'IndexedType cannot be null'} - I tried the stock Spartacus ':relevance:allCategories:<code>' query, ':relevance:category:<code>', a bare code, a free-text term, '*', with and without lang/curr, with and without the app's own 745-character fields string, with device/viewAll/sort/currentPage/selectedDeliveryArea, and with an x-user-id header. The solr index behind that endpoint is not resolvable from outside; the site has moved PLP search to Coveo. Documented as a dead end, not silently dropped. Route 2 - the Coveo Commerce API, which IS what the PLP renders from. Freedom's own backend issues the public search token at https://api-prod.freedom.com.au/greenlitrest/v2/freedomfurniture/coveo/token (HTTP 200), which identifies organization 'freedomfurnitureproduction1s4nmz28u'; the trackingId 'freedom_au' comes from the site's own baseSite config in ng-state (coveoTrackingId). POST to the allow-listed /rest/organizations/{org}/commerce/v2/listing with {'trackingId':'freedom_au','language':'en','country':'AU','currency':'AUD','context':{'view':{'url':...}}} returns the exact listing the PLP shows, including pagination.totalProducts. THE LISTING KEY - and the canonical proof that it is the same node. A listing config exists for the SHORT category URL https://www.freedom.com.au/c/<code> and NOT for the long nav path (the long path returns LISTING_CONFIGURATION_DOES_NOT_EXIST). I did not assume the two are the same category: I fetched https://www.freedom.com.au/c/bath-accessories directly and it returns HTTP 200 with H1 'Bath Accessories' and <link rel=canonical> = https://www.freedom.com.au/bed-and-bath/bathroom/c/bath-accessories - the site itself declares the short form an alias of the long form. The short form is therefore a FETCH DETAIL ONLY; the URL written into rows[] is the clean canonical nav path, exactly as the campaign-parameter rule requires for an equivalent situation. TREE SOURCE - FREEDOM'S OWN NAVIGATION, cross-checked against its own category sitemap. The home-page mega-menu server-renders the full category tree as hrefs; https://www.freedom.com.au/sitemap.xml -> categorysitemap.xml gives 234 category URLs. The two disagree in BOTH directions and I used the union: the sitemap does NOT contain the deeper mirror nodes (bathroom-mirrors, round-mirror, arched-mirror, wall-mirror, full-length-mirror, mirrors) that the mega-menu exposes, while the mega-menu is the only place the Bathroom Mirrors node appears at all. The Bathroom branch is BED & BATH > Bathroom > {Bath Accessories, Bath Mats, Bath Towels} - three children in the mega-menu, the same three in categorysitemap.xml, and independently the same three confirmed by product-tag enumeration of the parent (below). Bathroom Mirrors sits on a different branch, WALL ART, MIRRORS & LIGHTING > Wall Decor & Mirrors > Mirrors > Bathroom Mirrors. QTY: pagination.totalProducts from the storefront's OWN Coveo Commerce listing - the identical call the PLP makes. No estimate, no aggregation, no parent's number reused for a child, no pagination multiplication. VERIFICATION - ENUMERATION TO EXHAUSTION, which is the strongest form WORKER_BRIEF step 4 allows. I paged each node to the end and counted DISTINCT permanentids: Bath Accessories 81 stated / 81 enumerated; Bath Mats 28 / 28; Bath Towels 115 / 115; Bathroom 249 / 249. FOUR nodes of visibly different size (28, 81, 115, 249), 4/4 exact, zero drift - so the payload total is the true product count and not a cap or an estimate. A single page-size-100 call to Bath Accessories also returns exactly 81 products in one response, an independent confirmation of the same figure by a different page size. SECOND, INDEPENDENT CHECK - PARENT = EXACT SUM OF CHILDREN, proved by product identity rather than arithmetic: of the parent Bathroom node's 249 enumerated products, exactly 81 carry the ec_category tag 'bath-accessories', 28 carry 'bath-mats', 115 carry 'bath-towels' and 25 carry 'laundry-hampers', with ZERO overlap between the four sets and ZERO products outside them. 81+28+115+25 = 249. That both confirms the four totals and identifies the 25-product remainder as the cross-tagged Laundry Hampers node, which is routed out. DISCRIMINATION: the totals returned across the 17 nodes queried are 0, 2, 3, 4, 5, 25, 28, 29, 76, 81, 83, 90, 115, 249, 321, 402, 1421, 3385 - no site-wide constant, no round-number cap (no 100/500/1000 anywhere), and the endpoint distinguishes a real empty node (0) from a non-existent one (HTTP 404 LISTING_CONFIGURATION_DOES_NOT_EXIST), which is what let me classify Bathroom Mirrors correctly. H1 and rel=canonical were read on every recorded and reviewed node; the one recorded leaf is self-canonical at the URL written into rows[]. CONTENT CHECK on the one recorded leaf: all 81 Bath Accessories products were enumerated by name. The node is dominated by genuine Bathroom items under rules 13, 14, 17 and 18 - TIAN / NERO / REIGN / VETRA / PRESTO / SLIM COMPACT / EASYSTORE LUXE / FOREST STONE soap dispensers and lotion pumps, AVENZA / EUSTON / FOREST STONE II / VETRA soap dishes, FYNN / TIAN / PESCE / MIRAGE / CENDRIA / VETRA tumblers, EASYSTORE and CAM toothbrush caddies and holders, FLEX 360 / FLEX PLUS / FLEX LITE / FLEX STEEL / EASYSTORE PLUS toilet brushes and holders, EASYSTORE LUXE toilet roll holder and PIZARRA paper roll stand, SHERWOOD / GAIAN / BARAKI / BIMINI / MAVION / EASYSTORE bath and shower caddies, SHERYL corner shower caddy, EASYSTORE shower squeegees, CHAD / NARRO / ARC SLIMLINE / EASYSTORE LUXE bins, KASHIRA and CAM tissue boxes, CAM 4-piece bathroom set, SINKSHIELD sink mat (the rule-16 non-textile mat) and five digital bathroom scales. DISCLOSED HONESTLY: that same node also contains roughly 15 bathrobes and robes (SAIDIA, ANGOVE, SUPER SOFT, CHALET, BOCHUM, ZALEC, MONDAY STRIPE, MACOMIA and others), one eye mask, two toiletry/tote bags and one 'VALLAM Set of 8 Bath Towel', which rules 15 and 20 would send to Textile, plus one ladder and one HOLD ALL MAX laundry hamper. Freedom does not expose those as separate listing URLs - there is no bathrobe node in the nav or the sitemap - so the node is recorded whole, on its dominant primary product type, with this caveat stated rather than hidden. Its recorded 81 is the storefront's own figure for its own node. DEDUP - OPTION 1, run on every candidate URL and every rel=canonical target. The exclusion index holds 105 freedom.com.au keys. ZERO hits on the recorded leaf and zero on any node inside the Bathroom branch (bathroom, bath-accessories, bath-mats, bath-towels, bathroom-mirrors, laundry-hampers are all absent from the index). SEVEN HITS, all in review[] and never in rows[]: the ENTIRE decor-mirror branch - Mirrors 402, Wall Mirrors 321, Arched Mirrors 90, Full Length Mirrors 83, Round Mirrors 76 and Kids Mirrors 5, all Final.xlsx (Home Decor pass) - plus Vanity Tables 29 (Furniture.xlsx). This is OPTION 1 and the Home Decor pass working exactly as intended: the mirror branch was already taken, and the one bathroom-specific mirror node it contains is empty. CANONICAL-ALIAS BLIND SPOT (BATCH_BRIEF s4a) CHECKED: Round Mirrors and Arched Mirrors canonicalise to DIFFERENT URLs from the ones the nav links (.../wall-decor-and-mirrors/mirrors/c/round-mirrors, plural, under a /mirrors/ segment) - but the index holds the nav form, so both forms were tested and both resolve to already-extracted records. Vanity Tables likewise canonicalises to /bedroom/bedroom-furniture/c/vanity-tables while the index holds /c/vanity-tables; the /c/ form is the hit. Locale/cross-host blind spots (b) and (c) do not arise: freedom.com.au is a single-locale AU storefront, the index holds no freedom.co.nz or other variant host, and although the baseSite config also defines a New Zealand site (coveoTrackingId freedom_nz), it is not this company and was not walked. WHAT IS ABSENT FROM THIS RETAILER, evidenced rather than assumed. Freedom is a furniture and homewares retailer, not a bathroom-fittings retailer. It sells NO baths or bathtubs, NO toilets/WCs, NO bidets, NO basins or wash-basins, NO bathroom taps or faucets, NO showers, shower heads, shower mixers, shower enclosures or screens, NO bathroom vanity units, wash-stands or bathroom cabinets, and - right now - NO bathroom mirrors (the node exists and is empty). Evidence: the full mega-menu walk, the complete 234-URL categorysitemap.xml, and direct probes of the Coveo listing configuration for the codes bath-linen, towels, bathroom-storage, bathroom-accessories, toilet-roll-holders, shower, shower-curtains, bath-robes and bathroom-storage-au - EVERY one returns LISTING_CONFIGURATION_DOES_NOT_EXIST, i.e. no such category exists on this storefront. The only tag that did resolve, 'bath-storage' (4), is a hidden internal tag with no nav or sitemap URL and is a strict subset of Laundry Hampers; it is logged in review[]. RESULT: 1 grouping row + 1 leaf row; 16 review entries (7 dedup hits, 1 empty node, 3 textile routings, 1 storage routing, 1 hidden tag with no URL, 1 sale page, 2 parent/department exclusions). A single-leaf result is the correct answer here, not a shortfall: everything else Freedom files under Bathroom is towels and bath mats (Textile) or laundry hampers (Storage), and its entire mirror branch was already taken by the Home Decor pass.",
+ "rows": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bath Accessories",
+   "qty": 81,
+   "link": "https://www.freedom.com.au/bed-and-bath/bathroom/c/bath-accessories",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  }
+ ],
+ "review": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom (parent)",
+   "qty": 249,
+   "issue": "EXCLUDED AS PARENT URL (rule 24): it has three extractable nav children (Bath Accessories 81, Bath Mats 28, Bath Towels 115). Recorded in rows[] as the top grouping row with blank qty and blank link (rule 38). PROOF THAT IT IS A PURE ROLL-UP, by full product enumeration rather than arithmetic assumption: all 249 of its products were enumerated and their ec_category tags counted - exactly 81 carry 'bath-accessories', 28 carry 'bath-mats', 115 carry 'bath-towels' and the remaining 25 carry 'laundry-hampers', with ZERO overlap and ZERO products outside those four sets. 81+28+115+25 = 249 exactly. So the parent contains no rule-24 residue of its own; its only content beyond the three nav children is the 25 laundry hampers, which are cross-tagged in from Storage > Organisation and are routed out below.",
+   "link": "https://www.freedom.com.au/bed-and-bath/c/bathroom"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bath Mats",
+   "qty": 28,
+   "issue": "ROUTED TO TEXTILE (rules 15, 16, 20). Judged on the products, not the node name: all 28 were enumerated and every one is a TEXTILE bath mat, bath runner or contour mat - GORDONS Bathmat, BUCKLER Bathmat, CURLEW Bathmat, SAIDIA Bath Runner / Bath Mat / Contour Mat, TUSCA Bath Mat, EDVIN Bath Mat, ELVIRE Set of 2 Bath Mats, HASLEV Bath Mat, REED COLLECTION Bath Mat, MACOMIA Bath Mat. There is no rubber or anti-slip bathroom-accessory mat in this node that rule 16 would keep in Bathroom (the one such item on this storefront, SINKSHIELD Sink Mat, sits inside Bath Accessories, which IS recorded in Bathroom).",
+   "link": "https://www.freedom.com.au/bed-and-bath/bathroom/c/bath-mats"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bath Towels",
+   "qty": 115,
+   "issue": "ROUTED TO TEXTILE (rules 15, 20): bath towels, bath sheets, hand towels and towel sets - BUCKLER / CURLEW / GORDONS / COLESVILLE / MARTLEY / ORELLE bath towels and sheets, CLOUD SPA and MARINILLA towel sets. The matching bathroom HARDWARE and ACCESSORIES stay in Bathroom as Bath Accessories (toilet-roll holders, toilet brushes, soap dispensers and dishes, tumblers, bath caddies, bins) - the split rule 15 asks for.",
+   "link": "https://www.freedom.com.au/bed-and-bath/bathroom/c/bath-towels"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Mirrors",
+   "qty": 0,
+   "issue": "EMPTY NODE - a REAL category page with ZERO products, recorded here rather than as a zero-qty row or a silent drop (BATCH_BRIEF s5). This is the one node rule 10 most demanded be checked, so it was checked three ways: (1) the page itself returns HTTP 200 with H1 'Bathroom Mirrors' and a self-referential rel=canonical, so the category exists and is linked from the live mega-menu; (2) its Coveo commerce listing resolves successfully (HTTP 200, not a 404 'listing configuration does not exist') and reports totalProducts 0 / totalEntries 0; (3) as an independent cross-check I enumerated the parent Mirrors node (402 products, 380 retrieved) and counted ec_category tags - ZERO products anywhere in it carry the 'bathroom-mirrors' tag and ZERO carry the 'bathroom' tag. Freedom currently merchandises no bathroom-specific mirror. Its URL is also NOT in the exclusion index, so this is a genuine empty node and not a dedup exclusion.",
+   "link": "https://www.freedom.com.au/wall-art-mirrors-and-lighting/wall-decor-and-mirrors/mirrors/c/bathroom-mirrors"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Laundry Hampers (Storage > Organisation)",
+   "qty": 25,
+   "issue": "ROUTED TO STORAGE: primary product type is laundry storage (ONITO / ROCKLEY / SANDI / LOIRE / COIL / MILLTHORPE / DRIFTER / ULSTER / FARREN / WACO / SOLYRA / ELLAN laundry hampers and the Joseph Joseph TOTA and HOLD ALL range), and the site's own path for it is /storage/organisation/. It is cross-tagged into the Bathroom department - it is exactly the 25-product remainder of the 249 - but rules 30-33 forbid re-extracting general storage and rule 2 puts primary product type above room. Not recorded, and its 25 must not be added to the Bathroom figure.",
+   "link": "https://www.freedom.com.au/storage/organisation/c/laundry-hampers"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Storage (internal tag, no listing URL)",
+   "qty": 4,
+   "issue": "NOT RECORDED - NO VERIFIED LISTING URL EXISTS (rule 27, never invent a URL). While enumerating I found an internal Coveo category tag 'bath-storage' carrying 4 products. It resolves as a listing configuration, but it appears in NO nav path, in NO mega-menu branch and in NO entry of Freedom's own categorysitemap.xml, so there is no storefront listing page to record. It is in any case fully contained: all 4 of its products (COIL, ROCKLEY, ONITO and SANDI Laundry Hampers) are members of the 25-product Laundry Hampers node routed out above, so it is a strict subset and adds nothing new. Recorded here for completeness so the finding is not lost.",
+   "link": "https://www.freedom.com.au/storage/organisation/c/laundry-hampers"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Mirrors",
+   "qty": 402,
+   "issue": "ALREADY EXTRACTED IN Final.xlsx (Home Decor pass) as 'Mirrors' - verified URL-exact by dedup.already_extracted(). It is also not Bathroom on the merits: the site places it under WALL ART, MIRRORS & LIGHTING > Wall Decor & Mirrors, and enumeration of 380 of its 402 products found ZERO carrying the 'bathroom' or 'bathroom-mirrors' tag. Its only bathroom-specific child, Bathroom Mirrors, is empty (see above).",
+   "link": "https://www.freedom.com.au/wall-art-mirrors-and-lighting/wall-decor-and-mirrors/c/mirrors"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Round Mirrors",
+   "qty": 76,
+   "issue": "ALREADY EXTRACTED IN Final.xlsx (Home Decor pass) as 'Round Mirrors' - verified URL-exact by dedup.already_extracted(). A shape/size cut of the decor Mirrors node, not a bathroom node. Checked and rejected on primary product type and hierarchy, per BATCH_BRIEF s6's warning that 'mirror' is a false-positive magnet.",
+   "link": "https://www.freedom.com.au/wall-art-mirrors-and-lighting/wall-decor-and-mirrors/c/round-mirror"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Arched Mirrors",
+   "qty": 90,
+   "issue": "ALREADY EXTRACTED IN Final.xlsx (Home Decor pass) as 'Arched Mirrors' - verified URL-exact by dedup.already_extracted(). A shape/size cut of the decor Mirrors node, not a bathroom node. Checked and rejected on primary product type and hierarchy, per BATCH_BRIEF s6's warning that 'mirror' is a false-positive magnet.",
+   "link": "https://www.freedom.com.au/wall-art-mirrors-and-lighting/wall-decor-and-mirrors/c/arched-mirror"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Wall Mirrors",
+   "qty": 321,
+   "issue": "ALREADY EXTRACTED IN Final.xlsx (Home Decor pass) as 'Wall Mirrors' - verified URL-exact by dedup.already_extracted(). A shape/size cut of the decor Mirrors node, not a bathroom node. Checked and rejected on primary product type and hierarchy, per BATCH_BRIEF s6's warning that 'mirror' is a false-positive magnet.",
+   "link": "https://www.freedom.com.au/wall-art-mirrors-and-lighting/wall-decor-and-mirrors/c/wall-mirror"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Full Length Mirrors",
+   "qty": 83,
+   "issue": "ALREADY EXTRACTED IN Final.xlsx (Home Decor pass) as 'Full Length Mirrors' - verified URL-exact by dedup.already_extracted(). A shape/size cut of the decor Mirrors node, not a bathroom node. Checked and rejected on primary product type and hierarchy, per BATCH_BRIEF s6's warning that 'mirror' is a false-positive magnet.",
+   "link": "https://www.freedom.com.au/wall-art-mirrors-and-lighting/wall-decor-and-mirrors/c/full-length-mirror"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Kids Mirrors",
+   "qty": 5,
+   "issue": "ALREADY EXTRACTED IN Final.xlsx (Home Decor pass) as 'Kids Mirrors' - verified URL-exact by dedup.already_extracted(). Kids decor mirrors, not bathroom mirrors.",
+   "link": "https://www.freedom.com.au/c/kids-mirrors"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Vanity Tables",
+   "qty": 29,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Vanity Tables' - verified URL-exact by dedup.already_extracted(). IMPORTANT DISAMBIGUATION (rule 29): despite the word 'vanity' these are BEDROOM DRESSING TABLES, not bathroom vanity units - the page's own rel=canonical is /bedroom/bedroom-furniture/c/vanity-tables, i.e. the site itself files them under Bedroom Furniture. They are Furniture under OPTION 1 either way. Freedom sells no bathroom vanity unit, wash-stand or bathroom cabinet at all.",
+   "link": "https://www.freedom.com.au/c/vanity-tables"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Kids Bath Linen",
+   "qty": 2,
+   "issue": "ROUTED TO TEXTILE (rules 15, 20): kids bath linen - towels and hooded towels.",
+   "link": "https://www.freedom.com.au/c/kids-bath-linen"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Clearance Bed & Bath",
+   "qty": 3,
+   "issue": "NEVER RECORDED - SALE / CLEARANCE PAGE (rule 25). A promotional cut of the Bed & Bath department, not a subcategory. Logged with its exact figure only so it is visibly excluded.",
+   "link": "https://www.freedom.com.au/sale-and-clearance/clearance/c/clearance-bed-and-bath"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bed & Bath (top department)",
+   "qty": 1421,
+   "issue": "OUT OF SCOPE AS A NODE: this is the combined Bed + Bath department (bed linen, bedding, quilts, pillows, mattress protectors AND the bathroom branch). Recording it would aggregate unrelated categories (rule 26) and record a parent over valid children (rule 24). Its Bathroom half is the 249-product Bathroom node, which is the entry point walked here.",
+   "link": "https://www.freedom.com.au/c/bed-and-bath"
+  }
+ ],
+ "_reconstructed_from": "Bathroom.xlsx delivered 2026-09-01 (checkpoint), not original worker JSON"
+}

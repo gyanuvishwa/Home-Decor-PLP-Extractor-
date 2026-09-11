@@ -1,0 +1,61 @@
+{
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "Same access route as bs10/na10: direct HTTPS to www.interiordefine.com/graphql (Magento GraphQL, curl_cffi impersonate=chrome), no proxy, no block encountered. Discovery via the full 214-category GraphQL tree (categories(filters:{}, pageSize:200), 2 pages, total_count=214 all retrieved) - this is the data source the site's own mega menu/nav renders from. Found 'Warehouse Sale' (url_path 'warehouse', level 2, id 660) with 5 real site-defined children whose url_path is nested under warehouse/: Warehouse Sectionals, Warehouse Sofas, Warehouse Dining, Warehouse Accent Seating, Warehouse Beds. Applied the Sale-vs-Clearance test from the brief: fetched the category's own on-page description text (HTML-stripped) which reads 'One-of-a-kind finds - up to 60% off and ready to ship. All items are final sale.' - this is an explicit permanence signal ('final sale', 'one-of-a-kind' floor-sample/overstock language), not a generic temporary promo, so it clears the bar for Clearance under the site's own taxonomy. SKUs in this category are also prefixed distinctly (e.g. 'CAN.SC0211547HV...') vs the made-to-order SKUs used everywhere else on the site, consistent with a genuine one-off outlet/clearance stock pool. Kept 'Warehouse Sale' as the grouping parent (is_group=true) plus its 5 children as leaves; note the parent's total (242, confirmed via both category.product_count and a direct products(filter:{category_id}) query) does not exactly equal the sum of the 5 children (167) - this is expected Magento anchor-category behavior (parent can also hold directly-assigned products beyond what rolls up from listed children) and is not treated as an error per the brief's overlap-is-expected guidance. Considered and EXCLUDED: 'In Stock' (in-stock, 75 products, level 2 sibling of Warehouse Sale, not nested under it) - this reads as a ready-to-ship/availability filter, not a markdown or outlet listing; no description text and no clearance-family wording, so it does not meet the brief's target-term bar and was left out rather than force-flagged as ambiguous. Also probed urlResolver guesses: 'sale' resolves to category id 550 but that category no longer exists server-side (category(id:550) returns 'Category doesn't exist' and its products query returns total_count=0) - a dead/legacy URL with zero products, correctly dropped per the zero-product rule. Guesses clearance, outlet, final-sale, last-chance, end-of-line all resolved to nothing. No robots.txt Claude-specific disallow found.",
+  "rows": [
+    {
+      "category": "Clearance",
+      "sub_category": "Warehouse Sale",
+      "qty": 242,
+      "link": "https://www.interiordefine.com/warehouse",
+      "is_group": true,
+      "evidence": "GraphQL products(filter:{category_id:{eq:\"660\"}}).total_count = 242 (matches category(id:660).product_count = 242); category description text: 'One-of-a-kind finds - up to 60% off and ready to ship. All items are final sale.'",
+      "flag": null
+    },
+    {
+      "category": "Clearance",
+      "sub_category": "Warehouse Sectionals",
+      "qty": 4,
+      "link": "https://www.interiordefine.com/warehouse/warehouse-sectionals",
+      "is_group": false,
+      "evidence": "GraphQL products(filter:{category_id:{eq:\"661\"}}).total_count = 4 (category.product_count = 4)",
+      "flag": null
+    },
+    {
+      "category": "Clearance",
+      "sub_category": "Warehouse Sofas",
+      "qty": 10,
+      "link": "https://www.interiordefine.com/warehouse/warehouse-sofas",
+      "is_group": false,
+      "evidence": "GraphQL category(id:662).product_count = 10, url_path 'warehouse/warehouse-sofas'",
+      "flag": null
+    },
+    {
+      "category": "Clearance",
+      "sub_category": "Warehouse Dining",
+      "qty": 56,
+      "link": "https://www.interiordefine.com/warehouse/warehouse-dining",
+      "is_group": false,
+      "evidence": "GraphQL category(id:663).product_count = 56, url_path 'warehouse/warehouse-dining'",
+      "flag": null
+    },
+    {
+      "category": "Clearance",
+      "sub_category": "Warehouse Accent Seating",
+      "qty": 94,
+      "link": "https://www.interiordefine.com/warehouse/accent-seating",
+      "is_group": false,
+      "evidence": "GraphQL category(id:664).product_count = 94, url_path 'warehouse/accent-seating'",
+      "flag": null
+    },
+    {
+      "category": "Clearance",
+      "sub_category": "Warehouse Beds",
+      "qty": 3,
+      "link": "https://www.interiordefine.com/warehouse/beds",
+      "is_group": false,
+      "evidence": "GraphQL category(id:665).product_count = 3, url_path 'warehouse/beds'",
+      "flag": null
+    }
+  ]
+}

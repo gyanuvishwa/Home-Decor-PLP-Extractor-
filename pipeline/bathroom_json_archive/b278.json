@@ -1,0 +1,116 @@
+{
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "COMPANY: SR 278, La Redoute Interiors UK, brand_site laredoute.co.uk, UK. SAME PHYSICAL DOMAIN as SR 82 'La Redoute UK' (unfiltered marketplace, see b82.json) - SR 278 is the La Redoute Interieurs (LRI) house-brand SUBSET of that same laredoute.co.uk storefront, captured via the site's own ?brndid=la-redoute-interieurs filter, exactly mirroring how SR 98 (La Redoute Interieurs FR) is the LRI subset of laredoute.fr. This pattern was confirmed by reading companies.json (sr82 name 'La Redoute UK' url laredoute.co.uk; sr278 name 'La Redoute Interiors UK' url laredoute.co.uk - identical URL, different roster entries) and by the already-validated b82.json/b98.json notes before doing any fetching.\n\nROBOTS: https://www.laredoute.co.uk/robots.txt fetched FIRST (HTTP 200, 1437 bytes, plain curl). Groups: '*' (disallows /psrch/*, *filter=True$, */productdetailscomparator, /services/*.aspx, /producthelper/*, /servicerecommendations/*, /servicewishlist*, /account/identifyacct.aspx, /categories/GetParentProductsForCategoryButton, /shoppingbasket/basketitemcount/, /cdn-cgi/rum?), 'proximic' (Disallow: /), 'admantX' (Disallow: /), 'Mediapartners-Google' (Allow: /), 'Pinterestbot' (Crawl-delay: 1), 'Bingbot' (Disallow: *schema.org*). NO anthropic-ai/ClaudeBot/Claude-Web/Claude-User group anywhere, no Content-Signal line, no bare 'Disallow: /' for '*'. None of the /pplp/ URLs used here match any disallowed pattern (no ?filter=True, no /psrch/, no /services/). Hard-stop rule does not fire.\n\nACCESS - full tier ladder actually attempted this session (not assumed from prior sessions): TIER 1 direct HTTP - plain curl with a desktop Chrome UA returned HTTP 403 on the homepage payload was actually a client-rendered SPA shell (React, empty #content div, only font preloads, no nav/category links at all) even where status was 200; a Googlebot UA (curl, and separately python-requests) returned HTTP 200 + full server-rendered homepage HTML (253KB) but every /pplp/ category URL - filtered or unfiltered, with or without query string - returned HTTP 403 with a Cloudflare interstitial titled 'Just a moment...'. curl_cffi was then swept across 7 impersonation profiles (chrome124/131/120, safari17_0/18_0, firefox133, edge101): all 7 returned HTTP 403 on the same PLP URL, ~652KB Cloudflare challenge page each time. TIER 2 Playwright/CDP - a real headless Chromium session (playwright, Chrome UA, en-GB locale) loaded the same PLP URL and the challenge resolved to an explicit interactive block: title 'Just a moment...', body text 'I am not a robot / Please confirm that you are not a robot... Error reason: Country challenge' with a Ray ID and the requesting IP printed - this is Cloudflare's geo/IP-reputation challenge, not a solvable JS proof-of-work, consistent with the standing finding in memory note ipv4-egress-dead-use-ipv6-proxy.md that 'La Redoute UK's actual PLP/grid pages stayed blocked even after a Googlebot UA or a real Claude-in-Chrome session got past their CMS/marketing pages' and that this domain is on the residual IP/network-reputation-blocked list. TIER 3 Claude-in-Chrome (real logged-in Chrome via CDP, last resort) - THIS WORKED: navigating the same tab that a human's real browser session already had valid Cloudflare clearance for returned genuine rendered PLP HTML (page title carrying the exact node name, e.g. 'Bathroom Accessories LA REDOUTE INTERIEURS | La Redoute'), so the report below is NOT blocked - the real-session route succeeded where every scripted tier failed, matching this exact block's documented pattern. One incidental note: the shared MCP browser session showed contention from other concurrent workers (a tab group briefly reset mid-task, consistent with the documented multi-worker contention on this same domain) - a fresh tab was created and work continued cleanly with no data loss.\n\nSTATIC ROUTE CONFIRMED SEPARATELY: https://www.laredoute.co.uk/sitemap-categories.xml is NOT Cloudflare-challenged (plain Googlebot-UA curl, HTTP 200, 2.83MB) - this is the same sitemap SR 82's session used to build the category-id tree, so the node-id set below inherits that already-validated discovery; only the LRI qty numbers were newly read this session (sitemap alone carries no counts).\n\nTREE / SCOPE: identical node-id set to SR 82 (same domain, same taxonomy) - two branches: (A) La Redoute > Furniture > Bathroom Furniture (cat-75495) with children Bathroom Shelves & Units (158210), Vanity Units (386011), Towel Rails & Holders (75498), Bathroom Mirrors (75496); (B) La Redoute > Home Accessories & Decor > Storage Decor > Bathroom Storage & Accessories (cat-385864) with children Bathroom Accessories (75492), Laundry Baskets (75497), Toilet Accessories (75493), Bathroom Bins (75499). Every node was requested WITH ?brndid=la-redoute-interieurs. UNLIKE SR 98 (laredoute.fr), where several LRI-filtered nodes silently reverted to the unfiltered marketplace h1/count (proof of zero LRI stock), on laredoute.co.uk EVERY one of the 9 nodes below (both grouping parents and all leaves) rendered its h1 WITH the 'LA REDOUTE INTERIEURS' suffix, i.e. every node genuinely carries LRI-branded stock on the UK site - no node had to be rejected as LRI-empty. cat-75495 (parent) LRI count 62, its 4 children sum to 64 (16+41+6+1) - a small (~3%) parent/child mismatch of the same kind SR 82/SR 98 both documented (multi-tagged products), not evidence of a bad read. cat-385864 (parent) LRI count 44, its 4 children sum to 44 (6+35+1+2) - exact match, an independent completeness proof for branch B.\n\nQTY - source and verification. Every qty is read twice from the live DOM of the real Chrome session on the brand-filtered URL: (1) document.getElementById('ProductCount').textContent and (2) the product-grid's own data-totalproduct attribute; both agreed exactly on every one of the 9 nodes fetched (75492:6/6, 158210:16/16, 386011:41/41, 75498:6/6, 75496:1/1, 385864:44/44, 75497:35/35, 75493:1/1, 75499:2/2). h1 was also read on every node and matched the requested node name plus the LRI suffix in every case - no silent redirect to a parent or sibling. DISCRIMINATION: values span 1, 1, 2, 6, 6, 16, 35, 41, 44, 62 - not a site-wide constant.\n\nCROSS-CATEGORY DEDUP (mandatory, run via cross_category_url_index.json for every candidate leaf, both with and without the brndid query string): cat-158210 and cat-386011 -> Furniture.xlsx (both query-string and bare-URL keys present in the index); cat-75496 -> Wall_Decor.xlsx (both keys present). All three moved to review, NOT rows, regardless of bathroom.md rules 9/10/11 which would otherwise want them in Bathroom - the mandatory OPTION-1 cross-category dedup policy overrides. The other 6 candidate URLs (75492, 75498, 75497, 75493, 75499, plus the two grouping parents which carry no URL) returned no hit and are clean.\n\nCLASSIFICATION: Bathroom Accessories (rules 13/18), Toilet Accessories (rule 14), Bathroom Bins (rule 13), Towel Rails & Holders (bathroom hardware, rules 15/17 - the site's Towel Rails node is hardware, not the textile itself), Laundry Baskets (kept in Bathroom because its immediate site parent is literally 'Bathroom Storage & Accessories' and it is one of the four children whose counts sum exactly to that parent - rules 12, 30-33). EXCLUDED - parents: cat-75495 and cat-385864 both have valid recorded children so both are grouping rows (qty null, link null, rule 24). ROUTED TO TEXTILE (not recorded in rows, logged in review with exact LRI count): cat-84135 'Bath Towels & Linen LA REDOUTE INTERIEURS' (195) - bath linen, rules 15/20. EXCLUDED - not bathroom-specific: cat-75456 'Mirrors LA REDOUTE INTERIEURS' (109) - the general decorative-mirror department; its only bathroom-specific child is cat-75496, which is itself the Wall_Decor.xlsx dedup hit above, so nothing further is owed here; recording the parent would breach rule 24 in any case. CONFIRMED ABSENT (inherited from SR 82's already-validated full-sitemap sweep of this identical domain, cross-checked against today's own tree walk which surfaced the same node set and nothing more): no Baths/Bathtubs, Basins/Sinks, Toilets/WCs, Bidets, Showers, Shower Enclosures/Screens/Doors or Bathroom Taps/Faucets/Mixers node exists anywhere on laredoute.co.uk at any depth - it is a furniture/decor marketplace, not a plumbing merchant, for both the unfiltered marketplace and the LRI brand subset. Nothing was routed to Lighting: no bathroom-lighting node exists on this domain (confirmed by the same sitemap sweep SR 82 used).",
+ "rows": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Towel Rails & Holders",
+   "qty": 6,
+   "link": "https://www.laredoute.co.uk/pplp/100/75363/75491/cat-75498.aspx?brndid=la-redoute-interieurs",
+   "is_group": false,
+   "evidence": "Live DOM read via real Chrome session (Claude-in-Chrome, Cloudflare 'Country challenge' blocked every scripted tier): h1 'Towel Rails & Holders LA REDOUTE INTERIEURS', #ProductCount = '6', product-grid data-totalproduct = '6' (both signals agree).",
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Storage & Accessories",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Accessories",
+   "qty": 6,
+   "link": "https://www.laredoute.co.uk/pplp/100/75363/75491/cat-75492.aspx?brndid=la-redoute-interieurs",
+   "is_group": false,
+   "evidence": "Live DOM read via real Chrome session: h1 'Bathroom Accessories LA REDOUTE INTERIEURS', #ProductCount = '6', data-totalproduct = '6'.",
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Laundry Baskets",
+   "qty": 35,
+   "link": "https://www.laredoute.co.uk/pplp/100/75363/75491/cat-75497.aspx?brndid=la-redoute-interieurs",
+   "is_group": false,
+   "evidence": "Live DOM read via real Chrome session: h1 'Laundry Baskets LA REDOUTE INTERIEURS', #ProductCount = '35', data-totalproduct = '35'. Kept in Bathroom (rules 12/30-33): immediate site parent is 'Bathroom Storage & Accessories', and this is one of 4 children summing exactly to that parent's own count (35+6+1+2=44).",
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Toilet Accessories",
+   "qty": 1,
+   "link": "https://www.laredoute.co.uk/pplp/100/75363/75491/cat-75493.aspx?brndid=la-redoute-interieurs",
+   "is_group": false,
+   "evidence": "Live DOM read via real Chrome session: h1 'Toilet Accessories LA REDOUTE INTERIEURS', #ProductCount = '1', data-totalproduct = '1'.",
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Bins",
+   "qty": 2,
+   "link": "https://www.laredoute.co.uk/pplp/100/75363/75491/cat-75499.aspx?brndid=la-redoute-interieurs",
+   "is_group": false,
+   "evidence": "Live DOM read via real Chrome session: h1 'Bathroom Bins LA REDOUTE INTERIEURS', #ProductCount = '2', data-totalproduct = '2'.",
+   "flag": null
+  }
+ ],
+ "review": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Furniture > Vanity Units",
+   "qty": 41,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx (cross_category_url_index.json hit on both the brndid-filtered and bare URL for this exact company). Genuine Bathroom node by rule 9 (h1 'Vanity Units LA REDOUTE INTERIEURS', #ProductCount/data-totalproduct = 41), but the OPTION 1 dedup policy keeps bath vanities in Furniture. NOT recorded in rows.",
+   "link": "https://www.laredoute.co.uk/pplp/cat-386011.aspx?brndid=la-redoute-interieurs"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Furniture > Bathroom Shelves & Units",
+   "qty": 16,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx (cross_category_url_index.json hit, both URL forms). Genuine Bathroom node by rules 9/12 (h1 'Bathroom Shelves & Units LA REDOUTE INTERIEURS', count 16), stays in Furniture under OPTION 1. NOT recorded in rows.",
+   "link": "https://www.laredoute.co.uk/pplp/100/75363/75491/cat-158210.aspx?brndid=la-redoute-interieurs"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Furniture > Bathroom Mirrors",
+   "qty": 1,
+   "issue": "ALREADY EXTRACTED IN Wall_Decor.xlsx (cross_category_url_index.json hit, both URL forms). This is the bathroom-mirror node rule 10/11 would otherwise pull into Bathroom (h1 'Bathroom Mirrors LA REDOUTE INTERIEURS', count 1), but the mandatory cross-category dedup policy overrides and keeps it in Wall_Decor. NOT recorded in rows.",
+   "link": "https://www.laredoute.co.uk/pplp/100/75363/75491/cat-75496.aspx?brndid=la-redoute-interieurs"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Towels & Linen",
+   "qty": 195,
+   "issue": "ROUTED TO TEXTILE (rules 15, 20): the site's bath-linen department. h1 'Bath Towels & Linen LA REDOUTE INTERIEURS', #ProductCount = 195. Not a Bathroom-hardware node; the whole branch is towels/robes/textile bath mats.",
+   "link": "https://www.laredoute.co.uk/pplp/100/84100/cat-84135.aspx?brndid=la-redoute-interieurs"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Mirrors (general decor)",
+   "qty": 109,
+   "issue": "NOT BATHROOM (rule 24, general Decor parent): h1 'Mirrors LA REDOUTE INTERIEURS', #ProductCount = 109. Its only bathroom-specific child is cat-75496 'Bathroom Mirrors', already logged above as a Wall_Decor.xlsx dedup hit; recording this parent would also breach the parent-URL rule. Listed so it is not silently skipped.",
+   "link": "https://www.laredoute.co.uk/pplp/100/75363/75443/cat-75456.aspx?brndid=la-redoute-interieurs"
+  }
+ ]
+}

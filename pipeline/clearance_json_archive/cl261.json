@@ -1,0 +1,16 @@
+{
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "Shopify store, direct HTTP fetch worked (no WAF). Checked full /collections.json (60 collections), homepage nav, footer, and sitemap for Clearance-specific target terms (Clearance, Outlet, Final Sale, Last Chance, End of Line, Discontinued): zero matches anywhere. Also ran the site's own search for 'clearance' and 'outlet' directly (https://objectry.com/search?q=clearance&type=product and q=outlet) - both returned 0 actual product links in the results HTML, confirming absence rather than relying on a possibly-non-discriminating search. The only candidate is a plain collection titled 'Sale' (handle 'sale', linked directly in the homepage header nav). This is exactly the ambiguous case the brief warns about: a page named Sale/Offers/Deals should NOT be auto-classified as Clearance. Checked the page itself for a permanence signal (page <title> and <h1> are both just 'Sale'; no body copy anywhere mentioning outlet, final, permanent markdown, end-of-line, or last-chance stock) - found none. However the collection is not a dated/seasonal campaign either: published_at 2022-05-06, still being updated as of 2026-09-06, i.e. a persistent, ongoing discount section rather than a one-off promo. The store also maintains complementary 'No Sale' (450 products) and 'Furniture No Sale' (217 products) collections, which confirms 'Sale' functions as a sitewide percent-off tag/filter rather than a distinct clearance/outlet merchandising concept with its own identity. Because neither a clear INCLUDE nor a clear EXCLUDE signal is present, recording the row per the brief's uncertain-case instruction with a MANUAL REVIEW flag rather than silently dropping it or confidently labeling it Clearance. qty was cross-validated by enumeration + HTML despite the ambiguity on inclusion, so the count itself (32) is not in doubt, only the Sale-vs-Clearance classification.",
+  "rows": [
+    {
+      "category": "Clearance",
+      "sub_category": "Sale",
+      "qty": 32,
+      "link": "https://objectry.com/collections/sale",
+      "is_group": false,
+      "evidence": "Exhaustive /collections/sale/products.json?limit=250 enumeration: 32 unique product ids, page 2 returned {\"products\":[]}. Cross-checked: rendered HTML at /collections/sale contains exactly 32 unique product slugs, no pagination links present. Site's own collections.json products_count field reports 92 for this handle, but is known-inflated on this store (per prior extraction pass notes), so the exhaustive enumeration count was used instead.",
+      "flag": "MANUAL REVIEW: AMBIGUOUS SALE/CLEARANCE - page and collection are both titled plainly 'Sale' (not Clearance/Outlet/Final Sale/Last Chance/End of Line). No permanence, outlet, or clearance language found anywhere in the page copy or elsewhere on the site (site search for 'clearance' and 'outlet' both returned 0 product matches). However it is a long-lived, continuously-updated collection (live since 2022, not a dated campaign), and the store maintains complementary 'No Sale'/'Furniture No Sale' collections implying 'Sale' is a persistent sitewide discount tag. Recording per brief's ambiguous-case rule rather than guessing either way - human reviewer should decide whether this persistent discount collection counts as Clearance for this project."
+    }
+  ]
+}

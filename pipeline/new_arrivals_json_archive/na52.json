@@ -1,0 +1,106 @@
+{
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "SR52 Williams Sonoma Home. Site's mega-nav has one 'New' item (canonical URL /shop/home-new/, which itself resolves to /shop/home-new/home-all-new/ per the page's own canonicalUrl/categoryId - the site's 'All New Arrivals' roll-up) with genuine department children exposed both under /shop/home-new/home-new-<dept>/ and, for at least Furniture and Decor, re-aliased under /shop/home-<dept>/wsh-<dept>-new-arrivals/ (confirmed identical: same page <title>, same Constructor.io categoryId/group_id, same rendered item count - kept the /shop/home-new/... form as canonical and did not double-list the alias). METHOD: qty for 3 pages (All New=135, New Furniture=40, New Decor=21) was read directly off the live WebKit-rendered page header text ('135 Items' / '40 Items' / '21 Items') and cross-checked exact-match against the site's own Constructor.io browse API (ac.cnstrc.com/browse/group_id/<slug>, key_PysinTjKriGSD1Zl) - the literal endpoint the page's own JS calls, captured via live network trace. All 3 matched exactly with zero discrepancy. Midway through the session Akamai began rate-limiting/blocking further direct requests to williams-sonoma.com (both curl_cffi and Playwright WebKit, which had both been working), so the remaining rows below rely on that same Constructor.io browse API only, without a second live-header cross-check; group_id was independently confirmed via each page's own embedded categoryId (fetched over HTTP before the block) for New Outdoor/Bedding/Rugs, and via the URL-slug=group_id naming pattern (which held for every page checked this session) for New Lighting/Pillows&Throws and the two Morris & Co. collab pages. New Bath's URL was not in the shop-sitemap dump under /shop/home-new/ - the sitemap-confirmed URL is /shop/home-bath/wsh-bath-new-arrivals/ (department-level alias, matching the Furniture/Decor alias pattern above); its group_id 'home-new-bath' was pattern-guessed and returned a valid small result set (3) but could not be independently confirmed against that specific URL before the block, so it carries the heaviest flag of the set. The two Morris & Co. x Williams Sonoma Home collaboration pages are genuine product listings (dinnerware/flatware/napkins; bedroom furniture) but sit at the boundary between 'New Arrivals' and the site's separate 'Collaborations' nav item, so both are flagged per brief Sec.3 ambiguous-collection guidance rather than silently included or excluded. No Clearance/Sale overlap issue here - New/Sale are separate trees.",
+  "rows": [
+    {
+      "category": "New Arrivals",
+      "sub_category": "All New Arrivals",
+      "qty": 135,
+      "link": "https://www.williams-sonoma.com/shop/home-new/",
+      "is_group": true,
+      "evidence": "Live WebKit-rendered page header text '135 Items'; matches Constructor.io browse API (ac.cnstrc.com/browse/group_id/home-all-new) response.total_num_results=135 exactly; page's own categoryId='home-all-new', canonicalUrl='shop/home-new/home-all-new'",
+      "flag": null
+    },
+    {
+      "category": "New Furniture",
+      "sub_category": "New Furniture",
+      "qty": 40,
+      "link": "https://www.williams-sonoma.com/shop/home-new/home-new-furniture/",
+      "is_group": false,
+      "evidence": "Live WebKit-rendered page header text '40 Items'; matches Constructor.io browse API group_id=home-new-furniture total_num_results=40 exactly; identical page also served at /shop/home-furniture/wsh-furniture-new-arrivals/ (same categoryId/title - treated as duplicate URL of this row, not listed separately)",
+      "flag": null
+    },
+    {
+      "category": "New Outdoor",
+      "sub_category": "New Outdoor",
+      "qty": 6,
+      "link": "https://www.williams-sonoma.com/shop/home-new/home-new-outdoor/",
+      "is_group": false,
+      "evidence": "Page's own embedded categoryId='home-new-outdoor' confirmed via HTTP fetch of the page; Constructor.io browse API group_id=home-new-outdoor total_num_results=6",
+      "flag": "MANUAL REVIEW: qty sourced from Constructor.io browse API only - Akamai rate-limit blocked the live rendered-header cross-check for this page (3 other pages this session matched the API number exactly: 135/40/21)."
+    },
+    {
+      "category": "New Bedding",
+      "sub_category": "New Bedding",
+      "qty": 32,
+      "link": "https://www.williams-sonoma.com/shop/home-new/home-new-bedding/",
+      "is_group": false,
+      "evidence": "Page's own embedded categoryId='home-new-bedding' confirmed via HTTP fetch of the page; Constructor.io browse API group_id=home-new-bedding total_num_results=32",
+      "flag": "MANUAL REVIEW: qty sourced from Constructor.io browse API only - Akamai rate-limit blocked the live rendered-header cross-check for this page (3 other pages this session matched the API number exactly: 135/40/21)."
+    },
+    {
+      "category": "New Rugs",
+      "sub_category": "New Rugs",
+      "qty": 8,
+      "link": "https://www.williams-sonoma.com/shop/home-new/home-new-rugs/",
+      "is_group": false,
+      "evidence": "Page's own embedded categoryId='home-new-rugs' confirmed via HTTP fetch of the page; Constructor.io browse API group_id=home-new-rugs total_num_results=8",
+      "flag": "MANUAL REVIEW: qty sourced from Constructor.io browse API only - Akamai rate-limit blocked the live rendered-header cross-check for this page (3 other pages this session matched the API number exactly: 135/40/21)."
+    },
+    {
+      "category": "New Lighting",
+      "sub_category": "New Lighting",
+      "qty": 14,
+      "link": "https://www.williams-sonoma.com/shop/home-new/home-new-lighting/",
+      "is_group": false,
+      "evidence": "Constructor.io browse API group_id=home-new-lighting (URL-slug=group_id naming pattern, confirmed correct on 5 sibling pages this session) total_num_results=14; sampled products (Rowan Large Table Lamp, Classic Ring Chandelier) are genuine new lighting items",
+      "flag": "MANUAL REVIEW: qty sourced from Constructor.io browse API only, and group_id was pattern-matched rather than read from this page's own HTML (Akamai blocked the fetch) - the pattern held on every other page checked this session."
+    },
+    {
+      "category": "New Pillows & Throws",
+      "sub_category": "New Pillows & Throws",
+      "qty": 12,
+      "link": "https://www.williams-sonoma.com/shop/home-new/home-new-pillows-throws/",
+      "is_group": false,
+      "evidence": "Constructor.io browse API group_id=home-new-pillows-throws (URL-slug=group_id naming pattern, confirmed correct on 5 sibling pages this session) total_num_results=12; sampled products (Michel Pillow Cover, Landscape Grisaille Pillow Cover) are genuine new items",
+      "flag": "MANUAL REVIEW: qty sourced from Constructor.io browse API only, and group_id was pattern-matched rather than read from this page's own HTML (Akamai blocked the fetch) - the pattern held on every other page checked this session."
+    },
+    {
+      "category": "New Decor",
+      "sub_category": "New Decor",
+      "qty": 21,
+      "link": "https://www.williams-sonoma.com/shop/home-new/home-new-decor/",
+      "is_group": false,
+      "evidence": "Live WebKit-rendered page header text '21 Items'; matches Constructor.io browse API group_id=home-new-decor total_num_results=21 exactly; identical page also served at /shop/home-decor/wsh-art-decor-new-arrivals/ (same categoryId/title - treated as duplicate URL of this row, not listed separately)",
+      "flag": null
+    },
+    {
+      "category": "New Bath",
+      "sub_category": "New Bath",
+      "qty": 3,
+      "link": "https://www.williams-sonoma.com/shop/home-bath/wsh-bath-new-arrivals/",
+      "is_group": false,
+      "evidence": "Constructor.io browse API group_id=home-new-bath (pattern-guessed, following the confirmed Furniture/Decor alias pattern where the department-level wsh-<dept>-new-arrivals URL shares its group_id with home-new/home-new-<dept>) total_num_results=3",
+      "flag": "MANUAL REVIEW: URL was not found directly under /shop/home-new/ in the shop-sitemap (only the department-level alias /shop/home-bath/wsh-bath-new-arrivals/ appears there); the group_id 'home-new-bath' was pattern-guessed and returns a plausible small result set, but this specific URL/group_id pairing was not independently confirmed via a page fetch before Akamai blocked further requests. Lowest-confidence row in this file."
+    },
+    {
+      "category": "New Arrivals",
+      "sub_category": "Morris & Co. x Williams Sonoma Home - Dining",
+      "qty": 12,
+      "link": "https://www.williams-sonoma.com/shop/home-new/wsh-morris-co-dining/",
+      "is_group": false,
+      "evidence": "Constructor.io browse API group_id=wsh-morris-co-dining total_num_results=12; sampled products: Morris & Co. x Williams Sonoma Cotswold Dinner Plates, Fortessa Arezzo Flatware Sets, Morris & Co. x Williams Sonoma Compton Napkins",
+      "flag": "MANUAL REVIEW: AMBIGUOUS NEW COLLECTION - genuine product listing nested under the /shop/home-new/ (New) URL tree, but the site also has a separate top-level 'Collaborations' nav item; could not open the live page to see whether it is framed as New Arrivals or as a Collaborations feature before Akamai blocked further requests."
+    },
+    {
+      "category": "New Arrivals",
+      "sub_category": "Morris & Co. x Williams Sonoma Home - Furniture",
+      "qty": 3,
+      "link": "https://www.williams-sonoma.com/shop/home-new/wsh-morris-co-furniture/",
+      "is_group": false,
+      "evidence": "Constructor.io browse API group_id=wsh-morris-co-furniture total_num_results=3; sampled products: Lewis Hutch Desk (45\"), Lewis Canopy Bed, Lewis 1-Drawer Nightstand (26\")",
+      "flag": "MANUAL REVIEW: AMBIGUOUS NEW COLLECTION - genuine product listing nested under the /shop/home-new/ (New) URL tree, but the site also has a separate top-level 'Collaborations' nav item; could not open the live page to see whether it is framed as New Arrivals or as a Collaborations feature before Akamai blocked further requests."
+    }
+  ]
+}

@@ -1,0 +1,53 @@
+{
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ACCESS: HTTP-first, plain curl with a browser UA; no block encountered. robots.txt is a standard Shopify robots.txt (nilkamalathome.myshopify.com) with a single 'User-agent: *' group Allowing '/' broadly and Disallowing only admin/cart/checkout/account/AJAX-filter paths; no anthropic-ai/ClaudeBot/Claude-Web/Claude-User/Claude-SearchBot entry at all, so no Claude-specific block applies. NOTE: the first plain curl of '/' and '/collections/bath' returned a stale/poisoned edge-cache HTML body from an unrelated site (woodenstreet.com content under the nilkamalhomes.com response) - detected via title/class-name mismatch and worked around by re-fetching with a cache-busting query param, which returned genuine Nilkamal Homes HTML (confirmed via <title>, canonical URL, and Shopify theme asset paths). TREE: this is a general furniture/home-decor Shopify storefront (@home by Nilkamal), not a sanitaryware/fixtures retailer. There is no top-level 'Bathroom' nav item; the only relevant sub-tree is Furnishing > Bath & Laundry (mega-menu, verified from the rendered header nav), whose children are: Hooks & Hangers, Laundry Baskets, Towels, Bath Mats, Bath Slippers, Bath Organisers, Dustbins, Mirrors, Soap Dispensers, Soap Dishes (the last two share one URL /collections/soap-dispenser). Cross-checked against collections.json (629 total collections on the store) for anything bathroom-named outside this nav path: individual-bath-acce (1 product, Storage-type tumbler), bathroom-organisers (4 products, general storage trays/buckets), bathroom-shelf-bar (0 products), bath-utilities (0 products), accessory-sets (0 products) - none of these are linked anywhere in the live mega-menu, are near-empty or empty, and their contents (where non-empty) are generic storage items, not a genuine reachable Bathroom node, so none were recorded (rule 27, no invented/orphan URLs). utility-organisers and organisers ARE nav-linked but sit under general Furnishing/Decor, not Bath & Laundry, and their contents (storage boxes, utility trays, stools) are generic home storage, not Bathroom. CLASSIFICATION per Bath & Laundry child: Hooks & Hangers (/collections/hangers-hooks, verified via products.json - all 10 items are wooden/plastic/metal CLOTH hangers and wall organisers, not robe hooks) = general household hardware, not Bathroom, excluded. Laundry Baskets (/collections/laundry-baskets) = general storage, ALREADY EXTRACTED IN Storage.xlsx per cross_category_url_index -> review. Towels (/collections/towels) and Bath Mats (/collections/bath-mats) = textile per rule 15/16/20, ALREADY EXTRACTED IN Textile.xlsx per index -> review. Bath Slippers (/collections/bath-slippers) = footwear/personal-care item, not covered by any Bathroom rule (not fixture/accessory/hardware), excluded, not indexed elsewhere either. Bath Organisers (/collections/bath-laundry-storage, 43 products - storage baskets, tumblers, utility boxes) = Bathroom Storage per rule 12 but ALREADY EXTRACTED IN Storage.xlsx per index -> review, not rows. Dustbins (/collections/dustbins, verified via products.json - 17 generic household dustbins, no bathroom-specific framing) = excluded, not Bathroom. Mirrors (/collections/mirrors, 54 products) = general wall mirrors, ALREADY EXTRACTED IN Wall_Decor.xlsx per index -> review, not rows (rule: cross-category dedup wins regardless of which category's own rules would want it). Soap Dispensers & Soap Dishes (/collections/soap-dispenser) = genuine Bathroom accessory per rule 13, NOT in the cross-category index (no prior claim) -> recorded as a Bathroom row. ABSENCE CHECK for Fixtures/Baths/Showers/Taps/Enclosures/Toilets: ran a site-search discrimination check (search/suggest.json) for shower, toilet, bathtub, faucet, basin, vanity against a known-present control term (sofa); all six absent-category queries returned only irrelevant fallback matches (bath towels, bath mats, stoneware bath-accessory sets, water fountains, dresser-with-mirror furniture), never a genuine fixture/tap/toilet/basin/bathtub product, confirming genuine absence rather than a search-layer false negative (rule/trap: site search returning junk for a term it does not carry, discriminated against 'sofa' which returns real sofa results). QTY: Soap Dispensers & Dishes qty=22 confirmed by two independent methods matching exactly - the collection page's own rendered 'X products' header text and the Shopify storefront products.json item count for the same collection handle. Bath Organisers (43), Laundry Baskets (5), Towels (22), Bath Mats (24), Mirrors (54) qty figures (rendered header) are recorded here in review for completeness though these rows do not enter rows[] due to dedup/scope exclusion. DEDUP: checked pipeline/bathroom_json_archive/cross_category_url_index.json for every candidate URL under the Bath & Laundry hierarchy before recording; 5 hits (laundry-baskets->Storage.xlsx, bath-laundry-storage->Storage.xlsx, towels->Textile.xlsx, bath-mats->Textile.xlsx, mirrors->Wall_Decor.xlsx), all routed to review per the mandatory-log-every-dedup-hit instruction; soap-dispenser had no index hit and is the only Bathroom row.",
+ "rows": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Soap Dispensers & Dishes",
+   "qty": 22,
+   "link": "https://www.nilkamalhomes.com/collections/soap-dispenser",
+   "is_group": false,
+   "evidence": "Rendered collection header 'Buy Soap Dispensers & Dishes Online' page text reads '22 products'; confirmed identical via Shopify products.json for the same handle (22 items returned) - soap dishes, soap dispensers and stoneware bath-accessory sets, genuine Bathroom accessory per rule 13.",
+   "flag": null
+  }
+ ],
+ "review": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Organisers",
+   "qty": 43,
+   "issue": "ALREADY EXTRACTED IN Storage.xlsx",
+   "link": "https://www.nilkamalhomes.com/collections/bath-laundry-storage"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Laundry Baskets",
+   "qty": 5,
+   "issue": "ALREADY EXTRACTED IN Storage.xlsx",
+   "link": "https://www.nilkamalhomes.com/collections/laundry-baskets"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Towels",
+   "qty": 22,
+   "issue": "ALREADY EXTRACTED IN Textile.xlsx",
+   "link": "https://www.nilkamalhomes.com/collections/towels"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Mats",
+   "qty": 24,
+   "issue": "ALREADY EXTRACTED IN Textile.xlsx",
+   "link": "https://www.nilkamalhomes.com/collections/bath-mats"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Mirrors",
+   "qty": 54,
+   "issue": "ALREADY EXTRACTED IN Wall_Decor.xlsx",
+   "link": "https://www.nilkamalhomes.com/collections/mirrors"
+  }
+ ]
+}

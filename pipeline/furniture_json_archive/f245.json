@@ -1,0 +1,93 @@
+{
+  "sr": 245,
+  "company": "Meesho Home & Kitchen",
+  "brand_site": "meesho.com",
+  "country": "India",
+  "site_url": "https://www.meesho.com/",
+  "status": "partial",
+  "failure_reason": "Site fully reachable via Chrome (no Claude-specific robots.txt disallow; /pl/ category pages are not covered by the /*/clp/*, /*/collection/*, /*/facet_clp/*, /*/search disallow rules). Category tree was recovered completely, but the site's own 'Showing X out of Y products' listing-count widget is broken/unreliable for 8 of the 9 furniture leaves: it renders either a constant, physically-impossible '303966367' (identical across Bean Bags, Collapsible Shoe Racks, Shoe Racks, Storage Drawer Units, Hammock Swings -- a repeated constant across different categories, which per the sanity-check rule means it is not a real per-category count) or a capped '10000' (identical across Collapsible Wardrobe, Home Temple, Wall Shelves, and the parent Furniture landing page -- a suspiciously round display-cap value). Both values reproduced identically across repeated page loads, so they are a stable site bug, not a transient glitch. No internal API endpoint exposing an exact count could be found in the page's network activity (only /api/v1/products/filterConfig and /api/v1/mweb-navigation-tree were observed, neither of which carries a total count field), and the SSR __NEXT_DATA__ payload itself ships totalProductsCount=0 for every listing (matching the prior Home-Decor-pass finding for this same company). Only Study Table rendered a plausible, unique, non-capped value (799) that was stable across two independent loads, so that one row carries a real qty. The other 8 leaves are qty:null with a MANUAL REVIEW flag naming the specific bad value observed.",
+  "notes": "Access: navigated directly in the assigned Chrome tab; robots.txt (fetched via the tab) carries no ClaudeBot/anthropic-ai/Claude-Web disallow. Sitemap: https://www.meesho.com/sitemap.xml is a sitemap-index of ~495 per-department PDP (product) sitemaps plus exactly one PLP (category-listing) sitemap, https://www.meesho.com/sitemap/plp/0.xml, containing all ~19,017 of the site's category-listing URLs. Tree discovery: (1) the homepage nav exposes a top-level 'Furniture' department link (/furniture/pl/67d4), itself filed under Home & Kitchen (breadcrumb Home > Home & Kitchen > Furniture); (2) that page's own 'Category' filter facet enumerates exactly 8 immediate children: Bean Bags, Collapsible Shoe Racks, Collapsible Wardrobe, Home Temple, Shelves, Storage Drawer Units, Study Table, Wall Shelves (no '+more' truncation on that facet group, confirmed by reading the raw sidebar text); (3) cross-checked every one of those 8 names plus 'Shoe Racks' and 'Hammock Swings' (both found via homepage-link keyword scan) against the site-wide PLP sitemap for a bare/canonical (non colour/material-qualified) /<slug>/pl/<id> URL, per the mandatory sitemap cross-check rule. 7 of 8 facet names resolved to a canonical sitemap URL (bean-bags/pl/a3h, collapsible-shoe-racks/pl/9es, collapsible-wardrobe/pl/9ef, home-temple/pl/9fv, storage-drawer-units/pl/9ea, study-table/pl/9ij, wall-shelves/pl/9he). 'Shelves' (the 8th facet entry, distinct from 'Wall Shelves') had NO bare canonical URL anywhere in the 19,017-entry sitemap -- only colour/material-qualified variants exist (white-shelves, wood-shelves, plastic-shelves, bath-shelves, etc.), which are excluded per the colour/material-filter-page rule -- so no separate 'Shelves' row was emitted; its content is presumed to be covered by the Wall Shelves node. 'Shoe Racks' (shoe-racks/pl/1w06) is a second, separately-slugged canonical page whose first-20-tile product listing is ~95% identical to Collapsible Shoe Racks (collapsible-shoe-racks/pl/9es) but not byte-identical (differs in the last few tiles), so both were kept as distinct rows per the 'two genuinely different listing pages, keep both' rule, flagging the near-duplicate overlap. 'Hammock Swings' (hammock-swings/pl/aad) is NOT one of the Furniture page's own 8 facet children -- its own breadcrumb reads Home > Home & Kitchen > Furniture Accessories > Hammock Swings. 'Furniture Accessories' (furniture-accessories/pl/676r) itself was inspected and rejected as a row: it is a mixed roll-up of furniture hardware/parts (knobs, drawer pulls, legs, glides, covers -- explicitly excluded furniture-care/parts) mixed with unrelated junk (pet beds, cat scratching posts, baby cradles, oxygen-cylinder holders) -- a classic 'mixed roll-up: drop, don't pad' case -- but its one genuinely furniture-typed, separately-slugged child (Hammock Swings, a hanging/swing chair -- outdoor/indoor seating furniture) was kept as its own leaf under top bucket 'Furniture'. Excluded from Furniture Accessories as non-furniture/parts and not emitted: furniture hardware, drawer pulls, furniture legs, furniture covers, pet beds, cat furniture, baby cradles. Also excluded generally per project scope: chair/sofa/table covers and cloths (textile), table runners (textile), table lamps (lighting), desk supplies/organisers (office supplies), cabinet hardware (parts) -- all of which surfaced as keyword false-positives during the sitemap scan but were screened out before verification. Home Temple (mandir/pooja-unit cabinets) and Wall Shelves were kept per the site's own Furniture-department classification (rule: keep the site's classification unless products clearly contradict it) but are flagged for manual review as borderline judgement calls (devotional furniture-like cabinet; functional storage shelving that could arguably belong to Wall Decor). QTY METHOD: rendered 'Showing 1-20 out of N products' header, sanity-checked by reloading each page a second time. Discriminator applied: Study Table's 799 is unique, plausible, and reproduced identically on 2 loads -> accepted with evidence. The other 8 leaves reproduced identically across reloads but showed one of only two possible values (303966367 or 10000) shared across multiple, otherwise-unrelated categories -- a constant number repeating across different categories is the explicit reject signal in the qty rules -- so all 8 are null + 'MANUAL REVIEW' with the specific bad value recorded. No usable structured API total was found as a fallback (see failure_reason). No furniture node in this tree read exactly 0 products, so the live-zero-emit rule did not apply.",
+  "rows": [
+    {
+      "category": "Furniture",
+      "sub_category": "Bean Bags",
+      "qty": null,
+      "link": "https://www.meesho.com/bean-bags/pl/a3h",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: listing header reads 'Showing 1-20 out of 303966367 products' -- a physically impossible, exact-same constant reproduced on reload and shared verbatim with several unrelated categories (Collapsible Shoe Racks, Shoe Racks, Storage Drawer Units, Hammock Swings), indicating a broken/site-wide placeholder value rather than a real per-category count. No usable structured-data fallback found."
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Collapsible Shoe Racks",
+      "qty": null,
+      "link": "https://www.meesho.com/collapsible-shoe-racks/pl/9es",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: same broken constant header '303966367 products', reproduced on reload. Near-duplicate product listing also exists at the separately-slugged 'Shoe Racks' page (shoe-racks/pl/1w06); both kept as distinct rows since the URLs and tail-end product tiles differ."
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Shoe Racks",
+      "qty": null,
+      "link": "https://www.meesho.com/shoe-racks/pl/1w06",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: same broken constant header '303966367 products', reproduced on reload. This page's first-20 product tiles are ~95% identical to Collapsible Shoe Racks (collapsible-shoe-racks/pl/9es) -- likely a broader/legacy alias of the same catalog rather than a fully distinct category -- flagged for reviewer to confirm no double-count with that row."
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Collapsible Wardrobe",
+      "qty": null,
+      "link": "https://www.meesho.com/collapsible-wardrobe/pl/9ef",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: listing header reads 'Showing 1-20 out of 10000 products', reproduced on reload -- a round, capped display value shared verbatim with Home Temple, Wall Shelves and the parent Furniture landing page, not a real per-category count."
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Home Temple",
+      "qty": null,
+      "link": "https://www.meesho.com/home-temple/pl/9fv",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: same capped header '10000 products', reproduced on reload. Also a judgement call on inclusion: these are mandir/pooja-temple cabinet units (wood/marble, some wall-mounted, some with storage drawers); kept as Furniture because the site itself files this node directly under its Furniture department facet, but this is devotional/decor-adjacent and a reviewer may prefer to exclude it."
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Storage Drawer Units",
+      "qty": null,
+      "link": "https://www.meesho.com/storage-drawer-units/pl/9ea",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: same broken constant header '303966367 products', reproduced on reload."
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Study Table",
+      "qty": 799,
+      "link": "https://www.meesho.com/study-table/pl/9ij",
+      "is_group": false,
+      "evidence": "rendered listing header 'Showing 1-20 out of 799 products', reproduced identically on two independent page loads; unlike every other furniture leaf on this site it is a unique, plausible, non-capped value, so accepted as the real count",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Wall Shelves",
+      "qty": null,
+      "link": "https://www.meesho.com/wall-shelves/pl/9he",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: same capped header '10000 products', reproduced on reload. Also an ambiguous-shelving judgement call: these are functional wall-mounted/floating storage shelves; kept as Furniture because the site files this node under its Furniture department (not under a Wall Decor department), but a reviewer may prefer to route it to Wall Decor instead."
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Hammock Swings",
+      "qty": null,
+      "link": "https://www.meesho.com/hammock-swings/pl/aad",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: same broken constant header '303966367 products', reproduced on reload. Node is a hanging/swing chair (seating furniture) filed by the site under Home & Kitchen > Furniture Accessories, a mixed hardware/parts+unrelated-junk roll-up that was itself rejected as a row; this child was kept standalone since it has its own dedicated canonical URL and is a genuine furniture product type."
+    }
+  ]
+}

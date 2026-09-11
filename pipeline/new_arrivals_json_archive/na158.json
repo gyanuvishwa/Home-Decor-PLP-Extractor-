@@ -1,0 +1,61 @@
+{
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "Denmark storefront (da-dk locale, SFCC, direct HTTP fetch worked throughout - no Playwright/CiC needed). Per assignment hint, Danish 'Nyheder'/'Nyt' = New Arrivals; confirmed real. The site nests a genuine 'Nyheder' PLP under each of its 4 shopping departments (all present in sitemap AND main nav, page titles literally 'new products/new designs' in Danish): /da-dk/bolig/nyheder (Home), /da-dk/til-bordet/nyheder (Table/Dining), /da-dk/smykker/nyheder (Jewellery), /da-dk/soelvhaandvaerk/nyheder (Silverware). There is also an un-navlinked but fully live, sitemap-absent-but-directly-reachable aggregate page /da-dk/nyheder (title 'Se alle de nye produkter og kollektioner' = 'See all new products and collections') whose product set is essentially the union of the 4 department pages (179 unique tiles vs 172 in the union of the 4, 171/172 overlapping) - treated as the parent/aggregate row. A near-duplicate URL /da-dk/nyheder/smykker also exists (86 tiles, 81/82 overlap with /da-dk/smykker/nyheder) - treated as an alias of the same underlying Jewellery listing, canonical /da-dk/smykker/nyheder kept (matches the site's consistent <dept>/nyheder URL pattern and is the one indexed in the sitemap). The sitemap also lists /da-dk/jul/nyheder (Christmas New Arrivals, page title dated 'Julekollektion 2025' but the live product grid was independently tile-counted at 64 items matching current inventory) - included as a genuine site-taxonomy child since the brief does not scope this project away from holiday/gift content the way the separate Home-Decor project did; flagged for a human policy check given that other passes in this same multi-project pipeline exclude Christmas/Gift content by convention. All qty values are exhaustive unique data-itemid tile counts from the search-result-items grid (explicitly excluding the separate plp-recommendations-carousel Einstein block) on a single ?start=0&sz=200 (sz=300 for the aggregate) fetch, since this SFCC site does not server-render its 'Viser N af N' results-count text (it is populated client-side by JS and was empty/absent in every plain HTTP fetch, confirmed against a known category page too) - same exhaustive-tile-count method used by the prior Home-Decor pass on this same company. Checked and excluded as non-qualifying: '/da-dk/bolig/design-icons' and similar curated 'featured' collections do not use New/Nyheder naming and were not investigated further (out of scope - no New Arrivals signal). No 'New Collection'-style ambiguous pages were found requiring the Collection-page ambiguity flag.",
+  "rows": [
+    {
+      "category": "New Arrivals",
+      "sub_category": "New Arrivals",
+      "qty": 179,
+      "link": "https://www.georgjensen.com/da-dk/nyheder",
+      "is_group": true,
+      "evidence": "179 unique data-itemid product tiles in the 'shop-nyheder search-result-items' grid via https://www.georgjensen.com/da-dk/nyheder?start=0&sz=300 (page title 'Se alle de nye produkter og kollektioner' - See all new products and collections); recommendations carousel excluded from the count",
+      "flag": null
+    },
+    {
+      "category": "Home New Arrivals",
+      "sub_category": "Home New Arrivals",
+      "qty": 79,
+      "link": "https://www.georgjensen.com/da-dk/bolig/nyheder",
+      "is_group": false,
+      "evidence": "79 unique data-itemid product tiles in the 'bolig-nyheder search-result-items' grid via https://www.georgjensen.com/da-dk/bolig/nyheder?start=0&sz=200",
+      "flag": null
+    },
+    {
+      "category": "Table New Arrivals",
+      "sub_category": "Table New Arrivals",
+      "qty": 7,
+      "link": "https://www.georgjensen.com/da-dk/til-bordet/nyheder",
+      "is_group": false,
+      "evidence": "7 unique data-itemid product tiles in the 'til-bord-&bar-nyheder search-result-items' grid via https://www.georgjensen.com/da-dk/til-bordet/nyheder?start=0&sz=200",
+      "flag": null
+    },
+    {
+      "category": "Jewelry New Arrivals",
+      "sub_category": "Jewelry New Arrivals",
+      "qty": 82,
+      "link": "https://www.georgjensen.com/da-dk/smykker/nyheder",
+      "is_group": false,
+      "evidence": "82 unique data-itemid product tiles in the 'smykker-nyheder search-result-items' grid via https://www.georgjensen.com/da-dk/smykker/nyheder?start=0&sz=200",
+      "flag": "MANUAL REVIEW: near-duplicate alias URL https://www.georgjensen.com/da-dk/nyheder/smykker also live, 86 tiles, 81/82 overlap with this listing - treated as the same underlying listing, this URL kept as canonical (sitemap-indexed, matches site's <dept>/nyheder pattern used by the other 3 departments); confirm merge decision"
+    },
+    {
+      "category": "Silverware New Arrivals",
+      "sub_category": "Silverware New Arrivals",
+      "qty": 7,
+      "link": "https://www.georgjensen.com/da-dk/soelvhaandvaerk/nyheder",
+      "is_group": false,
+      "evidence": "7 unique data-itemid product tiles in the search-result-items grid via https://www.georgjensen.com/da-dk/soelvhaandvaerk/nyheder?start=0&sz=200",
+      "flag": null
+    },
+    {
+      "category": "Christmas New Arrivals",
+      "sub_category": "Christmas New Arrivals",
+      "qty": 64,
+      "link": "https://www.georgjensen.com/da-dk/jul/nyheder",
+      "is_group": false,
+      "evidence": "64 unique data-itemid product tiles in the 'jul-nyheder search-result-items' grid via https://www.georgjensen.com/da-dk/jul/nyheder?start=0&sz=200 (page title dated 'Julekollektion 2025' but live inventory independently verified via tile count)",
+      "flag": "MANUAL REVIEW: HOLIDAY/GIFT SCOPE - this is Christmas-specific New Arrivals; other extraction passes in this multi-project pipeline (Home-Decor, etc.) exclude Gift/Christmas content by convention, but this brief has no such scope restriction and the site genuinely nests this under its own Nyheder taxonomy alongside the 4 non-holiday departments - included pending a project-level policy decision on whether holiday content belongs in New Arrivals"
+    }
+  ]
+}

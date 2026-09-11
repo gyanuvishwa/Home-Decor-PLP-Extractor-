@@ -1,0 +1,237 @@
+{
+ "sr": 232,
+ "company": "Sur La Table",
+ "brand_site": "surlatable.com",
+ "country": "USA",
+ "site_url": "https://www.surlatable.com/",
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ACCESS: plain direct fetch, no WAF or blocking. robots.txt was fetched directly and has no Claude-specific disallow and no ClaudeBot / Claude-User / Claude-SearchBot group at all. Platform is Salesforce Commerce Cloud PWA Kit (server-rendered React), so each listing page's raw HTML already contains the product grid, the 'N Items' category header, the 'Showing 24 of N' pagination summary and the full facet payload. COUNT VERIFICATION: every qty is the site's own rendered 'N Items' category header. Two independent empirical checks were run across all 19 leaves in one coherent pass: (a) the header equals the same page's embedded search total and its 'Showing 24 of N' pagination summary on 19 of 19; (b) the page's own brand-facet partition (each product carries exactly one brand) sums to exactly the header on 17 of 19, and to N-1 on Bowls (154 of 155) and Outdoor Dinnerware (67 of 68), each explained by one product with no brand facet. In addition I obtained a SLAS guest token (public PKCE flow) against the site's own Shopper Search API and ran a true ID-level exhaustion (offset paging to the end, unique productId sets) on the main nodes: Bowls claimed 155 / 155 unique IDs, Plates 132/132, Mugs & Espresso Cups 90/90, Bar Glasses 147/147, Wine 159/159, Platters & Trays 125/125, Home Decor 96/96. That API indexes SFCC 'PRO-' master records while the storefront listings are served through Bloomreach, so on 8 of 19 nodes the two populations differ (Outdoor Dinnerware 68 storefront vs 51 API is the largest gap; Specialty Serving Pieces 69 vs 77 goes the other way). Per this project's standing rule the RENDERED header, not the API total, is what every row carries. The API was also used to read every product title in the ambiguous nodes, so all include/exclude calls below are based on actual titles rather than category names. NO LIGHTING, NO MIRRORS, NO CLOCKS - a genuine absence, confirmed by site search rather than assumed: 'chandelier', 'sconce', 'wall art', 'pendant light' and 'picture frame' each return 0 results; 'mirror' returns 31 results that are all mirror-finish cookware (Hestan / Viking pans) and no mirrors; 'clock' returns 1 result, a kitchen timer. The only genuine lighting products anywhere on the site are 3 Zafferano cordless table lamps, which sit inside the Home Decor leaf and have no lighting category of their own (recorded in that row's flag). Rule 0 therefore yielded no additional branches here: the taxonomy is purely product-type (Cookware, Bakeware, Kitchen Tools, Knives, Small Appliances, Coffee & Tea, Dining & Bar, Kitchen & Decor, Food, Outdoor) with no room tree at all, and every room-ish node (Outdoor) was traversed and its dining/glassware children extracted. SCOPE: as expected for a US kitchenware specialist the coverage is narrow but genuine - dinnerware, glassware and barware glasses, serveware, and one decorative-accessories leaf. EXCLUDED as out of scope by top-level branch: Cookware, Bakeware, Knives, Kitchen Tools, Small Appliances, Coffee & Tea, Food, all Outdoor Cookware and grilling, plus Cooking Classes, Recipes, Registry and Gifts. EXCLUDED with specific reasons: Flatware (202, including Flatware Sets 83, Open Stock & Specialty 75, Serving Utensils 69) = cutlery; Bar > Bar Tools & Accessories (134) = bar tools; Bar > Ice & Wine Buckets (32) = titles are dominated by Tovolo / W&P / Zoku ice moulds and ice trays plus stainless ice buckets, i.e. bar tools rather than glassware; Linens (Dining & Bar 340 and the identical Kitchen & Decor copy 456 - aprons, kitchen towels, napkins & napkin rings, placemats, tablecloths, paper napkins) = textiles, and the Napkins & Napkin Rings node is mixed so it was dropped rather than padded; Kitchen & Decor > Home Essentials (216 - cleaning, dish racks, trash, totes, kitchen islands, floor mats, pets); Countertop Organization > Organization & Storage (166), Utensil Holders (16) and Cookbooks & Cookbook Holders (39); Spoonrests & Trivets (21 - titles are silicone and cast-iron trivets and spoon rests, i.e. kitchen tools); Fragrance Collection (64, of which Candles 52 and Soaps & Lotions) = home fragrance; Decor > Wreaths & Trees (20) = faux plants and holiday. NEVER-EXTRACT nodes skipped: Dinnerware Collections (544) and its 46 pattern children, Glassware Collections (7), Flatware Collections (69), every Brands tree (Dining & Bar 56 brand nodes, Kitchen & Decor 16, Outdoor 7), Sur La Table Glassware (25), Zwilling Glassware (1), plus Sale, New, Best Sellers, All Top Rated, Gifts, Only at SLT, Holidays, Explore and Registry. DE-DUPLICATION (decided by comparing product-ID sets via the search API, not by names): (1) Kitchen & Decor > Decor > Home Decor (96) and Dining & Bar > Decor > Home Decor (81) are the same listing under two parents - 80 of the 81 IDs are shared - so only the Kitchen & Decor superset is emitted. (2) Inside that node the Decor parent total is exactly 96 = Home Decor, and Candles (52, of which 48 sit inside Home Decor) and Wreaths & Trees (20) are subset re-cuts of it, so neither gets its own row. (3) Drinkware > Mugs (78) is a strict subset of Dinnerware > Mugs & Espresso Cups (90) - all 78 IDs contained - so only the superset is emitted. (4) Dining & Bar > Sugar Bowls & Creamers is an empty duplicate node (0 products); the populated Kitchen & Decor copy (6) is used instead. (5) Dining & Bar > Tableware (5, id 'farmers-market-tableware') is a curated promo node whose 5 products all re-appear in Glasses and Platters & Trays, so it is dropped. OVERLAPS KEPT AND DOCUMENTED (none is the exact same listing under a second URL and none is a pure facet re-cut, so all are emitted): Glasses (219) partially overlaps Bar Glasses (93 shared IDs) and Wine (76 shared) but is neither a superset nor a subset of them - 49 of its products are in neither; Serving Bowls (94) shares 61 IDs with Bowls (155); Platters & Trays shares 29 IDs with Specialty Serving Pieces; the Outdoor Dinnerware and Outdoor Glassware leaves are near-disjoint from their indoor equivalents (melamine and acrylic lines). Specialty Serving Pieces (69) was kept as a genuine serveware leaf: reading all its titles, roughly three quarters are cake stands, serving boards, platters, tureens, gravy boats and egg dishes, with a minority of serving utensils - it is a real leaf, not a mixed roll-up. No duplicate-company flag applies to S.N. 232; surlatable.com has no prior S.N. in this project. Compared against S.N. 135 Denby (c135.json) for scoping discipline: same tableware-led shape (Dinnerware / Drinkware / Serving leaves counted, dinnerware pattern 'Collections' treated as re-cuts and not counted, Coasters kept, placemats and other textiles excluded).",
+ "rows": [
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Dinnerware",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Dinnerware Sets",
+   "parent": false,
+   "qty": 24,
+   "link": "https://www.surlatable.com/products/dining-bar/dinnerware/dinnerware-sets/",
+   "evidence": "rendered listing header '24 Items' (cross-checked against the same page's 'Showing 24 of 24' pagination summary and against the page's own brand-facet partition, which sums to exactly 24)",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Bowls",
+   "parent": false,
+   "qty": 155,
+   "link": "https://www.surlatable.com/products/dining-bar/dinnerware/bowls/",
+   "evidence": "rendered listing header '155 Items' (cross-checked against the same page's 'Showing 24 of 155' pagination summary and against the page's own brand-facet partition, which sums to 154 - the gap is a single product carrying no brand facet)",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Plates",
+   "parent": false,
+   "qty": 132,
+   "link": "https://www.surlatable.com/products/dining-bar/dinnerware/plates/",
+   "evidence": "rendered listing header '132 Items' (cross-checked against the same page's 'Showing 24 of 132' pagination summary and against the page's own brand-facet partition, which sums to exactly 132)",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Mugs and Espresso Cups",
+   "parent": false,
+   "qty": 90,
+   "link": "https://www.surlatable.com/products/dining-bar/dinnerware/mugs-espresso-cups/",
+   "evidence": "rendered listing header '90 Items' (cross-checked against the same page's 'Showing 24 of 90' pagination summary and against the page's own brand-facet partition, which sums to exactly 90)",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Drinkware",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Glasses",
+   "parent": false,
+   "qty": 219,
+   "link": "https://www.surlatable.com/products/dining-bar/drinkware/glasses/",
+   "evidence": "rendered listing header '219 Items' (cross-checked against the same page's 'Showing 24 of 219' pagination summary and against the page's own brand-facet partition, which sums to exactly 219)",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Bar Glasses",
+   "parent": false,
+   "qty": 147,
+   "link": "https://www.surlatable.com/products/dining-bar/drinkware/bar-glasses/",
+   "evidence": "rendered listing header '147 Items' (cross-checked against the same page's 'Showing 24 of 147' pagination summary and against the page's own brand-facet partition, which sums to exactly 147)",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Wine Glasses",
+   "parent": false,
+   "qty": 159,
+   "link": "https://www.surlatable.com/products/dining-bar/drinkware/wine/",
+   "evidence": "rendered listing header '159 Items' (cross-checked against the same page's 'Showing 24 of 159' pagination summary and against the page's own brand-facet partition, which sums to exactly 159)",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Double-Wall Glassware",
+   "parent": false,
+   "qty": 18,
+   "link": "https://www.surlatable.com/products/dining-bar/drinkware/double-wall-glassware/",
+   "evidence": "rendered listing header '18 Items' (cross-checked against the same page's 'Showing 24 of 18' pagination summary and against the page's own brand-facet partition, which sums to exactly 18)",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Coasters",
+   "parent": false,
+   "qty": 4,
+   "link": "https://www.surlatable.com/products/dining-bar/drinkware/coasters/",
+   "evidence": "rendered listing header '4 Items' (cross-checked against the same page's 'Showing 24 of 4' pagination summary and against the page's own brand-facet partition, which sums to exactly 4)",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Serving",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Pitchers",
+   "parent": false,
+   "qty": 33,
+   "link": "https://www.surlatable.com/products/dining-bar/serving/pitchers/",
+   "evidence": "rendered listing header '33 Items' (cross-checked against the same page's 'Showing 24 of 33' pagination summary and against the page's own brand-facet partition, which sums to exactly 33)",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Platters and Trays",
+   "parent": false,
+   "qty": 125,
+   "link": "https://www.surlatable.com/products/dining-bar/serving/platters-trays/",
+   "evidence": "rendered listing header '125 Items' (cross-checked against the same page's 'Showing 24 of 125' pagination summary and against the page's own brand-facet partition, which sums to exactly 125)",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Serving Bowls",
+   "parent": false,
+   "qty": 94,
+   "link": "https://www.surlatable.com/products/dining-bar/serving/serving-bowls/",
+   "evidence": "rendered listing header '94 Items' (cross-checked against the same page's 'Showing 24 of 94' pagination summary and against the page's own brand-facet partition, which sums to exactly 94)",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Specialty Serving Pieces",
+   "parent": false,
+   "qty": 69,
+   "link": "https://www.surlatable.com/products/dining-bar/serving/specialty-serving-pieces/",
+   "evidence": "rendered listing header '69 Items' (cross-checked against the same page's 'Showing 24 of 69' pagination summary and against the page's own brand-facet partition, which sums to exactly 69)",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Bar",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Decanters",
+   "parent": false,
+   "qty": 15,
+   "link": "https://www.surlatable.com/products/dining-bar/bar/decanters/",
+   "evidence": "rendered listing header '15 Items' (cross-checked against the same page's 'Showing 24 of 15' pagination summary and against the page's own brand-facet partition, which sums to exactly 15)",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Countertop Organization",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Butter Dishes and Gravy Boats",
+   "parent": false,
+   "qty": 15,
+   "link": "https://www.surlatable.com/products/kitchen-decor/countertop-organization/butter-dishes-gravy-boats/",
+   "evidence": "rendered listing header '15 Items' (cross-checked against the same page's 'Showing 24 of 15' pagination summary and against the page's own brand-facet partition, which sums to exactly 15)",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Sugar Bowls and Creamers",
+   "parent": false,
+   "qty": 6,
+   "link": "https://www.surlatable.com/products/kitchen-decor/countertop-organization/sugar-bowls-creamers/",
+   "evidence": "rendered listing header '6 Items' (cross-checked against the same page's 'Showing 24 of 6' pagination summary and against the page's own brand-facet partition, which sums to exactly 6)",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Outdoor Dining and Entertaining",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Outdoor Glassware",
+   "parent": false,
+   "qty": 18,
+   "link": "https://www.surlatable.com/products/outdoor/outdoor-dining-entertaining/outdoor-glassware/",
+   "evidence": "rendered listing header '18 Items' (cross-checked against the same page's 'Showing 24 of 18' pagination summary and against the page's own brand-facet partition, which sums to exactly 18)",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Outdoor Dinnerware",
+   "parent": false,
+   "qty": 68,
+   "link": "https://www.surlatable.com/products/outdoor/outdoor-dining-entertaining/outdoor-dinnerware/",
+   "evidence": "rendered listing header '68 Items' (cross-checked against the same page's 'Showing 24 of 68' pagination summary and against the page's own brand-facet partition, which sums to 67 - the gap is a single product carrying no brand facet)",
+   "flag": null
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Home Decor",
+   "parent": false,
+   "qty": null,
+   "link": "https://www.surlatable.com/products/kitchen-decor/decor/home-decor/",
+   "evidence": "rendered listing header '96 Items' (brand-facet partition sums to exactly 96); all 96 product titles read individually via the site's own Shopper Search API",
+   "flag": "MANUAL REVIEW: the site reports 96 Items but this leaf is an irreducible mix. Reading all 96 titles gives roughly 36 in-scope (candle holders and taper holders, glass hurricane, vases, rattan and palm trays, decorative ceramic roosters, unscented taper-candle sets, and 3 Zafferano cordless table lamps) against roughly 60 out-of-scope (about 30 scented Sur La Table candles = home fragrance, 20 Nearly Natural faux silk trees and faux wreaths, holiday crackers / place cards / glass pumpkins / tree decor, a cookbook holder and a wicker basket). The node exposes no product-type refinement, so no exact in-scope sub-count is obtainable from the site; 96 would over-state and any split would be my own estimate rather than a site-reported number."
+  }
+ ]
+}

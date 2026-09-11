@@ -1,0 +1,240 @@
+{
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ACCESS: clean. probe.fetch() returned HTTP 200 on every request across rotating fingerprints (safari18_0_ios, safari18_0, safari17_2_ios, chrome131); no Akamai/DataDome/Cloudflare interstitial, no 403, no 429, no reader prefix or alternate profile set needed. Pages are large (0.4-2.6 MB of server-rendered React) but fully rendered server-side, so no browser automation and no API host were needed - which matters, because robots forbids /api/*. Single host throughout (www.westwing.de serves pages and sitemaps), so no second robots.txt was owed. ROBOTS - READ CAREFULLY, THIS SITE NAMES CLAUDE: https://www.westwing.de/robots.txt was fetched FIRST (HTTP 200, safari18_0_ios) before any other request. It has four groups. The fourth is a shared AI-agent group whose user-agent list includes 'User-agent: ClaudeBot', 'User-agent: Claude-Web' and 'User-agent: anthropic-ai' (alongside GPTBot, OAI-SearchBot, ChatGPT-User, PerplexityBot, Amazonbot, Google-Extended, Applebot-Extended, CCBot, FacebookBot, Meta-ExternalAgent, Bytespider, TikTokBot, YouBot, FriendlyCrawler, OpenAI-Webcrawler, DataForSEObot, Diffbot, AI2Bot, NeevaAI). This group is the most specific one matching us, so it governs. It is NOT a blanket opt-out: it contains no 'Disallow: /'. Its directives are verbatim 'Allow: /llms.txt', 'Allow: /new-products/$', 'Allow: /customer/invitation/create/', 'Allow: /*/customer/invitation/create/', then 'Disallow: /all-products', 'Disallow: /p/s/*', 'Disallow: /customer*', 'Disallow: *--*', 'Disallow: /*?*q=*', 'Disallow: *?c=', 'Disallow: *&c=', 'Disallow: /sso/*', 'Disallow: /c/*', 'Disallow: /products/*', 'Disallow: /collections/*', 'Disallow: /api/*' - byte-identical to the generic '*' group apart from the extra 'Allow: /llms.txt'. So this is a uniform site-wide ruleset, not a Claude-targeted exclusion, and no Disallow in it covers the paths needed here. CRITICALLY, Westwing's category listing pages do NOT live under /c/, /collections/ or /products/: they are bare first-level slugs (/badezimmer-deko/, /seifenspender/, /badmoebel/ ...), which the site's own sitemap-categories.xml confirms for all 602 category URLs - zero of them contain '/c/'. Every URL requested this session was such a bare slug, or /sitemap.xml, or /sitemap-categories.xml, none of which is disallowed. Nothing disallowed was touched: no '--' URL was requested (checked - zero of the 602 category URLs contain '--'), no ?q= search, no ?c= or &c= parameter, no /api/, /products/, /collections/, /c/, /all-products, /p/s/, /customer or /sso path. No Crawl-delay is declared in any group; probe.py's 2 s per-host gap was kept. Product counts were therefore taken from rendered HTML only - the /api/ route was never used, precisely because it is disallowed. TREE: taken from the site's own navigation, three independent sources cross-checked. (1) The homepage embeds the full mega-menu in its React flight payload; 308 distinct labelled label->href pairs were extracted verbatim, giving the departments Möbel, Aufbewahrung, Accessoires, Leuchten, Teppiche, Textilien, Geschirr-Serien/Küche, Kinder, Gartenmöbel, Geschenke, Shop by Room, Marken. (2) Every PLP renders a 'plp-category-chips' strip naming its parent ('Alle <Parent>') and all its siblings, which is the site's own machine-readable category tree; it was harvested on each page visited and is what fixed each node's parent. (3) https://www.westwing.de/sitemap.xml -> https://www.westwing.de/sitemap-categories.xml (HTTP 200, 602 category URLs), regex-scanned for bad|bath|dusch|wanne|wc|toilette|waschbecken|waschtisch|armatur|sanitaer|spiegel|handtuch|seife|wasch, which recovered nodes the mega-menu truncates - /badmoebel/, /shower-curtains/, /decorative-mirrors-1/, /babyhandtuecher/, /seifen-cremes/, /seifenspender/, /bademaentel/, /badezimmerteppiche/, /antirutschmatten/. The bathroom branch that results is: Accessoires > Badaccessoires (/badezimmer-deko/, H1 'Badaccessoires', 420) with exactly nine children in the site's own chip order - Seifen & Cremes 53, Seifenspender & -schalen 87, Zahnputzbecher 42, Badaufbewahrung 71, Wäschekörbe 59, Kosmetikeimer 56, Toilettenbürsten 60, Toilettenpapierhalter 39, Handtuchhalter 36. Eight of the nine are recorded; Seifen & Cremes is routed out (consumable soaps and washing-up liquid). Alongside it sit Möbel > Schränke > Badschränke and Möbel > Regale > Badregale (both already in Furniture.xlsx), Accessoires > Spiegel > Kosmetikspiegel / Wandspiegel / Ganzkörperspiegel (all three already in Final.xlsx), Textilien > Badtextilien and its three children, plus Bademäntel, Shower curtains, Babyhandtücher and Teppiche > Nach Raum > Badezimmer, all routed to Textile. Westwing is a design/home-decor retailer: it sells NO sanitaryware, taps, basins, WCs, baths, showers or enclosures - the sitemap sweep for waschbecken|waschtisch|armatur|dusch|wanne|wc|sanitaer returned nothing beyond the nodes above, so those parts of rules 4-8 have no counterpart here and nothing was skipped. WÄSCHEKÖRBE JUDGEMENT: it is reachable by two paths - the mega-menu lists it under Aufbewahrung, but the site's own PLP chip strip gives its parent as 'Alle Badaccessoires' (/badezimmer-deko/) and it is also a chip of the Shop-by-Room Badezimmer hub. Two of the three site-declared placements are bathroom, so rule 12 ('Baskets ... include when site presents it under Bathroom; hierarchy decides') puts it in Bathroom, recorded once under the single canonical URL (rule 28). QTY: every figure is the listing page's OWN rendered German total, read from two places on the same page - the toolbar line '<N> Produkte' and the footer line '<shown> von <N> Produkten werden angezeigt' - which agreed on every node. On the four nodes large enough to paginate the two differ as expected (Badaccessoires '420 Produkte' / '120 von 420', Badtextilien '429 Produkte' / '120 von 429', Handtücher '225' / '120 von 225', Badmöbel '485' / '120 von 485'), proving the page size is 120 and that the toolbar number is a true paginated total, not a page-size artifact; on every recorded leaf the totals are below 120 and the footer reads 'N von N'. A third independent source agrees where the page embeds it: the server-rendered Algolia block carries \\\"nbHits\\\",485 on /badmoebel/ and 429 on /badtextilien/, matching the rendered strings exactly. Counts discriminate strongly (1, 7, 12, 16, 18, 33, 36, 37, 39, 42, 50, 53, 56, 59, 60, 71, 87, 130, 139, 206, 225, 228, 420, 429, 485), so no site-wide constant is in play. Every recorded page's H1 and BreadcrumbList were checked against the node requested and matched (Seifenspender & -schalen, Zahnputzbecher, Badaufbewahrung, Wäschekörbe, Kosmetikeimer, Toilettenbürsten, Toilettenpapierhalter, Handtuchhalter). Nothing was estimated, no parent number was reused for a child, and no siblings were summed - note the nine Badaccessoires children total 503 against a parent of 420, i.e. they genuinely overlap, which is exactly why only children are recorded and the parent is a blank grouping row. DUPLICATE-URL FAMILIES RESOLVED: Westwing serves room-scoped clones of the same categories under '-2'/'-3' handles (/seifenspender-2/ 87 = /seifenspender/ 87, /handtuchhalter-2/ 36 = /handtuchhalter/ 36, /bad-aufbewahrung-2/ 71 = /bad-aufbewahrung/ 71, /waeschekoerbe-waeschetaschen-2/ 59 = /waeschekoerbe-waeschetaschen/ 59). Each pair was fetched and compared; the plain handle is the one carrying <link rel=canonical> and BreadcrumbList JSON-LD while the '-2' twin carries neither, so the plain handle is recorded and the twin discarded (rule 28). The two exceptions are documented in review[]: /badschraenke-2/ (60 vs 36) and /badezimmer-deko-2/ (206 vs 420), which are genuinely different scoped sets rather than clones. DEDUP: dedup.already_extracted() was run on all 29 candidate and control URLs before anything was recorded. Four are exact hits and none of them is in rows[] - /badschraenke (Furniture.xlsx 'Bathroom Cabinets'), /badregale (Furniture.xlsx 'Bathroom Shelving'), /schminkspiegel (Final.xlsx 'Vanity Mirrors'), /wandspiegel (Final.xlsx 'Wall Mirrors'), /ganzkoerperspiegel (Final.xlsx 'Full-Length Mirrors'). All eight recorded leaves are clean. Westwing is heavily represented in the index (150+ westwing.de rows plus westwing.co.uk and westwing.it), and note that the .co.uk twin already carries 'Bathroom Cabinets' and 'Bathroom Shelves' and the .it twin 'Mobili bagno' and 'Scaffali bagno' - consistent with the Furniture pass having taken the bathroom furniture on every Westwing locale, which is why none of it comes into Bathroom here under OPTION 1. The index is URL-EXACT, so the '-2' locale/room variants above do not match their canonical twins; that is called out in review[] rather than exploited. VERDICT: BATHROOM FOUND - 8 leaves under one Badaccessoires grouping, 450 products across them, with bathroom furniture and mirrors left in Furniture/Home Decor and all bath textiles routed to Textile.",
+ "rows": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Accessories",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Soap Dispensers & Dishes",
+   "qty": 87,
+   "link": "https://www.westwing.de/seifenspender/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Toothbrush Cups",
+   "qty": 42,
+   "link": "https://www.westwing.de/zahnputzbecher/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Storage",
+   "qty": 71,
+   "link": "https://www.westwing.de/bad-aufbewahrung/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Laundry Baskets",
+   "qty": 59,
+   "link": "https://www.westwing.de/waeschekoerbe-waeschetaschen/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Cosmetic Bins",
+   "qty": 56,
+   "link": "https://www.westwing.de/kosmetikeimer/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Toilet Brushes",
+   "qty": 60,
+   "link": "https://www.westwing.de/toilettenbuersten/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Toilet Paper Holders",
+   "qty": 39,
+   "link": "https://www.westwing.de/toilettenpapierhalter/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Towel Holders",
+   "qty": 36,
+   "link": "https://www.westwing.de/handtuchhalter/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  }
+ ],
+ "review": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Shop by Room > Bathroom",
+   "qty": 485,
+   "issue": "WITHHELD ROLL-UP: this is the 'Shop by Room' bathroom hub (H1 'Badezimmer', breadcrumb Home / Shop by Room / Badezimmer, rendered '485 Produkte' / '120 von 485 Produkten werden angezeigt'). Its own category chips are room-scoped clones of nodes recorded or routed elsewhere (Badschränke, Seifenspender & Schalen, Handtuchhalter, Kosmetikeimer, Badaufbewahrung, Wäschekörbe, Handtücher, Badematten), so it double-counts roughly 450 already-recorded products plus the routed-out towels and bath mats. Recording it alongside its children would violate rules 24/28 and the no-aggregation rule, so it is withheld deliberately, not skipped.",
+   "link": "https://www.westwing.de/badmoebel/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Accessories > Bathroom Accessories (parent)",
+   "qty": 420,
+   "issue": "NOT RECORDED - parent of the nine recorded/reviewed leaves (rule 24). Rendered '420 Produkte' / '120 von 420 Produkten werden angezeigt', H1 'Badaccessoires'. Recorded here only as the grouping row; its URL is deliberately absent from rows[].",
+   "link": "https://www.westwing.de/badezimmer-deko/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Accessories > Soaps & Creams",
+   "qty": 53,
+   "issue": "NOT RECORDED - primary product type is a consumable toiletry/cleaning product, not a bathroom accessory, fixture or hardware (rules 2, 3, 13). The grid is hand soaps, bar soaps, hand creams and washing-up liquid (Handseife Apothecary, Seifenstück Refresh, Spülmittel Forest Garden/Shadow Lake/Blossom Breeze). Rule 13 covers soap DISPENSERS, dishes and holders - which are recorded separately as Seifenspender & -schalen (87) - not the soap itself. Included here so this ninth child of Badaccessoires is not silently dropped.",
+   "link": "https://www.westwing.de/seifen-cremes/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Furniture > Cabinets > Bathroom Cabinets",
+   "qty": 36,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Bathroom Cabinets' - exact URL hit from dedup.already_extracted(). Under the OPTION 1 policy bathroom cabinets and vanity units that Furniture already took stay in Furniture and are not re-extracted into Bathroom, even though rule 9 would otherwise class them as Bathroom.",
+   "link": "https://www.westwing.de/badschraenke/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathroom Cabinets (room-scoped variant)",
+   "qty": 60,
+   "issue": "NOT RECORDED - same category name 'Badschränke' served under the Shop-by-Room Badezimmer hub. It is the same merchandising node reached by a second nav path (rule 28) and is a superset of the canonical /badschraenke/ (60 vs 36); the canonical page is the one carrying <link rel=canonical> and BreadcrumbList JSON-LD, and it is ALREADY EXTRACTED in Furniture.xlsx as 'Bathroom Cabinets'. The exclusion index is URL-EXACT so this '-2' twin does not match it, but it is the same node under OPTION 1 and stays in Furniture. Flagged explicitly so the mismatch is visible rather than silently resolved.",
+   "link": "https://www.westwing.de/badschraenke-2/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Furniture > Shelves > Bathroom Shelves",
+   "qty": 37,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Bathroom Shelving' - exact URL hit from dedup.already_extracted(). Stays in Furniture under OPTION 1.",
+   "link": "https://www.westwing.de/badregale/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Accessories > Mirrors > Vanity Mirrors",
+   "qty": 16,
+   "issue": "ALREADY EXTRACTED IN Final.xlsx (Home Decor pass) as 'Vanity Mirrors' - exact URL hit. This is the one mirror node that rule 10 would pull into Bathroom (vanity/magnifying mirrors), so it is called out explicitly; it stays where the Home Decor pass put it and does not enter rows[].",
+   "link": "https://www.westwing.de/schminkspiegel/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Accessories > Mirrors > Wall Mirrors",
+   "qty": 139,
+   "issue": "ALREADY EXTRACTED IN Final.xlsx (Home Decor pass) as 'Wall Mirrors'. Also not a bathroom node on its merits: it is the general decorative wall-mirror listing under Accessoires > Spiegel, with no bathroom, LED, illuminated, demister or mirror-cabinet child anywhere in the tree.",
+   "link": "https://www.westwing.de/wandspiegel/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Accessories > Mirrors > Full-Length Mirrors",
+   "qty": 50,
+   "issue": "ALREADY EXTRACTED IN Final.xlsx (Home Decor pass) as 'Full-Length Mirrors'. Full-length/floor mirrors, primary type decor, not bathroom.",
+   "link": "https://www.westwing.de/ganzkoerperspiegel/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Textiles > Bath Textiles (parent)",
+   "qty": 429,
+   "issue": "ROUTED TO TEXTILE: bath linen department (rules 15, 20). Its three children are listed below. The parent URL is given for traceability only and must not be recorded (rule 24).",
+   "link": "https://www.westwing.de/badtextilien/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Textiles > Towels",
+   "qty": 225,
+   "issue": "ROUTED TO TEXTILE: bath, hand and guest towels (rule 15). The corresponding HARDWARE node, Handtuchhalter (towel rails), is recorded in rows[] as Bathroom per the same rule.",
+   "link": "https://www.westwing.de/handtuecher/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Textiles > Bath Mats",
+   "qty": 130,
+   "issue": "ROUTED TO TEXTILE: woven/tufted textile bath mats (rule 16 - textile bath mat goes to Textile; only a rubber/anti-slip mat sold as a bathroom accessory would come to Bathroom, and Westwing sells none).",
+   "link": "https://www.westwing.de/badvorleger-und-badematten/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Textiles > Beach & Hammam Towels",
+   "qty": 59,
+   "issue": "ROUTED TO TEXTILE: beach and hammam towels (rule 15). Listed because it is the third child of Badtextilien and would otherwise be a silent drop.",
+   "link": "https://www.westwing.de/strandtuecher/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathrobes",
+   "qty": 12,
+   "issue": "ROUTED TO TEXTILE: bathrobes (rule 20).",
+   "link": "https://www.westwing.de/bademaentel/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower curtains",
+   "qty": 7,
+   "issue": "ROUTED TO TEXTILE: shower curtains (rule 20). Sitemap-only node (English handle on the DE storefront, H1 'Shower curtains'), not present in the mega-menu; recovered from https://www.westwing.de/sitemap-categories.xml so it is not silently skipped.",
+   "link": "https://www.westwing.de/shower-curtains/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Rugs > By Room > Bathroom",
+   "qty": 130,
+   "issue": "ROUTED TO TEXTILE: bathroom rugs, i.e. the same textile bath-mat assortment served under the Teppiche (rugs) tree - H1 'Badezimmer', identical 130 total to Badtextilien > Badematten. Textile under rules 15/16, and recording it would in any case duplicate Badematten.",
+   "link": "https://www.westwing.de/badezimmerteppiche/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Kids > Textiles > Bath Textiles (Baby Towels)",
+   "qty": 18,
+   "issue": "ROUTED TO TEXTILE: baby bath towels and hooded towels (rule 15). Sits under Kinder > Kindertextilien, H1 'Badtextilien'.",
+   "link": "https://www.westwing.de/babyhandtuecher/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Storage > Bathroom Accessories (storage-scoped variant)",
+   "qty": 206,
+   "issue": "NOT RECORDED - the mega-menu's Aufbewahrung section links a second 'Badaccessoires' node whose siblings are Körbe / Boxen / Dosen / Büro-Organizer / Küchenaufbewahrung / Mülleimer. It is a 206-product storage-scoped slice of the 420-product canonical Accessoires > Badaccessoires and overlaps the recorded leaves; it carries no canonical tag and no BreadcrumbList. Withheld as an overlapping roll-up (brief s9) rather than recorded alongside its own children.",
+   "link": "https://www.westwing.de/badezimmer-deko-2/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Rugs > Anti-Slip Mats",
+   "qty": 1,
+   "issue": "NOT RECORDED - despite the name this is not a bathroom anti-slip mat. The node sits under Teppiche (rugs), its chips are the rug facets, and its single product is 'Waschbare In- & Outdoor-Fleece-Teppichunterlage Viles', a rug underlay. Rule 16's rubber/anti-slip exception requires the mat to be sold as a bathroom accessory; this one is not. Checked so the rule-16 exception is visibly considered rather than assumed away.",
+   "link": "https://www.westwing.de/antirutschmatten/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Decorative mirrors",
+   "qty": 33,
+   "issue": "NOT RECORDED - sitemap-only English-handle mirror collection (H1 'Decorative mirrors'), linked from no menu and carrying no category chips. Decorative wall mirrors, primary type decor, and an overlap of the Accessoires > Spiegel tree. Listed so the sitemap sweep is fully accounted for.",
+   "link": "https://www.westwing.de/decorative-mirrors-1/"
+  }
+ ],
+ "_reconstructed_from": "Bathroom.xlsx delivered 2026-09-01 (checkpoint), not original worker JSON"
+}

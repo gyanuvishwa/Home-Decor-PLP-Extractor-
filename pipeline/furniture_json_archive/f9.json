@@ -1,0 +1,417 @@
+{
+ "sr": 9,
+ "company": "Article",
+ "brand_site": "article.com",
+ "country": "USA",
+ "site_url": "https://www.article.com/",
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ACCESS: article.com reached DIRECTLY over IPv4 (HTTP 200) with probe.py/curl_cffi - no proxy needed, matching the prior Home-Decor pass. robots.txt names no Claude/anthropic-ai/ClaudeBot agent and allows /browse/; only /checkout, /order, /api, /account, /search? and /discount are disallowed, none of which I touched. The origin rate-limits bursts with HTTP 429, so all fetches were serialised with backoff and every 429 was retried to a 200.\n\nTREE SOURCE: /category_sitemap.xml is STALE and must not be used on its own - it still lists dead nodes and old IDs. The authoritative tree is the full mega-menu JSON, which Article server-renders into every /browse page inside the Nuxt payload under the key \"navigation\" (nested id/url/name/items). I extracted that array by balanced-bracket scan from /browse/1/sofas and used it as the spine. Article publishes TWO parallel taxonomies over the same leaf URLs: a room taxonomy (\"Rooms\": Living Room / Bedroom / Dining & Kitchen / Home Office / Entryway / Outdoor) and a product-type taxonomy (\"Products\": Seating / Tables / Beds & Bedroom / Storage & Organization / Outdoor / Rugs, Lighting & Decor). Per the brief's PRIMARY PRODUCT TYPE > ROOM NAME priority I used the product-type spine, which covers every furniture leaf exactly once and avoids the heavy duplication the room spine would produce (e.g. Bookcases & Shelving appears in Living Room, Home Office, Entryway and Storage). The room parents were fetched only as a cross-check and all resolve to supersets of leaves already captured: Living Room 600, Dining & Kitchen 193, Home Office 88, Entryway 65 items.\n\nURL SHAPE TRAP: /browse/<id>/<slug> is routed by the SLUG, not the id. The same id serves different categories under different slugs - /browse/702/all-tables is 346 items but /browse/702/file-cabinets is 6; /browse/104/outdoor-dining is 110 but /browse/104/outdoor-sets is 113; /browse/17 serves sofas-ottomans (98), outdoor-ottoman-and-pouf (11) and floor-lamps. So the ids in the prior Home-Decor pass do not conflict with these - both are correct. Every URL below was fetched individually and its h1 confirmed to match the category name claimed.\n\nQTY METHOD: every qty is the rendered listing header - Article server-renders exactly one \"N items\" string per listing, inside the Sort & Filter block. I confirmed by targeted extraction that the string inside the 'Sort & Filter' container is the only \"N items\" occurrence on the page, so the value is unambiguous. No structured/API source was used and none was needed. I did NOT count product hrefs - as the brief warns, rendered /product/ links are polluted by recommendation carousels (e.g. /browse/87/swivel-chairs reports 34 items but renders 110 distinct product hrefs).\n\nSANITY CHECKS RUN: (1) All 39 leaf counts were fetched a SECOND time in a separate pass and all 39 matched exactly with no redirect - zero drift. (2) Counts vary per URL across the full range 6..154, so no value is a site-wide total. (3) Partition checks: Dining Chairs & Stools parent (155) = Dining Chairs & Seating 117 + Stools 38 EXACTLY; All Tables parent (346) vs children 116+63+66+13+10+46+26 = 340, a 6-item remainder; All Bedroom parent (283) vs 121+36+43+54+25+mattresses 10 = 289; Outdoor Dining parent (110) vs 69+27+12 = 108. These near-exact reconciliations confirm the child sets are complete. (4) h1 checked on every page to catch silent parent-serving; the only silent redirects found were dead legacy slugs (below). (5) No suspiciously round or capped numbers.\n\nDEAD / LEGACY URLS EXCLUDED (all verified by fetch): /browse/103/sofas-daybeds 301s to /browse (All Products, 1839) - there is no separate daybeds category, daybeds live inside Beds; /browse/113/outdoor-benches 301s to /browse/61/outdoor-dining-chairs; /browse/79/tables-counter-bar-tables 301s to /browse/10/tables-dining-tables; /browse/90/tables-consoles-carts 301s to /browse/72/tables-consoles; /browse/26/decor-accents 301s to /browse/48/decor. Two legacy pages are still live but appear nowhere in the current nav and are superseded, so they were excluded to avoid duplicate rows: /browse/16/bedroom-dressers \"Dressers & Nightstands\" (75) is the old combined node now split into Dressers & Armoires (43) + Nightstands (36), and /browse/114/storage-benches-ottomans \"Storage Benches\" (33) is subsumed by Storage Beds & Benches (59). /browse/3/tables (346) and /browse/5/chairs (359) are legacy umbrella aliases of All Tables and the Seating group.\n\nGROUPING ROWS: Seating, Tables, Beds & Bedroom, Storage & Organization, Outdoor Lounging and Outdoor Dining all have extractable children, so per the hierarchy rule they carry qty=null/link=null even though the site does publish a number for each (All Seating 727, All Tables 346, All Bedroom 283, Storage & Organization 220, Outdoor Lounging 409, Outdoor Dining 110). Article nests two further intermediate parents inside Seating - \"Sofas, Sectionals, & Loveseats\" (/browse/1/sofas, 407 items, parent of Sofas & Loveseats / Sectionals / Sofa Beds / Modular Seating) and \"Dining Chairs & Stools\" (/browse/431/chairs-dining-chairs-stools, 155 items, parent of Dining Chairs & Seating 117 + Stools 38, summing EXACTLY). Because the workbook has only Category + Sub-Category columns, a third nesting level in one column would make the reading order ambiguous, so those two intermediate parents were flattened away and their leaves sit directly under Seating; their own totals are recorded here instead. Outdoor Sets (113) is emitted as a LEAF, not a group: its only nav children are ?tc= filter query-strings, which the brief forbids recording. It is also a SIBLING of Outdoor Lounging and Outdoor Dining rather than a child of either (it spans both lounge sets and dining sets), so in reading order it is placed before both grouping rows, directly under the Outdoor Furniture category. Noted anomaly: the Outdoor department page /browse/58/outdoor reports 401 items while its own child Outdoor Lounging reports 409 - a genuine, reproducible inconsistency in Article's own counts (both re-read and stable). It affects no emitted qty because both are parents and neither is a grouping row I assigned a number to.\n\nOVERLAP FLAGS: Article's taxonomy cross-lists rather than partitions. I ran a product-ID intersection test on the suspicious pairs and flagged four leaves that overlap a broader sibling rather than subdividing it: Swivel Chairs (all 34 inside Lounge Chairs), Dining Banquettes & Benches (36 of 37 inside Benches), Bedroom Benches (21 of 25 inside Benches), and Storage Cabinets (essentially all inside Sideboards & Cabinets). They are kept because each is a first-class, separately shoppable node in Article's live navigation with its own URL, h1 and exact count - but they must not be summed with their broader siblings. Storage Beds & Benches (59) was tested the same way and is genuinely distinct (only 20 items shared with Beds), so it is unflagged.\n\nEXCLUDED AS NOT FURNITURE: Mattresses (/browse/60/bedroom-mattresses, 10) - bedding, not furniture, and Article splits it cleanly from Beds so no combined-node exception was needed. Bedding & Inserts, Pillows & Throws, Rugs & Runners, Performance Rugs, Outdoor Rugs, Rug Pads - textiles. Lighting and its four children, and Mirrors - out of scope here and already captured by the Lighting and Wall Decor passes. Planters & Pots, Outdoor Accessories & Decor (102), Umbrellas & Stands, Furniture Covers, Cushion Cover Sets - decor and furniture care/parts. Decor > Poufs (/browse/65/decor-poufs) was excluded as a decor node, but Seating > Ottomans & Poufs (/browse/17/sofas-ottomans, 98) IS included because Article files it under the Products > Seating department, which is exactly the condition the brief sets for poufs. Wall Shelves (/browse/52/wall-shelves, 15) excluded: Article files it under Decor > \"Mirrors, Shelves & Planters\" alongside mirrors and planters, which is the decorative wall-shelf case the brief assigns to Wall Decor, not the freestanding-shelving case - freestanding units are covered by Bookcases & Shelving (80). Also dropped as §3 navigation junk: New Arrivals, Best Sellers, Sale, all /c/collections* landing pages, Furniture Bundles, Shop By Material, Contract Grade, Ideas & Inspiration, Article Pro, and every ?tc=/?av= filter query-string link in the mega-menu.",
+ "rows": [
+  {
+   "category": "Furniture",
+   "sub_category": "Seating",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sofas & Loveseats",
+   "qty": 154,
+   "link": "https://www.article.com/browse/12/sofas-sofas",
+   "is_group": false,
+   "evidence": "rendered 'Sort & Filter' header text '154 items' on https://www.article.com/browse/12/sofas-sofas",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sectionals",
+   "qty": 148,
+   "link": "https://www.article.com/browse/27/sofas-sectionals",
+   "is_group": false,
+   "evidence": "rendered 'Sort & Filter' header text '148 items' on https://www.article.com/browse/27/sofas-sectionals",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sofa Beds",
+   "qty": 41,
+   "link": "https://www.article.com/browse/28/sofas-sofa-beds",
+   "is_group": false,
+   "evidence": "rendered 'Sort & Filter' header text '41 items' on https://www.article.com/browse/28/sofas-sofa-beds",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Modular Seating",
+   "qty": 80,
+   "link": "https://www.article.com/browse/91/sofas-modular-sofas",
+   "is_group": false,
+   "evidence": "rendered 'Sort & Filter' header text '80 items' on https://www.article.com/browse/91/sofas-modular-sofas",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Lounge Chairs",
+   "qty": 141,
+   "link": "https://www.article.com/browse/2/chairs-lounge-chairs",
+   "is_group": false,
+   "evidence": "rendered 'Sort & Filter' header text '141 items' on https://www.article.com/browse/2/chairs-lounge-chairs",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Swivel Chairs",
+   "qty": 34,
+   "link": "https://www.article.com/browse/87/swivel-chairs",
+   "is_group": false,
+   "evidence": "rendered 'Sort & Filter' header text '34 items' on https://www.article.com/browse/87/swivel-chairs",
+   "flag": "MANUAL REVIEW: cross-listed slice - 34 of its 34 items also appear in Lounge Chairs (/browse/2/chairs-lounge-chairs); kept because it is a distinct node in Article's own navigation with its own URL and count, but it overlaps that node rather than partitioning it"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dining Chairs & Seating",
+   "qty": 117,
+   "link": "https://www.article.com/browse/7/chairs-dining-chairs",
+   "is_group": false,
+   "evidence": "rendered 'Sort & Filter' header text '117 items' on https://www.article.com/browse/7/chairs-dining-chairs",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Stools",
+   "qty": 38,
+   "link": "https://www.article.com/browse/47/chairs-stools",
+   "is_group": false,
+   "evidence": "rendered 'Sort & Filter' header text '38 items' on https://www.article.com/browse/47/chairs-stools",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Ottomans & Poufs",
+   "qty": 98,
+   "link": "https://www.article.com/browse/17/sofas-ottomans",
+   "is_group": false,
+   "evidence": "rendered 'Sort & Filter' header text '98 items' on https://www.article.com/browse/17/sofas-ottomans",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Benches",
+   "qty": 57,
+   "link": "https://www.article.com/browse/23/chairs-benches",
+   "is_group": false,
+   "evidence": "rendered 'Sort & Filter' header text '57 items' on https://www.article.com/browse/23/chairs-benches",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dining Banquettes & Benches",
+   "qty": 37,
+   "link": "https://www.article.com/browse/33/dining-benches",
+   "is_group": false,
+   "evidence": "rendered 'Sort & Filter' header text '37 items' on https://www.article.com/browse/33/dining-benches",
+   "flag": "MANUAL REVIEW: cross-listed slice - 36 of its 37 items also appear in Benches (/browse/23/chairs-benches); kept because it is a distinct node in Article's own navigation with its own URL and count, but it overlaps that node rather than partitioning it"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Office Chairs",
+   "qty": 28,
+   "link": "https://www.article.com/browse/82/chairs-office-chairs",
+   "is_group": false,
+   "evidence": "rendered 'Sort & Filter' header text '28 items' on https://www.article.com/browse/82/chairs-office-chairs",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Tables",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dining Tables",
+   "qty": 116,
+   "link": "https://www.article.com/browse/10/tables-dining-tables",
+   "is_group": false,
+   "evidence": "rendered 'Sort & Filter' header text '116 items' on https://www.article.com/browse/10/tables-dining-tables",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Coffee Tables",
+   "qty": 63,
+   "link": "https://www.article.com/browse/21/tables-coffee-tables",
+   "is_group": false,
+   "evidence": "rendered 'Sort & Filter' header text '63 items' on https://www.article.com/browse/21/tables-coffee-tables",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Side Tables",
+   "qty": 66,
+   "link": "https://www.article.com/browse/83/tables-side-tables",
+   "is_group": false,
+   "evidence": "rendered 'Sort & Filter' header text '66 items' on https://www.article.com/browse/83/tables-side-tables",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Consoles",
+   "qty": 13,
+   "link": "https://www.article.com/browse/72/tables-consoles",
+   "is_group": false,
+   "evidence": "rendered 'Sort & Filter' header text '13 items' on https://www.article.com/browse/72/tables-consoles",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Counter & Bar Tables",
+   "qty": 10,
+   "link": "https://www.article.com/browse/701/bar-counter-tables",
+   "is_group": false,
+   "evidence": "rendered 'Sort & Filter' header text '10 items' on https://www.article.com/browse/701/bar-counter-tables",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Desks",
+   "qty": 46,
+   "link": "https://www.article.com/browse/37/tables-desks",
+   "is_group": false,
+   "evidence": "rendered 'Sort & Filter' header text '46 items' on https://www.article.com/browse/37/tables-desks",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bar & Kitchen Furniture",
+   "qty": 26,
+   "link": "https://www.article.com/browse/36/tables-islands-carts",
+   "is_group": false,
+   "evidence": "rendered 'Sort & Filter' header text '26 items' on https://www.article.com/browse/36/tables-islands-carts",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Beds & Bedroom",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Beds",
+   "qty": 121,
+   "link": "https://www.article.com/browse/14/bedroom-beds",
+   "is_group": false,
+   "evidence": "rendered 'Sort & Filter' header text '121 items' on https://www.article.com/browse/14/bedroom-beds",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Nightstands",
+   "qty": 36,
+   "link": "https://www.article.com/browse/15/bedroom-nightstands",
+   "is_group": false,
+   "evidence": "rendered 'Sort & Filter' header text '36 items' on https://www.article.com/browse/15/bedroom-nightstands",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dressers & Armoires",
+   "qty": 43,
+   "link": "https://www.article.com/browse/22/bedroom-dressers",
+   "is_group": false,
+   "evidence": "rendered 'Sort & Filter' header text '43 items' on https://www.article.com/browse/22/bedroom-dressers",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Headboards",
+   "qty": 54,
+   "link": "https://www.article.com/browse/95/bedroom-headboards",
+   "is_group": false,
+   "evidence": "rendered 'Sort & Filter' header text '54 items' on https://www.article.com/browse/95/bedroom-headboards",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bedroom Benches",
+   "qty": 25,
+   "link": "https://www.article.com/browse/64/bedroom-benches",
+   "is_group": false,
+   "evidence": "rendered 'Sort & Filter' header text '25 items' on https://www.article.com/browse/64/bedroom-benches",
+   "flag": "MANUAL REVIEW: cross-listed slice - 21 of its 25 items also appear in Benches (/browse/23/chairs-benches); kept because it is a distinct node in Article's own navigation with its own URL and count, but it overlaps that node rather than partitioning it"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Storage & Organization",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "TV & Media Units",
+   "qty": 38,
+   "link": "https://www.article.com/browse/94/storage-media-units",
+   "is_group": false,
+   "evidence": "rendered 'Sort & Filter' header text '38 items' on https://www.article.com/browse/94/storage-media-units",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bookcases & Shelving",
+   "qty": 80,
+   "link": "https://www.article.com/browse/8/storage-bookcases-and-shelves",
+   "is_group": false,
+   "evidence": "rendered 'Sort & Filter' header text '80 items' on https://www.article.com/browse/8/storage-bookcases-and-shelves",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sideboards & Cabinets",
+   "qty": 127,
+   "link": "https://www.article.com/browse/93/storage-sideboards",
+   "is_group": false,
+   "evidence": "rendered 'Sort & Filter' header text '127 items' on https://www.article.com/browse/93/storage-sideboards",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Storage Cabinets",
+   "qty": 26,
+   "link": "https://www.article.com/browse/19/storage-cabinets",
+   "is_group": false,
+   "evidence": "rendered 'Sort & Filter' header text '26 items' on https://www.article.com/browse/19/storage-cabinets",
+   "flag": "MANUAL REVIEW: cross-listed slice - 26 of its 26 items also appear in Sideboards & Cabinets (/browse/93/storage-sideboards); kept because it is a distinct node in Article's own navigation with its own URL and count, but it overlaps that node rather than partitioning it"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "File Cabinets",
+   "qty": 6,
+   "link": "https://www.article.com/browse/702/file-cabinets",
+   "is_group": false,
+   "evidence": "rendered 'Sort & Filter' header text '6 items' on https://www.article.com/browse/702/file-cabinets",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Storage Beds & Benches",
+   "qty": 59,
+   "link": "https://www.article.com/browse/89/storage-beds",
+   "is_group": false,
+   "evidence": "rendered 'Sort & Filter' header text '59 items' on https://www.article.com/browse/89/storage-beds",
+   "flag": null
+  },
+  {
+   "category": "Outdoor Furniture",
+   "sub_category": "Outdoor Sets",
+   "qty": 113,
+   "link": "https://www.article.com/browse/104/outdoor-sets",
+   "is_group": false,
+   "evidence": "rendered 'Sort & Filter' header text '113 items' on https://www.article.com/browse/104/outdoor-sets",
+   "flag": null
+  },
+  {
+   "category": "Outdoor Furniture",
+   "sub_category": "Outdoor Lounging",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Outdoor Furniture",
+   "sub_category": "Outdoor Sofas & Loveseats",
+   "qty": 50,
+   "link": "https://www.article.com/browse/84/outdoor-sofas",
+   "is_group": false,
+   "evidence": "rendered 'Sort & Filter' header text '50 items' on https://www.article.com/browse/84/outdoor-sofas",
+   "flag": null
+  },
+  {
+   "category": "Outdoor Furniture",
+   "sub_category": "Outdoor Sectionals & Modulars",
+   "qty": 34,
+   "link": "https://www.article.com/browse/85/outdoor-sectionals",
+   "is_group": false,
+   "evidence": "rendered 'Sort & Filter' header text '34 items' on https://www.article.com/browse/85/outdoor-sectionals",
+   "flag": null
+  },
+  {
+   "category": "Outdoor Furniture",
+   "sub_category": "Lounge Chairs & Chaises",
+   "qty": 82,
+   "link": "https://www.article.com/browse/62/outdoor-lounge-chairs",
+   "is_group": false,
+   "evidence": "rendered 'Sort & Filter' header text '82 items' on https://www.article.com/browse/62/outdoor-lounge-chairs",
+   "flag": null
+  },
+  {
+   "category": "Outdoor Furniture",
+   "sub_category": "Outdoor Coffee & Side Tables",
+   "qty": 54,
+   "link": "https://www.article.com/browse/60/outdoor-coffee-side-tables",
+   "is_group": false,
+   "evidence": "rendered 'Sort & Filter' header text '54 items' on https://www.article.com/browse/60/outdoor-coffee-side-tables",
+   "flag": null
+  },
+  {
+   "category": "Outdoor Furniture",
+   "sub_category": "Outdoor Ottomans & Poufs",
+   "qty": 11,
+   "link": "https://www.article.com/browse/17/outdoor-ottoman-and-pouf",
+   "is_group": false,
+   "evidence": "rendered 'Sort & Filter' header text '11 items' on https://www.article.com/browse/17/outdoor-ottoman-and-pouf",
+   "flag": null
+  },
+  {
+   "category": "Outdoor Furniture",
+   "sub_category": "Outdoor Dining",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Outdoor Furniture",
+   "sub_category": "Outdoor Dining Tables",
+   "qty": 69,
+   "link": "https://www.article.com/browse/59/outdoor-dining-tables",
+   "is_group": false,
+   "evidence": "rendered 'Sort & Filter' header text '69 items' on https://www.article.com/browse/59/outdoor-dining-tables",
+   "flag": null
+  },
+  {
+   "category": "Outdoor Furniture",
+   "sub_category": "Outdoor Dining Chairs & Benches",
+   "qty": 27,
+   "link": "https://www.article.com/browse/61/outdoor-dining-chairs",
+   "is_group": false,
+   "evidence": "rendered 'Sort & Filter' header text '27 items' on https://www.article.com/browse/61/outdoor-dining-chairs",
+   "flag": null
+  },
+  {
+   "category": "Outdoor Furniture",
+   "sub_category": "Outdoor Bar & Counter Stools",
+   "qty": 12,
+   "link": "https://www.article.com/browse/97/outdoor-bar-counter-stools",
+   "is_group": false,
+   "evidence": "rendered 'Sort & Filter' header text '12 items' on https://www.article.com/browse/97/outdoor-bar-counter-stools",
+   "flag": null
+  }
+ ]
+}

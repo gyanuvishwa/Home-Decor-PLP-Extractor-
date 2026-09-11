@@ -1,0 +1,79 @@
+{
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "SR173 Chattels & More (UAE). Access as bs173.json (api.chattelsandmore.com /api/promotion/<slug> + /api/promotion-products/<id>/<categorySlug>). Main nav's only markdown-style item is 'Sale' (headerMainMenu id=1, slug 'sale', type='promotion'; also in footerLinks and sitemap.xml), reached at /en/promotion/sale. SALE VS. CLEARANCE JUDGEMENT CALL (the brief's central test): customer-facing signals say 'Sale' - nav label 'Sale', <title>'Sale | Chattels and More', meta/OG description 'Discover sale items at Chattels and More, where you'll find discounts across living-room, dining, bedroom, lighting and accessories' - generic discount wording, no 'final'/'clearance'/'outlet'/'last chance'/permanence language visible to a shopper. But the site's OWN backend taxonomy disagrees: the promotion API's 'campaign_name' field for this exact promotion is 'Clearance', and its banner image assets are literally uploaded as Clearance_Desktop.webp / Clearance_Mobile.webp. This is genuinely ambiguous per the brief's test, so every Sale/Clearance row below carries a MANUAL REVIEW flag rather than a guessed classification either way. No named regional seasonal campaign (no 'DSS'/'White Friday'/'Ramadan' branding found anywhere on the promotion or homepage) - special_price_from dates on the underlying products span a rolling window (observed May-Sep 2026), consistent with an ongoing markdown mechanism rather than a single dated blast, which leans slightly toward 'permanent-style clearance mechanism' but is not conclusive either way. Site exposes 5 genuine department children under this promotion (Living/Dining/Bedroom/Accessories/Lighting) with independently verified exact totals; fetched full per_page>=total listings for all 5 (last_page=1 confirmed exhaustive in each) and found only 1 cross-listed product (id 12850, 'Amy Buffet...storage cabinet', appears in both Living and Dining) out of 297 - not deduplicated, since both totals are genuinely what the site itself reports per department. SECOND CANDIDATE: the KARE-brand mobile menu (headerMobileMenuKare) links a 'KARE Sale' item to slug 'sale-kare' (promotion id=59). Its API 'name' field (customer displayed promotion name, not just backend campaign_name) is literally 'Clearance' - stronger internal signal than the main Sale page. It only has 3 of the 5 departments configured (Dining/Accessories/Lighting) and only 5 products total. Verified it is NOT simply a KARE-brand filter over the same Sale(id=1) product set (unlike ordinary category browsing, where a prior pass confirmed KARE is a pure facet): only 1 of its 5 products also appears in the main Sale(id=1) listing, so this is a materially different, independently curated small selection - kept as its own set of rows, also flagged. Discovery also checked: full headerMainMenu (no other markdown/clearance/outlet term), footerLinks/headerMegaMenuFooterLinks (New Collection 2026, Sale only), footer 'POPULAR' block (ordinary categories only), sitemap.xml grep for clearance/outlet/final-sale/last-chance/end-of-line/discontinued/as-is (all zero matches beyond the one Sale URL already covered), and direct /api/promotion/<slug> probes for clearance, outlet, final-sale, last-chance, end-of-line, discontinued, as-is (all returned 'Promotion not found'). The i18n translation table does carry 'outlet':'OUTLET' and 'as_is':'Last Chance to Buy' strings, but these are per-product filter/badge labels used inside ordinary category listings, not their own dedicated pages - no crawlable Outlet/As-Is PLP exists, so none is emitted as a row.",
+  "rows": [
+    {
+      "category": "Clearance",
+      "sub_category": "Sale (Clearance) - Living",
+      "qty": 29,
+      "link": "https://www.chattelsandmore.com/en/promotion/sale",
+      "is_group": false,
+      "evidence": "api.chattelsandmore.com GET /api/promotion-products/1/living-room?locale=en meta.total=29 (promotion id=1 name='Sale'; API field campaign_name='Clearance', image asset 'Clearance_Desktop.webp')",
+      "flag": "MANUAL REVIEW: AMBIGUOUS SALE/CLEARANCE - customer-facing page is titled/labelled 'Sale' with generic 'discounts' wording (no clearance/outlet/final-sale/last-chance language visible to shoppers), but the site's own backend names this exact promotion campaign_name='Clearance' and its banner assets are literally called Clearance_Desktop/Mobile.webp. See notes for full reasoning."
+    },
+    {
+      "category": "Clearance",
+      "sub_category": "Sale (Clearance) - Dining",
+      "qty": 105,
+      "link": "https://www.chattelsandmore.com/en/promotion/sale",
+      "is_group": false,
+      "evidence": "api.chattelsandmore.com GET /api/promotion-products/1/dining?locale=en meta.total=105",
+      "flag": "MANUAL REVIEW: AMBIGUOUS SALE/CLEARANCE - same reasoning as the Sale (Clearance) - Living row above."
+    },
+    {
+      "category": "Clearance",
+      "sub_category": "Sale (Clearance) - Bedroom",
+      "qty": 19,
+      "link": "https://www.chattelsandmore.com/en/promotion/sale",
+      "is_group": false,
+      "evidence": "api.chattelsandmore.com GET /api/promotion-products/1/bedroom?locale=en meta.total=19",
+      "flag": "MANUAL REVIEW: AMBIGUOUS SALE/CLEARANCE - same reasoning as the Sale (Clearance) - Living row above."
+    },
+    {
+      "category": "Clearance",
+      "sub_category": "Sale (Clearance) - Accessories",
+      "qty": 116,
+      "link": "https://www.chattelsandmore.com/en/promotion/sale",
+      "is_group": false,
+      "evidence": "api.chattelsandmore.com GET /api/promotion-products/1/accessories?locale=en meta.total=116",
+      "flag": "MANUAL REVIEW: AMBIGUOUS SALE/CLEARANCE - same reasoning as the Sale (Clearance) - Living row above."
+    },
+    {
+      "category": "Clearance",
+      "sub_category": "Sale (Clearance) - Lighting",
+      "qty": 28,
+      "link": "https://www.chattelsandmore.com/en/promotion/sale",
+      "is_group": false,
+      "evidence": "api.chattelsandmore.com GET /api/promotion-products/1/lighting?locale=en meta.total=28",
+      "flag": "MANUAL REVIEW: AMBIGUOUS SALE/CLEARANCE - same reasoning as the Sale (Clearance) - Living row above."
+    },
+    {
+      "category": "Clearance",
+      "sub_category": "KARE Clearance - Dining",
+      "qty": 2,
+      "link": "https://www.chattelsandmore.com/en/promotion/sale-kare",
+      "is_group": false,
+      "evidence": "api.chattelsandmore.com GET /api/promotion-products/59/dining?locale=en meta.total=2 (promotion id=59; API 'name' field='Clearance'; linked from KARE mobile menu as 'KARE Sale')",
+      "flag": "MANUAL REVIEW: AMBIGUOUS SALE/CLEARANCE - mobile-menu label is 'KARE Sale' but the promotion record's own 'name' field is 'Clearance'. Verified this is NOT a KARE-brand filter over the main Sale(id=1) listing - only 1 of its 5 products also appears there, so it is a distinct small curated set, not an alias."
+    },
+    {
+      "category": "Clearance",
+      "sub_category": "KARE Clearance - Accessories",
+      "qty": 2,
+      "link": "https://www.chattelsandmore.com/en/promotion/sale-kare",
+      "is_group": false,
+      "evidence": "api.chattelsandmore.com GET /api/promotion-products/59/accessories?locale=en meta.total=2",
+      "flag": "MANUAL REVIEW: AMBIGUOUS SALE/CLEARANCE - same reasoning as the KARE Clearance - Dining row above."
+    },
+    {
+      "category": "Clearance",
+      "sub_category": "KARE Clearance - Lighting",
+      "qty": 1,
+      "link": "https://www.chattelsandmore.com/en/promotion/sale-kare",
+      "is_group": false,
+      "evidence": "api.chattelsandmore.com GET /api/promotion-products/59/lighting?locale=en meta.total=1",
+      "flag": "MANUAL REVIEW: AMBIGUOUS SALE/CLEARANCE - same reasoning as the KARE Clearance - Dining row above."
+    }
+  ]
+}

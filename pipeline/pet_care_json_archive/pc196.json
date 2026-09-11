@@ -1,0 +1,115 @@
+{
+  "status": "partial",
+  "failure_reason": "kohls.com is behind Akamai Bot Manager; direct fetch/WebFetch 403 immediately (consistent with prior Home-Decor pass). curl_cffi impersonation (safari260_ios profile) got past Akamai and loaded 6 of the 11 confirmed Pet Supplies category pages with live server-rendered product counts, then the 7th request (Food & Treats) returned 403 and per the access-tier 'first block stops that host' rule, no further live requests were made to kohls.com. The remaining 4 confirmed categories (Grooming, Houses & Habitats, Training & Behavior, Travel) and the Food & Treats category are recorded with verified links/existence from the sitemap taxonomy but qty=null because the live count could not be fetched.",
+  "notes": "Site taxonomy discovery used the unprotected XML sitemaps (sitemap.xml -> 6x sitemap_catalog_N.xml, all HTTP 200 via curl_cffi, not Akamai-gated) rather than live nav, per the site-specific note in notes/196.md. Grepping the catalog sitemaps for 'Department:Pet Supplies' facet URLs reconstructed the full Category facet tree: Beds & Furniture, Bowls & Feeders, Clean Up, Clothes & Accessories, Collars & Leashes, Food & Treats, Grooming, Houses & Habitats, Toys, Training & Behavior, Travel (11 Category-level facets under Department:Pet Supplies; also PetType:Dog/Cat, Brand, SportsLeague/SportsTeam, Occasion, Trend, Price facets present but those are cross-cutting filters, not distinct categories, so excluded as navigation/marketing facets). No bare 'Department:Pet Supplies' landing URL (no CN param) was found in the sitemap, so the Pet Supplies department itself is emitted as a grouping row with link=null. Each Category-level PLP was then fetched live where the access budget allowed; qty was read from the page's own Astro BrowseHeading island prop blob (props=\"{&quot;h1tag&quot;:[0,&quot;<H1 text>&quot;],&quot;productCount&quot;:[0,<N>]}\"), which is the exact number rendered next to the H1 on the page (e.g. 'Pet Toys (1,058)') -- not a raw platform/API total, matching the Storefront-count-APIs-unreliable precedent. Sub-facet 'Product' level leaves under each Category (e.g. Toys > Plush Toys / Rope & Tug Toys / Interactive Toys; Collars & Leashes > Collars / Leashes / Harnesses; Houses & Habitats > Crates & Kennels / Gates & Doors) exist per the sitemap but were NOT individually fetched -- the access block hit before they could be reached, so Category-level is used as the leaf/qty granularity in this file. All 11 categories are Tier-1 pet-care signals (feeding/bowls, beds/housing, grooming, hygiene/waste (Clean Up = litter boxes/waste bags, H1 renders as 'Pet Cleaning Supplies'), toys, walking (collars/leashes), clothing, travel/carriers, training) except Food & Treats, which is flagged per the open PET CONSUMABLE policy gap. Excluded as non-category nav/marketing/brand facets: 'Family Pajamas', 'Jammies For Your Families', 'Happy Hounds', 'Majestic Pet', 'PAW', 'PetMaker', 'Lands' End' (all Brand/Trend facets), NFL/NBA/MLB/NHL/NCAA/Soccer/Los Angeles Chargers (SportsLeague/SportsTeam facets), Halloween (Occasion facet), 'Under $10' (Price facet). No PetType (Dog-only/Cat-only) rows were emitted since those are the same underlying category inventory filtered by pet type, not distinct site categories.",
+  "rows": [
+    {
+      "category": "Pet Supplies",
+      "sub_category": "Pet Supplies",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Pet Supplies",
+      "sub_category": "Beds & Furniture",
+      "qty": 1596,
+      "link": "https://www.kohls.com/catalog/beds-furniture-pet-supplies.jsp?CN=Category:Beds%20%26%20Furniture+Department:Pet%20Supplies",
+      "is_group": false,
+      "evidence": "BrowseHeading island: h1tag='Pet Beds & Furniture', productCount=1596",
+      "flag": null
+    },
+    {
+      "category": "Pet Supplies",
+      "sub_category": "Bowls & Feeders",
+      "qty": 552,
+      "link": "https://www.kohls.com/catalog/bowls-feeders-pet-supplies.jsp?CN=Category:Bowls%20%26%20Feeders+Department:Pet%20Supplies",
+      "is_group": false,
+      "evidence": "BrowseHeading island: h1tag='Pet Bowls & Feeders', productCount=552",
+      "flag": null
+    },
+    {
+      "category": "Pet Supplies",
+      "sub_category": "Clean Up",
+      "qty": 363,
+      "link": "https://www.kohls.com/catalog/clean-up-pet-supplies.jsp?CN=Category:Clean%20Up+Department:Pet%20Supplies",
+      "is_group": false,
+      "evidence": "BrowseHeading island: h1tag='Pet Cleaning Supplies', productCount=363",
+      "flag": null
+    },
+    {
+      "category": "Pet Supplies",
+      "sub_category": "Clothes & Accessories",
+      "qty": 615,
+      "link": "https://www.kohls.com/catalog/clothes-accessories-pet-supplies.jsp?CN=Category:Clothes%20%26%20Accessories+Department:Pet%20Supplies",
+      "is_group": false,
+      "evidence": "BrowseHeading island: h1tag='Pet Clothes & Accessories', productCount=615",
+      "flag": null
+    },
+    {
+      "category": "Pet Supplies",
+      "sub_category": "Collars & Leashes",
+      "qty": 571,
+      "link": "https://www.kohls.com/catalog/collars-leashes-pet-supplies.jsp?CN=Category:Collars%20%26%20Leashes+Department:Pet%20Supplies",
+      "is_group": false,
+      "evidence": "BrowseHeading island: h1tag='Pet Collars & Leashes', productCount=571",
+      "flag": null
+    },
+    {
+      "category": "Pet Supplies",
+      "sub_category": "Food & Treats",
+      "qty": null,
+      "link": "https://www.kohls.com/catalog/food-treats-pet-supplies.jsp?CN=Category:Food%20%26%20Treats+Department:Pet%20Supplies",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: PET CONSUMABLE - Food & Treats (dog/cat treats and food); category confirmed to exist via sitemap sub-facet URLs (clean-food-treats-pet-supplies.jsp, treats-food-treats-pet-supplies.jsp, dog-treats-food-treats-pet-supplies.jsp all carrying Category:Food & Treats+Department:Pet Supplies) but the direct category-level page returned 403 on the 7th live request of the session; per access-tier rules the host was not retried, so qty is unverified. Link is the pattern-consistent URL (matches the -pet-supplies.jsp + CN=Category:<Name>+Department:Pet Supplies shape of all 10 other confirmed category pages) but has not itself been confirmed to render 200."
+    },
+    {
+      "category": "Pet Supplies",
+      "sub_category": "Grooming",
+      "qty": null,
+      "link": "https://www.kohls.com/catalog/grooming-pet-supplies.jsp?CN=Category:Grooming+Department:Pet%20Supplies",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: qty unverified - category confirmed via sitemap (Category:Grooming+Department:Pet Supplies, plus PetType/Product sub-facet URLs e.g. dog-grooming-pet-supplies.jsp, shampoos-conditioners-grooming-pet-supplies.jsp) but live fetch was not attempted after the site blocked (403) the prior request in this session, per the 'first block stops that host' rule."
+    },
+    {
+      "category": "Pet Supplies",
+      "sub_category": "Houses & Habitats",
+      "qty": null,
+      "link": "https://www.kohls.com/catalog/houses-habitats-pet-supplies.jsp?CN=Category:Houses%20%26%20Habitats+Department:Pet%20Supplies",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: qty unverified - category confirmed via sitemap (Category:Houses & Habitats+Department:Pet Supplies, plus sub-facet URLs e.g. crates-kennels-houses-habitats-pet-supplies.jsp, gates-doors-houses-habitats-pet-supplies.jsp, accessories-houses-habitats-pet-supplies.jsp) but live fetch was not attempted after the site blocked (403) the prior request in this session, per the 'first block stops that host' rule."
+    },
+    {
+      "category": "Pet Supplies",
+      "sub_category": "Toys",
+      "qty": 1058,
+      "link": "https://www.kohls.com/catalog/toys-pet-supplies.jsp?CN=Category:Toys+Department:Pet%20Supplies",
+      "is_group": false,
+      "evidence": "BrowseHeading island: h1tag='Pet Toys', productCount=1058",
+      "flag": null
+    },
+    {
+      "category": "Pet Supplies",
+      "sub_category": "Training & Behavior",
+      "qty": null,
+      "link": "https://www.kohls.com/catalog/training-behavior-pet-supplies.jsp?CN=Category:Training%20%26%20Behavior+Department:Pet%20Supplies",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: qty unverified - category confirmed via sitemap (Category:Training & Behavior+Department:Pet Supplies) but live fetch was not attempted after the site blocked (403) the prior request in this session, per the 'first block stops that host' rule."
+    },
+    {
+      "category": "Pet Supplies",
+      "sub_category": "Travel",
+      "qty": null,
+      "link": "https://www.kohls.com/catalog/travel-pet-supplies.jsp?CN=Category:Travel+Department:Pet%20Supplies",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: qty unverified - category confirmed via sitemap (Category:Travel+Department:Pet Supplies, plus sub-facet URLs e.g. carriers-travel-pet-supplies.jsp, car-travel-gear-travel-pet-supplies.jsp) but live fetch was not attempted after the site blocked (403) the prior request in this session, per the 'first block stops that host' rule."
+    }
+  ]
+}

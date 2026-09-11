@@ -1,0 +1,46 @@
+{
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "Access: tier1 direct HTTP blocked by Cloudflare (plain curl on robots.txt returned a Cloudflare challenge page); curl_cffi with impersonate='chrome124' bypassed it cleanly for all pages (still tier-1 HTTP, no browser needed). robots.txt (fetched via curl_cffi) has no Claude-specific disallow (checked for anthropic-ai/ClaudeBot/Claude-Web/Claude-User/Claude-SearchBot; none present) -> proceeded. Tree source: homepage href scan found /GB/en/cat/home-tech/home/bathroom/ as the Bathroom node; that page's own href scan gave 5 children: bath-mats, bathrobes, bathroom-accessories, bathroom-mirrors, towels. No further sub-navigation found on any child page (each child page's href scan under the bathroom/ prefix returned only itself + the parent breadcrumb) so all 5 are leaves. Qty verification: mobile-result-count AND desktop-top-bar-result-count testids agree for each page (e.g. bathroom-accessories: '46 results' both places, plus a 'Show more results' pager showing '46/46 results' confirming no further pagination). bath-mats=63, bathrobes=63 (independently confirmed distinct via differing canonical URLs and breadcrumb, not a scraping duplicate), bathroom-accessories=46, bathroom-mirrors=15, towels=180. Exclusions per bathroom.md rule 15/20: bathrobes and towels are Textile-owned categories (bathrobes, bath/hand towels) -> excluded, routed to review. Rule 16: bath-mats sampled product titles are textile ('Giacomo Zigzag-Pattern Cotton-Terry Bath Mat', terry-cotton material) not rubber/anti-slip -> Textile, excluded, routed to review. Cross-category dedup check against cross_category_url_index.json: bathroom-mirrors URL already recorded in Wall_Decor.xlsx -> moved to review as ALREADY EXTRACTED, not recorded as a Bathroom row despite rule 10/11 normally wanting bathroom mirrors in Bathroom. bath-mats/bathrobes/towels URLs also already recorded in Textile.xlsx -> confirmed via same index, logged to review. Only bathroom-accessories (46) is a net-new Bathroom leaf, not present in any other category's index. Parent bathroom root page total (364, via same result-count testid) does not equal sum of children (367) -- consistent with known multi-tagging behavior, not an error; parent URL not recorded per rule 24 since valid subcategories exist.",
+  "rows": [
+    {
+      "category": "Bathroom",
+      "sub_category": "Bathroom Accessories",
+      "qty": 46,
+      "link": "https://www.selfridges.com/GB/en/cat/home-tech/home/bathroom/bathroom-accessories/",
+      "is_group": false,
+      "evidence": "mobile-result-count and desktop-top-bar-result-count testids both read '46 results'; pager footer reads '46/46 results' confirming full count with no further pagination.",
+      "flag": null
+    }
+  ],
+  "review": [
+    {
+      "category": "Bathroom",
+      "sub_category": "Bathroom Mirrors",
+      "qty": 15,
+      "issue": "ALREADY EXTRACTED IN Wall_Decor.xlsx (cross_category_url_index.json hit) -- mirror-type leaf per rule 10/11 would normally belong to Bathroom, but option-1 dedup rule requires deferring to the file it is already recorded in.",
+      "link": "https://www.selfridges.com/GB/en/cat/home-tech/home/bathroom/bathroom-mirrors/"
+    },
+    {
+      "category": "Bathroom",
+      "sub_category": "Bath Mats",
+      "qty": 63,
+      "issue": "Textile bath mat (sampled titles are cotton-terry fabric mats, not rubber/anti-slip) -> belongs to Textile per rule 16; also ALREADY EXTRACTED IN Textile.xlsx per cross_category_url_index.json.",
+      "link": "https://www.selfridges.com/GB/en/cat/home-tech/home/bathroom/bath-mats/"
+    },
+    {
+      "category": "Bathroom",
+      "sub_category": "Bathrobes",
+      "qty": 63,
+      "issue": "Bathrobes -> Textile per rule 20; also ALREADY EXTRACTED IN Textile.xlsx per cross_category_url_index.json.",
+      "link": "https://www.selfridges.com/GB/en/cat/home-tech/home/bathroom/bathrobes/"
+    },
+    {
+      "category": "Bathroom",
+      "sub_category": "Towels",
+      "qty": 180,
+      "issue": "Bath/Hand/Face Towels -> Textile per rule 15; also ALREADY EXTRACTED IN Textile.xlsx per cross_category_url_index.json.",
+      "link": "https://www.selfridges.com/GB/en/cat/home-tech/home/bathroom/towels/"
+    }
+  ]
+}

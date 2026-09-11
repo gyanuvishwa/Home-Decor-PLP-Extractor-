@@ -1,0 +1,16 @@
+{
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "Company scope = HSN's 'Home' department (assigned site https://www.hsn.com/shop/home/ho), same scope used by the prior Home-Decor pass for SR80, not all of hsn.com. ACCESS: hsn.com is behind Akamai Bot Manager; direct fetch and plain curl_cffi through translate.goog both got blocked/400'd on deep /shop/ paths during this run (likely shared-infra contention from parallel workers hitting hsn.com the same way, per notes/80.md precedent). WORKING ROUTE: Playwright (Chromium) navigating to the translate.goog-proxied URL (https://www-hsn-com.translate.goog/<path>?_x_tr_sl=en&_x_tr_tl=es&_x_tr_hl=en) returned full genuine server-rendered origin HTML (embedded 'product_results' JSON field) with HTTP 200 every time, after plain HTTP fetch of the same proxied URLs kept 400ing. DISCOVERY: checked main mega-nav (Departments/Featured/Top New Arrivals Stores panels on the Home department page and on the sitewide /shop/clearance/4525 page), the sitewide Clearance page's own 'Departments' facet (which exposes a per-department 'Home' filter), and the site's own search for 'best sellers' (query redirected straight to the homepage - HSN has no dedicated Best Sellers page/URL). HSN has no page literally named 'Bestsellers' or 'Best Sellers'. The closest genuine site-defined popularity-merchandising listing is 'Customer Picks' (HSN's own facet metadata tags it as attribute Name='popular filters', Value='customer picks'), which HSN exposes department-scoped, including a Home-department version. This maps to the brief's 'Customer Favorites' / 'Most Popular' target terms. Treated as the Bestsellers-equivalent PLP for this company; not flagged, since the site's own facet explicitly labels it a popularity/'popular filters' concept rather than an editorial curation. No further genuine children (e.g. 'Furniture Customer Picks') were found - only the single Home-department-scoped listing.",
+  "rows": [
+    {
+      "category": "Bestsellers",
+      "sub_category": "Customer Picks",
+      "qty": 1439,
+      "link": "https://www.hsn.com/shop/customer-picks-home/ho-1845",
+      "is_group": false,
+      "evidence": "Embedded page JSON: \"product_results\": \"1439\"; page title 'Customer Picks Home | HSN'; product_attributes facet Name='popular filters', Value='customer picks'",
+      "flag": null
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "Access: direct requests.get() would need testing but used curl_cffi chrome124 impersonation directly per prior-pass note (worked). robots.txt has explicit 'User-agent: ClaudeBot / Claude-Web / Claude-User / Claude-SearchBot / anthropic-ai -> Allow: /', no disallow for Claude. Checked: (1) top-level sitemap index (sitemap/sitemap-index.xml, 14 files) - no dedicated pet sitemap at top level; (2) header mega-menu on homepage - only 'Furniture' panel is SSR'd with a full hover tree, no 'Pets' top-level nav item found anywhere in rendered HTML or footer links; (3) homepage text-scanned for 'pet' - only marketing copy 'Kids & Pet Friendly' (a material-safety brand proposition, not a product category), no category links; (4) guessed 36 plausible pet-related category slugs (pet-supplies, pet-care, pet-accessories, dog-beds, cat-beds, pet-toys, pet-grooming, dog-house, pet-bowls, cat-litter, pet-carrier, pet-crate, etc.) directly as /category/<slug>.html - 6 returned HTTP 200 (pet-supplies, dog-beds, cat-beds, pet-toys, pet-grooming, dog-house) but all 6 were confirmed soft-404 fallback pages (generic homepage <title>/no <h1>, or <title>'Furniture Online...' with <h1>'Furniture', vs. a real category page's distinctive <title>'Buy X at Best Prices...' and matching <h1>) with an unfilled 'of <span></span> options in' count span - not real categories, discarded; (5) recursively fetched every non-top-level nested sitemap referenced inside furniture.xml/home_decor.xml/lamps_and_lighting.xml/mattresses.xml/kitchen_and_dining.xml/furnishings.xml/sofas_and_seating.xml/luxury.xml and grepped all <loc> entries for 'pet' - found exactly one real pet sitemap: sitemap/pet_furnishings.xml (nested one level under furnishings.xml, not listed in the top-level index, which is why the prior Home-Decor/Furniture/Textile passes never surfaced it), containing exactly 4 URLs. All 4 fetched and confirmed genuine (real <title>/<h1>, real SSR 'Showing X-Y of N options in <Name>' header, real breadcrumb JSON-LD). Breadcrumb JSON-LD on pets-mats.html proves hierarchy: Home > Furnishings > Pet Furnishings > Pet Mats - i.e. Pepperfry files pet products under its general 'Furnishings' (home textiles) vertical, not a standalone Pets department. 'Pet Furnishings' (qty=31) is the grouping page for the other 3; its children's qtys sum exactly to it (16+12+3=31), confirmed via the breadcrumb hierarchy and used as is_group with qty/link nulled per rule. No pet food/consumable or medical/veterinary categories found anywhere in the sitemaps checked, so nothing to flag under those two open policy gaps. No overlap with Furniture/Storage/Textile/Kitchen categories - these 3 leaf categories are exclusively pet products (pet floor mats, pet blankets, pet drying towels).",
+  "rows": [
+    {
+      "category": "Pet Care",
+      "sub_category": "Pet Furnishings",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Pet Mats",
+      "qty": 16,
+      "link": "https://www.pepperfry.com/category/pets-mats.html",
+      "is_group": false,
+      "evidence": "listing header 'Showing 1-16 of 16 options in Pet Mats'",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Pet Blankets",
+      "qty": 12,
+      "link": "https://www.pepperfry.com/category/pets-blankets.html",
+      "is_group": false,
+      "evidence": "listing header 'Showing 1-12 of 12 options in Pet Blankets'",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Pet Towel",
+      "qty": 3,
+      "link": "https://www.pepperfry.com/category/pet-towels.html",
+      "is_group": false,
+      "evidence": "listing header 'Showing 1-3 of 3 options in Pet Towel'",
+      "flag": null
+    }
+  ]
+}

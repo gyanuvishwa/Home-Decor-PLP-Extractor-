@@ -1,0 +1,94 @@
+{
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ACCESS: plain curl_cffi via probe.py, HTTP 200 on every request across safari15_5/chrome131/chrome124 profiles; no WAF, no proxy, no reader service - identical to the Furniture-pass ledger note. Platform is Magento 2. robots.txt was fetched FIRST (https://www.grahamandgreen.co.uk/robots.txt, 616 bytes). It declares exactly THREE groups - 'User-agent: *', 'User-agent: Googlebot' (Disallow: blank) and 'User-agent: Googlebot-image' (Disallow: blank). NO anthropic-ai / ClaudeBot / Claude-Web / Claude group exists anywhere in the file, and there is no Content-Signal line. The '*' group disallows /index.php/, /catalog/product_compare/, /catalog/category/view/, /wishlist/, /admin/, /onestepcheckout/, /customer/, /review/product/, /sendfriend/, /enable-cookies/, /LICENSE.txt, /LICENSE.html, /skin/, /directory/, /checkout/, /search/, /productstockalert/, /sales/order/ - none of which touches a /home-accessories/... category path or the ?p=N pagination parameter I used. No Crawl-delay is declared; probe.py's 2s per-host gap was honoured anyway. TREE: two independent sources that agree. (1) The rendered mega-menu in the homepage HTML - <div class=\\\"subnav__col nav-6-4\\\"> whose subnav__heading is https://www.grahamandgreen.co.uk/home-accessories/bathroom, i.e. Bathroom is a column of the Home Accessories department, with eight level-3 items: Bathroom Accessories, Bath & Body, Bathroom Lighting, Bath Mats, Bathroom Mirrors, Laundry Baskets, Wash Bags, View All Bathroom. (2) The Bathroom landing page's own PageBuilder category-tile block (h5.nav-heading-link anchors, in page order): Bathroom Accessories, Bath and Body, Bathroom Cabinets & Shelves, Hooks Shelves & Towel Rails, Bathroom Lights, Bath Mats, Bathroom Mirrors, Laundry Baskets & Bins, Wash Bags, Bath Caddies & Small Storage - plus 'storage' linked from the intro copy. (3) Cross-checked against media/sitemap/sitemap-1-{1..4}.xml (3,954 URLs), grepped for bath|shower|toilet|basin|sink|vanity|sanitary|tap|faucet|wc|soap|towel|mirror: the ONLY /home-accessories/bathroom/* nodes in existence are bathroom-accessories, bath-mats, bathroom-storage, bathroom-mirrors, bathroom-cabinets-and-shelves, bathroom-hooks-rails-and-loo-roll-holders, bath-caddies-and-small-storage and laundry-baskets-bins. Every one of those eight was opened; all eight breadcrumbs read 'Home > Home Accessories > Bathroom > <node>', i.e. the Bathroom subtree is FLAT (no level-4 exists), so each recorded node is a genuine leaf and rule 24 is satisfied. DEPTH CHECK: each leaf page was re-scanned for further /home-accessories/bathroom/ links; the only such links are the three global mega-menu items, no leaf exposes children. QTY: Graham and Green publishes NO product-count header anywhere - there is no 'N products' text, no Magento toolbar-amount element and probe.py's counts_in() surfaces zero candidates on these pages - so every qty is a FULL ENUMERATION exactly as the Furniture pass did it: fetch ?p=1,2,3... counting li.product-list__item tiles until a page returns zero, page size 48. Tiles were counted (not data-price-amount) because 'coming soon' tiles carry no price box and would undercount. VERIFICATION: (a) EXHAUSTION - every category was paged until an empty page was returned: bathroom-accessories [48,16,0]=64, bathroom-storage [18,0]=18, bathroom-cabinets-and-shelves [6,0]=6, bathroom-hooks-rails-and-loo-roll-holders [23,0]=23, bathroom-mirrors [21,0]=21, laundry-baskets-bins [3,0]=3, bath-mats [10,0]=10, and the Bathroom parent itself [48,48,48,9,0]=153. (b) UNIQUENESS - the set of distinct product hrefs equals the summed tile count on every category (64/18/6/23/21/3/10 unique), so no tile is double-counted across pages. (c) SECOND READ - all seven categories were re-enumerated later on fresh fingerprints and every number reproduced exactly, zero drift. (d) H1 + CANONICAL - each recorded URL's h1 matches the node requested (Bathroom Accessories / Bathroom Cabinets and Shelves / Bathroom Hooks, Towel Rails & Loo Roll Holders / Bathroom Mirrors / Bathroom Storage / Laundry Baskets & Bins) and each page is self-canonical. (e) DISCRIMINATION - 64, 18, 6, 23, 21, 3 (and 10, 153, 9, 42, 6 on the checked non-rows): no site-wide constant. CONTENT CHECK (rule 2) by product slug: Bathroom Accessories (64) = soap dishes, soap dispensers, toothbrush holders, bath caddies, trays (rules 13/18/21). Bathroom Cabinets & Shelves (6) = Chloe Natural Showcase Cabinet, Farringdon Box/Double Wall Shelf, Tala Gold Marble Shelf, Acacia/Wooden Towel Stand (rules 9/17). Hooks, Towel Rails & Loo Roll Holders (23) = Fosse/Eliston/Devonshire towel rails, towel rings, wall hooks, toilet roll holders, Selma Metal Toilet Roll Holder, Bear Loo Roll Holder (rules 13/14/17 - metal is explicitly fine, rule 22). Bathroom Mirrors (21) = Otto tilting/vanity mirrors, Ovin extension wall mirrors, Durley scalloped mirrors, swivel and carriage mirrors - primary type mirror, so Bathroom not Lighting (rules 10/11). Bathroom Storage (18) = towel stands, jute storage baskets, bath caddies, brick-mould loo roll holder, wall shelves (rule 12). Laundry Baskets & Bins (3) = Jute Laundry Baskets, Jute Storage Baskets, Set of Two Jute Bins - a genuine child of Bathroom in the site's own tree, so rule 30-33's 'Bathroom > Bathroom Baskets = Bathroom' applies. OVERLAP NOTE: Bathroom Storage shares products with Bathroom Cabinets & Shelves (4 of 6) and Laundry Baskets & Bins (3 of 3), but Magento breadcrumbs prove all three are level-3 SIBLINGS under Bathroom, not parent/child, and all three are distinct URLs, so rule 28 keeps them as separate records and no quantity was aggregated. EXCLUDED - REDIRECT TRAP (Magento 301s dead slugs to an ancestor rather than 404ing, as the Furniture pass documented): /home-accessories/bathroom/bath-caddies-and-small-storage serves h1 'Bathroom Accessories' with canonical .../bathroom-accessories and the identical 48 first-page tiles - it is an alias for Bathroom Accessories, NOT a node, so it was not recorded (it would have duplicated 64). Likewise /shop-by-room/bathroom serves h1 'Bathroom' with canonical .../home-accessories/bathroom (the parent), and /rugs/bath-mats serves canonical .../home-accessories/bathroom/bath-mats - both aliases, neither recorded. EXCLUDED - parent (rule 24): /home-accessories/bathroom is a real 153-product listing but it has six valid recorded children, so it is the top grouping row with blank qty/URL (rules 24/38). EXCLUDED - View All (rule 25): /home-accessories/bathroom?product_list_limit=all and the 'View All Bathroom' mega-menu item. EXCLUDED - other departments (rule 2, hierarchy): Home Accessories > Utility > Baskets (/home-accessories/utility/baskets, h1 'Baskets', 9 tiles) is the destination of the Bathroom column's 'Laundry Baskets' link but is a UTILITY-owned node, not part of the Bathroom subtree, so it stays with its own department; Gifts > Wash Bags (/gifts/by-category/wash-bags) is a gifting/travel node. Neither was recorded. CONFIRMED ABSENT: Graham and Green sells NO bathroom fixtures or sanitaryware. Across the whole 3,954-URL sitemap and the entire mega-menu there is no Baths/Bathtubs, Basins/Sinks, Toilets/WCs, Bidets, Showers, Shower Enclosures/Screens, Bathroom Taps/Faucets/Mixers or Vanity Unit node at any depth - it is a decorative homeware brand, not a plumbing merchant (the only 'bath' product slugs outside the nodes above are bath salts, bubble bath and a concrete bird bath). CROSS-FILE DEDUP: lib/dedup.already_extracted() was run on all 13 candidate URLs (bathroom, bathroom-accessories, bathroom-storage, bathroom-cabinets-and-shelves, bathroom-hooks-rails-and-loo-roll-holders, bathroom-mirrors, laundry-baskets-bins, bath-mats, bath-caddies-and-small-storage, shop-by-room/bathroom, rugs/bath-mats, lighting/bathroom-lights, utility/baskets, gifts/bath-and-body). ZERO hits - the Furniture pass on this company took only /furniture/*, /sofas/*, /outdoors/garden-furniture/* and /vintage-collection/furniture, none of which is a bathroom node, and the earlier Home-Decor pass indexed no /home-accessories/bathroom/* URL. Nothing was removed for dedup.",
+ "rows": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Accessories",
+   "qty": 64,
+   "link": "https://www.grahamandgreen.co.uk/home-accessories/bathroom/bathroom-accessories",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Cabinets & Shelves",
+   "qty": 6,
+   "link": "https://www.grahamandgreen.co.uk/home-accessories/bathroom/bathroom-cabinets-and-shelves",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Hooks, Towel Rails & Loo Roll Holders",
+   "qty": 23,
+   "link": "https://www.grahamandgreen.co.uk/home-accessories/bathroom/bathroom-hooks-rails-and-loo-roll-holders",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Mirrors",
+   "qty": 21,
+   "link": "https://www.grahamandgreen.co.uk/home-accessories/bathroom/bathroom-mirrors",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Storage",
+   "qty": 18,
+   "link": "https://www.grahamandgreen.co.uk/home-accessories/bathroom/bathroom-storage",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Laundry Baskets & Bins",
+   "qty": 3,
+   "link": "https://www.grahamandgreen.co.uk/home-accessories/bathroom/laundry-baskets-bins",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  }
+ ],
+ "review": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bath Mats",
+   "qty": 10,
+   "issue": "ROUTED TO TEXTILE: genuine child of Bathroom (breadcrumb Home > Home Accessories > Bathroom > Bath Mats, self-canonical) but every one of its 10 products is a woven/tufted textile mat - Je T'aime Bath Mat, Sardine Tufted Bath Mat, Amour, Astrid, Arlette, Natural Black Geometric, Blue Striped Tufted, Sage Natural Geometric, Green Gingham Tufted, Mustard Striped Tufted. Rules 15/16/20: textile bath mats go to Textile; no rubber/anti-slip bathroom-accessory mat exists here so rule 16's second limb does not apply. The Bathroom-landing tile labelled 'BATH MATS' points at https://www.grahamandgreen.co.uk/rugs/bath-mats, which is the SAME node (h1 'Bath Mats', canonical back to this URL, same 10 tiles) - one record, not two (rule 28).",
+   "link": "https://www.grahamandgreen.co.uk/home-accessories/bathroom/bath-mats"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathroom Lights",
+   "qty": 6,
+   "issue": "ROUTED TO LIGHTING: presented in the Bathroom mega-menu column (nav-6-4-3) and as a Bathroom-landing tile, but primary product type is lighting (rule 19/11) - Campden Bathroom Light, Alma Bathroom Spotlight etc. Not duplicated into Bathroom. The tile href /lighting/lights/bathroom-lights and the mega-menu href /lighting/bathroom-lights are the same node (both h1 'Bathroom Lights', canonical https://www.grahamandgreen.co.uk/lighting/bathroom-lights, 6 tiles).",
+   "link": "https://www.grahamandgreen.co.uk/lighting/bathroom-lights"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bath and Body",
+   "qty": 42,
+   "issue": "NOT BATHROOM (rule 2, primary product type): listed in the Bathroom mega-menu column and as a Bathroom-landing tile, but the node is h1 'Bath and Body Gifts' under Gifts, and its 42 products are toiletries/cosmetics - bath salts sachets, liquid soaps, bubble bath, soap-on-a-rope, bathing gel. Rule 13 covers soap DISPENSERS/DISHES/HOLDERS (which are counted inside Bathroom Accessories), not the soap itself. Recorded here so the nav node is not silently skipped; it belongs to Gifts/Beauty, not Bathroom.",
+   "link": "https://www.grahamandgreen.co.uk/gifts/by-category/bath-and-body"
+  }
+ ],
+ "_reconstructed_from": "Bathroom.xlsx delivered 2026-09-01 (checkpoint), not original worker JSON"
+}

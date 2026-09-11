@@ -1,0 +1,16 @@
+{
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "OKA (oka.com/uk, canonical bare www.oka.com). Site is Shopify + Graphene HC (Advanced Commerce), same architecture documented in the prior Home-Decor pass (notes/50.md): product grid/counts are rendered client-side via POST https://okashopify-1.store-uk1.advancedcommerce.services/api/js/query (theme 38caf17c88c5431c932b42cdc117b64e, template id 'category'). New finding this pass: the collection is resolved server-side from BOTH the X-Referer header (set to the canonical collection URL) AND an X-Requested-With: XMLHttpRequest header - omitting X-Requested-With silently falls back to the whole 1603-product catalogue with header.category_id=null even with X-Referer present (the prior pass's notes only mentioned X-Referer). Confirmed correct scoping by checking header.category_id in every response matched the true Shopify collection id from /collections.json. Discovery: fetched /collections.json (all 336 collections, 2 pages) and grepped titles/handles for bestseller/top/popular/favourite/trending synonyms. Only one match: handle 'bestsellers', title 'Our Bestsellers' (id 623365062923). Confirmed genuine: real product grid template (data-type='category'), on-page description 'Here, you will find all the pieces our customers love the most...', and it is the site's own CTA target ('Not sure where to start? Explore our best sellers' link in the empty-cart panel). No sub-structure - it is a single undifferentiated listing, not nested by room/type. No other Bestsellers-type URL exists on the site (checked main nav mega-menus, footer, and full collections.json listing - no 'top-sellers', 'popular', 'trending', 'customer-favourites' handles found).",
+  "rows": [
+    {
+      "category": "Bestsellers",
+      "sub_category": "Bestsellers",
+      "qty": 93,
+      "link": "https://www.oka.com/collections/bestsellers",
+      "is_group": false,
+      "evidence": "Graphene HC API POST /api/js/query with X-Referer=https://www.oka.com/collections/bestsellers + X-Requested-With=XMLHttpRequest resolved header.category_id=623365062923 (matches Shopify collection id for handle 'bestsellers' in /collections.json); response templates.category.product_count=93, page_count=2, page_size=60. Verified by exhaustion: page-1 HTML fragment contained exactly 60 [data-graphene-hc-el=\"item\"] tiles, consistent with 60+33=93.",
+      "flag": null
+    }
+  ]
+}

@@ -1,0 +1,61 @@
+{
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "Same access route as bs10/cl10: direct HTTPS to www.interiordefine.com/graphql (Magento GraphQL, curl_cffi impersonate=chrome), no proxy, no block. Discovery via the full 214-category GraphQL tree (categories(filters:{}, pageSize:200), 2 pages, all 214 retrieved) - the same data the site's own nav is built from. Found two distinct New-Arrivals-concept trees: (1) 'New Arrivals' (url_path 'new-arrivals', id 518) - a flat single listing; (2) 'Just in' (url_path 'just-in', id 290, exact match to the brief's 'Just In' target term) - a grouping parent whose 4 non-empty children carry the recently-added products, split by furniture type/collection: New Sectionals, New Sofas, New Chairs, Dixon (a fifth child, 'Simon', has 0 products and was dropped per the zero-product rule). Confirmed these two trees are genuinely different listings, not aliases: pulled the full SKU set for each (New Arrivals=21 SKUs, Just In=62 SKUs) and found ZERO overlap between them, so both were kept as separate rows per the brief's non-dedup instruction. Note: category(id:290).product_count field itself reports 0 (a stale/rollup quirk on this particular parent), but the actual products(filter:{category_id:{eq:\"290\"}}) query - which is exactly what the PWA storefront's own PLP fetch uses to populate /just-in - returns total_count=62, so that is the qty used, with the discrepancy called out in its own row's evidence. The 4 children's counts (24+14+15+19=72) don't sum exactly to the parent's direct-query total (62); this is expected Magento anchor/overlap behavior (not all child products necessarily surface as distinct from the parent's own direct assignment, and vice versa) and is not treated as an error. Both 'New Arrivals' and 'Just in' resolve cleanly via urlResolver as type CATEGORY. Also probed urlResolver guesses new-in, whats-new, recently-added - all resolved to nothing, confirming no further New Arrivals PLPs exist beyond the two trees found. No robots.txt Claude-specific disallow found. This is a made-to-order furniture retailer with a narrow catalog, so a small New Arrivals footprint (21 + 62 across two trees) is consistent with the site's scale.",
+  "rows": [
+    {
+      "category": "New Arrivals",
+      "sub_category": "New Arrivals",
+      "qty": 21,
+      "link": "https://www.interiordefine.com/new-arrivals",
+      "is_group": false,
+      "evidence": "GraphQL products(filter:{category_id:{eq:\"518\"}}).total_count = 21 (matches category(id:518).product_count = 21)",
+      "flag": null
+    },
+    {
+      "category": "New Arrivals",
+      "sub_category": "Just In",
+      "qty": 62,
+      "link": "https://www.interiordefine.com/just-in",
+      "is_group": true,
+      "evidence": "GraphQL products(filter:{category_id:{eq:\"290\"}}).total_count = 62 (note: category(id:290).product_count field itself reports 0, a rollup quirk - the direct products query is the value that matches what the live PLP renders and is used here)",
+      "flag": null
+    },
+    {
+      "category": "New Arrivals",
+      "sub_category": "New Sectionals",
+      "qty": 24,
+      "link": "https://www.interiordefine.com/just-in/new-sectionals",
+      "is_group": false,
+      "evidence": "GraphQL category(id:357).product_count = 24, url_path 'just-in/new-sectionals'",
+      "flag": null
+    },
+    {
+      "category": "New Arrivals",
+      "sub_category": "New Sofas",
+      "qty": 14,
+      "link": "https://www.interiordefine.com/just-in/new-sofas",
+      "is_group": false,
+      "evidence": "GraphQL category(id:358).product_count = 14, url_path 'just-in/new-sofas'",
+      "flag": null
+    },
+    {
+      "category": "New Arrivals",
+      "sub_category": "New Chairs",
+      "qty": 15,
+      "link": "https://www.interiordefine.com/just-in/new-chairs",
+      "is_group": false,
+      "evidence": "GraphQL category(id:359).product_count = 15, url_path 'just-in/new-chairs'",
+      "flag": null
+    },
+    {
+      "category": "New Arrivals",
+      "sub_category": "Dixon",
+      "qty": 19,
+      "link": "https://www.interiordefine.com/just-in/dixon",
+      "is_group": false,
+      "evidence": "GraphQL category(id:575).product_count = 19, url_path 'just-in/dixon'",
+      "flag": null
+    }
+  ]
+}

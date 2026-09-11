@@ -1,0 +1,35 @@
+{
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "IKEA UAE (ikea.com/ae/en) reached directly via tier-1 HTTP fetch (HTTP 200, no block). Independently re-derived Pet Care from ikea.com/ae/en/ only -- did NOT reuse or copy any qty from other IKEA-market rosters already in this project (UK/DE/FR etc.), per explicit instruction. Located the site's own Pet Care branch via its known category-ID URL shape (same /ae/en/cat/<slug>-<id>/ pattern documented in notes/164.md for Lighting/Wall Decor/Home Accessories): the product-type root 'Pet Products' (pt001) at https://www.ikea.com/ae/en/cat/pet-products-pt001/, confirmed live via direct fetch (HTTP 200) and Playwright render (breadcrumb 'Products > Pet products', UTSADD merchandising carousel). This root is a genuine grouping node with exactly two real child leaf categories exposed in its own on-page sub-nav ('Skip product categories list: Products / Cats / Dogs'): Cats (numeric category id 39569) and Dogs (numeric category id 39570) -- no other leaf under pt001 exists (verified via rendered page's full anchor list, which contains only these two /cat/ links besides the parent itself). Reverse-engineered the underlying listing API directly from a captured Playwright network request against these two known-live category IDs: POST https://sik.search.blue.cdtapps.com/ae/en/search?c=listaf&v=20250507 with body {searchParameters:{input:'<categoryID>',type:'CATEGORY'}, components:[{component:'PRIMARY_AREA', window:{size:24 or 999, offset:N}, ...}]}. Reproduced this call directly via curl (tier-1, no browser) for both category IDs with window.size=999: both returned metadata.max=12, metadata.itemsPerType.PRODUCT=12, and exactly 12 unique itemNoGlobal product entries -- matching a manual body_text check of the rendered Cats/Dogs pages. Boundary-tested exhaustion for both ids: offset=11 (size 24) returned metadata start=11/end=12/max=12 with the final 1 item; offset=12 returned an empty results array -- clean exhaustion boundary on both, reproduced consistently. Spot-checked item typeNames returned by the API for both categories: Cats = Scratching mat, Place mat for food bowl, Play tunnel for cat, Pet bed, Hook, Cat house (x3), Pet cushion, Pet blanket, Cat house on legs, Pet bowl (12 total, all genuine pet-specific products, no pet-themed-for-humans items, no consumables, no medical items). Dogs = Place mat for food bowl, Dog bed (x3), Pet bed, Snuffle mat for dog, Dog toy (x2), Soft toy for dog, Pet blanket, Pet bowl, Pet cushion (12 total, same clean profile). No pet-food/consumable or medical/veterinary rows found on this market, so no MANUAL REVIEW flags were needed. Absence-proof for anything beyond these two leaves: site search for 'pets' via rendered /ae/en/search/?q=pets returned real hits (internal_search_hits=93 first-bucket / 1540 total per GA telemetry, plus a genuine UTSADD pet-bed product link), consistent with the pt001 branch being the sole Pet Care area rather than a dead/absent category; the mega-menu Products root and the pt001 page's own sub-nav were checked directly (not just search) and surfaced no additional pet-specific branches beyond Cats/Dogs. No blocks encountered on ikea.com at any point in this pass (robots.txt returned 404 at /ae/en/robots.txt, not applicable to Claude-in-Chrome since it was never needed -- tier-1 direct HTTP plus tier-2 Playwright fully resolved this company)."
+  ,
+  "rows": [
+    {
+      "category": "Pet Products",
+      "sub_category": "Pet Products",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Pet Products",
+      "sub_category": "Cats",
+      "qty": 12,
+      "link": "https://www.ikea.com/ae/en/cat/cats-39569/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com POST search?c=listaf&v=20250507 body {input:'39569',type:'CATEGORY'} -> metadata.max=12, metadata.itemsPerType.PRODUCT=12, 12 unique itemNoGlobal items; boundary-tested offset=11 (last item) / offset=12 (empty) both confirmed",
+      "flag": null
+    },
+    {
+      "category": "Pet Products",
+      "sub_category": "Dogs",
+      "qty": 12,
+      "link": "https://www.ikea.com/ae/en/cat/dogs-39570/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com POST search?c=listaf&v=20250507 body {input:'39570',type:'CATEGORY'} -> metadata.max=12, metadata.itemsPerType.PRODUCT=12, 12 unique itemNoGlobal items; boundary-tested offset=11 (last item) / offset=12 (empty) both confirmed",
+      "flag": null
+    }
+  ]
+}

@@ -1,0 +1,51 @@
+{
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ROBOTS: https://www.swooneditions.com/robots.txt fetched FIRST (HTTP 200, profile safari17_0). Single 'User-agent: *' group only. NO group names ClaudeBot / anthropic-ai / Claude-Web, so no Claude-specific exclusion exists. Disallows are Magento boilerplate (/app/, /var/, /index.php/, /catalog/product/view/, /catalog/category/view/, /catalogsearch/, /search/, /checkout/, /customer/, /wishlist/) plus 'Disallow: */shop-by/' with 'Allow: */shop-by/page/' (layered-nav filter trap) and 'Disallow: /*?p=*&'. No Crawl-delay. Nothing I requested is covered: I used clean category paths, /media/sitemap.xml (declared in robots) and /graphql, none of which are disallowed. ACCESS: storefront is a client-side React SPA (curl returns a 4.4KB shell with no nav), so as in the Furniture pass I used the Magento 2 unauthenticated GraphQL endpoint POST https://www.swooneditions.com/graphql (curl_cffi impersonate=chrome131), the SPA's own data layer. TREE: pulled the COMPLETE category tree - categories(pageSize:300,currentPage:N,filters:{}) paged 4x, total_count 1117 nodes, all 1117 captured. There is NO Bathroom / Bath / Sanitaryware / Showers / Basins / Taps / Toilets node at any level. The 50 level-2 departments (all include_in_menu=1, i.e. the real mega-menu) are: Accessories, Almost Perfect, Bedroom, Bespoke furniture, Bestsellers, Chairs, Classic, Clearance, Collections, Contemporary, Art deco, Delivery by Christmas, Desks, Dining Room, Editions, EmilySixty Edit, Flash SALE, Footstools, Gift cards, Hallway, in Stock, Industrial, Kitchen, Lighting, Living Room, Made in Britain, Mid-century, New In, Not Perfect, Outdoor Furniture, Patterned Furniture, Range, Scandi, Beds, Sofas, Speedy Designs, Speedy Sofas, Storage, Home office, Swatches, Swoon Selects, Swoon Selects Ranges, Tables, The Essentials (+ utility/test buckets). The room departments are Bedroom, Dining Room, Hallway, Kitchen, Living Room, Home office and Outdoor - Swoon publishes NO bathroom room. SITEMAP PROOF: /media/sitemap.xml (declared in robots.txt) fetched in full, 5,530 <loc> entries. Regex bath|shower|basin|toilet|sanitary|vanity|tap|faucet|wc over every URL returned only: /bathrooms (a CMS page, see below), the two empty swoon-selects bathroom-accessories nodes, and false positives (SKU slugs containing 'tap' for tapered legs, 'wc' for wood/chalk finish codes, and 'showcase' blog posts). No bathroom listing URL exists in the sitemap. THE /bathrooms PAGE - DECISIVE: route(url:\"bathrooms\") resolves to __typename CmsPage, not CategoryTree (control 'zzz-not-a-real-page' returns null, so the resolver discriminates). cmsPage(identifier:\"bathrooms\") returns title 'Bathrooms' whose body is a name-clash disambiguation notice: \"Swoon.se ... is a bathroom furniture company founded in 2014 ... Same name, different company. Swoon.se are our partner in name, but we don't offer any of their products or services.\" Swoon Editions states in its own words that it sells no bathroom products. QTY / VERIFICATION: for the six candidate nodes I ran products(filter:{category_id:{eq:ID}}).total_count and read page_info.total_pages: Mirrors 26 (1 page, 26 unique SKUs enumerated), brass 4, rectangle 14, round 4, hexagon 0 (0 pages), swoon-selects/bathroom-accessories 0, kiwano/bathroom-accessories 0. Counts discriminate (26/14/4/4/0) and match categories.product_count exactly, the same equivalence the Furniture pass proved by exhaustion on all 37 of its leaves. EXCLUDED: Accessories > Mirrors and its three non-empty children are the only mirror listings on the site and are general decorative wall mirrors - product categories[] show living-room / hallway / bedroom / deco, never a bathroom node, and no LED / illuminated / demister / mirrored-cabinet / vanity variant exists - so under rule 2 and rule 11 they are Wall Decor, recorded in `review` as ROUTED TO DECOR rather than silently dropped. The two 'Bathroom accessories' nodes are empty shells of the retired Swoon Selects marketplace and carry no listing, so they cannot be leaves. DEDUP: dedup.already_extracted() run on all seven candidate URLs - no hits (the exclusion index holds 37 swooneditions.com URLs, all sofas/chairs/tables/storage/footstools/beds/desks/outdoor from Furniture.xlsx; no mirror or accessory URL among them). CONCLUSION: NO BATHROOM FOUND. rows = [].",
+ "rows": [],
+ "review": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Mirrors (Accessories > Mirrors)",
+   "qty": 26,
+   "issue": "ROUTED TO DECOR: general decorative wall mirrors, not bathroom mirrors. Site hierarchy files them under Accessories > Mirrors with no bathroom node anywhere; every product's own categories[] list is living-room / hallway / bedroom / deco / editions (verified on 6 PDPs via GraphQL: Lark 'Large Rectangle Mirror, Art Deco Style in Shiny Antique Brass', Iveley Oval, Walton Arched, Lyncott Rectangular, Keildon Arched). No demister/LED/vanity/cabinet mirror exists. Rule 2 (primary type + hierarchy) puts these in Wall Decor, not Bathroom.",
+   "link": "https://www.swooneditions.com/accessories/mirrors"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Brass mirrors",
+   "qty": 4,
+   "issue": "ROUTED TO DECOR: child of Accessories > Mirrors; decorative wall mirrors, no bathroom context.",
+   "link": "https://www.swooneditions.com/accessories/mirrors/brass-mirrors"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Rectangle mirrors",
+   "qty": 14,
+   "issue": "ROUTED TO DECOR: child of Accessories > Mirrors; decorative wall mirrors, no bathroom context.",
+   "link": "https://www.swooneditions.com/accessories/mirrors/rectangle-mirrors"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Round mirrors",
+   "qty": 4,
+   "issue": "ROUTED TO DECOR: child of Accessories > Mirrors; decorative wall mirrors, no bathroom context.",
+   "link": "https://www.swooneditions.com/accessories/mirrors/round-mirrors"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Hexagon mirrors",
+   "qty": 0,
+   "issue": "ROUTED TO DECOR (and empty): child of Accessories > Mirrors; GraphQL products(category_id:925).total_count = 0.",
+   "link": "https://www.swooneditions.com/accessories/mirrors/hexagon-mirrors"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom accessories (Swoon Selects)",
+   "qty": 0,
+   "issue": "EMPTY NODE: the only two nodes on the entire storefront whose name contains 'bathroom' (cat 1232 swoon-selects/bathroom-accessories and cat 1231 swoon-selects/kiwano/bathroom-accessories) both return products(...).total_count = 0 and categories.product_count = 0. They are dead remnants of the discontinued third-party 'Swoon Selects' marketplace (35 of its 38 sibling brand nodes are likewise at 0 products). Nothing to extract; not recorded as a leaf because it has no listing.",
+   "link": "https://www.swooneditions.com/swoon-selects/bathroom-accessories"
+  }
+ ],
+ "_reconstructed_from": "Bathroom.xlsx delivered 2026-09-01 (checkpoint), not original worker JSON"
+}

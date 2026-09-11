@@ -1,0 +1,43 @@
+{
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "Access: same route as prior Home-Decor pass (archive c203/SR174) - curl_cffi impersonate='chrome124' plain GET succeeds (HTTP 200) against this Next.js SPA (muji.com/jp/ja/store, custom GraphQL BFF), SSR HTML has full nav + paginated product tiles; no Playwright/CDP or Claude-in-Chrome needed. robots.txt has no Claude-specific disallow. Site does not expose a numeric SSR item-count footer for section-listing pages (client-hydrated only), so qty per Rule 1 was verified by extracting unique cmdty/detail/<id> product-tile links from the SSR HTML and confirming absence of a pagination widget/page=2+ link on each target section (all three leaf sections rendered well under the site's 40-items/page threshold with zero pagination links present, so the tile count is the exhausted total). Discovery path: the top hamburger-menu nav only links to a single mixed leaf node D00048 'グリーン・ガーデニング・ペット用品' (Green/Gardening/Pet Supplies - gardening tools, live plants AND pet products flattened into one un-faceted listing with no product-type filter, only color/price/in-stock tags). D00048 itself has no dedicated Pet-only URL and is NOT usable as a Pet Care row (would mix in gardening/plant SKUs). Fetched a pet product's PDP (4945247879612, cat-grass kit) and read its breadcrumb, which revealed a real, deeper, nav-hidden category: D00048 > D00049 'ペット用品' (Pet Supplies) - a genuine Pet Care parent not linked from the hamburger menu but reachable directly by URL. D00049's own 'category selection' modal (SSR-rendered) lists exactly 3 real children: S4000801 'ペットフード' (Pet Food), S4000802 'ペットシーツ・ペット雑貨' (Pet Sheets & Pet Sundries), S4000803 'ペット用家具' (Pet Furniture). Verified D00049 itself renders exactly 40 unique product tiles = 7+28+5, i.e. the three children exhaustively partition D00049 with zero overlap and zero leftover items, so D00049 was emitted as a pure grouping row (qty null, link null) and NOT double-counted against its children. Cross-checked page 1 of D00048 (the mixed parent) against D00049's product-ID set: the 13 D00048-only IDs on that page are all gardening items (soil, planters, watering can, plant nutrients, gloves) with zero pet items missed - confirms D00049 is the complete, non-leaky pet subtree and no pet SKUs are sitting directly under D00048 outside D00049. All product titles in the 3 leaf sections were read (Japanese) and are unambiguously pet products (cat food/treats/cat-grass kit; pet carriers/cushions/scratching posts/litter box/scoop/deodorant spray/shampoo/towels/food bowls/collars & harnesses incl. IDEE-brand; cat wall-mounted shelving/scratching furniture) - no pet-themed-only or human-owner items found, no exclusions applied within these 3 sections. No site-search fallback was needed since a real, exhaustive nav-tree path was found and confirmed self-consistent (40 = 40).",
+  "rows": [
+    {
+      "category": "Pet Care",
+      "sub_category": "Pet Supplies",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Pet Food",
+      "qty": 7,
+      "link": "https://www.muji.com/jp/ja/store/cmdty/section/S4000801",
+      "is_group": false,
+      "evidence": "SSR HTML for section/S4000801 rendered exactly 7 unique cmdty/detail/<id> product-tile links; no pagination widget/page=2 link present, confirming exhaustion (site's 40-items/page threshold not reached)",
+      "flag": "MANUAL REVIEW: PET CONSUMABLE - pet food/treats/supplements category (cat food, cat treats, cat-grass growing kit)"
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Pet Sheets & Sundries",
+      "qty": 28,
+      "link": "https://www.muji.com/jp/ja/store/cmdty/section/S4000802",
+      "is_group": false,
+      "evidence": "SSR HTML for section/S4000802 rendered exactly 28 unique cmdty/detail/<id> product-tile links; no pagination widget/page=2 link present, confirming exhaustion",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Pet Furniture",
+      "qty": 5,
+      "link": "https://www.muji.com/jp/ja/store/cmdty/section/S4000803",
+      "is_group": false,
+      "evidence": "SSR HTML for section/S4000803 rendered exactly 5 unique cmdty/detail/<id> product-tile links; no pagination widget/page=2 link present, confirming exhaustion",
+      "flag": null
+    }
+  ]
+}

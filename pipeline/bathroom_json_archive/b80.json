@@ -1,0 +1,123 @@
+{
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ACCESS: hsn.com is behind Akamai Bot Manager. A direct curl_cffi fetch of https://www.hsn.com/shop/bath/ho0469 returned HTTP 200 carrying only a ~7KB Akamai sensor interstitial with no product grid (verified this session, same as the Furniture pass). WORKING ROUTE (identical to the Furniture and Home-Decor passes): https://www-hsn-com.translate.goog/<path>?_x_tr_sl=en&_x_tr_tl=<lang>&_x_tr_hl=en, which returns genuine server-rendered origin HTML (~1.27MB per listing). It 429s under load; a rotating _x_tr_tl target language (es/fr/de/it/pt/nl/sv/da/pl/ro) plus backoff cleared it every time. Every `link` recorded is a canonical www.hsn.com origin URL, never a proxy URL. ROBOTS: fetched FIRST (https://www.hsn.com/robots.txt, 593 bytes). It has exactly two groups - 'User-agent: *' and 'User-agent: bingbot' (Crawl-delay: 1). There is NO anthropic-ai / ClaudeBot / Claude-Web directive at all, so no Claude exclusion exists. The '*' group disallows /account, /Ajax/profile, /profile, /checkout, /com, /cust, /facebook/like, /myaccount, two product URLs, /search, /search-more-products, /show-more-products/, /smgen.aspx and /bonusbuy/PromotionProducts/ - it does NOT disallow /shop/ or /sitemap. The disallowed /search and /show-more-products/ endpoints were deliberately not used at any point. TREE SOURCE: https://www.hsn.com/sitemap (the sitemap index) is served unprotected on a plain direct fetch and lists 14 department sitemaps; /sitemap/ho?name=home returned all 367 Home locs, which were listed in full and read end-to-end (not just grepped) so no bathroom node could hide behind a non-obvious slug. The tree was then confirmed on the live pages: Home > Bath is ho0469 (/shop/bath/ho0469, 110 items, schema.org BreadcrumbList = Home > Bath) and its own left-nav 'Departments' filter group enumerates exactly nine children with per-child counts - Accessories ho0470 (8), Bathroom Hardware ho0476 (6), Beach Towels ho0657 (1), Furniture ho0471 (30), Mirrors ho0477 (16), Rugs & Mats ho0474 (15), Shower Curtains ho0475 (16), Sleepwear & Robes ho0538 (4), Towels ho0473 (16). Each of those child pages was then opened individually; every one returns the Bath SIBLING set in its own Departments facet rather than a fresh child set, which is HSN's signature for a terminal node - so the Bath children are the deepest listing grids and there is no level-4 under Bath. QTY SOURCE: each listing page carries data-total-products=\"N\" on the product-grid div (id=template-product-grid), duplicated as data-cnstrc-num-results=\"N\" (HSN runs Constructor.io). VERIFICATION, four independent ways: (1) data-total-products equals data-cnstrc-num-results on every page read; (2) it equals the count the PARENT Bath page's own Departments facet publishes for that child, on all seven Bath children that have their own page - 8=8, 6=6, 30=30, 16=16, 15=15, 16=16, 16=16 - i.e. two structurally different parts of the rendered page agree; (3) the number of distinct /products/ tiles actually delivered in the HTML equals the total on every node at or under the 60-per-page limit (Accessories 8=8, Hardware 6=6, Mirrors 16=16, Rugs & Mats 15=15, Shower Curtains 16=16, Towels 16=16) - a genuine single-page exhaustion check - while Bath itself (110) and Decor > Mirrors (96) correctly show 60 tiles on page 1; (4) all three emitted leaves were re-read in a second forced pass (cache bypassed, different target language) and returned 8, 6 and 16 again, with Bath still 110 - no drift. Counts discriminate (1 to 110), they are not a site-wide constant, and every page's schema.org breadcrumb was checked to match the node requested. DEDUP: lib/dedup.already_extracted() was run on all 16 candidate/adjacent URLs. FOUR hits, all from Furniture.xlsx for HSN Home - Bath > Furniture ho0471 'Bathroom Furniture' (30), and the Furniture-department trio Bathroom Shelves ho0142 (4), Bathroom Stools ho0141 (14), Bathroom Vanities ho0143 (1). Under the run-owner OPTION 1 policy these stay in Furniture and are recorded in `review`, not `rows`, even though rules 9 and 12 would otherwise class them as Bathroom. EXCLUDED AND WHY: /shop/bath/ho0469 (110) is the parent and is never recorded while valid children exist (rule 24); /shop/bathroom-furniture/ho0138 (19) is the Furniture-department parent whose three children are all already-extracted, so it is barred both by rule 24 and by the dedup policy. HSN sells no toilets, basins, baths, taps or shower enclosures - the only shower items on the site are showerhead filters and showerheads, which sit inside the recorded Bathroom Hardware leaf. No bathroom LIGHTING node exists in the Home tree (wall-lights/ho0079 and ceiling-lighting/ho0077 are general Lighting, not bathroom-specific), so nothing was routed to Lighting. NET RESULT: 3 Bathroom leaves totalling 30 products, with 11 findings preserved in review.",
+ "rows": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Accessories",
+   "qty": 8,
+   "link": "https://www.hsn.com/shop/bathroom-accessories/ho0470",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Hardware",
+   "qty": 6,
+   "link": "https://www.hsn.com/shop/bathroom-hardware/ho0476",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Mirrors",
+   "qty": 16,
+   "link": "https://www.hsn.com/shop/bathroom-mirrors/ho0477",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  }
+ ],
+ "review": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath > Furniture (Bathroom Furniture)",
+   "qty": 30,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Bathroom Furniture' - dedup.already_extracted() hit. Per the run-owner OPTION 1 policy it stays in Furniture and is NOT re-extracted into Bathroom, even though rule 9 would otherwise class it as Bathroom.",
+   "link": "https://www.hsn.com/shop/bathroom-furniture/ho0471"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Furniture > Bathroom Furniture > Bathroom Shelves",
+   "qty": 4,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Bathroom Shelves' - dedup.already_extracted() hit. Stays in Furniture (OPTION 1).",
+   "link": "https://www.hsn.com/shop/bathroom-shelves/ho0142"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Furniture > Bathroom Furniture > Bathroom Stools",
+   "qty": 14,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Bathroom Stools' - dedup.already_extracted() hit. Stays in Furniture (OPTION 1).",
+   "link": "https://www.hsn.com/shop/bathroom-stools/ho0141"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Furniture > Bathroom Furniture > Bathroom Vanities",
+   "qty": 1,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Bathroom Vanities' - dedup.already_extracted() hit. Stays in Furniture (OPTION 1).",
+   "link": "https://www.hsn.com/shop/bathroom-vanities/ho0143"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath > Towels (Bath Towels & Sets)",
+   "qty": 16,
+   "issue": "ROUTED TO TEXTILE: bath towels and towel sets (rules 15, 20).",
+   "link": "https://www.hsn.com/shop/bath-towels-sets/ho0473"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath > Shower Curtains",
+   "qty": 16,
+   "issue": "ROUTED TO TEXTILE: shower curtains (rule 20). Tiles read: Madison Park Chester / Infinity / Jacqueline / Spa Waffle shower curtains, South Street Loft polyester striped shower curtain.",
+   "link": "https://www.hsn.com/shop/shower-curtains/ho0475"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath > Rugs & Mats (Bathroom Rugs and Mats)",
+   "qty": 15,
+   "issue": "ROUTED TO TEXTILE: textile bath mats dominate the node (rule 16) - Lavish Home 100% Cotton Trellis bathroom mat sets, memory-foam shag bath mats, Joy CleanBoss cotton luxe tub mats. Only one non-textile item (Hastings Home bamboo non-slip bath and shower mat) is present, not enough to reclassify the node.",
+   "link": "https://www.hsn.com/shop/bathroom-rugs-and-mats/ho0474"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath > Beach Towels",
+   "qty": 1,
+   "issue": "ROUTED TO TEXTILE: beach towels (rule 15). Appears in the Bath page's Departments facet with 1 product; its own department sits outside the Bath tree.",
+   "link": "https://www.hsn.com/shop/beach-towels/ho0657"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath > Sleepwear & Robes",
+   "qty": 4,
+   "issue": "ROUTED TO TEXTILE: bathrobes/sleepwear (rule 20). Appears in the Bath page's Departments facet with 4 products.",
+   "link": "https://www.hsn.com/shop/sleepwear-and-robes/ho0538"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Home Decor > Wall Decor > Mirrors",
+   "qty": 96,
+   "issue": "ROUTED TO DECOR: schema.org breadcrumb reads Home > Home Decor > Wall Decor > Mirrors, i.e. decorative wall mirrors, not the Bath tree (rules 11, 21). HSN's bathroom/vanity mirrors are a separate node (ho0477) and are recorded in rows. This node was also already covered by the earlier Home-Decor pass at 93 items.",
+   "link": "https://www.hsn.com/shop/mirrors/ho0060"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Cleaning & Laundry > Bathroom Cleaners",
+   "qty": 10,
+   "issue": "ROUTED TO CLEANING / OUT OF SCOPE: schema.org breadcrumb reads Home > Cleaning & Laundry > Bathroom Cleaners; the node sits in the Cleaning department, NOT in the Bath tree, and its siblings are All Purpose Cleaners, Specialty Cleaners and Steam Cleaners. Primary product type is cleaning chemicals (rule 2 - hierarchy and product type both point away from Bathroom).",
+   "link": "https://www.hsn.com/shop/bathroom-cleaners/ho0447"
+  }
+ ],
+ "_reconstructed_from": "Bathroom.xlsx delivered 2026-09-01 (checkpoint), not original worker JSON"
+}

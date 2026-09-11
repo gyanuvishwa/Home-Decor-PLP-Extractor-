@@ -1,0 +1,162 @@
+{
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ACCESS: plain curl_cffi fetches worked throughout (safari15_5 / chrome124 / chrome120 all 200); no WAF, no proxy, no rate limiting. ROBOTS: https://www.luluandgeorgia.com/robots.txt fetched FIRST (200, 3654 bytes). It is the Shopify agentic template - one generic 'User-agent: *' group and one 'User-agent: adsbot-google' group, byte-identical to Heal's file apart from the shop id and the sitemap line. NO group names ClaudeBot, Claude-Web, Claude-User, Claude-SearchBot or anthropic-ai anywhere in the file, and no Crawl-delay. The '*' group Allows / and disallows only transactional and crawl-trap paths: /admin, /cart/, /checkout, /checkouts/, /orders, /account, /29928226915, /services, /sf_*, /cart.js, /recommendations/products, /collections/*sort_by*, /collections/*+*, /collections/*%2B*, /collections/*filter*&*filter*, /blogs/*+*, /*?*oseid=*, /*?*preview_theme_id=*, /*?*preview_script_id=*, /cdn/wpm/*.js. Everything I requested - /collections/<handle>, /collections/<handle>/products.json, /sitemap*.xml and the theme asset /cdn/shop/t/51/assets/algolia_instant_search.js - is outside every Disallow pattern. I deliberately did NOT request the 'Baskets + Hampers' nav link because it is a ?refinementList[...] facet URL (also excluded by rule 27). TREE: taken from the site's OWN mega-menu in the homepage HTML. The desktop menu (nav.js-nav-desktop) and the mobile menu encode the same tree, and the mobile markup exposes the group headings explicitly, so it was parsed for structure. Bathroom content lives in three places: (1) Bed + Bath > Bath Linens + Accessories -> All Bath, Bath Towels + Linens, Bath Mats + Rugs, Personalized Bath Linens, Bath Accessories + Organization, Baskets + Hampers (facet URL), Bath Faucets; (2) Bed + Bath > Bath Furniture -> Bath Vanities, Bath Lighting, Bath Mirrors + Medicine Cabinets; (3) Furniture > Bathroom -> Bath Vanities (same URL as (2), rule 28). Cross-checks: Lighting > Bathroom Lighting (Bathroom Wall Lighting / Bathroom Ceiling Lighting / All Bathroom Lighting) and Wall Decor > 'Bathroom Mirrors + Medicine Cabinets' (the same /collections/bathroom-wall-decor URL) and 'Bathroom Wallpaper', and Decor + Tabletop > Storage + Organization > 'Bath Accessories + Organization' (again the same /collections/bath-accessories URL) - all reconciled to one record each. The full collections sitemap (sitemap_collections_1.xml, 820 collections) was then swept for every bath|shower|towel|soap|toilet|vanit|sink|faucet|mirror|medicine slug; it surfaced exactly one bath collection absent from the nav, /collections/bathroom-furniture, which is handled in `review`. Each of the three recorded leaves was fetched and its H1 and breadcrumb confirmed: 'Bath Accessories + Organization' / 'Bathroom Faucets' / 'Bathroom Mirrors + Medicine Cabinets', all with breadcrumb Home > Bed + Bath > Bath. None of them has child collections, so the deepest-node rule is satisfied and the parent /collections/bath (83) is correctly NOT recorded. QTY: the collection grid is Algolia InstantSearch (app AVKHUU7E0V, search key 82a89b3b781da17c3ff1c020ea007984, index shopify_products), and the visible count is literally algolia.helpers.formatNumber(data.nbHits) - the instantSearchStatsTemplate in the page's own inline script renders `<span class=\"ais-stats--nb-results\">${algolia.helpers.formatNumber(data.nbHits)} ${algolia.translations.resultsFound}</span>`, and the .ais-stats-container div is empty in the SSR HTML, i.e. that widget is the ONLY thing that ever prints a total on these pages. I replicated the query exactly as /cdn/shop/t/51/assets/algolia_instant_search.js builds it: filters = 'collections:\"<handle>\"' (collection_id_indexing is true, so the handle - not the numeric id - is the facet value); NO stock filter (config.stock_policy == 'allow', so the stockPolicyFilter branch is skipped); ruleContexts = [<handle>, 'collection_page'] and analyticsTags the same (collection_id_query_rules is false, so collectionRulesContextValue is the handle); facetingAfterDistinct = false; and CRITICALLY the 'distinct' parameter is NOT sent at all, because the theme only sets it when instant.distinct is truthy and instant.distinct = !!algolia.config.show_products = false. Sending distinct=false explicitly is WRONG on this store and was the one trap here: it overrides the index-level distinct and returns variant-level counts (sofas 6874 instead of 129, bathroom-vanities 47 instead of 20). The index's attributeForDistinct is meta.search.distinct_key ('<productId>_<style option>'), so a grid tile is one product-and-style, which is exactly what the page displays. VERIFICATION: (1) CONTROL SET - with the corrected query the numbers reproduce the validated Furniture.xlsx pass on its own control collections: sofas 129 (recorded 130), nightstands 118 (119), coffee-tables 223 (213), outdoor-side-tables 59 (59), bathroom-vanities 20 (21) - i.e. equal or one-off after several months of catalogue drift, and never off by a factor. (2) FULL ENUMERATION - seven collections of differing size were paged to the last page at hitsPerPage=36 (the theme's own collections_full_results_hits_per_page) and both the returned rows and the distinct meta.search.distinct_key values counted: nbHits == rows == unique distinct_key on all seven (bathroom-faucets 6, bath-linens 16, bath-mats 19, bathroom-vanities 20, bath-accessories 50, bath 83, bathroom-wall-decor 108). (3) DISCRIMINATION - the invented handle 'zzz-not-a-real-handle' returns nbHits = 0, and every real handle returns its own distinct value (6..445); no site-wide constant. (4) H1 / breadcrumb match on every recorded URL (above). (5) COMPOSITION AUDIT - every enumerated hit's own meta.search.filter_product_subcategory was tallied, which is how each node was classified: Bath Accessories + Organization = Bath Accessories 25 / Baskets + Bins 13 / Bath Mats 13 / Wastebaskets 3 / Shower Curtains 2 / Roman Shades 2 / other 3, with product titles such as Aukko Waste Basket, Howell Hamper, Ferm Living Soap Dish, Soap Pump, Toothbrush Holder, Toilet Brush, Tissue Box, Ceramic Canisters, Rattan Wastebin - dominant type is bathroom accessories and bathroom organisation, so it is recorded as Bathroom under rules 13/17, with the ~13 textile bath-mat and 2 shower-curtain tiles inside it disclosed here (they are NOT separately recorded, and the site's own dedicated textile nodes are routed out in `review`); Bathroom Faucets = 6 genuine bathroom faucets (Grohe Eurocube, Grohe Essence, Grohe Lineare, Newport Brass Jacobean, Astor Cross Handle, Pavani - the 'Bath Vanities' subcategory metafield on those rows is a merchandising mislabel, the titles and the H1 are unambiguous), Bathroom under rule 8; Bathroom Mirrors + Medicine Cabinets = Mirrors 96 / Medicine Cabinets 6 / Table Mirrors 1 / untagged 5, Bathroom under rules 10 and 12. (6) A SECOND, INDEPENDENT SURFACE was also read - Shopify /collections/<handle>/products.json paged to exhaustion (bathroom-faucets 7, bath-accessories 53, bathroom-wall-decor 144, bath 89, bathroom-vanities 16, sofas 160). It deliberately was NOT used for the recorded quantities: products.json is Shopify's raw collection membership and differs from the storefront in both directions, whereas nbHits is by the theme's own code the number the page prints. The divergence is recorded here for transparency rather than hidden. (7) NO AGGREGATION - no parent number reused, nothing summed. EXCLUDED: /collections/bath (shop-all parent), the Bed + Bath merchandising collections (Bath Pairings, Set Savings, Sale/New/Fall/In-Stock Bed + Bath, Bestsellers refinement URL, /pages/personalization), the 'Baskets + Hampers' refinementList facet URL, the Decor mirror hierarchy and its shape edits, the general Storage + Organization hierarchy, and /collections/bathroom-furniture - all itemised with quantities in `review`. Bath lighting and bath textiles were inspected in full and routed out to Lighting / Textile rather than skipped. DEDUP: dedup.already_extracted() was called on all 28 candidate collection URLs. Exactly ONE hit: https://www.luluandgeorgia.com/collections/bathroom-vanities (Furniture.xlsx, 'Bath Vanities') - it is in `review`, never in `rows`, and its sitemap-only superset /collections/bathroom-furniture (26) was also withheld for the same reason.",
+ "rows": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Linens + Accessories",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Accessories + Organization",
+   "qty": 50,
+   "link": "https://www.luluandgeorgia.com/collections/bath-accessories",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Faucets",
+   "qty": 6,
+   "link": "https://www.luluandgeorgia.com/collections/bathroom-faucets",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Mirrors + Medicine Cabinets",
+   "qty": 108,
+   "link": "https://www.luluandgeorgia.com/collections/bathroom-wall-decor",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  }
+ ],
+ "review": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Vanities",
+   "qty": 20,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Bath Vanities' (identical URL; dedup.already_extracted() hit). Per dispatch_note OPTION 1 it stays in Furniture and is not re-extracted into Bathroom. It is the site's Furniture > Bathroom > Bath Vanities node and is also linked a second time from Bed + Bath > Bath Furniture (same URL, rule 28).",
+   "link": "https://www.luluandgeorgia.com/collections/bathroom-vanities"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Furniture",
+   "qty": 26,
+   "issue": "EXCLUDED - sitemap-only collection (not in the mega-menu; breadcrumb is just 'Home'). All 26 tiles carry filter_product_subcategory = 'Bath Vanities' and it is a superset of the already-extracted /collections/bathroom-vanities (20). Recording it would re-extract the vanity range that dispatch_note OPTION 1 leaves in Furniture.",
+   "link": "https://www.luluandgeorgia.com/collections/bathroom-furniture"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "All Bath",
+   "qty": 83,
+   "issue": "EXCLUDED as a Shop-All roll-up (rules 24/25) - valid children exist. Composition check (filter_product_subcategory over all 83 enumerated tiles): Bath Accessories 25, Bath Vanities 21, Bath Mats 15, Baskets + Bins 9, Washcloths 9, Towel Set 2, Bath Linens 2, Wastebaskets 2, Shower Curtains 2, Hand Towel 1, Bins + Baskets 1 - i.e. exactly the recorded leaves plus the routed-out textiles and the already-extracted vanities.",
+   "link": "https://www.luluandgeorgia.com/collections/bath"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Towels + Linens",
+   "qty": 16,
+   "issue": "ROUTED TO TEXTILE: enumerated composition is Washcloths 9, Towel Set 3, Hand Towel 2, Bath Linens 1, Bath Mats 1, Bath Accessories 1 - bath towels and linens (rules 15/20).",
+   "link": "https://www.luluandgeorgia.com/collections/bath-linens"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Mats + Rugs",
+   "qty": 19,
+   "issue": "ROUTED TO TEXTILE: enumerated composition is Bath Mats 15 plus 7 Bath Accessories tags on the same rows; these are woven/cotton textile bath mats and rugs (Vela Organic Cotton Bath Mat, Nell Organic Cotton Bath Mat, Lucia Bath Mat), not rubber anti-slip mats, so rule 16 sends them to Textile.",
+   "link": "https://www.luluandgeorgia.com/collections/bath-mats"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Baskets + Hampers",
+   "qty": null,
+   "issue": "EXCLUDED - not a collection but a FACET URL on the recorded Bath Accessories leaf: /collections/bath-accessories?refinementList[meta.search.filter_product_subcategory][0]=Baskets + Bins&[1]=Wastebaskets. Rule 27 forbids recording filter/refinement URLs; its products are already inside the recorded Bath Accessories + Organization row.",
+   "link": "https://www.luluandgeorgia.com/collections/bath-accessories?refinementList%5Bmeta.search.filter_product_subcategory%5D%5B0%5D=Baskets%20%2B%20Bins&refinementList%5Bmeta.search.filter_product_subcategory%5D%5B1%5D=Wastebaskets"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Lighting / All Bathroom Lighting",
+   "qty": 445,
+   "issue": "ROUTED TO LIGHTING: primary product type is lighting (rule 19). Reached both from Bed + Bath > Bath Furniture > Bath Lighting and from Lighting > Bathroom Lighting > All Bathroom Lighting (same URL, rule 28).",
+   "link": "https://www.luluandgeorgia.com/collections/bathroom-lighting"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Wall Lighting",
+   "qty": 171,
+   "issue": "ROUTED TO LIGHTING: bathroom sconces / vanity lights (rules 11/19).",
+   "link": "https://www.luluandgeorgia.com/collections/bathroom-wall-lights"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Ceiling Lighting",
+   "qty": 252,
+   "issue": "ROUTED TO LIGHTING: bathroom flush mounts and pendants (rule 19).",
+   "link": "https://www.luluandgeorgia.com/collections/bathroom-ceiling-lights"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Wallpaper",
+   "qty": 128,
+   "issue": "ROUTED TO DECOR: primary product type is wallpaper / wallcovering, not a bathroom product (rules 2/21). Sits in the Wall Decor + Wallpaper menu.",
+   "link": "https://www.luluandgeorgia.com/collections/bathroom-safe-wallpaper"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Mirrors (Decor)",
+   "qty": 191,
+   "issue": "ROUTED TO DECOR: the Decor + Tabletop > Mirrors hierarchy (All Mirrors 191, Wall Mirrors 120 /collections/wall-mirrors, Full Length + Floor Mirrors 74 /collections/full-length-mirrors) is decorative wall and floor mirrors; primary product type is decorative mirror, not bathroom mirror (rule 11). Only the site's own dedicated Bathroom Mirrors + Medicine Cabinets node is recorded in Bathroom.",
+   "link": "https://www.luluandgeorgia.com/collections/mirrors"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Mirror shape collections",
+   "qty": null,
+   "issue": "EXCLUDED - shape/attribute edits of the Decor mirror range, not subcategories and not bathroom: round-oval-mirrors 30, rectangle-square-mirrors 55, angular-and-arched-mirrors 83, mantel-mirrors 24, arteriors-mirrors-wall-art, sarah-sherman-samuel-mirrors-collection (rules 25/29).",
+   "link": "https://www.luluandgeorgia.com/collections/round-oval-mirrors"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bed + Bath merchandising collections",
+   "qty": null,
+   "issue": "EXCLUDED as promotional / shop-all pages (rule 25): All Bed + Bath 268 (/collections/bed-bath), Bath Pairings 25 (/collections/bath-pairings), Set Savings 25 (/collections/bed-bath-set-savings), Sale Bed + Bath 38 (/collections/sale-bed-bath), New Bed + Bath 15 (/collections/new-bed-bath), Fall Bed + Bath 13 (/collections/fall-bed-bath), In-Stock + Ready to Ship Bed + Bath 54, Bestsellers (a product_type refinement URL), Personalized Bath Linens (/pages/personalization, a content page not a listing).",
+   "link": "https://www.luluandgeorgia.com/collections/bed-bath"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Baskets + Bins / All Storage + Organization",
+   "qty": 33,
+   "issue": "EXCLUDED - general Storage hierarchy (Decor + Tabletop > Storage + Organization: All Storage + Organization 123, Baskets + Bins 33). Rules 30-33 keep general baskets/bins in Storage; only the site's own Bath Accessories + Organization node, which sits under Bed + Bath > Bath, is taken into Bathroom.",
+   "link": "https://www.luluandgeorgia.com/collections/baskets"
+  }
+ ],
+ "_reconstructed_from": "Bathroom.xlsx delivered 2026-09-01 (checkpoint), not original worker JSON"
+}

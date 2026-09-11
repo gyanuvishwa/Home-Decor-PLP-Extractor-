@@ -1,0 +1,25 @@
+{
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "Site is a Magento PWA Studio SPA (empty #root, zero SSR HTML) - same as prior Furniture pass. Access route: direct HTTPS to www.interiordefine.com/graphql (Magento GraphQL), impersonate=chrome via curl_cffi, no proxy needed. robots.txt has no Claude-specific disallow. Discovery: pulled the full site category tree via `categories(filters:{}, pageSize:200)` across 2 pages (total_count=214, all 214 retrieved) - this is the same tree that feeds the site's own mega menu/nav, so it stands in for nav+sitemap discovery. Found two genuinely distinct Bestsellers-concept categories: 'Best Sellers' (best-sellers) and 'Best Selling Collections' (top-collections). Verified both are real PLPs (fetched sample SKUs/names - real furniture product configs, not editorial) and confirmed they are NOT aliases: SKU-set overlap is only 32/80 (Best Sellers) vs 226 (Best Selling Collections), i.e. mostly disjoint product sets, so kept as two separate rows per the brief's non-dedup rule. Both resolve via urlResolver as type CATEGORY. qty for each taken from `products(filter:{category_id:{eq:\"<id>\"}}, pageSize:1).total_count`, which is the exact GraphQL query the PWA storefront uses to populate that PLP's product grid (cross-checked against the category's own product_count field - identical for both). Considered and EXCLUDED: 'Trade Favorites' (trade-favorites, 51 products) - name and product-count field suggest a curated pick-list for interior-design trade professionals, not a customer-facing bestseller/popularity page; no page description available to confirm either way, but 'Trade' signals a B2B/design-trade program rather than the brief's target terms (Bestsellers/Top Sellers/Customer Favorites/Trending). Also tried urlResolver guesses customer-favorites, top-sellers, best-selling, most-popular, favorites, popular, trending, bestsellers - all resolved to nothing (None), confirming no additional Bestsellers PLPs exist beyond the two found. Neither Best Sellers nor Best Selling Collections has further site-defined children (no category in the 214-category tree has a url_path nested under best-sellers/ or top-collections/), so both are flat single listings (is_group=false), siblings of each other, not parent/child.",
+  "rows": [
+    {
+      "category": "Bestsellers",
+      "sub_category": "Best Sellers",
+      "qty": 80,
+      "link": "https://www.interiordefine.com/best-sellers",
+      "is_group": false,
+      "evidence": "GraphQL products(filter:{category_id:{eq:\"512\"}}).total_count = 80 (matches category(id:512).product_count = 80); category name 'Best Sellers', url_path 'best-sellers'",
+      "flag": null
+    },
+    {
+      "category": "Bestsellers",
+      "sub_category": "Best Selling Collections",
+      "qty": 226,
+      "link": "https://www.interiordefine.com/top-collections",
+      "is_group": false,
+      "evidence": "GraphQL products(filter:{category_id:{eq:\"601\"}}).total_count = 226 (matches category(id:601).product_count = 226); category name 'Best Selling Collections', url_path 'top-collections'",
+      "flag": null
+    }
+  ]
+}

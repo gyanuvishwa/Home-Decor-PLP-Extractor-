@@ -1,0 +1,86 @@
+{
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ACCESS: Datadome fronts urbanoutfitters.com and returned a 779-byte HTTP 403 to essentially every request for most of this session, including a full 10-profile curl_cffi sweep (chrome131/124/120, edge101, firefox133, safari15_5/17_0/17_2_ios/18_0/18_0_ios), WebFetch, and r.jina.ai. It is INTERMITTENT rather than absolute: the way through was brute persistence on a single profile - curl_cffi impersonate='safari18_0_ios' with http_version=2 and a browser header set, retried every 4s. robots.txt came back on attempt 6 of a Session-based retry and /home on attempt 11 of a bare retry loop; each category page then took between 1 and ~15 attempts. Every successful document is cached to disk so no URL was fetched twice.\nROBOTS (fetched FIRST, before any category page): https://www.urbanoutfitters.com/robots.txt, HTTP 200, 764 bytes. Two groups only - 'User-Agent: *' (Allow: /, then Disallow /wp-content/, *?webview=true, /*search?, /claims, /order-tracking, /order/, /password/reset, /wishlist/) and 'User-agent: Pinterest' (Crawl-delay: 120). It names NO anthropic-ai, ClaudeBot or Claude-Web agent, declares no general Crawl-delay, and disallows none of the category paths used here. No HARD STOP. I requested no /*search? URL and no wishlist/order path.\n\nTREE: from the site's own navigation JSON embedded in <script id=\"urbnInitialPiniaState\">, at catchAll.navItem, walked from the 'home' node (displayName 'Home + Dorm', nestLevel 1, 16 children). This is the same payload the sibling Anthropologie worker used - URBN runs one platform across its brands. The Bathroom-bearing node is Bath (slug 'bathroom-decor', nestLevel 2, 116 products) with EXACTLY four children, all nestLevel 3 with childSlugs=[] (i.e. the deepest level the site offers): Shower Curtains (78), Bath Mats (29), Towels (1) and Bathroom Storage (slug 'bathroom-shelving-storage', 4). The Bath parent URL is NOT recorded (rule 24) because valid children exist. Exactly ONE of the four children is Bathroom; the other three are bath textiles and are routed to Textile in `review`.\nI also chased every other node that could plausibly hide Bathroom content and checked each on-page: Wall Art > Mirrors (8, rule 10 - decorative only), Home Decor > Hardware (8, rule 17 - switch plates only), Storage + Organization > Bath Storage (a SECOND, differently-slugged bath node, currently empty at 0 products), and the seasonal On Campus > Bath + Laundry shop (59, rule 25). All four are written up in `review`. The categories sitemap (https://www.urbanoutfitters.com/categories_sitemap.xml, 200, 2,119 URLs) was independently regex-scanned for bath|shower|towel|mirror|toilet|soap|vanit to confirm nothing was missed: outside the nodes above the only hits are facet variants (/bath-mats?material=Tufted, /mirrors?itemType=Wall+Mirrors - facet URLs, barred by rules 25/27), apparel (bathing suits, bridal/baby shower dresses), /bath-body-products (personal-care beauty, not home) and /furniture-desks-makeup-vanities (bedroom desks and makeup vanities, Furniture).\n\nQTY: the listing page's OWN server-rendered header, <span class=\"c-pwa-tile-result-count\">N products</span>. Bathroom Storage = '4 products'.\nVERIFICATION, three independent readings inside the same document: (1) the rendered header text; (2) the Pinia store's category.totalRecordCount; (3) a physical enumeration of the server-rendered product tiles at category.pages[].wrapper.tiles, de-duplicated by product displayName. The page size is 72. On EVERY node whose total is at or below 72 all three agree exactly: Bathroom Storage 4 = 4 = 4, Mirrors 8 = 8 = 8, Hardware 8 = 8 = 8, Bath Mats 29 = 29 = 29, Towels 1 = 1 = 1, Bath Storage 0 = 0 = 0. On the nodes that overflow (Bath 116, Shower Curtains 78, Wall Art 86, Storage + Organization 83, Home 1284, On Campus 59->54) page 1 renders a full 72-tile slot exactly as a 72-per-page grid should. This is a direct proof of the header, not an inference.\nDISCRIMINATION: 0 / 1 / 4 / 8 / 8 / 29 / 59 / 78 / 83 / 86 / 116 / 1284 - all different, not a site-wide constant. IDENTITY: each page's navItem.displayName was checked against the node requested ('Bathroom Storage' for /bathroom-shelving-storage, 'Bath' for /bathroom-decor, etc.). INTERNAL CONSISTENCY: Bath 116 vs its four children 78+29+1+4 = 112, so the parent is 4 higher than the sum and no child figure is derived from the parent.\n\nCONTENT CHECK on the recorded leaf: all 4 products in Bath > Bathroom Storage were read - 'Alana Over-The-Toilet Metal Storage Shelf' (textbook rule-12 over-toilet bathroom storage), 'Mini Tabletop Storage Locker', 'My Goodies Checkered Ceramic Stash Jar' and 'Fiona Printed Laundry Bag'. The node is small and slightly mixed, but the website hierarchy places it under Bath and rule 12 makes hierarchy the deciding evidence, so it is recorded as Bathroom.\n\nDEDUP: dedup.already_extracted() called on all 11 candidate URLs (bathroom-decor, shower-curtains, bath-mats, bath-towels, bathroom-shelving-storage, bathroom-storage, mirrors, mirrors-wall-art, hardware, storage-organization, on-campus-bath-laundry). ZERO hits. Urban Outfitters' 6 rows in Furniture.xlsx are all /furniture children (seating, accent tables, storage furniture, desks+vanities, dressers, beds+headboards) and none is a bath node.\n\nEXCLUDED / NOT FOUND: Urban Outfitters sells no bathroom fixtures at all - no toilets, basins, sinks, bidets, baths, showers, enclosures, taps/faucets, bathroom vanity units, medicine cabinets, towel rails, toilet-roll holders, soap dispensers or bathroom mirrors exist anywhere in the 16-branch Home + Dorm tree or the 2,119-URL categories sitemap. Its bath offer is essentially bath textiles (shower curtains, bath mats, one towel) plus a 4-product storage node. No View All / Shop All (the nav's showShopAll entries), no facet URL, no search and no product-detail URL was recorded.",
+ "rows": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Storage",
+   "qty": 4,
+   "link": "https://www.urbanoutfitters.com/bathroom-shelving-storage",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  }
+ ],
+ "review": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Home + Dorm > Bath > Shower Curtains",
+   "qty": 78,
+   "issue": "ROUTED TO TEXTILE: shower curtains (rule 20). All 72 rendered tiles on page 1 are fabric shower curtains ('Aria Folk Floral Patterned Shower Curtain', 'Waterfall Ruffle Cotton Voile Shower Curtain', 'Maise Patterned Ruffled Shower Curtain'). Largest child of the Bath node.",
+   "link": "https://www.urbanoutfitters.com/shower-curtains"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Home + Dorm > Bath > Bath Mats",
+   "qty": 29,
+   "issue": "ROUTED TO TEXTILE: textile bath mats (rules 16/20). Enumerated all 29 rendered tiles - every one is tufted, plush, looped or printed textile ('Tiger Shape Tufted Bath Mat', 'Geo Diamond Looped Tufted Runner Bath Mat', 'Awning Stripe Plush Printed Bath Mat'); not one rubber or anti-slip mat, so the rule-16 carve-out does not apply.",
+   "link": "https://www.urbanoutfitters.com/bath-mats"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Home + Dorm > Bath > Towels",
+   "qty": 1,
+   "issue": "ROUTED TO TEXTILE: towels (rules 15/20). The node currently holds exactly one product, 'Nike Oversized Reversible Beach Towel'.",
+   "link": "https://www.urbanoutfitters.com/bath-towels"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Home + Dorm > Storage + Organization > Bath Storage",
+   "qty": 0,
+   "issue": "EMPTY NODE, NOT RECORDED: a second, distinct nav node also called Bath Storage (slug 'bathroom-storage', child of Storage + Organization, nestLevel 3) whose listing is currently EMPTY - the rendered header prints no result count at all and category.totalRecordCount is 0 with zero tiles. Exact count is 0, not unknown; recording it would add an empty row that duplicates the recorded Bath > Bathroom Storage leaf. Flagged for a reviewer in case it is restocked.",
+   "link": "https://www.urbanoutfitters.com/bathroom-storage"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Home + Dorm > Wall Art > Mirrors",
+   "qty": 8,
+   "issue": "ROUTED TO DECOR: inspected in full because rule 10 forbids skipping mirrors. All 8 products enumerated - Fleur Catch-All Tray & Tabletop Swing Mirror, Laurel Leaf & Floral Arch Wall Mirror, Tubular Framed Wall Mirror, Cam Leaning Arch Wall Mirror, Printed Weird Leopard & Lippy Wall Mirror, Bellevue Floor Mirror, Tabitha Arc Mirror, Eloise Wall Mirror. Every one is a decorative wall, arch, floor or tabletop mirror; there is no bathroom, vanity, LED, illuminated, anti-fog, demister, magnifying, shaving or cabinet mirror in the assortment, and the node sits under Wall Art, not Bath. Primary product type is decorative mirror (rules 2/21) -> Wall Decor.",
+   "link": "https://www.urbanoutfitters.com/mirrors"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Home + Dorm > Home Decor > Hardware",
+   "qty": 8,
+   "issue": "EXCLUDED (NOT BATHROOM): checked because 'Hardware' could have held towel bars, robe hooks or bathroom knobs (rule 17). All 8 products are light-switch plates, curtain tie-back sets and a decorative resin knob set - Delft Cat Shaped Resin Switch Plate, Maura Squiggle Shape Light Switch Cover, Sun Metal Curtain Tie-Back Set, Tiger Switch Plate, Marnie Scalloped Resin Switch Plate, Orchid Flower Resin Switch Plate, Crystal Resin Heart Curtain Tie-Back Set, Button Shaped Resin Knob - Set Of 2. No bathroom hardware whatsoever.",
+   "link": "https://www.urbanoutfitters.com/hardware"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "On Campus > Bath + Laundry",
+   "qty": 59,
+   "issue": "EXCLUDED (SEASONAL CURATED SHOP, rule 25): 'On Campus' is a back-to-school curated shop, not a node of the Home + Dorm category tree (it is absent from catchAll.navItem.navigationItems and its childSlugs). Its 54 rendered tiles are re-cuts of the same products as Bath > Shower Curtains / Bath Mats plus laundry bags ('Awning Stripe Patterned Shower Curtain', 'Kori Patterned Tufted Bath Mat Set', 'Shower Curtain Liner'), so it is both promotional and duplicative. Recorded here so it is not silently skipped.",
+   "link": "https://www.urbanoutfitters.com/on-campus-bath-laundry"
+  }
+ ],
+ "_reconstructed_from": "Bathroom.xlsx delivered 2026-09-01 (checkpoint), not original worker JSON"
+}

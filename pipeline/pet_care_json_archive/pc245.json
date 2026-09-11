@@ -1,0 +1,196 @@
+{
+  "status": "partial",
+  "failure_reason": "Site has a real, deep Pet Care taxonomy (confirmed via homepage nav JSON and PLP sitemap), but exact product counts (qty) are unattainable via any permitted route: Meesho's PLP pages are Next.js shells whose real product grid/totalProductsCount is populated by a client-side XHR after hydration (raw SSR payload shows totalProductsCount:0 on every category page checked), and the likely count/facet endpoints (*/facet_clp/*, */search) are robots.txt-disallowed -- identical platform-wide limitation to the prior Home-Decor pass on this same site. In addition, curl_cffi (impersonate=safari17_2_ios, the only profile that worked in the prior pass) started returning 403 after ~17 sequential requests mid-session (Akamai/WAF), so per the 'first block stops that host' rule further verification fetches (titles/breadcrumbs/counts for the remaining candidate URLs) were halted before every row could be independently confirmed.",
+  "notes": "Access: robots.txt has no Claude-specific disallow (checked first). curl_cffi impersonate='safari17_2_ios' returned real SSR HTML (200) for homepage, /dog-collars-harnesses-leashes/pl/6755, and /pet-supplies/pl/1nht; a subsequent batch of 17 breadcrumb-verification fetches all returned 403 (WAF) -- stopped requesting the host at that point per the brief's first-block rule, and used only what had already been fetched. Two independent sources of Pet Care structure were found: (1) the homepage's embedded 'nav.navUrls' JSON (a flat, curated list of ~362 top-level shop-by-category tiles covering the whole site) contains exactly 6 pet items with real titles: Collars & Leashes (/dog-collars-harnesses-leashes/pl/6755), Clothes & Grooming (/pet-grooming/pl/9ug), Food & Treats (/pet-food/pl/9uf), Aquarium Accessories (/aquarium-accessories/pl/21j0), Pet Toys (/interactive-toys-for-pets/pl/90f), Pet Bowls (/feeding-bowls-for-pets/pl/9af) -- these titles are CONFIRMED (rendered nav text). (2) The permitted /sitemap.xml -> /sitemap/plp/0.xml (category-listing sitemap, 19046 URLs total) contains ~35 additional dog/cat/pet-specific PLP URLs in a contiguous slug/id range (671y-679r) reading as coherent English category names (e.g. 'apparel-accessories-for-dogs/6757', 'litter-housebreaking-for-pets/674z', 'health-supplies-for-pets/6759', 'houses-kennels-pens/679r'); one of these (dog-collars-harnesses-leashes/6755) was independently breadcrumb-confirmed and its real title ('Dog Collars, Harnesses & Leashes', parent breadcrumb 'Pet Supplies') matches its slug almost exactly, giving reasonable confidence the sibling slugs in that same ID range are similarly literal -- but their titles were NOT independently fetched/confirmed before the 403 block hit, so each is flagged. Excluded from this range as likely non-navigable attribute/material-variant PLPs (same pattern as Meesho's color-variant carpet pages, e.g. 'teal-carpets'): metal-collars-for-dogs, stainless-steel-collars-for-dogs, dry-food-for-dogs, dry-food-for-cats, dog-leashes, dog-harnesses, dog-collars, cat-leashes, cat-collars, chew-toys-for-dogs, litter-for-cats, aquarium-lights, aquarium-decor, 5x shampoo-for-pets variants, dog-clothes/clothes-for-dogs/clothes-cats, dog-stuffed-toys/cats-stuffed-toys, exercise-balls-for-pets -- these look like children of the confirmed leaf rows below rather than separate top-level categories; not enumerated to avoid inventing an unverified 3rd tier. Also excluded as pet-themed-not-pet-care: 'lions-other-big-cats-stuffed-toys' (kids' stuffed-animal toy, not a pet product), 'english-cat-books'/'paperback-cat-books' (books about cats), 'petticoats'/'carpets'/'cateye-sunglasses'/collar-* clothing items (false-positive substring matches on 'pet'/'cat'). Breadcrumb taxonomy is internally inconsistent across the two confirmed fetches (Pet Supplies appears as id=42/type=cat/parent=null on one page and id=195/type=scat/parent=28('Home Improvement') on another) -- typical of Meesho's dual search-vs-catalog classification; not resolved, doesn't affect row identity. Treated /pet-supplies/pl/1nht as the department root/grouping row (mixed roll-up page, category_type scat with s_id filter only) rather than a leaf, consistent with prior pass's 'mixed roll-ups: drop, don't pad' practice. No overlap with other categories claimed (Furniture/Storage/Textile workers would not touch dog/cat-specific beds, collars, carriers). Absence check n/a -- Pet Care is clearly present and substantial on this site.",
+  "rows": [
+    {
+      "category": "Pet Care",
+      "sub_category": "Pet Supplies",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Dog Collars, Harnesses & Leashes",
+      "qty": null,
+      "link": "https://www.meesho.com/dog-collars-harnesses-leashes/pl/6755",
+      "is_group": false,
+      "evidence": "breadcrumb title confirmed via direct fetch: [{'title':'Pet Supplies','id':42,'type':'cat'},{'title':'Dog Collars, Harnesses & Leashes','id':375,'type':'scat'}]",
+      "flag": "MANUAL REVIEW: qty unattainable - SSR payload shows totalProductsCount:0 (real count/facet loaded via client-side XHR; facet_clp/search endpoints are robots.txt-disallowed)."
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Cat Collars, Harnesses & Leashes",
+      "qty": null,
+      "link": "https://www.meesho.com/cat-collars-harnesses-leashes/pl/675c",
+      "is_group": false,
+      "evidence": "URL present in /sitemap/plp/0.xml, id 675c sits in the same contiguous sibling range as the breadcrumb-confirmed 'Dog Collars, Harnesses & Leashes' (id 6755); title not independently fetched (403 hit before this page could be verified)",
+      "flag": "MANUAL REVIEW: sub_category title derived from URL slug, not independently confirmed (site returned 403 before fetch). qty also unattainable (SSR/XHR limitation, see notes)."
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Apparel & Accessories for Dogs",
+      "qty": null,
+      "link": "https://www.meesho.com/apparel-accessories-for-dogs/pl/6757",
+      "is_group": false,
+      "evidence": "URL present in /sitemap/plp/0.xml, id 6757 (same sibling range); title not independently fetched (403 hit before this page could be verified)",
+      "flag": "MANUAL REVIEW: sub_category title derived from URL slug, not independently confirmed. qty also unattainable (SSR/XHR limitation, see notes)."
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Apparel & Accessories for Cats",
+      "qty": null,
+      "link": "https://www.meesho.com/apparel-accessories-for-cats/pl/674w",
+      "is_group": false,
+      "evidence": "URL present in /sitemap/plp/0.xml, id 674w (same sibling range); title not independently fetched (403 hit before this page could be verified)",
+      "flag": "MANUAL REVIEW: sub_category title derived from URL slug, not independently confirmed. qty also unattainable (SSR/XHR limitation, see notes)."
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Clothes & Grooming",
+      "qty": null,
+      "link": "https://www.meesho.com/pet-grooming/pl/9ug",
+      "is_group": false,
+      "evidence": "title confirmed via homepage nav.navUrls JSON: {\"url\":\"/pet-grooming/pl/9ug\",\"title\":\"Clothes \\u0026 Grooming\"}; may overlap with the species-specific 'Apparel & Accessories for Dogs/Cats' rows above -- kept separate (different URL, not independently verified to be the same underlying listing)",
+      "flag": "MANUAL REVIEW: qty unattainable (SSR/XHR limitation, see notes). Possible overlap with 'Apparel & Accessories for Dogs/Cats' -- not merged, confirm at merge time."
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Dog Beds & Furniture",
+      "qty": null,
+      "link": "https://www.meesho.com/dog-beds-furniture/pl/675i",
+      "is_group": false,
+      "evidence": "URL present in /sitemap/plp/0.xml, id 675i (same sibling range); title not independently fetched (403 hit before this page could be verified)",
+      "flag": "MANUAL REVIEW: sub_category title derived from URL slug, not independently confirmed. qty also unattainable (SSR/XHR limitation, see notes)."
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Cat Beds & Furniture",
+      "qty": null,
+      "link": "https://www.meesho.com/cat-beds-furniture/pl/6756",
+      "is_group": false,
+      "evidence": "URL present in /sitemap/plp/0.xml, id 6756 (same sibling range); title not independently fetched (403 hit before this page could be verified)",
+      "flag": "MANUAL REVIEW: sub_category title derived from URL slug, not independently confirmed. qty also unattainable (SSR/XHR limitation, see notes)."
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Houses, Kennels & Pens",
+      "qty": null,
+      "link": "https://www.meesho.com/houses-kennels-pens/pl/679r",
+      "is_group": false,
+      "evidence": "URL present in /sitemap/plp/0.xml, id 679r (same sibling range); title not independently fetched (403 hit before this page could be verified)",
+      "flag": "MANUAL REVIEW: sub_category title derived from URL slug, not independently confirmed. qty also unattainable (SSR/XHR limitation, see notes)."
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Pet Toys",
+      "qty": null,
+      "link": "https://www.meesho.com/interactive-toys-for-pets/pl/90f",
+      "is_group": false,
+      "evidence": "title confirmed via homepage nav.navUrls JSON: {\"url\":\"/interactive-toys-for-pets/pl/90f\",\"title\":\"Pet Toys\"}",
+      "flag": "MANUAL REVIEW: qty unattainable (SSR/XHR limitation, see notes)."
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Pet Bowls",
+      "qty": null,
+      "link": "https://www.meesho.com/feeding-bowls-for-pets/pl/9af",
+      "is_group": false,
+      "evidence": "title confirmed via homepage nav.navUrls JSON: {\"url\":\"/feeding-bowls-for-pets/pl/9af\",\"title\":\"Pet Bowls\"}",
+      "flag": "MANUAL REVIEW: qty unattainable (SSR/XHR limitation, see notes)."
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Feeding & Watering Supplies for Pets",
+      "qty": null,
+      "link": "https://www.meesho.com/feeding-watering-supplies-for-pets/pl/675g",
+      "is_group": false,
+      "evidence": "URL present in /sitemap/plp/0.xml, id 675g (same sibling range); title not independently fetched (403 hit before this page could be verified)",
+      "flag": "MANUAL REVIEW: sub_category title derived from URL slug, not independently confirmed. qty also unattainable (SSR/XHR limitation, see notes). Possible overlap with 'Pet Bowls' -- not merged, confirm at merge time."
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Food & Treats",
+      "qty": null,
+      "link": "https://www.meesho.com/pet-food/pl/9uf",
+      "is_group": false,
+      "evidence": "title confirmed via homepage nav.navUrls JSON: {\"url\":\"/pet-food/pl/9uf\",\"title\":\"Food \\u0026 Treats\"}",
+      "flag": "MANUAL REVIEW: PET CONSUMABLE - pet food & treats (no include/exclude policy set yet, per brief). qty also unattainable (SSR/XHR limitation, see notes)."
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Dog Food & Treats",
+      "qty": null,
+      "link": "https://www.meesho.com/dog-food-treats/pl/6751",
+      "is_group": false,
+      "evidence": "URL present in /sitemap/plp/0.xml, id 6751 (same sibling range); title not independently fetched (403 hit before this page could be verified)",
+      "flag": "MANUAL REVIEW: PET CONSUMABLE - dog food & treats. sub_category title also derived from URL slug, not independently confirmed. qty unattainable (SSR/XHR limitation, see notes)."
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Cat Food & Treats",
+      "qty": null,
+      "link": "https://www.meesho.com/cat-food-treats/pl/674y",
+      "is_group": false,
+      "evidence": "URL present in /sitemap/plp/0.xml, id 674y (same sibling range); title not independently fetched (403 hit before this page could be verified)",
+      "flag": "MANUAL REVIEW: PET CONSUMABLE - cat food & treats. sub_category title also derived from URL slug, not independently confirmed. qty unattainable (SSR/XHR limitation, see notes)."
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Litter & Housebreaking for Pets",
+      "qty": null,
+      "link": "https://www.meesho.com/litter-housebreaking-for-pets/pl/674z",
+      "is_group": false,
+      "evidence": "URL present in /sitemap/plp/0.xml, id 674z (same sibling range); title not independently fetched (403 hit before this page could be verified)",
+      "flag": "MANUAL REVIEW: sub_category title derived from URL slug, not independently confirmed. qty also unattainable (SSR/XHR limitation, see notes)."
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Carriers & Travel Products for Pets",
+      "qty": null,
+      "link": "https://www.meesho.com/carriers-travel-products-for-pets/pl/675a",
+      "is_group": false,
+      "evidence": "URL present in /sitemap/plp/0.xml, id 675a (same sibling range); title not independently fetched (403 hit before this page could be verified)",
+      "flag": "MANUAL REVIEW: sub_category title derived from URL slug, not independently confirmed. qty also unattainable (SSR/XHR limitation, see notes)."
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Training & Behaviour Aids for Pets",
+      "qty": null,
+      "link": "https://www.meesho.com/training-behaviour-aids-for-pets/pl/675b",
+      "is_group": false,
+      "evidence": "URL present in /sitemap/plp/0.xml, id 675b (same sibling range); title not independently fetched (403 hit before this page could be verified)",
+      "flag": "MANUAL REVIEW: sub_category title derived from URL slug, not independently confirmed. qty also unattainable (SSR/XHR limitation, see notes)."
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Aquarium Accessories",
+      "qty": null,
+      "link": "https://www.meesho.com/aquarium-accessories/pl/21j0",
+      "is_group": false,
+      "evidence": "title confirmed via homepage nav.navUrls JSON: {\"url\":\"/aquarium-accessories/pl/21j0\",\"title\":\"Aquarium Accessories\"}",
+      "flag": "MANUAL REVIEW: qty unattainable (SSR/XHR limitation, see notes)."
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Health Supplies for Pets",
+      "qty": null,
+      "link": "https://www.meesho.com/health-supplies-for-pets/pl/6759",
+      "is_group": false,
+      "evidence": "URL present in /sitemap/plp/0.xml, id 6759 (same sibling range); title not independently fetched (403 hit before this page could be verified)",
+      "flag": "MANUAL REVIEW: PET MEDICAL / VETERINARY CATEGORY - pet health supplies (no inclusion rule set yet, per brief). sub_category title also derived from URL slug, not independently confirmed. qty unattainable (SSR/XHR limitation, see notes). Possible overlap/duplicate with 'Pet Health' row below -- confirm at merge time."
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Pet Health",
+      "qty": null,
+      "link": "https://www.meesho.com/pet-health/pl/9uh",
+      "is_group": false,
+      "evidence": "URL present in /sitemap/plp/0.xml, id 9uh; title not independently fetched (403 hit before this page could be verified)",
+      "flag": "MANUAL REVIEW: PET MEDICAL / VETERINARY CATEGORY - pet health (no inclusion rule set yet, per brief). sub_category title also derived from URL slug, not independently confirmed. qty unattainable (SSR/XHR limitation, see notes). Possible overlap/duplicate with 'Health Supplies for Pets' row above -- confirm at merge time."
+    }
+  ]
+}

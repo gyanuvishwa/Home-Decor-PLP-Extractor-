@@ -1,0 +1,104 @@
+{
+  "sr": 67,
+  "company": "Burrow",
+  "brand_site": "burrow.com",
+  "country": "USA",
+  "site_url": "https://burrow.com/",
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "ACCESS: robots.txt (curl, tier a) has no Claude-bot disallow, Sitemap: https://burrow.com/sitemap.xml listed. Tier (a) direct HTTP fetch (curl+UA impersonation) retrieved robots.txt, sitemap index, sitemap/collections/1.xml+2.xml (~160 collection URLs), and homepage HTML, but the site is a Shopify Hydrogen/React-Router app: /collections/*.json and /products.json endpoints are disabled (404), and the collection product grid is client-rendered (raw HTML only contains an obfuscated React-Router turbo-stream state blob, no parseable product list or count). Escalated to tier (b): Playwright headless (chromium, sync API), loaded each candidate collection page (wait_until=load + manual scroll-to-bottom loop to trigger lazy render), then read the rendered DOM. No candidate page displayed an explicit 'X products' or 'Showing X of Y' total anywhere, so qty = count of unique /products/ detail-page hrefs in the fully-scrolled rendered grid (per textile.md #28/storage.md #36 fallback: paginate/scroll and count unique product cards). No Claude-in-Chrome (tier c) needed. TREE METHOD: union of main mega-menu (extracted via data-click-id=\"main-menu_*\" attributes in homepage HTML: Bestsellers/Seating/Living/Dining/Bedroom/Office/Outdoor/Rugs & Decor/Storage/Warehouse sections) + sitemap/collections/*.xml (union superset) + each collection page's own on-page category label. Burrow is a modular-furniture/sofa brand organized by room, not by product-type, so most of the ~160 collections are Furniture (sofas, sectionals, chairs, tables, desks, beds, dressers) or Lighting/Outdoor and out of scope for this task. QTY METHOD: see above (unique product-detail-link count after full scroll); one exact-zero case (Outdoor Rugs) confirmed by an explicit empty grid (page header rendered, zero product cards, zero price elements). EXCLUDED and why: /collections/performance-rugs (exact duplicate of /collections/rugs - identical 6 products, different nav alias under Bedroom/Warehouse menus vs Living/Office menus - kept only 'rugs'); /collections/clearance-rugs, /collections/clearance-pillows, /collections/clearance-storage, /collections/new-releases-storage, /collections/ready-to-ship-storage-shelving, /collections/best-sellers, /collections/warehouse* - cross-cutting promotional/sale groupings, not standalone taxonomy nodes (rule: no Clearance/Collections/View-All); /collections/performance-flatweave, /collections/performance-brushed-chenille, /collections/perfromance-lino - confirmed via rendered page (all line items priced $1) to be fabric/rug-material SAMPLE SWATCH ordering pages, not real product listings; /collections/accessories, /collections/seating-accessories - generic aggregator collections whose contents are a strict superset/mix of items already counted under Pillows/Bedding/Sleep Kits plus furniture seat-mod parts (Mercer Inline/Corner Seat Mod, Mercer Block Arm Set); recording them would duplicate rows; /collections/sleep-kits (Nomad/Range/Field Sleep Kit) - a bundled mattress-topper+linen kit sold as one furniture-accessory SKU per sofa line, not a clean bedding/textile category, excluded on ambiguity rather than force-classified; /collections/mattresses - bare mattress product, Furniture/Bedroom boundary, not Textile; /collections/bar-carts-credenzas and /collections/carts-trays - both are supersets/overlaps of Credenzas & Media Storage plus items independently excluded (Dram Bar Cart = serving cart, storage.md #20 excludes serving/dining carts from Storage; Ottoman Tray, Round Tray = decorative trays, storage.md #8/#26 excludes decorative trays) - after removing the excluded items nothing new remained vs. Credenzas & Media Storage, so not recorded as separate rows; /collections/coffee-side-tables - page copy 'Living Room Surface Solutions', no storage function, Furniture; /collections/accent-furniture, /collections/shelving, /collections/bookcases-shelves and all Seating/Living/Dining/Bedroom/Office/Outdoor room-based furniture, lighting, and dining-ware collections - Furniture/Lighting/Kitchen & Dining, out of scope, not touched. Two zero-inventory items were still recorded (Outdoor Rugs qty=0, Covers - Relay qty=0) per the zero-product-category allowance (storage.md #39, applied by analogy to Textile) since the site explicitly shows an empty grid rather than a missing category. LOW-confidence flags: Covers - Relay (textile.md #21 'Furniture Cover -> Textile' supports inclusion, but the URL is sitemap-only, not in the main mega-menu, and currently has 0 products - genuine ambiguity about whether it is still an active taxonomy node); Storage Benches, Wall Shelves, Bookcases, and Credenzas & Media Storage (storage.md #18/#21 list Bookcases/Console Units/Cabinets as 'Potential Furniture' by default - these were included as Storage only because Burrow's own main-nav explicitly buckets them under a top-level 'Storage' menu section with copy explicitly using the word 'storage', and Burrow has no competing top-level 'Furniture' menu to defer to - flagged LOW per storage.md #42 ambiguity-handling rather than silently dropped or silently force-included). No node qualified as both Textile and Storage.",
+  "textile_rows": [
+    {
+      "category": "Textile",
+      "sub_category": "Rugs",
+      "qty": 6,
+      "link": "https://burrow.com/collections/rugs",
+      "is_group": false,
+      "evidence": "Playwright rendered DOM after full scroll: 6 unique /products/ hrefs (Destin Rug - Gray, Pratt Rug, Destin Rug - Tan, Duffy Rug, Nimbus Rug, Thompkins Rug); h1='Rugs'",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Outdoor Rugs",
+      "qty": 0,
+      "link": "https://burrow.com/collections/rugs-outdoor",
+      "is_group": false,
+      "evidence": "Playwright rendered DOM after full scroll: header 'Outdoor Rugs' rendered, zero product cards / zero price elements found",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Pillows",
+      "qty": 8,
+      "link": "https://burrow.com/collections/pillows",
+      "is_group": false,
+      "evidence": "Playwright rendered DOM after full scroll: 8 unique /products/ hrefs (Nomad Leather Bolster Pillow Set of Two, Nomad Leather Bolster Pillow, Vesper Lumbar Pillow, Nomad Lumbar Pillow, Nomad Leather Bolster Pillow Set of 2, Mercer Lumbar Pillow Set of 3, Mercer Lumbar Pillow, Mercer Lumbar Pillow Set of 2); h1='Pillows'",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Bedding",
+      "qty": 7,
+      "link": "https://burrow.com/collections/bedding",
+      "is_group": false,
+      "evidence": "Playwright rendered DOM after full scroll: 7 unique /products/ hrefs (3-Piece Eucalyptus Sheet Set, 4-Piece Eucalyptus Sheet Set, Eucalyptus Duvet Cover, Eucalyptus Mattress Protector, Eucalyptus Pillow Insert, Eucalyptus Pillowcase Set, Eucalyptus Duvet Insert)",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Furniture Covers - Relay",
+      "qty": 0,
+      "link": "https://burrow.com/collections/covers-relay",
+      "is_group": false,
+      "evidence": "Playwright rendered DOM after full scroll: header 'Relay Collection' rendered, zero product cards found; URL discovered via sitemap/collections/2.xml, not present in the main mega-menu",
+      "flag": "MANUAL REVIEW: zero-inventory, sitemap-only URL; classified per textile.md section 21 (Furniture Cover -> Textile)",
+      "confidence": "LOW"
+    }
+  ],
+  "storage_rows": [
+    {
+      "category": "Storage",
+      "sub_category": "Storage Benches",
+      "qty": 2,
+      "link": "https://burrow.com/collections/storage-benches",
+      "is_group": false,
+      "evidence": "Playwright rendered DOM after full scroll: 2 unique /products/ hrefs (Totem Bench, 2 listings); page title 'Storage Benches | Seating with Hidden Storage'; page copy 'Smart Storage Benches solutions'",
+      "flag": "MANUAL REVIEW: bench with storage compartment - furniture/storage boundary per storage.md section 10/21",
+      "confidence": "LOW"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Wall Shelves",
+      "qty": 15,
+      "link": "https://burrow.com/collections/wall-shelves",
+      "is_group": false,
+      "evidence": "Playwright rendered DOM after full scroll: 15 unique /products/ hrefs (Index Wall Shelf variants x5, Title Storage/Fully-Open Bookshelf variants x6, Title Wall Desk x2, Title Two-Piece/Three-Piece Home Office x2); page title 'Wall Shelves | Floating Shelves & Wall Storage'",
+      "flag": "MANUAL REVIEW: collection mixes genuine shelving/storage with wall-desk/home-office furniture items; furniture/storage boundary per storage.md section 18/21",
+      "confidence": "LOW"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Bookcases",
+      "qty": 21,
+      "link": "https://burrow.com/collections/bookcases",
+      "is_group": false,
+      "evidence": "Playwright rendered DOM after full scroll: 21 unique /products/ hrefs (Index/Title/Canon bookcase and shelf variants); page title 'Bookcases | Shelving & Display Storage'",
+      "flag": "MANUAL REVIEW: storage.md section 21 lists Bookcases under 'Potential Furniture' by default; included here because Burrow's own main-nav explicitly places this collection under its top-level 'Storage' menu section",
+      "confidence": "LOW"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Credenzas & Media Storage",
+      "qty": 11,
+      "link": "https://burrow.com/collections/credenzas-media-storage",
+      "is_group": false,
+      "evidence": "Playwright rendered DOM after full scroll: 11 unique /products/ hrefs (Opera Media Console x3, Opera Tall Media Console x2, Index Console x2, Carta Credenza x2, Totem Credenza x2); page title 'Credenzas & Media Storage | Entertainment Centers'",
+      "flag": "MANUAL REVIEW: credenza/media-console furniture-storage boundary per storage.md section 21 (Console Units/Cabinets listed as Potential Furniture); included because site explicitly places under top-level 'Storage' menu section",
+      "confidence": "LOW"
+    }
+  ]
+}

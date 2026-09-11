@@ -1,0 +1,61 @@
+{
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "EQ3 CA (Next.js SSR, dehydrated React-Query state; api.eq3.com XHR is hard-403 per prior pass so counts pulled from each page's own embedded __NEXT_DATA__ product-instance/search response, same method as the prior Home-Decor pass for this company). Discovery via the site's own site-navigation/menu-summary payload embedded on the homepage (10 categories / 36 subcategories / 141 product lines -- matches the authoritative taxonomy used by the prior Furniture/Home-Decor pass). Found a top-level nav CATEGORY literally named 'Best Sellers' (slug best-sellers) with H1 'Best Sellers' and meta title 'Shop EQ3 best sellers...' -- a genuine merchandising PLP, count=45 at /category/best-sellers. It has 4 genuine site-exposed child listings (same categoryId, distinct subcategoryId each): Quick Ship Upholstery (28), Bedroom Furniture (13), Dining Furniture (7), Bundles (2) -- emitted as parent+children per the grouping rule; their own page titles use quick-ship/in-stock/bundle framing rather than repeating the word 'Bestsellers', but they are taxonomically nested under the Best Sellers category node, not a separate concept. Separately, under Inspiration > Trending, the site exposes a second, structurally distinct Bestsellers listing (its own productLineId, different categoryId/subcategoryId from the Best Sellers hub above) titled 'Shop EQ3 Bestsellers | Discover Innovative Furniture Designs', count=12 -- kept as its own row since it is a genuinely different listing (different product set/count), not an alias of the main hub. Count-field reliability re-confirmed for this company: fetched quick-ship-upholstery at ?page=3 (one page past the ceil(28/24) boundary) and the harvested unique product IDs totalled exactly 28, matching the reported count, consistent with the prior pass's 25/25 verified-exact finding for this site. All other counts here are <=24 (self-verifying, first SSR page already returns the full set). Navigation discovery also checked: full header/footer/mega-menu nav tree (via the menu-summary JSON), sitemap.xml (440KB, no additional best-seller URLs), robots.txt (no Claude-specific disallow, plain HTTP fetch used throughout -- no Playwright/Claude-in-Chrome tier needed). No French-language handling needed for these particular pages (English CA storefront /ca/en throughout, matching the roster's Canada assignment).",
+  "rows": [
+    {
+      "category": "Bestsellers",
+      "sub_category": "Best Sellers",
+      "qty": 45,
+      "link": "https://www.eq3.com/ca/en/category/best-sellers",
+      "is_group": true,
+      "evidence": "__NEXT_DATA__ dehydrated /product-instance/search response for categoryId cjzvl9mf201ln0146jj1fgg9i (no subcategory filter): \"count\":45",
+      "flag": null
+    },
+    {
+      "category": "Bestsellers",
+      "sub_category": "Best Sellers - Quick Ship Upholstery",
+      "qty": 28,
+      "link": "https://www.eq3.com/ca/en/category/best-sellers/quick-ship-upholstery",
+      "is_group": false,
+      "evidence": "__NEXT_DATA__ /product-instance/search count field = 28 (categoryId cjzvl9mf201ln0146jj1fgg9i, subcategoryId cjzvlbg2601lr0146yrz15412); verified by ?page=3 fetch returning exactly 28 unique product IDs",
+      "flag": null
+    },
+    {
+      "category": "Bestsellers",
+      "sub_category": "Best Sellers - Bedroom Furniture",
+      "qty": 13,
+      "link": "https://www.eq3.com/ca/en/category/best-sellers/bedroom-furniture",
+      "is_group": false,
+      "evidence": "__NEXT_DATA__ /product-instance/search count field = 13 (subcategoryId cmeskxh635vqy0162l13pfb6h); count<=24 so first SSR page is self-verifying (all 13 returned)",
+      "flag": null
+    },
+    {
+      "category": "Bestsellers",
+      "sub_category": "Best Sellers - Dining Furniture",
+      "qty": 7,
+      "link": "https://www.eq3.com/ca/en/category/best-sellers/dining-furniture",
+      "is_group": false,
+      "evidence": "__NEXT_DATA__ /product-instance/search count field = 7 (subcategoryId cmesmcw7y60rw0198d7jfhyie); self-verifying, count<=24",
+      "flag": null
+    },
+    {
+      "category": "Bestsellers",
+      "sub_category": "Best Sellers - Bundles",
+      "qty": 2,
+      "link": "https://www.eq3.com/ca/en/category/best-sellers/bundles",
+      "is_group": false,
+      "evidence": "__NEXT_DATA__ /product-instance/search count field = 2 (subcategoryId cmkpzwpnk0et601465w3f9v1i); self-verifying, count<=24",
+      "flag": null
+    },
+    {
+      "category": "Bestsellers",
+      "sub_category": "Bestsellers (Trending)",
+      "qty": 12,
+      "link": "https://www.eq3.com/ca/en/category/inspiration/trending/bestsellers",
+      "is_group": false,
+      "evidence": "__NEXT_DATA__ /product-instance/search count field = 12 (categoryId cl2kr21dc051c0166vagoix88 / subcategoryId cl2krc8jy05bj0102x4so4uax / productLineId cl2kugicb06fi01668ibq40fu, page title 'Shop EQ3 Bestsellers'); self-verifying, count<=24; a genuinely distinct listing from the Best Sellers hub above (different taxonomy IDs and different product count), not an alias",
+      "flag": null
+    }
+  ]
+}

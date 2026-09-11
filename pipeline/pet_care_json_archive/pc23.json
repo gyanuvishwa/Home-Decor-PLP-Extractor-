@@ -1,0 +1,43 @@
+{
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "Salesforce Commerce Cloud (site id athome-sfra), same site as the prior Home-Decor pass. Direct pretty-page HTML (e.g. /pets/) is behind an Akamai bot-challenge (confirmed again: curl_cffi impersonate=chrome124 GET https://www.athome.com/pets/ returns 200 but with Akamai 'sec-if-cpt-container' challenge markup, not real content). Per the prior pass's finding, the storefront's own on/demandware.store/Sites-athome-sfra-Site/default/Search-Refinebar?cgid=<slug> controller is served unchallenged and its div.search-result-count 'Show N Items' text was used for every qty (same method the prior pass corroborated by exhaustive enumeration). Discovery: robots.txt has no Claude-specific disallow (only 'python-requests/2.24.0: Disallow /'; generic UA fine). sitemap_index.xml and sitemap_2.xml (category sitemap) fetched directly with curl+browser UA (200, unchallenged) and grepped case-insensitively for 'pet': only 3 hits -> /pets/, /pet-beds/, /best-rugs-for-pets/. llms.txt (robots.txt explicitly Allow:) fetched and its 'Core Pages'/'Category Descriptions' sections list Furniture, Home Decor, Holiday, Outdoor, Rugs, Wall Decor, Pillows, Kitchen & Dining, Bed & Bath, Window, Lighting, Storage & Organization -- no Pets entry (a small department the file doesn't call out). Fetched Search-Refinebar for cgid=pets (112 items total) and cgid=pet-beds; the pet-beds fragment's left-nav category tree block ('sub-category l2-cats') shows the complete, flat sibling list under the L1 parent 'Gifts For Pets' (/pets/): Pet Beds, Food Bowls & Mats (/bowls-feeders/), Pet Food Canisters (/food-canisters-treat-jars/), Furniture Covers & Blankets (/furniture-covers/) -- confirmed identical 4-item list re-appears in the bowls-feeders fragment too, and none of the 4 has any further l3 nesting, so this is the complete Pet Care tree. Parent 'Gifts For Pets' total (112) exceeds the sum of the 4 children (48+28+3+2=81), meaning some products are filed only at the parent level with no dedicated sub-category name; per the grouping rule the parent is not emitted as its own row (it functions as the top-level 'category' label only, same as 'Lighting' itself wasn't rowed in the prior Home-Decor pass) and none of its qty is used, avoiding double count. Verified via Search-UpdateGrid product-tile names that these are genuinely pet products, not pet-themed-for-humans: furniture-covers grid showed 'Natural Waterproof Pet Throw Blanket, 50x60' and 'Khaki Beige Pet Sofa Furniture Pad'; food-canisters-treat-jars grid showed 'Metal Canister with Wooden Lid', 'Treat Canister with wood lid, 60oz', 'Glass Pet Canister Wooden Lid Alum Handle' (pet food/treat storage containers, not food itself -> no PET CONSUMABLE flag needed). Excluded: /best-rugs-for-pets/ -- this sits under the Rugs department as a marketing/curated collection ('best rugs for pet owners'), not a genuine pet-specific product category; the rugs themselves are generic area rugs, pet-themed marketing only, and Rugs is a separate category's territory. No medical/veterinary or additional pet categories found anywhere else on the site (no dog/cat/leash/collar/scratch/litter/kennel hits in the category sitemap). No Playwright or Claude-in-Chrome escalation was needed; HTTP-first (curl_cffi impersonate=chrome124) reached everything required.",
+  "rows": [
+    {
+      "category": "Gifts For Pets",
+      "sub_category": "Pet Beds",
+      "qty": 48,
+      "link": "https://www.athome.com/pet-beds/",
+      "is_group": false,
+      "evidence": "Search-Refinebar (on/demandware.store/Sites-athome-sfra-Site/default/Search-Refinebar?cgid=pet-beds) div.search-result-count text 'Show 48 Items'",
+      "flag": null
+    },
+    {
+      "category": "Gifts For Pets",
+      "sub_category": "Food Bowls & Mats",
+      "qty": 28,
+      "link": "https://www.athome.com/bowls-feeders/",
+      "is_group": false,
+      "evidence": "Search-Refinebar (on/demandware.store/Sites-athome-sfra-Site/default/Search-Refinebar?cgid=bowls-feeders) div.search-result-count text 'Show 28 Items'",
+      "flag": null
+    },
+    {
+      "category": "Gifts For Pets",
+      "sub_category": "Pet Food Canisters",
+      "qty": 3,
+      "link": "https://www.athome.com/food-canisters-treat-jars/",
+      "is_group": false,
+      "evidence": "Search-Refinebar (on/demandware.store/Sites-athome-sfra-Site/default/Search-Refinebar?cgid=food-canisters-treat-jars) div.search-result-count text 'Show 3 Items'",
+      "flag": null
+    },
+    {
+      "category": "Gifts For Pets",
+      "sub_category": "Furniture Covers & Blankets",
+      "qty": 2,
+      "link": "https://www.athome.com/furniture-covers/",
+      "is_group": false,
+      "evidence": "Search-Refinebar (on/demandware.store/Sites-athome-sfra-Site/default/Search-Refinebar?cgid=furniture-covers) div.search-result-count text 'Show 2 Items'; product-tile names confirmed pet-specific ('Natural Waterproof Pet Throw Blanket, 50x60', 'Khaki Beige Pet Sofa Furniture Pad')",
+      "flag": null
+    }
+  ]
+}

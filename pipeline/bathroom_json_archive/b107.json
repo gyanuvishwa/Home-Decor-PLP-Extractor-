@@ -1,0 +1,362 @@
+{
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ROBOTS: https://www.ikea.com/robots.txt fetched FIRST, before any other request on the host (saved at work/w105_108/ikea_robots.txt, HTTP 200, 4,054 bytes) and re-verified by me rather than taken from the previous worker's dump. I read the group boundaries, not just a grep: the file has four groups - AdsBot-Google and AdsBot-Google-Mobile (Allow-only), AmazonProductDiscoverybot ('Disallow: /'), and 'User-agent: *'. NO Claude agent is named anywhere: a case-insensitive search for claude / anthropic / Content-Signal / Crawl-delay returns NOTHING, so there is no ClaudeBot, anthropic-ai or Claude-Web group and no crawl-delay. We fall under '*'. The '*' group's disallows that actually bear on this work are */search/*, /compare*, *?filter=*, *filters=*, *?sorting=*, *?storeId=*, *catalogId=*, /iows/, */navigation/, */recommendations/*, /m3/*, */fragments/* and the cart/checkout/profile paths. I stayed clear of every one of them: every URL I requested is a bare /de/de/cat/<slug>/ category path with NO query string at all. In particular I did NOT follow the /f/ facet links that IKEA renders at the bottom of each PLP (e.g. /cat/badzubehoer-10555/f/schwarz-badezimmeraccessoires-f-colors--10139/) - those are colour/material filter pages, they are facet URLs rather than categories, and they are not recorded anywhere here. probe.py's 2 s per-host gap was left at its default. Only one host was used: www.ikea.com. No API host, no CDN host, so no second robots file was needed. ACCESS: plain HTTP 200 on every request via probe.fetch(); no bot wall, no interstitial, no 403, no rate limiting. 87 category pages were fetched and cached under work/w105_108/ik_pages/. TREE: taken from IKEA's own navigation. Entry point found from the site's product index https://www.ikea.com/de/de/cat/produkte-products/ (not guessed): the bathroom department is 'Badmöbel & Badaccessoires', https://www.ikea.com/de/de/cat/badmoebel-badzubehoer-ba001/, with 17 children. The department page itself carries NO product grid and NO total - it is the only node in the entire walk with neither a rendered 'N Produkte' string nor a data-category totalCount - which independently proves it is a grouping node and not a leaf; it is recorded as the top grouping row with blank qty and blank link (rule 38). Children were taken from each page's own in-page category nav (a.hnf-inpage-nav__card). TRUNCATION CHECK, which matters here: that nav is context-sensitive, and I established the rule empirically rather than assuming it. On a node that HAS children the nav opens with a link back to that node's own parent and then lists its real children (e.g. Badspiegel -> Waschbeckenspiegel, Badezimmer-Spiegelschränke, Make-up- & Vergrößerungsspiegel, Spiegel mit Beleuchtung). On a node that has NO children the nav instead repeats the whole DEPARTMENT list, opening with 'Produkte' and showing all 17 siblings - which is exactly what Waschbecken, Badarmaturen, Handtuchhalter, Abdeckplatten, Make-Up Organizer, Badregale, Hängeschränke, Badezimmerhocker and Badrollwagen show. So 'nav lists 18 entries beginning with Produkte' is the site's own signal for 'this is a leaf', and no branch was left unexpanded. The walk was recursive to depth 4 from ba001 and was cut off at any node whose own breadcrumb left the bathroom department (those nodes are still recorded, just not descended into), which is why Möbelgriffe (Heimwerken), Badtextilien (Textilien & Teppiche) and Badezimmer Beleuchtung (Beleuchtung) appear in review[] rather than being crawled further. 60 nodes were walked in the main pass and 27 more leaves fetched individually; the full dump is work/w105_108/ik_tree.json and ik_more.json. QTY: every quantity here is the LISTING PAGE'S OWN RENDERED EXACT TOTAL, read from the server-rendered HTML - no API, no estimate, no client-side call. IKEA DE renders it twice on every PLP, in two independent places: (1) the visible string <p class=\"plp-filter-information__total-count\">N Produkte</p>, and (2) a machine-readable data-category attribute on div.js-product-list, e.g. data-category={\"id\":\"20490\",\"canonical\":\"https://www.ikea.com/de/de/cat/badspiegel-20490/\",\"totalCount\":33}. VERIFICATION: (a) The two rendered figures were compared on ALL 58 nodes in the walk that have a grid: 58/58 agree exactly, ZERO mismatches, and the two nodes with no figure at all are the department page and the product index, i.e. precisely the two non-PLPs. (b) INDEPENDENT CARD COUNT: IKEA server-renders the first page of product cards, so I counted div.plp-price-module__product-name occurrences on every recorded leaf. For every recorded leaf whose total is at or below IKEA's 24-per-page grid size, the number of rendered cards equals the stated total EXACTLY - 21/21, 18/18, 6/6, 8/8, 8/8, 16/16, 21/21, 5/5, 21/21, 3/3, 19/19, 12/12, 5/5, 5/5, 3/3, 5/5 - and every node whose total exceeds 24 renders exactly 24 cards (Duschablage 27 -> 24, Handtuchhalter 37 -> 24, Badspiegel 33 -> 24, Badezimmeraccessoires 82 -> 24, Duschen 61 -> 24). That is a real enumeration cross-check, not a restatement of the same number. (c) H1 and breadcrumb were read on every page and match the node asked for; the breadcrumb is what decided several routings, e.g. Badtextilien's own breadcrumb is 'Produkte > Textilien & Teppiche' and Badezimmer Beleuchtung's is 'Produkte > Beleuchtung', so both were routed out on the site's own filing rather than on their names. (d) Counts discriminate: 34 distinct values across 58 nodes; recorded leaves alone run 3, 5, 5, 5, 5, 6, 8, 8, 12, 16, 18, 19, 21, 21, 21, 27, 37 - no site-wide constant. (e) Product descriptions were read to confirm content matches the label, e.g. Waschbecken = 'Waschbecken mit Siphon, weiß, 80x48 cm' / 'Aufsatzwaschbecken mit Siphon', Badarmaturen = 'Mischbatterie/Waschbecken, verchromt', Duschkabinen & Duschwände = 'Eckdusche, 86x86x202 cm' / 'Schwingtür für Badewanne', Abdeckplatten = 'Abdeckplatte, Bambus/Furnier, 102x49 cm'. DEDUP - THIS COMPANY IS DEDUP-HEAVY, AS EXPECTED: already_extracted() was run on every candidate leaf, 36 URLs in total. TEN hits, every one of them Furniture.xlsx / 'IKEA DE' at the identical German /de/de/ URL: waschkommoden-waschbeckenschraenke-20720 (Washstands & Sink Base Cabinets, 112), waschkommode-ohne-waschbecken-54989 (18), waschbeckenunterschraenke-20721 (8), badregale-hochschraenke-20804 (56), oberschraenke-bad-20808 (16), badezimmer-spiegelschraenke-20500 (11), badezimmerhocker-und-baenke-20859 (12), badrollwagen-20858 (6), waescheschraenke-48925 (20). All are in review[], none in rows[]. That is the whole of IKEA DE's bathroom FURNITURE - the Furniture pass took it, and under OPTION 1 it stays there - which is why no vanity, cabinet, shelf, tall unit, stool or trolley node appears in rows[] even though rules 9 and 12 would otherwise admit them. What is left, and what rows[] contains, is the part the Furniture pass did NOT touch: fixtures (Waschbecken), taps (Badarmaturen), showers and enclosures (the Duschen branch), bathroom mirrors other than the mirror cabinet, bathroom accessories and hardware, and bathroom storage organisers. So this is emphatically NOT a 'everything already extracted' company. DEDUP BLIND SPOT, STATED EXPLICITLY: the exclusion index is URL-exact, and the two prior passes used DIFFERENT URL forms for this same storefront. Furniture.xlsx recorded IKEA DE on German /de/de/ URLs (116 rows), but Final.xlsx (the Home Decor pass) recorded the SAME storefront under the company name 'IKEA Germany' on ENGLISH /de/en/ URLs (46 rows, e.g. ikea.com/de/en/cat/mirrors-20489). I dumped every ikea.com key in the index to confirm this rather than assume it. The consequence for this company: Final.xlsx holds /de/en/cat/mirrors-20489 = 'Mirrors', which is the parent Dekoration > Spiegel node. The three mirror leaves I record - Waschbeckenspiegel 20498, Make-up- & Vergrößerungsspiegel 20499, Spiegel mit Beleuchtung 49138 - are CHILDREN of that node and are not themselves in the index in either language form, and all three are reached from the Bathroom department through Badspiegel (20490), whose own breadcrumb is 'Produkte > Badmöbel & Badaccessoires'. Rule 10 is explicit that vanity, magnifying and LED/illuminated mirrors are Bathroom and must not be skipped, so they are recorded - but the run owner should know that IKEA cross-files these three nodes under Dekoration > Spiegel (that is their own breadcrumb) and that the Home Decor pass holds their English-URL parent. If the run owner treats the /de/en/ and /de/de/ forms as the same node, these three become an OPTION 1 question rather than a Bathroom row. OVERLAP / ROLL-UPS WITHHELD: Badspiegel (33), Badezimmeraccessoires (82) and Duschen (61) each have live child listings, so all three are grouping rows with blank qty and blank link and their parent URLs are NOT recorded (rule 24). Badezimmersysteme & Badmöbel-Sets (365) and its whole 33-node series sub-tree are withheld as collection pages that re-cut already-extracted furniture (detailed in review[]). Waschtische & Waschbeckenschränke (137) is withheld with all three of its children, which are already in Furniture.xlsx. Two nodes are genuinely reachable from two nav paths and are recorded ONCE each, per rule 28: 'Duschablage & Badewannenablage' (10658, 27) appears under both Badezimmeraccessoires and Duschen and is recorded once, under Badezimmeraccessoires, which is its own breadcrumb parent; 'Spiegel mit Beleuchtung' (49138, 8) appears under both Badspiegel and Badezimmer Beleuchtung and is recorded once, under Badspiegel, per rule 11. I also checked whether 'Duschablagen & Duschkörbe ohne Bohren' (700699, 21) is merely a subset of 'Duschablage & Badewannenablage' (10658, 27) and it is NOT: comparing the product ids rendered on each page gives an intersection of 17 with 8 ids present in 700699 that are absent from the other, so they are genuinely different assortments (no-drill mounting versus all shower shelves) with different rendered totals, and both are recorded. No quantity anywhere in this file is summed, inferred from a parent, or reused between nodes. EMPTY NODES: none. Every node walked in the bathroom department returned a non-zero total, so there is no EMPTY NODE to name for this company. EXCLUDED, in one place: the department page ba001 and the three hub nodes Badspiegel / Badezimmeraccessoires / Duschen are grouping rows. The whole Badezimmersysteme series branch is a collection re-cut (rule 25). Ten furniture leaves are OPTION 1 exclusions. Badtextilien and its four children plus Duschvorhänge route to Textile. Badezimmer Beleuchtung and its three lighting children route to Lighting. The Waschküchen-Möbel laundry branch and its five non-bathroom children are withheld on primary product type plus their own breadcrumbs. IKEA's /f/ colour and material facet URLs were never followed or recorded. Everything named above appears in review[] with its exact rendered quantity and its exact URL, so nothing is silently skipped.",
+ "rows": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Furniture & Accessories",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Furniture & Accessories > Make-Up Organizers & Bathroom Storage",
+   "qty": 21,
+   "link": "https://www.ikea.com/de/de/cat/make-up-organizer-badezimmeraufbewahrung-16233/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Furniture & Accessories > Bathroom Mirrors",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Furniture & Accessories > Bathroom Mirrors > Washbasin Mirrors",
+   "qty": 18,
+   "link": "https://www.ikea.com/de/de/cat/waschbeckenspiegel-20498/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Furniture & Accessories > Bathroom Mirrors > Make-Up & Magnifying Mirrors",
+   "qty": 6,
+   "link": "https://www.ikea.com/de/de/cat/make-up-vergroesserungsspiegel-20499/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Furniture & Accessories > Bathroom Mirrors > Illuminated Mirrors",
+   "qty": 8,
+   "link": "https://www.ikea.com/de/de/cat/spiegel-mit-beleuchtung-49138/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Furniture & Accessories > Bathroom Accessories",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Furniture & Accessories > Bathroom Accessories > Pedal Bins",
+   "qty": 8,
+   "link": "https://www.ikea.com/de/de/cat/treteimer-48940/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Furniture & Accessories > Bathroom Accessories > Shower Shelves & Bath Shelves",
+   "qty": 27,
+   "link": "https://www.ikea.com/de/de/cat/duschablagen-duschkoerbe-10658/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Furniture & Accessories > Bathroom Accessories > No-Drill Shower Shelves & Caddies",
+   "qty": 21,
+   "link": "https://www.ikea.com/de/de/cat/duschablagen-duschkoerbe-ohne-bohren-700699/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Furniture & Accessories > Bathroom Accessories > Soap Dispensers & Soap Dishes",
+   "qty": 16,
+   "link": "https://www.ikea.com/de/de/cat/seifenspender-seifenschalen-10656/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Furniture & Accessories > Bathroom Accessories > Toilet Brushes & Toilet Accessories",
+   "qty": 21,
+   "link": "https://www.ikea.com/de/de/cat/toilettenzubehoer-48944/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Furniture & Accessories > Bathroom Accessories > Toothbrush Holders",
+   "qty": 5,
+   "link": "https://www.ikea.com/de/de/cat/zahnbuerstenhalter-48943/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Furniture & Accessories > Towel Rails & Bathroom Shelves",
+   "qty": 37,
+   "link": "https://www.ikea.com/de/de/cat/handtuchhalter-badezimmer-ablagen-20615/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Furniture & Accessories > Bathroom Cover Panels",
+   "qty": 3,
+   "link": "https://www.ikea.com/de/de/cat/abdeckplatten-fuers-bad-30565/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Furniture & Accessories > Washbasins",
+   "qty": 19,
+   "link": "https://www.ikea.com/de/de/cat/waschbecken-20723/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Furniture & Accessories > Bathroom Taps & Mixer Taps",
+   "qty": 12,
+   "link": "https://www.ikea.com/de/de/cat/badarrmaturen-mischbatterien-20724/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Furniture & Accessories > Showers",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Furniture & Accessories > Showers > Shower Sets & Rails",
+   "qty": 5,
+   "link": "https://www.ikea.com/de/de/cat/duschgarnituren-schienen-40693/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Furniture & Accessories > Showers > Shower Heads",
+   "qty": 5,
+   "link": "https://www.ikea.com/de/de/cat/duschkoepfe-40692/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Furniture & Accessories > Showers > Shower Mixer Taps",
+   "qty": 3,
+   "link": "https://www.ikea.com/de/de/cat/mischbatterien-fuer-die-dusche-40691/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Furniture & Accessories > Showers > Shower Cabins & Shower Walls",
+   "qty": 5,
+   "link": "https://www.ikea.com/de/de/cat/duschwaende-duschabtrennungen-47358/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  }
+ ],
+ "review": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Furniture & Accessories > Washstands & Washbasin Cabinets > Wash Commodes & Under-Basin Cabinets",
+   "qty": 112,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Washstands & Sink Base Cabinets' (company 'IKEA DE', identical /de/de/ URL). OPTION 1 - stays in Furniture.",
+   "link": "https://www.ikea.com/de/de/cat/waschkommoden-waschbeckenschraenke-20720/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Furniture & Accessories > Washstands & Washbasin Cabinets > Wash Commodes Without Washbasin",
+   "qty": 18,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Washstands without Basin' (company 'IKEA DE', identical URL). OPTION 1.",
+   "link": "https://www.ikea.com/de/de/cat/waschkommode-ohne-waschbecken-54989/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Furniture & Accessories > Washstands & Washbasin Cabinets > Washbasin Base Cabinets",
+   "qty": 8,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Under-Sink Cabinets' (company 'IKEA DE', identical URL). OPTION 1.",
+   "link": "https://www.ikea.com/de/de/cat/waschbeckenunterschraenke-20721/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Furniture & Accessories > Washstands & Washbasin Cabinets (parent)",
+   "qty": 137,
+   "issue": "NOT RECORDED - parent of the three nodes above, all three of which are already in Furniture.xlsx. Rule 24 forbids recording the parent while valid child listings exist, and OPTION 1 removes all three children from Bathroom scope, so this branch contributes no rows. It is NOT recorded as a grouping row either, because a grouping row with no recorded children would be meaningless.",
+   "link": "https://www.ikea.com/de/de/cat/waschkommoden-20719/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Furniture & Accessories > Bathroom Shelves & Tall Cabinets",
+   "qty": 56,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Bathroom Shelves & Tall Cabinets' (company 'IKEA DE', identical URL). OPTION 1.",
+   "link": "https://www.ikea.com/de/de/cat/badregale-hochschraenke-20804/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Furniture & Accessories > Bathroom Wall Cabinets",
+   "qty": 16,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Bathroom Wall Cabinets' (company 'IKEA DE', identical URL). OPTION 1.",
+   "link": "https://www.ikea.com/de/de/cat/oberschraenke-bad-20808/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Furniture & Accessories > Bathroom Mirrors > Bathroom Mirror Cabinets",
+   "qty": 11,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Bathroom Mirror Cabinets' (company 'IKEA DE', identical URL). OPTION 1 - stays in Furniture even though rule 10 explicitly names mirrored cabinets as Bathroom. Its three sibling mirror leaves under Badspiegel are NOT in the index and are recorded in rows[].",
+   "link": "https://www.ikea.com/de/de/cat/badezimmer-spiegelschraenke-20500/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Furniture & Accessories > Bathroom Stools & Benches",
+   "qty": 12,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Bathroom Stools & Benches' (company 'IKEA DE', identical URL). OPTION 1.",
+   "link": "https://www.ikea.com/de/de/cat/badezimmerhocker-und-baenke-20859/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Furniture & Accessories > Bathroom Trolleys",
+   "qty": 6,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Bathroom Trolleys' (company 'IKEA DE', identical URL). OPTION 1.",
+   "link": "https://www.ikea.com/de/de/cat/badrollwagen-20858/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Furniture & Accessories > Laundry Room Furniture > Laundry Cabinets & Laundry Shelves",
+   "qty": 20,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Laundry Cabinets & Laundry Shelves' (company 'IKEA DE', identical URL). OPTION 1.",
+   "link": "https://www.ikea.com/de/de/cat/waescheschraenke-48925/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Furniture & Accessories > Bathroom Systems & Bathroom Furniture Sets",
+   "qty": 365,
+   "issue": "NOT RECORDED - series/collection branch (rule 25) that also double-counts already-extracted furniture. Its seven children are IKEA product SERIES, not product types: ÄNGSJÖN (700453, 245), TÄNNFORSEN (700456, 115), ENHET (700458, 135), HAVBÄCK (700451, 112), HEMNES (700457, 32), NYSJÖN (700459, 21), VIDVESSEL (700868, 16); each of those in turn splits into per-series re-cuts of the same product types (e.g. 'ÄNGSJÖN Waschtischunterschränke mit Waschbecken' 146, 'ENHET Badschränke & Badregale' 17, 'TÄNNFORSEN Spiegel & Spiegelschränke' 5, 'Waschbecken für HEMNES' 12 - 33 such nodes were walked in total). Recording any of them would (a) record a collection page and (b) re-list, under a range name, the same washstands, wall cabinets, tall cabinets and mirror cabinets that Furniture.xlsx already holds and that OPTION 1 keeps in Furniture. The whole branch is therefore withheld. Full per-node counts are in work/w105_108/ik_tree.json.",
+   "link": "https://www.ikea.com/de/de/cat/badezimmersysteme-700450/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Furniture & Accessories > Bathroom Lighting",
+   "qty": 27,
+   "issue": "ROUTED TO LIGHTING: primary product type is lighting (rules 11, 19). Its own breadcrumb is 'Produkte > Beleuchtung', i.e. IKEA files it in the Lighting department and only cross-links it into the bathroom nav. Children: Beleuchtung für Badezimmerschränke (55010, 9), Badezimmer-Deckenleuchten (700215, 5), Badezimmer-Wandleuchten (700214, 8) - all Lighting. Its fourth child 'Spiegel mit Beleuchtung' (49138, 8) is NOT routed out: primary type there is a mirror, so under rule 11 it is recorded in rows[] under Badspiegel, once, not twice.",
+   "link": "https://www.ikea.com/de/de/cat/badezimmerleuchten-10736/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Lighting > Bathroom Lighting > Lighting for Bathroom Cabinets",
+   "qty": 9,
+   "issue": "ROUTED TO LIGHTING: cabinet lighting (rule 19).",
+   "link": "https://www.ikea.com/de/de/cat/beleuchtung-fuer-badezimmerschraenke-55010/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Lighting > Bathroom Lighting > Bathroom Ceiling Lights",
+   "qty": 5,
+   "issue": "ROUTED TO LIGHTING: bathroom ceiling lights (rule 19).",
+   "link": "https://www.ikea.com/de/de/cat/badezimmer-deckenleuchten-700215/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Lighting > Bathroom Lighting > Bathroom Wall Lights",
+   "qty": 8,
+   "issue": "ROUTED TO LIGHTING: bathroom wall lights (rule 19).",
+   "link": "https://www.ikea.com/de/de/cat/badezimmer-wandleuchten-700214/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Furniture & Accessories > Bathroom Textiles",
+   "qty": 86,
+   "issue": "ROUTED TO TEXTILE: bath textiles (rules 15, 20). Own breadcrumb is 'Produkte > Textilien & Teppiche', i.e. IKEA files it in the Textiles department. Grouping node for the four textile leaves below.",
+   "link": "https://www.ikea.com/de/de/cat/badtextilien-tl003/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Textiles & Rugs > Bathroom Textiles > Towels",
+   "qty": 41,
+   "issue": "ROUTED TO TEXTILE: towels (rule 15).",
+   "link": "https://www.ikea.com/de/de/cat/handtuecher-20520/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Textiles & Rugs > Bathroom Textiles > Bath Mats",
+   "qty": 13,
+   "issue": "ROUTED TO TEXTILE: textile bath mats, not rubber/anti-slip bathroom accessories (rule 16).",
+   "link": "https://www.ikea.com/de/de/cat/badematten-20519/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Textiles & Rugs > Bathroom Textiles > Shower Curtains",
+   "qty": 16,
+   "issue": "ROUTED TO TEXTILE: shower curtains (rule 20). Note this node is ALSO shown as a child of Badmöbel & Badaccessoires > Duschen in the shower nav; it is routed out once, from its own textile parent, and is not recorded under Duschen either.",
+   "link": "https://www.ikea.com/de/de/cat/duschvorhaenge-18908/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Textiles & Rugs > Bathroom Textiles > Spa Accessories",
+   "qty": 17,
+   "issue": "ROUTED TO TEXTILE: verified by reading the node's own 17 rendered product descriptions - Bademantel (bathrobes), Pantoffeln (slippers), Haarhandtuch (hair towel), Waschhandschuh/Schrubbhandschuh (wash mitts), Kulturbeutel. Soft goods, not bathroom equipment (rules 15, 20).",
+   "link": "https://www.ikea.com/de/de/cat/spa-zubehoer-700339/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Furniture & Accessories > Laundry Room Furniture",
+   "qty": 59,
+   "issue": "NOT BATHROOM: laundry-room branch. It sits inside the bathroom department in the nav, but every child is laundry or cleaning by primary product type (rule 2) and each child's OWN breadcrumb points out of the bathroom department: Waschzubehör (55004, 5) and Wäschekörbe (20601, 21) and Trockengestelle (20602, 11) and Bügelbretter (20608, 4) all breadcrumb to 'Produkte > Putzutensilien & Waschutensilien', and Waschmaschinen & Trockner (20826, 6) breadcrumbs to 'Produkte > Küchenmöbel & Elektrogeräte > Elektrogeräte'. Only its sixth child, Wäscheschränke & Wäscheregale (48925, 20), breadcrumbs into the bathroom department, and that one is already in Furniture.xlsx. Flagged rather than dropped because Zara Home DE's laundry-basket node DID sit inside its bathroom department and was recorded there; here the site's own hierarchy says laundry, so it is withheld.",
+   "link": "https://www.ikea.com/de/de/cat/waschkueche-moebel-ba003/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Cleaning & Laundry Utensils > Laundry Baskets",
+   "qty": 21,
+   "issue": "NOT BATHROOM: laundry baskets, breadcrumb 'Produkte > Putzutensilien & Waschutensilien' (rules 2, 30-33). Named for completeness because it is reachable from the bathroom department nav.",
+   "link": "https://www.ikea.com/de/de/cat/waeschekoerbe-20601/"
+  }
+ ],
+ "_reconstructed_from": "Bathroom.xlsx delivered 2026-09-01 (checkpoint), not original worker JSON"
+}

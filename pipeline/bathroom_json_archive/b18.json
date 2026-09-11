@@ -1,0 +1,142 @@
+{
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ACCESS: plain direct fetch via probe.fetch (curl_cffi), no proxy; every GraphQL and category request returned HTTP 200. robots.txt names no Claude / anthropic-ai / ClaudeBot agent (only Bytespider is fully disallowed); User-agent:* disallows */cart/*, */checkout/, */customer/*, */catalogsearch/*, */tag/*, */review/*, */catalog/category/view/*, */catalog/product/view/* and *?filter=* - none of which were requested. No Crawl-delay; probe.py's 2s/host gap applied. The assigned /ae/en/ root 302-redirects to the real UAE English locale; GraphQL availableStores confirms store_code 'en' = 'UAE En', locale en_US, base_url https://www.marinahomeinteriors.com/en-uae/, so every URL recorded uses /en-uae/ and every GraphQL call sent the Store: en header. TREE: taken from Magento GraphQL, not scraped from the nav, so the sweep is exhaustive rather than menu-limited. categories(filters:{}, pageSize:300) returned total_count 147 and all 147 items (1 root, 34 level-2, 62 level-3, 50 level-4); every one was inspected. There is exactly one bathroom department: BATHROOM (url_path 'bath', category id 29, level 2, include_in_menu 1) with 4 children - ACCESSORIES (id 131, 8 children), TOWELS (id 128, 4 children), BATH MATS (id 129), BATHROBES (id 130). Marina Home sells NO sanitaryware, baths, showers, enclosures, taps, toilets, basins, vanity units or bathroom cabinets; grepping all 147 url_paths for bath|shower|toilet|sanitary|vanity|basin|sink|tap|faucet|wash|wc turned up nothing outside the 'bath/' subtree. Of the four BATHROOM children only ACCESSORIES is Bathroom by primary product type; TOWELS, BATH MATS and BATHROBES are textile and were routed out (see review) - so nothing was silently skipped. BATHROOM and ACCESSORIES both have extractable children and are therefore grouping rows with blank qty and blank URL per the parent-URL rule. All 8 ACCESSORIES children are childless leaves and carry qty + URL. QTY - TWO INDEPENDENT SOURCES, EXACT AGREEMENT ON ALL 17 NODES: (1) Magento GraphQL products(filter:{category_uid:{eq:<uid>}}).total_count, and (2) the storefront's own Klevu category-merchandising API - the exact endpoint the PLP grid renders from - POST https://eucs26v2.ksearchnet.com/cs/v2/search with apiKey klevu-162393374404713664, typeOfRequest CATNAV, settings.query.categoryPath '<PATH>' , reading meta.totalResultsFound. Results (klevu = graphql): BATHROOM 43=43, ACCESSORIES 27=27, Soap Dispensers 7=7, Soap Dish 2=2, Brush Stand 2=2, Tumblers 3=3, Box With Lid 6=6, Vanity Tray 2=2, Upright Tissue Box 3=3, Waste Bins 1=1, Bath Mats 1=1, Bathrobes 2=2, Towels 13=13, Bath Sheets 5=5, Bath Towels 4=4, Face Towels 3=3, Hand Towels 1=1. Zero mismatches out of 17. RULE-1 TRAP AVOIDED: Magento categoryList.product_count was NOT used - the prior Furniture pass proved it 3-5x inflated on this site. The PLP itself is a Magento 2 PWA Studio SPA with a Klevu infinite-scroll grid that publishes no count text at all in the rendered DOM, so a rendered header is genuinely unobtainable here and these two structured sources are the correct substitute. VERIFICATION: (a) every leaf's full product list was pulled from GraphQL at pageSize:100 and the number of items returned equalled total_count exactly on all 17 nodes (e.g. Soap Dispensers 7 items / total_count 7), i.e. enumerated to exhaustion, not inferred. (b) Arithmetic closure: BATHROOM 43 = ACCESSORIES 27 + TOWELS 13 + BATH MATS 1 + BATHROBES 2. TOWELS 13 = 5+4+3+1 exactly. ACCESSORIES 27 vs children union 26 - the single unmatched SKU was identified by set-differencing the child SKU lists against the parent's: SVC1067 'Pebble Vase Small', a decorative vase mis-filed directly on bath/accessories, which is Decor by primary type anyway (rule 21) and is not in any recorded leaf. (c) All 16 bath URLs were put through GraphQL urlResolver and every one returned type=CATEGORY with exactly the category id I had counted (0 bad), so there is no silent redirect or CMS page behind any recorded link. (d) vanity-tray.html and waste-bins.html are absent from uae_en_sitemap.xml (they are newer categories, ids 386 and 625) so they were not taken from the sitemap - they come from the GraphQL tree, were confirmed by urlResolver as CATEGORY 386/625, and both return HTTP 200 on direct fetch; the other 14 also appear verbatim in https://www.marinahomeinteriors.com/uae_en_sitemap.xml. (e) Counts discriminate (7/2/2/3/6/2/3/1) - no site-wide constant. EXCLUDED: DECOR > MIRROR > FLOOR MIRROR / WALL MIRROR and DECOR > WALL > MIRRORS are decorative mirrors sitting in the Decor hierarchy with no bathroom framing, so per rules 10/11/29 they stay with Home Decor and were not duplicated here. STORAGE > CABINETS & CLOSETS / SHELVING & BOOKCASES / SIDE BOARDS / MEDIA UNITS are general room furniture, not bathroom furniture (rules 30-33). LIGHTING has only CHANDELIERS, PENDANT LIGHTS, FLOOR LAMPS and TABLE LAMPS - there is no bathroom / vanity / mirror light node, so nothing was routed to Lighting. The 12 include_in_menu=0 promotional level-2 nodes (SALE, GIFTING, FESTIVE, EID EDIT, DIWALI EDITS, RAMADAN EDIT, SPRING EDIT, FATHERS DAY EDIT, SINGLES DAY EDIT, KICK OFF EDIT, TIMELESS EDIT, THE CENTURIAL EDIT, ART OF LIVING, EXCLUSIVE, CLOUD DANCER, ALL) are seasonal/collection pages excluded by rule 25 and none of them is bathroom-specific.",
+ "rows": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Accessories",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Soap Dispensers",
+   "qty": 7,
+   "link": "https://www.marinahomeinteriors.com/en-uae/bath/accessories/soap-dispensers.html",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Soap Dish",
+   "qty": 2,
+   "link": "https://www.marinahomeinteriors.com/en-uae/bath/accessories/soap-dish.html",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Brush Stand",
+   "qty": 2,
+   "link": "https://www.marinahomeinteriors.com/en-uae/bath/accessories/brush-stand.html",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Tumblers",
+   "qty": 3,
+   "link": "https://www.marinahomeinteriors.com/en-uae/bath/accessories/tumblers.html",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Box With Lid",
+   "qty": 6,
+   "link": "https://www.marinahomeinteriors.com/en-uae/bath/accessories/box-with-lid.html",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Vanity Tray",
+   "qty": 2,
+   "link": "https://www.marinahomeinteriors.com/en-uae/bath/accessories/vanity-tray.html",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Upright Tissue Box",
+   "qty": 3,
+   "link": "https://www.marinahomeinteriors.com/en-uae/bath/accessories/upright-tissue-box.html",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Waste Bins",
+   "qty": 1,
+   "link": "https://www.marinahomeinteriors.com/en-uae/bath/accessories/waste-bins.html",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  }
+ ],
+ "review": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Towels > Bath Sheets",
+   "qty": 5,
+   "issue": "ROUTED TO TEXTILE: bath sheets, textile towelling (rules 15/20). Child of BATHROOM > TOWELS (parent total 13, recorded nowhere as it is a grouping node).",
+   "link": "https://www.marinahomeinteriors.com/en-uae/bath/towels/bath-sheets.html"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Towels > Bath Towels",
+   "qty": 4,
+   "issue": "ROUTED TO TEXTILE: bath towels, textile towelling (rules 15/20).",
+   "link": "https://www.marinahomeinteriors.com/en-uae/bath/towels/bath-towels.html"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Towels > Face Towels",
+   "qty": 3,
+   "issue": "ROUTED TO TEXTILE: face towels, textile towelling (rules 15/20).",
+   "link": "https://www.marinahomeinteriors.com/en-uae/bath/towels/face-towels.html"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Towels > Hand Towels",
+   "qty": 1,
+   "issue": "ROUTED TO TEXTILE: hand towels, textile towelling (rules 15/20).",
+   "link": "https://www.marinahomeinteriors.com/en-uae/bath/towels/hand-towels.html"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Mats",
+   "qty": 1,
+   "issue": "ROUTED TO TEXTILE: textile bath mat, not a rubber/anti-slip bathroom accessory (rule 16). Verified at product level - the node holds exactly one product, 'Reef Bath Mat' (SKU NTL1040, url_key reef-bath-mat-blue-fabric-ntl1040), whose Magento description reads '100% cotton Reef bath mat in navy'.",
+   "link": "https://www.marinahomeinteriors.com/en-uae/bath/bath-mats.html"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathrobes",
+   "qty": 2,
+   "issue": "ROUTED TO TEXTILE: bathrobes (rule 20). Node holds 2 products, both 'Haleki Bathrobe L/XL'.",
+   "link": "https://www.marinahomeinteriors.com/en-uae/bath/robes-slippers.html"
+  }
+ ],
+ "_reconstructed_from": "Bathroom.xlsx delivered 2026-09-01 (checkpoint), not original worker JSON"
+}

@@ -1,0 +1,52 @@
+{
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "Orange Tree (orangetree.in) is a Shopify store, fully reachable via direct HTTP (200s, no block); robots.txt has no Claude disallow. Discovery: enumerated the FULL collections.json catalog (300 collections, 2 pages) and checked main nav + the homepage mega-menu, which has a dedicated accordion section literally headed 'NEW ARRIVALS' containing: 'All New' -> /collections/new, and three site-defined tag-filtered children -- Furniture -> /collections/new/furniture, Lighting -> /collections/new/lighting, Decor -> /collections/new/decor (site UI spelled 'Décor'; rendered here as plain ASCII 'Decor'). This is a genuine site-exposed parent/children structure (New Arrivals > Furniture/Lighting/Decor New Arrivals), not an invented split -- preserved as a grouping row + 3 leaves. Counting method: /collections/new/<tag> is a Shopify collection+tag combo view with no dedicated products.json endpoint, so exact counts for the 3 children were computed by pulling the full /collections/new/products.json (377 unique ids, exact, exhaustive pagination) and filtering by each product's own 'tags' array for 'Furniture'/'lighting'/'decor' (216/119/20 respectively) -- cross-checked against raw /products/ link enumeration on the live paginated HTML of each /collections/new/<tag> page, which produced identical counts (216/119/20), so the tag-filter counts are verified exact, not estimated. 216+119+20=355 of 377 parent items carry one of the three tags; the remaining 22 have none of those tags (no further site-exposed sub-split exists for them, so not broken out). Cached collections.json products_count for the parent ('new' handle) is inflated (671 cached vs 377 exact), matching the known Shopify products_count-unreliable pattern on this store. Separately, a second, older-looking collection titled 'New Arrivals' (handle new-arrivals, 93 exact unique products) exists and IS listed in sitemap_collections_1.xml, but is NOT linked from main nav, the homepage 'NEW ARRIVALS' menu, banners, or any category page checked (furniture/lighting/decor/wall-decor) -- recorded separately below with a MANUAL REVIEW flag rather than silently merged into or dropped from the canonical nav-linked /collections/new structure; it is a distinct product set, not a simple alias (different handle, different count, not cross-verified against the 'new' set here).",
+  "rows": [
+    {
+      "category": "New Arrivals",
+      "sub_category": "All New",
+      "qty": 377,
+      "link": "https://www.orangetree.in/collections/new",
+      "is_group": true,
+      "evidence": "Exhaustive pagination of /collections/new/products.json (limit=250, 2 pages) -> 377 unique product ids (cached products_count=671 is inflated). Homepage mega-menu section headed 'NEW ARRIVALS' links 'All New' here; homepage promo banner also labels this 'New Arrivals' / 'Latest Collections'.",
+      "flag": null
+    },
+    {
+      "category": "Furniture New Arrivals",
+      "sub_category": "Furniture New Arrivals",
+      "qty": 216,
+      "link": "https://www.orangetree.in/collections/new/furniture",
+      "is_group": false,
+      "evidence": "216 of the 377 /collections/new/products.json items carry tag 'Furniture'; cross-checked identical (216) via unique /products/ links enumerated across all paginated pages of the live /collections/new/furniture listing. Site nav item: 'NEW ARRIVALS' menu -> 'Furniture'.",
+      "flag": null
+    },
+    {
+      "category": "Lighting New Arrivals",
+      "sub_category": "Lighting New Arrivals",
+      "qty": 119,
+      "link": "https://www.orangetree.in/collections/new/lighting",
+      "is_group": false,
+      "evidence": "119 of the 377 /collections/new/products.json items carry tag 'lighting'; cross-checked identical (119) via unique /products/ links across all paginated pages of the live /collections/new/lighting listing. Site nav item: 'NEW ARRIVALS' menu -> 'Lighting'.",
+      "flag": null
+    },
+    {
+      "category": "Decor New Arrivals",
+      "sub_category": "Decor New Arrivals",
+      "qty": 20,
+      "link": "https://www.orangetree.in/collections/new/decor",
+      "is_group": false,
+      "evidence": "20 of the 377 /collections/new/products.json items carry tag 'decor'; cross-checked identical (20) via unique /products/ links across all paginated pages of the live /collections/new/decor listing. Site nav item: 'NEW ARRIVALS' menu -> 'Décor' (ASCII-normalized to 'Decor').",
+      "flag": null
+    },
+    {
+      "category": "New Arrivals",
+      "sub_category": "New Arrivals (unlinked collection)",
+      "qty": 93,
+      "link": "https://www.orangetree.in/collections/new-arrivals",
+      "is_group": false,
+      "evidence": "Exhaustive pagination of /collections/new-arrivals/products.json -> 93 unique product ids (cached products_count=109, inflated). Present in sitemap_collections_1.xml but not found linked from main nav, the homepage 'NEW ARRIVALS' menu, banners, or any category page checked.",
+      "flag": "MANUAL REVIEW: second collection also titled 'New Arrivals' (handle new-arrivals) exists with 93 real products, distinct from the nav-linked /collections/new structure above, but not discoverable via any nav/menu/footer path checked in this pass -- only via the sitemap. Could be a legacy/superseded New Arrivals page kept live, or a route reachable some other way not checked (e.g. a direct marketing link). Human should confirm whether this is still the correct page to report or should be dropped as stale."
+    }
+  ]
+}

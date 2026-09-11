@@ -1,0 +1,16 @@
+{
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "Same access route (translate.goog proxy). Checked nav/footer for a dedicated Clearance/Outlet page: none exists site-wide (tested /clearance, /outlet, /home/clearance, /home/outlet, /sale/home/clearance -- all HTTP 404). The site's only markdown listing is 'Sale' (/sale and department children /sale/women, /sale/men, /sale/kids, /sale/home, /sale/beauty, /sale/designer, plus /sale/top-offers and /sale/take-an-extra), which per brief §3 is a generic promotional Sale, not automatically Clearance. HOWEVER: on https://www.davidjones.com/sale/home (Sale > Home & Food, 12292 items unfiltered) the site's own embedded GraphQL/SSR facet data (source: FREDHOPPER) defines a distinct filter facet explicitly labelled by the site as {\"label\":\"Clearance\",\"type\":\"clearance_flag\",\"values\":[{\"name\":\"Yes\",\"slug\":\"y\",\"count\":1572}]} -- i.e. David Jones itself tags a subset of Sale/Home products as 'Clearance' (a permanent-markdown flag), distinct from the rest of the temporary Sale listing. This is the site's own taxonomy explicitly using the word 'Clearance' (not an inference from generic sale copy), so it qualifies as a genuine Clearance row per the brief's test, even though it surfaces as an in-page filter rather than its own URL path. Cross-verified via Playwright: expanded the 'Clearance' filter accordion on the live page and the rendered checkbox showed label 'Yes' with counter '1572', matching the embedded facet JSON exactly. Attempted to resolve a distinct filtered/bookmarkable URL for this facet (query params clearance_flag=y, clearance_flag=Y, clearanceFlag=y, f=clearance_flag:y, and path variants /sale/home/f/clearance_flag/y, /sale/home/clearance_flag/y) -- none altered the server-rendered numberOfItems (all returned the unfiltered 12292), and the client-side checkbox toggle did not change the browser URL either, indicating this filter is applied via client-side/GraphQL state only with no distinct bookmarkable URL. Recorded the row against the parent /sale/home listing URL with a flag noting the link itself shows the unfiltered 12292 count and the filter must be applied manually. No other clearance-type page/facet found (no 'Outlet', 'Final Sale', 'Last Chance', 'End of Line' labels anywhere in nav, footer, or the /sale/home page).",
+  "rows": [
+    {
+      "category": "Clearance",
+      "sub_category": "Clearance",
+      "qty": 1572,
+      "link": "https://www.davidjones.com/sale/home",
+      "is_group": false,
+      "evidence": "embedded SSR facet JSON on /sale/home: {\"label\":\"Clearance\",\"type\":\"clearance_flag\",\"values\":[{\"name\":\"Yes\",\"slug\":\"y\",\"count\":1572,...}]}; cross-verified live via Playwright -- expanding the on-page 'Clearance' filter accordion renders checkbox label 'Yes' with counter '1572'",
+      "flag": "MANUAL REVIEW: link is the parent /sale/home listing (shows 12292 unfiltered items by default) -- the qty=1572 is the site's own 'Clearance' filter-facet count (clearance_flag=Yes) within that listing; no distinct bookmarkable/query-string URL for the filtered view could be found (query-param and path variants tested, none applied server-side; client-side toggle did not change the URL either), so the filter must be applied manually via the on-page 'Clearance' facet to see this subset."
+    }
+  ]
+}

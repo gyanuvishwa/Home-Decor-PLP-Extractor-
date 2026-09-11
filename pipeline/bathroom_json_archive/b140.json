@@ -1,0 +1,724 @@
+{
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ROBOTS (www.ikea.com): fetched FIRST, before any other request on the host - HTTP 200, 4,054 bytes - and read by group boundary rather than by grep. The file has four groups: AdsBot-Google and AdsBot-Google-Mobile (Allow-only), 'User-agent: AmazonProductDiscoverybot / Disallow: /', and 'User-agent: *'. NO Claude agent is named anywhere - a case-insensitive search for claude, anthropic, Claude-Web, ClaudeBot, Content-Signal and Crawl-delay returns NOTHING - so there is no section-5 hard stop and no crawl-delay to honour beyond probe.py's own 2 s per-host gap. We fall under '*'. The '*' disallows that bear on this work are */search/?q=*, */search/products/?q=*, /compare*, *?filter=*, *filters=*, *?sorting=*, *&sorting=*, *?storeId=*, *catalogId=*, *productId=*, *partNumber=*, *?priceFilter*, *min_price=*, *max_price=*, /iows/, */navigation/, */fragments/*, /*-fragment.html, */rl/, */browse-history/, and the cart/order/checkout/profile/favourites paths. I stayed clear of every one of them: EVERY URL requested in this pass is a bare https://www.ikea.com/fr/fr/cat/<slug>/ category path with NO query string at all - no ?page, no ?filter, no ?sorting, no facet path. In particular I did NOT follow the /f/ facet links IKEA renders at the foot of each PLP (colour and material filter pages); none is recorded anywhere here. ONE HOST ONLY: www.ikea.com. No API host, no CDN host, no proxy, no r.jina.ai, no browser automation, no campaign parameters - so no second robots file was owed. ACCESS: plain HTTP 200 on every request through probe.fetch(); no bot wall, no interstitial, no 403, no rate limiting. 92 category pages were fetched and cached under work/140/pages/. TREE SOURCE - IKEA's own navigation, not guessed URL patterns. Entry point found from the site's own product index https://www.ikea.com/fr/fr/cat/produits-products/, which server-renders all 1,222 fr/fr category slugs; the bathroom department is 'Salle de bain', https://www.ikea.com/fr/fr/cat/salle-de-bain-ba001/ (the same ba001 id as the German storefront at SR 107), with 17 children. Children at every level were taken from each page's own in-page category nav (a.hnf-inpage-nav__card). TRUNCATION / LEAF RULE, established empirically rather than assumed - and I record that my first two attempts at it were WRONG and were discarded. IKEA's in-page nav is context-sensitive: on a node that HAS children it opens with a link back to that node's own parent and then lists its real children; on a node with NO children it instead repeats that node's SIBLING set, which necessarily includes the node itself. So the reliable signal is 'does this node's own URL appear among the cards it renders' - if yes it is a leaf, if no the cards are its children (a node is never its own child). That rule resolved all 92 nodes cleanly and is what the recursion used. My earlier heuristics - 'nav starts with the product index' and 'nav equals the department list' - both misfired (the first classified the department page itself as a leaf, the second failed at depth 3+ where the repeated set is the parent's sibling list, not the department list); the walk was rerun from scratch each time. Recursion ran to depth 5 from ba001 and reached a fixed point at 92 nodes with nothing left unexpanded. QTY: every quantity here is the LISTING PAGE'S OWN RENDERED EXACT TOTAL, read from the server-rendered HTML. No API, no estimate, no aggregation, no parent's number reused for a child. IKEA FR renders it twice on every PLP, in two independent places: (1) the visible string <p class=\"plp-filter-information__total-count\">N éléments</p> (note the French word is 'éléments', not 'produits'), and (2) a machine-readable data-category attribute on div.js-product-list, e.g. data-category={\"id\":\"10555\",\"canonical\":\"https://www.ikea.com/fr/fr/cat/accessoires-salle-de-bain-10555/\",\"totalCount\":85}. VERIFICATION. (a) The two rendered figures were compared on ALL 91 nodes in the walk that have a grid: 91/91 agree exactly, ZERO mismatches. The single node with neither figure is the department page ba001 itself, i.e. precisely the one non-PLP - which is independent structural proof that it is a grouping node and belongs in rows[] as a group with blank qty and blank link (rule 38). (b) INDEPENDENT CARD COUNT, a real enumeration cross-check rather than a restatement of the same number: IKEA server-renders the first page of product cards, so I counted div.plp-price-module__product-name occurrences on every node. For EVERY node whose total is at or below IKEA's 24-per-page grid, the rendered card count equals the stated total exactly - among the recorded leaves 3/3, 5/5, 5/5, 6/6, 6/6, 6/6, 8/8, 9/9, 9/9, 15/15, 16/16, 19/19, 21/21, 24/24, 24/24 - and every node whose total exceeds 24 renders exactly 24 (brosses-wc 25, tablettes 37, accessoires 85, douches 65, textiles 87, solutions 421). (c) The data-category 'canonical' field on every recorded leaf equals the URL written into rows[], so there is no canonical-alias dedup blind spot on any row. (d) DISCRIMINATION: 40+ distinct totals across the 92 nodes; the recorded leaves alone run 3, 5, 6, 6, 6, 8, 9, 9, 15, 16, 19, 21, 24, 24, 25, 37 - no site-wide constant. (e) H1 was read on every page and matches the node requested. (f) Product names and descriptions were read on every recorded leaf to confirm the content matches the label - Vasques et lavabos = 'BACKSJÖN Vasque avec siphon, blanc, 100x48 cm' / 'ORRSJÖN Double vasque avec siphon' / 'VINDELÄLVEN Lavabo intégré avec siphon'; Robinets et mitigeurs = 'DALSKÄR Mitigeur lavabo, chromé' / 'HAMNSKÄR Mitigeur lavabo, couleur laiton'; Parois et receveurs de douche = 'OPPEJEN Cabine de douche, 86x86x202 cm' / 'OPPEJEN Porte de baignoire, verre'; Colonnes et ensembles de douche = 'BROGRUND Ensemble douche mitigeur thermo, chromé'; Pommeaux et flexibles = 'BROGRUND Douchette 5 jets' / 'KOLSJÖN Flexible douche'; Brosses WC = 'EKOLN Brosse pour WC' / 'BROGRUND Porte-rouleau WC'; Distributeur savon et porte-savon = 'EKOLN Distributeur savon' / 'EKOLN Porte-savon'; Étagères murales et porte-serviettes = 'BROGRUND Barre porte-serviettes, acier inoxydable, 67 cm' / 'RÅGRUND Porte-serviettes avec 2 barres, bambou' / 'ENUDDEN Patère pour porte'; Paniers de rangement = 'GOTTERN Panier, jonc de mer' / 'NOJIG Organiseur' / 'DRAGAN Accessoires bain, 4 pièces, bambou'; Plans de travail = 'TOLKEN Plateau, blanc marbré, 122x49 cm'; Miroirs avec lumières = 'KÄRRSJÖN Miroir avec éclairage intégré, anti-buée, 60x80 cm' / 'STORJORM Miroir avec éclairage intégré'; Miroirs grossissants et à maquillage = 'TRENSUM Miroir, acier inoxydable' / 'FRÄCK Miroir, acier inoxydable'. THE TWO-AXIS PROBLEM AND HOW IT WAS RESOLVED - this is the main judgement in this file. IKEA France exposes the same bathroom catalogue on two axes: a generic product axis and a SERIES axis under 'Solutions salle de bain complètes' (421) that re-slices the identical products by furniture series (HAVBÄCK, ÄNGSJÖN, TÄNNFORSEN, ENHET, HEMNES, VIDVESSEL, NYSJÖN). I recorded the GENERIC axis only. That is not an assumption - I measured it by extracting the per-card product ids (value=\"compare-<id>\") from both sides: every series 'vasques' node is a STRICT SUBSET of the generic Vasques et lavabos node (19) - HAVBÄCK 12 of 12 inside it, ÄNGSJÖN 12 of 12, TÄNNFORSEN 12 of 12, HEMNES 10 of 10, VIDVESSEL 4 of 4 - and the generic Meubles bas avec vasque (158) renders ENHET, HAVBÄCK, TÄNNFORSEN and ÄNGSJÖN products side by side on its own first page. All 38 series-axis nodes are therefore in review[] with that proof, never in rows[]. DEDUP: dedup.already_extracted() was run on ALL 92 walked URLs. TEN hits, every one of them in review[] and never in rows[]: Meubles bas avec vasque 20720 (Furniture.xlsx, 'Washstands with Basin'), Meubles bas sans vasque 54989 ('Washstands without Basin'), Meubles sous lavabo 20721 ('Under-Sink Cabinets'), Étagères salle de bain 20804 ('Bathroom Shelf Units & Tall Cabinets'), Armoires et colonnes 20808 ('Bathroom Wall Cabinets'), Meubles hauts avec miroir 20500 ('Bathroom Mirror Cabinets'), Tabourets et bancs 20859 ('Bathroom Stools & Benches'), Dessertes 20858 ('Bathroom Trolleys'), Meubles de buanderie 48925 ('Laundry Cabinets'), and Miroirs à poser 20498 (Final.xlsx Home Decor pass, 'Table Mirrors'). ZERO hits on any of the 17 recorded leaves. This is OPTION 1 doing exactly what it is for: IKEA France's bath vanities, washstands, bathroom cabinets and mirror cabinets are already in Furniture.xlsx and they STAY there, even though rules 9, 10 and 12 would otherwise class them as Bathroom. The brief warned to expect hits on every leaf and to accept NO BATHROOM FOUND if that were the outcome; it is not the outcome here - the Furniture pass took the bathroom FURNITURE and left the fixtures, taps, showers, enclosures, mirrors, accessories, hardware and bathroom storage untouched, and those are what this file records. A GENUINE DE/FR DIVERGENCE, FLAGGED RATHER THAN SMOOTHED OVER: category id 20498 is the node SR 107 IKEA DE recorded as a Bathroom row ('Waschbeckenspiegel', 18). On the French storefront the same id is named 'Miroirs à poser' and the earlier Home Decor pass already took it as 'Table Mirrors', so under the cross-file dedup rule it stays where it is. FR therefore has 2 bathroom-mirror rows where DE had 3. OVERLAPPING SIBLINGS - NEVER SUMMED, and the overlaps were measured: within Accessoires salle de bain the six children total 100 while the parent renders 85, because siblings share products - Accessoires de douche et baignoire (24) and Accessoires de salle de bain sans perçage (21) share 15 ids (TISKEN, FLORSJÖN, KROKFJORDEN suction baskets and shelves appear in both). Within Miroirs salle de bain, Miroirs grossissants et à maquillage (6) shares 2 ids with Miroirs avec lumières (9) (the two EKFÄNN illuminated mirrors) and 3 with the already-extracted Miroirs à poser (LINDBYN and KARMSUND table mirrors). Each figure recorded is the storefront's own number for its own node; they are recorded separately per rule 28 and must NOT be added together. Two nodes are also reachable by two nav paths - Accessoires de douche et baignoire (under both Accessoires salle de bain and Douches) and Rideaux de douche (under both Textiles de bain and Douches) - and each is recorded exactly once (rule 28). ROUTED OUT, all in review[] with counts and URLs so nothing is silently skipped: Textiles de bain (87) and its 9 towel/mat/curtain/bathrobe leaves to TEXTILE; Luminaires salle de bain (27) and its 3 lighting leaves to LIGHTING, while Miroirs avec lumières - which IKEA cross-links into that lighting branch - is recorded as a BATHROOM row because its primary product type is a mirror (rule 11), including the anti-fog KÄRRSJÖN; Buanderie et accessoires (62) and its 6 laundry leaves to STORAGE / appliances; and Boutons et poignées (57), furniture knobs and handles cross-linked from the series pages, routed out on primary product type exactly as SR 107 IKEA DE routed Möbelgriffe. NO EMPTY NODES: every one of the 92 walked nodes returned a non-zero total, so there is no EMPTY NODE entry to make. NO VIEW ALL / COLLECTIONS / SEARCH / PDP URL is recorded anywhere. RESULT: 4 grouping rows + 17 leaf rows; 75 review entries.",
+ "rows": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathroom Storage Baskets & Makeup Organizers",
+   "qty": 24,
+   "link": "https://www.ikea.com/fr/fr/cat/boites-et-paniers-salles-de-bain-16233/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathroom Wall Shelves & Towel Rails",
+   "qty": 37,
+   "link": "https://www.ikea.com/fr/fr/cat/tablettes-salles-de-bain-20615/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathroom Mirrors",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathroom Mirrors > Magnifying & Makeup Mirrors",
+   "qty": 6,
+   "link": "https://www.ikea.com/fr/fr/cat/miroirs-grossissants-et-a-maquillage-20499/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathroom Mirrors > Mirrors with Lights",
+   "qty": 9,
+   "link": "https://www.ikea.com/fr/fr/cat/miroirs-avec-lumieres-49138/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathroom Accessories",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathroom Accessories > Bathroom Bins",
+   "qty": 9,
+   "link": "https://www.ikea.com/fr/fr/cat/poubelles-de-salle-de-bain-48940/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathroom Accessories > Shower & Bathtub Accessories",
+   "qty": 24,
+   "link": "https://www.ikea.com/fr/fr/cat/accessoires-douche-10658/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathroom Accessories > Soap Dispenser & Soap Dish",
+   "qty": 16,
+   "link": "https://www.ikea.com/fr/fr/cat/distributeur-savon-et-porte-savon-10656/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathroom Accessories > Toilet Brushes & Toilet Paper Holders",
+   "qty": 25,
+   "link": "https://www.ikea.com/fr/fr/cat/brosses-wc-48944/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathroom Accessories > Toothbrush Holders",
+   "qty": 5,
+   "link": "https://www.ikea.com/fr/fr/cat/porte-brosses-a-dents-48943/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathroom Accessories > Non-Drill Bathroom Accessories",
+   "qty": 21,
+   "link": "https://www.ikea.com/fr/fr/cat/accessoires-de-salle-de-bain-sans-percage-700699/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathroom Countertops",
+   "qty": 3,
+   "link": "https://www.ikea.com/fr/fr/cat/plans-de-travail-salle-de-bain-30565/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Wash-basins & Sinks",
+   "qty": 19,
+   "link": "https://www.ikea.com/fr/fr/cat/vasques-et-lavabos-20723/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathroom Taps & Mixers",
+   "qty": 15,
+   "link": "https://www.ikea.com/fr/fr/cat/robinets-mitigeurs-20724/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Showers",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Showers > Shower Columns & Sets",
+   "qty": 8,
+   "link": "https://www.ikea.com/fr/fr/cat/colonnes-et-kits-de-douche-40693/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Showers > Shower Heads & Hoses",
+   "qty": 6,
+   "link": "https://www.ikea.com/fr/fr/cat/pommeaux-et-flexibles-de-douche-40692/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Showers > Shower Mixers",
+   "qty": 6,
+   "link": "https://www.ikea.com/fr/fr/cat/mitigeurs-de-douche-40691/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Showers > Shower Screens & Trays",
+   "qty": 5,
+   "link": "https://www.ikea.com/fr/fr/cat/parois-de-douche-47358/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  }
+ ],
+ "review": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom (department)",
+   "qty": null,
+   "issue": "EXCLUDED AS PARENT URL (rule 24) and structurally a grouping node: it is the ONLY node in the whole 92-node walk with NO product grid at all - no plp-filter-information total-count string and no data-category totalCount - which independently proves it is not a listing. It has 17 children. Emitted as the top grouping row with blank qty and blank link (rule 38).",
+   "link": "https://www.ikea.com/fr/fr/cat/salle-de-bain-ba001/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Complete Bathroom Solutions",
+   "qty": 421,
+   "issue": "DUPLICATE SERIES AXIS - NOT RECORDED. IKEA France exposes the same bathroom catalogue on two axes: the generic product axis (Meubles sous vasques/lavabos, Vasques et lavabos, Miroirs salle de bain, ...) and a series axis under 'Solutions salle de bain complètes' that re-slices the identical products by furniture series. Recording both would double count. PROOF, measured not assumed: every series 'vasques' node is a strict SUBSET of the generic Vasques et lavabos node (19) - HAVBACK 12 of 12 inside it, ANGSJON 12 of 12, TANNFORSEN 12 of 12, HEMNES 10 of 10, VIDVESSEL 4 of 4 - and the generic Meubles bas avec vasque (158) renders ENHET, HAVBACK, TANNFORSEN and ANGSJON products side by side on its own first page. This is the series-axis roll-up itself, with 7 series children. OPTION 1 also applies to the washstand/cabinet/mirror-cabinet members of this branch: their generic twins are already in Furniture.xlsx, so re-recording the series-scoped copies would smuggle Furniture-owned vanities back into Bathroom through a different URL - exactly the blind spot the brief warns about.",
+   "link": "https://www.ikea.com/fr/fr/cat/solutions-salle-de-bain-completes-700450/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Complete Bathroom Solutions > HAVBACK bathroom",
+   "qty": 120,
+   "issue": "DUPLICATE SERIES AXIS - NOT RECORDED (see the Solutions salle de bain complètes entry for the containment proof). Series-scoped roll-up of products already exposed on the generic product axis.",
+   "link": "https://www.ikea.com/fr/fr/cat/havbaeck-salle-de-bain-700451/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Complete Bathroom Solutions > ANGSJON bathroom",
+   "qty": 268,
+   "issue": "DUPLICATE SERIES AXIS - NOT RECORDED (see the Solutions salle de bain complètes entry for the containment proof). Series-scoped roll-up of products already exposed on the generic product axis.",
+   "link": "https://www.ikea.com/fr/fr/cat/aengsjoen-salle-de-bain-700453/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Complete Bathroom Solutions > TANNFORSEN bathroom",
+   "qty": 131,
+   "issue": "DUPLICATE SERIES AXIS - NOT RECORDED (see the Solutions salle de bain complètes entry for the containment proof). Series-scoped roll-up of products already exposed on the generic product axis.",
+   "link": "https://www.ikea.com/fr/fr/cat/taennforsen-salle-de-bain-700456/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Complete Bathroom Solutions > ENHET bathroom",
+   "qty": 140,
+   "issue": "DUPLICATE SERIES AXIS - NOT RECORDED (see the Solutions salle de bain complètes entry for the containment proof). Series-scoped roll-up of products already exposed on the generic product axis.",
+   "link": "https://www.ikea.com/fr/fr/cat/enhet-salle-de-bain-700458/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Complete Bathroom Solutions > HEMNES bathroom",
+   "qty": 36,
+   "issue": "DUPLICATE SERIES AXIS - NOT RECORDED (see the Solutions salle de bain complètes entry for the containment proof). Series-scoped roll-up of products already exposed on the generic product axis.",
+   "link": "https://www.ikea.com/fr/fr/cat/hemnes-salle-de-bain-700457/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Complete Bathroom Solutions > VIDVESSEL bathroom",
+   "qty": 19,
+   "issue": "DUPLICATE SERIES AXIS - NOT RECORDED (see the Solutions salle de bain complètes entry for the containment proof). Series-scoped roll-up of products already exposed on the generic product axis.",
+   "link": "https://www.ikea.com/fr/fr/cat/vidvessel-salle-de-bain-700868/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Complete Bathroom Solutions > NYSJON bathroom",
+   "qty": 24,
+   "issue": "DUPLICATE SERIES AXIS - NOT RECORDED (see the Solutions salle de bain complètes entry for the containment proof). Series-scoped roll-up of products already exposed on the generic product axis.",
+   "link": "https://www.ikea.com/fr/fr/cat/nysjoen-salle-de-bain-700459/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Complete Bathroom Solutions > HAVBACK vanity units with basin",
+   "qty": 22,
+   "issue": "DUPLICATE SERIES AXIS - NOT RECORDED. Series-scoped slice of an assortment already exposed on the generic product axis; see the Solutions salle de bain complètes entry for the subset proof. Vanity, washstand, bathroom-cabinet and mirror-cabinet members are additionally covered by OPTION 1, since their generic twins are already recorded in Furniture.xlsx.",
+   "link": "https://www.ikea.com/fr/fr/cat/havbaeck-meubles-bas-avec-vasque-700465/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Complete Bathroom Solutions > HAVBACK vanity units without basin",
+   "qty": 3,
+   "issue": "DUPLICATE SERIES AXIS - NOT RECORDED. Series-scoped slice of an assortment already exposed on the generic product axis; see the Solutions salle de bain complètes entry for the subset proof. Vanity, washstand, bathroom-cabinet and mirror-cabinet members are additionally covered by OPTION 1, since their generic twins are already recorded in Furniture.xlsx.",
+   "link": "https://www.ikea.com/fr/fr/cat/havbaeck-meubles-bas-sans-vasque-700464/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Complete Bathroom Solutions > HAVBACK storage units",
+   "qty": 4,
+   "issue": "DUPLICATE SERIES AXIS - NOT RECORDED. Series-scoped slice of an assortment already exposed on the generic product axis; see the Solutions salle de bain complètes entry for the subset proof. Vanity, washstand, bathroom-cabinet and mirror-cabinet members are additionally covered by OPTION 1, since their generic twins are already recorded in Furniture.xlsx.",
+   "link": "https://www.ikea.com/fr/fr/cat/havbaeck-rangement-salle-de-bain-700463/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Complete Bathroom Solutions > HAVBACK mirrors and bathroom cabinets with mirror",
+   "qty": 4,
+   "issue": "DUPLICATE SERIES AXIS - NOT RECORDED. Series-scoped slice of an assortment already exposed on the generic product axis; see the Solutions salle de bain complètes entry for the subset proof. Vanity, washstand, bathroom-cabinet and mirror-cabinet members are additionally covered by OPTION 1, since their generic twins are already recorded in Furniture.xlsx.",
+   "link": "https://www.ikea.com/fr/fr/cat/havbaeck-miroirs-et-armoires-de-salle-de-bain-avec-miroir-700462/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Complete Bathroom Solutions > HAVBACK wash-basins",
+   "qty": 12,
+   "issue": "DUPLICATE SERIES AXIS - NOT RECORDED. Series-scoped slice of an assortment already exposed on the generic product axis; see the Solutions salle de bain complètes entry for the subset proof. Vanity, washstand, bathroom-cabinet and mirror-cabinet members are additionally covered by OPTION 1, since their generic twins are already recorded in Furniture.xlsx.",
+   "link": "https://www.ikea.com/fr/fr/cat/havbaeck-vasques-700466/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Complete Bathroom Solutions > ANGSJON vanity units with basin",
+   "qty": 170,
+   "issue": "DUPLICATE SERIES AXIS - NOT RECORDED. Series-scoped slice of an assortment already exposed on the generic product axis; see the Solutions salle de bain complètes entry for the subset proof. Vanity, washstand, bathroom-cabinet and mirror-cabinet members are additionally covered by OPTION 1, since their generic twins are already recorded in Furniture.xlsx.",
+   "link": "https://www.ikea.com/fr/fr/cat/aengsjoen-meubles-bas-avec-vasque-700470/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Complete Bathroom Solutions > ANGSJON vanity units without basin",
+   "qty": 2,
+   "issue": "DUPLICATE SERIES AXIS - NOT RECORDED. Series-scoped slice of an assortment already exposed on the generic product axis; see the Solutions salle de bain complètes entry for the subset proof. Vanity, washstand, bathroom-cabinet and mirror-cabinet members are additionally covered by OPTION 1, since their generic twins are already recorded in Furniture.xlsx.",
+   "link": "https://www.ikea.com/fr/fr/cat/aengsjoen-meubles-bas-sans-vasque-700469/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Complete Bathroom Solutions > ANGSJON storage units",
+   "qty": 5,
+   "issue": "DUPLICATE SERIES AXIS - NOT RECORDED. Series-scoped slice of an assortment already exposed on the generic product axis; see the Solutions salle de bain complètes entry for the subset proof. Vanity, washstand, bathroom-cabinet and mirror-cabinet members are additionally covered by OPTION 1, since their generic twins are already recorded in Furniture.xlsx.",
+   "link": "https://www.ikea.com/fr/fr/cat/aengsjoen-rangement-salle-de-bain-700468/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Complete Bathroom Solutions > ANGSJON mirrors and bathroom cabinets with mirror",
+   "qty": 4,
+   "issue": "DUPLICATE SERIES AXIS - NOT RECORDED. Series-scoped slice of an assortment already exposed on the generic product axis; see the Solutions salle de bain complètes entry for the subset proof. Vanity, washstand, bathroom-cabinet and mirror-cabinet members are additionally covered by OPTION 1, since their generic twins are already recorded in Furniture.xlsx.",
+   "link": "https://www.ikea.com/fr/fr/cat/aengsjoen-miroirs-et-armoires-de-salle-de-bain-avec-miroir-700467/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Complete Bathroom Solutions > ANGSJON wash-basins",
+   "qty": 12,
+   "issue": "DUPLICATE SERIES AXIS - NOT RECORDED. Series-scoped slice of an assortment already exposed on the generic product axis; see the Solutions salle de bain complètes entry for the subset proof. Vanity, washstand, bathroom-cabinet and mirror-cabinet members are additionally covered by OPTION 1, since their generic twins are already recorded in Furniture.xlsx.",
+   "link": "https://www.ikea.com/fr/fr/cat/aengsjoen-vasques-700471/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Complete Bathroom Solutions > TANNFORSEN vanity units with basin",
+   "qty": 33,
+   "issue": "DUPLICATE SERIES AXIS - NOT RECORDED. Series-scoped slice of an assortment already exposed on the generic product axis; see the Solutions salle de bain complètes entry for the subset proof. Vanity, washstand, bathroom-cabinet and mirror-cabinet members are additionally covered by OPTION 1, since their generic twins are already recorded in Furniture.xlsx.",
+   "link": "https://www.ikea.com/fr/fr/cat/taennforsen-meubles-bas-avec-vasque-700476/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Complete Bathroom Solutions > TANNFORSEN vanity units without basin",
+   "qty": 2,
+   "issue": "DUPLICATE SERIES AXIS - NOT RECORDED. Series-scoped slice of an assortment already exposed on the generic product axis; see the Solutions salle de bain complètes entry for the subset proof. Vanity, washstand, bathroom-cabinet and mirror-cabinet members are additionally covered by OPTION 1, since their generic twins are already recorded in Furniture.xlsx.",
+   "link": "https://www.ikea.com/fr/fr/cat/taennforsen-meubles-bas-sans-vasque-700475/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Complete Bathroom Solutions > TANNFORSEN storage units",
+   "qty": 4,
+   "issue": "DUPLICATE SERIES AXIS - NOT RECORDED. Series-scoped slice of an assortment already exposed on the generic product axis; see the Solutions salle de bain complètes entry for the subset proof. Vanity, washstand, bathroom-cabinet and mirror-cabinet members are additionally covered by OPTION 1, since their generic twins are already recorded in Furniture.xlsx.",
+   "link": "https://www.ikea.com/fr/fr/cat/taennforsen-rangement-salle-de-bain-700474/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Complete Bathroom Solutions > TANNFORSEN mirrors and bathroom cabinets with mirror",
+   "qty": 5,
+   "issue": "DUPLICATE SERIES AXIS - NOT RECORDED. Series-scoped slice of an assortment already exposed on the generic product axis; see the Solutions salle de bain complètes entry for the subset proof. Vanity, washstand, bathroom-cabinet and mirror-cabinet members are additionally covered by OPTION 1, since their generic twins are already recorded in Furniture.xlsx.",
+   "link": "https://www.ikea.com/fr/fr/cat/taennforsen-miroirs-et-armoires-de-salle-de-bain-avec-miroir-700473/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Complete Bathroom Solutions > TANNFORSEN wash-basins",
+   "qty": 12,
+   "issue": "DUPLICATE SERIES AXIS - NOT RECORDED. Series-scoped slice of an assortment already exposed on the generic product axis; see the Solutions salle de bain complètes entry for the subset proof. Vanity, washstand, bathroom-cabinet and mirror-cabinet members are additionally covered by OPTION 1, since their generic twins are already recorded in Furniture.xlsx.",
+   "link": "https://www.ikea.com/fr/fr/cat/taennforsen-vasques-700472/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Complete Bathroom Solutions > ENHET bathroom furniture set",
+   "qty": 30,
+   "issue": "DUPLICATE SERIES AXIS - NOT RECORDED. Series-scoped slice of an assortment already exposed on the generic product axis; see the Solutions salle de bain complètes entry for the subset proof. Vanity, washstand, bathroom-cabinet and mirror-cabinet members are additionally covered by OPTION 1, since their generic twins are already recorded in Furniture.xlsx.",
+   "link": "https://www.ikea.com/fr/fr/cat/enhet-ensemble-meubles-de-salle-de-bain-700491/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Complete Bathroom Solutions > ENHET vanity units with basin",
+   "qty": 3,
+   "issue": "DUPLICATE SERIES AXIS - NOT RECORDED. Series-scoped slice of an assortment already exposed on the generic product axis; see the Solutions salle de bain complètes entry for the subset proof. Vanity, washstand, bathroom-cabinet and mirror-cabinet members are additionally covered by OPTION 1, since their generic twins are already recorded in Furniture.xlsx.",
+   "link": "https://www.ikea.com/fr/fr/cat/enhet-meubles-bas-avec-vasque-700493/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Complete Bathroom Solutions > ENHET vanity units without basin",
+   "qty": 2,
+   "issue": "DUPLICATE SERIES AXIS - NOT RECORDED. Series-scoped slice of an assortment already exposed on the generic product axis; see the Solutions salle de bain complètes entry for the subset proof. Vanity, washstand, bathroom-cabinet and mirror-cabinet members are additionally covered by OPTION 1, since their generic twins are already recorded in Furniture.xlsx.",
+   "link": "https://www.ikea.com/fr/fr/cat/enhet-meubles-bas-sans-vasque-700492/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Complete Bathroom Solutions > ENHET bathroom storage and shelving units",
+   "qty": 18,
+   "issue": "DUPLICATE SERIES AXIS - NOT RECORDED. Series-scoped slice of an assortment already exposed on the generic product axis; see the Solutions salle de bain complètes entry for the subset proof. Vanity, washstand, bathroom-cabinet and mirror-cabinet members are additionally covered by OPTION 1, since their generic twins are already recorded in Furniture.xlsx.",
+   "link": "https://www.ikea.com/fr/fr/cat/enhet-rangement-salle-de-bain-700486/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Complete Bathroom Solutions > ENHET bathroom cabinets with mirror",
+   "qty": 3,
+   "issue": "DUPLICATE SERIES AXIS - NOT RECORDED. Series-scoped slice of an assortment already exposed on the generic product axis; see the Solutions salle de bain complètes entry for the subset proof. Vanity, washstand, bathroom-cabinet and mirror-cabinet members are additionally covered by OPTION 1, since their generic twins are already recorded in Furniture.xlsx.",
+   "link": "https://www.ikea.com/fr/fr/cat/enhet-armoires-de-salle-de-bain-avec-miroir-700484/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Complete Bathroom Solutions > ENHET bathroom accessories and lighting",
+   "qty": 8,
+   "issue": "DUPLICATE SERIES AXIS - NOT RECORDED. Series-scoped slice of an assortment already exposed on the generic product axis; see the Solutions salle de bain complètes entry for the subset proof. Vanity, washstand, bathroom-cabinet and mirror-cabinet members are additionally covered by OPTION 1, since their generic twins are already recorded in Furniture.xlsx.",
+   "link": "https://www.ikea.com/fr/fr/cat/enhet-accessoires-de-salle-de-bain-700485/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Complete Bathroom Solutions > ENHET laundry combinations",
+   "qty": 15,
+   "issue": "DUPLICATE SERIES AXIS - NOT RECORDED. Series-scoped slice of an assortment already exposed on the generic product axis; see the Solutions salle de bain complètes entry for the subset proof. Vanity, washstand, bathroom-cabinet and mirror-cabinet members are additionally covered by OPTION 1, since their generic twins are already recorded in Furniture.xlsx.",
+   "link": "https://www.ikea.com/fr/fr/cat/enhet-combinaison-de-rangement-buanderie-700490/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Complete Bathroom Solutions > HEMNES bathroom furniture set",
+   "qty": 1,
+   "issue": "DUPLICATE SERIES AXIS - NOT RECORDED. Series-scoped slice of an assortment already exposed on the generic product axis; see the Solutions salle de bain complètes entry for the subset proof. Vanity, washstand, bathroom-cabinet and mirror-cabinet members are additionally covered by OPTION 1, since their generic twins are already recorded in Furniture.xlsx.",
+   "link": "https://www.ikea.com/fr/fr/cat/hemnes-ensemble-meubles-de-salle-de-bain-700479/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Complete Bathroom Solutions > HEMNES vanity units with basin",
+   "qty": 4,
+   "issue": "DUPLICATE SERIES AXIS - NOT RECORDED. Series-scoped slice of an assortment already exposed on the generic product axis; see the Solutions salle de bain complètes entry for the subset proof. Vanity, washstand, bathroom-cabinet and mirror-cabinet members are additionally covered by OPTION 1, since their generic twins are already recorded in Furniture.xlsx.",
+   "link": "https://www.ikea.com/fr/fr/cat/hemnes-meubles-bas-avec-vasque-700481/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Complete Bathroom Solutions > HEMNES vanity units without basin",
+   "qty": 3,
+   "issue": "DUPLICATE SERIES AXIS - NOT RECORDED. Series-scoped slice of an assortment already exposed on the generic product axis; see the Solutions salle de bain complètes entry for the subset proof. Vanity, washstand, bathroom-cabinet and mirror-cabinet members are additionally covered by OPTION 1, since their generic twins are already recorded in Furniture.xlsx.",
+   "link": "https://www.ikea.com/fr/fr/cat/hemnes-meubles-bas-sans-vasque-700480/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Complete Bathroom Solutions > HEMNES bathroom cabinets with mirror",
+   "qty": 3,
+   "issue": "DUPLICATE SERIES AXIS - NOT RECORDED. Series-scoped slice of an assortment already exposed on the generic product axis; see the Solutions salle de bain complètes entry for the subset proof. Vanity, washstand, bathroom-cabinet and mirror-cabinet members are additionally covered by OPTION 1, since their generic twins are already recorded in Furniture.xlsx.",
+   "link": "https://www.ikea.com/fr/fr/cat/hemnes-armoires-de-salle-de-bain-avec-miroir-700478/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Complete Bathroom Solutions > HEMNES wash-basins",
+   "qty": 10,
+   "issue": "DUPLICATE SERIES AXIS - NOT RECORDED. Series-scoped slice of an assortment already exposed on the generic product axis; see the Solutions salle de bain complètes entry for the subset proof. Vanity, washstand, bathroom-cabinet and mirror-cabinet members are additionally covered by OPTION 1, since their generic twins are already recorded in Furniture.xlsx.",
+   "link": "https://www.ikea.com/fr/fr/cat/hemnes-vasques-700477/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Complete Bathroom Solutions > VIDVESSEL wash-basins",
+   "qty": 4,
+   "issue": "DUPLICATE SERIES AXIS - NOT RECORDED. Series-scoped slice of an assortment already exposed on the generic product axis; see the Solutions salle de bain complètes entry for the subset proof. Vanity, washstand, bathroom-cabinet and mirror-cabinet members are additionally covered by OPTION 1, since their generic twins are already recorded in Furniture.xlsx.",
+   "link": "https://www.ikea.com/fr/fr/cat/vidvessel-vasques-700874/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Complete Bathroom Solutions > NYSJON bathroom storage",
+   "qty": 7,
+   "issue": "DUPLICATE SERIES AXIS - NOT RECORDED. Series-scoped slice of an assortment already exposed on the generic product axis; see the Solutions salle de bain complètes entry for the subset proof. Vanity, washstand, bathroom-cabinet and mirror-cabinet members are additionally covered by OPTION 1, since their generic twins are already recorded in Furniture.xlsx.",
+   "link": "https://www.ikea.com/fr/fr/cat/nysjoen-rangement-salle-de-bain-700494/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Complete Bathroom Solutions > NYSJON vanity units with basin/washbasin",
+   "qty": 2,
+   "issue": "DUPLICATE SERIES AXIS - NOT RECORDED. Series-scoped slice of an assortment already exposed on the generic product axis; see the Solutions salle de bain complètes entry for the subset proof. Vanity, washstand, bathroom-cabinet and mirror-cabinet members are additionally covered by OPTION 1, since their generic twins are already recorded in Furniture.xlsx.",
+   "link": "https://www.ikea.com/fr/fr/cat/nysjoen-meubles-bas-avec-vasque-lavabo-700495/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Washstands & Vanity Units",
+   "qty": 176,
+   "issue": "EXCLUDED AS PARENT URL (rule 24) - it has 3 children - AND the whole branch is OPTION 1 territory: all three children are already recorded in Furniture.xlsx and therefore stay in Furniture. Its 176 is not recorded and never aggregated.",
+   "link": "https://www.ikea.com/fr/fr/cat/meubles-vasques-lavabos-20719/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Washstands & Vanity Units > Vanity Units with Basin",
+   "qty": 158,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Washstands with Basin'. OPTION 1: bath vanities and vanity units already in Furniture stay in Furniture.",
+   "link": "https://www.ikea.com/fr/fr/cat/meubles-vasque-a-poser-20720/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Washstands & Vanity Units > Vanity Units without Basin",
+   "qty": 13,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Washstands without Basin'. OPTION 1.",
+   "link": "https://www.ikea.com/fr/fr/cat/meubles-bas-sans-vasque-54989/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Washstands & Vanity Units > Under-Sink Cabinets",
+   "qty": 6,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Under-Sink Cabinets'. OPTION 1.",
+   "link": "https://www.ikea.com/fr/fr/cat/meuble-bas-sous-lavabo-20721/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathroom Shelving Units",
+   "qty": 60,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Bathroom Shelf Units & Tall Cabinets'. OPTION 1 - bathroom cabinets already in Furniture stay in Furniture.",
+   "link": "https://www.ikea.com/fr/fr/cat/etageres-salles-de-bain-20804/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathroom Cabinets & Tall Units",
+   "qty": 16,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Bathroom Wall Cabinets'. OPTION 1.",
+   "link": "https://www.ikea.com/fr/fr/cat/armoires-toilette-20808/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathroom Stools & Benches",
+   "qty": 12,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Bathroom Stools & Benches'. OPTION 1.",
+   "link": "https://www.ikea.com/fr/fr/cat/tabourets-et-bancs-salle-de-bain-20859/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathroom Trolleys",
+   "qty": 6,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Bathroom Trolleys'. OPTION 1.",
+   "link": "https://www.ikea.com/fr/fr/cat/dessertes-de-salle-de-bain-20858/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathroom Mirrors (parent)",
+   "qty": 33,
+   "issue": "EXCLUDED AS PARENT URL (rule 24): h1 'Miroirs salle de bain', 33 items, 4 children - two of them already extracted and two recorded above as rows. Its 33 is not recorded and never aggregated. Inspected in full per rule 10; this is IKEA France's real bathroom-mirror node and it was NOT skipped.",
+   "link": "https://www.ikea.com/fr/fr/cat/miroirs-salle-de-bain-20490/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Mirrors > Table Mirrors",
+   "qty": 19,
+   "issue": "ALREADY EXTRACTED IN Final.xlsx (Home Decor pass) as 'Table Mirrors'. Note the category id 20498 is the same node SR 107 IKEA DE recorded as a bathroom row ('Waschbeckenspiegel', 18); on the FR storefront the Home Decor pass got there first, so under the cross-file dedup rule it stays where it is and is NOT re-extracted into Bathroom. Flagged explicitly because it is a genuine DE/FR divergence rather than an oversight.",
+   "link": "https://www.ikea.com/fr/fr/cat/miroirs-a-poser-20498/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Mirrors > Tall Units with Mirror",
+   "qty": 10,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Bathroom Mirror Cabinets'. OPTION 1 - medicine/mirror cabinets already in Furniture stay in Furniture, even though rule 10 would otherwise class them as Bathroom mirrors.",
+   "link": "https://www.ikea.com/fr/fr/cat/meubles-hauts-avec-miroir-20500/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathroom Accessories (parent)",
+   "qty": 85,
+   "issue": "EXCLUDED AS PARENT URL (rule 24): h1 'Accessoires salle de bain', 85 items, 6 children, all six recorded above as leaves. Its 85 is not recorded and never aggregated - and note the six children total 100, more than 85, because they overlap (see the sibling-overlap note).",
+   "link": "https://www.ikea.com/fr/fr/cat/accessoires-salle-de-bain-10555/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Laundry & Accessories",
+   "qty": 62,
+   "issue": "ROUTED TO STORAGE + EXCLUDED AS PARENT (rules 12/24/30-33): the laundry-room branch. It is a child of Salle de bain in IKEA's nav but its products are laundry and household-utility goods, not bathroom fixtures, hardware or accessories. 6 children, all listed below.",
+   "link": "https://www.ikea.com/fr/fr/cat/buanderie-et-accessoires-ba003/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Laundry & Accessories > Laundry Furniture",
+   "qty": 22,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Laundry Cabinets'. Laundry furniture, and out of scope for Bathroom in any case.",
+   "link": "https://www.ikea.com/fr/fr/cat/meubles-buanderie-48925/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Laundry & Accessories > Washing Machines & Tumble Dryers",
+   "qty": 6,
+   "issue": "ROUTED OUT - major appliances (washing machines and tumble dryers). Not Bathroom under any of rules 3-17.",
+   "link": "https://www.ikea.com/fr/fr/cat/lave-linge-seche-linge-20826/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Laundry & Accessories > Laundry Baskets",
+   "qty": 19,
+   "issue": "ROUTED TO STORAGE (rule 12 / rules 30-33): enumerated names are laundry bags, laundry baskets and stands - 'Sac à linge et support', 'Panier à linge, intérieur tissu, rotin, 80 l', 'Sac à linge, blanc, 70 l'. Clearly-Storage-owned products belong to Storage; this sits under the Buanderie branch, not under Accessoires salle de bain.",
+   "link": "https://www.ikea.com/fr/fr/cat/paniers-a-linge-20601/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Laundry & Accessories > Clothes Drying Racks",
+   "qty": 13,
+   "issue": "ROUTED TO STORAGE: clothes drying racks - laundry utility, not bathroom.",
+   "link": "https://www.ikea.com/fr/fr/cat/sechoirs-a-linge-20602/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Laundry & Accessories > Ironing Boards",
+   "qty": 4,
+   "issue": "ROUTED TO STORAGE: ironing boards - laundry utility, not bathroom.",
+   "link": "https://www.ikea.com/fr/fr/cat/planches-a-repasser-20608/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Laundry & Accessories > Laundry Accessories",
+   "qty": 7,
+   "issue": "ROUTED TO STORAGE: laundry accessories - laundry utility, not bathroom.",
+   "link": "https://www.ikea.com/fr/fr/cat/accessoires-linge-55004/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bath Textiles",
+   "qty": 87,
+   "issue": "ROUTED TO TEXTILE + EXCLUDED AS PARENT (rules 20/24): h1 'Textiles de bain', 87 items, 4 children, all listed below. IKEA files it under the Textiles department (tl003 prefix) while cross-linking it into the bathroom room nav.",
+   "link": "https://www.ikea.com/fr/fr/cat/textiles-de-bain-tl003/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Textiles > Bath Linens",
+   "qty": 40,
+   "issue": "ROUTED TO TEXTILE + EXCLUDED AS PARENT (rules 15/24): the towel parent, 6 children listed below.",
+   "link": "https://www.ikea.com/fr/fr/cat/linges-de-bain-20520/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Linens > Bath Sheets",
+   "qty": 8,
+   "issue": "ROUTED TO TEXTILE: bath sheets (rule 15). Deepest towel leaf.",
+   "link": "https://www.ikea.com/fr/fr/cat/draps-de-bain-20524/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Linens > Bath Towels",
+   "qty": 9,
+   "issue": "ROUTED TO TEXTILE: bath towels (rule 15). Deepest towel leaf.",
+   "link": "https://www.ikea.com/fr/fr/cat/serviettes-de-bain-20523/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Linens > Guest Towels",
+   "qty": 9,
+   "issue": "ROUTED TO TEXTILE: hand towels (rule 15). Deepest towel leaf.",
+   "link": "https://www.ikea.com/fr/fr/cat/serviettes-20525/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Linens > Hand Towels",
+   "qty": 5,
+   "issue": "ROUTED TO TEXTILE: hand towels (rule 15). Deepest towel leaf.",
+   "link": "https://www.ikea.com/fr/fr/cat/essuie-mains-20522/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Linens > Washcloths",
+   "qty": 3,
+   "issue": "ROUTED TO TEXTILE: washcloths/face cloths (rule 15). Deepest towel leaf.",
+   "link": "https://www.ikea.com/fr/fr/cat/gants-de-toilette-20521/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Linens > Baby & Children's Towels & Bath Capes",
+   "qty": 10,
+   "issue": "ROUTED TO TEXTILE: baby and children's towels and hooded bath capes (rule 15).",
+   "link": "https://www.ikea.com/fr/fr/cat/serviettes-et-gants-de-toilette-enfant-18700/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Textiles > Bath Mats",
+   "qty": 14,
+   "issue": "ROUTED TO TEXTILE (rule 16): I enumerated the rendered grid rather than judging on the node name and all 14 are textile mats - TOFTBO, FJÄLLKATTFOT, FINTSEN, ALSTERN, BACKMÅRA, ALMTJÄRN, each described simply as 'Tapis de bain' in a fabric colourway. IKEA France publishes no rubber or anti-slip bath-mat node, so no non-textile mat is being lost.",
+   "link": "https://www.ikea.com/fr/fr/cat/tapis-de-bain-20519/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Textiles > Shower Curtains",
+   "qty": 16,
+   "issue": "ROUTED TO TEXTILE: shower curtains (rule 20). Reachable from two nav paths - Textiles de bain and Douches - and recorded once here under one entry (rule 28).",
+   "link": "https://www.ikea.com/fr/fr/cat/rideaux-de-douche-18908/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Textiles > Bathrobe & Spa Accessories",
+   "qty": 17,
+   "issue": "ROUTED TO TEXTILE: enumerated names are bathrobes, slippers/mules, a hair towel and an exfoliating glove - 'Peignoir, beige, L/XL', 'Mules, beige, S/M', 'Serviette pour cheveux', 'Gant exfoliant'. Bathrobes go to Textile under rule 20.",
+   "link": "https://www.ikea.com/fr/fr/cat/accessoires-de-spa-700339/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathroom Lighting",
+   "qty": 27,
+   "issue": "ROUTED TO LIGHTING + EXCLUDED AS PARENT (rules 11/19/24): primary product type is lighting. Inspected and NOT skipped, per rule 19. 4 children - three lighting leaves listed below plus Miroirs avec lumières, which IKEA cross-links here but whose primary product type is a MIRROR and which is therefore recorded as a Bathroom row above (rule 11), under its canonical place in the Miroirs salle de bain branch.",
+   "link": "https://www.ikea.com/fr/fr/cat/luminaires-salle-de-bain-10736/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Lighting > Built-in Bathroom Lighting",
+   "qty": 9,
+   "issue": "ROUTED TO LIGHTING (rule 19): LED strips, cabinet/mirror lighting bars, drivers and remotes - 'Éclairage LED élément/miroir', 'Baguette lumin LED salle de bain', 'Transformateur électrique connecté'. Primary type is lighting, not mirror.",
+   "link": "https://www.ikea.com/fr/fr/cat/eclairage-integre-salle-de-bain-55010/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Lighting > Bathroom Ceiling Lights",
+   "qty": 4,
+   "issue": "ROUTED TO LIGHTING (rule 19): bathroom ceiling lights.",
+   "link": "https://www.ikea.com/fr/fr/cat/plafonniers-salle-de-bain-700215/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Lighting > Bathroom Wall Lights",
+   "qty": 8,
+   "issue": "ROUTED TO LIGHTING (rule 19): bathroom wall lights.",
+   "link": "https://www.ikea.com/fr/fr/cat/lumieres-murales-salle-de-bain-700214/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Showers (parent)",
+   "qty": 65,
+   "issue": "EXCLUDED AS PARENT URL (rule 24): h1 'Douches', 65 items, 6 children. Four are recorded above as leaves; the other two are cross-linked nodes recorded elsewhere - Accessoires de douche et baignoire under Accessoires salle de bain, and Rideaux de douche routed to Textile. Its 65 is not recorded and never aggregated.",
+   "link": "https://www.ikea.com/fr/fr/cat/douches-40690/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "HAVBACK / ANGSJON / TANNFORSEN series nav > Knobs & Handles",
+   "qty": 57,
+   "issue": "ROUTED OUT - NOT BATHROOM (rule 2): knobs and handles for kitchen and furniture doors, e.g. 'KALERUM Bouton, couleur laiton, 30 mm', 'BILLSBRO Poignée, blanc, 120 mm'. IKEA cross-links it from the bathroom series pages as a finishing accessory but its own department is Bricolage/Quincaillerie, and its primary product type is furniture hardware, not bathroom hardware. Same call as SR 107 IKEA DE, which routed Möbelgriffe out for the same reason.",
+   "link": "https://www.ikea.com/fr/fr/cat/boutons-et-poignees-16298/"
+  }
+ ],
+ "_reconstructed_from": "Bathroom.xlsx delivered 2026-09-01 (checkpoint), not original worker JSON"
+}

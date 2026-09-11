@@ -1,0 +1,615 @@
+{
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ROBOTS (www.ikea.com): fetched FIRST, before any other request on the host - HTTP 200, 4,054 bytes - and read by GROUP BOUNDARY, not by grep. Exactly four groups exist: 'AdsBot-Google' and 'AdsBot-Google-Mobile' (Allow-only), 'User-agent: AmazonProductDiscoverybot / Disallow: /', and 'User-agent: *'. NO Claude agent is named anywhere: a case-insensitive search for claude, anthropic, ClaudeBot, Claude-Web, anthropic-ai, Content-Signal and Crawl-delay returns ZERO hits, so there is no hard stop and no crawl-delay to honour beyond probe.py's own 2 s per-host gap. We fall under '*'. The '*' disallows that bear on this work are */search/?q=*, */search/products/?q=*, /compare*, *?filter=*, *filters=*, *?sorting=*, *&sorting=*, *?storeId=*, *catalogId=*, *productId=*, *productid=*, *partNumber=*, *?priceFilter*, *min_price=*, *max_price=*, /iows/, */navigation/, */fragments/*, /*-fragment.html, */rl/, */browse-history/, */recommendations/*, /m3/*, /cdn-cgi/ and the cart/order/checkout/profile/favourites paths. I stayed clear of every one: no facet URL, no /f/ filter page, no sort, no storeId, no /iows/ API, no fragment endpoint, no internal search. DISCLOSURE, because it is a query string: for the PAGINATION-TRAP TEST ONLY I requested three '?page=N' URLs on one generic path. 'page' is NOT in any disallow rule in the '*' group (the query-string disallows are filter, filters, sorting, storeId, catalogId, productId, partNumber, priceFilter, min_price, max_price, minprice, maxprice, krypto, compare, printView, preferedui, tblang, OrderItemDisplay, StockAvailSearchForm, range_chapter, range_subcategory - none of them is 'page'), so it was permitted. It also produced NOTHING that any recorded figure depends on. ONE HOST ONLY: www.ikea.com. No API host, no CDN host, no proxy, no r.jina.ai, no browser automation, no campaign parameters - so no second robots file was owed. ACCESS: plain HTTP 200 on every request through probe.fetch(); no bot wall, no interstitial, no 403, no 429, no rate limiting. 80 bathroom category pages plus 5 already-extracted Home-Decor mirror pages plus 3 pagination probes plus 2 /jp/en/ locale probes were fetched; the 80 bathroom pages are cached under work/184/pages/. TREE SOURCE - IKEA'S OWN IN-PAGE NAVIGATION, not guessed URL patterns and not a mega-menu. Entry point https://www.ikea.com/jp/ja/cat/bathroom-ba001/ (H1 '洗面所収納・洗面台・バスタオル'; the same ba001 department id as SR 107 IKEA DE, SR 140 IKEA FR and SR 164 IKEA UAE), which server-renders 18 in-page nav cards. Children at every level came from each page's own a.hnf-inpage-nav__card set. LEAF RULE, taken from the SR 140/164 siblings and re-verified here: IKEA's in-page nav is context-sensitive - on a node that HAS children the FIRST card is a link back to that node's PARENT ('商品一覧' / Products) and the rest are its real children; on a node with NO children the cards are that node's SIBLING set, which necessarily includes the node itself. The test is therefore 'does this node's own URL appear among its own cards' - yes = leaf, no = cards[1:] are its children. The recursion ran to a FIXED POINT at 80 nodes with ZERO unexpanded children left and zero fetch failures; it never escaped the bathroom department. QTY: every quantity here is the LISTING PAGE'S OWN RENDERED EXACT TOTAL, read from server-rendered HTML. No API, no estimate, no aggregation, no parent's number reused for a child, no pagination arithmetic. IKEA JP renders the figure in THREE independent places on every PLP: (1) the visible <p class=\"plp-filter-information__total-count\">N アイテム</p>, (2) the visible 'N件中N件表示' string, and (3) a machine-readable data-category attribute on the product-list div, e.g. {\"id\":\"20723\",\"canonical\":\"https://www.ikea.com/jp/ja/cat/bathroom-sinks-20723/\",\"totalCount\":16}. VERIFICATION. (a) The rendered total-count string and the data-category totalCount were compared on ALL 79 nodes in the walk that have a grid: 79/79 agree exactly, ZERO mismatches. The single node with NEITHER figure is the department page ba001 itself - i.e. precisely the one non-PLP - which is independent structural proof that it is a grouping node (rule 38). (b) INDEPENDENT CARD ENUMERATION, not a restatement of the same number: per-card data-ref-id product ids were extracted from every page. For EVERY node whose total is at or below IKEA's 24-per-page grid the unique id count equals the stated total EXACTLY - among the 15 recorded leaves 1/1, 2/2, 5/5, 5/5, 6/6, 8/8, 12/12, 14/14, 16/16, 17/17, 18/18, 20/20, 22/22 - and every node whose total exceeds 24 renders exactly 24 unique ids (26, 31). Zero violations across all 79 grids. (c) COUNT TRAP AVOIDED - IKEA IGNORES ?page= AND RE-SERVES PAGE 1, exactly as BATCH_BRIEF s3 warns and exactly as the three siblings found. PROVED here on bathroom-vanity-units-with-basin-20720: ?page=1, ?page=2 and ?page=3 each returned HTTP 200 with the IDENTICAL 24 data-ref-ids (same first three ids s09516688 / s09637001 / s19516683) and the same totalCount 64; the union of all three pages is 24, not 72. Naive pagination arithmetic would have produced 72 for a 64-product node. NO recorded figure comes from pagination. (d) The data-category 'canonical' field and the <link rel=canonical> on EVERY recorded leaf equal the URL written into rows[] - checked one by one, 15/15 self-canonical - so there is no canonical-alias dedup blind spot on any row. (e) DISCRIMINATION: 38 distinct totals across the 80 nodes - 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 20, 22, 24, 26, 28, 31, 34, 40, 42, 48, 51, 54, 64, 74, 77, 80, 104, 105, 128, 213 - no site-wide constant, no round-number cap. (f) H1 was read on every page and matches the node requested. (g) Product names and full aria-label descriptions were read on EVERY recorded leaf to confirm content matches the label: Bathroom sinks 20723 = TORNVIKEN countertop wash-basin 45 cm / ORRSJON semi-recessed wash-basin with water trap 50x44 / VASTERSJON countertop wash-basin / RANNILEN water traps and pop-up wastes; Bathroom taps 20724 = DALSKAR, SALJEN, BROGRUND (incl. sensor tap), ENSEN, RUNSKAR wash-basin mixer taps and the ABACKEN mist nozzle; Shower hooks 40693 = TISKEN suction handshower holder; Toilet brushes 48944 = ENUDDEN/BROGRUND/BOLMEN/FLORSJON toilet brushes plus SKOGSVIKEN and KROKFJORDEN toilet-roll holders/stands and the TOSSIG toilet seat (rule 14 - toilet accessories); Soap dispensers & dishes 10656 = EKOLN/DRAGAN/TACKAN soap dispensers and dishes, TISKEN suction soap dish, BROFJARDEN and STORAVAN 3-piece bathroom sets; Toothbrush holders 48943 = DRAGAN/EKOLN/SILVTJARN/TISKEN/RANEN toothbrush holders and the HUMLESJON tumbler; Bathroom bins 48940 = BROFJARDEN/GANSJON/FLORSJON/EKOLN/PARLSLINKE/HOLASS/KINNASJO bins and the BROGRUND touch-top bin; Shower & bath storage 10658 = KROKFJORDEN suction corner shelves and 2-tier shower hanger, TISKEN suction baskets and corner shelf, RANEN shower/soap basket, HUMLESJON suction mirror, VALVATTNET non-textile anti-slip bathtub mat (rule 16); Non-drill bathroom accessories 700699 = TISKEN/KROKFJORDEN/RANEN suction and SKOGHALL self-adhesive baskets, hooks, towel racks and shelves; Bathroom shelves & towel rails 20615 = BROGRUND/FLORSJON/BASINGEN towel rails, TISKEN suction towel rack, ENUDDEN/TJUSIG/BROGRUND hooks, VESKEN corner shelf unit (rule 17 hardware); Bathroom baskets & make-up organisers 16233 = SAXBORGA mirror-lid storage box, NOJIG and VISSLAAN organisers and hanging tray, GRUNDTAL tissue box, KLIPPKAKTUS turntable; Bathroom countertops 30565 = ALSKEN 102x49 and TOLKEN 82x49 countertops; Vanity mirrors 20498 = FRACK, LINDBYN, NISSEDAL, ROTSUND, KOMPISHANG mirrors; Makeup & magnifying mirrors 20499 = FRACK, LINDBYN, KARMSUND, TRENSUM, TYSNES table/magnifying mirrors; Mirrors with lights 49138 = FAXALVEN mirrors and mirror cabinets with built-in lighting and TREASJON mirror cabinets with built-in lighting. DEDUP - OPTION 1, run on ALL 80 walked URLs plus every rel=canonical target plus the 5 already-extracted Home-Decor mirror nodes. NINE HITS, every one of them in review[] and never in rows[], and ZERO hits on any of the 15 recorded leaves: bathroom-shelving-units-20804 (Furniture.xlsx 'Bathroom Tall Cabinets & Shelving Units', 51), bathroom-wall-cabinets-20808 ('Bathroom Wall Cabinets', 14), bathroom-stools-benches-20859 ('Bathroom Stools & Benches', 11), bathroom-trolleys-20858 ('Bathroom Trolleys', 6), under-sink-cabinets-20721 ('Under Sink Cabinets', 3), mirror-cabinets-20500 ('Mirror Cabinets', 8), bathroom-vanity-units-with-basin-20720 ('Vanity Units', 64), bathroom-vanity-units-without-basin-54989 ('Vanity Units without Basin', 13) and laundry-storage-48925 ('Laundry Storage', 18). That is the same shape the three siblings produced - SR 107 IKEA DE 18 leaves / 10 hits, SR 140 IKEA FR 17 / 10, SR 164 IKEA UAE 17 / 10 - and it is OPTION 1 working as intended: the Furniture pass took the bathroom FURNITURE and left the sinks, taps, showers, mirrors, accessories, hardware and bathroom storage untouched, and those are what this file records. *** NEW DEDUP BLIND SPOT FOUND ON THIS COMPANY - SLUG RENAMES INSIDE ONE LOCALE. *** Three of the nine hits above are INVISIBLE to the URL-exact index and would have been silently re-extracted into Bathroom if I had trusted already_extracted() alone. IKEA JP has RENAMED the URL slug while keeping IKEA's numeric category id: the index holds ikea.com/jp/ja/cat/vanity-units-20720 but the live URL is now .../cat/bathroom-vanity-units-with-basin-20720/; index vanity-units-without-basin-54989 vs live bathroom-vanity-units-without-basin-54989; index laundry-cabinets-shelving-48925 vs live laundry-storage-48925. dedup.already_extracted() returns None on all three live URLs. I caught them by rebuilding the index as a (locale, trailing-numeric-category-id) map and matching on ID rather than on URL string - 9 id-matches against only 6 URL-exact matches. This is a FIFTH blind spot alongside BATCH_BRIEF s4 (a)-(d) - not a canonical alias, not a locale variant, not a cross-host alternate, but the SAME site, SAME locale, SAME category id under a rewritten slug - and it will affect any site whose URLs carry a stable numeric id. Recording those three would have re-imported 95 products that Furniture.xlsx already holds. DEDUP BLIND SPOTS (b) and (c) - the brief's specific warning about IKEA locale forms, CHECKED AND CLEARED rather than assumed. The index holds 899 ikea.com keys in exactly seven locale forms: ae/en 180, jp/ja 172, fr/fr 163, de/de 116, gb/en 112, in/en 110, de/en 46. For the Japanese storefront there are 172 keys and they are ALL /jp/ja/ - the exact form I walked - and ZERO /jp/en/ keys, so the DE-style /de/de/-vs-/de/en/ split does not exist here. I did NOT assume that: a /jp/en/ storefront DOES exist and answers HTTP 200 (title 'Bathroom Furniture - Bathroom Storage - IKEA'), and I fetched its ba001 department page to compare. It renders the same 18 in-page nav cards carrying the SAME 17 child category ids as /jp/ja/ (set difference empty in both directions), so /jp/en/ hides no node; and it self-canonicalises to .../jp/en/cat/bathroom-furniture-storage-ba001/, i.e. it is a parallel locale, not an alias of /jp/ja/. Cross-HOST check: the index contains ZERO keys on ikea.jp, and IKEA JP PLPs emit NO <link rel=alternate hreflang> at all - grep over all 80 cached pages returns 0 files containing 'hreflang' - only a self-referential rel=canonical, so there is no cross-host locale alternate to miss. The nine hits above are therefore the complete dedup picture. THE TWO-AXIS PROBLEM AND HOW IT WAS RESOLVED - the main judgement in this file, handled exactly as SR 140 and SR 164 handled it. IKEA JP exposes the same bathroom catalogue twice: a generic PRODUCT axis and a SERIES axis under bathroom-ranges-700450 (213) re-slicing the identical products by furniture series (HAVBACK 104, ANGSJON 128, TANNFORSEN 105, ENHET 104, NYSJON 16, VIDVESSEL 15 - which sum to 472 against a parent of 213, so the series pages overlap each other heavily and could never be summed). I recorded the GENERIC axis only. Not assumed - MEASURED by per-card data-ref-id extraction of all 31 series-axis nodes against a 311-id pool built from the 26 generic bathroom nodes: twelve series nodes are EXACT subsets with ZERO ids outside (sinks-for-havbaeck 9/9, sinks-for-aengsjoen 9/9, sinks-for-taennforsen 9/9, wash-basins-for-vidvessel 3/3, vidvessel-bathroom 15/15, the three series mirror/mirror-cabinet nodes 4/4, 4/4, 5/5, aengsjoen and taennforsen vanity-units-without-basin 1/1 and 2/2, enhet vanity-units with and without basin 3/3 and 3/3), and every one of the 85 distinct residual ids across the rest was OPENED and named rather than hand-waved: washstands with basin (belong to 20720), mirror cabinets (20500), ENHET frame parts and wall and tall cabinets - doors, mirror doors, base frames, wall frames, legs, drawer fronts (20808, 20804), a laundry bag (48925), knobs and handles (16298), ENHET furniture combinations, and one drill template. Every destination is either ALREADY EXTRACTED in Furniture.xlsx or routed out on primary product type, so the series axis contains NOTHING that is both new and in Bathroom scope. All 31 series-axis nodes are in review[] with that proof, never in rows[]; recording them would have double-counted the 213-product roll-up. OVERLAPPING SIBLINGS - NEVER SUMMED, and every overlap was MEASURED. Bathroom mirrors 20490 (28): the UNION of its four children's id sets is EXACTLY 28, which equals the parent's own rendered total of 28 - an independent confirmation that the parent is a pure roll-up - while the children's totals sum to 36, because siblings share products (Vanity mirrors and Makeup & magnifying mirrors share the FRACK and LINDBYN table mirrors). Bathroom accessories 10555 (77): six children totalling 93 against a parent of 77, with a MEASURED 15-id overlap between Shower & bath storage and Non-drill bathroom accessories (the shared TISKEN suction and KROKFJORDEN/RANEN baskets, hooks and corner shelves) - union 76 against the parent's 77. Showers 40690 (40): three children summing to 40 with a union of 38. Bathroom vanities 20719 (80): three children summing to EXACTLY 80. Bath textiles tl003 (74): four children summing to EXACTLY 74. Each recorded figure is the storefront's own number for its own node; they are recorded separately per rule 28 and MUST NOT be added together. NODES REACHABLE BY TWO NAV PATHS, each handled exactly ONCE (rule 28): shower-caddies-10658 (under both Bathroom accessories and Showers - recorded once, under Bathroom accessories, its first nav path); shower-curtains-18908 (under both Bath textiles and Showers - one review entry); mirrors-with-lights-49138 (under both Bathroom mirrors and Bathroom lighting - one row, placed under Bathroom mirrors, because its primary product type is a mirror, rule 11, so it is NOT a lighting routing); bathroom-taps-20724, bathroom-countertops-30565 and knobs-handles-16298 are cross-linked into up to six of the series pages and are each handled once on the generic axis. TWO JUDGEMENT CALLS STATED OPENLY. (1) vanity-mirrors-20498 (18) IS recorded as a Bathroom row: its URL is absent from the index (and absent by category id too), its hierarchy is Bathroom > Bathroom mirrors, and rule 10 forbids excluding a node because it is called 'vanity'. To be safe I fetched the five already-extracted Home-Decor mirror nodes (wall-mirrors-24858 = 48, round-mirrors-24860 = 14, large-mirrors-24859 = 21, decorative-mirrors-24861 = 17, standing-mirrors-49139 = 9) and measured containment: only 10 of 20498's 18 ids fall inside that 85-id decor pool, so 20498 is demonstrably NOT a subset of an already-extracted node and 8 of its products appear nowhere else. This is a deliberate divergence from SR 140 IKEA FR, where the same category id WAS already in Final.xlsx as 'Table Mirrors' and therefore had to go to review; on /jp/ja/ it is not. (2) mirrors-with-lights-49138 (5) IS recorded: its URL is absent from the jp/ja index (unlike SR 164 UAE, where it was a Final.xlsx hit) and its primary product type is a mirror, not a light (rule 11), so it is Bathroom and must not be duplicated into Lighting. DISCLOSED: 4 of its 5 ids also appear in mirror-cabinets-20500, which is an already-extracted Furniture node, and 0 of the 5 fall in the Home-Decor mirror pool - so this row's 5 must not be read as 5 wholly-new products. NO EMPTY NODES: all 79 grids returned a non-zero total (minimum 1, Shower hooks 40693), so there is no EMPTY NODE entry to make. NO ORPHANS UNRECORDED: the recursion reached a fixed point with zero unexpanded children, and every node reachable from ba001 is accounted for in rows[] or review[]. NO VIEW ALL / COLLECTIONS / SEARCH / FACET / PDP URL is recorded anywhere; the 'Products' index card at the head of every in-page nav is the parent link and is never recorded. Every URL written into rows[] and review[] is a bare https://www.ikea.com/jp/ja/cat/<slug>/ path with NO query string. WHAT IS ABSENT FROM THIS STOREFRONT, stated so it is not read as a miss: IKEA JP sells no bathtubs, no toilets/WCs, no bidets, no shower enclosures or screens, and no shower heads/mixers/columns - the Showers branch holds one single product (a TISKEN suction handshower holder) plus the shower caddies and the shower curtains. The FR and UAE siblings DID have shower heads, shower mixers and enclosure nodes; Japan does not, and I confirmed that by walking the Showers node's own in-page nav to a fixed point (3 children only) rather than by assuming. RESULT: 4 grouping rows + 15 leaf rows; 62 review entries.",
+ "rows": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathroom Boxes & Baskets",
+   "qty": 20,
+   "link": "https://www.ikea.com/jp/ja/cat/bathroom-boxes-baskets-16233/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathroom Accessories",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathroom Accessories > Bathroom Bins",
+   "qty": 8,
+   "link": "https://www.ikea.com/jp/ja/cat/bathroom-bins-48940/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathroom Accessories > Shower & Bath Storage",
+   "qty": 26,
+   "link": "https://www.ikea.com/jp/ja/cat/shower-caddies-10658/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathroom Accessories > Soap Dispensers & Soap Dishes",
+   "qty": 14,
+   "link": "https://www.ikea.com/jp/ja/cat/soap-dispensers-soap-dishes-10656/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathroom Accessories > Toilet Brushes",
+   "qty": 17,
+   "link": "https://www.ikea.com/jp/ja/cat/toilet-brushes-48944/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathroom Accessories > Toothbrush Holders",
+   "qty": 6,
+   "link": "https://www.ikea.com/jp/ja/cat/toothbrush-holders-48943/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathroom Accessories > Non-Drill Bathroom Accessories",
+   "qty": 22,
+   "link": "https://www.ikea.com/jp/ja/cat/non-drill-bathroom-accessories-700699/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathroom Shelves & Towel Rails",
+   "qty": 31,
+   "link": "https://www.ikea.com/jp/ja/cat/bathroom-shelves-20615/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathroom Mirrors",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathroom Mirrors > Vanity Mirrors",
+   "qty": 18,
+   "link": "https://www.ikea.com/jp/ja/cat/vanity-mirrors-20498/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathroom Mirrors > Makeup & Magnifying Mirrors",
+   "qty": 5,
+   "link": "https://www.ikea.com/jp/ja/cat/makeup-magnifying-mirrors-20499/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathroom Mirrors > Mirrors with Lights",
+   "qty": 5,
+   "link": "https://www.ikea.com/jp/ja/cat/mirrors-with-lights-49138/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathroom Countertops",
+   "qty": 2,
+   "link": "https://www.ikea.com/jp/ja/cat/bathroom-countertops-30565/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathroom Sinks",
+   "qty": 16,
+   "link": "https://www.ikea.com/jp/ja/cat/bathroom-sinks-20723/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathroom Taps",
+   "qty": 12,
+   "link": "https://www.ikea.com/jp/ja/cat/bathroom-taps-20724/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Showers",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Showers > Shower Hooks",
+   "qty": 1,
+   "link": "https://www.ikea.com/jp/ja/cat/shower-sets-rails-40693/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  }
+ ],
+ "review": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom (department)",
+   "qty": null,
+   "issue": "EXCLUDED AS PARENT URL (rule 24) and structurally a grouping node: of the 80 nodes walked it is the ONLY one that renders NEITHER a plp-filter-information__total-count string NOR a data-category totalCount, i.e. the only one with no product grid of its own. Recorded in rows[] as the top grouping row with blank qty and blank link (rule 38).",
+   "link": "https://www.ikea.com/jp/ja/cat/bathroom-ba001/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Tall Cabinets & Shelving Units",
+   "qty": 51,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Bathroom Tall Cabinets & Shelving Units' - OPTION 1: IKEA Japan's bath vanities, bathroom cabinets, mirror cabinets, bathroom stools/trolleys and laundry storage STAY in Furniture.xlsx and are NOT re-imported into Bathroom, even though rules 9/10/12 would otherwise class them as Bathroom. Matched URL-exact by dedup.already_extracted(); the page's own rel=canonical and its data-category 'canonical' field are the same URL.",
+   "link": "https://www.ikea.com/jp/ja/cat/bathroom-shelving-units-20804/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Wall Cabinets",
+   "qty": 14,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Bathroom Wall Cabinets' - OPTION 1: IKEA Japan's bath vanities, bathroom cabinets, mirror cabinets, bathroom stools/trolleys and laundry storage STAY in Furniture.xlsx and are NOT re-imported into Bathroom, even though rules 9/10/12 would otherwise class them as Bathroom. Matched URL-exact by dedup.already_extracted(); the page's own rel=canonical and its data-category 'canonical' field are the same URL.",
+   "link": "https://www.ikea.com/jp/ja/cat/bathroom-wall-cabinets-20808/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Stools & Benches",
+   "qty": 11,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Bathroom Stools & Benches' - OPTION 1: IKEA Japan's bath vanities, bathroom cabinets, mirror cabinets, bathroom stools/trolleys and laundry storage STAY in Furniture.xlsx and are NOT re-imported into Bathroom, even though rules 9/10/12 would otherwise class them as Bathroom. Matched URL-exact by dedup.already_extracted(); the page's own rel=canonical and its data-category 'canonical' field are the same URL.",
+   "link": "https://www.ikea.com/jp/ja/cat/bathroom-stools-benches-20859/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Trolleys",
+   "qty": 6,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Bathroom Trolleys' - OPTION 1: IKEA Japan's bath vanities, bathroom cabinets, mirror cabinets, bathroom stools/trolleys and laundry storage STAY in Furniture.xlsx and are NOT re-imported into Bathroom, even though rules 9/10/12 would otherwise class them as Bathroom. Matched URL-exact by dedup.already_extracted(); the page's own rel=canonical and its data-category 'canonical' field are the same URL.",
+   "link": "https://www.ikea.com/jp/ja/cat/bathroom-trolleys-20858/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Under Sink Cabinets",
+   "qty": 3,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Under Sink Cabinets' - OPTION 1: IKEA Japan's bath vanities, bathroom cabinets, mirror cabinets, bathroom stools/trolleys and laundry storage STAY in Furniture.xlsx and are NOT re-imported into Bathroom, even though rules 9/10/12 would otherwise class them as Bathroom. Matched URL-exact by dedup.already_extracted(); the page's own rel=canonical and its data-category 'canonical' field are the same URL.",
+   "link": "https://www.ikea.com/jp/ja/cat/under-sink-cabinets-20721/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Mirror Cabinets",
+   "qty": 8,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Mirror Cabinets' - OPTION 1: IKEA Japan's bath vanities, bathroom cabinets, mirror cabinets, bathroom stools/trolleys and laundry storage STAY in Furniture.xlsx and are NOT re-imported into Bathroom, even though rules 9/10/12 would otherwise class them as Bathroom. Matched URL-exact by dedup.already_extracted(); the page's own rel=canonical and its data-category 'canonical' field are the same URL.",
+   "link": "https://www.ikea.com/jp/ja/cat/mirror-cabinets-20500/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Vanity Units with Basin",
+   "qty": 64,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Vanity Units' - OPTION 1: IKEA Japan's bath vanities, bathroom cabinets, mirror cabinets, bathroom stools/trolleys and laundry storage STAY in Furniture.xlsx and are NOT re-imported into Bathroom, even though rules 9/10/12 would otherwise class them as Bathroom. MATCHED BY CATEGORY ID, NOT BY URL STRING - a NEW dedup blind spot found on this company: IKEA JP has RENAMED the slug while keeping IKEA's numeric category id, so the URL-exact index MISSES it. Index key = ikea.com/jp/ja/cat/vanity-units-20720 ; live URL = .../cat/bathroom-vanity-units-with-basin-20720/ ; identical category id 20720. dedup.already_extracted() on the live URL returns None, but this is the SAME node as the Furniture.xlsx record and is therefore already extracted.",
+   "link": "https://www.ikea.com/jp/ja/cat/bathroom-vanity-units-with-basin-20720/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Vanity Units without Basin",
+   "qty": 13,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Vanity Units without Basin' - OPTION 1: IKEA Japan's bath vanities, bathroom cabinets, mirror cabinets, bathroom stools/trolleys and laundry storage STAY in Furniture.xlsx and are NOT re-imported into Bathroom, even though rules 9/10/12 would otherwise class them as Bathroom. MATCHED BY CATEGORY ID, NOT BY URL STRING - a NEW dedup blind spot found on this company: IKEA JP has RENAMED the slug while keeping IKEA's numeric category id, so the URL-exact index MISSES it. Index key = ikea.com/jp/ja/cat/vanity-units-without-basin-54989 ; live URL = .../cat/bathroom-vanity-units-without-basin-54989/ ; identical category id 54989. dedup.already_extracted() on the live URL returns None, but this is the SAME node as the Furniture.xlsx record and is therefore already extracted.",
+   "link": "https://www.ikea.com/jp/ja/cat/bathroom-vanity-units-without-basin-54989/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Laundry Storage",
+   "qty": 18,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Laundry Storage' - OPTION 1: IKEA Japan's bath vanities, bathroom cabinets, mirror cabinets, bathroom stools/trolleys and laundry storage STAY in Furniture.xlsx and are NOT re-imported into Bathroom, even though rules 9/10/12 would otherwise class them as Bathroom. MATCHED BY CATEGORY ID, NOT BY URL STRING - a NEW dedup blind spot found on this company: IKEA JP has RENAMED the slug while keeping IKEA's numeric category id, so the URL-exact index MISSES it. Index key = ikea.com/jp/ja/cat/laundry-cabinets-shelving-48925 ; live URL = .../cat/laundry-storage-48925/ ; identical category id 48925. dedup.already_extracted() on the live URL returns None, but this is the SAME node as the Furniture.xlsx record and is therefore already extracted.",
+   "link": "https://www.ikea.com/jp/ja/cat/laundry-storage-48925/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Vanities (roll-up)",
+   "qty": 80,
+   "issue": "EXCLUDED AS PARENT URL (rule 24): it has three extractable children (20720 / 54989 / 20721) whose totals 64+13+3 sum EXACTLY to its own rendered 80, proving it is a pure roll-up. All three children are ALREADY EXTRACTED in Furniture.xlsx under OPTION 1, so the roll-up carries no Bathroom-scope content that is not already in Furniture; recording it would re-import 80 already-extracted vanity products. Not recorded in rows[] and not recorded as a grouping row either, since it has no surviving child.",
+   "link": "https://www.ikea.com/jp/ja/cat/bathroom-vanities-20719/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Textiles (department)",
+   "qty": 74,
+   "issue": "ROUTED TO TEXTILE: primary product type is a textile (rules 15, 16, 20). Parent of the bath-textile branch; its four children (34+10+13+17) sum exactly to its own rendered 74. The matching HARDWARE stays in Bathroom as タオル掛け・バスルームラック・フックなど / bathroom-shelves-20615 (31: BROGRUND/FLORSJON/BASINGEN towel rails, TISKEN suction towel rack, ENUDDEN/TJUSIG hooks, VESKEN corner shelf) - exactly the split rule 15 asks for.",
+   "link": "https://www.ikea.com/jp/ja/cat/bath-textiles-tl003/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Towels (roll-up)",
+   "qty": 34,
+   "issue": "ROUTED TO TEXTILE: primary product type is a textile (rules 15, 16, 20). Bath/hand/face/baby towels. Note the five towel children sum to 35 against the roll-up's own 34 - siblings overlap, so these figures must never be added.",
+   "link": "https://www.ikea.com/jp/ja/cat/towels-20520/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Towels",
+   "qty": 8,
+   "issue": "ROUTED TO TEXTILE: primary product type is a textile (rules 15, 16, 20). Bath/hand/face/baby towels. Note the five towel children sum to 35 against the roll-up's own 34 - siblings overlap, so these figures must never be added.",
+   "link": "https://www.ikea.com/jp/ja/cat/bath-towels-20523/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Hand Towels",
+   "qty": 8,
+   "issue": "ROUTED TO TEXTILE: primary product type is a textile (rules 15, 16, 20). Bath/hand/face/baby towels. Note the five towel children sum to 35 against the roll-up's own 34 - siblings overlap, so these figures must never be added.",
+   "link": "https://www.ikea.com/jp/ja/cat/hand-towels-20525/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Sheets & Beach Towels",
+   "qty": 2,
+   "issue": "ROUTED TO TEXTILE: primary product type is a textile (rules 15, 16, 20). Bath/hand/face/baby towels. Note the five towel children sum to 35 against the roll-up's own 34 - siblings overlap, so these figures must never be added.",
+   "link": "https://www.ikea.com/jp/ja/cat/bath-sheets-20524/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Face Cloths",
+   "qty": 7,
+   "issue": "ROUTED TO TEXTILE: primary product type is a textile (rules 15, 16, 20). Bath/hand/face/baby towels. Note the five towel children sum to 35 against the roll-up's own 34 - siblings overlap, so these figures must never be added.",
+   "link": "https://www.ikea.com/jp/ja/cat/face-washcloth-20521/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Baby & Kids Towels",
+   "qty": 10,
+   "issue": "ROUTED TO TEXTILE: primary product type is a textile (rules 15, 16, 20). Bath/hand/face/baby towels. Note the five towel children sum to 35 against the roll-up's own 34 - siblings overlap, so these figures must never be added.",
+   "link": "https://www.ikea.com/jp/ja/cat/baby-towels-washcloths-18700/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Mats",
+   "qty": 10,
+   "issue": "ROUTED TO TEXTILE: primary product type is a textile (rules 15, 16, 20). Product enumeration confirms all 10 are TEXTILE bath/toilet mats (TOFTBO, BACKMARA, ALSTERN, ALMTJARN, VATTENSKRUV, KARRKNIPPROT), not rubber anti-slip mats, so rule 16 sends the whole node to Textile. The one non-textile anti-slip piece on this storefront (VALVATTNET bathtub mat) sits inside 浴室収納・浴室ラック / shower-caddies-10658, which IS recorded in Bathroom.",
+   "link": "https://www.ikea.com/jp/ja/cat/bath-mats-20519/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower Curtains",
+   "qty": 13,
+   "issue": "ROUTED TO TEXTILE: primary product type is a textile (rules 15, 16, 20). Shower curtains are explicitly Textile under rule 20. Cross-linked from both バスルームアクセサリー-textiles and シャワー; one review entry only (rule 28).",
+   "link": "https://www.ikea.com/jp/ja/cat/shower-curtains-18908/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathrobes & Spa Accessories",
+   "qty": 17,
+   "issue": "ROUTED TO TEXTILE: primary product type is a textile (rules 15, 16, 20). Enumerated: BJALVEN bathrobes, STJARNBUSKE hair towel, TASJON/SKOVELSJON/SKOGSSALLAT slippers, SKOGSSALLAT eye mask and wash pouch - bathrobes and personal spa textiles, not bathroom hardware or fixtures. Rule 20.",
+   "link": "https://www.ikea.com/jp/ja/cat/bath-robe-spa-accessories-700339/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Lighting",
+   "qty": 24,
+   "issue": "ROUTED TO LIGHTING: primary product type is lighting (rules 11, 19); a Lighting record must NOT be duplicated into Bathroom. Parent of the bathroom-lighting branch. Its four listed children total 27 against a rendered 24 because 女優ミラー・照明付きミラー / mirrors-with-lights-49138 is cross-linked into it from 洗面所鏡; that node is NOT routed out - its primary type is a mirror (rule 11) and it is recorded in rows[].",
+   "link": "https://www.ikea.com/jp/ja/cat/bathroom-lighting-10736/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Cabinet Lighting",
+   "qty": 10,
+   "issue": "ROUTED TO LIGHTING: primary product type is lighting (rules 11, 19); a Lighting record must NOT be duplicated into Bathroom. Enumerated: SILVERGLANS LED bathroom stick light and driver, FLASKPOST LED cabinet/wall light, BILRESA/STYRBAR remotes and remote kits.",
+   "link": "https://www.ikea.com/jp/ja/cat/bathroom-cabinet-lighting-55010/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Ceiling Lights",
+   "qty": 4,
+   "issue": "ROUTED TO LIGHTING: primary product type is lighting (rules 11, 19); a Lighting record must NOT be duplicated into Bathroom. Ceiling lamps.",
+   "link": "https://www.ikea.com/jp/ja/cat/bathroom-ceiling-lights-700215/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Wall Lights",
+   "qty": 8,
+   "issue": "ROUTED TO LIGHTING: primary product type is lighting (rules 11, 19); a Lighting record must NOT be duplicated into Bathroom. Wall lamps.",
+   "link": "https://www.ikea.com/jp/ja/cat/bathroom-wall-lights-700214/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Laundry (department)",
+   "qty": 48,
+   "issue": "ROUTED TO STORAGE / LAUNDRY APPLIANCES: primary product type is laundry equipment and laundry storage, not bathroom fixtures, accessories or bathroom-specific hardware (rule 2 - primary product type beats room/location, and rules 30-33 forbid re-extracting general storage). Routed exactly as SR 140 IKEA FR routed Buanderie and SR 164 IKEA UAE routed Bathroom laundry. Its five children total 57 against a rendered 48, so siblings overlap and the figures must not be summed.",
+   "link": "https://www.ikea.com/jp/ja/cat/bathroom-laundry-ba003/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Laundry Accessories",
+   "qty": 8,
+   "issue": "ROUTED TO STORAGE / LAUNDRY APPLIANCES: primary product type is laundry equipment and laundry storage, not bathroom fixtures, accessories or bathroom-specific hardware (rule 2 - primary product type beats room/location, and rules 30-33 forbid re-extracting general storage). Routed exactly as SR 140 IKEA FR routed Buanderie and SR 164 IKEA UAE routed Bathroom laundry. ",
+   "link": "https://www.ikea.com/jp/ja/cat/laundry-accessories-55004/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Laundry Baskets",
+   "qty": 16,
+   "issue": "ROUTED TO STORAGE / LAUNDRY APPLIANCES: primary product type is laundry equipment and laundry storage, not bathroom fixtures, accessories or bathroom-specific hardware (rule 2 - primary product type beats room/location, and rules 30-33 forbid re-extracting general storage). Routed exactly as SR 140 IKEA FR routed Buanderie and SR 164 IKEA UAE routed Bathroom laundry. ",
+   "link": "https://www.ikea.com/jp/ja/cat/laundry-baskets-20601/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Drying Racks",
+   "qty": 13,
+   "issue": "ROUTED TO STORAGE / LAUNDRY APPLIANCES: primary product type is laundry equipment and laundry storage, not bathroom fixtures, accessories or bathroom-specific hardware (rule 2 - primary product type beats room/location, and rules 30-33 forbid re-extracting general storage). Routed exactly as SR 140 IKEA FR routed Buanderie and SR 164 IKEA UAE routed Bathroom laundry. ",
+   "link": "https://www.ikea.com/jp/ja/cat/drying-racks-20602/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Ironing Boards",
+   "qty": 2,
+   "issue": "ROUTED TO STORAGE / LAUNDRY APPLIANCES: primary product type is laundry equipment and laundry storage, not bathroom fixtures, accessories or bathroom-specific hardware (rule 2 - primary product type beats room/location, and rules 30-33 forbid re-extracting general storage). Routed exactly as SR 140 IKEA FR routed Buanderie and SR 164 IKEA UAE routed Bathroom laundry. ",
+   "link": "https://www.ikea.com/jp/ja/cat/ironing-boards-20608/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Knobs & Handles",
+   "qty": 54,
+   "issue": "ROUTED OUT ON PRIMARY PRODUCT TYPE (rule 2): general furniture knobs and handles, cross-linked into four of the six bathroom series pages. Not bathroom hardware in the rule-17 sense (no towel rail, robe hook, toilet-roll holder or shower rail among them). Routed exactly as SR 107 IKEA DE routed Moebelgriffe and SR 164 IKEA UAE routed Knobs & handles.",
+   "link": "https://www.ikea.com/jp/ja/cat/knobs-handles-16298/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Vanity Series",
+   "qty": 213,
+   "issue": "SERIES AXIS - WITHHELD AS AN OVERLAPPING RE-SLICE OF THE GENERIC AXIS, NOT RECORDED (rule 28 + BATCH_BRIEF s5). IKEA JP exposes the same bathroom catalogue twice: a generic PRODUCT axis (sinks / taps / vanities / mirrors / accessories) and this SERIES axis under 洗面台シリーズ / bathroom-ranges-700450 (213) that re-cuts the identical products by furniture series. Only the generic axis is recorded. PROVED, not assumed, by per-card data-ref-id extraction over all 31 series-axis nodes against a 311-id pool built from the 26 generic bathroom nodes: every series node is either a strict subset of the generic pool or its residual ids resolve to products that belong to already-extracted Furniture.xlsx nodes. Fully-contained with ZERO ids outside: sinks-for-havbaeck 9/9, sinks-for-aengsjoen 9/9, sinks-for-taennforsen 9/9, wash-basins-for-vidvessel 3/3, vidvessel-bathroom 15/15, havbaeck-mirror-mirror-cabinets 4/4, aengsjoen-mirror-mirror-cabinets 4/4, taennforsen-mirror-mirror-cabinets 5/5, aengsjoen-vanity-units-without-basin 1/1, taennforsen-vanity-units-without-basin 2/2, enhet-vanity-units-with-basin 3/3, enhet-vanity-units-without-basin 3/3. The 85 distinct residual ids across the remaining nodes were all opened and named: they are 洗面台/洗面ボウル washstands with basin (-> 洗面キャビネット 20720, ALREADY EXTRACTED), ミラーキャビネット mirror cabinets (-> 20500, ALREADY EXTRACTED), ウォールキャビネット / ハイキャビネット / ミラードア / 扉 / ベースフレーム / ウォールフレーム / 脚 / 引き出し前部 ENHET frame parts and wall/tall cabinets (-> 20808 and 20804, both ALREADY EXTRACTED), ランドリーバッグ laundry bag (-> 48925, ALREADY EXTRACTED), ノブ / 取っ手 knobs and handles (-> 16298, routed out on primary type), 収納コンビネーション / バスルーム ENHET furniture combinations, and one ドリルテンプレート drill template. Nothing on the series axis is both NEW and in Bathroom scope. Recording these 31 nodes would have double-counted the 213-product roll-up. HONEST LIMIT: because IKEA ignores ?page=, generic nodes above the 24-per-page grid (20720=64, 20804=51, 16298=54, 20615=31, 10555=77) could only be id-enumerated to their first 24 cards, so containment for those residuals rests on product identity plus the Furniture.xlsx dedup rather than on exhaustive id equality.",
+   "link": "https://www.ikea.com/jp/ja/cat/bathroom-ranges-700450/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "HAVBACK Vanity Series",
+   "qty": 104,
+   "issue": "SERIES AXIS - WITHHELD AS AN OVERLAPPING RE-SLICE OF THE GENERIC AXIS, NOT RECORDED (rule 28 + BATCH_BRIEF s5). IKEA JP exposes the same bathroom catalogue twice: a generic PRODUCT axis (sinks / taps / vanities / mirrors / accessories) and this SERIES axis under 洗面台シリーズ / bathroom-ranges-700450 (213) that re-cuts the identical products by furniture series. Only the generic axis is recorded. PROVED, not assumed, by per-card data-ref-id extraction over all 31 series-axis nodes against a 311-id pool built from the 26 generic bathroom nodes: every series node is either a strict subset of the generic pool or its residual ids resolve to products that belong to already-extracted Furniture.xlsx nodes. Fully-contained with ZERO ids outside: sinks-for-havbaeck 9/9, sinks-for-aengsjoen 9/9, sinks-for-taennforsen 9/9, wash-basins-for-vidvessel 3/3, vidvessel-bathroom 15/15, havbaeck-mirror-mirror-cabinets 4/4, aengsjoen-mirror-mirror-cabinets 4/4, taennforsen-mirror-mirror-cabinets 5/5, aengsjoen-vanity-units-without-basin 1/1, taennforsen-vanity-units-without-basin 2/2, enhet-vanity-units-with-basin 3/3, enhet-vanity-units-without-basin 3/3. The 85 distinct residual ids across the remaining nodes were all opened and named: they are 洗面台/洗面ボウル washstands with basin (-> 洗面キャビネット 20720, ALREADY EXTRACTED), ミラーキャビネット mirror cabinets (-> 20500, ALREADY EXTRACTED), ウォールキャビネット / ハイキャビネット / ミラードア / 扉 / ベースフレーム / ウォールフレーム / 脚 / 引き出し前部 ENHET frame parts and wall/tall cabinets (-> 20808 and 20804, both ALREADY EXTRACTED), ランドリーバッグ laundry bag (-> 48925, ALREADY EXTRACTED), ノブ / 取っ手 knobs and handles (-> 16298, routed out on primary type), 収納コンビネーション / バスルーム ENHET furniture combinations, and one ドリルテンプレート drill template. Nothing on the series axis is both NEW and in Bathroom scope. Recording these 31 nodes would have double-counted the 213-product roll-up. HONEST LIMIT: because IKEA ignores ?page=, generic nodes above the 24-per-page grid (20720=64, 20804=51, 16298=54, 20615=31, 10555=77) could only be id-enumerated to their first 24 cards, so containment for those residuals rests on product identity plus the Furniture.xlsx dedup rather than on exhaustive id equality.",
+   "link": "https://www.ikea.com/jp/ja/cat/havbaeck-modern-bathroom-range-700451/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "HAVBACK Mirror & Mirror Cabinets",
+   "qty": 4,
+   "issue": "SERIES AXIS - WITHHELD AS AN OVERLAPPING RE-SLICE OF THE GENERIC AXIS, NOT RECORDED (rule 28 + BATCH_BRIEF s5). IKEA JP exposes the same bathroom catalogue twice: a generic PRODUCT axis (sinks / taps / vanities / mirrors / accessories) and this SERIES axis under 洗面台シリーズ / bathroom-ranges-700450 (213) that re-cuts the identical products by furniture series. Only the generic axis is recorded. PROVED, not assumed, by per-card data-ref-id extraction over all 31 series-axis nodes against a 311-id pool built from the 26 generic bathroom nodes: every series node is either a strict subset of the generic pool or its residual ids resolve to products that belong to already-extracted Furniture.xlsx nodes. Fully-contained with ZERO ids outside: sinks-for-havbaeck 9/9, sinks-for-aengsjoen 9/9, sinks-for-taennforsen 9/9, wash-basins-for-vidvessel 3/3, vidvessel-bathroom 15/15, havbaeck-mirror-mirror-cabinets 4/4, aengsjoen-mirror-mirror-cabinets 4/4, taennforsen-mirror-mirror-cabinets 5/5, aengsjoen-vanity-units-without-basin 1/1, taennforsen-vanity-units-without-basin 2/2, enhet-vanity-units-with-basin 3/3, enhet-vanity-units-without-basin 3/3. The 85 distinct residual ids across the remaining nodes were all opened and named: they are 洗面台/洗面ボウル washstands with basin (-> 洗面キャビネット 20720, ALREADY EXTRACTED), ミラーキャビネット mirror cabinets (-> 20500, ALREADY EXTRACTED), ウォールキャビネット / ハイキャビネット / ミラードア / 扉 / ベースフレーム / ウォールフレーム / 脚 / 引き出し前部 ENHET frame parts and wall/tall cabinets (-> 20808 and 20804, both ALREADY EXTRACTED), ランドリーバッグ laundry bag (-> 48925, ALREADY EXTRACTED), ノブ / 取っ手 knobs and handles (-> 16298, routed out on primary type), 収納コンビネーション / バスルーム ENHET furniture combinations, and one ドリルテンプレート drill template. Nothing on the series axis is both NEW and in Bathroom scope. Recording these 31 nodes would have double-counted the 213-product roll-up. HONEST LIMIT: because IKEA ignores ?page=, generic nodes above the 24-per-page grid (20720=64, 20804=51, 16298=54, 20615=31, 10555=77) could only be id-enumerated to their first 24 cards, so containment for those residuals rests on product identity plus the Furniture.xlsx dedup rather than on exhaustive id equality.",
+   "link": "https://www.ikea.com/jp/ja/cat/havbaeck-mirror-mirror-cabinets-700462/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "HAVBACK Cabinet & Legs",
+   "qty": 4,
+   "issue": "SERIES AXIS - WITHHELD AS AN OVERLAPPING RE-SLICE OF THE GENERIC AXIS, NOT RECORDED (rule 28 + BATCH_BRIEF s5). IKEA JP exposes the same bathroom catalogue twice: a generic PRODUCT axis (sinks / taps / vanities / mirrors / accessories) and this SERIES axis under 洗面台シリーズ / bathroom-ranges-700450 (213) that re-cuts the identical products by furniture series. Only the generic axis is recorded. PROVED, not assumed, by per-card data-ref-id extraction over all 31 series-axis nodes against a 311-id pool built from the 26 generic bathroom nodes: every series node is either a strict subset of the generic pool or its residual ids resolve to products that belong to already-extracted Furniture.xlsx nodes. Fully-contained with ZERO ids outside: sinks-for-havbaeck 9/9, sinks-for-aengsjoen 9/9, sinks-for-taennforsen 9/9, wash-basins-for-vidvessel 3/3, vidvessel-bathroom 15/15, havbaeck-mirror-mirror-cabinets 4/4, aengsjoen-mirror-mirror-cabinets 4/4, taennforsen-mirror-mirror-cabinets 5/5, aengsjoen-vanity-units-without-basin 1/1, taennforsen-vanity-units-without-basin 2/2, enhet-vanity-units-with-basin 3/3, enhet-vanity-units-without-basin 3/3. The 85 distinct residual ids across the remaining nodes were all opened and named: they are 洗面台/洗面ボウル washstands with basin (-> 洗面キャビネット 20720, ALREADY EXTRACTED), ミラーキャビネット mirror cabinets (-> 20500, ALREADY EXTRACTED), ウォールキャビネット / ハイキャビネット / ミラードア / 扉 / ベースフレーム / ウォールフレーム / 脚 / 引き出し前部 ENHET frame parts and wall/tall cabinets (-> 20808 and 20804, both ALREADY EXTRACTED), ランドリーバッグ laundry bag (-> 48925, ALREADY EXTRACTED), ノブ / 取っ手 knobs and handles (-> 16298, routed out on primary type), 収納コンビネーション / バスルーム ENHET furniture combinations, and one ドリルテンプレート drill template. Nothing on the series axis is both NEW and in Bathroom scope. Recording these 31 nodes would have double-counted the 213-product roll-up. HONEST LIMIT: because IKEA ignores ?page=, generic nodes above the 24-per-page grid (20720=64, 20804=51, 16298=54, 20615=31, 10555=77) could only be id-enumerated to their first 24 cards, so containment for those residuals rests on product identity plus the Furniture.xlsx dedup rather than on exhaustive id equality.",
+   "link": "https://www.ikea.com/jp/ja/cat/havbaeck-storage-700463/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "HAVBACK Vanity Units without Basin",
+   "qty": 2,
+   "issue": "SERIES AXIS - WITHHELD AS AN OVERLAPPING RE-SLICE OF THE GENERIC AXIS, NOT RECORDED (rule 28 + BATCH_BRIEF s5). IKEA JP exposes the same bathroom catalogue twice: a generic PRODUCT axis (sinks / taps / vanities / mirrors / accessories) and this SERIES axis under 洗面台シリーズ / bathroom-ranges-700450 (213) that re-cuts the identical products by furniture series. Only the generic axis is recorded. PROVED, not assumed, by per-card data-ref-id extraction over all 31 series-axis nodes against a 311-id pool built from the 26 generic bathroom nodes: every series node is either a strict subset of the generic pool or its residual ids resolve to products that belong to already-extracted Furniture.xlsx nodes. Fully-contained with ZERO ids outside: sinks-for-havbaeck 9/9, sinks-for-aengsjoen 9/9, sinks-for-taennforsen 9/9, wash-basins-for-vidvessel 3/3, vidvessel-bathroom 15/15, havbaeck-mirror-mirror-cabinets 4/4, aengsjoen-mirror-mirror-cabinets 4/4, taennforsen-mirror-mirror-cabinets 5/5, aengsjoen-vanity-units-without-basin 1/1, taennforsen-vanity-units-without-basin 2/2, enhet-vanity-units-with-basin 3/3, enhet-vanity-units-without-basin 3/3. The 85 distinct residual ids across the remaining nodes were all opened and named: they are 洗面台/洗面ボウル washstands with basin (-> 洗面キャビネット 20720, ALREADY EXTRACTED), ミラーキャビネット mirror cabinets (-> 20500, ALREADY EXTRACTED), ウォールキャビネット / ハイキャビネット / ミラードア / 扉 / ベースフレーム / ウォールフレーム / 脚 / 引き出し前部 ENHET frame parts and wall/tall cabinets (-> 20808 and 20804, both ALREADY EXTRACTED), ランドリーバッグ laundry bag (-> 48925, ALREADY EXTRACTED), ノブ / 取っ手 knobs and handles (-> 16298, routed out on primary type), 収納コンビネーション / バスルーム ENHET furniture combinations, and one ドリルテンプレート drill template. Nothing on the series axis is both NEW and in Bathroom scope. Recording these 31 nodes would have double-counted the 213-product roll-up. HONEST LIMIT: because IKEA ignores ?page=, generic nodes above the 24-per-page grid (20720=64, 20804=51, 16298=54, 20615=31, 10555=77) could only be id-enumerated to their first 24 cards, so containment for those residuals rests on product identity plus the Furniture.xlsx dedup rather than on exhaustive id equality.",
+   "link": "https://www.ikea.com/jp/ja/cat/havbaeck-vanity-units-without-basin-700464/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "HAVBACK Vanity Units with Basin",
+   "qty": 17,
+   "issue": "SERIES AXIS - WITHHELD AS AN OVERLAPPING RE-SLICE OF THE GENERIC AXIS, NOT RECORDED (rule 28 + BATCH_BRIEF s5). IKEA JP exposes the same bathroom catalogue twice: a generic PRODUCT axis (sinks / taps / vanities / mirrors / accessories) and this SERIES axis under 洗面台シリーズ / bathroom-ranges-700450 (213) that re-cuts the identical products by furniture series. Only the generic axis is recorded. PROVED, not assumed, by per-card data-ref-id extraction over all 31 series-axis nodes against a 311-id pool built from the 26 generic bathroom nodes: every series node is either a strict subset of the generic pool or its residual ids resolve to products that belong to already-extracted Furniture.xlsx nodes. Fully-contained with ZERO ids outside: sinks-for-havbaeck 9/9, sinks-for-aengsjoen 9/9, sinks-for-taennforsen 9/9, wash-basins-for-vidvessel 3/3, vidvessel-bathroom 15/15, havbaeck-mirror-mirror-cabinets 4/4, aengsjoen-mirror-mirror-cabinets 4/4, taennforsen-mirror-mirror-cabinets 5/5, aengsjoen-vanity-units-without-basin 1/1, taennforsen-vanity-units-without-basin 2/2, enhet-vanity-units-with-basin 3/3, enhet-vanity-units-without-basin 3/3. The 85 distinct residual ids across the remaining nodes were all opened and named: they are 洗面台/洗面ボウル washstands with basin (-> 洗面キャビネット 20720, ALREADY EXTRACTED), ミラーキャビネット mirror cabinets (-> 20500, ALREADY EXTRACTED), ウォールキャビネット / ハイキャビネット / ミラードア / 扉 / ベースフレーム / ウォールフレーム / 脚 / 引き出し前部 ENHET frame parts and wall/tall cabinets (-> 20808 and 20804, both ALREADY EXTRACTED), ランドリーバッグ laundry bag (-> 48925, ALREADY EXTRACTED), ノブ / 取っ手 knobs and handles (-> 16298, routed out on primary type), 収納コンビネーション / バスルーム ENHET furniture combinations, and one ドリルテンプレート drill template. Nothing on the series axis is both NEW and in Bathroom scope. Recording these 31 nodes would have double-counted the 213-product roll-up. HONEST LIMIT: because IKEA ignores ?page=, generic nodes above the 24-per-page grid (20720=64, 20804=51, 16298=54, 20615=31, 10555=77) could only be id-enumerated to their first 24 cards, so containment for those residuals rests on product identity plus the Furniture.xlsx dedup rather than on exhaustive id equality.",
+   "link": "https://www.ikea.com/jp/ja/cat/havbaeck-vanity-units-with-basin-700465/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Sinks for HAVBACK",
+   "qty": 9,
+   "issue": "SERIES AXIS - WITHHELD AS AN OVERLAPPING RE-SLICE OF THE GENERIC AXIS, NOT RECORDED (rule 28 + BATCH_BRIEF s5). IKEA JP exposes the same bathroom catalogue twice: a generic PRODUCT axis (sinks / taps / vanities / mirrors / accessories) and this SERIES axis under 洗面台シリーズ / bathroom-ranges-700450 (213) that re-cuts the identical products by furniture series. Only the generic axis is recorded. PROVED, not assumed, by per-card data-ref-id extraction over all 31 series-axis nodes against a 311-id pool built from the 26 generic bathroom nodes: every series node is either a strict subset of the generic pool or its residual ids resolve to products that belong to already-extracted Furniture.xlsx nodes. Fully-contained with ZERO ids outside: sinks-for-havbaeck 9/9, sinks-for-aengsjoen 9/9, sinks-for-taennforsen 9/9, wash-basins-for-vidvessel 3/3, vidvessel-bathroom 15/15, havbaeck-mirror-mirror-cabinets 4/4, aengsjoen-mirror-mirror-cabinets 4/4, taennforsen-mirror-mirror-cabinets 5/5, aengsjoen-vanity-units-without-basin 1/1, taennforsen-vanity-units-without-basin 2/2, enhet-vanity-units-with-basin 3/3, enhet-vanity-units-without-basin 3/3. The 85 distinct residual ids across the remaining nodes were all opened and named: they are 洗面台/洗面ボウル washstands with basin (-> 洗面キャビネット 20720, ALREADY EXTRACTED), ミラーキャビネット mirror cabinets (-> 20500, ALREADY EXTRACTED), ウォールキャビネット / ハイキャビネット / ミラードア / 扉 / ベースフレーム / ウォールフレーム / 脚 / 引き出し前部 ENHET frame parts and wall/tall cabinets (-> 20808 and 20804, both ALREADY EXTRACTED), ランドリーバッグ laundry bag (-> 48925, ALREADY EXTRACTED), ノブ / 取っ手 knobs and handles (-> 16298, routed out on primary type), 収納コンビネーション / バスルーム ENHET furniture combinations, and one ドリルテンプレート drill template. Nothing on the series axis is both NEW and in Bathroom scope. Recording these 31 nodes would have double-counted the 213-product roll-up. HONEST LIMIT: because IKEA ignores ?page=, generic nodes above the 24-per-page grid (20720=64, 20804=51, 16298=54, 20615=31, 10555=77) could only be id-enumerated to their first 24 cards, so containment for those residuals rests on product identity plus the Furniture.xlsx dedup rather than on exhaustive id equality.",
+   "link": "https://www.ikea.com/jp/ja/cat/sinks-for-havbaeck-700466/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "ANGSJON Vanity Series",
+   "qty": 128,
+   "issue": "SERIES AXIS - WITHHELD AS AN OVERLAPPING RE-SLICE OF THE GENERIC AXIS, NOT RECORDED (rule 28 + BATCH_BRIEF s5). IKEA JP exposes the same bathroom catalogue twice: a generic PRODUCT axis (sinks / taps / vanities / mirrors / accessories) and this SERIES axis under 洗面台シリーズ / bathroom-ranges-700450 (213) that re-cuts the identical products by furniture series. Only the generic axis is recorded. PROVED, not assumed, by per-card data-ref-id extraction over all 31 series-axis nodes against a 311-id pool built from the 26 generic bathroom nodes: every series node is either a strict subset of the generic pool or its residual ids resolve to products that belong to already-extracted Furniture.xlsx nodes. Fully-contained with ZERO ids outside: sinks-for-havbaeck 9/9, sinks-for-aengsjoen 9/9, sinks-for-taennforsen 9/9, wash-basins-for-vidvessel 3/3, vidvessel-bathroom 15/15, havbaeck-mirror-mirror-cabinets 4/4, aengsjoen-mirror-mirror-cabinets 4/4, taennforsen-mirror-mirror-cabinets 5/5, aengsjoen-vanity-units-without-basin 1/1, taennforsen-vanity-units-without-basin 2/2, enhet-vanity-units-with-basin 3/3, enhet-vanity-units-without-basin 3/3. The 85 distinct residual ids across the remaining nodes were all opened and named: they are 洗面台/洗面ボウル washstands with basin (-> 洗面キャビネット 20720, ALREADY EXTRACTED), ミラーキャビネット mirror cabinets (-> 20500, ALREADY EXTRACTED), ウォールキャビネット / ハイキャビネット / ミラードア / 扉 / ベースフレーム / ウォールフレーム / 脚 / 引き出し前部 ENHET frame parts and wall/tall cabinets (-> 20808 and 20804, both ALREADY EXTRACTED), ランドリーバッグ laundry bag (-> 48925, ALREADY EXTRACTED), ノブ / 取っ手 knobs and handles (-> 16298, routed out on primary type), 収納コンビネーション / バスルーム ENHET furniture combinations, and one ドリルテンプレート drill template. Nothing on the series axis is both NEW and in Bathroom scope. Recording these 31 nodes would have double-counted the 213-product roll-up. HONEST LIMIT: because IKEA ignores ?page=, generic nodes above the 24-per-page grid (20720=64, 20804=51, 16298=54, 20615=31, 10555=77) could only be id-enumerated to their first 24 cards, so containment for those residuals rests on product identity plus the Furniture.xlsx dedup rather than on exhaustive id equality.",
+   "link": "https://www.ikea.com/jp/ja/cat/aengsjoen-modern-bathroom-range-700453/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "ANGSJON Mirror & Mirror Cabinets",
+   "qty": 4,
+   "issue": "SERIES AXIS - WITHHELD AS AN OVERLAPPING RE-SLICE OF THE GENERIC AXIS, NOT RECORDED (rule 28 + BATCH_BRIEF s5). IKEA JP exposes the same bathroom catalogue twice: a generic PRODUCT axis (sinks / taps / vanities / mirrors / accessories) and this SERIES axis under 洗面台シリーズ / bathroom-ranges-700450 (213) that re-cuts the identical products by furniture series. Only the generic axis is recorded. PROVED, not assumed, by per-card data-ref-id extraction over all 31 series-axis nodes against a 311-id pool built from the 26 generic bathroom nodes: every series node is either a strict subset of the generic pool or its residual ids resolve to products that belong to already-extracted Furniture.xlsx nodes. Fully-contained with ZERO ids outside: sinks-for-havbaeck 9/9, sinks-for-aengsjoen 9/9, sinks-for-taennforsen 9/9, wash-basins-for-vidvessel 3/3, vidvessel-bathroom 15/15, havbaeck-mirror-mirror-cabinets 4/4, aengsjoen-mirror-mirror-cabinets 4/4, taennforsen-mirror-mirror-cabinets 5/5, aengsjoen-vanity-units-without-basin 1/1, taennforsen-vanity-units-without-basin 2/2, enhet-vanity-units-with-basin 3/3, enhet-vanity-units-without-basin 3/3. The 85 distinct residual ids across the remaining nodes were all opened and named: they are 洗面台/洗面ボウル washstands with basin (-> 洗面キャビネット 20720, ALREADY EXTRACTED), ミラーキャビネット mirror cabinets (-> 20500, ALREADY EXTRACTED), ウォールキャビネット / ハイキャビネット / ミラードア / 扉 / ベースフレーム / ウォールフレーム / 脚 / 引き出し前部 ENHET frame parts and wall/tall cabinets (-> 20808 and 20804, both ALREADY EXTRACTED), ランドリーバッグ laundry bag (-> 48925, ALREADY EXTRACTED), ノブ / 取っ手 knobs and handles (-> 16298, routed out on primary type), 収納コンビネーション / バスルーム ENHET furniture combinations, and one ドリルテンプレート drill template. Nothing on the series axis is both NEW and in Bathroom scope. Recording these 31 nodes would have double-counted the 213-product roll-up. HONEST LIMIT: because IKEA ignores ?page=, generic nodes above the 24-per-page grid (20720=64, 20804=51, 16298=54, 20615=31, 10555=77) could only be id-enumerated to their first 24 cards, so containment for those residuals rests on product identity plus the Furniture.xlsx dedup rather than on exhaustive id equality.",
+   "link": "https://www.ikea.com/jp/ja/cat/aengsjoen-mirror-mirror-cabinets-700467/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "ANGSJON Cabinet & Legs",
+   "qty": 4,
+   "issue": "SERIES AXIS - WITHHELD AS AN OVERLAPPING RE-SLICE OF THE GENERIC AXIS, NOT RECORDED (rule 28 + BATCH_BRIEF s5). IKEA JP exposes the same bathroom catalogue twice: a generic PRODUCT axis (sinks / taps / vanities / mirrors / accessories) and this SERIES axis under 洗面台シリーズ / bathroom-ranges-700450 (213) that re-cuts the identical products by furniture series. Only the generic axis is recorded. PROVED, not assumed, by per-card data-ref-id extraction over all 31 series-axis nodes against a 311-id pool built from the 26 generic bathroom nodes: every series node is either a strict subset of the generic pool or its residual ids resolve to products that belong to already-extracted Furniture.xlsx nodes. Fully-contained with ZERO ids outside: sinks-for-havbaeck 9/9, sinks-for-aengsjoen 9/9, sinks-for-taennforsen 9/9, wash-basins-for-vidvessel 3/3, vidvessel-bathroom 15/15, havbaeck-mirror-mirror-cabinets 4/4, aengsjoen-mirror-mirror-cabinets 4/4, taennforsen-mirror-mirror-cabinets 5/5, aengsjoen-vanity-units-without-basin 1/1, taennforsen-vanity-units-without-basin 2/2, enhet-vanity-units-with-basin 3/3, enhet-vanity-units-without-basin 3/3. The 85 distinct residual ids across the remaining nodes were all opened and named: they are 洗面台/洗面ボウル washstands with basin (-> 洗面キャビネット 20720, ALREADY EXTRACTED), ミラーキャビネット mirror cabinets (-> 20500, ALREADY EXTRACTED), ウォールキャビネット / ハイキャビネット / ミラードア / 扉 / ベースフレーム / ウォールフレーム / 脚 / 引き出し前部 ENHET frame parts and wall/tall cabinets (-> 20808 and 20804, both ALREADY EXTRACTED), ランドリーバッグ laundry bag (-> 48925, ALREADY EXTRACTED), ノブ / 取っ手 knobs and handles (-> 16298, routed out on primary type), 収納コンビネーション / バスルーム ENHET furniture combinations, and one ドリルテンプレート drill template. Nothing on the series axis is both NEW and in Bathroom scope. Recording these 31 nodes would have double-counted the 213-product roll-up. HONEST LIMIT: because IKEA ignores ?page=, generic nodes above the 24-per-page grid (20720=64, 20804=51, 16298=54, 20615=31, 10555=77) could only be id-enumerated to their first 24 cards, so containment for those residuals rests on product identity plus the Furniture.xlsx dedup rather than on exhaustive id equality.",
+   "link": "https://www.ikea.com/jp/ja/cat/aengsjoen-storage-700468/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "ANGSJON Vanity Units without Basin",
+   "qty": 1,
+   "issue": "SERIES AXIS - WITHHELD AS AN OVERLAPPING RE-SLICE OF THE GENERIC AXIS, NOT RECORDED (rule 28 + BATCH_BRIEF s5). IKEA JP exposes the same bathroom catalogue twice: a generic PRODUCT axis (sinks / taps / vanities / mirrors / accessories) and this SERIES axis under 洗面台シリーズ / bathroom-ranges-700450 (213) that re-cuts the identical products by furniture series. Only the generic axis is recorded. PROVED, not assumed, by per-card data-ref-id extraction over all 31 series-axis nodes against a 311-id pool built from the 26 generic bathroom nodes: every series node is either a strict subset of the generic pool or its residual ids resolve to products that belong to already-extracted Furniture.xlsx nodes. Fully-contained with ZERO ids outside: sinks-for-havbaeck 9/9, sinks-for-aengsjoen 9/9, sinks-for-taennforsen 9/9, wash-basins-for-vidvessel 3/3, vidvessel-bathroom 15/15, havbaeck-mirror-mirror-cabinets 4/4, aengsjoen-mirror-mirror-cabinets 4/4, taennforsen-mirror-mirror-cabinets 5/5, aengsjoen-vanity-units-without-basin 1/1, taennforsen-vanity-units-without-basin 2/2, enhet-vanity-units-with-basin 3/3, enhet-vanity-units-without-basin 3/3. The 85 distinct residual ids across the remaining nodes were all opened and named: they are 洗面台/洗面ボウル washstands with basin (-> 洗面キャビネット 20720, ALREADY EXTRACTED), ミラーキャビネット mirror cabinets (-> 20500, ALREADY EXTRACTED), ウォールキャビネット / ハイキャビネット / ミラードア / 扉 / ベースフレーム / ウォールフレーム / 脚 / 引き出し前部 ENHET frame parts and wall/tall cabinets (-> 20808 and 20804, both ALREADY EXTRACTED), ランドリーバッグ laundry bag (-> 48925, ALREADY EXTRACTED), ノブ / 取っ手 knobs and handles (-> 16298, routed out on primary type), 収納コンビネーション / バスルーム ENHET furniture combinations, and one ドリルテンプレート drill template. Nothing on the series axis is both NEW and in Bathroom scope. Recording these 31 nodes would have double-counted the 213-product roll-up. HONEST LIMIT: because IKEA ignores ?page=, generic nodes above the 24-per-page grid (20720=64, 20804=51, 16298=54, 20615=31, 10555=77) could only be id-enumerated to their first 24 cards, so containment for those residuals rests on product identity plus the Furniture.xlsx dedup rather than on exhaustive id equality.",
+   "link": "https://www.ikea.com/jp/ja/cat/aengsjoen-vanity-units-without-basin-700469/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "ANGSJON Vanity Units with Basin",
+   "qty": 42,
+   "issue": "SERIES AXIS - WITHHELD AS AN OVERLAPPING RE-SLICE OF THE GENERIC AXIS, NOT RECORDED (rule 28 + BATCH_BRIEF s5). IKEA JP exposes the same bathroom catalogue twice: a generic PRODUCT axis (sinks / taps / vanities / mirrors / accessories) and this SERIES axis under 洗面台シリーズ / bathroom-ranges-700450 (213) that re-cuts the identical products by furniture series. Only the generic axis is recorded. PROVED, not assumed, by per-card data-ref-id extraction over all 31 series-axis nodes against a 311-id pool built from the 26 generic bathroom nodes: every series node is either a strict subset of the generic pool or its residual ids resolve to products that belong to already-extracted Furniture.xlsx nodes. Fully-contained with ZERO ids outside: sinks-for-havbaeck 9/9, sinks-for-aengsjoen 9/9, sinks-for-taennforsen 9/9, wash-basins-for-vidvessel 3/3, vidvessel-bathroom 15/15, havbaeck-mirror-mirror-cabinets 4/4, aengsjoen-mirror-mirror-cabinets 4/4, taennforsen-mirror-mirror-cabinets 5/5, aengsjoen-vanity-units-without-basin 1/1, taennforsen-vanity-units-without-basin 2/2, enhet-vanity-units-with-basin 3/3, enhet-vanity-units-without-basin 3/3. The 85 distinct residual ids across the remaining nodes were all opened and named: they are 洗面台/洗面ボウル washstands with basin (-> 洗面キャビネット 20720, ALREADY EXTRACTED), ミラーキャビネット mirror cabinets (-> 20500, ALREADY EXTRACTED), ウォールキャビネット / ハイキャビネット / ミラードア / 扉 / ベースフレーム / ウォールフレーム / 脚 / 引き出し前部 ENHET frame parts and wall/tall cabinets (-> 20808 and 20804, both ALREADY EXTRACTED), ランドリーバッグ laundry bag (-> 48925, ALREADY EXTRACTED), ノブ / 取っ手 knobs and handles (-> 16298, routed out on primary type), 収納コンビネーション / バスルーム ENHET furniture combinations, and one ドリルテンプレート drill template. Nothing on the series axis is both NEW and in Bathroom scope. Recording these 31 nodes would have double-counted the 213-product roll-up. HONEST LIMIT: because IKEA ignores ?page=, generic nodes above the 24-per-page grid (20720=64, 20804=51, 16298=54, 20615=31, 10555=77) could only be id-enumerated to their first 24 cards, so containment for those residuals rests on product identity plus the Furniture.xlsx dedup rather than on exhaustive id equality.",
+   "link": "https://www.ikea.com/jp/ja/cat/aengsjoen-vanity-units-with-basin-700470/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Sinks for ANGSJON",
+   "qty": 9,
+   "issue": "SERIES AXIS - WITHHELD AS AN OVERLAPPING RE-SLICE OF THE GENERIC AXIS, NOT RECORDED (rule 28 + BATCH_BRIEF s5). IKEA JP exposes the same bathroom catalogue twice: a generic PRODUCT axis (sinks / taps / vanities / mirrors / accessories) and this SERIES axis under 洗面台シリーズ / bathroom-ranges-700450 (213) that re-cuts the identical products by furniture series. Only the generic axis is recorded. PROVED, not assumed, by per-card data-ref-id extraction over all 31 series-axis nodes against a 311-id pool built from the 26 generic bathroom nodes: every series node is either a strict subset of the generic pool or its residual ids resolve to products that belong to already-extracted Furniture.xlsx nodes. Fully-contained with ZERO ids outside: sinks-for-havbaeck 9/9, sinks-for-aengsjoen 9/9, sinks-for-taennforsen 9/9, wash-basins-for-vidvessel 3/3, vidvessel-bathroom 15/15, havbaeck-mirror-mirror-cabinets 4/4, aengsjoen-mirror-mirror-cabinets 4/4, taennforsen-mirror-mirror-cabinets 5/5, aengsjoen-vanity-units-without-basin 1/1, taennforsen-vanity-units-without-basin 2/2, enhet-vanity-units-with-basin 3/3, enhet-vanity-units-without-basin 3/3. The 85 distinct residual ids across the remaining nodes were all opened and named: they are 洗面台/洗面ボウル washstands with basin (-> 洗面キャビネット 20720, ALREADY EXTRACTED), ミラーキャビネット mirror cabinets (-> 20500, ALREADY EXTRACTED), ウォールキャビネット / ハイキャビネット / ミラードア / 扉 / ベースフレーム / ウォールフレーム / 脚 / 引き出し前部 ENHET frame parts and wall/tall cabinets (-> 20808 and 20804, both ALREADY EXTRACTED), ランドリーバッグ laundry bag (-> 48925, ALREADY EXTRACTED), ノブ / 取っ手 knobs and handles (-> 16298, routed out on primary type), 収納コンビネーション / バスルーム ENHET furniture combinations, and one ドリルテンプレート drill template. Nothing on the series axis is both NEW and in Bathroom scope. Recording these 31 nodes would have double-counted the 213-product roll-up. HONEST LIMIT: because IKEA ignores ?page=, generic nodes above the 24-per-page grid (20720=64, 20804=51, 16298=54, 20615=31, 10555=77) could only be id-enumerated to their first 24 cards, so containment for those residuals rests on product identity plus the Furniture.xlsx dedup rather than on exhaustive id equality.",
+   "link": "https://www.ikea.com/jp/ja/cat/sinks-for-aengsjoen-700471/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "TANNFORSEN Vanity Series",
+   "qty": 105,
+   "issue": "SERIES AXIS - WITHHELD AS AN OVERLAPPING RE-SLICE OF THE GENERIC AXIS, NOT RECORDED (rule 28 + BATCH_BRIEF s5). IKEA JP exposes the same bathroom catalogue twice: a generic PRODUCT axis (sinks / taps / vanities / mirrors / accessories) and this SERIES axis under 洗面台シリーズ / bathroom-ranges-700450 (213) that re-cuts the identical products by furniture series. Only the generic axis is recorded. PROVED, not assumed, by per-card data-ref-id extraction over all 31 series-axis nodes against a 311-id pool built from the 26 generic bathroom nodes: every series node is either a strict subset of the generic pool or its residual ids resolve to products that belong to already-extracted Furniture.xlsx nodes. Fully-contained with ZERO ids outside: sinks-for-havbaeck 9/9, sinks-for-aengsjoen 9/9, sinks-for-taennforsen 9/9, wash-basins-for-vidvessel 3/3, vidvessel-bathroom 15/15, havbaeck-mirror-mirror-cabinets 4/4, aengsjoen-mirror-mirror-cabinets 4/4, taennforsen-mirror-mirror-cabinets 5/5, aengsjoen-vanity-units-without-basin 1/1, taennforsen-vanity-units-without-basin 2/2, enhet-vanity-units-with-basin 3/3, enhet-vanity-units-without-basin 3/3. The 85 distinct residual ids across the remaining nodes were all opened and named: they are 洗面台/洗面ボウル washstands with basin (-> 洗面キャビネット 20720, ALREADY EXTRACTED), ミラーキャビネット mirror cabinets (-> 20500, ALREADY EXTRACTED), ウォールキャビネット / ハイキャビネット / ミラードア / 扉 / ベースフレーム / ウォールフレーム / 脚 / 引き出し前部 ENHET frame parts and wall/tall cabinets (-> 20808 and 20804, both ALREADY EXTRACTED), ランドリーバッグ laundry bag (-> 48925, ALREADY EXTRACTED), ノブ / 取っ手 knobs and handles (-> 16298, routed out on primary type), 収納コンビネーション / バスルーム ENHET furniture combinations, and one ドリルテンプレート drill template. Nothing on the series axis is both NEW and in Bathroom scope. Recording these 31 nodes would have double-counted the 213-product roll-up. HONEST LIMIT: because IKEA ignores ?page=, generic nodes above the 24-per-page grid (20720=64, 20804=51, 16298=54, 20615=31, 10555=77) could only be id-enumerated to their first 24 cards, so containment for those residuals rests on product identity plus the Furniture.xlsx dedup rather than on exhaustive id equality.",
+   "link": "https://www.ikea.com/jp/ja/cat/taennforsen-traditional-bathroom-range-700456/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Sinks for TANNFORSEN",
+   "qty": 9,
+   "issue": "SERIES AXIS - WITHHELD AS AN OVERLAPPING RE-SLICE OF THE GENERIC AXIS, NOT RECORDED (rule 28 + BATCH_BRIEF s5). IKEA JP exposes the same bathroom catalogue twice: a generic PRODUCT axis (sinks / taps / vanities / mirrors / accessories) and this SERIES axis under 洗面台シリーズ / bathroom-ranges-700450 (213) that re-cuts the identical products by furniture series. Only the generic axis is recorded. PROVED, not assumed, by per-card data-ref-id extraction over all 31 series-axis nodes against a 311-id pool built from the 26 generic bathroom nodes: every series node is either a strict subset of the generic pool or its residual ids resolve to products that belong to already-extracted Furniture.xlsx nodes. Fully-contained with ZERO ids outside: sinks-for-havbaeck 9/9, sinks-for-aengsjoen 9/9, sinks-for-taennforsen 9/9, wash-basins-for-vidvessel 3/3, vidvessel-bathroom 15/15, havbaeck-mirror-mirror-cabinets 4/4, aengsjoen-mirror-mirror-cabinets 4/4, taennforsen-mirror-mirror-cabinets 5/5, aengsjoen-vanity-units-without-basin 1/1, taennforsen-vanity-units-without-basin 2/2, enhet-vanity-units-with-basin 3/3, enhet-vanity-units-without-basin 3/3. The 85 distinct residual ids across the remaining nodes were all opened and named: they are 洗面台/洗面ボウル washstands with basin (-> 洗面キャビネット 20720, ALREADY EXTRACTED), ミラーキャビネット mirror cabinets (-> 20500, ALREADY EXTRACTED), ウォールキャビネット / ハイキャビネット / ミラードア / 扉 / ベースフレーム / ウォールフレーム / 脚 / 引き出し前部 ENHET frame parts and wall/tall cabinets (-> 20808 and 20804, both ALREADY EXTRACTED), ランドリーバッグ laundry bag (-> 48925, ALREADY EXTRACTED), ノブ / 取っ手 knobs and handles (-> 16298, routed out on primary type), 収納コンビネーション / バスルーム ENHET furniture combinations, and one ドリルテンプレート drill template. Nothing on the series axis is both NEW and in Bathroom scope. Recording these 31 nodes would have double-counted the 213-product roll-up. HONEST LIMIT: because IKEA ignores ?page=, generic nodes above the 24-per-page grid (20720=64, 20804=51, 16298=54, 20615=31, 10555=77) could only be id-enumerated to their first 24 cards, so containment for those residuals rests on product identity plus the Furniture.xlsx dedup rather than on exhaustive id equality.",
+   "link": "https://www.ikea.com/jp/ja/cat/sinks-for-taennforsen-700472/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "TANNFORSEN Mirror & Mirror Cabinets",
+   "qty": 5,
+   "issue": "SERIES AXIS - WITHHELD AS AN OVERLAPPING RE-SLICE OF THE GENERIC AXIS, NOT RECORDED (rule 28 + BATCH_BRIEF s5). IKEA JP exposes the same bathroom catalogue twice: a generic PRODUCT axis (sinks / taps / vanities / mirrors / accessories) and this SERIES axis under 洗面台シリーズ / bathroom-ranges-700450 (213) that re-cuts the identical products by furniture series. Only the generic axis is recorded. PROVED, not assumed, by per-card data-ref-id extraction over all 31 series-axis nodes against a 311-id pool built from the 26 generic bathroom nodes: every series node is either a strict subset of the generic pool or its residual ids resolve to products that belong to already-extracted Furniture.xlsx nodes. Fully-contained with ZERO ids outside: sinks-for-havbaeck 9/9, sinks-for-aengsjoen 9/9, sinks-for-taennforsen 9/9, wash-basins-for-vidvessel 3/3, vidvessel-bathroom 15/15, havbaeck-mirror-mirror-cabinets 4/4, aengsjoen-mirror-mirror-cabinets 4/4, taennforsen-mirror-mirror-cabinets 5/5, aengsjoen-vanity-units-without-basin 1/1, taennforsen-vanity-units-without-basin 2/2, enhet-vanity-units-with-basin 3/3, enhet-vanity-units-without-basin 3/3. The 85 distinct residual ids across the remaining nodes were all opened and named: they are 洗面台/洗面ボウル washstands with basin (-> 洗面キャビネット 20720, ALREADY EXTRACTED), ミラーキャビネット mirror cabinets (-> 20500, ALREADY EXTRACTED), ウォールキャビネット / ハイキャビネット / ミラードア / 扉 / ベースフレーム / ウォールフレーム / 脚 / 引き出し前部 ENHET frame parts and wall/tall cabinets (-> 20808 and 20804, both ALREADY EXTRACTED), ランドリーバッグ laundry bag (-> 48925, ALREADY EXTRACTED), ノブ / 取っ手 knobs and handles (-> 16298, routed out on primary type), 収納コンビネーション / バスルーム ENHET furniture combinations, and one ドリルテンプレート drill template. Nothing on the series axis is both NEW and in Bathroom scope. Recording these 31 nodes would have double-counted the 213-product roll-up. HONEST LIMIT: because IKEA ignores ?page=, generic nodes above the 24-per-page grid (20720=64, 20804=51, 16298=54, 20615=31, 10555=77) could only be id-enumerated to their first 24 cards, so containment for those residuals rests on product identity plus the Furniture.xlsx dedup rather than on exhaustive id equality.",
+   "link": "https://www.ikea.com/jp/ja/cat/taennforsen-mirror-mirror-cabinets-700473/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "TANNFORSEN Storage",
+   "qty": 4,
+   "issue": "SERIES AXIS - WITHHELD AS AN OVERLAPPING RE-SLICE OF THE GENERIC AXIS, NOT RECORDED (rule 28 + BATCH_BRIEF s5). IKEA JP exposes the same bathroom catalogue twice: a generic PRODUCT axis (sinks / taps / vanities / mirrors / accessories) and this SERIES axis under 洗面台シリーズ / bathroom-ranges-700450 (213) that re-cuts the identical products by furniture series. Only the generic axis is recorded. PROVED, not assumed, by per-card data-ref-id extraction over all 31 series-axis nodes against a 311-id pool built from the 26 generic bathroom nodes: every series node is either a strict subset of the generic pool or its residual ids resolve to products that belong to already-extracted Furniture.xlsx nodes. Fully-contained with ZERO ids outside: sinks-for-havbaeck 9/9, sinks-for-aengsjoen 9/9, sinks-for-taennforsen 9/9, wash-basins-for-vidvessel 3/3, vidvessel-bathroom 15/15, havbaeck-mirror-mirror-cabinets 4/4, aengsjoen-mirror-mirror-cabinets 4/4, taennforsen-mirror-mirror-cabinets 5/5, aengsjoen-vanity-units-without-basin 1/1, taennforsen-vanity-units-without-basin 2/2, enhet-vanity-units-with-basin 3/3, enhet-vanity-units-without-basin 3/3. The 85 distinct residual ids across the remaining nodes were all opened and named: they are 洗面台/洗面ボウル washstands with basin (-> 洗面キャビネット 20720, ALREADY EXTRACTED), ミラーキャビネット mirror cabinets (-> 20500, ALREADY EXTRACTED), ウォールキャビネット / ハイキャビネット / ミラードア / 扉 / ベースフレーム / ウォールフレーム / 脚 / 引き出し前部 ENHET frame parts and wall/tall cabinets (-> 20808 and 20804, both ALREADY EXTRACTED), ランドリーバッグ laundry bag (-> 48925, ALREADY EXTRACTED), ノブ / 取っ手 knobs and handles (-> 16298, routed out on primary type), 収納コンビネーション / バスルーム ENHET furniture combinations, and one ドリルテンプレート drill template. Nothing on the series axis is both NEW and in Bathroom scope. Recording these 31 nodes would have double-counted the 213-product roll-up. HONEST LIMIT: because IKEA ignores ?page=, generic nodes above the 24-per-page grid (20720=64, 20804=51, 16298=54, 20615=31, 10555=77) could only be id-enumerated to their first 24 cards, so containment for those residuals rests on product identity plus the Furniture.xlsx dedup rather than on exhaustive id equality.",
+   "link": "https://www.ikea.com/jp/ja/cat/taennforsen-storage-700474/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "TANNFORSEN Vanity Units without Basin",
+   "qty": 2,
+   "issue": "SERIES AXIS - WITHHELD AS AN OVERLAPPING RE-SLICE OF THE GENERIC AXIS, NOT RECORDED (rule 28 + BATCH_BRIEF s5). IKEA JP exposes the same bathroom catalogue twice: a generic PRODUCT axis (sinks / taps / vanities / mirrors / accessories) and this SERIES axis under 洗面台シリーズ / bathroom-ranges-700450 (213) that re-cuts the identical products by furniture series. Only the generic axis is recorded. PROVED, not assumed, by per-card data-ref-id extraction over all 31 series-axis nodes against a 311-id pool built from the 26 generic bathroom nodes: every series node is either a strict subset of the generic pool or its residual ids resolve to products that belong to already-extracted Furniture.xlsx nodes. Fully-contained with ZERO ids outside: sinks-for-havbaeck 9/9, sinks-for-aengsjoen 9/9, sinks-for-taennforsen 9/9, wash-basins-for-vidvessel 3/3, vidvessel-bathroom 15/15, havbaeck-mirror-mirror-cabinets 4/4, aengsjoen-mirror-mirror-cabinets 4/4, taennforsen-mirror-mirror-cabinets 5/5, aengsjoen-vanity-units-without-basin 1/1, taennforsen-vanity-units-without-basin 2/2, enhet-vanity-units-with-basin 3/3, enhet-vanity-units-without-basin 3/3. The 85 distinct residual ids across the remaining nodes were all opened and named: they are 洗面台/洗面ボウル washstands with basin (-> 洗面キャビネット 20720, ALREADY EXTRACTED), ミラーキャビネット mirror cabinets (-> 20500, ALREADY EXTRACTED), ウォールキャビネット / ハイキャビネット / ミラードア / 扉 / ベースフレーム / ウォールフレーム / 脚 / 引き出し前部 ENHET frame parts and wall/tall cabinets (-> 20808 and 20804, both ALREADY EXTRACTED), ランドリーバッグ laundry bag (-> 48925, ALREADY EXTRACTED), ノブ / 取っ手 knobs and handles (-> 16298, routed out on primary type), 収納コンビネーション / バスルーム ENHET furniture combinations, and one ドリルテンプレート drill template. Nothing on the series axis is both NEW and in Bathroom scope. Recording these 31 nodes would have double-counted the 213-product roll-up. HONEST LIMIT: because IKEA ignores ?page=, generic nodes above the 24-per-page grid (20720=64, 20804=51, 16298=54, 20615=31, 10555=77) could only be id-enumerated to their first 24 cards, so containment for those residuals rests on product identity plus the Furniture.xlsx dedup rather than on exhaustive id equality.",
+   "link": "https://www.ikea.com/jp/ja/cat/taennforsen-vanity-units-without-basin-700475/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "TANNFORSEN Vanity Units with Basin",
+   "qty": 17,
+   "issue": "SERIES AXIS - WITHHELD AS AN OVERLAPPING RE-SLICE OF THE GENERIC AXIS, NOT RECORDED (rule 28 + BATCH_BRIEF s5). IKEA JP exposes the same bathroom catalogue twice: a generic PRODUCT axis (sinks / taps / vanities / mirrors / accessories) and this SERIES axis under 洗面台シリーズ / bathroom-ranges-700450 (213) that re-cuts the identical products by furniture series. Only the generic axis is recorded. PROVED, not assumed, by per-card data-ref-id extraction over all 31 series-axis nodes against a 311-id pool built from the 26 generic bathroom nodes: every series node is either a strict subset of the generic pool or its residual ids resolve to products that belong to already-extracted Furniture.xlsx nodes. Fully-contained with ZERO ids outside: sinks-for-havbaeck 9/9, sinks-for-aengsjoen 9/9, sinks-for-taennforsen 9/9, wash-basins-for-vidvessel 3/3, vidvessel-bathroom 15/15, havbaeck-mirror-mirror-cabinets 4/4, aengsjoen-mirror-mirror-cabinets 4/4, taennforsen-mirror-mirror-cabinets 5/5, aengsjoen-vanity-units-without-basin 1/1, taennforsen-vanity-units-without-basin 2/2, enhet-vanity-units-with-basin 3/3, enhet-vanity-units-without-basin 3/3. The 85 distinct residual ids across the remaining nodes were all opened and named: they are 洗面台/洗面ボウル washstands with basin (-> 洗面キャビネット 20720, ALREADY EXTRACTED), ミラーキャビネット mirror cabinets (-> 20500, ALREADY EXTRACTED), ウォールキャビネット / ハイキャビネット / ミラードア / 扉 / ベースフレーム / ウォールフレーム / 脚 / 引き出し前部 ENHET frame parts and wall/tall cabinets (-> 20808 and 20804, both ALREADY EXTRACTED), ランドリーバッグ laundry bag (-> 48925, ALREADY EXTRACTED), ノブ / 取っ手 knobs and handles (-> 16298, routed out on primary type), 収納コンビネーション / バスルーム ENHET furniture combinations, and one ドリルテンプレート drill template. Nothing on the series axis is both NEW and in Bathroom scope. Recording these 31 nodes would have double-counted the 213-product roll-up. HONEST LIMIT: because IKEA ignores ?page=, generic nodes above the 24-per-page grid (20720=64, 20804=51, 16298=54, 20615=31, 10555=77) could only be id-enumerated to their first 24 cards, so containment for those residuals rests on product identity plus the Furniture.xlsx dedup rather than on exhaustive id equality.",
+   "link": "https://www.ikea.com/jp/ja/cat/taennforsen-vanity-units-with-basin-700476/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "ENHET Vanity Series",
+   "qty": 104,
+   "issue": "SERIES AXIS - WITHHELD AS AN OVERLAPPING RE-SLICE OF THE GENERIC AXIS, NOT RECORDED (rule 28 + BATCH_BRIEF s5). IKEA JP exposes the same bathroom catalogue twice: a generic PRODUCT axis (sinks / taps / vanities / mirrors / accessories) and this SERIES axis under 洗面台シリーズ / bathroom-ranges-700450 (213) that re-cuts the identical products by furniture series. Only the generic axis is recorded. PROVED, not assumed, by per-card data-ref-id extraction over all 31 series-axis nodes against a 311-id pool built from the 26 generic bathroom nodes: every series node is either a strict subset of the generic pool or its residual ids resolve to products that belong to already-extracted Furniture.xlsx nodes. Fully-contained with ZERO ids outside: sinks-for-havbaeck 9/9, sinks-for-aengsjoen 9/9, sinks-for-taennforsen 9/9, wash-basins-for-vidvessel 3/3, vidvessel-bathroom 15/15, havbaeck-mirror-mirror-cabinets 4/4, aengsjoen-mirror-mirror-cabinets 4/4, taennforsen-mirror-mirror-cabinets 5/5, aengsjoen-vanity-units-without-basin 1/1, taennforsen-vanity-units-without-basin 2/2, enhet-vanity-units-with-basin 3/3, enhet-vanity-units-without-basin 3/3. The 85 distinct residual ids across the remaining nodes were all opened and named: they are 洗面台/洗面ボウル washstands with basin (-> 洗面キャビネット 20720, ALREADY EXTRACTED), ミラーキャビネット mirror cabinets (-> 20500, ALREADY EXTRACTED), ウォールキャビネット / ハイキャビネット / ミラードア / 扉 / ベースフレーム / ウォールフレーム / 脚 / 引き出し前部 ENHET frame parts and wall/tall cabinets (-> 20808 and 20804, both ALREADY EXTRACTED), ランドリーバッグ laundry bag (-> 48925, ALREADY EXTRACTED), ノブ / 取っ手 knobs and handles (-> 16298, routed out on primary type), 収納コンビネーション / バスルーム ENHET furniture combinations, and one ドリルテンプレート drill template. Nothing on the series axis is both NEW and in Bathroom scope. Recording these 31 nodes would have double-counted the 213-product roll-up. HONEST LIMIT: because IKEA ignores ?page=, generic nodes above the 24-per-page grid (20720=64, 20804=51, 16298=54, 20615=31, 10555=77) could only be id-enumerated to their first 24 cards, so containment for those residuals rests on product identity plus the Furniture.xlsx dedup rather than on exhaustive id equality.",
+   "link": "https://www.ikea.com/jp/ja/cat/enhet-contemporary-bathroom-range-700458/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "ENHET Mirror & Mirror Cabinets",
+   "qty": 3,
+   "issue": "SERIES AXIS - WITHHELD AS AN OVERLAPPING RE-SLICE OF THE GENERIC AXIS, NOT RECORDED (rule 28 + BATCH_BRIEF s5). IKEA JP exposes the same bathroom catalogue twice: a generic PRODUCT axis (sinks / taps / vanities / mirrors / accessories) and this SERIES axis under 洗面台シリーズ / bathroom-ranges-700450 (213) that re-cuts the identical products by furniture series. Only the generic axis is recorded. PROVED, not assumed, by per-card data-ref-id extraction over all 31 series-axis nodes against a 311-id pool built from the 26 generic bathroom nodes: every series node is either a strict subset of the generic pool or its residual ids resolve to products that belong to already-extracted Furniture.xlsx nodes. Fully-contained with ZERO ids outside: sinks-for-havbaeck 9/9, sinks-for-aengsjoen 9/9, sinks-for-taennforsen 9/9, wash-basins-for-vidvessel 3/3, vidvessel-bathroom 15/15, havbaeck-mirror-mirror-cabinets 4/4, aengsjoen-mirror-mirror-cabinets 4/4, taennforsen-mirror-mirror-cabinets 5/5, aengsjoen-vanity-units-without-basin 1/1, taennforsen-vanity-units-without-basin 2/2, enhet-vanity-units-with-basin 3/3, enhet-vanity-units-without-basin 3/3. The 85 distinct residual ids across the remaining nodes were all opened and named: they are 洗面台/洗面ボウル washstands with basin (-> 洗面キャビネット 20720, ALREADY EXTRACTED), ミラーキャビネット mirror cabinets (-> 20500, ALREADY EXTRACTED), ウォールキャビネット / ハイキャビネット / ミラードア / 扉 / ベースフレーム / ウォールフレーム / 脚 / 引き出し前部 ENHET frame parts and wall/tall cabinets (-> 20808 and 20804, both ALREADY EXTRACTED), ランドリーバッグ laundry bag (-> 48925, ALREADY EXTRACTED), ノブ / 取っ手 knobs and handles (-> 16298, routed out on primary type), 収納コンビネーション / バスルーム ENHET furniture combinations, and one ドリルテンプレート drill template. Nothing on the series axis is both NEW and in Bathroom scope. Recording these 31 nodes would have double-counted the 213-product roll-up. HONEST LIMIT: because IKEA ignores ?page=, generic nodes above the 24-per-page grid (20720=64, 20804=51, 16298=54, 20615=31, 10555=77) could only be id-enumerated to their first 24 cards, so containment for those residuals rests on product identity plus the Furniture.xlsx dedup rather than on exhaustive id equality.",
+   "link": "https://www.ikea.com/jp/ja/cat/enhet-mirror-mirror-cabinets-700484/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "ENHET Bathroom Accessories & Lighting",
+   "qty": 9,
+   "issue": "SERIES AXIS - WITHHELD AS AN OVERLAPPING RE-SLICE OF THE GENERIC AXIS, NOT RECORDED (rule 28 + BATCH_BRIEF s5). IKEA JP exposes the same bathroom catalogue twice: a generic PRODUCT axis (sinks / taps / vanities / mirrors / accessories) and this SERIES axis under 洗面台シリーズ / bathroom-ranges-700450 (213) that re-cuts the identical products by furniture series. Only the generic axis is recorded. PROVED, not assumed, by per-card data-ref-id extraction over all 31 series-axis nodes against a 311-id pool built from the 26 generic bathroom nodes: every series node is either a strict subset of the generic pool or its residual ids resolve to products that belong to already-extracted Furniture.xlsx nodes. Fully-contained with ZERO ids outside: sinks-for-havbaeck 9/9, sinks-for-aengsjoen 9/9, sinks-for-taennforsen 9/9, wash-basins-for-vidvessel 3/3, vidvessel-bathroom 15/15, havbaeck-mirror-mirror-cabinets 4/4, aengsjoen-mirror-mirror-cabinets 4/4, taennforsen-mirror-mirror-cabinets 5/5, aengsjoen-vanity-units-without-basin 1/1, taennforsen-vanity-units-without-basin 2/2, enhet-vanity-units-with-basin 3/3, enhet-vanity-units-without-basin 3/3. The 85 distinct residual ids across the remaining nodes were all opened and named: they are 洗面台/洗面ボウル washstands with basin (-> 洗面キャビネット 20720, ALREADY EXTRACTED), ミラーキャビネット mirror cabinets (-> 20500, ALREADY EXTRACTED), ウォールキャビネット / ハイキャビネット / ミラードア / 扉 / ベースフレーム / ウォールフレーム / 脚 / 引き出し前部 ENHET frame parts and wall/tall cabinets (-> 20808 and 20804, both ALREADY EXTRACTED), ランドリーバッグ laundry bag (-> 48925, ALREADY EXTRACTED), ノブ / 取っ手 knobs and handles (-> 16298, routed out on primary type), 収納コンビネーション / バスルーム ENHET furniture combinations, and one ドリルテンプレート drill template. Nothing on the series axis is both NEW and in Bathroom scope. Recording these 31 nodes would have double-counted the 213-product roll-up. HONEST LIMIT: because IKEA ignores ?page=, generic nodes above the 24-per-page grid (20720=64, 20804=51, 16298=54, 20615=31, 10555=77) could only be id-enumerated to their first 24 cards, so containment for those residuals rests on product identity plus the Furniture.xlsx dedup rather than on exhaustive id equality.",
+   "link": "https://www.ikea.com/jp/ja/cat/enhet-bathroom-accessories-700485/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "ENHET Bathroom Storage & Shelving",
+   "qty": 14,
+   "issue": "SERIES AXIS - WITHHELD AS AN OVERLAPPING RE-SLICE OF THE GENERIC AXIS, NOT RECORDED (rule 28 + BATCH_BRIEF s5). IKEA JP exposes the same bathroom catalogue twice: a generic PRODUCT axis (sinks / taps / vanities / mirrors / accessories) and this SERIES axis under 洗面台シリーズ / bathroom-ranges-700450 (213) that re-cuts the identical products by furniture series. Only the generic axis is recorded. PROVED, not assumed, by per-card data-ref-id extraction over all 31 series-axis nodes against a 311-id pool built from the 26 generic bathroom nodes: every series node is either a strict subset of the generic pool or its residual ids resolve to products that belong to already-extracted Furniture.xlsx nodes. Fully-contained with ZERO ids outside: sinks-for-havbaeck 9/9, sinks-for-aengsjoen 9/9, sinks-for-taennforsen 9/9, wash-basins-for-vidvessel 3/3, vidvessel-bathroom 15/15, havbaeck-mirror-mirror-cabinets 4/4, aengsjoen-mirror-mirror-cabinets 4/4, taennforsen-mirror-mirror-cabinets 5/5, aengsjoen-vanity-units-without-basin 1/1, taennforsen-vanity-units-without-basin 2/2, enhet-vanity-units-with-basin 3/3, enhet-vanity-units-without-basin 3/3. The 85 distinct residual ids across the remaining nodes were all opened and named: they are 洗面台/洗面ボウル washstands with basin (-> 洗面キャビネット 20720, ALREADY EXTRACTED), ミラーキャビネット mirror cabinets (-> 20500, ALREADY EXTRACTED), ウォールキャビネット / ハイキャビネット / ミラードア / 扉 / ベースフレーム / ウォールフレーム / 脚 / 引き出し前部 ENHET frame parts and wall/tall cabinets (-> 20808 and 20804, both ALREADY EXTRACTED), ランドリーバッグ laundry bag (-> 48925, ALREADY EXTRACTED), ノブ / 取っ手 knobs and handles (-> 16298, routed out on primary type), 収納コンビネーション / バスルーム ENHET furniture combinations, and one ドリルテンプレート drill template. Nothing on the series axis is both NEW and in Bathroom scope. Recording these 31 nodes would have double-counted the 213-product roll-up. HONEST LIMIT: because IKEA ignores ?page=, generic nodes above the 24-per-page grid (20720=64, 20804=51, 16298=54, 20615=31, 10555=77) could only be id-enumerated to their first 24 cards, so containment for those residuals rests on product identity plus the Furniture.xlsx dedup rather than on exhaustive id equality.",
+   "link": "https://www.ikea.com/jp/ja/cat/enhet-bathroom-cabinets-700486/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "ENHET Bathroom Storage Combination",
+   "qty": 6,
+   "issue": "SERIES AXIS - WITHHELD AS AN OVERLAPPING RE-SLICE OF THE GENERIC AXIS, NOT RECORDED (rule 28 + BATCH_BRIEF s5). IKEA JP exposes the same bathroom catalogue twice: a generic PRODUCT axis (sinks / taps / vanities / mirrors / accessories) and this SERIES axis under 洗面台シリーズ / bathroom-ranges-700450 (213) that re-cuts the identical products by furniture series. Only the generic axis is recorded. PROVED, not assumed, by per-card data-ref-id extraction over all 31 series-axis nodes against a 311-id pool built from the 26 generic bathroom nodes: every series node is either a strict subset of the generic pool or its residual ids resolve to products that belong to already-extracted Furniture.xlsx nodes. Fully-contained with ZERO ids outside: sinks-for-havbaeck 9/9, sinks-for-aengsjoen 9/9, sinks-for-taennforsen 9/9, wash-basins-for-vidvessel 3/3, vidvessel-bathroom 15/15, havbaeck-mirror-mirror-cabinets 4/4, aengsjoen-mirror-mirror-cabinets 4/4, taennforsen-mirror-mirror-cabinets 5/5, aengsjoen-vanity-units-without-basin 1/1, taennforsen-vanity-units-without-basin 2/2, enhet-vanity-units-with-basin 3/3, enhet-vanity-units-without-basin 3/3. The 85 distinct residual ids across the remaining nodes were all opened and named: they are 洗面台/洗面ボウル washstands with basin (-> 洗面キャビネット 20720, ALREADY EXTRACTED), ミラーキャビネット mirror cabinets (-> 20500, ALREADY EXTRACTED), ウォールキャビネット / ハイキャビネット / ミラードア / 扉 / ベースフレーム / ウォールフレーム / 脚 / 引き出し前部 ENHET frame parts and wall/tall cabinets (-> 20808 and 20804, both ALREADY EXTRACTED), ランドリーバッグ laundry bag (-> 48925, ALREADY EXTRACTED), ノブ / 取っ手 knobs and handles (-> 16298, routed out on primary type), 収納コンビネーション / バスルーム ENHET furniture combinations, and one ドリルテンプレート drill template. Nothing on the series axis is both NEW and in Bathroom scope. Recording these 31 nodes would have double-counted the 213-product roll-up. HONEST LIMIT: because IKEA ignores ?page=, generic nodes above the 24-per-page grid (20720=64, 20804=51, 16298=54, 20615=31, 10555=77) could only be id-enumerated to their first 24 cards, so containment for those residuals rests on product identity plus the Furniture.xlsx dedup rather than on exhaustive id equality.",
+   "link": "https://www.ikea.com/jp/ja/cat/enhet-bathroom-combinations-700491/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "ENHET Vanity Units without Basin",
+   "qty": 3,
+   "issue": "SERIES AXIS - WITHHELD AS AN OVERLAPPING RE-SLICE OF THE GENERIC AXIS, NOT RECORDED (rule 28 + BATCH_BRIEF s5). IKEA JP exposes the same bathroom catalogue twice: a generic PRODUCT axis (sinks / taps / vanities / mirrors / accessories) and this SERIES axis under 洗面台シリーズ / bathroom-ranges-700450 (213) that re-cuts the identical products by furniture series. Only the generic axis is recorded. PROVED, not assumed, by per-card data-ref-id extraction over all 31 series-axis nodes against a 311-id pool built from the 26 generic bathroom nodes: every series node is either a strict subset of the generic pool or its residual ids resolve to products that belong to already-extracted Furniture.xlsx nodes. Fully-contained with ZERO ids outside: sinks-for-havbaeck 9/9, sinks-for-aengsjoen 9/9, sinks-for-taennforsen 9/9, wash-basins-for-vidvessel 3/3, vidvessel-bathroom 15/15, havbaeck-mirror-mirror-cabinets 4/4, aengsjoen-mirror-mirror-cabinets 4/4, taennforsen-mirror-mirror-cabinets 5/5, aengsjoen-vanity-units-without-basin 1/1, taennforsen-vanity-units-without-basin 2/2, enhet-vanity-units-with-basin 3/3, enhet-vanity-units-without-basin 3/3. The 85 distinct residual ids across the remaining nodes were all opened and named: they are 洗面台/洗面ボウル washstands with basin (-> 洗面キャビネット 20720, ALREADY EXTRACTED), ミラーキャビネット mirror cabinets (-> 20500, ALREADY EXTRACTED), ウォールキャビネット / ハイキャビネット / ミラードア / 扉 / ベースフレーム / ウォールフレーム / 脚 / 引き出し前部 ENHET frame parts and wall/tall cabinets (-> 20808 and 20804, both ALREADY EXTRACTED), ランドリーバッグ laundry bag (-> 48925, ALREADY EXTRACTED), ノブ / 取っ手 knobs and handles (-> 16298, routed out on primary type), 収納コンビネーション / バスルーム ENHET furniture combinations, and one ドリルテンプレート drill template. Nothing on the series axis is both NEW and in Bathroom scope. Recording these 31 nodes would have double-counted the 213-product roll-up. HONEST LIMIT: because IKEA ignores ?page=, generic nodes above the 24-per-page grid (20720=64, 20804=51, 16298=54, 20615=31, 10555=77) could only be id-enumerated to their first 24 cards, so containment for those residuals rests on product identity plus the Furniture.xlsx dedup rather than on exhaustive id equality.",
+   "link": "https://www.ikea.com/jp/ja/cat/enhet-vanity-units-without-basin-700492/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "ENHET Vanity Units with Basin",
+   "qty": 3,
+   "issue": "SERIES AXIS - WITHHELD AS AN OVERLAPPING RE-SLICE OF THE GENERIC AXIS, NOT RECORDED (rule 28 + BATCH_BRIEF s5). IKEA JP exposes the same bathroom catalogue twice: a generic PRODUCT axis (sinks / taps / vanities / mirrors / accessories) and this SERIES axis under 洗面台シリーズ / bathroom-ranges-700450 (213) that re-cuts the identical products by furniture series. Only the generic axis is recorded. PROVED, not assumed, by per-card data-ref-id extraction over all 31 series-axis nodes against a 311-id pool built from the 26 generic bathroom nodes: every series node is either a strict subset of the generic pool or its residual ids resolve to products that belong to already-extracted Furniture.xlsx nodes. Fully-contained with ZERO ids outside: sinks-for-havbaeck 9/9, sinks-for-aengsjoen 9/9, sinks-for-taennforsen 9/9, wash-basins-for-vidvessel 3/3, vidvessel-bathroom 15/15, havbaeck-mirror-mirror-cabinets 4/4, aengsjoen-mirror-mirror-cabinets 4/4, taennforsen-mirror-mirror-cabinets 5/5, aengsjoen-vanity-units-without-basin 1/1, taennforsen-vanity-units-without-basin 2/2, enhet-vanity-units-with-basin 3/3, enhet-vanity-units-without-basin 3/3. The 85 distinct residual ids across the remaining nodes were all opened and named: they are 洗面台/洗面ボウル washstands with basin (-> 洗面キャビネット 20720, ALREADY EXTRACTED), ミラーキャビネット mirror cabinets (-> 20500, ALREADY EXTRACTED), ウォールキャビネット / ハイキャビネット / ミラードア / 扉 / ベースフレーム / ウォールフレーム / 脚 / 引き出し前部 ENHET frame parts and wall/tall cabinets (-> 20808 and 20804, both ALREADY EXTRACTED), ランドリーバッグ laundry bag (-> 48925, ALREADY EXTRACTED), ノブ / 取っ手 knobs and handles (-> 16298, routed out on primary type), 収納コンビネーション / バスルーム ENHET furniture combinations, and one ドリルテンプレート drill template. Nothing on the series axis is both NEW and in Bathroom scope. Recording these 31 nodes would have double-counted the 213-product roll-up. HONEST LIMIT: because IKEA ignores ?page=, generic nodes above the 24-per-page grid (20720=64, 20804=51, 16298=54, 20615=31, 10555=77) could only be id-enumerated to their first 24 cards, so containment for those residuals rests on product identity plus the Furniture.xlsx dedup rather than on exhaustive id equality.",
+   "link": "https://www.ikea.com/jp/ja/cat/enhet-vanity-units-with-basin-700493/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "NYSJON Vanity Series",
+   "qty": 16,
+   "issue": "SERIES AXIS - WITHHELD AS AN OVERLAPPING RE-SLICE OF THE GENERIC AXIS, NOT RECORDED (rule 28 + BATCH_BRIEF s5). IKEA JP exposes the same bathroom catalogue twice: a generic PRODUCT axis (sinks / taps / vanities / mirrors / accessories) and this SERIES axis under 洗面台シリーズ / bathroom-ranges-700450 (213) that re-cuts the identical products by furniture series. Only the generic axis is recorded. PROVED, not assumed, by per-card data-ref-id extraction over all 31 series-axis nodes against a 311-id pool built from the 26 generic bathroom nodes: every series node is either a strict subset of the generic pool or its residual ids resolve to products that belong to already-extracted Furniture.xlsx nodes. Fully-contained with ZERO ids outside: sinks-for-havbaeck 9/9, sinks-for-aengsjoen 9/9, sinks-for-taennforsen 9/9, wash-basins-for-vidvessel 3/3, vidvessel-bathroom 15/15, havbaeck-mirror-mirror-cabinets 4/4, aengsjoen-mirror-mirror-cabinets 4/4, taennforsen-mirror-mirror-cabinets 5/5, aengsjoen-vanity-units-without-basin 1/1, taennforsen-vanity-units-without-basin 2/2, enhet-vanity-units-with-basin 3/3, enhet-vanity-units-without-basin 3/3. The 85 distinct residual ids across the remaining nodes were all opened and named: they are 洗面台/洗面ボウル washstands with basin (-> 洗面キャビネット 20720, ALREADY EXTRACTED), ミラーキャビネット mirror cabinets (-> 20500, ALREADY EXTRACTED), ウォールキャビネット / ハイキャビネット / ミラードア / 扉 / ベースフレーム / ウォールフレーム / 脚 / 引き出し前部 ENHET frame parts and wall/tall cabinets (-> 20808 and 20804, both ALREADY EXTRACTED), ランドリーバッグ laundry bag (-> 48925, ALREADY EXTRACTED), ノブ / 取っ手 knobs and handles (-> 16298, routed out on primary type), 収納コンビネーション / バスルーム ENHET furniture combinations, and one ドリルテンプレート drill template. Nothing on the series axis is both NEW and in Bathroom scope. Recording these 31 nodes would have double-counted the 213-product roll-up. HONEST LIMIT: because IKEA ignores ?page=, generic nodes above the 24-per-page grid (20720=64, 20804=51, 16298=54, 20615=31, 10555=77) could only be id-enumerated to their first 24 cards, so containment for those residuals rests on product identity plus the Furniture.xlsx dedup rather than on exhaustive id equality.",
+   "link": "https://www.ikea.com/jp/ja/cat/nysjoen-contemporary-bathroom-range-700459/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "NYSJON Storage & Mirror",
+   "qty": 3,
+   "issue": "SERIES AXIS - WITHHELD AS AN OVERLAPPING RE-SLICE OF THE GENERIC AXIS, NOT RECORDED (rule 28 + BATCH_BRIEF s5). IKEA JP exposes the same bathroom catalogue twice: a generic PRODUCT axis (sinks / taps / vanities / mirrors / accessories) and this SERIES axis under 洗面台シリーズ / bathroom-ranges-700450 (213) that re-cuts the identical products by furniture series. Only the generic axis is recorded. PROVED, not assumed, by per-card data-ref-id extraction over all 31 series-axis nodes against a 311-id pool built from the 26 generic bathroom nodes: every series node is either a strict subset of the generic pool or its residual ids resolve to products that belong to already-extracted Furniture.xlsx nodes. Fully-contained with ZERO ids outside: sinks-for-havbaeck 9/9, sinks-for-aengsjoen 9/9, sinks-for-taennforsen 9/9, wash-basins-for-vidvessel 3/3, vidvessel-bathroom 15/15, havbaeck-mirror-mirror-cabinets 4/4, aengsjoen-mirror-mirror-cabinets 4/4, taennforsen-mirror-mirror-cabinets 5/5, aengsjoen-vanity-units-without-basin 1/1, taennforsen-vanity-units-without-basin 2/2, enhet-vanity-units-with-basin 3/3, enhet-vanity-units-without-basin 3/3. The 85 distinct residual ids across the remaining nodes were all opened and named: they are 洗面台/洗面ボウル washstands with basin (-> 洗面キャビネット 20720, ALREADY EXTRACTED), ミラーキャビネット mirror cabinets (-> 20500, ALREADY EXTRACTED), ウォールキャビネット / ハイキャビネット / ミラードア / 扉 / ベースフレーム / ウォールフレーム / 脚 / 引き出し前部 ENHET frame parts and wall/tall cabinets (-> 20808 and 20804, both ALREADY EXTRACTED), ランドリーバッグ laundry bag (-> 48925, ALREADY EXTRACTED), ノブ / 取っ手 knobs and handles (-> 16298, routed out on primary type), 収納コンビネーション / バスルーム ENHET furniture combinations, and one ドリルテンプレート drill template. Nothing on the series axis is both NEW and in Bathroom scope. Recording these 31 nodes would have double-counted the 213-product roll-up. HONEST LIMIT: because IKEA ignores ?page=, generic nodes above the 24-per-page grid (20720=64, 20804=51, 16298=54, 20615=31, 10555=77) could only be id-enumerated to their first 24 cards, so containment for those residuals rests on product identity plus the Furniture.xlsx dedup rather than on exhaustive id equality.",
+   "link": "https://www.ikea.com/jp/ja/cat/nysjoen-storage-mirrors-700494/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "NYSJON Vanity Units with Basin",
+   "qty": 1,
+   "issue": "SERIES AXIS - WITHHELD AS AN OVERLAPPING RE-SLICE OF THE GENERIC AXIS, NOT RECORDED (rule 28 + BATCH_BRIEF s5). IKEA JP exposes the same bathroom catalogue twice: a generic PRODUCT axis (sinks / taps / vanities / mirrors / accessories) and this SERIES axis under 洗面台シリーズ / bathroom-ranges-700450 (213) that re-cuts the identical products by furniture series. Only the generic axis is recorded. PROVED, not assumed, by per-card data-ref-id extraction over all 31 series-axis nodes against a 311-id pool built from the 26 generic bathroom nodes: every series node is either a strict subset of the generic pool or its residual ids resolve to products that belong to already-extracted Furniture.xlsx nodes. Fully-contained with ZERO ids outside: sinks-for-havbaeck 9/9, sinks-for-aengsjoen 9/9, sinks-for-taennforsen 9/9, wash-basins-for-vidvessel 3/3, vidvessel-bathroom 15/15, havbaeck-mirror-mirror-cabinets 4/4, aengsjoen-mirror-mirror-cabinets 4/4, taennforsen-mirror-mirror-cabinets 5/5, aengsjoen-vanity-units-without-basin 1/1, taennforsen-vanity-units-without-basin 2/2, enhet-vanity-units-with-basin 3/3, enhet-vanity-units-without-basin 3/3. The 85 distinct residual ids across the remaining nodes were all opened and named: they are 洗面台/洗面ボウル washstands with basin (-> 洗面キャビネット 20720, ALREADY EXTRACTED), ミラーキャビネット mirror cabinets (-> 20500, ALREADY EXTRACTED), ウォールキャビネット / ハイキャビネット / ミラードア / 扉 / ベースフレーム / ウォールフレーム / 脚 / 引き出し前部 ENHET frame parts and wall/tall cabinets (-> 20808 and 20804, both ALREADY EXTRACTED), ランドリーバッグ laundry bag (-> 48925, ALREADY EXTRACTED), ノブ / 取っ手 knobs and handles (-> 16298, routed out on primary type), 収納コンビネーション / バスルーム ENHET furniture combinations, and one ドリルテンプレート drill template. Nothing on the series axis is both NEW and in Bathroom scope. Recording these 31 nodes would have double-counted the 213-product roll-up. HONEST LIMIT: because IKEA ignores ?page=, generic nodes above the 24-per-page grid (20720=64, 20804=51, 16298=54, 20615=31, 10555=77) could only be id-enumerated to their first 24 cards, so containment for those residuals rests on product identity plus the Furniture.xlsx dedup rather than on exhaustive id equality.",
+   "link": "https://www.ikea.com/jp/ja/cat/nysjoen-vanity-units-with-basin-700495/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "VIDVASSEL Bathroom",
+   "qty": 15,
+   "issue": "SERIES AXIS - WITHHELD AS AN OVERLAPPING RE-SLICE OF THE GENERIC AXIS, NOT RECORDED (rule 28 + BATCH_BRIEF s5). IKEA JP exposes the same bathroom catalogue twice: a generic PRODUCT axis (sinks / taps / vanities / mirrors / accessories) and this SERIES axis under 洗面台シリーズ / bathroom-ranges-700450 (213) that re-cuts the identical products by furniture series. Only the generic axis is recorded. PROVED, not assumed, by per-card data-ref-id extraction over all 31 series-axis nodes against a 311-id pool built from the 26 generic bathroom nodes: every series node is either a strict subset of the generic pool or its residual ids resolve to products that belong to already-extracted Furniture.xlsx nodes. Fully-contained with ZERO ids outside: sinks-for-havbaeck 9/9, sinks-for-aengsjoen 9/9, sinks-for-taennforsen 9/9, wash-basins-for-vidvessel 3/3, vidvessel-bathroom 15/15, havbaeck-mirror-mirror-cabinets 4/4, aengsjoen-mirror-mirror-cabinets 4/4, taennforsen-mirror-mirror-cabinets 5/5, aengsjoen-vanity-units-without-basin 1/1, taennforsen-vanity-units-without-basin 2/2, enhet-vanity-units-with-basin 3/3, enhet-vanity-units-without-basin 3/3. The 85 distinct residual ids across the remaining nodes were all opened and named: they are 洗面台/洗面ボウル washstands with basin (-> 洗面キャビネット 20720, ALREADY EXTRACTED), ミラーキャビネット mirror cabinets (-> 20500, ALREADY EXTRACTED), ウォールキャビネット / ハイキャビネット / ミラードア / 扉 / ベースフレーム / ウォールフレーム / 脚 / 引き出し前部 ENHET frame parts and wall/tall cabinets (-> 20808 and 20804, both ALREADY EXTRACTED), ランドリーバッグ laundry bag (-> 48925, ALREADY EXTRACTED), ノブ / 取っ手 knobs and handles (-> 16298, routed out on primary type), 収納コンビネーション / バスルーム ENHET furniture combinations, and one ドリルテンプレート drill template. Nothing on the series axis is both NEW and in Bathroom scope. Recording these 31 nodes would have double-counted the 213-product roll-up. HONEST LIMIT: because IKEA ignores ?page=, generic nodes above the 24-per-page grid (20720=64, 20804=51, 16298=54, 20615=31, 10555=77) could only be id-enumerated to their first 24 cards, so containment for those residuals rests on product identity plus the Furniture.xlsx dedup rather than on exhaustive id equality.",
+   "link": "https://www.ikea.com/jp/ja/cat/vidvessel-bathroom-700868/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Wash Basins for VIDVASSEL",
+   "qty": 3,
+   "issue": "SERIES AXIS - WITHHELD AS AN OVERLAPPING RE-SLICE OF THE GENERIC AXIS, NOT RECORDED (rule 28 + BATCH_BRIEF s5). IKEA JP exposes the same bathroom catalogue twice: a generic PRODUCT axis (sinks / taps / vanities / mirrors / accessories) and this SERIES axis under 洗面台シリーズ / bathroom-ranges-700450 (213) that re-cuts the identical products by furniture series. Only the generic axis is recorded. PROVED, not assumed, by per-card data-ref-id extraction over all 31 series-axis nodes against a 311-id pool built from the 26 generic bathroom nodes: every series node is either a strict subset of the generic pool or its residual ids resolve to products that belong to already-extracted Furniture.xlsx nodes. Fully-contained with ZERO ids outside: sinks-for-havbaeck 9/9, sinks-for-aengsjoen 9/9, sinks-for-taennforsen 9/9, wash-basins-for-vidvessel 3/3, vidvessel-bathroom 15/15, havbaeck-mirror-mirror-cabinets 4/4, aengsjoen-mirror-mirror-cabinets 4/4, taennforsen-mirror-mirror-cabinets 5/5, aengsjoen-vanity-units-without-basin 1/1, taennforsen-vanity-units-without-basin 2/2, enhet-vanity-units-with-basin 3/3, enhet-vanity-units-without-basin 3/3. The 85 distinct residual ids across the remaining nodes were all opened and named: they are 洗面台/洗面ボウル washstands with basin (-> 洗面キャビネット 20720, ALREADY EXTRACTED), ミラーキャビネット mirror cabinets (-> 20500, ALREADY EXTRACTED), ウォールキャビネット / ハイキャビネット / ミラードア / 扉 / ベースフレーム / ウォールフレーム / 脚 / 引き出し前部 ENHET frame parts and wall/tall cabinets (-> 20808 and 20804, both ALREADY EXTRACTED), ランドリーバッグ laundry bag (-> 48925, ALREADY EXTRACTED), ノブ / 取っ手 knobs and handles (-> 16298, routed out on primary type), 収納コンビネーション / バスルーム ENHET furniture combinations, and one ドリルテンプレート drill template. Nothing on the series axis is both NEW and in Bathroom scope. Recording these 31 nodes would have double-counted the 213-product roll-up. HONEST LIMIT: because IKEA ignores ?page=, generic nodes above the 24-per-page grid (20720=64, 20804=51, 16298=54, 20615=31, 10555=77) could only be id-enumerated to their first 24 cards, so containment for those residuals rests on product identity plus the Furniture.xlsx dedup rather than on exhaustive id equality.",
+   "link": "https://www.ikea.com/jp/ja/cat/wash-basins-for-vidvessel-700874/"
+  }
+ ],
+ "_reconstructed_from": "Bathroom.xlsx delivered 2026-09-01 (checkpoint), not original worker JSON"
+}

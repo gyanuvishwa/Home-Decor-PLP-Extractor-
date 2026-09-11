@@ -1,0 +1,88 @@
+{
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "Access: curl_cffi impersonate=chrome124, no Claude-specific robots.txt disallow (note: robots.txt has a bare 'Disallow: /newest-additions' line for User-agent: *, but as a prefix-match rule it does not actually cover the real URLs found, which are all of the form /<department>/newest-additions/, e.g. /indoor-furniture/newest-additions/ - none of them start with /newest-additions). TWO PARALLEL STRUCTURES FOUND, kept as separate rows because they are genuinely different listings, not aliases: (1) a dedicated top-nav 'New' hub at /new/ (categoryId=254677, categoryAttributes OVERWRITE_H1_TAG_TITLE='New Arrivals', page <title>New Home Decorations & Popular Home Decor</title>) reporting 409 products sitewide, confirmed exact via full paginated enumeration. Nav declares 8 children under /new/ (Furniture/Decor/Outdoor/Bedding/Rugs & Lighting/Halloween Haven/Christmas/Seasonal at /new/furniture/ etc.) but every one of those 8 child categoryIds resolves via UnbxdAPI to numberOfProducts=0 and currentCategoryURL=null - dead/broken nav links - so the /new/ root is emitted as a single standalone row, not a group with working children. (2) Separately, each product department's OWN nav menu (Furniture, Decor, Outdoor, Bedding, Rugs & Lighting, Halloween Haven, Christmas, Seasonal - the actual site-wide department taxonomy, not the /new/ hub) carries its own working 'New Arrivals' child at a /<dept>/newest-additions/ URL, each independently verified as a real PLP (200 status, distinct on-page title, real Unbxd categoryId with products) - not aliases of /new/, since their per-department counts (71/65/130/21/44/105/103/35, sum=574) neither equal nor cleanly partition the 409 sitewide root figure, i.e. they are structurally independent listings that happen to overlap in the same underlying products, which the brief treats as expected/normal. SEASONAL-CAMPAIGN-VS-STANDING-CONCEPT CHECK (per instruction to watch for this, cf. House Australia 'New Season'): explicitly considered whether the Halloween/Christmas/Seasonal 'New Arrivals' pages are themed marketing campaigns rather than a genuine 'recently added to catalogue' concept. Ruled NOT ambiguous: Halloween Haven, Christmas, and Seasonal (gifts-celebrations) are permanent, evergreen top-level departments in this site's taxonomy (same standing as Furniture or Decor, verified in the prior Home-Decor pass and in this session's 253-node nav pull), each carrying the identical 'newest-additions' URL convention and Unbxd-backed real product grid as every non-seasonal department - these are department-scoped New Arrivals listings, not one-off campaign/lookbook pages, so no flag applied. QTY DISCREPANCY FOUND AND RESOLVED: Halloween New Arrivals (categoryId=51734) reports numberOfProducts=114, but this endpoint's JSON payload has no 'uniqueId' field at all (unlike every other category checked in this pass and in the sibling Clearance/Bestsellers files), so a partNumber/targetURL-based full paginated enumeration was used instead: it found only 105 distinct products - 4 partNumbers (p_188296 x4, p_168105 x5, p_188686 x2, p_188805 x2) each appear as an exact duplicate tile (identical targetURL, not a distinct color/style variant) repeated across pagination pages. Set qty=105 (the verified figure) and flagged the row rather than trusting the site's own inflated 114 count. Checked for other Bestsellers/New-Arrivals-shaped nav/sitemap entries beyond what's reported - none found in the 253-node nav tree or the 4 CAT sitemaps.",
+  "rows": [
+    {
+      "category": "New Arrivals",
+      "sub_category": "New Arrivals",
+      "qty": 409,
+      "link": "https://www.grandinroad.com/new/",
+      "is_group": false,
+      "evidence": "UnbxdAPI categoryId=254677 numberOfProducts=409 (currentCategoryURL=/new/); confirmed via full paginated enumeration, 409 distinct uniqueId values, exact match. Page <title>New Home Decorations & Popular Home Decor | Grandin Road</title>.",
+      "flag": null
+    },
+    {
+      "category": "Furniture New Arrivals",
+      "sub_category": "New Arrivals",
+      "qty": 71,
+      "link": "https://www.grandinroad.com/indoor-furniture/newest-additions/",
+      "is_group": false,
+      "evidence": "UnbxdAPI categoryId=11569 numberOfProducts=71, currentCategoryURL=/indoor-furniture/newest-additions/; confirmed via full paginated enumeration, exact match. Page <title>New Furniture Arrivals | Grandin Road</title>.",
+      "flag": null
+    },
+    {
+      "category": "Decor New Arrivals",
+      "sub_category": "New Arrivals",
+      "qty": 65,
+      "link": "https://www.grandinroad.com/indoor-decor/newest-additions/",
+      "is_group": false,
+      "evidence": "UnbxdAPI categoryId=11566 numberOfProducts=65, currentCategoryURL=/indoor-decor/newest-additions/; confirmed via full paginated enumeration, exact match. Page <title>Newest Indoor Decor From Grandin Road | Grandin Road</title>.",
+      "flag": null
+    },
+    {
+      "category": "Outdoor New Arrivals",
+      "sub_category": "New Arrivals",
+      "qty": 130,
+      "link": "https://www.grandinroad.com/outdoor-living/newest-additions/",
+      "is_group": false,
+      "evidence": "UnbxdAPI categoryId=59216 numberOfProducts=130, currentCategoryURL=/outdoor-living/newest-additions/; confirmed via full paginated enumeration, exact match. Page <title>Newest Outdoor Living Arrivals | grandinroad</title>.",
+      "flag": null
+    },
+    {
+      "category": "Bedding New Arrivals",
+      "sub_category": "New Arrivals",
+      "qty": 21,
+      "link": "https://www.grandinroad.com/bed-and-bath/newest-additions/",
+      "is_group": false,
+      "evidence": "UnbxdAPI categoryId=89797 numberOfProducts=21, currentCategoryURL=/bed-and-bath/newest-additions/; confirmed via full paginated enumeration, exact match. Page <title>New Bedding - New Additions | Grandin Road</title>.",
+      "flag": null
+    },
+    {
+      "category": "Rugs & Lighting New Arrivals",
+      "sub_category": "New Arrivals",
+      "qty": 44,
+      "link": "https://www.grandinroad.com/area-rugs-door-mats/newest-additions/",
+      "is_group": false,
+      "evidence": "UnbxdAPI categoryId=11567 numberOfProducts=44, currentCategoryURL=/area-rugs-door-mats/newest-additions/; confirmed via full paginated enumeration, exact match. Page <title>Newest Area Rugs And Doormats | grandinroad</title>.",
+      "flag": null
+    },
+    {
+      "category": "Halloween New Arrivals",
+      "sub_category": "New Arrivals",
+      "qty": 105,
+      "link": "https://www.grandinroad.com/halloween-haven/newest-additions/",
+      "is_group": false,
+      "evidence": "Site's own UnbxdAPI categoryId=51734 numberOfProducts field reports 114, but full paginated enumeration (partNumber/targetURL identity - this endpoint's payload lacks a uniqueId field) found only 105 distinct products; 4 partNumbers appear as exact duplicate tiles (identical targetURL) 2-5x across pages. qty set to the verified 105, not the raw 114 field. Page <title>New Halloween Decorations - New Halloween Haven Decor | Grandin Road</title>.",
+      "flag": "MANUAL REVIEW: site's numberOfProducts field says 114 but exhaustive pagination enumeration confirms only 105 distinct products (partNumbers p_188296 x4, p_168105 x5, p_188686 x2, p_188805 x2 each returned as identical duplicate tiles, same targetURL each time - a pagination/sort-stability bug, not legitimate separate style/color tiles). qty=105 is the verified figure; recommend a manual browse-and-count check if precision matters here."
+    },
+    {
+      "category": "Christmas New Arrivals",
+      "sub_category": "New Arrivals",
+      "qty": 103,
+      "link": "https://www.grandinroad.com/christmas-decor/newest-additions/",
+      "is_group": false,
+      "evidence": "UnbxdAPI categoryId=87154 numberOfProducts=103, currentCategoryURL=/christmas-decor/newest-additions/; confirmed via full paginated enumeration, exact match. Page <title>New Christmas Decorations - New Christmas Decor | Grandin Road</title>.",
+      "flag": null
+    },
+    {
+      "category": "Seasonal New Arrivals",
+      "sub_category": "New Arrivals",
+      "qty": 35,
+      "link": "https://www.grandinroad.com/gifts-celebrations/newest-additions/",
+      "is_group": false,
+      "evidence": "UnbxdAPI categoryId=11570 numberOfProducts=35, currentCategoryURL=/gifts-celebrations/newest-additions/; confirmed via full paginated enumeration, exact match. Page <title>New Holiday & Seasonal Decor | Grandin Road</title>.",
+      "flag": null
+    }
+  ]
+}

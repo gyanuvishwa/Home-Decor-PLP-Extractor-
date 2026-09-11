@@ -1,0 +1,70 @@
+{
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "Reached via plain direct HTTPS (tier 1); robots.txt has no Claude-specific disallow (generic User-agent: * rules only, plus explicit Allow blocks for Googlebot-Image/AdsBot). Found Dunelm's dedicated Pets department via category-sitemap.xml (grep for 'pet' -> 7 URLs under /category/pets/*) and cross-checked against the site's own mega-menu JSON (reduxState.editorialContent.content.nav, nav[9].subCategories[4], label='Pets', url=/category/pets, subSubCategories array) embedded in the page's own ssr-state-data script. The mega-menu node lists exactly 7 children: All Pet Supplies, Pet Bowls, Dog Supplies, Dog Beds, Dog Leads/Collars & Harnesses, Cat Supplies, Cat Beds -- identical set to the sitemap, confirming completeness (no additional pet nav nodes exist anywhere in the ~97KB full-site nav JSON; grep for Toy/Groom/Litter/Scratch/Carrier/Treat/Coat/Hygien/Waste/Feed against the nav's 'label' fields returns zero pet-specific hits beyond the 7 already found). Dunelm A/B-serves two PLP templates (same pattern as the prior Home-Decor pass): 'ssr-state-data' (reduxState.searchProduct.results[0].res.nbHits) on some requests, 'shell-ssr-data' (dehydrated react-query state .totalProducts) on others -- both were parsed depending which template a given fetch landed on. Every qty below is confirmed by TWO independent signals: the rendered listing-header text 'N results' (appears twice per page in the HTML) AND the structured JSON total (nbHits or totalProducts), which agreed in every case. Spot-checked Dog Beds (292) a second time via a separate ?page=5 request that happened to land on the other template -- totalProducts:292, totalPages:5 -- no drift. /category/pets itself is a pure hub/landing page (Prismic 'landing:pets' content, a 'Pet brands' logo-tile grid, no product listing/header) -> emitted as a group row only. EXCLUDED: 'All Pet Supplies' (1055) -- a shop-all roll-up name (same convention as 'All Home Decor'/'All Gallery' excluded in the prior Home-Decor pass on this site); its own Type facet breakdown shows it is the union of Dog Supplies + Cat Supplies + Pet Bowls plus scattered pet-themed non-care items (Books 34, Pet Ornaments 9, Wall Art & Prints 2, Photo Frames 1, Ornaments 3, Cushions 1 -- pet-themed gifts/decor, correctly out of scope). Several genuine Tier-1 Pet Care product types exist ONLY as internal 'Type' facet values on the Dog Supplies / Cat Supplies / All Pet Supplies listings, with NO dedicated nav node or category URL anywhere in the site (checked mega-menu + sitemap, both exhaustive and identical): Pet Toys (247 within Dog Supplies, 32 within Cat Supplies), Pet Grooming (9 dog / 3 cat), Pet Carriers (10 dog / 3 cat), Pet Coats & Jumpers (14, dog only), Pet Food Storage (7 dog / 5 cat), Doggy Bags/waste bags (8, dog only), Pet Bowl Mats (8 dog / 7 cat), Scratching Posts & Playhouses (7, cat-tree/scratcher type, All-Pet-Supplies facet only, does not even appear as a facet under Cat Supplies specifically), and Pet Treats (15 dog / 0 cat -- flagging per brief: MANUAL REVIEW candidate for the open PET CONSUMABLE policy gap, but not emitted as a row because it is not a genuine navigable category, just an internal facet value with no dedicated URL -- following the same precedent the prior Home-Decor pass used to exclude filter-only subset re-cuts like Chandeliers/Tripod Lights that lacked a mega-menu entry). No medical/veterinary pet category exists on the site. No other species (bird/fish/small-animal) ranges found; Dunelm's Pets range is dog- and cat-only. Dog Supplies (761) and Cat Supplies (167) are themselves real leaf listings with their own product grids (not pure groupings; qty is real, not null) that also each expose a narrower nav-linked child (Dog Beds 292 / Dog Leads-Collars-Harnesses 83 under Dog Supplies; Cat Beds 88 under Cat Supplies) -- kept as separate rows per Rule 4 (genuinely different PLPs/URLs/counts), overlap noted here rather than nulling either qty, matching how the prior pass kept Bathroom Lighting alongside Ceiling/Wall Lights on this same site. 'Dog Leads, Collars & Harnesses' is implemented as a query-filter URL (/category/pets/dog-supplies?type=pet-leads-collars-harness) rather than a path-segment category, but it IS an explicit mega-menu subSubCategory with its own label, unlike the excluded facet-only items above, so it is included as a leaf; its count (83) exactly matches the 'Type' facet count for 'Pet Leads, Collars & Harness' shown on the parent Dog Supplies page, corroborating the number.",
+  "rows": [
+    {
+      "category": "Pet Care",
+      "sub_category": "Pets",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Pet Bowls",
+      "qty": 72,
+      "link": "https://www.dunelm.com/category/pets/pets-bowls-and-feeders",
+      "is_group": false,
+      "evidence": "rendered listing header '72 results' (appears twice in page HTML)",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Dog Supplies",
+      "qty": 761,
+      "link": "https://www.dunelm.com/category/pets/dog-supplies",
+      "is_group": false,
+      "evidence": "rendered listing header '761 results'; ssr-state-data reduxState.searchProduct.results[0].res.nbHits=761",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Dog Beds",
+      "qty": 292,
+      "link": "https://www.dunelm.com/category/pets/dog-supplies/dog-beds",
+      "is_group": false,
+      "evidence": "rendered listing header '292 results'; ssr-state-data nbHits=292; re-verified via a separate ?page=5 request that landed on the alternate template, shell-ssr-data totalProducts:292, totalPages:5 (no drift)",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Dog Leads, Collars & Harnesses",
+      "qty": 83,
+      "link": "https://www.dunelm.com/category/pets/dog-supplies?type=pet-leads-collars-harness",
+      "is_group": false,
+      "evidence": "rendered listing header '83 results'; shell-ssr-data totalProducts=83; matches the 'Pet Leads, Collars & Harness' Type-facet count (83) shown on the parent Dog Supplies listing",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Cat Supplies",
+      "qty": 167,
+      "link": "https://www.dunelm.com/category/pets/cat-supplies",
+      "is_group": false,
+      "evidence": "rendered listing header '167 results'; shell-ssr-data totalProducts=167",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Cat Beds",
+      "qty": 88,
+      "link": "https://www.dunelm.com/category/pets/cat-supplies/cat-beds",
+      "is_group": false,
+      "evidence": "rendered listing header '88 results'; shell-ssr-data totalProducts=88",
+      "flag": null
+    }
+  ]
+}

@@ -1,0 +1,504 @@
+{
+  "sr": 181,
+  "company": "Freedom Australia",
+  "brand_site": "freedom.com.au",
+  "country": "Australia",
+  "site_url": "https://www.freedom.com.au/",
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "ACCESS: Tier (a) succeeded throughout - curl_cffi (chrome impersonation) fetched robots.txt (Allow: / for User-agent: *, no anthropic-ai/ClaudeBot/Claude-Web/Claude-User/Claude-SearchBot entry, so no tier restriction applies), sitemap.xml, and categorysitemap.xml (234 category URLs). Category listing pages are an Angular/Spartacus (SAP Commerce Cloud, brand 'freedomfurniture') SPA whose SSR HTML does not embed a rendered product grid or count (grid text stays 'Loading...' in raw HTML/DOM), so exact qty could not be read from static HTML alone; a short Playwright run (tier b) was used ONCE to observe the live network traffic and identify the real data source: the front-end calls a Coveo Commerce v2 'listing' REST endpoint (https://freedomfurnitureproduction1s4nmz28u.org.coveo.com/rest/organizations/.../commerce/v2/listing) using a short-lived bearer token obtained from https://api-prod.freedom.com.au/greenlitrest/v2/freedomfurniture/coveo/token. That token and endpoint were then called directly via curl_cffi (tier a, no browser needed) for every remaining category, each request keyed only by view.url=https://www.freedom.com.au/c/<slug> (the SPA normalizes the visited breadcrumb URL down to this short form before querying Coveo, confirmed by replaying an observed real page's exact request and reproducing its number). Every category recorded was double-checked against the SPA's own H1/live-network response for at least one representative node (e.g. Office Storage confirmed H1='Office Storage' + totalProducts=320 matching the direct API call) and against internally-consistent parent-vs-children sums (see TREE) to defend against the 'bad slug silently serves a wrong number' failure mode called out in the brief. TREE: built from the union of categorysitemap.xml (234 URLs) and the full live mega-menu link set scraped from a rendered page's <a href> list (~380 unique /c/ links), which surfaced several genuine categories missing from the sitemap (quilts, pillows, mattress-protectors-and-toppers, coverlets, blinds, chair-pads, electric-blanket, kitchen-textiles, outdoor-cover, kids-bath-linen, kids-cushions-and-throws, storage-boxes, storage-units, wardrobe-organisation, jewellery-boxes-and-trays, coat-hangers-and-wall-hooks, kids-storage, kids-organisation-furniture, office-bins) - each confirmed live (HTTP 200) before use. Parent/child completeness was cross-checked by summing children against the parent category's own Coveo total: bed-linen(952)=quilt-covers(408)+sheets-and-pillowcases(494)+coverlets(50) exact; curtains-and-accessories(117)=curtains(104)+accessories(13) exact; bathroom(246)=bath-accessories(83)+bath-mats(27)+bath-towels(111)+laundry-hampers(25, cross-tagged, already recorded once under Storage) exact; napery(175) and cushions-and-throws(701) matched children within normal stock-churn tolerance. Parent category URLs (organisation, storage-furniture, storage, bed-linen, bedding, napery, curtains-and-accessories, cushions-and-throws, bathroom, kitchen-and-tableware/c/kitchen-storage's own parent) were NOT recorded as their own rows since valid subcategories exist for each (rule: parent URL only when no subcategories). QTY: pagination.totalProducts field from the Coveo listing response for each category's own view.url - this is the same number the live rendered page shows (spot-checked via Playwright network capture), never estimated/aggregated/inferred. EXCLUDED (Textile) - Accessories (13, curtain wands/joiners/brackets/tracks = hardware, textile.md S5); Coasters (21, stone/marble/ceramic coaster sets, not textile); Pouffes (ottoman-type seating = Furniture); Bath Accessories (83, soap dispensers/tumblers/bins/decorative boxes - not textile, not primarily storage either); Robes (23, URL name is misleading - actual products are ARLINGTON/KAVOVA/MANDAGUARI 'Wardrobe' and a bookshelf, i.e. Bedroom Furniture, not bathrobes - confirmed via product samples before trusting the slug name); Furniture Protection (10, timber/leather/stone CARE and polish products, not fabric covers despite the category name); Underlays (0 products, and rug pads are a functional accessory not a textile product type in any case); Wallpaper and all rug colour/size facet pages (blue-rugs, grey-rugs, large-rug, round-rug, etc. - ~20 URLs) were treated as attribute-filtered views of the already-recorded All Rugs / Outdoor Rugs listings, not distinct category-tree nodes, to avoid duplicate/inflated rows; Kids Bedding (85, dominated by 'Lift Bed'/'Cot Bed'/'Play Ottoman' kids furniture per its own taxonomy 'Kids Beds > Kids Furniture' - the genuine textile subset is already covered separately by Nursery Bed Linen). EXCLUDED (Storage) - Storage Boxes (25) and Jewellery Boxes & Trays (36): despite the URL names, live product samples for both are 'Decorative Box'/'Decorative Bowl' items under the site's own 'Homewares > Decorator Accents > Home Accessories' taxonomy, i.e. Decorative Home Accessories, not functional storage (storage.md S24 boundary) - confirmed by inspecting actual returned product names rather than trusting the slug; Kids Storage (88) and Kids Organisation Furniture (56): both resolve under the site's own 'Kids Furniture'/'Nursery Furniture' taxonomy with dresser/bedside-table/bed-end samples - Furniture task's domain per storage.md S21 tie-break rule (explicit Furniture placement wins); Kitchen Bins (20) and Office Bins (0): waste/recycling bins, not organization storage; Office Accessories (41): a mixed catch-all (storage box, clock, serving tray, book end) with no primary storage purpose, distinct from the dedicated Office Storage category already recorded; Storage/Organisation/Storage-Furniture parent URLs: not recorded, subcategories exist for each.",
+  "textile_rows": [
+    {
+      "category": "Textile",
+      "sub_category": "Bedding",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Quilts",
+      "qty": 74,
+      "link": "https://www.freedom.com.au/bed-and-bath/bedding/c/quilts",
+      "is_group": false,
+      "evidence": "Coveo commerce/v2/listing pagination.totalProducts for categoryCode=quilts (view.url=/c/quilts)",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Pillows",
+      "qty": 115,
+      "link": "https://www.freedom.com.au/bed-and-bath/bedding/c/pillows",
+      "is_group": false,
+      "evidence": "Coveo commerce/v2/listing pagination.totalProducts for categoryCode=pillows",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Mattress Protectors & Toppers",
+      "qty": 104,
+      "link": "https://www.freedom.com.au/bed-and-bath/bedding/c/mattress-protectors-and-toppers",
+      "is_group": false,
+      "evidence": "Coveo commerce/v2/listing pagination.totalProducts for categoryCode=mattress-protectors-and-toppers",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Bed Linen",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Quilt Covers",
+      "qty": 408,
+      "link": "https://www.freedom.com.au/bed-and-bath/bed-linen/c/quilt-covers",
+      "is_group": false,
+      "evidence": "Coveo commerce/v2/listing pagination.totalProducts for categoryCode=quilt-covers",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Sheets & Pillowcases",
+      "qty": 494,
+      "link": "https://www.freedom.com.au/bed-and-bath/bed-linen/c/sheets-and-pillowcases",
+      "is_group": false,
+      "evidence": "Coveo commerce/v2/listing pagination.totalProducts for categoryCode=sheets-and-pillowcases",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Coverlets",
+      "qty": 50,
+      "link": "https://www.freedom.com.au/bed-and-bath/bed-linen/c/coverlets",
+      "is_group": false,
+      "evidence": "Coveo commerce/v2/listing pagination.totalProducts for categoryCode=coverlets",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Bathroom",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Bath Mats",
+      "qty": 27,
+      "link": "https://www.freedom.com.au/bed-and-bath/bathroom/c/bath-mats",
+      "is_group": false,
+      "evidence": "Coveo commerce/v2/listing pagination.totalProducts for categoryCode=bath-mats",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Bath Towels",
+      "qty": 111,
+      "link": "https://www.freedom.com.au/bed-and-bath/bathroom/c/bath-towels",
+      "is_group": false,
+      "evidence": "Coveo commerce/v2/listing pagination.totalProducts for categoryCode=bath-towels; sample includes bath towels/bath sheets/hand towels",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Cushions & Throws",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Cushions",
+      "qty": 450,
+      "link": "https://www.freedom.com.au/cushions-throws-and-decor/cushions-and-throws/c/cushions",
+      "is_group": false,
+      "evidence": "Coveo commerce/v2/listing pagination.totalProducts for categoryCode=cushions",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Outdoor Cushions",
+      "qty": 57,
+      "link": "https://www.freedom.com.au/cushions-throws-and-decor/cushions-and-throws/c/outdoor-cushions",
+      "is_group": false,
+      "evidence": "Coveo commerce/v2/listing pagination.totalProducts for categoryCode=outdoor-cushions",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Throws",
+      "qty": 150,
+      "link": "https://www.freedom.com.au/cushions-throws-and-decor/cushions-and-throws/c/throws",
+      "is_group": false,
+      "evidence": "Coveo commerce/v2/listing pagination.totalProducts for categoryCode=throws",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Chair Pads",
+      "qty": 4,
+      "link": "https://www.freedom.com.au/c/chair-pads",
+      "is_group": false,
+      "evidence": "Coveo commerce/v2/listing pagination.totalProducts for categoryCode=chair-pads; page title 'Chair Pads in Australia | Seat Cushions & Dining Chair Cushions'",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Electric Blankets",
+      "qty": 36,
+      "link": "https://www.freedom.com.au/c/electric-blanket",
+      "is_group": false,
+      "evidence": "Coveo commerce/v2/listing pagination.totalProducts for categoryCode=electric-blanket; sample includes 'Quilted Heated Throw'/'Electric Blanket' items",
+      "flag": "Heated/electric blanket products - primary product type is a textile blanket/throw, powered feature noted for review",
+      "confidence": "MEDIUM"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Kids Cushions & Throws",
+      "qty": 32,
+      "link": "https://www.freedom.com.au/c/kids-cushions-and-throws",
+      "is_group": false,
+      "evidence": "Coveo commerce/v2/listing pagination.totalProducts for categoryCode=kids-cushions-and-throws",
+      "flag": "Category mixes genuine textile items (novelty/cloud pillows) with kids furniture (Play Couch, decorator accessories) per its own taxonomy 'Kids Activity Furniture'; qty is the site's own category total, not a pure textile count",
+      "confidence": "LOW"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Curtains & Accessories",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Curtains",
+      "qty": 104,
+      "link": "https://www.freedom.com.au/cushions-throws-and-decor/curtains-and-accessories/c/curtains",
+      "is_group": false,
+      "evidence": "Coveo commerce/v2/listing pagination.totalProducts for categoryCode=curtains",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Blinds",
+      "qty": 16,
+      "link": "https://www.freedom.com.au/c/blinds",
+      "is_group": false,
+      "evidence": "Coveo commerce/v2/listing pagination.totalProducts for categoryCode=blinds",
+      "flag": "Category mixes fabric Roller/Roman blinds (textile) with Timber Venetian blinds (not textile) in a single listing; qty is the site's combined category total",
+      "confidence": "LOW"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Napery",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Placemats & Napkins",
+      "qty": 77,
+      "link": "https://www.freedom.com.au/kitchen-and-tableware/napery/c/placemats-and-napkins",
+      "is_group": false,
+      "evidence": "Coveo commerce/v2/listing pagination.totalProducts for categoryCode=placemats-and-napkins",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Tablecloths & Runners",
+      "qty": 41,
+      "link": "https://www.freedom.com.au/kitchen-and-tableware/napery/c/tablecloths-and-runners",
+      "is_group": false,
+      "evidence": "Coveo commerce/v2/listing pagination.totalProducts for categoryCode=tablecloths-and-runners",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Kitchen Textiles",
+      "qty": 29,
+      "link": "https://www.freedom.com.au/c/kitchen-textiles",
+      "is_group": false,
+      "evidence": "Coveo commerce/v2/listing pagination.totalProducts for categoryCode=kitchen-textiles; sample: tea towel sets, oven glove, apron/teatowel sets",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Rugs",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "All Rugs",
+      "qty": 1810,
+      "link": "https://www.freedom.com.au/rugs/c/all-rugs",
+      "is_group": false,
+      "evidence": "Coveo commerce/v2/listing pagination.totalProducts for categoryCode=all-rugs",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Outdoor Rugs",
+      "qty": 174,
+      "link": "https://www.freedom.com.au/rugs/c/outdoor-rugs",
+      "is_group": false,
+      "evidence": "Coveo commerce/v2/listing pagination.totalProducts for categoryCode=outdoor-rugs",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Doormats",
+      "qty": 107,
+      "link": "https://www.freedom.com.au/rugs/c/door-mats",
+      "is_group": false,
+      "evidence": "Coveo commerce/v2/listing pagination.totalProducts for categoryCode=door-mats",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Furniture Covers",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Sofa & Chair Covers",
+      "qty": 14,
+      "link": "https://www.freedom.com.au/c/sofa-covers",
+      "is_group": false,
+      "evidence": "Coveo commerce/v2/listing pagination.totalProducts for categoryCode=sofa-covers; sample: fabric sofa cover, dining chair cover, slip covers",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Outdoor Furniture Covers",
+      "qty": 91,
+      "link": "https://www.freedom.com.au/c/outdoor-cover",
+      "is_group": false,
+      "evidence": "Coveo commerce/v2/listing pagination.totalProducts for categoryCode=outdoor-cover; page title 'Outdoor Furniture Covers in Australia | Tables, Chairs & Cushions'",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Nursery Bed Linen",
+      "qty": 30,
+      "link": "https://www.freedom.com.au/c/nursery-bed-linen",
+      "is_group": false,
+      "evidence": "Coveo commerce/v2/listing pagination.totalProducts for categoryCode=nursery-bed-linen",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Kids Bath Linen",
+      "qty": 2,
+      "link": "https://www.freedom.com.au/c/kids-bath-linen",
+      "is_group": false,
+      "evidence": "Coveo commerce/v2/listing pagination.totalProducts for categoryCode=kids-bath-linen; sample: hooded baby towel, washcloth set",
+      "flag": null,
+      "confidence": "HIGH"
+    }
+  ],
+  "storage_rows": [
+    {
+      "category": "Storage",
+      "sub_category": "Organisation",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Baskets",
+      "qty": 55,
+      "link": "https://www.freedom.com.au/storage/organisation/c/baskets",
+      "is_group": false,
+      "evidence": "Coveo commerce/v2/listing pagination.totalProducts for categoryCode=baskets (view.url=/c/baskets, storage/organisation path)",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Laundry Hampers",
+      "qty": 25,
+      "link": "https://www.freedom.com.au/storage/organisation/c/laundry-hampers",
+      "is_group": false,
+      "evidence": "Coveo commerce/v2/listing pagination.totalProducts for categoryCode=laundry-hampers",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Shoe Racks",
+      "qty": 26,
+      "link": "https://www.freedom.com.au/storage/organisation/c/shoe-racks",
+      "is_group": false,
+      "evidence": "Coveo commerce/v2/listing pagination.totalProducts for categoryCode=shoe-racks",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Coat Racks & Wall Hooks",
+      "qty": 28,
+      "link": "https://www.freedom.com.au/storage/organisation/c/coat-hangers-and-wall-hooks",
+      "is_group": false,
+      "evidence": "Coveo commerce/v2/listing pagination.totalProducts for categoryCode=coat-hangers-and-wall-hooks; sample: coat rack, wall hook, coat hook, hatstand",
+      "flag": "Site places this explicitly under Storage > Organisation, but freestanding coat racks/hatstands lean furniture-like and wall hooks lean hardware-like; kept per explicit site hierarchy",
+      "confidence": "LOW"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Wardrobe Organisation",
+      "qty": 11,
+      "link": "https://www.freedom.com.au/c/wardrobe-organisation",
+      "is_group": false,
+      "evidence": "Coveo commerce/v2/listing pagination.totalProducts for categoryCode=wardrobe-organisation; sample: storage bag, organiser, shoe tray",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Storage Furniture",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "MEDIUM"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Bookcases & Shelves",
+      "qty": 39,
+      "link": "https://www.freedom.com.au/storage/storage-furniture/c/bookcases-and-shelves",
+      "is_group": false,
+      "evidence": "Coveo commerce/v2/listing pagination.totalProducts for categoryCode=bookcases-and-shelves",
+      "flag": "Storage/Furniture boundary case (storage.md S18/S21): products are bookshelves/display cabinets, traditionally furniture, but the site explicitly places this under Storage > Storage Furniture (not under any Furniture-named path) - kept per the site-hierarchy tie-break rule",
+      "confidence": "MEDIUM"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Storage Units",
+      "qty": 228,
+      "link": "https://www.freedom.com.au/storage/storage-furniture/c/storage-units",
+      "is_group": false,
+      "evidence": "Coveo commerce/v2/listing pagination.totalProducts for categoryCode=storage-units",
+      "flag": "Same Storage/Furniture boundary case as Bookcases & Shelves - sample includes bookshelf/bookcase/shelving-unit items, kept per explicit Storage-section placement",
+      "confidence": "MEDIUM"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Office",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Office Storage",
+      "qty": 320,
+      "link": "https://www.freedom.com.au/storage/office/c/office-storage",
+      "is_group": false,
+      "evidence": "Coveo commerce/v2/listing pagination.totalProducts for categoryCode=office-storage; cross-verified via live Playwright network capture on the real page - H1 'Office Storage', totalProducts=320 matches",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Kitchen Storage",
+      "qty": 51,
+      "link": "https://www.freedom.com.au/kitchen-and-tableware/c/kitchen-storage",
+      "is_group": false,
+      "evidence": "Coveo commerce/v2/listing pagination.totalProducts for categoryCode=kitchen-storage; page title 'Kitchen Storage in Australia | Kitchen Organiser & Storage Containers for Food'; sample: butter bell, canister, biscuit tin, food storage",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Wine Racks",
+      "qty": 9,
+      "link": "https://www.freedom.com.au/kitchen-and-tableware/kitchen-storage/c/wine-racks",
+      "is_group": false,
+      "evidence": "Coveo commerce/v2/listing pagination.totalProducts for categoryCode=wine-racks",
+      "flag": null,
+      "confidence": "MEDIUM"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Outdoor Storage",
+      "qty": 5,
+      "link": "https://www.freedom.com.au/c/outdoor-storage",
+      "is_group": false,
+      "evidence": "Coveo commerce/v2/listing pagination.totalProducts for categoryCode=outdoor-storage; sample: storage box, wall shelf, storage basket, peg bag, compost bucket",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Kids Organisation",
+      "qty": 38,
+      "link": "https://www.freedom.com.au/c/kids-organisation",
+      "is_group": false,
+      "evidence": "Coveo commerce/v2/listing pagination.totalProducts for categoryCode=kids-organisation",
+      "flag": "Category mixes genuine storage items (storage basket set, hamper) with kids furniture (rotating bookcase, storage bench, art/craft trolley); qty is the site's own category total, not a pure storage count",
+      "confidence": "LOW"
+    }
+  ]
+}

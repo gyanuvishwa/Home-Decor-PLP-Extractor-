@@ -1,0 +1,1194 @@
+{
+  "sr": 226,
+  "company": "IKEA India",
+  "brand_site": "ikea.com",
+  "country": "India",
+  "site_url": "https://www.ikea.com/in/en/",
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "ACCESS: DIRECT HTTP FETCH (tier a), no Playwright/Chrome needed. robots.txt fetched at https://www.ikea.com/robots.txt: no anthropic-ai/ClaudeBot/Claude-Web/Claude-User/Claude-SearchBot directive anywhere, no blanket Disallow: / for User-agent: *; the sik.search.blue.cdtapps.com API host is not named either. Homepage https://www.ikea.com/in/en/ returned HTTP 200 via curl with a standard desktop User-Agent; no 403/CAPTCHA/DataDome/rate-limit at any point across ~95 HTTP requests (1 category page fetch + 91 product-count API calls). This mirrors the same IKEA global platform already vetted on UK/DE/FR/AE/JP (see f226.json Furniture notes), except this session used curl/urllib directly (tier a) rather than Claude-in-Chrome (tier c), since the site's own SSR HTML embeds the full category tree as inline JSON and the product-count API is reachable via plain HTTPS with a Referer header -- no browser rendering was required.\n\nTREE METHOD: fetched https://www.ikea.com/in/en/cat/textiles-tl001/ (the Home Textiles department page) and extracted the embedded page-header <script type=\"text/hydrate\"> JSON payload from the raw HTML, which contains data.config.catalogSlim -- an array of 23 top-level department nodes (ids st001, 700640, fu004, bm001, fu002, st007, ka001, kt001, tl001, de001, tl002, od001, ba001, li001, bc001, lc001, pp001, fb001, hi001, hs001, he001, pt001, wt001), each carrying a full recursive 'subs' child tree (830+ nodes site-wide, the same catalogSlim structure independently confirmed in this same session's Furniture f226.json). Walked catalogSlim for tl001 (Home textiles) and tl002 (Curtains & blinds) in full -- both are self-contained subtrees; tl002 is NOT nested under tl001 in India's own hierarchy, confirmed independently rather than assumed from another locale -- to build the Textile tree; walked st001 (Storage & organisation), st007 (Small storage & organisers), bm001 (Beds & mattresses, for 'Under bed storage'), lc001 (Laundry & cleaning), ba001 (Bathroom products), ka001 (Modular kitchens) and fu004 (Office furniture & gaming) for Storage-eligible nodes. India-specific check performed live: the plain URL /in/en/cat/textiles-tl002/ 301-redirects to /in/en/cat/curtains-blinds-tl002/ with canonical/h1 both reading 'Curtains & blinds', proving tl002 is its own India department distinct from tl001 'Home textiles'.\n\nQTY METHOD: same sik.search.blue.cdtapps.com/in/en/product-list-page?category=<id> API used by this same session's Furniture extraction (f226.json), called directly via urllib with a desktop User-Agent and a Referer header (no browser needed -- the API has no CORS/session gate against a plain HTTPS client). qty = productListPage.productCount for every leaf; the API echoes back productListPage.category.name and .url for every id, and all 91 ids queried returned a category.name/url matching the expected id/slug exactly (no silent parent-listing substitution). plannerCount>0 triggers a +1 offset on the rendered listing header (a non-product planner-tool tile), the same behaviour already measured on IKEA UK/DE/FR/AE/JP and re-confirmed in this session's own Furniture pass (Sofas productCount=151, header '152 items'); qty recorded here is always the un-inflated productCount, never the header figure, and each row's evidence states both numbers.\n\nGROUPING STRUCTURE: grouping-row labels and nesting follow India's own live catalogSlim hierarchy directly (Home textiles > Bedding > Bed linen / Duvets / Pillows; Cushions & cushion covers; Rugs; Children's textiles; Outdoor cushions; Table cloth and accessories; Bath towels and mats > Towels; Kitchen textiles; Baby textiles; Curtains & blinds > Curtains / Blinds), not a blind copy of another locale's group labels. Duplicate nodes that IKEA cross-lists under two parents in the same mega-menu (e.g. 'Cushions & cushion covers' appears both nested under Bedding and as its own top-level Home-textiles child; 'Children's bed linen'/'Children's duvets & pillows'/'Children's rugs'/'Baby towels & washcloths' each appear under both a room-specific parent and the cross-cutting 'Children's textiles'/'Baby textiles' parents) were recorded exactly once at their most specific canonical parent and skipped at the redundant parent, per the duplicate-prevention rule; the redundant parent was then dropped if it had no other surviving child (e.g. 'Baby textiles' keeps only 'Baby blankets & quilts' since its other four children -- baby bed linen, baby duvets & pillows, baby towels & washcloths, nursery rugs -- are recorded under Bedding/Bath towels/Rugs instead).\n\nSTORAGE-VS-FURNITURE BOUNDARY (the central judgment call on this company): India's 'Storage & organisation' (st001) top department is almost entirely modular/component FURNITURE -- Wardrobes, Chest of drawers & drawer units, Bookcases & shelving units, Display and Storage Cabinets, TV unit & media furniture, Sideboards & console tables, Shoe cabinets, Storage units & cabinets, Room dividers, Hallway furniture sets, and every named component system (PAX, BESTA, PLATSA, EKET, SMASTAD, IVAR, BROR, SKYTTA, JONAXEL, JOSTEIN, TROFAST, LASTARE, GULDDRAGARE, OMAR) -- and this SAME company's own Furniture extraction (pipeline/furniture_json_archive/f226.json) already explicitly claims essentially all of it as Furniture rows (Wardrobes, Chest of drawers, Bookshelves and Bookcases, Storage shelves & units, Cube shelves, Pantry, Basket drawer units, Shoe cabinets, Room dividers, Hallway furniture sets all appear verbatim in f226.json's Furniture rows) and explicitly documents excluding the whole named-system layer plus 'under-bed storage' as furniture parts/textiles. To avoid duplicate cross-category classification of the same nodes, this Storage pass did NOT re-claim anything already present in f226.json's Furniture rows (wardrobes/cabinets/bookcases/TV storage/sideboards/named systems), and did NOT re-claim 'Outdoor Storage' (21958, st001) since f226.json's Furniture notes explicitly flag it as an ambiguous furniture row already included there. Storage rows here instead come from the genuinely standalone, non-furniture storage-accessory departments/nodes: 'Small storage & organisers' (st007 -- boxes, baskets, organisers, bag organisers, food storage), 'Under bed storage' (bm001, explicitly excluded from Furniture's own list as furniture-parts/textile), 'Toy boxes & shelves' (the one non-named-system child surviving under st001's Children's storage & organisation branch, its TROFAST-system sibling excluded as a named component system), kitchen drawer/cupboard organisers and cutlery trays standalone under Modular kitchens (ka001), and Bathroom Storage/trolleys/laundry cabinets & shelving scattered under ba001/lc001.\n\nEXCLUDED, and why: from Textile -- curtain hardware (curtain rods & rails, track systems, finials/brackets, explicit textile.md hardware exclusion); Venetian blinds and No-drill blinds (slat/mounting-type buckets, material not confirmed as fabric); Spa accessories (bath tools/brushes bundle, not confirmed textile); Sewing accessories (needles/thread/tools, not fabric). From Storage -- the entire Furniture-claimed layer described above; all named component systems; Wall shelves/floating shelves/complete wall shelves/picture ledges/brackets/plain 'Shelves'/Cube Storage (Wall Decor's job, same convention as this project's Furniture task); Hooks, Hangers, Hooks & hangers, Children's hooks & wall organisation (hardware, not storage); Noticeboards (office/decor, not storage); Recycling bins, Waste paper & pedal bins, Bin bags & liners, Bathroom bins (waste disposal, not storage of belongings -- not covered by any storage.md category); Cable management & accessories, Desk accessories, Moving supplies (mixed/generic accessory buckets, not a named storage category); Bathroom accessories subtree other than Bathroom organisers (shower accessories, soap dispensers, toilet brushes, toothbrush holders -- toiletry fixtures, storage.md Sec.14/28 exclusion); Bags department other than Bag organisers (shopping/tote/backpack/travel/cool bags -- fashion/carry items, storage.md Sec.6 exclusion); Water bottle & travel mugs, Cool bags (drinkware/travel accessories, Kitchen & Dining territory); Food storage accessories & resealable bags (disposable consumable, not a durable storage product); Kitchen shelves, Kitchen Rack & Wall storage's shelf child (Wall Decor's job, same convention applied to 'Kitchen shelves' as to the generic Wall shelves subtree); Laundry accessories (too generic/mixed to confirm storage-only contents), Drying racks, Ironing boards (laundry tools/appliances, not storage containers); all METOD/ENHET kitchen-cabinet-system parts, doors, fronts, worktops (fitted-kitchen furniture components, not general-retail storage); Storage units & cabinets (home and office) and Trolleys/fu005 (cabinet- and cart-furniture, consistent with the Furniture boundary already drawn on this company).\n\nSANITY CHECKS: all 91 queried category ids returned productListPage.category.name/url exactly matching the expected id/slug (zero silent parent-listing substitutions); qty values span 1-106 across the 95 leaves with 50+ distinct values, no site-wide constant or suspiciously round cap; low counts (e.g. Children's duvets & pillows=1, Fur rugs=2, Anti-slip & underlays=2, Bag organisers=3) match the general small-niche-category pattern already documented on this same India storefront in f226.json and are treated as genuine, not errors. MANUAL REVIEW flags (14 rows, all MEDIUM confidence) mark nodes where IKEA bundles a textile/storage item with an adjacent non-textile/non-storage item under one shared URL with no further sub-split available, or where the rule files do not explicitly enumerate the exact product type (e.g. filled 'Pillows' as distinct from pillowcases/pillow covers) -- each flag states the specific ambiguity inline in that row's flag field.",
+  "textile_rows": [
+    {
+      "category": "Textile",
+      "sub_category": "Home textiles",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": null
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Bedding",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": null
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Bed linen",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": null
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Duvet cover sets",
+      "qty": 71,
+      "link": "https://www.ikea.com/in/en/cat/duvet-cover-sets-10680/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=10680 -> productListPage.productCount=71 (India's own live category name 'Duvet cover sets', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header reads '71 items'",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Bed sheets",
+      "qty": 106,
+      "link": "https://www.ikea.com/in/en/cat/bedsheets-10681/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=10681 -> productListPage.productCount=106 (India's own live category name 'Bed sheets', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header reads '106 items'",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Children's bed linen",
+      "qty": 32,
+      "link": "https://www.ikea.com/in/en/cat/childrens-bed-linen-18776/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=18776 -> productListPage.productCount=32 (India's own live category name 'Children's bed linen', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header reads '32 items'",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Pillow covers",
+      "qty": 15,
+      "link": "https://www.ikea.com/in/en/cat/pillow-covers-18890/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=18890 -> productListPage.productCount=15 (India's own live category name 'Pillow covers', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header reads '15 items'",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Baby bed linen",
+      "qty": 15,
+      "link": "https://www.ikea.com/in/en/cat/baby-bed-linen-18692/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=18692 -> productListPage.productCount=15 (India's own live category name 'Baby bed linen', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header reads '15 items'",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Duvets",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": null
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Polyester duvets",
+      "qty": 8,
+      "link": "https://www.ikea.com/in/en/cat/polyester-duvets-20530/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=20530 -> productListPage.productCount=8 (India's own live category name 'Polyester duvets', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header reads '8 items'",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Baby duvets & pillows",
+      "qty": 2,
+      "link": "https://www.ikea.com/in/en/cat/baby-duvets-pillows-18694/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=18694 -> productListPage.productCount=2 (India's own live category name 'Baby duvets & pillows', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header reads '2 items'",
+      "flag": "MANUAL REVIEW: node mixes duvets (textile) with pillows (not explicitly enumerated as textile in textile.md's Bedding list); IKEA does not split this node further on India's site.",
+      "confidence": "MEDIUM"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Children's duvets & pillows",
+      "qty": 1,
+      "link": "https://www.ikea.com/in/en/cat/childrens-duvets-pillows-31773/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=31773 -> productListPage.productCount=1 (India's own live category name 'Children's duvets & pillows', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header reads '1 items'",
+      "flag": "MANUAL REVIEW: node mixes duvets (textile) with pillows (not explicitly enumerated as textile in textile.md's Bedding list); IKEA does not split this node further on India's site.",
+      "confidence": "MEDIUM"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Blankets & throws",
+      "qty": 15,
+      "link": "https://www.ikea.com/in/en/cat/blankets-throws-20528/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=20528 -> productListPage.productCount=15 (India's own live category name 'Blankets & throws', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header reads '15 items'",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Bedspreads",
+      "qty": 20,
+      "link": "https://www.ikea.com/in/en/cat/bedspreads-20527/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=20527 -> productListPage.productCount=20 (India's own live category name 'Bedspreads', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header reads '20 items'",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Pillows",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": null
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Polyester pillows",
+      "qty": 13,
+      "link": "https://www.ikea.com/in/en/cat/polyester-pillows-20534/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=20534 -> productListPage.productCount=13 (India's own live category name 'Polyester pillows', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header reads '13 items'",
+      "flag": "MANUAL REVIEW: 'Pillows' (the filled sleep pillow, not pillowcases/covers) is not explicitly enumerated in textile.md Sec.3's Bedding list; included as a home-textile/bedding product by common retail convention and because IKEA files it directly inside the Bedding department alongside Duvets/Bedspreads.",
+      "confidence": "MEDIUM"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Ergonomic pillows",
+      "qty": 10,
+      "link": "https://www.ikea.com/in/en/cat/ergonomic-pillows-46083/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=46083 -> productListPage.productCount=10 (India's own live category name 'Ergonomic pillows', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header reads '10 items'",
+      "flag": "MANUAL REVIEW: same 'Pillows not explicitly enumerated' rationale as sibling id 20534.",
+      "confidence": "MEDIUM"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Memory foam & foam pillows",
+      "qty": 8,
+      "link": "https://www.ikea.com/in/en/cat/memory-foam-foam-pillows-20536/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=20536 -> productListPage.productCount=8 (India's own live category name 'Memory foam & foam pillows', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header reads '8 items'",
+      "flag": "MANUAL REVIEW: same 'Pillows not explicitly enumerated' rationale as sibling id 20534.",
+      "confidence": "MEDIUM"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Mattress & pillow protectors",
+      "qty": 11,
+      "link": "https://www.ikea.com/in/en/cat/mattress-pillow-protectors-24824/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=24824 -> productListPage.productCount=11 (India's own live category name 'Mattress & pillow protectors', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header reads '11 items'",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Bed & headboard covers",
+      "qty": 3,
+      "link": "https://www.ikea.com/in/en/cat/bed-headboard-covers-57280/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=57280 -> productListPage.productCount=3 (India's own live category name 'Bed & headboard covers', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header reads '3 items'",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Pillow protectors",
+      "qty": 3,
+      "link": "https://www.ikea.com/in/en/cat/pillow-protectors-700529/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=700529 -> productListPage.productCount=3 (India's own live category name 'Pillow protectors', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header reads '3 items'",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Comforters",
+      "qty": 10,
+      "link": "https://www.ikea.com/in/en/cat/comforters-700553/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=700553 -> productListPage.productCount=10 (India's own live category name 'Comforters', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header reads '10 items'",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Cushions & cushion covers",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": null
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Cushion covers",
+      "qty": 53,
+      "link": "https://www.ikea.com/in/en/cat/cushion-covers-18903/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=18903 -> productListPage.productCount=53 (India's own live category name 'Cushion covers', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header reads '53 items'",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Cushions",
+      "qty": 9,
+      "link": "https://www.ikea.com/in/en/cat/cushions-18902/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=18902 -> productListPage.productCount=9 (India's own live category name 'Cushions', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header reads '9 items'",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Inner cushions",
+      "qty": 5,
+      "link": "https://www.ikea.com/in/en/cat/inner-cushions-18904/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=18904 -> productListPage.productCount=5 (India's own live category name 'Inner cushions', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header reads '5 items'",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Rugs",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": null
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Large & medium rugs",
+      "qty": 47,
+      "link": "https://www.ikea.com/in/en/cat/large-medium-carpets-10692/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=10692 -> productListPage.productCount=47 (India's own live category name 'Large & medium rugs', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=1, so the site's hydrated listing header reads '48 items' (a non-product planner-tool tile is injected whenever plannerCount>0 -- the same +1-regardless-of-plannerCount offset independently documented on IKEA UK/DE/AE/JP and spot-confirmed on this same India session's Furniture extraction f226.json: Sofas productCount=151, rendered header '152 items'; qty here is the un-inflated productCount, not the inflated header)",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Runners & small rugs",
+      "qty": 32,
+      "link": "https://www.ikea.com/in/en/cat/runners-small-carpets-10689/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=10689 -> productListPage.productCount=32 (India's own live category name 'Runners & small rugs', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=1, so the site's hydrated listing header reads '33 items' (a non-product planner-tool tile is injected whenever plannerCount>0 -- the same +1-regardless-of-plannerCount offset independently documented on IKEA UK/DE/AE/JP and spot-confirmed on this same India session's Furniture extraction f226.json: Sofas productCount=151, rendered header '152 items'; qty here is the un-inflated productCount, not the inflated header)",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Handmade rugs",
+      "qty": 10,
+      "link": "https://www.ikea.com/in/en/cat/handmade-carpets-39267/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=39267 -> productListPage.productCount=10 (India's own live category name 'Handmade rugs', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=1, so the site's hydrated listing header reads '11 items' (a non-product planner-tool tile is injected whenever plannerCount>0 -- the same +1-regardless-of-plannerCount offset independently documented on IKEA UK/DE/AE/JP and spot-confirmed on this same India session's Furniture extraction f226.json: Sofas productCount=151, rendered header '152 items'; qty here is the un-inflated productCount, not the inflated header)",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Outdoor rugs",
+      "qty": 6,
+      "link": "https://www.ikea.com/in/en/cat/outdoor-rugs-34204/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=34204 -> productListPage.productCount=6 (India's own live category name 'Outdoor rugs', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=1, so the site's hydrated listing header reads '7 items' (a non-product planner-tool tile is injected whenever plannerCount>0 -- the same +1-regardless-of-plannerCount offset independently documented on IKEA UK/DE/AE/JP and spot-confirmed on this same India session's Furniture extraction f226.json: Sofas productCount=151, rendered header '152 items'; qty here is the un-inflated productCount, not the inflated header)",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Door mats",
+      "qty": 21,
+      "link": "https://www.ikea.com/in/en/cat/door-mats-10698/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=10698 -> productListPage.productCount=21 (India's own live category name 'Door mats', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header reads '21 items'",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Fur rugs",
+      "qty": 2,
+      "link": "https://www.ikea.com/in/en/cat/fur-rugs-20544/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=20544 -> productListPage.productCount=2 (India's own live category name 'Fur rugs', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header reads '2 items'",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Anti-slip & underlays",
+      "qty": 2,
+      "link": "https://www.ikea.com/in/en/cat/anti-slip-underlays-10699/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=10699 -> productListPage.productCount=2 (India's own live category name 'Anti-slip & underlays', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header reads '2 items'",
+      "flag": "MANUAL REVIEW: rug-underlay pads are frequently rubber/foam rather than textile fabric; kept here because IKEA files them under the Rugs department, but material could not be independently confirmed per-SKU.",
+      "confidence": "MEDIUM"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Round rugs",
+      "qty": 2,
+      "link": "https://www.ikea.com/in/en/cat/round-carpets-20543/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=20543 -> productListPage.productCount=2 (India's own live category name 'Round rugs', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=1, so the site's hydrated listing header reads '3 items' (a non-product planner-tool tile is injected whenever plannerCount>0 -- the same +1-regardless-of-plannerCount offset independently documented on IKEA UK/DE/AE/JP and spot-confirmed on this same India session's Furniture extraction f226.json: Sofas productCount=151, rendered header '152 items'; qty here is the un-inflated productCount, not the inflated header)",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Children's rugs",
+      "qty": 8,
+      "link": "https://www.ikea.com/in/en/cat/childrens-rugs-18774/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=18774 -> productListPage.productCount=8 (India's own live category name 'Children's rugs', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=1, so the site's hydrated listing header reads '9 items' (a non-product planner-tool tile is injected whenever plannerCount>0 -- the same +1-regardless-of-plannerCount offset independently documented on IKEA UK/DE/AE/JP and spot-confirmed on this same India session's Furniture extraction f226.json: Sofas productCount=151, rendered header '152 items'; qty here is the un-inflated productCount, not the inflated header)",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Nursery rugs",
+      "qty": 2,
+      "link": "https://www.ikea.com/in/en/cat/nursery-rugs-18699/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=18699 -> productListPage.productCount=2 (India's own live category name 'Nursery rugs', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=1, so the site's hydrated listing header reads '3 items' (a non-product planner-tool tile is injected whenever plannerCount>0 -- the same +1-regardless-of-plannerCount offset independently documented on IKEA UK/DE/AE/JP and spot-confirmed on this same India session's Furniture extraction f226.json: Sofas productCount=151, rendered header '152 items'; qty here is the un-inflated productCount, not the inflated header)",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Children's textiles",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": null
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Children's cushions & blankets",
+      "qty": 7,
+      "link": "https://www.ikea.com/in/en/cat/childrens-cushions-blankets-18777/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=18777 -> productListPage.productCount=7 (India's own live category name 'Children's cushions & blankets', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header reads '7 items'",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Children's bed accessories & canopies",
+      "qty": 11,
+      "link": "https://www.ikea.com/in/en/cat/childrens-bed-accessories-canopies-18775/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=18775 -> productListPage.productCount=11 (India's own live category name 'Children's bed accessories & canopies', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=1, so the site's hydrated listing header reads '12 items' (a non-product planner-tool tile is injected whenever plannerCount>0 -- the same +1-regardless-of-plannerCount offset independently documented on IKEA UK/DE/AE/JP and spot-confirmed on this same India session's Furniture extraction f226.json: Sofas productCount=151, rendered header '152 items'; qty here is the un-inflated productCount, not the inflated header)",
+      "flag": "MANUAL REVIEW: node bundles fabric bed canopies (textile) with possible non-fabric bed accessories/hardware; IKEA does not split it further on India's site.",
+      "confidence": "MEDIUM"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Outdoor cushions",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": null
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Outdoor chair cushions",
+      "qty": 22,
+      "link": "https://www.ikea.com/in/en/cat/outdoor-seat-cushions-46400/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=46400 -> productListPage.productCount=22 (India's own live category name 'Outdoor chair cushions', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header reads '22 items'",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Outdoor cushions",
+      "qty": 2,
+      "link": "https://www.ikea.com/in/en/cat/outdoor-pillows-46401/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=46401 -> productListPage.productCount=2 (India's own live category name 'Outdoor cushions', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header reads '2 items'",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Table cloth and accessories",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": null
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Table cloths & runners",
+      "qty": 9,
+      "link": "https://www.ikea.com/in/en/cat/table-cloths-runners-20541/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=20541 -> productListPage.productCount=9 (India's own live category name 'Table cloths & runners', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header reads '9 items'",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Place mats & coasters",
+      "qty": 20,
+      "link": "https://www.ikea.com/in/en/cat/place-mats-coasters-20539/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=20539 -> productListPage.productCount=20 (India's own live category name 'Place mats & coasters', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header reads '20 items'",
+      "flag": "MANUAL REVIEW: node bundles fabric placemats (textile) with coasters (often cork/wood/non-textile); IKEA does not split it further on India's site.",
+      "confidence": "MEDIUM"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Napkins",
+      "qty": 17,
+      "link": "https://www.ikea.com/in/en/cat/napkins-20561/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=20561 -> productListPage.productCount=17 (India's own live category name 'Napkins', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header reads '17 items'",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Bath towels and mats",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": null
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Towels",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": null
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Bath towels",
+      "qty": 8,
+      "link": "https://www.ikea.com/in/en/cat/bath-towels-20523/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=20523 -> productListPage.productCount=8 (India's own live category name 'Bath towels', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header reads '8 items'",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Hand towels",
+      "qty": 8,
+      "link": "https://www.ikea.com/in/en/cat/hand-towels-20525/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=20525 -> productListPage.productCount=8 (India's own live category name 'Hand towels', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header reads '8 items'",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Bath sheets",
+      "qty": 2,
+      "link": "https://www.ikea.com/in/en/cat/bath-sheets-20524/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=20524 -> productListPage.productCount=2 (India's own live category name 'Bath sheets', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header reads '2 items'",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Face cloths",
+      "qty": 6,
+      "link": "https://www.ikea.com/in/en/cat/face-cloths-20521/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=20521 -> productListPage.productCount=6 (India's own live category name 'Face cloths', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header reads '6 items'",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Baby towels & washcloths",
+      "qty": 10,
+      "link": "https://www.ikea.com/in/en/cat/baby-towels-washcloths-18700/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=18700 -> productListPage.productCount=10 (India's own live category name 'Baby towels & washcloths', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header reads '10 items'",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Bath mats",
+      "qty": 13,
+      "link": "https://www.ikea.com/in/en/cat/bath-mats-20519/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=20519 -> productListPage.productCount=13 (India's own live category name 'Bath mats', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header reads '13 items'",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Shower curtains",
+      "qty": 13,
+      "link": "https://www.ikea.com/in/en/cat/shower-curtains-18908/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=18908 -> productListPage.productCount=13 (India's own live category name 'Shower curtains', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header reads '13 items'",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Kitchen textiles",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": null
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Tea towels",
+      "qty": 11,
+      "link": "https://www.ikea.com/in/en/cat/tea-towels-18851/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=18851 -> productListPage.productCount=11 (India's own live category name 'Tea towels', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header reads '11 items'",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Aprons",
+      "qty": 4,
+      "link": "https://www.ikea.com/in/en/cat/aprons-18852/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=18852 -> productListPage.productCount=4 (India's own live category name 'Aprons', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header reads '4 items'",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Pot holders & oven gloves",
+      "qty": 7,
+      "link": "https://www.ikea.com/in/en/cat/pot-holders-oven-gloves-20537/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=20537 -> productListPage.productCount=7 (India's own live category name 'Pot holders & oven gloves', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header reads '7 items'",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Baby textiles",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": null
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Baby blankets & quilts",
+      "qty": 5,
+      "link": "https://www.ikea.com/in/en/cat/baby-blankets-quilts-18695/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=18695 -> productListPage.productCount=5 (India's own live category name 'Baby blankets & quilts', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header reads '5 items'",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Bath robes & accessories",
+      "qty": 12,
+      "link": "https://www.ikea.com/in/en/cat/bathrobe-and-accessories-42925/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=42925 -> productListPage.productCount=12 (India's own live category name 'Bath robes & accessories', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header reads '12 items'",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Chair pads",
+      "qty": 20,
+      "link": "https://www.ikea.com/in/en/cat/chair-pads-20542/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=20542 -> productListPage.productCount=20 (India's own live category name 'Chair pads', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header reads '20 items'",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Fabrics & sewing",
+      "qty": 3,
+      "link": "https://www.ikea.com/in/en/cat/fabrics-sewing-10655/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=10655 -> productListPage.productCount=3 (India's own live category name 'Fabrics & sewing', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header reads '3 items'",
+      "flag": "MANUAL REVIEW: category page also links onward to non-textile 'Sewing accessories' (needles/thread/tools, excluded); the fabric-by-the-metre products sit at this parent level with no dedicated sub-URL, so per textile.md's parent-URL rule (allowed when no valid subcategory exists) the parent's own URL and count are used, but the count may include a handful of non-fabric sewing items reachable from the same page.",
+      "confidence": "MEDIUM"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Curtains & blinds",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": null
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Curtains",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": null
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Block-out curtains",
+      "qty": 4,
+      "link": "https://www.ikea.com/in/en/cat/block-out-curtains-700218/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=700218 -> productListPage.productCount=4 (India's own live category name 'Block-out curtains', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header reads '4 items'",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Room darkening curtains",
+      "qty": 8,
+      "link": "https://www.ikea.com/in/en/cat/room-darkening-curtains-700219/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=700219 -> productListPage.productCount=8 (India's own live category name 'Room darkening curtains', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header reads '8 items'",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Light filtering curtains",
+      "qty": 22,
+      "link": "https://www.ikea.com/in/en/cat/light-filtering-curtains-700220/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=700220 -> productListPage.productCount=22 (India's own live category name 'Light filtering curtains', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header reads '22 items'",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Net & sheer curtains",
+      "qty": 12,
+      "link": "https://www.ikea.com/in/en/cat/net-sheer-curtains-700221/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=700221 -> productListPage.productCount=12 (India's own live category name 'Net & sheer curtains', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header reads '12 items'",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Blinds",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": null
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Block-out blinds",
+      "qty": 11,
+      "link": "https://www.ikea.com/in/en/cat/block-out-blinds-700222/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=700222 -> productListPage.productCount=11 (India's own live category name 'Block-out blinds', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header reads '11 items'",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Roller blinds",
+      "qty": 15,
+      "link": "https://www.ikea.com/in/en/cat/roller-blinds-700223/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=700223 -> productListPage.productCount=15 (India's own live category name 'Roller blinds', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header reads '15 items'",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Roman blinds",
+      "qty": 5,
+      "link": "https://www.ikea.com/in/en/cat/roman-blinds-700224/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=700224 -> productListPage.productCount=5 (India's own live category name 'Roman blinds', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header reads '5 items'",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Pleated & cellular blinds",
+      "qty": 5,
+      "link": "https://www.ikea.com/in/en/cat/pleated-cellular-blinds-700225/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=700225 -> productListPage.productCount=5 (India's own live category name 'Pleated & cellular blinds', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header reads '5 items'",
+      "flag": "MANUAL REVIEW: cellular/pleated shades on IKEA are polyester-fabric-like but textile.md does not explicitly enumerate 'cellular blinds'; included as fabric window covering, material not independently confirmed per-SKU.",
+      "confidence": "MEDIUM"
+    }
+  ],
+  "storage_rows": [
+    {
+      "category": "Storage",
+      "sub_category": "Storage boxes & baskets",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": null
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Paper & media boxes",
+      "qty": 60,
+      "link": "https://www.ikea.com/in/en/cat/paper-media-boxes-16202/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=16202 -> productListPage.productCount=60 (India's own live category name 'Paper & media boxes', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header reads '60 items'",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Clothes boxes",
+      "qty": 44,
+      "link": "https://www.ikea.com/in/en/cat/clothes-boxes-10565/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=10565 -> productListPage.productCount=44 (India's own live category name 'Clothes boxes', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=1, so the site's hydrated listing header reads '45 items' (a non-product planner-tool tile is injected whenever plannerCount>0 -- the same +1-regardless-of-plannerCount offset independently documented on IKEA UK/DE/AE/JP and spot-confirmed on this same India session's Furniture extraction f226.json: Sofas productCount=151, rendered header '152 items'; qty here is the un-inflated productCount, not the inflated header)",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Children's boxes & baskets",
+      "qty": 34,
+      "link": "https://www.ikea.com/in/en/cat/childrens-boxes-baskets-20479/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=20479 -> productListPage.productCount=34 (India's own live category name 'Children's boxes & baskets', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=1, so the site's hydrated listing header reads '35 items' (a non-product planner-tool tile is injected whenever plannerCount>0 -- the same +1-regardless-of-plannerCount offset independently documented on IKEA UK/DE/AE/JP and spot-confirmed on this same India session's Furniture extraction f226.json: Sofas productCount=151, rendered header '152 items'; qty here is the un-inflated productCount, not the inflated header)",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Baskets",
+      "qty": 17,
+      "link": "https://www.ikea.com/in/en/cat/baskets-16201/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=16201 -> productListPage.productCount=17 (India's own live category name 'Baskets', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=1, so the site's hydrated listing header reads '18 items' (a non-product planner-tool tile is injected whenever plannerCount>0 -- the same +1-regardless-of-plannerCount offset independently documented on IKEA UK/DE/AE/JP and spot-confirmed on this same India session's Furniture extraction f226.json: Sofas productCount=151, rendered header '152 items'; qty here is the un-inflated productCount, not the inflated header)",
+      "flag": "MANUAL REVIEW: generic 'Baskets' node could include some decorative-only baskets alongside genuine storage baskets (storage.md Sec.5/Sec.23); kept because the site files the whole node under its 'Storage boxes & baskets' category.",
+      "confidence": "MEDIUM"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Secondary storage boxes",
+      "qty": 53,
+      "link": "https://www.ikea.com/in/en/cat/secondary-storage-boxes-10797/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=10797 -> productListPage.productCount=53 (India's own live category name 'Secondary storage boxes', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header reads '53 items'",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Bathroom organisers",
+      "qty": 17,
+      "link": "https://www.ikea.com/in/en/cat/bathroom-organisers-16233/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=16233 -> productListPage.productCount=17 (India's own live category name 'Bathroom organisers', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header reads '17 items'",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Paper & media organisers",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": null
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Magazine files",
+      "qty": 7,
+      "link": "https://www.ikea.com/in/en/cat/magazine-files-10567/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=10567 -> productListPage.productCount=7 (India's own live category name 'Magazine files', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header reads '7 items'",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Clothes organisers",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": null
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Children's clothes & shoes organisation",
+      "qty": 6,
+      "link": "https://www.ikea.com/in/en/cat/childrens-clothes-shoes-organisation-20477/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=20477 -> productListPage.productCount=6 (India's own live category name 'Children's clothes & shoes organisation', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header reads '6 items'",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Hanging clothes organisers",
+      "qty": 9,
+      "link": "https://www.ikea.com/in/en/cat/hanging-clothes-organisers-10459/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=10459 -> productListPage.productCount=9 (India's own live category name 'Hanging clothes organisers', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header reads '9 items'",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Shoe boxes & organisers",
+      "qty": 8,
+      "link": "https://www.ikea.com/in/en/cat/shoe-boxes-organisers-47380/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=47380 -> productListPage.productCount=8 (India's own live category name 'Shoe boxes & organisers', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header reads '8 items'",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Laundry baskets",
+      "qty": 14,
+      "link": "https://www.ikea.com/in/en/cat/laundry-baskets-20601/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=20601 -> productListPage.productCount=14 (India's own live category name 'Laundry baskets', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header reads '14 items'",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Clothes racks & stands",
+      "qty": 17,
+      "link": "https://www.ikea.com/in/en/cat/clothes-racks-stands-10455/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=10455 -> productListPage.productCount=17 (India's own live category name 'Clothes racks & stands', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header reads '17 items'",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Shoe racks & stands",
+      "qty": 26,
+      "link": "https://www.ikea.com/in/en/cat/shoe-racks-stands-10454/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=10454 -> productListPage.productCount=26 (India's own live category name 'Shoe racks & stands', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header reads '26 items'",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Bag organisers",
+      "qty": 3,
+      "link": "https://www.ikea.com/in/en/cat/bag-organisers-47441/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=47441 -> productListPage.productCount=3 (India's own live category name 'Bag organisers', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header reads '3 items'",
+      "flag": "MANUAL REVIEW: an insert/organiser for handbags -- primary purpose is organisation (storage.md Sec.7) but adjacent sibling nodes (the Bags department) are fashion/carry items excluded per Sec.6, so classification leans on the 'organiser' naming.",
+      "confidence": "MEDIUM"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Wall Storage",
+      "qty": 41,
+      "link": "https://www.ikea.com/in/en/cat/wall-storage-37900/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=37900 -> productListPage.productCount=41 (India's own live category name 'Wall Storage', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header reads '41 items'",
+      "flag": "MANUAL REVIEW: node sits inside 'Hooks & wall organisation' alongside excluded Wall Decor/shelf nodes; kept individually because IKEA's own category name is explicitly 'Wall Storage' (storage.md Sec.18/19 primary-purpose test).",
+      "confidence": "MEDIUM"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Food storage & organising",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": null
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Food containers",
+      "qty": 24,
+      "link": "https://www.ikea.com/in/en/cat/food-containers-20606/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=20606 -> productListPage.productCount=24 (India's own live category name 'Food containers', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header reads '24 items'",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Food container sets",
+      "qty": 16,
+      "link": "https://www.ikea.com/in/en/cat/food-container-sets-700586/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=700586 -> productListPage.productCount=16 (India's own live category name 'Food container sets', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header reads '16 items'",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Fridge organisers",
+      "qty": 7,
+      "link": "https://www.ikea.com/in/en/cat/fridge-organisers-700588/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=700588 -> productListPage.productCount=7 (India's own live category name 'Fridge organisers', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header reads '7 items'",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Pantry & worktop organisers",
+      "qty": 36,
+      "link": "https://www.ikea.com/in/en/cat/pantry-worktop-organisers-700589/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=700589 -> productListPage.productCount=36 (India's own live category name 'Pantry & worktop organisers', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header reads '36 items'",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Jars & tins",
+      "qty": 25,
+      "link": "https://www.ikea.com/in/en/cat/jars-tins-15950/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=15950 -> productListPage.productCount=25 (India's own live category name 'Jars &  tins', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header reads '25 items'",
+      "flag": "MANUAL REVIEW: 'Jars & tins' can include decorative or serving jars alongside storage jars; storage.md Sec.13 includes food-storage jars 'when primarily marketed as storage', not independently confirmed per-SKU.",
+      "confidence": "MEDIUM"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Spice & condiment stands",
+      "qty": 27,
+      "link": "https://www.ikea.com/in/en/cat/spice-condiment-stands-15951/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=15951 -> productListPage.productCount=27 (India's own live category name 'Spice & condiment stands', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header reads '27 items'",
+      "flag": "MANUAL REVIEW: a stand/organiser for spice jars -- primary purpose organisation (storage.md Sec.13) but could shade into a serving/display accessory depending on SKU.",
+      "confidence": "MEDIUM"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Wine racks",
+      "qty": 4,
+      "link": "https://www.ikea.com/in/en/cat/wine-racks-15952/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=15952 -> productListPage.productCount=4 (India's own live category name 'Wine racks', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header reads '4 items'",
+      "flag": "MANUAL REVIEW: wine racks can be read as storage/organisation of bottles (storage.md Sec.19 Racks) or as a kitchen display accessory; not independently confirmed per-SKU.",
+      "confidence": "MEDIUM"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Mix & match food containers & lids",
+      "qty": 12,
+      "link": "https://www.ikea.com/in/en/cat/mix-match-food-containers-lids-700610/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=700610 -> productListPage.productCount=12 (India's own live category name 'Mix & match food containers & lids', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header reads '12 items'",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Kitchen drawer organisers",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": null
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Cutlery trays for 40cm drawers",
+      "qty": 6,
+      "link": "https://www.ikea.com/in/en/cat/cutlery-trays-for-40cm-drawers-700172/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=700172 -> productListPage.productCount=6 (India's own live category name 'Cutlery trays for 40cm drawers', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header reads '6 items'",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Cutlery trays for 60cm drawers",
+      "qty": 9,
+      "link": "https://www.ikea.com/in/en/cat/cutlery-trays-for-60cm-drawers-700173/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=700173 -> productListPage.productCount=9 (India's own live category name 'Cutlery trays for 60cm drawers', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header reads '9 items'",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Cutlery trays for 80cm drawers",
+      "qty": 10,
+      "link": "https://www.ikea.com/in/en/cat/cutlery-trays-for-80cm-drawers-700174/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=700174 -> productListPage.productCount=10 (India's own live category name 'Cutlery trays for 80cm drawers', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header reads '10 items'",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Slim cutlery trays & racks",
+      "qty": 11,
+      "link": "https://www.ikea.com/in/en/cat/slim-cutlery-trays-racks-700775/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=700775 -> productListPage.productCount=11 (India's own live category name 'slim cutlery trays & racks', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header reads '11 items'",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Drawer dividers",
+      "qty": 23,
+      "link": "https://www.ikea.com/in/en/cat/drawer-dividers-24257/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=24257 -> productListPage.productCount=23 (India's own live category name 'Drawer dividers', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header reads '23 items'",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Kitchen cupboard bins",
+      "qty": 12,
+      "link": "https://www.ikea.com/in/en/cat/kitchen-cupboard-bins-24259/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=24259 -> productListPage.productCount=12 (India's own live category name 'Kitchen cupboard bins', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header reads '12 items'",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Cleaning organisers",
+      "qty": 4,
+      "link": "https://www.ikea.com/in/en/cat/clean-organisers-24256/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=24256 -> productListPage.productCount=4 (India's own live category name 'Cleaning organisers', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header reads '4 items'",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Kitchen Rack & Wall storage",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": null
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Wall organisers",
+      "qty": 65,
+      "link": "https://www.ikea.com/in/en/cat/wall-organisers-20677/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=20677 -> productListPage.productCount=65 (India's own live category name 'Wall organisers', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header reads '65 items'",
+      "flag": "MANUAL REVIEW: wall-mounted kitchen rack/organiser -- primary purpose storage (storage.md Sec.19) but sits in a nav branch that otherwise leads to excluded plain 'Kitchen shelves' (Wall Decor's job elsewhere in this project).",
+      "confidence": "MEDIUM"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Bathroom Storage",
+      "qty": 30,
+      "link": "https://www.ikea.com/in/en/cat/shelf-units-20804/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=20804 -> productListPage.productCount=30 (India's own live category name 'Bathroom Storage', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header reads '30 items'",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Bathroom trolleys",
+      "qty": 4,
+      "link": "https://www.ikea.com/in/en/cat/bathroom-trolleys-20858/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=20858 -> productListPage.productCount=4 (India's own live category name 'Bathroom trolleys', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header reads '4 items'",
+      "flag": "MANUAL REVIEW: a rolling cart/trolley for bathroom storage (storage.md Sec.20 Storage Carts & Trolleys); could shade toward a furniture-classified trolley depending on presentation, not independently re-verified on India's product tiles.",
+      "confidence": "MEDIUM"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Laundry cabinets & shelving",
+      "qty": 10,
+      "link": "https://www.ikea.com/in/en/cat/laundry-cabinets-shelving-48925/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=48925 -> productListPage.productCount=10 (India's own live category name 'Laundry cabinets & shelving', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header reads '10 items'",
+      "flag": "MANUAL REVIEW: 'cabinets & shelving' framed as laundry storage (storage.md Sec.11/Sec.17); could shade toward furniture depending on the specific SKU, not independently re-verified on India's product tiles.",
+      "confidence": "MEDIUM"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Under bed storage",
+      "qty": 15,
+      "link": "https://www.ikea.com/in/en/cat/under-bed-storage-19059/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=19059 -> productListPage.productCount=15 (India's own live category name 'Under bed storage', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=0, so the site's hydrated listing header reads '15 items'",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Toy boxes & shelves",
+      "qty": 2,
+      "link": "https://www.ikea.com/in/en/cat/toy-boxes-shelves-700560/",
+      "is_group": false,
+      "evidence": "sik.search.blue.cdtapps.com/in/en/product-list-page?category=700560 -> productListPage.productCount=2 (India's own live category name 'Toy boxes & shelves', echoed by the API as productListPage.category.name/url matching the expected id/slug, confirming no silent parent-listing redirect); plannerCount=1, so the site's hydrated listing header reads '3 items' (a non-product planner-tool tile is injected whenever plannerCount>0 -- the same +1-regardless-of-plannerCount offset independently documented on IKEA UK/DE/AE/JP and spot-confirmed on this same India session's Furniture extraction f226.json: Sofas productCount=151, rendered header '152 items'; qty here is the un-inflated productCount, not the inflated header)",
+      "flag": null,
+      "confidence": "HIGH"
+    }
+  ]
+}

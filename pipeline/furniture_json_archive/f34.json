@@ -1,0 +1,399 @@
+{
+ "sr": 34,
+ "company": "Ballard Designs",
+ "brand_site": "ballarddesigns.com",
+ "country": "USA",
+ "site_url": "https://www.ballarddesigns.com/",
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ACCESS: Cornerstone Brands platform (IBM WebSphere Commerce + React PWA), same recipe as the Frontgate sibling. www.ballarddesigns.com 403s Akamai on plain requests; curl_cffi impersonate=chrome124 was served 200 on every request, no retries needed. robots.txt carries no anthropic-ai/ClaudeBot/Claude-Web directive.\nTREE: taken from the site's own nav API https://www.ballarddesigns.com/JSONAPIs?module=categories (466 nodes with categoryId + targetURL). Cross-checked against SiteMap_CAT_001..004_v2.xml (listed in robots.txt) = 466 <loc> URLs; the only 3 sitemap URLs absent from the nav were underscore variants of three Living Room sofa-collection slugs, so the nav tree is complete and no furniture node is hidden from it.\nCOUNTS: every leaf URL was re-fetched with ?templateInfo=true and confirmed HTTP 200 resolving to ITSELF and carrying its own categoryId. Counts come from the storefront's own grid controller /UnbxdAPI?categoryId=<id>&returnRespAsJSON=true&isAPI=true&requesttype=ajax with header 'CBI-AJAX: 1' -> numberOfProducts (returned as a JSON string). Each of the 36 leaves was then paged with &unbxdStart to exhaustion and the returned tile count matched numberOfProducts EXACTLY on all 36. Note this platform renders one tile per colourway (e.g. 'Zarah Console Table - Walnut' and '- Whitewashed Oak' are two tiles sharing one productId), so unique-productId dedup undercounts (Media Furniture 100 tiles vs 94 unique productIds); the tile count = numberOfProducts = the rendered header, and that is what is reported. All 36 counts were read twice in separate passes and were identical (no drift). Counts discriminate properly (3 to 102) and every leaf is well below its parent (Furniture parent 982, Living Room 583, Dining & Kitchen 237, Bedroom 134, Home Office 167, Home Organization 37, Entryway 56, Outdoor Furniture 229) - no site-wide constant.\nNAV ALIASES DROPPED (would have created duplicate rows): Furniture > Living Room > 'Bookcases & Cabinets' (/furniture/living-room/bookcases/r/, categoryId 82915, 17 tiles) 301s to /furniture/home-office/bookcases/ and templateInfo returns categoryId 83470; all 17 of its titles sit inside the captured Home Office 'Bookcases & Cabinets' (84), so it was dropped. 'Bath Storage' (/bed-bath/bath/storage/, 3 tiles) 301s to /bed-bath/bed-bath-organization/bathroom-storage-seating/ - dropped. 'Mattresses & Foundations' (/furniture/bedroom/mattresses/r/) 301s to /bed-bath/bedding/mattresses/ and returns numberOfProducts=0 - dropped (and mattresses are out of scope anyway).\nCROSS-FILED DUPLICATES DROPPED: Bed & Bath > Bed & Bath Organization mirrors the Furniture > Home Organization nodes - 'Bathroom Storage & Seating' (162460, 19) is 17/18 identical to the Furniture-department node 163954 (18) that was kept; 'Closet Systems and Storage' (162462, 6) is 5/6 inside the kept 'Closet Storage & Systems' (163953, 15); 'Laundry Racks & Storage' (162461, 6) is entirely inside those two. Only the Furniture-department versions were kept. Furniture > Home Organization > 'Laundry Organization' (163955, 10) was dropped: 5 tiles are non-furniture (nesting baskets, two drying racks, a hamper, boot trays) and the other 5 (Shelby Wall Cabinet / Open Shelf / Storage Drawer / Storage Cabinet, Casa Florentina Brandisi Cabinet) are all already inside the kept 'Bathroom Storage & Seating' - it contributes zero unique furniture.\nEXCLUDED AS MARKETING RE-CUTS / SECTION 3 JUNK: 'Sofa Collections' (135) and all 40 of its named collection children, 'Dining Room Collections', 'Bedroom Collections', 'Home Office Collections', 'Outdoor Furniture Collections', 'Upholstery' (188452, 242) and 'Upholstery' (82913, 225) and 'Best Selling In-Stock', 'Leather Furniture' and 'In-Stock Upholstery' (material/availability filter re-cuts), 'Casa Florentina' brand line (32900/43903), all 'Design Partners' branches (Suzanne Kasler, Miles Redd, Bunny Williams, Carson Kressley - designer listing pages), 'Shop by Style' (outdoor style filters), 'Shop All Banquettes', 'About Tuscan Home Office' (editorial), 'Outdoor Furniture Care' (editorial), New/Featured/Trends/Clearance/Gifts/Holiday. The whole 'Dorm' department was excluded as an audience re-cut of the main catalogue: /dorm/furniture/ (180) draws entirely from nodes already captured, and its 'Desk Chairs' child even mixes in dining chairs and slipcovers; 'Headboards' (6) is a strict subset of the captured 'Beds & Headboards' (39).\nEXCLUDED AS NON-FURNITURE: 'Mattresses & Foundations' (mattresses/bedding), 'Replacement Slipcovers' (3) and 'Outdoor Furniture Covers' (28) and 'Swatches' (furniture parts/covers), 'Outdoor Umbrellas & Stands' (umbrellas are not furniture), Outdoor Cushions & Pillows, Outdoor Rugs & Drapery, Outdoor Decor, Decor & More > Organization (42: baskets, waste bins, trays, pin boards) and its 'Wall Organization' child (hooks, wall brackets, wall panels), 'Wall Shelves' (wall decor), Mirrors & Art, Lighting, Bedding, Bath (towels/rugs/accessories), Bathroom Mirrors & Hardware, Rugs & Drapery, Fabric, Botanicals, Pillows, Tabletop, Wallpaper.\nOVERLAP CHECK: a full pairwise subset test over the 36 kept leaves (by (name, mfPartNumber) tile sets) found NO leaf that is contained in another, so no kept row is a pure re-cut. Ballard does cross-file individual SKUs across nodes (e.g. nightstands also appear in 'Coffee & Accent Tables', consoles in both 'Console Tables' and 'Media Furniture'), but these are the site's own distinct nav nodes with distinct totals, so all were kept per the hierarchy rule. Two sub_category names repeat across different branches with different links ('Chaise Lounges' in Living Room and Outdoor Furniture; 'Dining Tables'/'Dining Chairs' in Dining & Kitchen and Outdoor Furniture) - they are genuinely different listing pages and the preceding grouping row disambiguates them.",
+ "rows": [
+  {
+   "category": "Furniture",
+   "sub_category": "Living Room",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sofas",
+   "qty": 68,
+   "link": "https://www.ballarddesigns.com/furniture/living-room/sofas/",
+   "is_group": false,
+   "evidence": "Cornerstone storefront grid API /UnbxdAPI?categoryId=82906&returnRespAsJSON=true&isAPI=true (header CBI-AJAX: 1) -> numberOfProducts=\"68\"; verified by paging &unbxdStart to exhaustion (68 tiles returned, exact match). This is the request the rendered PLP header is built from.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sectional Sofas",
+   "qty": 45,
+   "link": "https://www.ballarddesigns.com/furniture/living-room/sectionals/",
+   "is_group": false,
+   "evidence": "Cornerstone storefront grid API /UnbxdAPI?categoryId=82907&returnRespAsJSON=true&isAPI=true (header CBI-AJAX: 1) -> numberOfProducts=\"45\"; verified by paging &unbxdStart to exhaustion (45 tiles returned, exact match). This is the request the rendered PLP header is built from.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Chairs",
+   "qty": 62,
+   "link": "https://www.ballarddesigns.com/furniture/living-room/chairs/",
+   "is_group": false,
+   "evidence": "Cornerstone storefront grid API /UnbxdAPI?categoryId=82908&returnRespAsJSON=true&isAPI=true (header CBI-AJAX: 1) -> numberOfProducts=\"62\"; verified by paging &unbxdStart to exhaustion (62 tiles returned, exact match). This is the request the rendered PLP header is built from.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Chaise Lounges",
+   "qty": 6,
+   "link": "https://www.ballarddesigns.com/furniture/living-room/chaise/",
+   "is_group": false,
+   "evidence": "Cornerstone storefront grid API /UnbxdAPI?categoryId=82909&returnRespAsJSON=true&isAPI=true (header CBI-AJAX: 1) -> numberOfProducts=\"6\"; verified by paging &unbxdStart to exhaustion (6 tiles returned, exact match). This is the request the rendered PLP header is built from.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Ottomans & Benches",
+   "qty": 52,
+   "link": "https://www.ballarddesigns.com/furniture/living-room/ottomans/",
+   "is_group": false,
+   "evidence": "Cornerstone storefront grid API /UnbxdAPI?categoryId=82911&returnRespAsJSON=true&isAPI=true (header CBI-AJAX: 1) -> numberOfProducts=\"52\"; verified by paging &unbxdStart to exhaustion (52 tiles returned, exact match). This is the request the rendered PLP header is built from.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Coffee & Accent Tables",
+   "qty": 102,
+   "link": "https://www.ballarddesigns.com/furniture/living-room/coffee-accent-tables/",
+   "is_group": false,
+   "evidence": "Cornerstone storefront grid API /UnbxdAPI?categoryId=82912&returnRespAsJSON=true&isAPI=true (header CBI-AJAX: 1) -> numberOfProducts=\"102\"; verified by paging &unbxdStart to exhaustion (102 tiles returned, exact match). This is the request the rendered PLP header is built from.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Console Tables",
+   "qty": 23,
+   "link": "https://www.ballarddesigns.com/furniture/living-room/console-tables/",
+   "is_group": false,
+   "evidence": "Cornerstone storefront grid API /UnbxdAPI?categoryId=82917&returnRespAsJSON=true&isAPI=true (header CBI-AJAX: 1) -> numberOfProducts=\"23\"; verified by paging &unbxdStart to exhaustion (23 tiles returned, exact match). This is the request the rendered PLP header is built from.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Media Furniture",
+   "qty": 100,
+   "link": "https://www.ballarddesigns.com/furniture/living-room/media/",
+   "is_group": false,
+   "evidence": "Cornerstone storefront grid API /UnbxdAPI?categoryId=82916&returnRespAsJSON=true&isAPI=true (header CBI-AJAX: 1) -> numberOfProducts=\"100\"; verified by paging &unbxdStart to exhaustion (100 tiles returned, exact match). This is the request the rendered PLP header is built from.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dining & Kitchen",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dining Tables",
+   "qty": 25,
+   "link": "https://www.ballarddesigns.com/furniture/dining-kitchen/dining-tables/",
+   "is_group": false,
+   "evidence": "Cornerstone storefront grid API /UnbxdAPI?categoryId=83409&returnRespAsJSON=true&isAPI=true (header CBI-AJAX: 1) -> numberOfProducts=\"25\"; verified by paging &unbxdStart to exhaustion (25 tiles returned, exact match). This is the request the rendered PLP header is built from.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dining Chairs",
+   "qty": 49,
+   "link": "https://www.ballarddesigns.com/furniture/dining-kitchen/dining-chairs/",
+   "is_group": false,
+   "evidence": "Cornerstone storefront grid API /UnbxdAPI?categoryId=83408&returnRespAsJSON=true&isAPI=true (header CBI-AJAX: 1) -> numberOfProducts=\"49\"; verified by paging &unbxdStart to exhaustion (49 tiles returned, exact match). This is the request the rendered PLP header is built from.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dining Benches",
+   "qty": 12,
+   "link": "https://www.ballarddesigns.com/furniture/dining-kitchen/benches/",
+   "is_group": false,
+   "evidence": "Cornerstone storefront grid API /UnbxdAPI?categoryId=83414&returnRespAsJSON=true&isAPI=true (header CBI-AJAX: 1) -> numberOfProducts=\"12\"; verified by paging &unbxdStart to exhaustion (12 tiles returned, exact match). This is the request the rendered PLP header is built from.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bar & Counter Stools",
+   "qty": 41,
+   "link": "https://www.ballarddesigns.com/furniture/dining-kitchen/barstools/",
+   "is_group": false,
+   "evidence": "Cornerstone storefront grid API /UnbxdAPI?categoryId=83415&returnRespAsJSON=true&isAPI=true (header CBI-AJAX: 1) -> numberOfProducts=\"41\"; verified by paging &unbxdStart to exhaustion (41 tiles returned, exact match). This is the request the rendered PLP header is built from.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Banquettes",
+   "qty": 40,
+   "link": "https://www.ballarddesigns.com/furniture/dining-kitchen/banquettes/",
+   "is_group": false,
+   "evidence": "Cornerstone storefront grid API /UnbxdAPI?categoryId=83407&returnRespAsJSON=true&isAPI=true (header CBI-AJAX: 1) -> numberOfProducts=\"40\"; verified by paging &unbxdStart to exhaustion (40 tiles returned, exact match). This is the request the rendered PLP header is built from.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Buffets & Sideboards",
+   "qty": 25,
+   "link": "https://www.ballarddesigns.com/furniture/dining-kitchen/buffets-sideboards/",
+   "is_group": false,
+   "evidence": "Cornerstone storefront grid API /UnbxdAPI?categoryId=83406&returnRespAsJSON=true&isAPI=true (header CBI-AJAX: 1) -> numberOfProducts=\"25\"; verified by paging &unbxdStart to exhaustion (25 tiles returned, exact match). This is the request the rendered PLP header is built from.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bar Carts & Storage",
+   "qty": 10,
+   "link": "https://www.ballarddesigns.com/furniture/dining-kitchen/bar-carts-storage/",
+   "is_group": false,
+   "evidence": "Cornerstone storefront grid API /UnbxdAPI?categoryId=163957&returnRespAsJSON=true&isAPI=true (header CBI-AJAX: 1) -> numberOfProducts=\"10\"; verified by paging &unbxdStart to exhaustion (10 tiles returned, exact match). This is the request the rendered PLP header is built from.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Pantry Cabinets & Islands",
+   "qty": 25,
+   "link": "https://www.ballarddesigns.com/furniture/dining-kitchen/pantry-cabinets-kitchen-islands/",
+   "is_group": false,
+   "evidence": "Cornerstone storefront grid API /UnbxdAPI?categoryId=145946&returnRespAsJSON=true&isAPI=true (header CBI-AJAX: 1) -> numberOfProducts=\"25\"; verified by paging &unbxdStart to exhaustion (25 tiles returned, exact match). This is the request the rendered PLP header is built from.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bedroom",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Beds & Headboards",
+   "qty": 39,
+   "link": "https://www.ballarddesigns.com/furniture/bedroom/beds-daybeds-headboards/",
+   "is_group": false,
+   "evidence": "Cornerstone storefront grid API /UnbxdAPI?categoryId=83439&returnRespAsJSON=true&isAPI=true (header CBI-AJAX: 1) -> numberOfProducts=\"39\"; verified by paging &unbxdStart to exhaustion (39 tiles returned, exact match). This is the request the rendered PLP header is built from.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Nightstands",
+   "qty": 41,
+   "link": "https://www.ballarddesigns.com/furniture/bedroom/nightstand/",
+   "is_group": false,
+   "evidence": "Cornerstone storefront grid API /UnbxdAPI?categoryId=90400&returnRespAsJSON=true&isAPI=true (header CBI-AJAX: 1) -> numberOfProducts=\"41\"; verified by paging &unbxdStart to exhaustion (41 tiles returned, exact match). This is the request the rendered PLP header is built from.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dressers & Chests",
+   "qty": 34,
+   "link": "https://www.ballarddesigns.com/furniture/bedroom/dresser/",
+   "is_group": false,
+   "evidence": "Cornerstone storefront grid API /UnbxdAPI?categoryId=90401&returnRespAsJSON=true&isAPI=true (header CBI-AJAX: 1) -> numberOfProducts=\"34\"; verified by paging &unbxdStart to exhaustion (34 tiles returned, exact match). This is the request the rendered PLP header is built from.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "End of Bed Benches",
+   "qty": 17,
+   "link": "https://www.ballarddesigns.com/furniture/bedroom/end-of-bed-benches/",
+   "is_group": false,
+   "evidence": "Cornerstone storefront grid API /UnbxdAPI?categoryId=164453&returnRespAsJSON=true&isAPI=true (header CBI-AJAX: 1) -> numberOfProducts=\"17\"; verified by paging &unbxdStart to exhaustion (17 tiles returned, exact match). This is the request the rendered PLP header is built from.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Home Office",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Desks & Filing Cabinets",
+   "qty": 66,
+   "link": "https://www.ballarddesigns.com/furniture/home-office/desks/",
+   "is_group": false,
+   "evidence": "Cornerstone storefront grid API /UnbxdAPI?categoryId=83456&returnRespAsJSON=true&isAPI=true (header CBI-AJAX: 1) -> numberOfProducts=\"66\"; verified by paging &unbxdStart to exhaustion (66 tiles returned, exact match). This is the request the rendered PLP header is built from.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Desk Chairs",
+   "qty": 12,
+   "link": "https://www.ballarddesigns.com/furniture/home-office/desk-chairs/",
+   "is_group": false,
+   "evidence": "Cornerstone storefront grid API /UnbxdAPI?categoryId=83455&returnRespAsJSON=true&isAPI=true (header CBI-AJAX: 1) -> numberOfProducts=\"12\"; verified by paging &unbxdStart to exhaustion (12 tiles returned, exact match). This is the request the rendered PLP header is built from.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bookcases & Cabinets",
+   "qty": 84,
+   "link": "https://www.ballarddesigns.com/furniture/home-office/bookcases/",
+   "is_group": false,
+   "evidence": "Cornerstone storefront grid API /UnbxdAPI?categoryId=83470&returnRespAsJSON=true&isAPI=true (header CBI-AJAX: 1) -> numberOfProducts=\"84\"; verified by paging &unbxdStart to exhaustion (84 tiles returned, exact match). This is the request the rendered PLP header is built from.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Home Organization",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Closet Storage & Systems",
+   "qty": 15,
+   "link": "https://www.ballarddesigns.com/furniture/home-organization/closet-storage/",
+   "is_group": false,
+   "evidence": "Cornerstone storefront grid API /UnbxdAPI?categoryId=163953&returnRespAsJSON=true&isAPI=true (header CBI-AJAX: 1) -> numberOfProducts=\"15\"; verified by paging &unbxdStart to exhaustion (15 tiles returned, exact match). This is the request the rendered PLP header is built from.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bathroom Storage & Seating",
+   "qty": 18,
+   "link": "https://www.ballarddesigns.com/furniture/home-organization/bathroom-storage/",
+   "is_group": false,
+   "evidence": "Cornerstone storefront grid API /UnbxdAPI?categoryId=163954&returnRespAsJSON=true&isAPI=true (header CBI-AJAX: 1) -> numberOfProducts=\"18\"; verified by paging &unbxdStart to exhaustion (18 tiles returned, exact match). This is the request the rendered PLP header is built from.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Entryway",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Entryway Tables",
+   "qty": 26,
+   "link": "https://www.ballarddesigns.com/furniture/entry/console-tables/",
+   "is_group": false,
+   "evidence": "Cornerstone storefront grid API /UnbxdAPI?categoryId=104452&returnRespAsJSON=true&isAPI=true (header CBI-AJAX: 1) -> numberOfProducts=\"26\"; verified by paging &unbxdStart to exhaustion (26 tiles returned, exact match). This is the request the rendered PLP header is built from.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Entryway Storage & Seating",
+   "qty": 30,
+   "link": "https://www.ballarddesigns.com/furniture/entry/entryway-storage-seating/",
+   "is_group": false,
+   "evidence": "Cornerstone storefront grid API /UnbxdAPI?categoryId=163956&returnRespAsJSON=true&isAPI=true (header CBI-AJAX: 1) -> numberOfProducts=\"30\"; verified by paging &unbxdStart to exhaustion (30 tiles returned, exact match). This is the request the rendered PLP header is built from.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Outdoor Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Outdoor Seating Sets",
+   "qty": 37,
+   "link": "https://www.ballarddesigns.com/outdoor/furniture/seating-sets/",
+   "is_group": false,
+   "evidence": "Cornerstone storefront grid API /UnbxdAPI?categoryId=185452&returnRespAsJSON=true&isAPI=true (header CBI-AJAX: 1) -> numberOfProducts=\"37\"; verified by paging &unbxdStart to exhaustion (37 tiles returned, exact match). This is the request the rendered PLP header is built from.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sofas & Lounge Seating",
+   "qty": 60,
+   "link": "https://www.ballarddesigns.com/outdoor/furniture/seating/",
+   "is_group": false,
+   "evidence": "Cornerstone storefront grid API /UnbxdAPI?categoryId=84009&returnRespAsJSON=true&isAPI=true (header CBI-AJAX: 1) -> numberOfProducts=\"60\"; verified by paging &unbxdStart to exhaustion (60 tiles returned, exact match). This is the request the rendered PLP header is built from.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Chaise Lounges",
+   "qty": 15,
+   "link": "https://www.ballarddesigns.com/outdoor/furniture/chaise-lounge/",
+   "is_group": false,
+   "evidence": "Cornerstone storefront grid API /UnbxdAPI?categoryId=84006&returnRespAsJSON=true&isAPI=true (header CBI-AJAX: 1) -> numberOfProducts=\"15\"; verified by paging &unbxdStart to exhaustion (15 tiles returned, exact match). This is the request the rendered PLP header is built from.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Swings & Daybeds",
+   "qty": 3,
+   "link": "https://www.ballarddesigns.com/outdoor/furniture/swings-and-daybeds/",
+   "is_group": false,
+   "evidence": "Cornerstone storefront grid API /UnbxdAPI?categoryId=158452&returnRespAsJSON=true&isAPI=true (header CBI-AJAX: 1) -> numberOfProducts=\"3\"; verified by paging &unbxdStart to exhaustion (3 tiles returned, exact match). This is the request the rendered PLP header is built from.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dining Sets",
+   "qty": 9,
+   "link": "https://www.ballarddesigns.com/outdoor/furniture/dining-sets/",
+   "is_group": false,
+   "evidence": "Cornerstone storefront grid API /UnbxdAPI?categoryId=83985&returnRespAsJSON=true&isAPI=true (header CBI-AJAX: 1) -> numberOfProducts=\"9\"; verified by paging &unbxdStart to exhaustion (9 tiles returned, exact match). This is the request the rendered PLP header is built from.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dining Tables",
+   "qty": 13,
+   "link": "https://www.ballarddesigns.com/outdoor/furniture/dining-tables/",
+   "is_group": false,
+   "evidence": "Cornerstone storefront grid API /UnbxdAPI?categoryId=83989&returnRespAsJSON=true&isAPI=true (header CBI-AJAX: 1) -> numberOfProducts=\"13\"; verified by paging &unbxdStart to exhaustion (13 tiles returned, exact match). This is the request the rendered PLP header is built from.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dining Chairs",
+   "qty": 18,
+   "link": "https://www.ballarddesigns.com/outdoor/furniture/dining-chairs/",
+   "is_group": false,
+   "evidence": "Cornerstone storefront grid API /UnbxdAPI?categoryId=83988&returnRespAsJSON=true&isAPI=true (header CBI-AJAX: 1) -> numberOfProducts=\"18\"; verified by paging &unbxdStart to exhaustion (18 tiles returned, exact match). This is the request the rendered PLP header is built from.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Accent Furniture",
+   "qty": 50,
+   "link": "https://www.ballarddesigns.com/outdoor/furniture/accent/",
+   "is_group": false,
+   "evidence": "Cornerstone storefront grid API /UnbxdAPI?categoryId=83987&returnRespAsJSON=true&isAPI=true (header CBI-AJAX: 1) -> numberOfProducts=\"50\"; verified by paging &unbxdStart to exhaustion (50 tiles returned, exact match). This is the request the rendered PLP header is built from.",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Storage Solutions",
+   "qty": 11,
+   "link": "https://www.ballarddesigns.com/outdoor/storage/",
+   "is_group": false,
+   "evidence": "Cornerstone storefront grid API /UnbxdAPI?categoryId=120445&returnRespAsJSON=true&isAPI=true (header CBI-AJAX: 1) -> numberOfProducts=\"11\"; verified by paging &unbxdStart to exhaustion (11 tiles returned, exact match). This is the request the rendered PLP header is built from.",
+   "flag": "MANUAL REVIEW: mixed roll-up filed by the site under Outdoor > Outdoor Furniture - 7 of 11 tiles are storage furniture (Easton 2-Door Cabinet, Easton Corner Cabinet, Miles Redd Bermuda 2-Door Console, Navio Castered Storage Cube, Navio Storage Side Table, Ceylon Teak Bakers Rack, Positano Towel Cabana) but 4 are non-furniture goods (Beauclaire Hose Pot, Marco Polo Pool Caddy, Castine Storage Bin, Castine Waste Bin)"
+  }
+ ]
+}

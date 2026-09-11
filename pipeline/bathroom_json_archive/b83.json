@@ -1,0 +1,225 @@
+{
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ACCESS: next.co.uk is Akamai-protected. A direct curl_cffi fetch through probe.py with impersonate='safari18_0' (safari17_0 and chrome124 also work) returned genuine origin HTML on every /shop/home/bathroom... path - HTTP 200 on all ~45 URLs fetched, 270-720 KB each. WebFetch and r.jina.ai still 403 and a real browser tab renders only the Akamai interstitial, so, exactly as in the Furniture-pass ledger, no rendered listing header is obtainable by any route and the SSR-embedded search state is the qty source. probe.py's 2s per-host gap was honoured throughout. ROBOTS - READ FIRST AND ENFORCED PER-URL: https://www.next.co.uk/robots.txt was fetched before anything else (HTTP 200, 263,101 bytes, 6,543 lines - one of the largest retail robots files there is). It declares 15 groups: '*', AdsBot-Google, AdsBot-Google-Mobile, BingAdsBot, facebookexternalhit, Facebot, TikTokBot, SnapchatAdsBot, Snapbot, Pinterestbot, Twitterbot, Googlebot-Image, Storebot-Google, Googlebot-Video and Halebot. There is NO anthropic-ai / ClaudeBot / Claude-Web / Claude group anywhere in the file and no Content-Signal line, so the generic '*' group is the one that applies to me, and no Crawl-delay is declared. The '*' group carries 6,307 allow/disallow rules and it disallows a LARGE number of bathroom paths, so I implemented a Google-semantics robots matcher (wildcard *, end-anchor $, longest-match-wins with allow beating disallow at equal length; sanity-checked against known rules such as '*/shop/*brand-beaverbrooks*', '*/error.asp', '*/homeware/all-*' and '*/shop/*/*/bathroom/*') and ran EVERY candidate URL through it before fetching. Nothing disallowed was ever requested. Blocked and therefore never fetched: */shop/home/bathroom/all-bathroom$, and */shop/home/bathroom/{towels,laundry,beach-towels,toilet-roll-holders,cabinets,towel-bales,towel-rails,toilet-brushes,shower-caddy,shower-curtains,storage,toothbrush-tidy,bins,toilet-seats,soap-dispensers,hooks,toys,scales,side-table,trays,light-pulls,wall-art}*, plus */bathroom/bathroom-furniture/storage*, */shop/home/bathroom/bathroom-accessories/bins*, */shop/home/bathroom/bathroom-accessories/hooks* and */shop/home/*/*/mirrors*. Permitted and used: /shop/home/bathroom, /shop/home/bathroom/{bathroom-furniture,bathroom-accessories,bathroom-textiles,mirrors,chests,shelves,stools-and-ottomans,ornaments,bathmats} and the 4-level /shop/home/bathroom/bathroom-accessories/* and /bathroom-textiles/* leaves listed in the rows. Note this is a path-level Disallow inside the generic '*' group, NOT a named Claude agent group, so it is not a company-level HARD STOP - it restricts which URLs I may open, and the four bathroom nodes it makes unreachable are recorded in `review` with the reason rather than silently dropped. TREE SOURCE: the site's own SSR link-facet blob, which every listing page embeds as a list of {\"u\":<url>,\"n\":<name>,\"v\":\"link:<key>\",\"c\":<count>} objects - the data that drives Next's own left-hand category navigation. /shop/home/bathroom (h1 'Bathroom') publishes 32 of them; the three that are real category groups are Bathroom Textiles, Bathroom Accessories and Bathroom Furniture, and the remaining 29 are the shallower type-rollup URLs for the same listings (see the last review row). Opening each of the three groups gives the true child sets: Bathroom Furniture (h1 'Bathroom Furniture', totalResults 81) -> cabinets 60, storage 11, side table 6, stools and ottomans 3, shelves 1; Bathroom Accessories (h1 'Bathroom Accessories', totalResults 616) -> bathroom accessories 216, toilet roll holders 64, ornaments 53, towel rails 47, mirrors 45, toilet brushes 29, shower caddy 29, shower curtains 29, toothbrush tidy 22, bins 20, toilet seats 19, soap dispensers 18, hooks 12, scales 7, trays 4, light pulls 2; Bathroom Textiles (h1 'Home Bathroom Textiles', totalResults 1250) -> towels 703, bathmats 405, beach towels 93, towel bales 49. COMPLETENESS PROOF: each group's children sum EXACTLY to the group's own totalResults - 60+11+6+3+1 = 81, 216+64+53+47+45+29+29+29+22+20+19+18+12+7+4+2 = 616, 703+405+93+49 = 1250 - so no child is hidden anywhere in the Bathroom department and the tree is complete. None of the 20 leaves exposes a link facet of its own, i.e. the department is exactly three levels deep and every recorded URL is a genuine leaf (rule 24). QTY SOURCE: the SSR-embedded \"search\":{\"totalResults\":N} on that exact leaf URL - the same source and the same method the Furniture pass used on this company, used because a rendered header is unobtainable behind Akamai. VERIFICATION, four ways: (a) INDEPENDENT SECOND SOURCE - for all 18 leaves I opened, the leaf's own totalResults equals the count its PARENT independently publishes in the parent's link-facet blob, with no exception (216/64/47/29/29/22/19/18/7/4/2 in Accessories, 703/405/93/49 in Textiles, 53 for ornaments); these are two different blobs computed on two different pages. (b) ARITHMETIC RECONCILIATION - the three sums above close exactly on the group totals. (c) SECOND READ - every recorded leaf was fetched a second time on a different impersonation profile and all 18 numbers reproduced exactly, zero drift. (d) BAD-SLUG DISCRIMINATION - /shop/home/bathroom/bathroom-furniture/zzz-not-a-real-slug returns h1 'Sorry, the category you requested might have moved or no longer exists.' with totalResults 0 rather than silently serving the parent, so a 200 plus a matching h1 proves the node is real; every emitted URL was h1-verified (Home Bathroom Accessories / Toilet Roll Holders / Towel Rails / Home Mirrors / Toilet Brushes / Shower Caddy / Toothbrush Holders / Toilet Seats / Soap Dispensers / Home Scales / Serving Trays / Home Light Pulls). (e) DISCRIMINATION - 216, 64, 47, 46, 29, 29, 22, 19, 18, 7, 4, 2: no site-wide constant, and the two 29s (Toilet Brushes, Shower Caddy) are genuinely equal on both reads. CLASSIFICATION (rule 2): Toilet Roll Holders/Toilet Brushes/Toilet Seats = rule 14; Towel Rails = rule 15/17 hardware (the towels themselves are routed to Textile); Shower Caddy = rule 6/13; Toothbrush Holders, Soap Dispensers, Trays = rule 13; Bathroom Mirrors = rule 10/11 (primary type mirror, not lighting); Bathroom Accessories (216) is the site's own catch-all accessories leaf, a genuine sibling of the others, not a View All - it is one of the 16 link facets and carries its own h1 and total. LOW-CONFIDENCE INCLUSIONS, stated openly: Scales (7, h1 'Home Scales') and Light Pulls (2, h1 'Home Light Pulls') are not named in rule 3's list. Both are kept in Bathroom because rule 2 puts WEBSITE CATEGORY HIERARCHY above room/keyword and Next files both as children of Bathroom > Bathroom Accessories, because both are bathroom-intended accessories/hardware in function (bathroom scales; the pull cord for a bathroom pull-switch), and because a light PULL is not a luminaire, so rule 19/11 does not send it to Lighting. Neither is in the exclusion index. EXCLUDED - parents (rule 24): /shop/home/bathroom (Bathroom), /shop/home/bathroom/bathroom-accessories (616) and /shop/home/bathroom/bathroom-furniture (81) all have children, so they are grouping rows or review rows with no URL of their own in `rows`. Bathroom Furniture contributes ZERO leaf rows - four of its five children are already in Furniture.xlsx and the fifth is robots-disallowed - so no group row was emitted for it. EXCLUDED - View All (rule 25): /shop/home/bathroom/all-bathroom (2,090 per the department facet), which is robots-disallowed as well. CONFIRMED ABSENT: Next Home sells no bathroom fixtures or sanitaryware in this department - there is no Baths, Basins, Toilets (the WC itself), Bidets, Showers, Shower Enclosures/Screens or Bathroom Taps node among the 32 department facets or the 25 group-level children; the only fixture-adjacent nodes are Toilet Seats and Shower Caddy, both recorded. Next's separate '*bathroom-fittings*' slugs referenced in robots.txt are all disallowed and do not appear in any live facet blob. CROSS-FILE DEDUP: lib/dedup.already_extracted() was run on all 35 candidate URLs. FOUR hits, all against Furniture.xlsx for this same company - /bathroom-furniture/cabinets 'Bathroom Cabinets', /bathroom-furniture/side-table 'Bathroom Side Tables', /bathroom-furniture/stools-and-ottomans 'Bathroom Stools & Ottomans', /bathroom-furniture/shelves 'Bathroom Shelves'. All four went to `review`, none to `rows`. I also deliberately did NOT record their shallower aliases /shop/home/bathroom/{cabinets,side-table,stools-and-ottomans,shelves,chests}, which would have re-extracted the same products under a URL the dedup index does not literally contain. || COORDINATOR EDIT: 'Light Pulls' (2) moved from Output to Review and routed to Lighting, for consistency with the same classification applied to John Lewis (SR 46). No other change.",
+ "rows": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Accessories",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Accessories",
+   "qty": 216,
+   "link": "https://www.next.co.uk/shop/home/bathroom/bathroom-accessories/bathroom-accessories",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Toilet Roll Holders",
+   "qty": 64,
+   "link": "https://www.next.co.uk/shop/home/bathroom/bathroom-accessories/toilet-roll-holders",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Towel Rails",
+   "qty": 47,
+   "link": "https://www.next.co.uk/shop/home/bathroom/bathroom-accessories/towel-rails",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Mirrors",
+   "qty": 46,
+   "link": "https://www.next.co.uk/shop/home/bathroom/mirrors",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Toilet Brushes",
+   "qty": 29,
+   "link": "https://www.next.co.uk/shop/home/bathroom/bathroom-accessories/toilet-brushes",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower Caddy",
+   "qty": 29,
+   "link": "https://www.next.co.uk/shop/home/bathroom/bathroom-accessories/shower-caddy",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Toothbrush Holders",
+   "qty": 22,
+   "link": "https://www.next.co.uk/shop/home/bathroom/bathroom-accessories/toothbrush-tidy",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Toilet Seats",
+   "qty": 19,
+   "link": "https://www.next.co.uk/shop/home/bathroom/bathroom-accessories/toilet-seats",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Soap Dispensers",
+   "qty": 18,
+   "link": "https://www.next.co.uk/shop/home/bathroom/bathroom-accessories/soap-dispensers",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Scales",
+   "qty": 7,
+   "link": "https://www.next.co.uk/shop/home/bathroom/bathroom-accessories/scales",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Trays",
+   "qty": 4,
+   "link": "https://www.next.co.uk/shop/home/bathroom/bathroom-accessories/trays",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  }
+ ],
+ "review": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathroom Accessories > Shower Curtains",
+   "qty": 29,
+   "issue": "ROUTED TO TEXTILE: h1 'Shower Curtains', own totalResults 29 (matches the parent's link-facet value exactly). Rule 20 sends shower curtains to Textile, so it is not recorded in Bathroom even though the site files it under Bathroom Accessories.",
+   "link": "https://www.next.co.uk/shop/home/bathroom/bathroom-accessories/shower-curtains"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathroom Accessories > Ornaments",
+   "qty": 53,
+   "issue": "ROUTED TO DECOR: h1 'Home Ornaments', own totalResults 53 (matches the parent facet). Primary product type is decorative ornaments, which rule 21 sends to Decorative Home Accessories, not Bathroom. Reachable at two URLs - this one and the department-level /shop/home/bathroom/ornaments, which returns the identical h1 and the identical 53 - one node, one record (rule 28).",
+   "link": "https://www.next.co.uk/shop/home/bathroom/bathroom-accessories/ornaments"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathroom Textiles",
+   "qty": 1250,
+   "issue": "ROUTED TO TEXTILE: the whole Bathroom Textiles group (h1 'Home Bathroom Textiles', own totalResults 1250). Its four children, each opened and read from its own totalResults, are Towels 703 (/bathroom-textiles/towels), Bathmats 405 (/bathroom-textiles/bathmats), Beach Towels 93 (/bathroom-textiles/beach-towels) and Towel Bales 49 (/bathroom-textiles/towel-bales) - 703+405+93+49 = 1250 exactly, so that is the complete child set. All four are towels / textile bath mats under rules 15/16/20 and none is duplicated into Bathroom.",
+   "link": "https://www.next.co.uk/shop/home/bathroom/bathroom-textiles"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathroom Furniture > Bathroom Cabinets",
+   "qty": 60,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Bathroom Cabinets' (dedup.already_extracted hit, same company SR 83, identical URL, identical qty 60). Genuine Bathroom node by rule 9 but kept in Furniture under the run-owner OPTION 1 policy. NOT recorded in rows.",
+   "link": "https://www.next.co.uk/shop/home/bathroom/bathroom-furniture/cabinets"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathroom Furniture > Bathroom Side Tables",
+   "qty": 6,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Bathroom Side Tables' (dedup hit, same URL, same qty 6). NOT recorded in rows.",
+   "link": "https://www.next.co.uk/shop/home/bathroom/bathroom-furniture/side-table"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathroom Furniture > Bathroom Stools & Ottomans",
+   "qty": 3,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Bathroom Stools & Ottomans' (dedup hit, same URL, same qty 3). NOT recorded in rows.",
+   "link": "https://www.next.co.uk/shop/home/bathroom/bathroom-furniture/stools-and-ottomans"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathroom Furniture > Bathroom Shelves",
+   "qty": 1,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Bathroom Shelves' (dedup hit, same URL, same qty 1). NOT recorded in rows.",
+   "link": "https://www.next.co.uk/shop/home/bathroom/bathroom-furniture/shelves"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathroom Furniture > Bathroom Storage",
+   "qty": 11,
+   "issue": "ROBOTS-DISALLOWED, NOT FETCHED: robots.txt line 'disallow: */bathroom/bathroom-furniture/storage*' in the generic User-agent: * group covers this exact path, so the page was never requested. The qty 11 is the value the PERMITTED parent page (/shop/home/bathroom/bathroom-furniture) publishes for it in its own link-facet blob, and it is corroborated arithmetically: 60+11+6+3+1 = 81 = the parent's own totalResults. Would have been a Bathroom Storage row under rule 12; left in review because I am not permitted to verify it on its own page.",
+   "link": "https://www.next.co.uk/shop/home/bathroom/bathroom-furniture/storage"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathroom Accessories > Mirrors",
+   "qty": 45,
+   "issue": "ROBOTS-DISALLOWED, NOT FETCHED: 'disallow: */shop/home/*/*/mirrors*' covers this path. NO DATA LOST - the same bathroom-mirror listing is also served at the department-level URL /shop/home/bathroom/mirrors, which robots.txt does NOT disallow; that page was fetched, returns h1 'Home Mirrors' and its own totalResults 46, and IS the recorded Bathroom Mirrors row (rule 10). This deeper 4-level variant is logged here only so the robots restriction is visible.",
+   "link": "https://www.next.co.uk/shop/home/bathroom/bathroom-accessories/mirrors"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathroom Accessories > Bins",
+   "qty": 20,
+   "issue": "ROBOTS-DISALLOWED, NOT FETCHED: 'disallow: */shop/home/bathroom/bathroom-accessories/bins*' names this exact path, and the department-level twin /shop/home/bathroom/bins is disallowed too ('*/shop/home/bathroom/bins*'), so there is NO permitted URL for this node. qty 20 is the parent page's own published link-facet value. Would have been a Bathroom row under rule 13; not recorded because I may not open it.",
+   "link": "https://www.next.co.uk/shop/home/bathroom/bathroom-accessories/bins"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathroom Accessories > Hooks",
+   "qty": 12,
+   "issue": "ROBOTS-DISALLOWED, NOT FETCHED: 'disallow: */shop/home/bathroom/bathroom-accessories/hooks*' names this exact path and '*/shop/home/bathroom/hooks*' blocks the department-level twin, so no permitted URL exists. qty 12 is the parent's own published link-facet value. Would have been a Bathroom row under rules 13/17.",
+   "link": "https://www.next.co.uk/shop/home/bathroom/bathroom-accessories/hooks"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Laundry",
+   "qty": 134,
+   "issue": "ROBOTS-DISALLOWED, NOT FETCHED: 'disallow: */shop/home/bathroom/laundry*'. Appears only as a department-level link facet on /shop/home/bathroom (qty 134 from that blob); it is NOT a child of Bathroom Furniture, Bathroom Accessories or Bathroom Textiles (each of those three groups' children sum exactly to the group total, leaving no room for it). Laundry baskets/hampers/airers would in any case sit closer to Storage/Laundry than Bathroom. Logged so it is not silently skipped.",
+   "link": "https://www.next.co.uk/shop/home/bathroom/laundry"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > department-level type rollups (chests 1, shelves 1, stools and ottomans 3, side table 6, cabinets 56, storage 29, bins 21, hooks 12, toys 8, wall art 1)",
+   "qty": 0,
+   "issue": "NOT RECORDED - duplicate URLs for nodes already handled, and mostly robots-disallowed. /shop/home/bathroom/<type> is a second, shallower URL for the same merchandised listing as /shop/home/bathroom/<group>/<type>. The permitted ones I checked return the same content and near-identical totals (/shop/home/bathroom/shelves h1 'Home Shelves' totalResults 1 vs bathroom-furniture/shelves 1; /shop/home/bathroom/stools-and-ottomans h1 'Home Stools Ottomans' 3 vs bathroom-furniture/stools-and-ottomans 3; /shop/home/bathroom/chests h1 'Home Chests' 1; /shop/home/bathroom/ornaments 53 == bathroom-accessories/ornaments 53; /shop/home/bathroom/bathmats 405 == bathroom-textiles/bathmats 405). Recording them would re-extract Furniture.xlsx's Next bathroom-furniture nodes under an alias URL and double-count the textile/decor nodes, so none was recorded. The rest (cabinets, storage, bins, hooks, toys, wall art, towels, laundry, towel-bales, towel-rails, toilet-brushes, shower-caddy, shower-curtains, toothbrush-tidy, toilet-seats, soap-dispensers, side-table, trays, scales, light-pulls, all-bathroom at this depth) are explicitly robots-disallowed and were never fetched.",
+   "link": "https://www.next.co.uk/shop/home/bathroom"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Light Pulls",
+   "qty": 2,
+   "issue": "ROUTED TO LIGHTING (coordinator, consistency): primary product type is an electrical lighting control, not a bathroom fitting (rules 11/19). Applied to match the identical call made independently on SR 46 John Lewis, whose 'Bathroom Light Pulls' (4) resolves to the 'Switches & Dimmers' product type and was routed to Lighting. Next files this node under Bathroom > Bathroom Accessories, but hierarchy yields to primary product type under rule 2. Count 2 is the worker's verified SSR totalResults figure.",
+   "link": "https://www.next.co.uk/shop/home/bathroom/bathroom-accessories/light-pulls"
+  }
+ ],
+ "_reconstructed_from": "Bathroom.xlsx delivered 2026-09-01 (checkpoint), not original worker JSON"
+}

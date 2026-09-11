@@ -1,0 +1,974 @@
+{
+  "sr": 275,
+  "company": "Argos Home",
+  "brand_site": "argos.co.uk",
+  "country": "UK",
+  "site_url": "https://www.argos.co.uk/",
+  "status": "partial",
+  "failure_reason": "Akamai Bot Manager blocks the entire argos.co.uk site (including the homepage) at tier (a) direct HTTP fetch (requests: 403 Access Denied; curl_cffi impersonate=chrome124: 403 Access Denied on both '/' and any '/browse/...' category page) and at tier (b) Playwright chromium (headless domcontentloaded, and headed with channel='chrome' + --disable-blink-features=AutomationControlled + webdriver-property spoof + mouse-movement warm-up on the homepage first - homepage itself returned HTTP 403 'Access Denied' in every configuration). Tier (c) Claude-in-Chrome (a real connected browser extension) initially got through and successfully rendered 16 category listing pages with live product-count headers, but partway through the session (after roughly 18 page loads) it too began returning Akamai's 'Access Denied' edgesuite error page on every further request, including previously-unvisited URLs - confirming a session/IP-level block rather than a per-URL cache. Per STEP1 rule 4, requesting the host was stopped at that point instead of chasing the block further. Only the static XML sitemap files (/robots.txt, /sitemap.xml, /browse_sitemap.xml) remained reachable via tier (a) throughout and were used to build the complete category tree. As a result roughly a third of the qualifying rows carry a real rendered qty (obtained before the block) and the remaining two-thirds carry qty=null with a MANUAL REVIEW flag, tree-confirmed from the sitemap only.",
+  "notes": "ACCESS: tier (a) direct requests/curl_cffi got 403 on '/' and all '/browse/*' pages (Akamai edgesuite Access Denied), but the static sitemap files were exempt and returned 200: /robots.txt (curl_cffi impersonate=chrome124), https://www.argos.co.uk/sitemap.xml (sitemap index), and https://www.argos.co.uk/browse_sitemap.xml (165KB, 1505 URLs, the full site category tree with clean /browse/<dept>/.../c:<id>/ slugs, no facet/query noise). robots.txt has no anthropic-ai/ClaudeBot/Claude-Web disallow (only generic '*'->/wishlist,/list/*, plus Googlebot/Bingbot rules), so tier (c) was permitted. tier (b) Playwright (headless, then headed real-Chrome-channel with stealth flags and homepage warm-up) still got 403 on the homepage itself, so it was abandoned. tier (c) Claude-in-Chrome (one connected local browser extension) worked initially - loaded and rendered 16 category pages with real product-count headers - then began returning a cached-looking but actually-fresh Access Denied response (different Akamai reference IDs) on every subsequent request including brand-new URLs, so it was stopped per the first-block rule rather than retried further. TREE: built entirely from browse_sitemap.xml filtered to the 307 URLs under /browse/home-and-furniture/ (the Home & Furniture department; the other 10 top-level departments - appliances, baby-and-nursery, clothing, garden-and-diy, gifts-and-occasions, health-and-beauty, jewellery-and-watches, sports-and-leisure, technology, toys - were scanned and excluded as out of scope for textile/storage). Category names in the rows are the exact slug-derived / breadcrumb-confirmed names (breadcrumb confirmed on all 16 pages successfully loaded via tier c; for the remaining nodes the name is the humanised sitemap slug, unverified against a live h1/breadcrumb because the page could not be loaded). QTY: for the 16 loaded pages, qty = the exact 'N products' header shown above the grid (e.g. '318 products' on Duvets). For every other qualifying node, qty=null with a MANUAL REVIEW flag per STEP1 rule 3 - no number was estimated, inferred, or copied from a sibling. EXCLUDED: Lighting (ceiling/floor/wall/desk/outdoor lights, bulbs) - out of scope. Kitchen & Dining/Kitchenware non-textile/non-storage items (cookware, tableware crockery/glassware/cutlery, dish racks, kitchen scales, kitchen bins, kitchen roll holders, mug trees excluded as LOW-value holders were instead kept as a LOW-confidence Storage row, water filter jugs, knives, starter sets) - out of scope except where explicitly a storage/organisation node. Furniture (all bedroom furniture including ottoman-and-storage-beds which is a bed not a storage box, all living-room furniture, dining-room furniture except the textile seat-pads, office desks/chairs, kids bedroom furniture, bathroom cabinets/wall-cabinets/shelves under 'bathroom-furniture' since the site does not label them Storage, kitchen-furniture placeholder node with no subcategories) - Furniture task, not this one. Decorative Home Accessories (artificial flowers/plants/trees, candle holders, candles, clocks, indoor pots and planters, mirrors of every type, ornaments, picture frames, vases, wall art and prints, most Christmas decorations - baubles, crackers, lights, table/room decorations, tree decorations, trees, wrapping, wreaths and garlands, outdoor Christmas decorations, tree-skirts-and-stands excluded as a mixed fabric-skirt/hardware-stand node with no reliable primary type, Christmas candles/home-fragrance/cookware/tableware) - out of scope; purely decorative even where technically able to hold something. Home fragrance (electric diffusers, reed diffusers, room spray) - out of scope. Bathroom fixtures/accessories with no storage or textile function (bathroom accessory sets, bathroom bins as waste bins not organisers, bathroom mirrors, bathroom scales, toilet brushes/roll-holders/seats, towel rails and rings as hardware) - excluded per textile.md SS9 and storage.md SS14/SS28. Hardware (blind-and-curtain-accessories, curtain-poles-and-tracks, coat-hooks-and-stands, kitchen roll holders, clothes hangers) - excluded per textile.md SS5 hardware rule and storage.md's container-not-accessory principle. Cleaning supplies (mops, dustpans/brushes, window cleaners, carpet sweepers, cleaning products) and laundry non-storage items (clothes airers, clothes steamers, irons, ironing boards, washing lines) - out of scope; laundry-accessories (a mixed pegs/bags/misc catch-all) excluded as genuinely ambiguous rather than forced into Storage. Pet supplies (entire department - cat/dog/fish/small-pet/wildlife products) - out of scope per textile.md SS18/storage.md SS31. Hot water bottles - excluded, primary product is a rubber/PVC bottle not a textile item even though sold in the Bedding node. Picnicware and picnic accessories (picnic-blankets-and-baskets) - excluded as a mixed textile/general-merchandise node outside the home-textile/home-storage scope, consistent with prior workers excluding garden picnic-ware as out of scope. Moving-house-packs-and-bubble-wrap - excluded (packing material, not a storage container product); cardboard-boxes from the same moving-house-supplies node was kept as a genuine storage-box product (MEDIUM). Lunch boxes and kids-room-decorations - excluded as neither textile nor storage per rules. No View-All/Collection/search/product-detail URLs were used anywhere in this file; all URLs are the exact /browse/.../c:<id>/ category listing URLs read from browse_sitemap.xml.",
+  "textile_rows": [
+    {
+      "category": "Textile",
+      "sub_category": "Bath Towels and Mats",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Bath Mats",
+      "qty": 156,
+      "link": "https://www.argos.co.uk/browse/home-and-furniture/bath-towels-and-mats/bath-mats/c:29544/",
+      "is_group": false,
+      "evidence": "rendered '156 products' count header on category listing page (Claude-in-Chrome, tier c)",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Bath Towels",
+      "qty": 659,
+      "link": "https://www.argos.co.uk/browse/home-and-furniture/bath-towels-and-mats/bath-towels/c:29546/",
+      "is_group": false,
+      "evidence": "rendered '659 products' count header on category listing page (Claude-in-Chrome, tier c)",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Bathroom Accessories",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Shower Curtains",
+      "qty": 62,
+      "link": "https://www.argos.co.uk/browse/home-and-furniture/bathroom-accessories/shower-curtains/c:29545/",
+      "is_group": false,
+      "evidence": "rendered '62 products' count header on category listing page (Claude-in-Chrome, tier c)",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Bedding",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Bed Sheets",
+      "qty": 396,
+      "link": "https://www.argos.co.uk/browse/home-and-furniture/bedding/bed-sheets/c:29476/",
+      "is_group": false,
+      "evidence": "rendered '396 products' count header on category listing page (Claude-in-Chrome, tier c)",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Bedspreads",
+      "qty": 11,
+      "link": "https://www.argos.co.uk/browse/home-and-furniture/bedding/bedspreads/c:29482/",
+      "is_group": false,
+      "evidence": "rendered '11 products' count header on category listing page (Claude-in-Chrome, tier c)",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Duvet Cover Sets",
+      "qty": 1098,
+      "link": "https://www.argos.co.uk/browse/home-and-furniture/bedding/duvet-cover-sets/c:29474/",
+      "is_group": false,
+      "evidence": "rendered '1098 products' count header on category listing page (Claude-in-Chrome, tier c)",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Duvets",
+      "qty": 318,
+      "link": "https://www.argos.co.uk/browse/home-and-furniture/bedding/duvets/c:29473/",
+      "is_group": false,
+      "evidence": "rendered '318 products' count header on category listing page (Claude-in-Chrome, tier c)",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Electric Blankets",
+      "qty": 30,
+      "link": "https://www.argos.co.uk/browse/home-and-furniture/bedding/electric-blankets/c:29472/",
+      "is_group": false,
+      "evidence": "rendered '30 products' count header on category listing page (Claude-in-Chrome, tier c)",
+      "flag": "electric/heated blanket - primary product combines a fabric blanket/underblanket with an electrical heating element (listing also includes a heated mattress protector); site categorises it under Bedding alongside duvets, but textile.md does not explicitly address electric blankets",
+      "confidence": "MEDIUM"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Kids Bedding",
+      "qty": 253,
+      "link": "https://www.argos.co.uk/browse/home-and-furniture/bedding/kids-bedding/c:29475/",
+      "is_group": false,
+      "evidence": "rendered '253 products' count header on category listing page (Claude-in-Chrome, tier c)",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Mattress Protectors",
+      "qty": 38,
+      "link": "https://www.argos.co.uk/browse/home-and-furniture/bedding/mattress-protectors/c:29477/",
+      "is_group": false,
+      "evidence": "rendered '38 products' count header on category listing page (Claude-in-Chrome, tier c)",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Mattress Toppers",
+      "qty": 67,
+      "link": "https://www.argos.co.uk/browse/home-and-furniture/bedding/mattress-toppers/c:29478/",
+      "is_group": false,
+      "evidence": "rendered '67 products' count header on category listing page (Claude-in-Chrome, tier c)",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Pillow Protectors",
+      "qty": 13,
+      "link": "https://www.argos.co.uk/browse/home-and-furniture/bedding/pillow-protectors/c:29481/",
+      "is_group": false,
+      "evidence": "rendered '13 products' count header on category listing page (Claude-in-Chrome, tier c)",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Pillowcases",
+      "qty": 129,
+      "link": "https://www.argos.co.uk/browse/home-and-furniture/bedding/pillowcases/c:29480/",
+      "is_group": false,
+      "evidence": "rendered '129 products' count header on category listing page (Claude-in-Chrome, tier c)",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Pillows",
+      "qty": 262,
+      "link": "https://www.argos.co.uk/browse/home-and-furniture/bedding/pillows/c:29479/",
+      "is_group": false,
+      "evidence": "rendered '262 products' count header on category listing page (Claude-in-Chrome, tier c)",
+      "flag": "pillows are not explicitly named in textile.md (which lists Pillowcases/Pillow Shams/Pillow Covers); classified as core bedding textile alongside duvets and pillowcases",
+      "confidence": "MEDIUM"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Blinds, Curtains and Poles",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Blinds",
+      "qty": 99,
+      "link": "https://www.argos.co.uk/browse/home-and-furniture/blinds-curtains-and-poles/blinds/c:29540/",
+      "is_group": false,
+      "evidence": "rendered '99 products' count header on category listing page (Claude-in-Chrome, tier c)",
+      "flag": "listing confirmed to mix fabric blackout/roller blinds with non-fabric wood and plastic Venetian blinds; textile.md includes 'Roller Blinds when clearly textile' but this category is not exclusively fabric products",
+      "confidence": "MEDIUM"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Curtains",
+      "qty": 890,
+      "link": "https://www.argos.co.uk/browse/home-and-furniture/blinds-curtains-and-poles/curtains/c:29541/",
+      "is_group": false,
+      "evidence": "rendered '890 products' count header on category listing page (Claude-in-Chrome, tier c)",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Dining Room Furniture",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Seat Pads",
+      "qty": null,
+      "link": "https://www.argos.co.uk/browse/home-and-furniture/dining-room-furniture/seat-pads/c:29652/",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: category listing page returns Akamai Bot Manager 403 (Access Denied) at every reachable access tier - could not load rendered qty; row confirmed from browse_sitemap.xml sitemap-derived category tree only, not from a live page load",
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Home Furnishings",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Blankets and Throws",
+      "qty": null,
+      "link": "https://www.argos.co.uk/browse/home-and-furniture/home-furnishings/blankets-and-throws/c:29526/",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: category listing page returns Akamai Bot Manager 403 (Access Denied) at every reachable access tier - could not load rendered qty; row confirmed from browse_sitemap.xml sitemap-derived category tree only, not from a live page load",
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Cushions",
+      "qty": null,
+      "link": "https://www.argos.co.uk/browse/home-and-furniture/home-furnishings/cushions/c:29527/",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: category listing page returns Akamai Bot Manager 403 (Access Denied) at every reachable access tier - could not load rendered qty; row confirmed from browse_sitemap.xml sitemap-derived category tree only, not from a live page load",
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Door Mats",
+      "qty": null,
+      "link": "https://www.argos.co.uk/browse/home-and-furniture/home-furnishings/door-mats/c:1000176/",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: category listing page returns Akamai Bot Manager 403 (Access Denied) at every reachable access tier - could not load rendered qty; row confirmed from browse_sitemap.xml sitemap-derived category tree only, not from a live page load",
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Draught Excluders and Door Stops",
+      "qty": null,
+      "link": "https://www.argos.co.uk/browse/home-and-furniture/home-furnishings/draught-excluders-and-door-stops/c:1028000/",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: category listing page returns Akamai Bot Manager 403 (Access Denied) at every reachable access tier - could not load rendered qty or confirm product mix; node combines fabric draught excluders (textile) with door stops (typically wood/metal/rubber, not textile) under one URL - could not verify live which product type dominates",
+      "confidence": "LOW"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Christmas Decorations",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Christmas Stockings",
+      "qty": null,
+      "link": "https://www.argos.co.uk/browse/home-and-furniture/home-furnishings/christmas-decorations/christmas-stockings/c:1043251/",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: category listing page returns Akamai Bot Manager 403 (Access Denied) at every reachable access tier - could not load rendered qty; textile.md SS15 explicitly allows 'Fabric Christmas Stockings' but could not verify live that all listed items are genuinely fabric stockings rather than decorative novelty items",
+      "confidence": "MEDIUM"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Christmas Homewares",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Christmas Bedding",
+      "qty": null,
+      "link": "https://www.argos.co.uk/browse/home-and-furniture/home-furnishings/christmas-homewares/christmas-bedding/c:1027683/",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: category listing page returns Akamai Bot Manager 403 (Access Denied) at every reachable access tier - could not load rendered qty; row confirmed from browse_sitemap.xml sitemap-derived category tree only, not from a live page load",
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Rugs and Runners",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Hallway and Stair Runners",
+      "qty": null,
+      "link": "https://www.argos.co.uk/browse/home-and-furniture/home-furnishings/rugs-and-runners/hallway-and-stair-runners/c:1000174/",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: category listing page returns Akamai Bot Manager 403 (Access Denied) at every reachable access tier - could not load rendered qty; row confirmed from browse_sitemap.xml sitemap-derived category tree only, not from a live page load",
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Outdoor Rugs",
+      "qty": null,
+      "link": "https://www.argos.co.uk/browse/home-and-furniture/home-furnishings/rugs-and-runners/outdoor-rugs/c:812473/",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: category listing page returns Akamai Bot Manager 403 (Access Denied) at every reachable access tier - could not load rendered qty; row confirmed from browse_sitemap.xml sitemap-derived category tree only, not from a live page load",
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Rugs",
+      "qty": null,
+      "link": "https://www.argos.co.uk/browse/home-and-furniture/home-furnishings/rugs-and-runners/rugs/c:29529/",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: category listing page returns Akamai Bot Manager 403 (Access Denied) at every reachable access tier - could not load rendered qty; row confirmed from browse_sitemap.xml sitemap-derived category tree only, not from a live page load",
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Kids Room",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Kids Furnishings",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Kids Curtains and Blinds",
+      "qty": null,
+      "link": "https://www.argos.co.uk/browse/home-and-furniture/kids-room/kids-furnishings/kids-curtains-and-blinds/c:826713/",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: category listing page returns Akamai Bot Manager 403 (Access Denied) at every reachable access tier - could not load rendered qty; node combines curtains (textile) with blinds (mixed fabric/non-fabric, per the adult Blinds category) so exact composition could not be verified live",
+      "confidence": "MEDIUM"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Kids Cushions",
+      "qty": null,
+      "link": "https://www.argos.co.uk/browse/home-and-furniture/kids-room/kids-furnishings/kids-cushions/c:826715/",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: category listing page returns Akamai Bot Manager 403 (Access Denied) at every reachable access tier - could not load rendered qty; row confirmed from browse_sitemap.xml sitemap-derived category tree only, not from a live page load",
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Kids Rugs",
+      "qty": null,
+      "link": "https://www.argos.co.uk/browse/home-and-furniture/kids-room/kids-furnishings/kids-rugs/c:826714/",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: category listing page returns Akamai Bot Manager 403 (Access Denied) at every reachable access tier - could not load rendered qty; row confirmed from browse_sitemap.xml sitemap-derived category tree only, not from a live page load",
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Kitchenware",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Tea Towels, Aprons and Oven Gloves",
+      "qty": null,
+      "link": "https://www.argos.co.uk/browse/home-and-furniture/kitchenware/tea-towels-aprons-and-oven-gloves/c:29719/",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: category listing page returns Akamai Bot Manager 403 (Access Denied) at every reachable access tier - could not load rendered qty; row confirmed from browse_sitemap.xml sitemap-derived category tree only, not from a live page load",
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Laundry and Ironing",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Ironing Board Covers",
+      "qty": null,
+      "link": "https://www.argos.co.uk/browse/home-and-furniture/laundry-and-ironing/ironing-board-covers/c:789418/",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: category listing page returns Akamai Bot Manager 403 (Access Denied) at every reachable access tier - could not load rendered qty; fabric cover product, treated analogously to a furniture cover per textile.md SS21",
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Tableware",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Table Linen",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Napkins",
+      "qty": null,
+      "link": "https://www.argos.co.uk/browse/home-and-furniture/tableware/table-linen/napkins/c:789446/",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: category listing page returns Akamai Bot Manager 403 (Access Denied) at every reachable access tier - could not load rendered qty; row confirmed from browse_sitemap.xml sitemap-derived category tree only, not from a live page load",
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Placemats and Coasters",
+      "qty": null,
+      "link": "https://www.argos.co.uk/browse/home-and-furniture/tableware/table-linen/placemats-and-coasters/c:789447/",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: category listing page returns Akamai Bot Manager 403 (Access Denied) at every reachable access tier - could not load rendered qty; node combines fabric placemats (textile) with coasters (typically cork/wood/glass, not textile); site nests it under Table Linen so kept as Textile but composition unverified live",
+      "confidence": "MEDIUM"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Table Cloths and Table Runners",
+      "qty": null,
+      "link": "https://www.argos.co.uk/browse/home-and-furniture/tableware/table-linen/table-cloths-and-table-runners/c:29746/",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: category listing page returns Akamai Bot Manager 403 (Access Denied) at every reachable access tier - could not load rendered qty; row confirmed from browse_sitemap.xml sitemap-derived category tree only, not from a live page load",
+      "confidence": "HIGH"
+    }
+  ],
+  "storage_rows": [
+    {
+      "category": "Storage",
+      "sub_category": "Bathroom Accessories",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Shower and Bath Storage",
+      "qty": null,
+      "link": "https://www.argos.co.uk/browse/home-and-furniture/bathroom-accessories/shower-and-bath-storage/c:62266/",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: category listing page returns Akamai Bot Manager 403 (Access Denied) at every reachable access tier - could not load rendered qty; row confirmed from browse_sitemap.xml sitemap-derived category tree only, not from a live page load",
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Bathroom Furniture",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Under-Sink Storage",
+      "qty": null,
+      "link": "https://www.argos.co.uk/browse/home-and-furniture/bathroom-furniture/under-sink-storage/c:812663/",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: category listing page returns Akamai Bot Manager 403 (Access Denied) at every reachable access tier - could not load rendered qty; sibling nodes bathroom-shelves/bathroom-wall-cabinets/freestanding-bathroom-cabinets under the same 'bathroom-furniture' parent were excluded as Furniture, this node was kept because its own slug explicitly names Storage",
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Hallway Furniture",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Hallway Storage",
+      "qty": null,
+      "link": "https://www.argos.co.uk/browse/home-and-furniture/hallway-furniture/hallway-storage/c:29915/",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: category listing page returns Akamai Bot Manager 403 (Access Denied) at every reachable access tier - could not load rendered qty; row confirmed from browse_sitemap.xml sitemap-derived category tree only, not from a live page load",
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Kids Room",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Kids Storage",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Kids Baskets and Boxes",
+      "qty": null,
+      "link": "https://www.argos.co.uk/browse/home-and-furniture/kids-room/kids-storage/kids-baskets-and-boxes/c:826712/",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: category listing page returns Akamai Bot Manager 403 (Access Denied) at every reachable access tier - could not load rendered qty; row confirmed from browse_sitemap.xml sitemap-derived category tree only, not from a live page load",
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Kids Bookcases and Shelving",
+      "qty": null,
+      "link": "https://www.argos.co.uk/browse/home-and-furniture/kids-room/kids-storage/kids-bookcases-and-shelving/c:826711/",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: category listing page returns Akamai Bot Manager 403 (Access Denied) at every reachable access tier - could not load rendered qty; node mixes bookcases (typically Furniture) with shelving (storage-ambiguous per storage.md SS18); kept as Storage because the site nests it explicitly under the 'kids-storage' parent",
+      "confidence": "MEDIUM"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Toy Boxes",
+      "qty": null,
+      "link": "https://www.argos.co.uk/browse/home-and-furniture/kids-room/kids-storage/toy-boxes/c:29687/",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: category listing page returns Akamai Bot Manager 403 (Access Denied) at every reachable access tier - could not load rendered qty; row confirmed from browse_sitemap.xml sitemap-derived category tree only, not from a live page load",
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Kitchen Storage",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Kitchen Food Storage",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Bread Bins",
+      "qty": null,
+      "link": "https://www.argos.co.uk/browse/home-and-furniture/kitchen-storage/kitchen-food-storage/bread-bins/c:29723/",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: category listing page returns Akamai Bot Manager 403 (Access Denied) at every reachable access tier - could not load rendered qty; row confirmed from browse_sitemap.xml sitemap-derived category tree only, not from a live page load",
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Food Storage",
+      "qty": null,
+      "link": "https://www.argos.co.uk/browse/home-and-furniture/kitchen-storage/kitchen-food-storage/food-storage/c:29721/",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: category listing page returns Akamai Bot Manager 403 (Access Denied) at every reachable access tier - could not load rendered qty; row confirmed from browse_sitemap.xml sitemap-derived category tree only, not from a live page load",
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Storage Jars and Sets",
+      "qty": null,
+      "link": "https://www.argos.co.uk/browse/home-and-furniture/kitchen-storage/kitchen-food-storage/storage-jars-and-sets/c:29722/",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: category listing page returns Akamai Bot Manager 403 (Access Denied) at every reachable access tier - could not load rendered qty; row confirmed from browse_sitemap.xml sitemap-derived category tree only, not from a live page load",
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Kitchen Organisation",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Cutlery Trays",
+      "qty": null,
+      "link": "https://www.argos.co.uk/browse/home-and-furniture/kitchen-storage/kitchen-organisation/cutlery-trays/c:789430/",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: category listing page returns Akamai Bot Manager 403 (Access Denied) at every reachable access tier - could not load rendered qty; row confirmed from browse_sitemap.xml sitemap-derived category tree only, not from a live page load",
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Kitchen Shelves and Stands",
+      "qty": null,
+      "link": "https://www.argos.co.uk/browse/home-and-furniture/kitchen-storage/kitchen-organisation/kitchen-shelves-and-stands/c:29725/",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: category listing page returns Akamai Bot Manager 403 (Access Denied) at every reachable access tier - could not load rendered qty; shelving is a known Furniture/Storage/Wall Decor boundary case per storage.md SS18; kept as Storage because the site nests it under Kitchen Organisation",
+      "confidence": "MEDIUM"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Mug Trees",
+      "qty": null,
+      "link": "https://www.argos.co.uk/browse/home-and-furniture/kitchen-storage/kitchen-organisation/mug-trees/c:29724/",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: category listing page returns Akamai Bot Manager 403 (Access Denied) at every reachable access tier - could not load rendered qty; mug trees are not explicitly listed in storage.md; included on the strength of the site's own placement under Kitchen Organisation and their organising function",
+      "confidence": "LOW"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Wine Racks",
+      "qty": null,
+      "link": "https://www.argos.co.uk/browse/home-and-furniture/kitchen-storage/kitchen-organisation/wine-racks/c:29711/",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: category listing page returns Akamai Bot Manager 403 (Access Denied) at every reachable access tier - could not load rendered qty; wine racks are not explicitly listed in storage.md but function as a storage/organisation rack per SS19",
+      "confidence": "MEDIUM"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Kitchen Trolleys",
+      "qty": null,
+      "link": "https://www.argos.co.uk/browse/home-and-furniture/kitchen-storage/kitchen-trolleys/c:29720/",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: category listing page returns Akamai Bot Manager 403 (Access Denied) at every reachable access tier - could not load rendered qty; row confirmed from browse_sitemap.xml sitemap-derived category tree only, not from a live page load",
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Laundry and Ironing",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Laundry Baskets",
+      "qty": null,
+      "link": "https://www.argos.co.uk/browse/home-and-furniture/laundry-and-ironing/laundry-baskets/c:29434/",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: category listing page returns Akamai Bot Manager 403 (Access Denied) at every reachable access tier - could not load rendered qty; row confirmed from browse_sitemap.xml sitemap-derived category tree only, not from a live page load",
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Office Furniture",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Filing Cabinets and Office Storage",
+      "qty": null,
+      "link": "https://www.argos.co.uk/browse/home-and-furniture/office-furniture/filing-cabinets-and-office-storage/c:29864/",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: category listing page returns Akamai Bot Manager 403 (Access Denied) at every reachable access tier - could not load rendered qty; row confirmed from browse_sitemap.xml sitemap-derived category tree only, not from a live page load",
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Storage and Organisation",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Bookcases and Shelving Units",
+      "qty": null,
+      "link": "https://www.argos.co.uk/browse/home-and-furniture/storage-and-organisation/bookcases-and-shelving-units/c:29890/",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: category listing page returns Akamai Bot Manager 403 (Access Denied) at every reachable access tier - could not load rendered qty; bookcases lean Furniture per storage.md SS21 but the site explicitly places this node inside the 'Storage and Organisation' department",
+      "confidence": "MEDIUM"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "CD and DVD Storage",
+      "qty": null,
+      "link": "https://www.argos.co.uk/browse/home-and-furniture/storage-and-organisation/cd-and-dvd-storage/c:29891/",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: category listing page returns Akamai Bot Manager 403 (Access Denied) at every reachable access tier - could not load rendered qty; row confirmed from browse_sitemap.xml sitemap-derived category tree only, not from a live page load",
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Clothes Storage",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Overdoor Storage and Hanging Storage",
+      "qty": null,
+      "link": "https://www.argos.co.uk/browse/home-and-furniture/storage-and-organisation/clothes-storage/overdoor-storage-and-hanging-storage/c:29589/",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: category listing page returns Akamai Bot Manager 403 (Access Denied) at every reachable access tier - could not load rendered qty; row confirmed from browse_sitemap.xml sitemap-derived category tree only, not from a live page load",
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Storage Bags",
+      "qty": null,
+      "link": "https://www.argos.co.uk/browse/home-and-furniture/storage-and-organisation/clothes-storage/storage-bags/c:29597/",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: category listing page returns Akamai Bot Manager 403 (Access Denied) at every reachable access tier - could not load rendered qty; row confirmed from browse_sitemap.xml sitemap-derived category tree only, not from a live page load",
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Under-Bed Storage",
+      "qty": null,
+      "link": "https://www.argos.co.uk/browse/home-and-furniture/storage-and-organisation/clothes-storage/under-bed-storage/c:824440/",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: category listing page returns Akamai Bot Manager 403 (Access Denied) at every reachable access tier - could not load rendered qty; row confirmed from browse_sitemap.xml sitemap-derived category tree only, not from a live page load",
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Cube Storage",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Cube Storage Boxes",
+      "qty": null,
+      "link": "https://www.argos.co.uk/browse/home-and-furniture/storage-and-organisation/cube-storage/cube-storage-boxes/c:1000067/",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: category listing page returns Akamai Bot Manager 403 (Access Denied) at every reachable access tier - could not load rendered qty; row confirmed from browse_sitemap.xml sitemap-derived category tree only, not from a live page load",
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Cube Storage Units",
+      "qty": null,
+      "link": "https://www.argos.co.uk/browse/home-and-furniture/storage-and-organisation/cube-storage/cube-storage-units/c:1000066/",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: category listing page returns Akamai Bot Manager 403 (Access Denied) at every reachable access tier - could not load rendered qty; row confirmed from browse_sitemap.xml sitemap-derived category tree only, not from a live page load",
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Decorative Baskets and Boxes",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Decorative Storage Boxes",
+      "qty": null,
+      "link": "https://www.argos.co.uk/browse/home-and-furniture/storage-and-organisation/decorative-baskets-and-boxes/decorative-storage-boxes/c:29591/",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: category listing page returns Akamai Bot Manager 403 (Access Denied) at every reachable access tier - could not load rendered qty; row confirmed from browse_sitemap.xml sitemap-derived category tree only, not from a live page load",
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Storage Baskets",
+      "qty": null,
+      "link": "https://www.argos.co.uk/browse/home-and-furniture/storage-and-organisation/decorative-baskets-and-boxes/storage-baskets/c:1000061/",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: category listing page returns Akamai Bot Manager 403 (Access Denied) at every reachable access tier - could not load rendered qty; row confirmed from browse_sitemap.xml sitemap-derived category tree only, not from a live page load",
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Moving House Supplies",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Cardboard Boxes",
+      "qty": null,
+      "link": "https://www.argos.co.uk/browse/home-and-furniture/storage-and-organisation/moving-house-supplies/cardboard-boxes/c:797725/",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: category listing page returns Akamai Bot Manager 403 (Access Denied) at every reachable access tier - could not load rendered qty; moving/packing boxes still function as genuine storage containers, kept as Storage; the sibling 'moving-house-packs-and-bubble-wrap' node was excluded as packing material rather than a storage product",
+      "confidence": "MEDIUM"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Ottomans and Storage Benches",
+      "qty": null,
+      "link": "https://www.argos.co.uk/browse/home-and-furniture/storage-and-organisation/ottomans-and-storage-benches/c:29594/",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: category listing page returns Akamai Bot Manager 403 (Access Denied) at every reachable access tier - could not load rendered qty; ottomans/storage benches are seating furniture with a storage function (storage.md SS21); kept as Storage because the site places the node inside the 'Storage and Organisation' department rather than under any Furniture category",
+      "confidence": "MEDIUM"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Plastic Storage Boxes and Drawers",
+      "qty": null,
+      "link": "https://www.argos.co.uk/browse/home-and-furniture/storage-and-organisation/plastic-storage-boxes-and-drawers/c:29593/",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: category listing page returns Akamai Bot Manager 403 (Access Denied) at every reachable access tier - could not load rendered qty; row confirmed from browse_sitemap.xml sitemap-derived category tree only, not from a live page load",
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Shoe Storage",
+      "qty": null,
+      "link": "https://www.argos.co.uk/browse/home-and-furniture/storage-and-organisation/shoe-storage/c:29596/",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: category listing page returns Akamai Bot Manager 403 (Access Denied) at every reachable access tier - could not load rendered qty; row confirmed from browse_sitemap.xml sitemap-derived category tree only, not from a live page load",
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Storage Trunks and Blanket Boxes",
+      "qty": null,
+      "link": "https://www.argos.co.uk/browse/home-and-furniture/storage-and-organisation/storage-trunks-and-blanket-boxes/c:29592/",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: category listing page returns Akamai Bot Manager 403 (Access Denied) at every reachable access tier - could not load rendered qty; row confirmed from browse_sitemap.xml sitemap-derived category tree only, not from a live page load",
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Storage Units",
+      "qty": null,
+      "link": "https://www.argos.co.uk/browse/home-and-furniture/storage-and-organisation/storage-units/c:29590/",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: category listing page returns Akamai Bot Manager 403 (Access Denied) at every reachable access tier - could not load rendered qty; row confirmed from browse_sitemap.xml sitemap-derived category tree only, not from a live page load",
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Wall-Mounted and Floating Shelves",
+      "qty": null,
+      "link": "https://www.argos.co.uk/browse/home-and-furniture/storage-and-organisation/wall-mounted-and-floating-shelves/c:29892/",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: category listing page returns Akamai Bot Manager 403 (Access Denied) at every reachable access tier - could not load rendered qty; shelving is a Storage/Furniture/Wall Decor boundary case per storage.md SS18; kept as Storage because the site nests it inside the 'Storage and Organisation' department",
+      "confidence": "MEDIUM"
+    }
+  ]
+}

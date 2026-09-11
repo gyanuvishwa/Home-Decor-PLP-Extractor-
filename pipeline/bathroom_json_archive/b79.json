@@ -1,0 +1,62 @@
+{
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "RETRY of prior BLOCKED/ACCESS-FAILURE result. Tier 1 (curl_cffi, 5 impersonation profiles incl. chrome124/120/110/edge101/safari17_0) all hit Akamai Bot Manager sensor-challenge or 418 on the target URL. Tier 2 (Playwright, real 'chrome' channel, homepage-warmed cookies) still hit Akamai hard block ('QVC.com is currently unavailable') on every /c/.../c.html category URL tried, though the homepage loaded fine -- confirmed category-listing-specific bot wall, not a general site block. Escalated to Tier 3 (mcp__claude-in-chrome__*, real logged-in Chrome session) which loaded all pages cleanly with full DOM -- this tier succeeded. api.qvc.com was never fetched directly (robots.txt Disallow:/ respected throughout); only www.qvc.com pages were requested, and www.qvc.com/robots.txt itself has no Claude/anthropic-ai-specific disallow (Allow:/ for User-agent:*; separate blocks only for OAI-SearchBot/PerplexityBot-irrelevant paths, none targeting Claude). Original URL https://www.qvc.com/home-and-garden/_/N-17h8/c.html is a dead/legacy slug -- QVC has restructured its site nav; the current Home & Garden equivalent is 'For the Home' at https://www.qvc.com/c/for-the-home/-/lglu/c.html (verified: a fabricated guess at a Furniture sub-URL silently redirected to this parent, confirming the bad-slug-silently-falls-back trap -- no invented URLs were recorded). Tree source: the site's own 'Bath' department page (https://www.qvc.com/c/for-the-home/bath/-/sio1/c.html), whose left-nav Category facet is the complete, exhaustive sub-category list -- confirmed exhaustive because the 7 facet counts (558+127+5+94+19+63+9) sum exactly to the page's own total of 875, matching the 'Bath (875)' facet count shown on the parent 'For the Home' page. No other bathroom-relevant node found elsewhere in the site nav (QVC is TV/general-merchandise retail; no plumbing fixtures/vanities/toilets sold). Qty verified per leaf: Bath Accessories and Shower Heads pages individually visited and their 'X of X' result-count header read directly (matches facet count); Bathroom Storage/Bath Rugs & Mats/Bathroom Scales/Towels/Shower Curtains counts taken from the parent Bath page's own facet sidebar (site's own number, not inferred). Cross-category dedup checked via cross_category_url_index.json for every candidate: Bathroom Storage -> already in Furniture.xlsx+Storage.xlsx (routed to review, not rows). Bath Rugs & Mats -> already in Textile.xlsx (routed to review, not rows). Bath Accessories and Shower Heads -> not in index, recorded as genuine Bathroom leaves (rule 13 Accessories include; rule 6 Showers include 'Shower Heads' explicitly). Towels and Shower Curtains excluded per rules 15/20 (Bath textiles -> Textile.xlsx's own run, not Bathroom) -- logged to review for completeness, not rows. Bathroom Scales -> not covered by any rule in bathroom.md's explicit inclusion lists (personal-care/health device, not a fixture/accessory/furniture/hardware item); flagged LOW confidence per rule 29, sent to review rather than guessed into rows.",
+  "rows": [
+    {
+      "category": "Bathroom",
+      "sub_category": "Bath Accessories",
+      "qty": 19,
+      "link": "https://www.qvc.com/c/for-the-home/bath/bath-accessories/-/xwmsj5/c.html",
+      "is_group": false,
+      "evidence": "Page title 'Bathroom Accessories | Soap Dispensers & Waste Baskets - QVC.com'; result-count header read directly on the leaf page: '1 - 19 of 19'. Rule 13 ACCESSORIES include.",
+      "flag": null
+    },
+    {
+      "category": "Bathroom",
+      "sub_category": "Shower Heads",
+      "qty": 5,
+      "link": "https://www.qvc.com/c/for-the-home/bath/shower-heads/-/1clqx/c.html",
+      "is_group": false,
+      "evidence": "Page title 'Shower Heads with Hose | Handheld Shower Heads, Shower Head Filters, & More - QVC.com'; result-count header read directly on the leaf page: '1 - 5 of 5'. Rule 6 SHOWERS explicitly includes 'Shower Systems/Sets/Heads'.",
+      "flag": null
+    }
+  ],
+  "review": [
+    {
+      "category": "Bathroom",
+      "sub_category": "Bathroom Storage",
+      "qty": 63,
+      "issue": "ALREADY EXTRACTED IN Furniture.xlsx, Storage.xlsx (cross_category_url_index.json hit) -- excluded from rows per mandatory dedup rule.",
+      "link": "https://www.qvc.com/c/for-the-home/bath/bathroom-storage/-/6sghgz/c.html"
+    },
+    {
+      "category": "Bathroom",
+      "sub_category": "Bath Rugs & Mats",
+      "qty": 94,
+      "issue": "ALREADY EXTRACTED IN Textile.xlsx (cross_category_url_index.json hit) -- excluded from rows per mandatory dedup rule.",
+      "link": "https://www.qvc.com/c/for-the-home/bath/bath-rugs-and-mats/-/1pqjpw5/c.html"
+    },
+    {
+      "category": "Bathroom",
+      "sub_category": "Bathroom Scales",
+      "qty": 9,
+      "issue": "AMBIGUOUS: personal-care/health device sold under the site's Bath department, but not named in any bathroom.md inclusion list (Fixtures/Baths/Showers/Enclosures/Taps/Furniture/Mirrors/Storage/Accessories/Toilet Accessories/Hardware/Ceramics). Not a Furniture/Storage/Textile item either -- no other category owns it. Confidence LOW per rule 29; needs human adjudication on whether Bathroom Scales counts as Bathroom.",
+      "link": "https://www.qvc.com/c/for-the-home/bath/bathroom-scales/-/1ckn2/c.html"
+    },
+    {
+      "category": "Bathroom",
+      "sub_category": "Towels",
+      "qty": 558,
+      "issue": "EXCLUDED (not Bathroom): Bath Towels/Hand Towels/Washcloths route to Textile per rule 15/20. Belongs to Textile.xlsx's own run, not recorded here.",
+      "link": "https://www.qvc.com/c/for-the-home/bath/towels/-/rh9ha1/c.html"
+    },
+    {
+      "category": "Bathroom",
+      "sub_category": "Shower Curtains",
+      "qty": 127,
+      "issue": "EXCLUDED (not Bathroom): Shower Curtains route to Textile per rule 20. Belongs to Textile.xlsx's own run, not recorded here.",
+      "link": "https://www.qvc.com/c/for-the-home/bath/shower-curtains/-/avzu4o/c.html"
+    }
+  ]
+}

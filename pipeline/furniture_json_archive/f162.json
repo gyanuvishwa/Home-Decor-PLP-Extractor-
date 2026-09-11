@@ -1,0 +1,102 @@
+{
+  "sr": 162,
+  "company": "Serax",
+  "brand_site": "serax.com",
+  "country": "Belgium",
+  "site_url": "https://www.serax.com/",
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "ACCESS: Claude-in-Chrome only, own tab (1961715015). www.serax.com redirects to bare serax.com, which is the canonical origin used for every link. robots.txt names no Claude/anthropic/ClaudeBot agent and carries only a generic Shopify agent-guidance / UCP-MCP notice, so no block. TREE: taken from the site's own mega-nav (Tableware / Lighting / Home accessories / Furniture). The Furniture department has exactly six children in the mega-menu: Tables (/collections/tables-desks), Chairs, Stools, Sofas & Pouffes (/collections/sofas-armchairs), Shelves & Storage (/collections/shelves) and Outdoor Furniture (/collections/furniture-outdoor). Cross-checked three ways per the brief: (a) mega-menu, (b) the on-page sibling chip strip rendered on each furniture collection page (shows the same set minus Shelves), (c) the full Shopify collection catalogue via /collections.json paged to exhaustion (3073 collections). There is no third tier - no dining-tables / coffee-tables / side-tables split exists as a collection, so the six nav children are genuine leaves. QTY METHOD: this theme publishes NO rendered product-count header anywhere (verified on the loaded page and in the SSR HTML - the only 'N items' string on the page is the cart). The grid is an Algolia client-side widget that renders no product tiles into the DOM for the connector to count. So Rule 1 is unobtainable and Rule 3 (full enumeration) was used: /collections/<handle>/products.json?limit=250 paged to exhaustion, counting unique product IDs. Each count was then INDEPENDENTLY corroborated against the Shopify product GIDs (gid://shopify/Product/<id>) embedded in that collection page's own SSR HTML; the page-1 render caps at 50 tiles, and for every node below that cap the two sources agree exactly (chairs 20=20, stools 24=24, shelves 0=0, benches 2=2, footstools 14=14, ottomans 9=9, racks 1=1). Nodes above the cap read 50 GIDs as expected. The Shopify collections.json products_count field was REJECTED as the known-inflated source: it reports chairs 45 (vs 20 exact), stools 46 (vs 24), tables-desks 185 (vs 113), sofas-armchairs 194 (vs 119), furniture-outdoor 176 (vs 122), shelves 3 (vs 0) - the same defect the prior Home-Decor pass on this exact site proved (dinnerware 1514 reported vs 1305 exact). Part of that gap is also stock/channel gating (brief 7b trap 4): the enumerated number is what the storefront actually publishes. SANITY CHECKS: every leaf returned HTTP 200 with a self-referential canonical matching the handle requested and a node-specific <title> ('Discover all Serax chairs', 'Discover all Serax benches', ...), so the bad-slug-serves-the-parent trap does not apply here; counts differ per node (no site-wide constant); no suspiciously round numbers. STRUCTURE FINDING: /collections/furniture ('All furniture', 224 ids) is byte-identical in membership to /collections/furniture-indoor (224 ids) and has ZERO id overlap with /collections/furniture-outdoor (122) - i.e. the site's 'All furniture' node is indoor-only. Both are View-All/department rollups and are therefore not emitted as rows per section 3. The six nav children DO overlap each other by design (Tables/Chairs/Stools/Sofas are product-type collections spanning indoor and outdoor, while Outdoor Furniture is a context collection: all 122 outdoor items also sit in one of the type collections; only 1 of the 20 chairs is indoor). Rows are the site's own listing pages, so this overlap is reported as-is and not netted out. OFF-NAV COLLECTIONS (brief 7b trap 1): /collections.json surfaced four further real, non-empty, self-canonical furniture listing pages that the mega-menu does not link - Benches (2), Footstools (14), Ottomans (9) and Racks (1). All four return 200 with their own SEO title and their own product set, so they are emitted, each flagged as nav-unlinked with its overlap stated. Two further off-nav furniture handles exist but are empty and unlinked from anywhere (/collections/bookcases 0, /collections/clothes-racks 0) - omitted as catalogue noise rather than tree nodes. A hidden collection '[HIDDEN] Dining' (5) was also found and skipped as hidden/non-navigable. MIXED CONTENT: title-scanned every leaf locally rather than by browsing. Tables 113/113, Chairs 20/20 and Stools 24/24 are clean furniture. Sofas & Pouffes carries 10 out-of-scope items among its 119 (7 'protection cover' items, 2 extra cushions, 1 bench connection element - covers/parts and textiles per section 1). Outdoor Furniture carries 21 out-of-scope items among its 122 (15 seat/lounger cushions, 6 protection covers). Those are the site's own listing contents, so the site figure is reported per the qty rule and the contamination is flagged for review instead of being silently subtracted. Also noted: the indoor master holds ~40 cushions plus a wall towel rack that no furniture child lists, and a handful of genuine furniture (indoor Ottomans, two side tables, 'Rack James black') that the site failed to tag into any nav child - a site tagging gap, not a missing category. EXCLUDED per section 1: Tableware/Dinnerware/Glassware/Cutlery/Cookware/Kitchenware, all Lighting, and the whole Home-accessories branch (decorative objects, vases, pottery, bathroom accessories, mirrors, candle holders).",
+  "rows": [
+    {
+      "category": "Furniture",
+      "sub_category": "Tables",
+      "qty": 113,
+      "link": "https://serax.com/collections/tables-desks",
+      "is_group": false,
+      "evidence": "full enumeration: /collections/tables-desks/products.json?limit=250 paged to exhaustion = 113 unique product IDs (no rendered count header exists on this theme; page SSR embeds 50 product GIDs = page-1 render cap)",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Chairs",
+      "qty": 20,
+      "link": "https://serax.com/collections/chairs",
+      "is_group": false,
+      "evidence": "full enumeration: /collections/chairs/products.json?limit=250 = 20 unique product IDs; independently corroborated by 20 distinct gid://shopify/Product ids embedded in the /collections/chairs page HTML",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Stools",
+      "qty": 24,
+      "link": "https://serax.com/collections/stools",
+      "is_group": false,
+      "evidence": "full enumeration: /collections/stools/products.json?limit=250 = 24 unique product IDs; independently corroborated by 24 distinct gid://shopify/Product ids in the page HTML",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Sofas & Pouffes",
+      "qty": 119,
+      "link": "https://serax.com/collections/sofas-armchairs",
+      "is_group": false,
+      "evidence": "full enumeration: /collections/sofas-armchairs/products.json?limit=250 paged to exhaustion = 119 unique product IDs (no rendered count header on this theme)",
+      "flag": "MANUAL REVIEW: site figure includes 10 out-of-scope items among the 119 - 7 'protection cover' items, 2 extra cushions and 1 bench connection element; furniture-only subset is 109"
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Shelves & Storage",
+      "qty": 0,
+      "link": "https://serax.com/collections/shelves",
+      "is_group": false,
+      "evidence": "live mega-nav node, HTTP 200, canonical https://serax.com/collections/shelves, title 'Discover All Serax Shelves | Designer Shelves & Storage'; /collections/shelves/products.json returns an empty products array and the page HTML embeds 0 product GIDs",
+      "flag": "MANUAL REVIEW: nav-linked category currently listing 0 products; the inflated collections.json products_count field claims 3, both exact sources say 0"
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Outdoor Furniture",
+      "qty": 122,
+      "link": "https://serax.com/collections/furniture-outdoor",
+      "is_group": false,
+      "evidence": "full enumeration: /collections/furniture-outdoor/products.json?limit=250 paged to exhaustion = 122 unique product IDs (no rendered count header on this theme)",
+      "flag": "MANUAL REVIEW: site figure includes 21 out-of-scope items among the 122 - 15 seat/lounger cushions and 6 protection covers; furniture-only subset is 101. Also overlaps the type collections: all 122 ids also appear in Tables/Chairs/Stools/Sofas & Pouffes"
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Benches",
+      "qty": 2,
+      "link": "https://serax.com/collections/benches",
+      "is_group": false,
+      "evidence": "full enumeration: /collections/benches/products.json = 2 unique product IDs; corroborated by 2 distinct gid://shopify/Product ids in the page HTML",
+      "flag": "MANUAL REVIEW: real self-canonical listing page (HTTP 200, title 'Discover all Serax benches') but not linked from the mega-menu; both ids also appear in nav nodes"
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Footstools",
+      "qty": 14,
+      "link": "https://serax.com/collections/footstools",
+      "is_group": false,
+      "evidence": "full enumeration: /collections/footstools/products.json = 14 unique product IDs; corroborated by 14 distinct gid://shopify/Product ids in the page HTML",
+      "flag": "MANUAL REVIEW: real self-canonical listing page but not linked from the mega-menu; overlaps Ottomans and Sofas & Pouffes (6 of the 14 also sit in nav nodes, 8 do not)"
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Ottomans",
+      "qty": 9,
+      "link": "https://serax.com/collections/ottomans",
+      "is_group": false,
+      "evidence": "full enumeration: /collections/ottomans/products.json = 9 unique product IDs; corroborated by 9 distinct gid://shopify/Product ids in the page HTML",
+      "flag": "MANUAL REVIEW: real self-canonical listing page but not linked from the mega-menu; overlaps Footstools and Sofas & Pouffes, and includes 1 'protection cover ottoman' accessory"
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Racks",
+      "qty": 1,
+      "link": "https://serax.com/collections/racks",
+      "is_group": false,
+      "evidence": "full enumeration: /collections/racks/products.json = 1 unique product ID ('Rack James black'); corroborated by 1 gid://shopify/Product id in the page HTML",
+      "flag": "MANUAL REVIEW: not linked from the mega-menu, single product, and ambiguous between freestanding hall/entryway furniture and a wall-mounted rack - the sibling 'Wall towel rack black Juno' was excluded as a bathroom fixture"
+    }
+  ]
+}

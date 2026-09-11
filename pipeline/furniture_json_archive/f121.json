@@ -1,0 +1,732 @@
+{
+  "sr": 121,
+  "company": "Westwing IT",
+  "brand_site": "westwing.it",
+  "country": "Italy",
+  "site_url": "https://www.westwing.it/",
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "ACCESS: Claude-in-Chrome connector only, one dedicated tab (id 1961714745), zero HTTP clients - no curl/requests/WebFetch/jina/translate.goog/proxy of any kind. Every page was opened either by navigating the tab or by same-origin fetch() run from the loaded westwing.it page via javascript_tool, so the site's own cookies and session applied. Requests paced at ~1.2-1.5s with two serial streams; zero 403/429/error responses across ~80 category fetches. ROBOTS: checked first at /robots.txt. ClaudeBot / Claude-Web / anthropic-ai ARE named, but they sit in one shared AI-crawler group (with GPTBot, PerplexityBot, CCBot, Bytespider etc.) whose Disallow list (/all-products, /p/s/*, /customer*, *--*, /*?*q=*, *?c=, *&c=, /sso/*, /c/*, /products/*, /collections/*, /api/*) is identical to the generic 'User-agent: *' block plus an extra 'Allow: /llms.txt'. No 'Disallow: /', and none of those prefixes match this site's category URL pattern (flat slugs off the root, e.g. /divani-angolari/). Not a Claude-specific block - same finding as Westwing UK (f91) and Westwing DE (f103). The one robots-disallowed area touched by the menu (/collection/*) was excluded anyway as marketing collections. TREE SOURCE: the site's own mega-menu, not a guess. The storefront is the same Shopify Oxygen/Hydrogen React-Router app as UK and DE; the full navigation ships in the homepage as a flattened turbo-stream payload (window.__reactRouterContext.streamController.enqueue). I concatenated the 7 enqueue chunks (259,397 chars), parsed the 6,143-entry flattened array and wrote a reference resolver, then read menuItems at index 598: 16 top-level departments, 563 nodes when flattened - exactly the same shape DE reported. Cross-checked against /sitemap-categories.xml (581 URLs, fetched same-origin); 254 sitemap slugs are not in the menu and were keyword-scanned for furniture terms. WHERE FURNITURE LIVES: three canonical departments - 'Arredamento' /mobili/ (89 nodes), 'Giardino' > 'Mobili da giardino' /mobili-da-giardino/, and 'Bambini' > 'Mobili per cameretta' /mobili-cameretta/. The remaining 13 departments (Westwing Collection, Accessori casa, Illuminazione, Tappeti, Tessili, Tavola, Cucina, Promozioni, Buoni regalo, Idee regalo, Ambienti della casa, Marche, plus 'Mobili e accessori contenitori') carry no canonical furniture node of their own. DUPLICATE ALIASES: as on UK and DE, the menu re-uses the same nodes under other departments with -2/-3/-4/-5 slug aliases. The entire 'Mobili e accessori contenitori' department (41 nodes) is built from aliases (/credenze-2/, /cassettiere-3/, /comodini-4/, /mobili-tv-3/, /librerie-3/, /mensole-2/, /armadi-componibili-3/, /scarpiere-5/ ...) plus small-storage goods, and the 'Mobili per cameretta' block that hangs under Arredamento is the -2/-3 alias set of the canonical Bambini one. Every link recorded here is the canonical, self-canonical slug: each row's URL was confirmed to be its own <link rel=canonical> value in the fetched HTML (the single exception is /sedie-in-legno/, which ships no canonical tag server-side - it was accepted on its own 200 response, its own h1 'Sedie in legno' and its own distinct count). No alias and no node is counted twice. QTY METHOD: the page's own rendered header 'N Prodotti'. It renders twice per page at two independent DOM locations (the desktop sort/filter-bar label and the mobile filter-panel label) and both matched on every single row. Verified against the real rendered DOM too: I navigated the tab to /librerie/ and read document.body.innerText - h1 'Librerie', '205 Prodotti', canonical /librerie/, identical to the fetched value. JSON-LD numberOfItems was NOT used (it is the SSR first batch, not the total) and no href/tile counting was done. SANITY CHECKS: every h1 matched the node I intended to load (no silent parent-serving); counts vary per node with no site-wide constant (5 for Headboards up to 495 for Corner Sofas); no suspiciously round display caps; the parents /mobili/ (7266 Prodotti) and /esterni/ (1652) were read only to confirm they are department roots and are emitted as structure, never summed. EXCLUDED and why: /collection/sofa-collection/, /collection/bed-collection/, /collection/storage-collection/ (marketing collections, also robots-disallowed); Materassi, topper e doghe /materassi-doghe/ (mattresses, toppers and slatted bases -> bedding); Cuscini per divano, Cuscini da esterno, Cuscini per sedie da giardino (textiles); Specchi and all its children (mirrors -> Wall Decor); Cura dei mobili /cura-mobili/ (furniture care); Coperture per mobili da esterno (furniture covers); Ganci e appendiabiti da parete /ganci-appendiabiti-da-parete/ (wall coat hooks, hardware); Cassapanche da esterno /cassapanca-da-esterno/ (9) - I opened it and the tiles are outdoor storage boxes and chests on wheels (Cassapanca da esterno con ruote Ocean, Cassapanca con ruote Atlantic, Garten-Aufbewahrungsbox Arkin), i.e. standalone storage, and they are the identical products Westwing DE's /gartenaufbewahrung/ (also 9) was excluded for; the whole 'Piccoli contenitori e organizer' block (baskets, boxes, jewellery boxes, bathroom accessories, waste bins); Ombrelloni (parasols); all Illuminazione and Illuminazione da esterno; Tappeti, Tessili, Tavola, Cucina, Accessori casa; Sdraiette per neonati (baby bouncers, baby gear not furniture); the Bambini textile/toy/tableware blocks; Promozioni, Buoni regalo, Idee regalo, Ambienti della casa, Marche, Temi e stili per l'esterno and the /n/... landing pages (navigation/marketing per Rule 3). Two cross-cut theme nodes were dropped as re-cuts that would double-count leaves already recorded: /mobili-con-contenitore/ ('Mobili con contenitore', whose children are alias copies of Letti con contenitore, Panche and Tavolini da salotto) and /pouffes-with-storage/. SITEMAP-ONLY FINDINGS: /sofa-elements/ ('Sofa elements', 353) is in the sitemap and self-canonical with its own h1 but is not linked from the mega-menu - it is a genuine modular-sofa-component listing and is KEPT, exactly as on UK and DE. /poltrone-sospese-e-amache/ ('Poltrone sospese e amache', hanging chairs and hammocks) resolves 200 but reports 0 Prodotti, so it is omitted rather than emitted as a zero row - same outcome as DE's /haengesessel/. /poufs-1/ ('Poufs', 156) is a second self-canonical slug for the same listing as /pouf/ (also 156, overlapping titles such as 'Pouf in boucle Ellie, Giallo', different display order); only the menu's /pouf/ is recorded, to avoid a duplicate. OVERLAPPING CUTS KEPT AS THE SITE DEFINES THEM: within Sedie the four children (con braccioli 292 / senza braccioli 390 / imbottite 307 / in legno 111) are the site's own overlapping cuts of the same chair pool; they are recorded as the site defines them and must not be summed. Same for the Divani seat-count children. SIBLING-STORE NOTE: this is the Italian storefront (westwing.it, EUR, own canonical URLs). Its tree is the same shape as Westwing DE (f103) - 16 departments, 563 menu nodes, 80 emitted rows - and its counts track DE's closely (e.g. Corner Sofas 495=495, Sofa Beds 88=88, Sofa Elements 353=353, Footstools 384=384, Upholstered Beds 317=317, Beds with Storage 160=160, Bed Frames 32=32, Bookcases 205=205, Modular Wardrobes 87=87, Garden Furniture Sets 22=22, Outdoor Bean Bags 60=60, Outdoor Stools & Poufs 96=96) while many others differ by single or double digits (Dining Tables 226 vs 227, Wall Shelves 427 vs 428, Garden Chairs 115 vs 147, Garden Tables 82 vs 89, Sun Loungers 39 vs 42, Shoe Cabinets 99 vs 101, Bar Stools 81 vs 81 but Chairs with Armrests 292 vs 312 and without 390 vs 403). The prior Home-Decor pass on this company established the same picture and proved independence by product-ID comparison. All qty and links here are IT's own, read from IT's own pages. WALL-SHELVING FLAG: per the batch instruction, /mensole/ (Wall Shelves, 427) is included and flagged MANUAL REVIEW as ambiguous shelving so the six-company wall-shelving decision stays adjudicable as one, matching the flags on Westwing UK (f91) and Westwing DE (f103).",
+  "rows": [
+    {
+      "category": "Furniture",
+      "sub_category": "Sofas",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Corner Sofas",
+      "qty": 495,
+      "link": "https://www.westwing.it/divani-angolari/",
+      "is_group": false,
+      "evidence": "rendered listing header '495 Prodotti' on the category page; the same value appears at two independent DOM locations (desktop sort-bar label and mobile filter-panel label) in one response; page h1 'Divani angolari'",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "2-Seater Sofas",
+      "qty": 176,
+      "link": "https://www.westwing.it/2-posti-divani/",
+      "is_group": false,
+      "evidence": "rendered listing header '176 Prodotti' on the category page; the same value appears at two independent DOM locations (desktop sort-bar label and mobile filter-panel label) in one response; page h1 'Divani 2 posti'",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "3-Seater Sofas",
+      "qty": 273,
+      "link": "https://www.westwing.it/3-posti-divani/",
+      "is_group": false,
+      "evidence": "rendered listing header '273 Prodotti' on the category page; the same value appears at two independent DOM locations (desktop sort-bar label and mobile filter-panel label) in one response; page h1 'Divani 3 posti'",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "4-Seater Sofas",
+      "qty": 320,
+      "link": "https://www.westwing.it/divani-4-posti/",
+      "is_group": false,
+      "evidence": "rendered listing header '320 Prodotti' on the category page; the same value appears at two independent DOM locations (desktop sort-bar label and mobile filter-panel label) in one response; page h1 'Divani 4 posti'",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Sofa Beds",
+      "qty": 88,
+      "link": "https://www.westwing.it/divani-letto/",
+      "is_group": false,
+      "evidence": "rendered listing header '88 Prodotti' on the category page; the same value appears at two independent DOM locations (desktop sort-bar label and mobile filter-panel label) in one response; page h1 'Divani letto'",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Sofa Elements",
+      "qty": 353,
+      "link": "https://www.westwing.it/sofa-elements/",
+      "is_group": false,
+      "evidence": "rendered listing header '353 Prodotti' on the category page; the same value appears at two independent DOM locations (desktop sort-bar label and mobile filter-panel label) in one response; page h1 'Sofa elements'",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Footstools",
+      "qty": 384,
+      "link": "https://www.westwing.it/salotto-poggiapiedi/",
+      "is_group": false,
+      "evidence": "rendered listing header '384 Prodotti' on the category page; the same value appears at two independent DOM locations (desktop sort-bar label and mobile filter-panel label) in one response; page h1 'Poggiapiedi'",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Armchairs",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Small Armchairs",
+      "qty": 216,
+      "link": "https://www.westwing.it/poltroncine/",
+      "is_group": false,
+      "evidence": "rendered listing header '216 Prodotti' on the category page; the same value appears at two independent DOM locations (desktop sort-bar label and mobile filter-panel label) in one response; page h1 'Poltroncine'",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Upholstered Armchairs",
+      "qty": 135,
+      "link": "https://www.westwing.it/poltrone-imbottite/",
+      "is_group": false,
+      "evidence": "rendered listing header '135 Prodotti' on the category page; the same value appears at two independent DOM locations (desktop sort-bar label and mobile filter-panel label) in one response; page h1 'Poltrone imbottite'",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Chair Beds",
+      "qty": 16,
+      "link": "https://www.westwing.it/poltrone-letto/",
+      "is_group": false,
+      "evidence": "rendered listing header '16 Prodotti' on the category page; the same value appears at two independent DOM locations (desktop sort-bar label and mobile filter-panel label) in one response; page h1 'Poltrone letto'",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Beds",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Upholstered Beds",
+      "qty": 317,
+      "link": "https://www.westwing.it/letti-imbottiti/",
+      "is_group": false,
+      "evidence": "rendered listing header '317 Prodotti' on the category page; the same value appears at two independent DOM locations (desktop sort-bar label and mobile filter-panel label) in one response; page h1 'Letti imbottiti'",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Box Spring Beds",
+      "qty": 54,
+      "link": "https://www.westwing.it/letti-boxspring/",
+      "is_group": false,
+      "evidence": "rendered listing header '54 Prodotti' on the category page; the same value appears at two independent DOM locations (desktop sort-bar label and mobile filter-panel label) in one response; page h1 'Letti boxspring'",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Bed Frames",
+      "qty": 32,
+      "link": "https://www.westwing.it/strutture-letto/",
+      "is_group": false,
+      "evidence": "rendered listing header '32 Prodotti' on the category page; the same value appears at two independent DOM locations (desktop sort-bar label and mobile filter-panel label) in one response; page h1 'Strutture letto'",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Beds with Storage",
+      "qty": 160,
+      "link": "https://www.westwing.it/letti-contenitore/",
+      "is_group": false,
+      "evidence": "rendered listing header '160 Prodotti' on the category page; the same value appears at two independent DOM locations (desktop sort-bar label and mobile filter-panel label) in one response; page h1 'Letti con contenitore'",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Single Beds",
+      "qty": 100,
+      "link": "https://www.westwing.it/letti-singoli/",
+      "is_group": false,
+      "evidence": "rendered listing header '100 Prodotti' on the category page; the same value appears at two independent DOM locations (desktop sort-bar label and mobile filter-panel label) in one response; page h1 'Letti singoli'",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Headboards",
+      "qty": 5,
+      "link": "https://www.westwing.it/testiere-e-pedane/",
+      "is_group": false,
+      "evidence": "rendered listing header '5 Prodotti' on the category page; the same value appears at two independent DOM locations (desktop sort-bar label and mobile filter-panel label) in one response; page h1 'Testiere letto'",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Chairs",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Chairs with Armrests",
+      "qty": 292,
+      "link": "https://www.westwing.it/sedie-braccioli/",
+      "is_group": false,
+      "evidence": "rendered listing header '292 Prodotti' on the category page; the same value appears at two independent DOM locations (desktop sort-bar label and mobile filter-panel label) in one response; page h1 'Sedie con braccioli'",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Chairs without Armrests",
+      "qty": 390,
+      "link": "https://www.westwing.it/sedie-senza-braccioli/",
+      "is_group": false,
+      "evidence": "rendered listing header '390 Prodotti' on the category page; the same value appears at two independent DOM locations (desktop sort-bar label and mobile filter-panel label) in one response; page h1 'Sedie senza braccioli'",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Upholstered Chairs",
+      "qty": 307,
+      "link": "https://www.westwing.it/sedie-imbottite/",
+      "is_group": false,
+      "evidence": "rendered listing header '307 Prodotti' on the category page; the same value appears at two independent DOM locations (desktop sort-bar label and mobile filter-panel label) in one response; page h1 'Sedie imbottite'",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Wooden Chairs",
+      "qty": 111,
+      "link": "https://www.westwing.it/sedie-in-legno/",
+      "is_group": false,
+      "evidence": "rendered listing header '111 Prodotti' on the category page; the same value appears at two independent DOM locations (desktop sort-bar label and mobile filter-panel label) in one response; page h1 'Sedie in legno'",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Desk Chairs",
+      "qty": 58,
+      "link": "https://www.westwing.it/sedie-da-ufficio/",
+      "is_group": false,
+      "evidence": "rendered listing header '58 Prodotti' on the category page; the same value appears at two independent DOM locations (desktop sort-bar label and mobile filter-panel label) in one response; page h1 'Sedie da scrivania'",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Bar Stools",
+      "qty": 81,
+      "link": "https://www.westwing.it/sgabelli-cucina/",
+      "is_group": false,
+      "evidence": "rendered listing header '81 Prodotti' on the category page; the same value appears at two independent DOM locations (desktop sort-bar label and mobile filter-panel label) in one response; page h1 'Sgabelli alti'",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Tables",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Dining Tables",
+      "qty": 226,
+      "link": "https://www.westwing.it/tavoli-da-pranzo/",
+      "is_group": false,
+      "evidence": "rendered listing header '226 Prodotti' on the category page; the same value appears at two independent DOM locations (desktop sort-bar label and mobile filter-panel label) in one response; page h1 'Tavoli da pranzo'",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Coffee Tables",
+      "qty": 325,
+      "link": "https://www.westwing.it/tavolini-da-salotto/",
+      "is_group": false,
+      "evidence": "rendered listing header '325 Prodotti' on the category page; the same value appears at two independent DOM locations (desktop sort-bar label and mobile filter-panel label) in one response; page h1 'Tavolini da salotto'",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Side Tables",
+      "qty": 468,
+      "link": "https://www.westwing.it/tavolini/",
+      "is_group": false,
+      "evidence": "rendered listing header '468 Prodotti' on the category page; the same value appears at two independent DOM locations (desktop sort-bar label and mobile filter-panel label) in one response; page h1 'Tavolini'",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Bedside Tables",
+      "qty": 176,
+      "link": "https://www.westwing.it/comodini/",
+      "is_group": false,
+      "evidence": "rendered listing header '176 Prodotti' on the category page; the same value appears at two independent DOM locations (desktop sort-bar label and mobile filter-panel label) in one response; page h1 'Comodini'",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Office Desks",
+      "qty": 79,
+      "link": "https://www.westwing.it/scrivanie-scrittoi/",
+      "is_group": false,
+      "evidence": "rendered listing header '79 Prodotti' on the category page; the same value appears at two independent DOM locations (desktop sort-bar label and mobile filter-panel label) in one response; page h1 'Scrivanie da ufficio'",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Console Tables",
+      "qty": 83,
+      "link": "https://www.westwing.it/consolle/",
+      "is_group": false,
+      "evidence": "rendered listing header '83 Prodotti' on the category page; the same value appears at two independent DOM locations (desktop sort-bar label and mobile filter-panel label) in one response; page h1 'Consolle'",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Serving Trolleys",
+      "qty": 39,
+      "link": "https://www.westwing.it/carrelli/",
+      "is_group": false,
+      "evidence": "rendered listing header '39 Prodotti' on the category page; the same value appears at two independent DOM locations (desktop sort-bar label and mobile filter-panel label) in one response; page h1 'Carrelli portavivande'",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Sideboards & Chests of Drawers",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Sideboards",
+      "qty": 145,
+      "link": "https://www.westwing.it/credenze/",
+      "is_group": false,
+      "evidence": "rendered listing header '145 Prodotti' on the category page; the same value appears at two independent DOM locations (desktop sort-bar label and mobile filter-panel label) in one response; page h1 'Credenze e madie'",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Chests of Drawers",
+      "qty": 80,
+      "link": "https://www.westwing.it/cassettiere/",
+      "is_group": false,
+      "evidence": "rendered listing header '80 Prodotti' on the category page; the same value appears at two independent DOM locations (desktop sort-bar label and mobile filter-panel label) in one response; page h1 'Cassettiere'",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "TV Units",
+      "qty": 139,
+      "link": "https://www.westwing.it/mobili-tv/",
+      "is_group": false,
+      "evidence": "rendered listing header '139 Prodotti' on the category page; the same value appears at two independent DOM locations (desktop sort-bar label and mobile filter-panel label) in one response; page h1 'Mobili TV'",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Highboards",
+      "qty": 72,
+      "link": "https://www.westwing.it/credenze-alte/",
+      "is_group": false,
+      "evidence": "rendered listing header '72 Prodotti' on the category page; the same value appears at two independent DOM locations (desktop sort-bar label and mobile filter-panel label) in one response; page h1 'Credenze alte'",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Display Cabinets",
+      "qty": 77,
+      "link": "https://www.westwing.it/vetrine/",
+      "is_group": false,
+      "evidence": "rendered listing header '77 Prodotti' on the category page; the same value appears at two independent DOM locations (desktop sort-bar label and mobile filter-panel label) in one response; page h1 'Vetrine'",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Shelving",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Bookcases",
+      "qty": 205,
+      "link": "https://www.westwing.it/librerie/",
+      "is_group": false,
+      "evidence": "rendered listing header '205 Prodotti' on the category page; the same value appears at two independent DOM locations (desktop sort-bar label and mobile filter-panel label) in one response; page h1 'Librerie'",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Wall Shelves",
+      "qty": 427,
+      "link": "https://www.westwing.it/mensole/",
+      "is_group": false,
+      "evidence": "rendered listing header '427 Prodotti' on the category page; the same value appears at two independent DOM locations (desktop sort-bar label and mobile filter-panel label) in one response; page h1 'Mensole'",
+      "flag": "MANUAL REVIEW: ambiguous shelving - the site files Mensole under its Arredamento (Furniture) > Scaffali department, but sampled tiles are wall-mounted shelves and ledges (Mensola da parete in metallo Caterpillar, The Ledge Large, String Pocket, Mensola da parete Nivo) that could belong to Wall Decor instead. Same node and same product family as Westwing DE /wandregale/ (428) and Westwing UK - decide the six stores together"
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Bathroom Shelving",
+      "qty": 37,
+      "link": "https://www.westwing.it/scaffali-bagno/",
+      "is_group": false,
+      "evidence": "rendered listing header '37 Prodotti' on the category page; the same value appears at two independent DOM locations (desktop sort-bar label and mobile filter-panel label) in one response; page h1 'Scaffali bagno'",
+      "flag": "MANUAL REVIEW: mixed population - filed under Arredamento > Scaffali and does contain freestanding bathroom shelf units (Scaffale da bagno in bambu Kit/Drake, Scaffale da bagno con ruote Tower), but sampled tiles also include wall towel holders (Portasciugamani da parete Dora/Kit) which are bathroom fixtures"
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Wardrobes & Cabinets",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Modular Wardrobes",
+      "qty": 87,
+      "link": "https://www.westwing.it/armadi-componibili/",
+      "is_group": false,
+      "evidence": "rendered listing header '87 Prodotti' on the category page; the same value appears at two independent DOM locations (desktop sort-bar label and mobile filter-panel label) in one response; page h1 'Armadi componibili'",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Sliding Door Wardrobes",
+      "qty": 35,
+      "link": "https://www.westwing.it/armadi-ante-scorrevoli/",
+      "is_group": false,
+      "evidence": "rendered listing header '35 Prodotti' on the category page; the same value appears at two independent DOM locations (desktop sort-bar label and mobile filter-panel label) in one response; page h1 'Armadi ad ante scorrevoli'",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Hinged Door Wardrobes",
+      "qty": 53,
+      "link": "https://www.westwing.it/armadi-ante-battenti/",
+      "is_group": false,
+      "evidence": "rendered listing header '53 Prodotti' on the category page; the same value appears at two independent DOM locations (desktop sort-bar label and mobile filter-panel label) in one response; page h1 'Armadi ad ante battenti'",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Corner Wardrobes",
+      "qty": 18,
+      "link": "https://www.westwing.it/armadi-ad-angolo/",
+      "is_group": false,
+      "evidence": "rendered listing header '18 Prodotti' on the category page; the same value appears at two independent DOM locations (desktop sort-bar label and mobile filter-panel label) in one response; page h1 'Armadi ad angolo'",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Open Wardrobes",
+      "qty": 8,
+      "link": "https://www.westwing.it/armadi-senza-ante/",
+      "is_group": false,
+      "evidence": "rendered listing header '8 Prodotti' on the category page; the same value appears at two independent DOM locations (desktop sort-bar label and mobile filter-panel label) in one response; page h1 'Armadi senza ante'",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Shoe Cabinets & Shoe Racks",
+      "qty": 99,
+      "link": "https://www.westwing.it/scarpiere/",
+      "is_group": false,
+      "evidence": "rendered listing header '99 Prodotti' on the category page; the same value appears at two independent DOM locations (desktop sort-bar label and mobile filter-panel label) in one response; page h1 'Scarpiere e porta scarpe'",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Bathroom Furniture",
+      "qty": 36,
+      "link": "https://www.westwing.it/mobili-bagno/",
+      "is_group": false,
+      "evidence": "rendered listing header '36 Prodotti' on the category page; the same value appears at two independent DOM locations (desktop sort-bar label and mobile filter-panel label) in one response; page h1 'Mobili bagno'",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Office Drawer Units",
+      "qty": 77,
+      "link": "https://www.westwing.it/cassettiere-ufficio/",
+      "is_group": false,
+      "evidence": "rendered listing header '77 Prodotti' on the category page; the same value appears at two independent DOM locations (desktop sort-bar label and mobile filter-panel label) in one response; page h1 'Cassettiere da ufficio'",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Benches",
+      "qty": 155,
+      "link": "https://www.westwing.it/panche-per-sala-da-pranzo/",
+      "is_group": false,
+      "evidence": "rendered listing header '155 Prodotti' on the category page; the same value appears at two independent DOM locations (desktop sort-bar label and mobile filter-panel label) in one response; page h1 'Panche'",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Poufs & Stools",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Poufs",
+      "qty": 156,
+      "link": "https://www.westwing.it/pouf/",
+      "is_group": false,
+      "evidence": "rendered listing header '156 Prodotti' on the category page; the same value appears at two independent DOM locations (desktop sort-bar label and mobile filter-panel label) in one response; page h1 'Pouf'",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Stools",
+      "qty": 119,
+      "link": "https://www.westwing.it/sgabelli/",
+      "is_group": false,
+      "evidence": "rendered listing header '119 Prodotti' on the category page; the same value appears at two independent DOM locations (desktop sort-bar label and mobile filter-panel label) in one response; page h1 'Sgabelli'",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Bean Bags & Floor Cushions",
+      "qty": 27,
+      "link": "https://www.westwing.it/poltrone-sacco-e-cuscini-pavimento/",
+      "is_group": false,
+      "evidence": "rendered listing header '27 Prodotti' on the category page; the same value appears at two independent DOM locations (desktop sort-bar label and mobile filter-panel label) in one response; page h1 'Poltrone sacco e cuscini da pavimento'",
+      "flag": "MANUAL REVIEW: node mixes bean-bag seating (furniture per the brief's pouf/seating rule, and the site files it under Arredamento > Pouf e sgabelli) with floor cushions (textiles)"
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Coat Racks",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Coat Stands",
+      "qty": 52,
+      "link": "https://www.westwing.it/appendiabiti-da-terra/",
+      "is_group": false,
+      "evidence": "rendered listing header '52 Prodotti' on the category page; the same value appears at two independent DOM locations (desktop sort-bar label and mobile filter-panel label) in one response; page h1 'Appendiabiti da terra'",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Kids Furniture",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Kids Beds",
+      "qty": 36,
+      "link": "https://www.westwing.it/letti-bambini/",
+      "is_group": false,
+      "evidence": "rendered listing header '36 Prodotti' on the category page; the same value appears at two independent DOM locations (desktop sort-bar label and mobile filter-panel label) in one response; page h1 'Letti per bambini'",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Cots",
+      "qty": 63,
+      "link": "https://www.westwing.it/culle/",
+      "is_group": false,
+      "evidence": "rendered listing header '63 Prodotti' on the category page; the same value appears at two independent DOM locations (desktop sort-bar label and mobile filter-panel label) in one response; page h1 'Culle'",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Kids Tables & Chairs",
+      "qty": 133,
+      "link": "https://www.westwing.it/tavolini-sedie-bambini/",
+      "is_group": false,
+      "evidence": "rendered listing header '133 Prodotti' on the category page; the same value appears at two independent DOM locations (desktop sort-bar label and mobile filter-panel label) in one response; page h1 'Tavolini e sedie per bambini'",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "High Chairs",
+      "qty": 23,
+      "link": "https://www.westwing.it/seggioloni/",
+      "is_group": false,
+      "evidence": "rendered listing header '23 Prodotti' on the category page; the same value appears at two independent DOM locations (desktop sort-bar label and mobile filter-panel label) in one response; page h1 'Seggioloni'",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Kids Poufs",
+      "qty": 150,
+      "link": "https://www.westwing.it/pouf-bambini/",
+      "is_group": false,
+      "evidence": "rendered listing header '150 Prodotti' on the category page; the same value appears at two independent DOM locations (desktop sort-bar label and mobile filter-panel label) in one response; page h1 'Pouf per bambini'",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Kids Wardrobes",
+      "qty": 56,
+      "link": "https://www.westwing.it/armadi-cameretta/",
+      "is_group": false,
+      "evidence": "rendered listing header '56 Prodotti' on the category page; the same value appears at two independent DOM locations (desktop sort-bar label and mobile filter-panel label) in one response; page h1 'Armadi per cameretta'",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Changing Tables",
+      "qty": 26,
+      "link": "https://www.westwing.it/mobili-fasciatoio/",
+      "is_group": false,
+      "evidence": "rendered listing header '26 Prodotti' on the category page; the same value appears at two independent DOM locations (desktop sort-bar label and mobile filter-panel label) in one response; page h1 'Mobili fasciatoio'",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Kids Shelves",
+      "qty": 82,
+      "link": "https://www.westwing.it/mensole-cameretta/",
+      "is_group": false,
+      "evidence": "rendered listing header '82 Prodotti' on the category page; the same value appears at two independent DOM locations (desktop sort-bar label and mobile filter-panel label) in one response; page h1 'Mensole per cameretta'",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Garden Furniture",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Garden Chairs",
+      "qty": 115,
+      "link": "https://www.westwing.it/sedie-da-giardino/",
+      "is_group": false,
+      "evidence": "rendered listing header '115 Prodotti' on the category page; the same value appears at two independent DOM locations (desktop sort-bar label and mobile filter-panel label) in one response; page h1 'Sedie da giardino'",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Garden Tables",
+      "qty": 82,
+      "link": "https://www.westwing.it/tavoli-da-giardino/",
+      "is_group": false,
+      "evidence": "rendered listing header '82 Prodotti' on the category page; the same value appears at two independent DOM locations (desktop sort-bar label and mobile filter-panel label) in one response; page h1 'Tavoli da giardino'",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Garden Side Tables",
+      "qty": 81,
+      "link": "https://www.westwing.it/tavolini-da-giardino/",
+      "is_group": false,
+      "evidence": "rendered listing header '81 Prodotti' on the category page; the same value appears at two independent DOM locations (desktop sort-bar label and mobile filter-panel label) in one response; page h1 'Tavolini da giardino'",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Garden Furniture Sets",
+      "qty": 22,
+      "link": "https://www.westwing.it/set-giardino/",
+      "is_group": false,
+      "evidence": "rendered listing header '22 Prodotti' on the category page; the same value appears at two independent DOM locations (desktop sort-bar label and mobile filter-panel label) in one response; page h1 'Set da giardino'",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Garden Sofas",
+      "qty": 106,
+      "link": "https://www.westwing.it/divani-esterno/",
+      "is_group": false,
+      "evidence": "rendered listing header '106 Prodotti' on the category page; the same value appears at two independent DOM locations (desktop sort-bar label and mobile filter-panel label) in one response; page h1 'Divani da giardino'",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Garden Armchairs",
+      "qty": 58,
+      "link": "https://www.westwing.it/poltrone-da-giardino/",
+      "is_group": false,
+      "evidence": "rendered listing header '58 Prodotti' on the category page; the same value appears at two independent DOM locations (desktop sort-bar label and mobile filter-panel label) in one response; page h1 'Poltrone da giardino'",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Garden Benches",
+      "qty": 17,
+      "link": "https://www.westwing.it/panchine-da-giardino/",
+      "is_group": false,
+      "evidence": "rendered listing header '17 Prodotti' on the category page; the same value appears at two independent DOM locations (desktop sort-bar label and mobile filter-panel label) in one response; page h1 'Panchine da giardino'",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Sun Loungers",
+      "qty": 39,
+      "link": "https://www.westwing.it/sedie-sdraio-lettini-prendi-sole/",
+      "is_group": false,
+      "evidence": "rendered listing header '39 Prodotti' on the category page; the same value appears at two independent DOM locations (desktop sort-bar label and mobile filter-panel label) in one response; page h1 'Sdraio da giardino'",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Outdoor Bean Bags",
+      "qty": 60,
+      "link": "https://www.westwing.it/poltrone-sacco-esterno/",
+      "is_group": false,
+      "evidence": "rendered listing header '60 Prodotti' on the category page; the same value appears at two independent DOM locations (desktop sort-bar label and mobile filter-panel label) in one response; page h1 'Poltrone sacco da esterno'",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Outdoor Stools & Poufs",
+      "qty": 96,
+      "link": "https://www.westwing.it/sgabelli-pouf-esterno/",
+      "is_group": false,
+      "evidence": "rendered listing header '96 Prodotti' on the category page; the same value appears at two independent DOM locations (desktop sort-bar label and mobile filter-panel label) in one response; page h1 'Sgabelli e pouf da esterno'",
+      "flag": null
+    }
+  ]
+}

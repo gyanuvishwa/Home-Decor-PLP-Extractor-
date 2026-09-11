@@ -1,0 +1,183 @@
+{
+  "sr": 149,
+  "company": "Seletti",
+  "brand_site": "seletti.it",
+  "country": "Italy",
+  "site_url": "https://seletti.it/",
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "Reached via Claude-in-Chrome only (own tab, no HTTP layer). seletti.it redirects to https://www.seletti.it/ - Shopify (Dawn-derived theme), English UI on the EU/Italy storefront, so no Italian-to-English node translation was actually needed; nav labels are already English. robots.txt read in-tab: generic 'User-agent: *' group only, no Claude/ClaudeBot/anthropic-ai directive, no full-site disallow. No 403/CAPTCHA/rate-limit was encountered at any point; requests were paced ~1 per 1.2-1.5s via same-origin fetch from the loaded page context.\n\nTREE SOURCES (union of three, per the 'nav under-reports' trap): (1) the rendered mega-menu on the homepage - 184 collection links harvested from <header>, giving the Furniture department's 21 children and the Outdoor department's 5; (2) the complete Shopify collection list via same-origin /collections.json?limit=250 - all 160 collections, which supersedes the sitemap since it is the authoritative store-side list; (3) the /collections/furniture landing page itself, which has NO sub-category tile/chip strip (only pagination and top-level department links), so it added nothing. A furniture-term regex over all 160 handles+titles (furnit/mobili/sof/divani/chair/sedie/poltrone/tavoli/table/desk/scrivania/bed/letto/cabinet/armadi/wardrobe/stool/sgabelli/bench/panche/credenze/dresser/shelv/scaffali/bookcase/libreria/seat/nightstand/comodino/pouf/console/sideboard/hanger/appendi/rack/trolley) returned 10 non-nav hits; all 10 were resolved (see below).\n\nQTY METHOD (Rule 1, with an independent Rule 3 cross-check): this theme DOES render a real total - <h2 class='product-count__text'> e.g. '207 products', echoed by the infinite-scroll widget ('you have viewed 16 of 207 Products'). Every leaf's HTML was fetched same-origin and the header parsed. As an independent confirmation I also exhausted /collections/<handle>/products.json?limit=250 and counted unique product IDs: the two agreed EXACTLY on all 16 nodes checked. Note this contradicts the prior Home-Decor pass, which found the /collections.json metadata products_count field off by 1-5 - that inflated field was NOT used here; the rendered header was, and it is exact on this store.\n\nTRAP CHECKS: bogus-slug control /collections/zzz-not-a-real-node-149 returns a genuine HTTP 404, so this store does not silently serve a parent listing for an invalid handle. Every leaf was still verified for HTTP 200 AND h1 ('Collection: <name>') AND rel=canonical matching the requested handle - all 23 probed handles passed. Node identity was keyed on the SLUG throughout, which mattered twice: (a) 'pouf' renders as 'Modular Pouf' (26) while 'pouf-1' renders as 'Pouf' (3) - two different nodes, both kept; (b) 'table' (16, h1 'Table', the nav's 'Tables') and 'tables' (11, h1 'Tables') are two distinct collections, and a label-keyed dedup would have eaten one.\n\nRESOLVED NON-NAV / OVERLAP DECISIONS:\n- 'furniture' (207) and 'furniture-1' (207) are two handles for the same Furniture department, both parents with extractable children -> grouping row only, no qty/link, per the URL-hierarchy rule.\n- 'tables' (11) DROPPED: set arithmetic shows all 11 of its product IDs are already inside 'table' (16), i.e. a strict subset and a redundant duplicate node absent from the nav.\n- 'superfurniture' (23) DROPPED: a product-LINE roll-up (Toiletpaper/Hello Again 'Superfurniture'), cross-cutting the type nodes - SUPERCHAIR/SUPERCABINET/SUPERSTOOL/SUPERBENCH/SUPERBED/SUPERSHELF/SUPERTABLE, each already counted in Chairs/Cabinets/Stool/Bench/Bed/Shelf/Tables. Marketing collection, not a product type.\n- 'selection-furniture' (5) DROPPED: a curated 'Selection' roll-up, and mixed - it contains a carpet ('Burnt Carpet Voice') and a curtain ('Curtain Shit') alongside 3 furniture items.\n- 'deckchairs-poolbeds' (12) DROPPED as a parent roll-up: 5 of its members come from 'deckchairs' (7) and 7 from 'poolbeds' (7), 5+7=12 exactly. The two deeper type nodes are emitted instead, so nothing is lost and nothing is double-counted.\n- 'toiletpaper-pets-folding-chairs' (6) DROPPED: designer-collab subset of Folding Chairs.\n\nEXCLUDED FROM THE FURNITURE MENU (present in the site's own Furniture department but out of scope): Curtains and Cushions and Rugs (textiles), Wall Mirrors (Wall Decor's job), and Hangers (19) - inspected the full product list and they are novelty wall-mounted coat hooks (Hangers Snail/Mushroom/Sprout, Cactus, Solar System Hanger), i.e. decorative wall hardware, not a coat stand or any freestanding furniture piece. Also excluded from the Outdoor department: Lighting Outdoor, Tableware Outdoor, and 'Terracotta Vases & Ornaments' (handle outdoor-lighitng). Excluded per the never-extract rule: the 'Products'/'Gifts' shop-all roll-ups, the four price-band facets, New Arrival / Sales / Best Seller, 'Limited Edition' (collectibles), and the ~20 designer/collab listing collections.\n\nSANITY: counts vary correctly by node (1 to 26) with no constant or suspiciously round value; the department total 207 exceeds the sum of the in-scope leaves, as expected given the excluded textile/mirror/hanger children. Two nodes are genuinely tiny (Bed=1 SUPERBED, Bench=1 SUPERBENCH) - that is real, not a misread: Seletti's furniture line is small and design-led, and products.json confirms exactly one item each.",
+  "rows": [
+    {
+      "category": "Furniture",
+      "sub_category": "Furniture",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Armchairs",
+      "qty": 26,
+      "link": "https://www.seletti.it/collections/armchiars",
+      "is_group": false,
+      "evidence": "rendered listing header '.product-count__text' = '26 products'; independently confirmed by exhausting /products.json?limit=250 = 26 unique product IDs",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Bed",
+      "qty": 1,
+      "link": "https://www.seletti.it/collections/bed",
+      "is_group": false,
+      "evidence": "rendered listing header '.product-count__text' = '1 product'; independently confirmed by exhausting /products.json?limit=250 = 1 unique product IDs",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Bench",
+      "qty": 1,
+      "link": "https://www.seletti.it/collections/bench",
+      "is_group": false,
+      "evidence": "rendered listing header '.product-count__text' = '1 product'; independently confirmed by exhausting /products.json?limit=250 = 1 unique product IDs",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Cabinets",
+      "qty": 14,
+      "link": "https://www.seletti.it/collections/cabinets",
+      "is_group": false,
+      "evidence": "rendered listing header '.product-count__text' = '14 products'; independently confirmed by exhausting /products.json?limit=250 = 14 unique product IDs",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Chairs",
+      "qty": 21,
+      "link": "https://www.seletti.it/collections/chairs",
+      "is_group": false,
+      "evidence": "rendered listing header '.product-count__text' = '21 products'; independently confirmed by exhausting /products.json?limit=250 = 21 unique product IDs",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Deckchairs",
+      "qty": 7,
+      "link": "https://www.seletti.it/collections/deckchairs",
+      "is_group": false,
+      "evidence": "rendered listing header '.product-count__text' = '7 products'; independently confirmed by exhausting /products.json?limit=250 = 7 unique product IDs",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Folding Chairs",
+      "qty": 13,
+      "link": "https://www.seletti.it/collections/folding-chairs",
+      "is_group": false,
+      "evidence": "rendered listing header '.product-count__text' = '13 products'; independently confirmed by exhausting /products.json?limit=250 = 13 unique product IDs",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Modular Pouf",
+      "qty": 26,
+      "link": "https://www.seletti.it/collections/pouf",
+      "is_group": false,
+      "evidence": "rendered listing header '.product-count__text' = '26 products'; independently confirmed by exhausting /products.json?limit=250 = 26 unique product IDs",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Nightstand",
+      "qty": 2,
+      "link": "https://www.seletti.it/collections/nightstand",
+      "is_group": false,
+      "evidence": "rendered listing header '.product-count__text' = '2 products'; independently confirmed by exhausting /products.json?limit=250 = 2 unique product IDs",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Poolbeds",
+      "qty": 7,
+      "link": "https://www.seletti.it/collections/poolbeds",
+      "is_group": false,
+      "evidence": "rendered listing header '.product-count__text' = '7 products'; independently confirmed by exhausting /products.json?limit=250 = 7 unique product IDs",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Pouf",
+      "qty": 3,
+      "link": "https://www.seletti.it/collections/pouf-1",
+      "is_group": false,
+      "evidence": "rendered listing header '.product-count__text' = '3 products'; independently confirmed by exhausting /products.json?limit=250 = 3 unique product IDs",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Shelf",
+      "qty": 3,
+      "link": "https://www.seletti.it/collections/shelf",
+      "is_group": false,
+      "evidence": "rendered listing header '.product-count__text' = '3 products'; independently confirmed by exhausting /products.json?limit=250 = 3 unique product IDs",
+      "flag": "MANUAL REVIEW: ambiguous shelving - 3 SUPERSHELF units (incl. 'SUPERSHELF BATHROOM'); Shopify product_type is literally 'Furniture' and the site files the node in its Furniture department, but product copy does not settle freestanding vs wall-mounted. Included on the site's own classification."
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Side Table",
+      "qty": 19,
+      "link": "https://www.seletti.it/collections/side-table",
+      "is_group": false,
+      "evidence": "rendered listing header '.product-count__text' = '19 products'; independently confirmed by exhausting /products.json?limit=250 = 19 unique product IDs",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Sofas",
+      "qty": 16,
+      "link": "https://www.seletti.it/collections/sofas",
+      "is_group": false,
+      "evidence": "rendered listing header '.product-count__text' = '16 products'; independently confirmed by exhausting /products.json?limit=250 = 16 unique product IDs",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Stool",
+      "qty": 19,
+      "link": "https://www.seletti.it/collections/stool",
+      "is_group": false,
+      "evidence": "rendered listing header '.product-count__text' = '19 products'; independently confirmed by exhausting /products.json?limit=250 = 19 unique product IDs",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Tables",
+      "qty": 16,
+      "link": "https://www.seletti.it/collections/table",
+      "is_group": false,
+      "evidence": "rendered listing header '.product-count__text' = '16 products'; independently confirmed by exhausting /products.json?limit=250 = 16 unique product IDs",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Outdoor",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Outdoor Tables and Chairs",
+      "qty": 21,
+      "link": "https://www.seletti.it/collections/outdoor-table-and-chairs",
+      "is_group": false,
+      "evidence": "rendered listing header '.product-count__text' = '21 products'; independently confirmed by exhausting /products.json?limit=250 = 21 unique product IDs",
+      "flag": "MANUAL REVIEW: room/use cross-cut - 14 of its 21 SKUs are also listed in the indoor type nodes (Tables/Chairs/Armchairs/Stool); 7 are unique (Industry Collection aluminium outdoor tables). Kept as a genuine Outdoor department node per the type-tree + room-tree pattern, but it double-counts against the type nodes."
+    }
+  ]
+}

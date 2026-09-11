@@ -1,0 +1,129 @@
+{
+ "sr": 54,
+ "company": "Schoolhouse",
+ "brand_site": "schoolhouse.com",
+ "country": "USA",
+ "site_url": "https://www.schoolhouse.com/",
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ACCESS: plain direct fetch, HTTP 200 throughout, no WAF, no impersonation or proxy needed (same as the prior Home-Decor pass). www.schoolhouse.com 301s to schoolhouse.com; every link below is the page's own rel=canonical. Platform: Shopify (shop schoolhouse-development.myshopify.com). TREE: the live mega-menu (dumped from the homepage HTML) has exactly one FURNITURE department, and its only real children are Living Room Furniture, Bedroom Furniture, Dining Furniture and Storage Furniture (plus 'Shop all FURNITURE' and 'In Stock Furniture', both dropped per rule 3). The menu has no deeper level. I then walked sitemap_collections_1.xml (the full collection list) for every furniture slug and probed 30 candidates. COUNTS: every qty is the rendered listing header <span id=\"ProductCountDesktop\">N products</span>. Shopify products_count was NOT used anywhere. Each header was independently confirmed by enumerating unique /products/ slugs in the grid: header == unique-slug count on 15/15 collections measured, and every one is a single page (no pagination markup, all counts far under the page size). Two full reads were taken minutes apart with identical results, no drift; the desktop and mobile count spans agree on every page; the h1 matches the requested collection on every page except /collections/chairs (h1 'Seating'), noted below; and the numbers differ per category, so this is not a site-wide constant. COVERAGE PROOF: /collections/all-furniture header = 21 and enumerates to 21 unique slugs. The union of the four nav children is exactly those same 21 slugs (Living Room 10, plus Bedroom's one unique product 'hamilton-bed', plus Dining's 10 unique = 21; Storage Furniture 8 adds nothing new). So the four nav rows are a complete but OVERLAPPING cover of the department: 10+5+11+8=34 > 21 is the site's own taxonomy, not an error. SECOND AXIS: a set of legacy product-type collections still resolves with live products but is no longer linked from the nav. I emitted the ones whose contents genuinely match their name and flagged each as off-nav. 'Tables' (7) is emitted as a grouping row only, never as a leaf, because Dining Tables and Coffee and Side Tables are narrower collections of it (rule 2). These type rows overlap the room rows and each other; that is the site's taxonomy and is documented here rather than silently deduped. DE-DUPLICATION (compared by product-slug sets, never by name): /collections/chairs (h1 'Seating', 2) has an identical slug set to /collections/stools-benches (2) - Stools + Benches kept, Seating dropped. EMPTY LEGACY FURNITURE COLLECTIONS (HTTP 200, header '0 products', enumerate to 0 slugs, so nothing emitted): beds, dressers-storage, sofas-and-sectionals, sofas-sectionals, sofas-upholstered-chairs, upholstered-chairs, ottomans, ottomans-benches, bedroom-seating, bins-baskets, baskets, domestic-utility, and outdoor-furniture. There is therefore NO outdoor furniture, no sofas/sectionals/upholstery, no ottomans and no dressers in the current assortment - /collections/outdoor (5) is 4 sconces + 1 rug, zero furniture. This matches the prior pass's headline finding that the catalogue has been drastically reduced (sitemap_products_1.xml lists ~147 products site-wide; the entire Furniture department is 21). MIXED ROLL-UPS DROPPED, NOT PADDED: /collections/organization 'Organization + Utility' (15) is 9 hooks/hook-rails + stacking trays + a catch-all + a wall shelf; only 3 storage carts and 1 stool are furniture and those are already covered by Storage/Dining Furniture and Carts + Racks - dropped (standalone organisers are out of scope per rule 1). /collections/office-utility (9) is 2 rugs + 2 lamps + 2 hooks + a tray set + the same 2 stools - no desks, no office chairs - dropped; there is no office-furniture node on this site. /collections/storage-organization (3) = stool + stacking trays + catch-all - dropped. /collections/kids-room (12) is bedding, one lamp and hooks plus the same utility stool - no kids furniture - dropped. /collections/living-room-storage (3) = Forma Cabinet + a utility stool + a WALL shelf, i.e. it no longer matches its name and its furniture is fully covered by Storage Furniture - dropped. EXCLUDED per rules 1 and 3: all lighting, mirrors, rugs, bedding, throw pillows, bath textiles, cabinet/door/bath hardware, hooks + racks, wall shelves + ledges, planters, tabletop, clocks, wallpaper, light bulbs and ceiling fans; and all rule-3 nav junk - Shop all / All Furniture, In Stock Furniture, Ready to Ship, furniture-bestsellers, new-furniture, sale-furniture, every bfcm-*/sale-*/in-stock-* stock-and-promo re-cut, the named marketing collections (Milo Furniture Collection, Miller, Forma, Teak, Schoolhouse Utility Stool Collection and the rest) and all colour/size/price facet pages.",
+ "rows": [
+  {
+   "category": "Furniture",
+   "sub_category": "Living Room Furniture",
+   "qty": 10,
+   "link": "https://schoolhouse.com/collections/living-room-furniture",
+   "is_group": false,
+   "evidence": "rendered listing header <span id=\"ProductCountDesktop\">10 products</span> on https://schoolhouse.com/collections/living-room-furniture; independently confirmed by enumerating unique /products/ slugs in the grid = 10 (single page, no pagination)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bedroom Furniture",
+   "qty": 5,
+   "link": "https://schoolhouse.com/collections/bedroom-furniture",
+   "is_group": false,
+   "evidence": "rendered listing header <span id=\"ProductCountDesktop\">5 products</span> on https://schoolhouse.com/collections/bedroom-furniture; independently confirmed by enumerating unique /products/ slugs in the grid = 5 (single page, no pagination)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dining Furniture",
+   "qty": 11,
+   "link": "https://schoolhouse.com/collections/dining-furniture",
+   "is_group": false,
+   "evidence": "rendered listing header <span id=\"ProductCountDesktop\">11 products</span> on https://schoolhouse.com/collections/dining-furniture; independently confirmed by enumerating unique /products/ slugs in the grid = 11 (single page, no pagination)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Storage Furniture",
+   "qty": 8,
+   "link": "https://schoolhouse.com/collections/storage-furniture",
+   "is_group": false,
+   "evidence": "rendered listing header <span id=\"ProductCountDesktop\">8 products</span> on https://schoolhouse.com/collections/storage-furniture; independently confirmed by enumerating unique /products/ slugs in the grid = 8 (single page, no pagination)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Tables",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dining Tables",
+   "qty": 3,
+   "link": "https://schoolhouse.com/collections/dining-tables",
+   "is_group": false,
+   "evidence": "rendered listing header <span id=\"ProductCountDesktop\">3 products</span> on https://schoolhouse.com/collections/dining-tables; independently confirmed by enumerating unique /products/ slugs in the grid = 3 (single page, no pagination)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Coffee and Side Tables",
+   "qty": 5,
+   "link": "https://schoolhouse.com/collections/coffee-and-side-tables",
+   "is_group": false,
+   "evidence": "rendered listing header <span id=\"ProductCountDesktop\">5 products</span> on https://schoolhouse.com/collections/coffee-and-side-tables; independently confirmed by enumerating unique /products/ slugs in the grid = 5 (single page, no pagination)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Nightstands + Side Tables",
+   "qty": 4,
+   "link": "https://schoolhouse.com/collections/nightstands-side-tables",
+   "is_group": false,
+   "evidence": "rendered listing header <span id=\"ProductCountDesktop\">4 products</span> on https://schoolhouse.com/collections/nightstands-side-tables; independently confirmed by enumerating unique /products/ slugs in the grid = 4 (single page, no pagination)",
+   "flag": "MANUAL REVIEW: off-nav legacy product-type collection; overlaps 'Coffee and Side Tables' (2 shared products) and the room collections"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Consoles + Credenzas",
+   "qty": 1,
+   "link": "https://schoolhouse.com/collections/consoles-credenzas",
+   "is_group": false,
+   "evidence": "rendered listing header <span id=\"ProductCountDesktop\">1 products</span> on https://schoolhouse.com/collections/consoles-credenzas; independently confirmed by enumerating unique /products/ slugs in the grid = 1 (single page, no pagination)",
+   "flag": "MANUAL REVIEW: off-nav legacy product-type collection, 1 product"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sideboards + Buffets",
+   "qty": 2,
+   "link": "https://schoolhouse.com/collections/sideboards-and-buffets",
+   "is_group": false,
+   "evidence": "rendered listing header <span id=\"ProductCountDesktop\">2 products</span> on https://schoolhouse.com/collections/sideboards-and-buffets; independently confirmed by enumerating unique /products/ slugs in the grid = 2 (single page, no pagination)",
+   "flag": "MANUAL REVIEW: off-nav legacy product-type collection; contents are Forma Cabinet + Lolly Bar Cart"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dining Chairs",
+   "qty": 1,
+   "link": "https://schoolhouse.com/collections/dining-chairs",
+   "is_group": false,
+   "evidence": "rendered listing header <span id=\"ProductCountDesktop\">1 products</span> on https://schoolhouse.com/collections/dining-chairs; independently confirmed by enumerating unique /products/ slugs in the grid = 1 (single page, no pagination)",
+   "flag": "MANUAL REVIEW: off-nav legacy product-type collection, 1 product"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Stools + Benches",
+   "qty": 2,
+   "link": "https://schoolhouse.com/collections/stools-benches",
+   "is_group": false,
+   "evidence": "rendered listing header <span id=\"ProductCountDesktop\">2 products</span> on https://schoolhouse.com/collections/stools-benches; independently confirmed by enumerating unique /products/ slugs in the grid = 2 (single page, no pagination)",
+   "flag": "MANUAL REVIEW: off-nav legacy product-type collection; /collections/chairs (h1 'Seating', 2) has an identical product set and was dropped as a duplicate"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Carts + Racks",
+   "qty": 4,
+   "link": "https://schoolhouse.com/collections/carts-and-racks",
+   "is_group": false,
+   "evidence": "rendered listing header <span id=\"ProductCountDesktop\">4 products</span> on https://schoolhouse.com/collections/carts-and-racks; independently confirmed by enumerating unique /products/ slugs in the grid = 4 (single page, no pagination)",
+   "flag": "MANUAL REVIEW: off-nav legacy product-type collection; the site's own Furniture facet list carries a 'Carts (4)' product type, so the site files these as furniture"
+  }
+ ]
+}

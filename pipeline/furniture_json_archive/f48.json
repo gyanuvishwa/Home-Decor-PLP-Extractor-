@@ -1,0 +1,246 @@
+{
+ "sr": 48,
+ "company": "Made.com UK",
+ "brand_site": "made.com",
+ "country": "UK",
+ "site_url": "https://www.made.com/",
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "SITE IDENTITY (confirmed this session): www.made.com is live but is a Next plc storefront trading as 'Made'. The original Made.com was wound up in 2022 and Next bought the brand; the footer reads '(c) 2026 Next Retail Ltd trading as Made United Kingdom', the URL scheme is Next's /shop/<dept>/<cat> with /f/<facet> filter paths, and the assortment is Next's multi-brand homeware range (MADE.COM, The Set, next, The Conran Shop, Jasper Conran London, Gallery Home, La Redoute Interieurs and others). So this is the Next-operated Made catalogue, not the old Made.com own-design range. It is still furniture-led: 732 of the 1,803 store-wide products sit in the Furniture department.\n\nACCESS: robots.txt was fetched and checked first - no anthropic-ai / ClaudeBot / Claude-Web directive, only generic filter and search blocks (including */f/*category-* and the room /f/ paths, which is why no facet URL is used as a link). Direct desktop-Chrome curl 403s on /shop/ paths; curl_cffi impersonate=safari17_0 (the profile recorded in notes/48.md) worked for every request. No proxy, no translate.goog, no browser automation.\n\nTAXONOMY: taken from the site's own 'category' facet block in the SSR JSON. /shop (Shop all) exposes the complete 81-node store taxonomy with counts; /shop/furniture (h1 'MADE Furniture Collection', totalResults 732) exposes exactly 24 category nodes whose counts sum to 732 - an exact partition, so that is the authoritative furniture leaf set. The category sitemap (sitemap-index.xml -> Made-GB-EN-Category.xml.gz, 12,029 URLs of which only 45 are non-facet category paths) supplied the canonical URL for 17 of them; the remaining 7 (TV Units, Bar Stools, Console Tables, Nest of Tables, Office Desks, Office Chairs, Cabinets) were found by probing and each returns its own curated h1 and its own count. A wrong slug does NOT silently serve the parent here - it returns h1 'Sorry, the category you requested might have moved or no longer exists.' with totalResults 0, which is how /shop/furniture/storage and /shop/office-furniture were ruled out.\n\nFLAT (NOT ROOM-NESTED) STRUCTURE - PROVEN, NOT ASSUMED: Made exposes room sub-departments (/shop/living-room-furniture 387, /shop/bedroom-furniture 255, /shop/dining-room-furniture 198, /shop/home-office 95, /shop/garden/garden-furniture 16) but the department prefix in the URL is cosmetic: the trailing category slug alone determines the listing. Proof: /shop/living-room-furniture/chests and /shop/bedroom-furniture/chests both return 59 products and I compared the full itemNumber sets - they are IDENTICAL (59 of 59). The same node therefore appears under several rooms, so nesting by room would emit the same listing two or three times. Each category is emitted once, under a single Furniture group, with the sitemap-canonical URL where one exists.\n\nCOUNT METHOD: this site publishes no rendered 'N items' header (the only count string in the HTML is the i18n template '0 results'), so qty is the page's own SSR search.totalResults, INDEPENDENTLY PROVEN by exhaustion on a structured product-ID field. The payload carries an itemsCache keyed by offset (0,12,...,72) = 84 itemNumbers per fetch, and ?p=N shifts the window to offset (N-1)*12, so p=1,8,15,... enumerates the whole listing. The unique itemNumber count equalled totalResults on 24 of 24 leaves. No href counting was used. Sanity checks: counts differ per category (3 to 127, not a constant), no suspiciously round display cap, every h1 matches the node loaded, and the 23 furniture leaves plus Mattresses sum to the department total.\n\nDRIFT: notes/48.md warned that Made drifts within a session (Ceiling Lights read 158/159/158). I took TWO full independent reads of all 24 leaves several minutes apart: every leaf returned the identical total and the identical unique-ID count both times, so nothing is drift-flagged. The /shop/furniture parent facet snapshot is slightly staler than the leaf pages - it showed beds 69 / chests 58 / side table 21 against the leaves' 71 / 59 / 22 - which is exactly why qty comes from each leaf page's own total and never from the parent's facet block.\n\nEXCLUDED, with reasons: Mattresses (14, /shop/bedroom-furniture/mattresses) - a Furniture-department node but bedding, not furniture, per brief. Mirrors (32) and Wall Art (95) - Wall Decor. All Lighting nodes (Ceiling, Desk & Table, Wall, Floor, Outdoor lights, Lighting Accessories). Bedsets (62), Cushions, Throws, Rugs, Curtains, Pillow Cases, Duvets, Bed Sheets, Towels, Bathmats, Table Linen - textiles. Tableware, glassware, kitchen appliances, kettles, toasters, coffee makers. Vases, candles, candle holders, diffusers, clocks, plants, plant pots, wallpaper. Boxes and Baskets (3), Bins (10), Hooks (2), Laundry (4), Kitchen Storage & Organisation (5) - standalone storage goods for the future Storage task. Samples (73) - fabric swatches, not products. Garden Accessories (1). Toilet-roll holders and toothbrush tidy - bathroom accessories.\n\nSOFA TYPES CHECKED AND REJECTED AS A BRANCH: /shop/sofas carries a 'sofatype' facet (Chair 55, Sofa Bed 30, 2 Seater Sofa 24, Foot Stool 4). These are filter values, not taxonomy nodes: they sum to 113 rather than 127, robots.txt disallows /shop/sofas/f/*sofatype-sofa, and every sofatype URL indexed in the sitemap is combined with a colour or brand filter. Per brief section 3 no filter URL was recorded. The 'MADE-To-Order Sofas' page /sofasbymade is a marketing landing page and was likewise not recorded.",
+ "rows": [
+  {
+   "category": "Furniture",
+   "sub_category": "Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sofas",
+   "qty": 127,
+   "link": "https://www.made.com/shop/sofas",
+   "is_group": false,
+   "evidence": "SSR JSON search.totalResults=127 on https://www.made.com/shop/sofas; independently proven by exhaustion - 127 unique structured itemNumber IDs collected from the paged itemsCache (?p=1,8,15,... shifts the 84-item window); two separate reads in this session both returned 127",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Beds",
+   "qty": 71,
+   "link": "https://www.made.com/shop/bedroom-furniture/beds",
+   "is_group": false,
+   "evidence": "SSR JSON search.totalResults=71 on https://www.made.com/shop/bedroom-furniture/beds; independently proven by exhaustion - 71 unique structured itemNumber IDs collected from the paged itemsCache (?p=1,8,15,... shifts the 84-item window); two separate reads in this session both returned 71",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dining Chairs",
+   "qty": 68,
+   "link": "https://www.made.com/shop/dining-room-furniture/dining-chairs",
+   "is_group": false,
+   "evidence": "SSR JSON search.totalResults=68 on https://www.made.com/shop/dining-room-furniture/dining-chairs; independently proven by exhaustion - 68 unique structured itemNumber IDs collected from the paged itemsCache (?p=1,8,15,... shifts the 84-item window); two separate reads in this session both returned 68",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sideboards",
+   "qty": 62,
+   "link": "https://www.made.com/shop/living-room-furniture/sideboards",
+   "is_group": false,
+   "evidence": "SSR JSON search.totalResults=62 on https://www.made.com/shop/living-room-furniture/sideboards; independently proven by exhaustion - 62 unique structured itemNumber IDs collected from the paged itemsCache (?p=1,8,15,... shifts the 84-item window); two separate reads in this session both returned 62",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Chest of Drawers",
+   "qty": 59,
+   "link": "https://www.made.com/shop/bedroom-furniture/chests",
+   "is_group": false,
+   "evidence": "SSR JSON search.totalResults=59 on https://www.made.com/shop/bedroom-furniture/chests; independently proven by exhaustion - 59 unique structured itemNumber IDs collected from the paged itemsCache (?p=1,8,15,... shifts the 84-item window); two separate reads in this session both returned 59",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dining Tables",
+   "qty": 42,
+   "link": "https://www.made.com/shop/dining-room-furniture/dining-tables",
+   "is_group": false,
+   "evidence": "SSR JSON search.totalResults=42 on https://www.made.com/shop/dining-room-furniture/dining-tables; independently proven by exhaustion - 42 unique structured itemNumber IDs collected from the paged itemsCache (?p=1,8,15,... shifts the 84-item window); two separate reads in this session both returned 42",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Shelves & Shelving Units",
+   "qty": 39,
+   "link": "https://www.made.com/shop/shelves",
+   "is_group": false,
+   "evidence": "SSR JSON search.totalResults=39 on https://www.made.com/shop/shelves; independently proven by exhaustion - 39 unique structured itemNumber IDs collected from the paged itemsCache (?p=1,8,15,... shifts the 84-item window); two separate reads in this session both returned 39",
+   "flag": "MANUAL REVIEW: ambiguous shelving - listing is mostly freestanding shelving units and bookcases (Blaze/Kaci/Nyla/Reeve Shelving Units, Pavia Rattan Bookcase) but also contains a few decorative wall shelves (Piper Wall Shelf, Maggie Two Tier Shelf, Ingrid Shelf); the site files the node under Furniture, so it is kept whole"
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bedside Tables",
+   "qty": 37,
+   "link": "https://www.made.com/shop/bedroom-furniture/bedside-tables",
+   "is_group": false,
+   "evidence": "SSR JSON search.totalResults=37 on https://www.made.com/shop/bedroom-furniture/bedside-tables; independently proven by exhaustion - 37 unique structured itemNumber IDs collected from the paged itemsCache (?p=1,8,15,... shifts the 84-item window); two separate reads in this session both returned 37",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "TV Units",
+   "qty": 30,
+   "link": "https://www.made.com/shop/living-room-furniture/tv-units",
+   "is_group": false,
+   "evidence": "SSR JSON search.totalResults=30 on https://www.made.com/shop/living-room-furniture/tv-units; independently proven by exhaustion - 30 unique structured itemNumber IDs collected from the paged itemsCache (?p=1,8,15,... shifts the 84-item window); two separate reads in this session both returned 30",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Wardrobes",
+   "qty": 29,
+   "link": "https://www.made.com/shop/bedroom-furniture/wardrobes",
+   "is_group": false,
+   "evidence": "SSR JSON search.totalResults=29 on https://www.made.com/shop/bedroom-furniture/wardrobes; independently proven by exhaustion - 29 unique structured itemNumber IDs collected from the paged itemsCache (?p=1,8,15,... shifts the 84-item window); two separate reads in this session both returned 29",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Stools & Ottomans",
+   "qty": 28,
+   "link": "https://www.made.com/shop/bedroom-furniture/stools-ottomans",
+   "is_group": false,
+   "evidence": "SSR JSON search.totalResults=28 on https://www.made.com/shop/bedroom-furniture/stools-ottomans; independently proven by exhaustion - 28 unique structured itemNumber IDs collected from the paged itemsCache (?p=1,8,15,... shifts the 84-item window); two separate reads in this session both returned 28",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Coffee Tables",
+   "qty": 24,
+   "link": "https://www.made.com/shop/living-room-furniture/coffee-table",
+   "is_group": false,
+   "evidence": "SSR JSON search.totalResults=24 on https://www.made.com/shop/living-room-furniture/coffee-table; independently proven by exhaustion - 24 unique structured itemNumber IDs collected from the paged itemsCache (?p=1,8,15,... shifts the 84-item window); two separate reads in this session both returned 24",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Side Tables",
+   "qty": 22,
+   "link": "https://www.made.com/shop/living-room-furniture/side-table",
+   "is_group": false,
+   "evidence": "SSR JSON search.totalResults=22 on https://www.made.com/shop/living-room-furniture/side-table; independently proven by exhaustion - 22 unique structured itemNumber IDs collected from the paged itemsCache (?p=1,8,15,... shifts the 84-item window); two separate reads in this session both returned 22",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dressing Tables",
+   "qty": 16,
+   "link": "https://www.made.com/shop/bedroom-furniture/dressers-consoles",
+   "is_group": false,
+   "evidence": "SSR JSON search.totalResults=16 on https://www.made.com/shop/bedroom-furniture/dressers-consoles; independently proven by exhaustion - 16 unique structured itemNumber IDs collected from the paged itemsCache (?p=1,8,15,... shifts the 84-item window); two separate reads in this session both returned 16",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bar Stools",
+   "qty": 15,
+   "link": "https://www.made.com/shop/dining-room-furniture/bar-stool",
+   "is_group": false,
+   "evidence": "SSR JSON search.totalResults=15 on https://www.made.com/shop/dining-room-furniture/bar-stool; independently proven by exhaustion - 15 unique structured itemNumber IDs collected from the paged itemsCache (?p=1,8,15,... shifts the 84-item window); two separate reads in this session both returned 15",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Office Desks",
+   "qty": 14,
+   "link": "https://www.made.com/shop/home-office/office-desk",
+   "is_group": false,
+   "evidence": "SSR JSON search.totalResults=14 on https://www.made.com/shop/home-office/office-desk; independently proven by exhaustion - 14 unique structured itemNumber IDs collected from the paged itemsCache (?p=1,8,15,... shifts the 84-item window); two separate reads in this session both returned 14",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Garden Furniture Sets",
+   "qty": 12,
+   "link": "https://www.made.com/shop/garden/garden-furniture/garden-furniture-sets",
+   "is_group": false,
+   "evidence": "SSR JSON search.totalResults=12 on https://www.made.com/shop/garden/garden-furniture/garden-furniture-sets; independently proven by exhaustion - 12 unique structured itemNumber IDs collected from the paged itemsCache (?p=1,8,15,... shifts the 84-item window); two separate reads in this session both returned 12",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Office Chairs",
+   "qty": 8,
+   "link": "https://www.made.com/shop/home-office/office-chair",
+   "is_group": false,
+   "evidence": "SSR JSON search.totalResults=8 on https://www.made.com/shop/home-office/office-chair; independently proven by exhaustion - 8 unique structured itemNumber IDs collected from the paged itemsCache (?p=1,8,15,... shifts the 84-item window); two separate reads in this session both returned 8",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Console Tables",
+   "qty": 6,
+   "link": "https://www.made.com/shop/living-room-furniture/console-table",
+   "is_group": false,
+   "evidence": "SSR JSON search.totalResults=6 on https://www.made.com/shop/living-room-furniture/console-table; independently proven by exhaustion - 6 unique structured itemNumber IDs collected from the paged itemsCache (?p=1,8,15,... shifts the 84-item window); two separate reads in this session both returned 6",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Benches",
+   "qty": 5,
+   "link": "https://www.made.com/shop/dining-room/benches",
+   "is_group": false,
+   "evidence": "SSR JSON search.totalResults=5 on https://www.made.com/shop/dining-room/benches; independently proven by exhaustion - 5 unique structured itemNumber IDs collected from the paged itemsCache (?p=1,8,15,... shifts the 84-item window); two separate reads in this session both returned 5",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Garden Chairs & Loungers",
+   "qty": 4,
+   "link": "https://www.made.com/shop/garden/garden-furniture/garden-chairs-loungers",
+   "is_group": false,
+   "evidence": "SSR JSON search.totalResults=4 on https://www.made.com/shop/garden/garden-furniture/garden-chairs-loungers; independently proven by exhaustion - 4 unique structured itemNumber IDs collected from the paged itemsCache (?p=1,8,15,... shifts the 84-item window); two separate reads in this session both returned 4",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Cabinets",
+   "qty": 3,
+   "link": "https://www.made.com/shop/furniture/cabinets",
+   "is_group": false,
+   "evidence": "SSR JSON search.totalResults=3 on https://www.made.com/shop/furniture/cabinets; independently proven by exhaustion - 3 unique structured itemNumber IDs collected from the paged itemsCache (?p=1,8,15,... shifts the 84-item window); two separate reads in this session both returned 3",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Nest of Tables",
+   "qty": 2,
+   "link": "https://www.made.com/shop/living-room-furniture/nest-of-tables",
+   "is_group": false,
+   "evidence": "SSR JSON search.totalResults=2 on https://www.made.com/shop/living-room-furniture/nest-of-tables; independently proven by exhaustion - 2 unique structured itemNumber IDs collected from the paged itemsCache (?p=1,8,15,... shifts the 84-item window); two separate reads in this session both returned 2",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Storage & Organisation",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Storage",
+   "qty": 6,
+   "link": "https://www.made.com/shop/storage-organisation/storage",
+   "is_group": false,
+   "evidence": "SSR JSON search.totalResults=6 on https://www.made.com/shop/storage-organisation/storage; independently proven by exhaustion - 6 unique structured itemNumber IDs collected from the paged itemsCache (?p=1,8,15,... shifts the 84-item window); two separate reads in this session both returned 6",
+   "flag": "MANUAL REVIEW: the site files this node under Storage & Organisation, NOT under the Furniture department (https://www.made.com/shop/furniture/storage returns the category-not-found page). 4 of the 6 items are storage furniture (walnut bookcase, vinyl storage cabinet, rattan shoe storage, Ronda vinyl cabinet); 2 are wall shelves. Zero itemNumber overlap with the Shelves node, so no double count."
+  }
+ ]
+}

@@ -1,0 +1,224 @@
+{
+  "sr": 43,
+  "company": "Nordstrom Home",
+  "brand_site": "nordstrom.com",
+  "country": "USA",
+  "site_url": "https://www.nordstrom.com/browse/home",
+  "status": "partial",
+  "failure_reason": "Nordstrom's anti-bot system (obfuscated JS challenge / 'unusual activity' wall) blocked reliable, evidence-grade extraction of per-category product counts at every access tier. Category tree was still recovered via the site's own navigation-sitemap.xml (tier a, unblocked) and one successful full render of the /browse/home landing page (tier c), so classification proceeded, but qty could not be captured for any node and is left null with a MANUAL REVIEW flag rather than estimated.",
+  "notes": "ACCESS: robots.txt (User-agent: * and Googlebot) allows /browse/home* (only /browse/*/libs/* and search/checkout paths disallowed; no anthropic-ai/ClaudeBot block) so tier (a) was tried first. Tier (a) direct HTTP (curl_cffi, chrome120 impersonation) returned HTTP 200 for /browse/home and /browse/home/bedding/duvet-covers but the body was an obfuscated bot-detection JS challenge payload ('istlWasHere' script), not real HTML - no usable nav/qty. Escalated to tier (b): Playwright headless and headed (--disable-blink-features=AutomationControlled) both returned an explicit 'We've noticed some unusual activity ... we don't allow unidentified, automated traffic' block page on /browse/home. Escalated to tier (c): Claude-in-Chrome real Chrome tab. /browse/home rendered fully once (after retries) giving the top-level Home tiles (Bedding, Kitchen, Home Decor, Bath, Candles & Diffusers, Home Gifts) and a sitewide 'Home' listing of 56281 items (not usable as a category qty - aggregate, not a leaf). Every subsequent subcategory page load (bedding, bedding/duvet-covers, bedding/basics, bath, decor, etc.) resolved a correct tab title (e.g. 'Duvet Covers & Pillow Shams | Nordstrom' for /browse/home/bedding/duvet-covers, confirming the node is real) but the page then hung/stayed busy indefinitely - read_page, get_page_text, find, screenshot, and even a subsequent navigate() call all timed out or returned empty/blank across 10+ retries with generous waits (up to 10s each). This is a genuine tier (c) block per the first-block-stops-you rule; stopped requesting product-count data from Nordstrom rather than retry/poll further. TREE: built from https://www.nordstrom.com/navigation-sitemap.xml (fetched via tier-a HTTP, NOT blocked - sitemaps are exempt from the JS challenge), filtered to /browse/home/* entries, cross-checked against the one successful /browse/home render. This is the site's own authoritative nav listing, not fabricated. QTY: could not be obtained for any node (see failure_reason) - every row below is qty=null with flag='MANUAL REVIEW: quantity not extracted - Nordstrom blocked page rendering at all 3 access tiers'. Category confidence (HIGH/MEDIUM/LOW) reflects classification certainty from the URL slug + nav placement, independent of the qty gap. EXCLUDED: home/decor/furniture (Furniture), home/decor/lighting (Lighting), home/decor/{clocks,mirrors,picture-frames,vases,accents,jewelry-boxes-holders-decorative-use,candles-diffusers*,books-games-puzzles} and home/dining-entertainment/{dinnerware,drinkware-barware,flatware-silverware,mugs,serveware} (Kitchen & Dining / Decorative Home Accessories, out of scope for this task); home/decor/wall (Wall Decor, no confirmed textile-only sub-node visible); home/decor/desk-accessories (ambiguous, likely decorative desk items not clearly storage); home/bath/bathroom-accessories (ambiguous general bath accessories, not confirmed as either textile or storage-specific - excluded rather than force a LOW row on a name that doesn't clearly indicate either); home/outdoor (single broad top-level node, room/area name only, no visible sub-breakdown to confirm textile vs storage vs furniture content - excluded per 'room name alone must never determine classification'); home/kitchenware/{appliances,bar-tools,coffee-tea-accessories,cookware-bakeware,kitchen-knives} (Kitchen & Dining); home/pantry* (food/Kitchen & Dining); home/electronics* (not applicable); home/luggage-travel*, home/travel-essentials, home/water-bottles-tumblers (general merchandise/travel, out of home-textile/storage scope); home/pet-accessories (pet boundary, excluded per rules); home/dorm-room-essentials* (curated collection duplicating existing Bedding/Bath/Decor/Kitchenware categories - Collection landing page, excluded per View-All/Collections rule); home/fall-harvest, home/halloween-decor, home/new, home/home/housewarming-gifts, home/home/luxe-home, home/bedding/fabric-materials-guide (seasonal/promotional/editorial landing or guide pages, not standard category listings - excluded). Duplicate-link check: none of the recorded URLs repeat.",
+  "textile_rows": [
+    {
+      "category": "Textile",
+      "sub_category": "Bedding",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Bedding Basics",
+      "qty": null,
+      "link": "https://www.nordstrom.com/browse/home/bedding/basics",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: quantity not extracted - Nordstrom blocked page rendering at all 3 access tiers; also unconfirmed exactly what 'Basics' contains (could skew non-textile) since sub-nav could not be read",
+      "confidence": "LOW"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Blankets & Throws",
+      "qty": null,
+      "link": "https://www.nordstrom.com/browse/home/bedding/blankets-throws",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: quantity not extracted - Nordstrom blocked page rendering at all 3 access tiers",
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Comforters",
+      "qty": null,
+      "link": "https://www.nordstrom.com/browse/home/bedding/comforters",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: quantity not extracted - Nordstrom blocked page rendering at all 3 access tiers",
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Duvet Covers & Pillow Shams",
+      "qty": null,
+      "link": "https://www.nordstrom.com/browse/home/bedding/duvet-covers",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: quantity not extracted - Nordstrom blocked page rendering at all 3 access tiers (page title confirmed as real node: 'Duvet Covers & Pillow Shams | Nordstrom')",
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Bedding Sets",
+      "qty": null,
+      "link": "https://www.nordstrom.com/browse/home/bedding/sets",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: quantity not extracted - Nordstrom blocked page rendering at all 3 access tiers",
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Sheets",
+      "qty": null,
+      "link": "https://www.nordstrom.com/browse/home/bedding/sheets",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: quantity not extracted - Nordstrom blocked page rendering at all 3 access tiers",
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Bath",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Towels",
+      "qty": null,
+      "link": "https://www.nordstrom.com/browse/home/bath/towels",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: quantity not extracted - Nordstrom blocked page rendering at all 3 access tiers",
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Decor",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Decorative Pillows",
+      "qty": null,
+      "link": "https://www.nordstrom.com/browse/home/decor/decorative-pillows",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: quantity not extracted - Nordstrom blocked page rendering at all 3 access tiers",
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Rugs",
+      "qty": null,
+      "link": "https://www.nordstrom.com/browse/home/decor/rugs",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: quantity not extracted - Nordstrom blocked page rendering at all 3 access tiers",
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Dining & Entertainment",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Table Linens",
+      "qty": null,
+      "link": "https://www.nordstrom.com/browse/home/dining-entertainment/table-linens",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: quantity not extracted - Nordstrom blocked page rendering at all 3 access tiers",
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Kitchenware",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Kitchen Linens",
+      "qty": null,
+      "link": "https://www.nordstrom.com/browse/home/kitchenware/kitchen-linens",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: quantity not extracted - Nordstrom blocked page rendering at all 3 access tiers",
+      "confidence": "HIGH"
+    }
+  ],
+  "storage_rows": [
+    {
+      "category": "Storage",
+      "sub_category": "Decor",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Storage & Organization",
+      "qty": null,
+      "link": "https://www.nordstrom.com/browse/home/decor/storage-organization",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: quantity not extracted - Nordstrom blocked page rendering at all 3 access tiers",
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Jewelry Boxes & Holders",
+      "qty": null,
+      "link": "https://www.nordstrom.com/browse/home/decor/jewelry-boxes-holders",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: quantity not extracted - Nordstrom blocked page rendering at all 3 access tiers; also possible overlap with purely-decorative jewelry boxes (Decorative Home Accessories) that could not be resolved since sub-nav/product listing could not be read",
+      "confidence": "MEDIUM"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Kitchenware",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Storage & Gadgets",
+      "qty": null,
+      "link": "https://www.nordstrom.com/browse/home/kitchenware/storage-gadgets",
+      "is_group": false,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: quantity not extracted - Nordstrom blocked page rendering at all 3 access tiers; 'gadgets' portion of the name may include non-storage kitchen tools that could not be confirmed since the product listing could not be read",
+      "confidence": "MEDIUM"
+    }
+  ]
+}

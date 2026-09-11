@@ -1,0 +1,354 @@
+{
+  "sr": 176,
+  "company": "Kmart Australia",
+  "brand_site": "kmart.com.au",
+  "country": "Australia",
+  "site_url": "https://www.kmart.com.au/",
+  "status": "partial",
+  "failure_reason": "Kmart returned HTTP 403 on every further category page after ~45 same-origin category fetches from the Chrome tab; stopped at the first block with no retries. 4 emitted leaves (Baby Cots & Mattresses, Baby Highchairs Boosters & Step Stools, Camping Furniture, Bathroom Cabinets & Shelves) therefore carry the site's nav count instead of a page-verified count, and 4 further minor nodes (Bathroom Trolleys, Wall Hooks & Coat Racks, Beach Chairs, and the camping-chairs / camping-tables sub-slugs) could not be inspected at all - all are out-of-scope or sub-5-product nodes. The 27 core Furniture-department leaves are fully verified.",
+  "notes": "ACCESS: Claude-in-Chrome tab only. robots.txt names no Claude agent and is 'User-agent: * / Allow: /' with only cart/login/api paths disallowed. The Akamai wall the prior Home-Decor pass hit over the HTTP layer did NOT appear in a real Chrome session - category PLPs render normally. TREE: three independent sources unioned - (1) the homepage mega-menu payload __NEXT_DATA__:props.navigationProps.staticHeaderData (full taxonomy with per-node counts), (2) the category sitemap https://www.kmart.com.au/sitemap/au/category-sitemap.xml (2235 category URLs, keyword-scanned locally for furniture slugs), (3) each category page's own dynamicWayfinders pill strip. The sitemap/second-menu cross-check paid off: Bedside Tables (35) and Wardrobes (2) exist only under the Bedroom department's own 'Bedroom Furniture' menu, not under the Furniture department menu. QTY: for 28 leaves the qty is pageProps.currentCategory.count read from the category page itself via same-origin fetch; that field is what the PLP renders as 'Showing 1-N of N Products' (proved on Bedside Tables: rendered header '1-35 of 35 Products' vs count 35). CORROBORATION: nav count vs page count agreed exactly on 24 of those 28 leaves and differed by exactly 1 on 4 (Bed Frames 1669/1670, Drawers 493/492, Sideboards 279/278, Desks 994/993) - live catalogue drift, not a padded header. That agreement is what licenses using the nav count for the 4 leaves whose page fetch was blocked; those 4 are flagged. BLOCK: after ~45 same-origin category fetches Kmart began returning HTTP 403 on every further category page. Per the hard-block rule I stopped immediately, made no retries and no backoff. Unverified as a result: Baby Cots & Mattresses, Baby Highchairs Boosters & Step Stools, Camping Furniture, Bathroom Cabinets & Shelves (all emitted with nav counts + flags), plus Bathroom Trolleys (nav 3), Wall Hooks & Coat Racks (nav 2), Beach Chairs and the camping-chairs / camping-tables sub-slugs (dropped, see below). TRAP 2 CONFIRMED: /category/home-and-living/rattan-furniture/ returned HTTP 200 but its currentCategory resolved to the PARENT 'Furniture' node (16947) - a bad slug serving a plausible wrong number. Dropped. /category/home-and-living/cabinets/ and /category/home-and-living/outdoor-tables/ are sitemap-only slugs that return 200 with no currentCategory at all and appear nowhere in the nav - not real listing pages, dropped. Every emitted leaf was confirmed to resolve to its own node (currentCategory.url == the URL requested). DEDUP: Kmart re-links the same URL from several menus with different internal group_ids and different nav counts for the SAME url (e.g. /bedroom-furniture/ reads 5883 in the Furniture menu and 2927 in the Bedroom menu; the page itself says 5882). Every node is emitted once, keyed on URL, under its most natural parent: Side Tables / Bookshelves / Shelving Units / Lounge Chairs each appear in two or three of the Furniture sub-menus and are emitted once only. EXCLUDED and why: Bed Mattresses (1168, bedding); Rugs under Hallway Furniture (3799, textiles); Wall Hooks & Coat Racks (2, wall hooks); Bathroom Trolleys (3), Kitchen Trolley (33), Wardrobe/Drawer Organisers, Storage Boxes/Tubs/Bags (standalone storage, Storage task); Wall & Floating Shelves (Wall Decor); Outdoor Cushions, Sun Shelters & Umbrellas, Pots & Planters, Outdoor Decor (not furniture); Beach Chairs, Home Gyms & Benches, Pool Table, Table Games (sporting goods); Table Lamps / Bedside Table Lamps / Desk Lighting (lighting); Tableware, Cake Stands, Tablecloths, Table Runners (dining/textiles); Doll Houses & Furniture (toys); all 'Shop All', 'Latest Arrivals', 'Online Exclusives', 'Clearance' and 'Shop by Collection' nodes (nav junk per rule 3). COMPOSITION CAVEAT carried over from the prior pass and still true: a large share of the inventory under these URLs is third-party marketplace stock (Advwin, Ausway, Costway, VidaXL and similar) rather than Kmart's own range - the counts are exactly what the site reports for the category, but they are not a count of Kmart-branded furniture.",
+  "rows": [
+    {
+      "category": "Furniture",
+      "sub_category": "Bedroom Furniture",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Bed Frames & Bedheads",
+      "qty": 1670,
+      "link": "https://www.kmart.com.au/category/home-and-living/bed-frames-and-bedheads/",
+      "is_group": false,
+      "evidence": "SSR __NEXT_DATA__:props.pageProps.currentCategory.count on the category page itself (same-origin fetch from the loaded Kmart tab); this field is the number the PLP prints as 'Showing 1-N of N Products' - verified identical on Bedside Tables (rendered header '1-35 of 35 Products' = currentCategory.count 35)",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Bedside Tables",
+      "qty": 35,
+      "link": "https://www.kmart.com.au/category/home-and-living/bedside-tables/",
+      "is_group": false,
+      "evidence": "SSR __NEXT_DATA__:props.pageProps.currentCategory.count on the category page itself (same-origin fetch from the loaded Kmart tab); this field is the number the PLP prints as 'Showing 1-N of N Products' - verified identical on Bedside Tables (rendered header '1-35 of 35 Products' = currentCategory.count 35)",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Drawers",
+      "qty": 492,
+      "link": "https://www.kmart.com.au/category/home-and-living/drawers/",
+      "is_group": false,
+      "evidence": "SSR __NEXT_DATA__:props.pageProps.currentCategory.count on the category page itself (same-origin fetch from the loaded Kmart tab); this field is the number the PLP prints as 'Showing 1-N of N Products' - verified identical on Bedside Tables (rendered header '1-35 of 35 Products' = currentCategory.count 35)",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Wardrobes",
+      "qty": 2,
+      "link": "https://www.kmart.com.au/category/home-and-living/wardrobes/",
+      "is_group": false,
+      "evidence": "SSR __NEXT_DATA__:props.pageProps.currentCategory.count on the category page itself (same-origin fetch from the loaded Kmart tab); this field is the number the PLP prints as 'Showing 1-N of N Products' - verified identical on Bedside Tables (rendered header '1-35 of 35 Products' = currentCategory.count 35)",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Bookshelves",
+      "qty": 626,
+      "link": "https://www.kmart.com.au/category/home-and-living/bookshelves/",
+      "is_group": false,
+      "evidence": "SSR __NEXT_DATA__:props.pageProps.currentCategory.count on the category page itself (same-origin fetch from the loaded Kmart tab); this field is the number the PLP prints as 'Showing 1-N of N Products' - verified identical on Bedside Tables (rendered header '1-35 of 35 Products' = currentCategory.count 35)",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Shelving Units",
+      "qty": 485,
+      "link": "https://www.kmart.com.au/category/home-and-living/shelving-units/",
+      "is_group": false,
+      "evidence": "SSR __NEXT_DATA__:props.pageProps.currentCategory.count on the category page itself (same-origin fetch from the loaded Kmart tab); this field is the number the PLP prints as 'Showing 1-N of N Products' - verified identical on Bedside Tables (rendered header '1-35 of 35 Products' = currentCategory.count 35)",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Side Tables",
+      "qty": 1129,
+      "link": "https://www.kmart.com.au/category/home-and-living/side-tables/",
+      "is_group": false,
+      "evidence": "SSR __NEXT_DATA__:props.pageProps.currentCategory.count on the category page itself (same-origin fetch from the loaded Kmart tab); this field is the number the PLP prints as 'Showing 1-N of N Products' - verified identical on Bedside Tables (rendered header '1-35 of 35 Products' = currentCategory.count 35)",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Lounge Chairs",
+      "qty": 96,
+      "link": "https://www.kmart.com.au/category/home-and-living/occasional-chairs/",
+      "is_group": false,
+      "evidence": "SSR __NEXT_DATA__:props.pageProps.currentCategory.count on the category page itself (same-origin fetch from the loaded Kmart tab); this field is the number the PLP prints as 'Showing 1-N of N Products' - verified identical on Bedside Tables (rendered header '1-35 of 35 Products' = currentCategory.count 35)",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Garment Racks",
+      "qty": 227,
+      "link": "https://www.kmart.com.au/category/home-and-living/garment-racks/",
+      "is_group": false,
+      "evidence": "SSR __NEXT_DATA__:props.pageProps.currentCategory.count on the category page itself (same-origin fetch from the loaded Kmart tab); this field is the number the PLP prints as 'Showing 1-N of N Products' - verified identical on Bedside Tables (rendered header '1-35 of 35 Products' = currentCategory.count 35)",
+      "flag": "MANUAL REVIEW: node appears in the site's Furniture mega-menu but its canonical breadcrumb is Home & Living > Storage & Organisation - storage/furniture borderline"
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Shoe Storage",
+      "qty": 25,
+      "link": "https://www.kmart.com.au/category/home-and-living/shoe-storage/",
+      "is_group": false,
+      "evidence": "SSR __NEXT_DATA__:props.pageProps.currentCategory.count on the category page itself (same-origin fetch from the loaded Kmart tab); this field is the number the PLP prints as 'Showing 1-N of N Products' - verified identical on Bedside Tables (rendered header '1-35 of 35 Products' = currentCategory.count 35)",
+      "flag": "MANUAL REVIEW: node appears in the site's Furniture mega-menu but its canonical breadcrumb is Home & Living > Storage & Organisation - storage/furniture borderline"
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Dining & Kitchen Furniture",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Dining Tables",
+      "qty": 561,
+      "link": "https://www.kmart.com.au/category/home-and-living/dining-tables/",
+      "is_group": false,
+      "evidence": "SSR __NEXT_DATA__:props.pageProps.currentCategory.count on the category page itself (same-origin fetch from the loaded Kmart tab); this field is the number the PLP prints as 'Showing 1-N of N Products' - verified identical on Bedside Tables (rendered header '1-35 of 35 Products' = currentCategory.count 35)",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Dining Chairs",
+      "qty": 674,
+      "link": "https://www.kmart.com.au/category/home-and-living/dining-chairs/",
+      "is_group": false,
+      "evidence": "SSR __NEXT_DATA__:props.pageProps.currentCategory.count on the category page itself (same-origin fetch from the loaded Kmart tab); this field is the number the PLP prints as 'Showing 1-N of N Products' - verified identical on Bedside Tables (rendered header '1-35 of 35 Products' = currentCategory.count 35)",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Sideboards & Buffet Units",
+      "qty": 278,
+      "link": "https://www.kmart.com.au/category/home-and-living/sideboards-and-buffet-units/",
+      "is_group": false,
+      "evidence": "SSR __NEXT_DATA__:props.pageProps.currentCategory.count on the category page itself (same-origin fetch from the loaded Kmart tab); this field is the number the PLP prints as 'Showing 1-N of N Products' - verified identical on Bedside Tables (rendered header '1-35 of 35 Products' = currentCategory.count 35)",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Stools",
+      "qty": 871,
+      "link": "https://www.kmart.com.au/category/home-and-living/stools/",
+      "is_group": false,
+      "evidence": "SSR __NEXT_DATA__:props.pageProps.currentCategory.count on the category page itself (same-origin fetch from the loaded Kmart tab); this field is the number the PLP prints as 'Showing 1-N of N Products' - verified identical on Bedside Tables (rendered header '1-35 of 35 Products' = currentCategory.count 35)",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Storage Drawers & Trolleys",
+      "qty": 567,
+      "link": "https://www.kmart.com.au/category/home-and-living/storage-drawers-and-trolleys/",
+      "is_group": false,
+      "evidence": "SSR __NEXT_DATA__:props.pageProps.currentCategory.count on the category page itself (same-origin fetch from the loaded Kmart tab); this field is the number the PLP prints as 'Showing 1-N of N Products' - verified identical on Bedside Tables (rendered header '1-35 of 35 Products' = currentCategory.count 35)",
+      "flag": "MANUAL REVIEW: node appears in the site's Furniture mega-menu but its canonical breadcrumb is Home & Living > Storage & Organisation - storage/furniture borderline"
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Living Room Furniture",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Coffee Tables",
+      "qty": 326,
+      "link": "https://www.kmart.com.au/category/home-and-living/coffee-tables/",
+      "is_group": false,
+      "evidence": "SSR __NEXT_DATA__:props.pageProps.currentCategory.count on the category page itself (same-origin fetch from the loaded Kmart tab); this field is the number the PLP prints as 'Showing 1-N of N Products' - verified identical on Bedside Tables (rendered header '1-35 of 35 Products' = currentCategory.count 35)",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Entertainment Units",
+      "qty": 384,
+      "link": "https://www.kmart.com.au/category/home-and-living/entertainment-units/",
+      "is_group": false,
+      "evidence": "SSR __NEXT_DATA__:props.pageProps.currentCategory.count on the category page itself (same-origin fetch from the loaded Kmart tab); this field is the number the PLP prints as 'Showing 1-N of N Products' - verified identical on Bedside Tables (rendered header '1-35 of 35 Products' = currentCategory.count 35)",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Ottomans",
+      "qty": 163,
+      "link": "https://www.kmart.com.au/category/home-and-living/ottomans/",
+      "is_group": false,
+      "evidence": "SSR __NEXT_DATA__:props.pageProps.currentCategory.count on the category page itself (same-origin fetch from the loaded Kmart tab); this field is the number the PLP prints as 'Showing 1-N of N Products' - verified identical on Bedside Tables (rendered header '1-35 of 35 Products' = currentCategory.count 35)",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Sofas",
+      "qty": 11,
+      "link": "https://www.kmart.com.au/category/home-and-living/sofas/",
+      "is_group": false,
+      "evidence": "SSR __NEXT_DATA__:props.pageProps.currentCategory.count on the category page itself (same-origin fetch from the loaded Kmart tab); this field is the number the PLP prints as 'Showing 1-N of N Products' - verified identical on Bedside Tables (rendered header '1-35 of 35 Products' = currentCategory.count 35)",
+      "flag": "MANUAL REVIEW: only 11 products - genuinely tiny for a Sofas node; Kmart AU's own sofa range is small and the count is an in-stock snapshot, re-read before trusting as catalogue size"
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Beanbags",
+      "qty": 82,
+      "link": "https://www.kmart.com.au/category/home-and-living/beanbags/",
+      "is_group": false,
+      "evidence": "SSR __NEXT_DATA__:props.pageProps.currentCategory.count on the category page itself (same-origin fetch from the loaded Kmart tab); this field is the number the PLP prints as 'Showing 1-N of N Products' - verified identical on Bedside Tables (rendered header '1-35 of 35 Products' = currentCategory.count 35)",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Office Furniture",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Desks",
+      "qty": 993,
+      "link": "https://www.kmart.com.au/category/home-and-living/desks/",
+      "is_group": false,
+      "evidence": "SSR __NEXT_DATA__:props.pageProps.currentCategory.count on the category page itself (same-origin fetch from the loaded Kmart tab); this field is the number the PLP prints as 'Showing 1-N of N Products' - verified identical on Bedside Tables (rendered header '1-35 of 35 Products' = currentCategory.count 35)",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Desk Chairs",
+      "qty": 1031,
+      "link": "https://www.kmart.com.au/category/home-and-living/desk-chairs/",
+      "is_group": false,
+      "evidence": "SSR __NEXT_DATA__:props.pageProps.currentCategory.count on the category page itself (same-origin fetch from the loaded Kmart tab); this field is the number the PLP prints as 'Showing 1-N of N Products' - verified identical on Bedside Tables (rendered header '1-35 of 35 Products' = currentCategory.count 35)",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Hallway Furniture",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Console Tables",
+      "qty": 210,
+      "link": "https://www.kmart.com.au/category/home-and-living/console-tables/",
+      "is_group": false,
+      "evidence": "SSR __NEXT_DATA__:props.pageProps.currentCategory.count on the category page itself (same-origin fetch from the loaded Kmart tab); this field is the number the PLP prints as 'Showing 1-N of N Products' - verified identical on Bedside Tables (rendered header '1-35 of 35 Products' = currentCategory.count 35)",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Entryway Storage",
+      "qty": 8,
+      "link": "https://www.kmart.com.au/category/home-and-living/entryway-storage/",
+      "is_group": false,
+      "evidence": "SSR __NEXT_DATA__:props.pageProps.currentCategory.count on the category page itself (same-origin fetch from the loaded Kmart tab); this field is the number the PLP prints as 'Showing 1-N of N Products' - verified identical on Bedside Tables (rendered header '1-35 of 35 Products' = currentCategory.count 35)",
+      "flag": "MANUAL REVIEW: node appears in the site's Furniture mega-menu but its canonical breadcrumb is Home & Living > Storage & Organisation - storage/furniture borderline"
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Kids Furniture",
+      "qty": 16,
+      "link": "https://www.kmart.com.au/category/home-and-living/kids-furniture/",
+      "is_group": false,
+      "evidence": "SSR __NEXT_DATA__:props.pageProps.currentCategory.count on the category page itself (same-origin fetch from the loaded Kmart tab); this field is the number the PLP prints as 'Showing 1-N of N Products' - verified identical on Bedside Tables (rendered header '1-35 of 35 Products' = currentCategory.count 35)",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Outdoor Living",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Outdoor Furniture",
+      "qty": 1929,
+      "link": "https://www.kmart.com.au/category/home-and-living/outdoor-furniture/",
+      "is_group": false,
+      "evidence": "SSR __NEXT_DATA__:props.pageProps.currentCategory.count on the category page itself (same-origin fetch from the loaded Kmart tab); this field is the number the PLP prints as 'Showing 1-N of N Products' - verified identical on Bedside Tables (rendered header '1-35 of 35 Products' = currentCategory.count 35)",
+      "flag": "MANUAL REVIEW: recorded the department as a leaf. Its only child node, Outdoor Chairs & Stools (/category/home-and-living/outdoor-chairs-and-stools/, 3 products), covers 3 of 1929, so recording the child instead would have lost the branch"
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Nursery Furniture & Decor",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Nursery Furniture",
+      "qty": 56,
+      "link": "https://www.kmart.com.au/category/kids-and-baby/nursery-furniture/",
+      "is_group": false,
+      "evidence": "SSR __NEXT_DATA__:props.pageProps.currentCategory.count on the category page itself (same-origin fetch from the loaded Kmart tab); this field is the number the PLP prints as 'Showing 1-N of N Products' - verified identical on Bedside Tables (rendered header '1-35 of 35 Products' = currentCategory.count 35)",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Baby Cots & Mattresses",
+      "qty": 104,
+      "link": "https://www.kmart.com.au/category/kids-and-baby/baby-cots-and-mattresses/",
+      "is_group": false,
+      "evidence": "site's own mega-menu payload __NEXT_DATA__:props.staticHeaderData node count; per-page verification blocked by HTTP 403 after ~45 requests. Corroboration: across the 28 leaves verified both ways this session the nav count matched the page count exactly on 24 and differed by 1 on 4 (live catalogue drift)",
+      "flag": "MANUAL REVIEW: qty from the site nav only (page fetch 403'd); node mixes cots (furniture) with cot mattresses (bedding, out of scope) and the site publishes no split"
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Baby Highchairs Boosters & Step Stools",
+      "qty": 82,
+      "link": "https://www.kmart.com.au/category/kids-and-baby/baby-highchairs-boosters-and-step-stools/",
+      "is_group": false,
+      "evidence": "site's own mega-menu payload __NEXT_DATA__:props.staticHeaderData node count; per-page verification blocked by HTTP 403 after ~45 requests. Corroboration: across the 28 leaves verified both ways this session the nav count matched the page count exactly on 24 and differed by 1 on 4 (live catalogue drift)",
+      "flag": "MANUAL REVIEW: qty from the site nav only (page fetch 403'd); highchairs are kids seating furniture but the node is filed under Baby Feeding & Nursing and also holds booster seats and step stools"
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Camping Furniture",
+      "qty": 399,
+      "link": "https://www.kmart.com.au/category/sport-and-outdoor/camping-furniture/",
+      "is_group": false,
+      "evidence": "site's own mega-menu payload __NEXT_DATA__:props.staticHeaderData node count; per-page verification blocked by HTTP 403 after ~45 requests. Corroboration: across the 28 leaves verified both ways this session the nav count matched the page count exactly on 24 and differed by 1 on 4 (live catalogue drift)",
+      "flag": "MANUAL REVIEW: qty from the site nav only (page fetch 403'd); folding camp chairs/tables under Sport & Outdoor > Camping - furniture by product type but arguably camping gear rather than home/patio furniture. Sitemap also lists camping-chairs and camping-tables sub-slugs that could not be counted"
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Bathroom Cabinets & Shelves",
+      "qty": 26,
+      "link": "https://www.kmart.com.au/category/home-and-living/bathroom-cabinets-and-shelves/",
+      "is_group": false,
+      "evidence": "site's own mega-menu payload __NEXT_DATA__:props.staticHeaderData node count; per-page verification blocked by HTTP 403 after ~45 requests. Corroboration: across the 28 leaves verified both ways this session the nav count matched the page count exactly on 24 and differed by 1 on 4 (live catalogue drift)",
+      "flag": "MANUAL REVIEW: qty from the site nav only (page fetch 403'd); bathroom cabinets are in scope per the brief but the node is filed under Bathroom Storage, not a Furniture department"
+    }
+  ]
+}

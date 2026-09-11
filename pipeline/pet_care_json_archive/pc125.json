@@ -1,0 +1,34 @@
+{
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "Shopify storefront, robots.txt Allow:/ (no Claude disallow). Direct HTTP fetch of collections.json worked throughout (per prior notes/125.md, canonical host fenwick.co.uk). Absence-proof method: paginated https://fenwick.co.uk/collections.json?limit=250 through all pages until an empty page (pages 1-14, 3258 total published collections, page 15 returned 0), then regex-scanned every collection title/handle for pet|dog|cat|puppy|kitten|leash|collar|harness|kennel|crate|scratch|litter across the full corpus. Hits: 'Pet Accessories' (home-and-tech-pet-accessories, follows the same home-and-tech-<dept>-<subcat> URL convention as the Lighting/Kitchen&Dining/Home Decor nodes captured in the prior Home-Decor pass; confirmed as a real merchandising department -- its name appears in the homepage's own analytics category-classifier JS array alongside Bathroom/Bedroom/Kitchen/Dining/Luggage) with two real children 'Pet Clothing' and 'Pet Toys' (only two home-and-tech-pet-accessories-* handles exist); 'Barbour Pet Accessories' (brand shop-in-shop collection, not linked from the visible mega-menu but a real published PLP, title 'Barbour Pet Accessories' on page); 'For the Pet Lover' (a gift-guide list alongside sibling nodes 'For the Tech Lover'/'For the Health Guru'/'For the Interior Designer' etc in a Home & Tech mega-menu 'Gifting' flyout -- excluded as a Gift Guide/marketing page per rules); 'Pet Gifts' (handle pet-gifts, page titled 'Pet Gifts' -- checked overlap: 31/32 of its products already appear inside the Pet Accessories parent listing, the 32nd is a Dog Advent Calendar treat -- this is a gift-curation cross-cut of the same catalog, not a distinct merchandising category, excluded as a Gifts page per rules). All other hits were false positives on the substring pet/dog/cat and confirmed non-Pet-Care on inspection: Jellycat (plush toy brand for people/nursery, not pet products), Women's Designer Cat Eye Sunglasses, Women's Designer Kitten Heels, Marcato (pasta-maker brand), Peter Lehmann (wine brand), Kid's Science & Education Toys (matched on 'cat' in 'Education'). No cat litter, pet food/bowl, pet bed, pet furniture, or pet-medical department exists anywhere in the 3258-collection corpus outside the Pet Accessories dept itself. Quantities verified by exhaustive pagination of each collection's /products.json?limit=250 counting unique product handles to exhaustion (page 1 returned <250 for every collection here, confirming no further pages) -- an exact catalogue count, per this company's established prior-pass methodology, not the separately-known-inflated collections.json products_count field (which read 73/49/6/58/36/32 for the same six collections vs the verified exact 69/45/6/55/32/32). Overlap/merge decisions: 'Barbour Pet Accessories' (55 products) is a 100% subset of the 'Pet Accessories' parent listing (all 55 handles also appear in the 69-item parent) -- it is a brand-filtered facet of the same underlying catalog, not additional distinct inventory, so it is DROPPED as a separate row (documented here per the same-underlying-listing merge rule) rather than double-counted. 'Pet Accessories' parent (69 exact) is a genuine grouping node with two real children (Pet Clothing 45, Pet Toys 6) so it is emitted as is_group:true/qty:null per the grouping convention used throughout this company's prior passes; however the two children only account for 51 of the parent's 69 products -- the remaining 18 (Barbour dog leads/collars/harnesses/carrier/poop-bag-dispenser, two Le Creuset pet bowls, one dog-treats tin) have no dedicated child sub-collection URL of their own and are therefore not represented as their own counted row, to avoid emitting a non-exhaustive or link-less leaf; flagged on the group row for manual review in case a reviewer wants a synthetic catch-all bucket. 'Pet Gifts' and 'For the Pet Lover' dropped entirely as marketing/gift-guide pages (not merchandising categories) per rules, even though they contain real pet products, since those products are already captured under Pet Accessories/Pet Clothing/Pet Toys (26-31 of 32 items in each case verified as overlapping).",
+  "rows": [
+    {
+      "category": "Pet Care",
+      "sub_category": "Pet Accessories",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: parent collection https://fenwick.co.uk/collections/home-and-tech-pet-accessories has 69 exact products (exhaustive /products.json pagination); children below (Pet Clothing 45 + Pet Toys 6) cover only 51 of these -- the remaining 18 products (Barbour dog leads/collars/harnesses/carrier/poop-bag-dispenser, 2 Le Creuset pet bowls, 1 dog-treats tin) have no dedicated sub-collection of their own and are not represented as a separate row."
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Pet Clothing",
+      "qty": 45,
+      "link": "https://fenwick.co.uk/collections/home-and-tech-pet-accessories-pet-clothes",
+      "is_group": false,
+      "evidence": "exhaustive /products.json?limit=250 pagination: 45 unique product handles returned on page 1 (<250, confirms exhaustion)",
+      "flag": null
+    },
+    {
+      "category": "Pet Care",
+      "sub_category": "Pet Toys",
+      "qty": 6,
+      "link": "https://fenwick.co.uk/collections/home-and-tech-pet-accessories-pet-toys",
+      "is_group": false,
+      "evidence": "exhaustive /products.json?limit=250 pagination: 6 unique product handles returned on page 1 (<250, confirms exhaustion)",
+      "flag": null
+    }
+  ]
+}

@@ -1,0 +1,99 @@
+{
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "RETRY of a prior HTTP-only block. This session has a browser tool (mcp__claude-in-chrome) and it defeated the DataDome wall cleanly: navigating https://www.etsy.com/c/home-and-living/bathroom in a real Chrome tab returned a full 200 render (no captcha), confirming the earlier block was purely HTTP/TLS-fingerprint based, not a Claude-specific opt-out (robots.txt already checked clean by the prior worker). Note: the browser's egress IP geo-resolves to India, so pages render as 'Etsy India' with canonical tags under /in-en/ locale paths; the plain non-locale URLs (https://www.etsy.com/c/home-and-living/bathroom/...) still load the same content directly (verified: no redirect, matching H1), so those are the links recorded here as the more portable canonical form for a USA-site record. Enumerated the full sub-category tree via a DOM query for every <a href> matching /c/home-and-living/bathroom/ (bypassing the collapsed 'Show more' UI, which did not reliably expand under repeated clicks in this heavily-loaded shared browser session) -- found all 13 real sub-category nodes: bathroom-vanities, bathroom-decor, shower-curtains-and-rings, towel-racks-and-rods, bath-mats-and-rugs, bath-towels, soap-dishes-and-dispensers, beach-towels, toilet-paper-holders, medicine-cabinets, bathroom-storage, hooded-towels, bathtub-trays. Visited each node's own listing page and read its rendered item-count element. Etsy's UI caps the displayed count at '1,000+ items' for any category at or above that threshold and gives no exact total anywhere in the rendered DOM at that scale (confirmed: this happens even on narrow-sounding nodes like 'Toilet Paper Holders' and 'Soap Dishes & Dispensers', so it is a genuine platform-wide display cap, not a fluke of one page) -- consistent with the project's own Walmart precedent (b194.json, '(1000+)' -> CAPPED/NO QTY, not estimated, not paginated to completion). Only 3 of the 13 nodes render below the cap with an exact number: Medicine Cabinets (538, 'results, with ads'), Bathroom Storage (922, 'results,'), Bathtub Trays (296, 'results,'). Ran the mandatory cross-category dedup check (cross_category_url_index.json) on all 13 candidate URLs: all 3 exact-qty nodes are ALREADY EXTRACTED IN Storage.xlsx; Bath Towels, Bath Mats & Rugs, Beach Towels, Hooded Towels, and Shower Curtains & Rings are ALREADY EXTRACTED IN Textile.xlsx. The remaining 5 nodes (Bathroom Vanities, Bathroom Decor, Towel Racks & Rods, Soap Dishes & Dispensers, Toilet Paper Holders) are genuinely Bathroom by rule and not recorded elsewhere, but all are capped at '1,000+ items' with no exact figure obtainable -- rule 26 forbids estimating, and full manual pagination of a 1,000+-item Etsy marketplace category is not a productive use of effort (same call as the Walmart precedent). Net result: every one of the 13 real sub-category nodes is accounted for, but none qualify for rows[] -- either dedup-excluded (8 nodes) or qty-unobtainable (5 nodes). This is a complete, successful extraction (status ok, not partial/blocked) that happens to yield zero net-new Bathroom rows once dedup and the qty rule are applied.",
+  "rows": [],
+  "review": [
+    {
+      "category": "Bathroom",
+      "sub_category": "Bathroom Vanities",
+      "qty": null,
+      "issue": "CAPPED / NO QTY: Etsy's own rendered item-count element reads only '1,000+ items', no exact total disclosed anywhere in the DOM at this scale; rule 26 forbids estimating or partial-pagination-inferring a number. Would otherwise be a genuine Bathroom furniture leaf (rule 9) and is not recorded in Furniture.xlsx/Storage.xlsx per the cross-category index.",
+      "link": "https://www.etsy.com/c/home-and-living/bathroom/bathroom-vanities"
+    },
+    {
+      "category": "Bathroom",
+      "sub_category": "Bathroom Decor",
+      "qty": null,
+      "issue": "CAPPED / NO QTY ('1,000+ items') and genuinely mixed content on manual inspection (ceramic swan towel holders and soap savers = Bathroom accessories rule 13; tissue box covers, perfume/essential-oil bottles, vanity trays = generic decor, not bathroom-specific) - primary product type varies listing to listing, LOW confidence per rule 29, not recorded as a clean leaf.",
+      "link": "https://www.etsy.com/c/home-and-living/bathroom/bathroom-decor"
+    },
+    {
+      "category": "Bathroom",
+      "sub_category": "Shower Curtains & Rings",
+      "qty": null,
+      "issue": "ALREADY EXTRACTED IN Textile.xlsx (mandatory cross-category dedup, URL-exact hit). Also independently mixed: shower curtains are Textile (rule 20) while shower curtain rings/rails are Bathroom hardware (rule 6); Etsy combines both under one URL. Qty capped at '1,000+ items' in any case.",
+      "link": "https://www.etsy.com/c/home-and-living/bathroom/shower-curtains-and-rings"
+    },
+    {
+      "category": "Bathroom",
+      "sub_category": "Towel Racks & Rods",
+      "qty": null,
+      "issue": "CAPPED / NO QTY: rendered item-count is '1,000+ items', no exact figure available. Would otherwise be a genuine Bathroom hardware leaf (rules 15/17) and is not recorded in any other protected workbook per the cross-category index.",
+      "link": "https://www.etsy.com/c/home-and-living/bathroom/towel-racks-and-rods"
+    },
+    {
+      "category": "Bathroom",
+      "sub_category": "Bath Mats & Rugs",
+      "qty": null,
+      "issue": "ROUTED TO TEXTILE (textile area/bath rugs per rule 16, e.g. 'Pink Cloud Rug', 'Bamboo Area Rug', 'Jellyfish Area Rug' - no rubber/anti-slip bathroom-specific mat identified) and ALREADY EXTRACTED IN Textile.xlsx per cross-category dedup. Qty capped at '1,000+ items' regardless.",
+      "link": "https://www.etsy.com/c/home-and-living/bathroom/bath-mats-and-rugs"
+    },
+    {
+      "category": "Bathroom",
+      "sub_category": "Bath Towels",
+      "qty": null,
+      "issue": "ROUTED TO TEXTILE (bath towels, rule 20) and ALREADY EXTRACTED IN Textile.xlsx per cross-category dedup. Qty capped at '1,000+ items' regardless.",
+      "link": "https://www.etsy.com/c/home-and-living/bathroom/bath-towels"
+    },
+    {
+      "category": "Bathroom",
+      "sub_category": "Soap Dishes & Dispensers",
+      "qty": null,
+      "issue": "CAPPED / NO QTY: rendered item-count is '1,000+ items', no exact figure available. Would otherwise be a genuine Bathroom accessory leaf (rules 13/18) and is not recorded in any other protected workbook per the cross-category index.",
+      "link": "https://www.etsy.com/c/home-and-living/bathroom/soap-dishes-and-dispensers"
+    },
+    {
+      "category": "Bathroom",
+      "sub_category": "Beach Towels",
+      "qty": null,
+      "issue": "ROUTED TO TEXTILE and not bathroom-specific (generic beach towels, not bathroom-intended per rule 13) and ALREADY EXTRACTED IN Textile.xlsx per cross-category dedup. Qty capped at '1,000+ items' regardless.",
+      "link": "https://www.etsy.com/c/home-and-living/bathroom/beach-towels"
+    },
+    {
+      "category": "Bathroom",
+      "sub_category": "Toilet Paper Holders",
+      "qty": null,
+      "issue": "CAPPED / NO QTY: rendered item-count is '1,000+ items' even for this narrow node, no exact figure available. Would otherwise be a genuine Bathroom accessory leaf (rule 14) and is not recorded in any other protected workbook per the cross-category index.",
+      "link": "https://www.etsy.com/c/home-and-living/bathroom/toilet-paper-holders"
+    },
+    {
+      "category": "Bathroom",
+      "sub_category": "Medicine Cabinets",
+      "qty": 538,
+      "issue": "ALREADY EXTRACTED IN Storage.xlsx (mandatory cross-category dedup, URL-exact hit). Exact qty verified via the page's own rendered header '538 results, with ads'. Would otherwise be a genuine Bathroom furniture/storage leaf (rules 9/12).",
+      "link": "https://www.etsy.com/c/home-and-living/bathroom/medicine-cabinets"
+    },
+    {
+      "category": "Bathroom",
+      "sub_category": "Bathroom Storage",
+      "qty": 922,
+      "issue": "ALREADY EXTRACTED IN Storage.xlsx (mandatory cross-category dedup, URL-exact hit). Exact qty verified via the page's own rendered header '922 results,'. Would otherwise be a genuine Bathroom storage leaf (rule 12).",
+      "link": "https://www.etsy.com/c/home-and-living/bathroom/bathroom-storage"
+    },
+    {
+      "category": "Bathroom",
+      "sub_category": "Hooded Towels",
+      "qty": null,
+      "issue": "ROUTED TO TEXTILE (hooded bath towels, rule 20) and ALREADY EXTRACTED IN Textile.xlsx per cross-category dedup. Qty capped at '1,000+ items' regardless.",
+      "link": "https://www.etsy.com/c/home-and-living/bathroom/hooded-towels"
+    },
+    {
+      "category": "Bathroom",
+      "sub_category": "Bathtub Trays",
+      "qty": 296,
+      "issue": "ALREADY EXTRACTED IN Storage.xlsx (mandatory cross-category dedup, URL-exact hit). Exact qty verified via the page's own rendered header '296 results,'. Would otherwise be a genuine Bathroom accessory/caddy leaf (rule 13).",
+      "link": "https://www.etsy.com/c/home-and-living/bathroom/bathtub-trays"
+    }
+  ]
+}

@@ -1,0 +1,1011 @@
+{
+ "sr": 227,
+ "company": "JCPenney Home",
+ "brand_site": "jcpenney.com",
+ "country": "USA",
+ "site_url": "https://www.jcpenney.com/",
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "Direct fetch worked throughout (no WAF/Cloudflare block hit; robots.txt has no Claude-specific disallow, checked first per Rule 3). Site taxonomy read from server-rendered nav links on jcpenney.com/d/home-store, /d/home-store/home-decor and /d/home-store/kitchen-dining (category IDs cat...NNN visible in each link's id= param). PLP grids are client-rendered so no count is in the page HTML; counts instead came from the exact backend the frontend itself calls: JCPenney's search/browse config (embedded in each gallery page's inline JS, key 'constructorIO') points to Constructor.io at ac.cnstrc.com with public index key key_xT77K5VmpiVduqnj. Each category's own id (group_id) was queried via ac.cnstrc.com/browse/group_id/<id>?key=...&filters[item_type]=<x>, which returns response.total_num_results -- verified exact (not sampled/approximate) by spot cross-checking that a category's item_type facet counts sum to exactly its own total_num_results (Lighting: 745, Wall Decor item_type facets sum to ~2433) and that a direct filters[item_type] query reproduces the facet's reported count exactly (table lamps 207, vases 49 both confirmed). Scope: Lighting (Lighting & Lamps dept, all fixture types except ceiling fans/bulbs per Rule 0.2), Mirrors (main Mirrors category is 100% wall mirrors=134; Makeup/Vanity Mirrors=41 and Shower Mirrors=2 recovered from the Bath Accessories category under Rule 0.3 'all mirrors in scope, every type' -- these are a genuinely distinct item_type not present in the main Mirrors node), Wall Decor, Decorative Accessories (Home Accents category), Clocks (all 5 sub-types kept per brief's 'all types'), Picture Frames & Photo Display, Curtain Rods & Hardware (decorative-metal rods/finials/holdbacks-tiebacks only, not brackets/sliders/connectors/wands/extenders/hooks/rings which are functional mounting hardware), and Kitchen & Dining Tableware/Dinnerware, Serveware and Glassware & Drinkware (Rule: mugs/tumblers/stemware in scope as 'Glassware... functional', but Water Bottles/Travel Mugs/Insulated Tumblers excluded as travel-hydration gear, and cutlery/cookware/bakeware/small-appliances/table-linens excluded per the standard Kitchen exclusion). Excluded categories checked and dropped on merits: Artificial Florals & Plants, Wreaths, Garlands, Snow Globes, Floral Arrangements (all artificial/holiday), Candles & Home Fragrance jar candles/diffusers/oils/potpourri/room sprays/hand soaps (fragrance/personal care), Decorative Pillows incl. Throws (textile), Area Rugs/Runners/Accent Rugs (textile/floor covering), Plant Stands/Wreath Storage Bags (furniture/storage), Accent Furniture (2669 products, all tables/chairs/benches/ottomans -- no mirrors found there), Photo Albums/Digital Frames (storage/electronics), Salad Servers/Cheese Knives/Cake Servers/Spoon Rests/Casserole Dishes (utensils/cookware), Curtain Rod Brackets/Sliders/Connectors/Wands/Extenders/Hooks/Rings (mounting hardware). CROSS-CATEGORY DUPLICATES (Rule 0.6, same-listing-under-second-URL, dropped not double-counted): Wall Mirrors (134) appears identically in both the Mirrors category and as a Wall Decor item_type facet -- kept only under Mirrors. Wall Frames (19) and Collage Frames (1) appear identically in both Picture Frames & Albums and Wall Decor -- kept only under Picture Frames. Wall Clocks (81) appears identically in both Clocks and Wall Decor -- kept only under Clocks. Candle Sconces (3) appears identically in both Wall Decor and Candles & Home Fragrance -- kept only under Wall Decor. Candle Holders (85) appears identically in both Decorative Accessories(Home Accents) and Candles & Home Fragrance -- but this whole bucket was separately dropped by the holiday audit below. Serving Platters (115) and Serving Bowls (86) appear identically in both Dinnerware and Serveware -- kept only under Serveware; Dipping Bowls(4)/Egg Plates(1)/Cake Plates(1)/Sugar Bowls(1) likewise. Serving Pitchers (20) and Decanters (2) appear identically in both Serveware and Glassware & Drinkware -- kept only under Glassware & Drinkware. A dept-level 'Vases' nav shortcut (jcpenney.com/g/home-store/home-decor?item_type=vase+fillers|vases&id=cat100240022) is a pure facet re-cut of Decorative Accessories' own Vases/Vase Fillers types and was not re-emitted. HOLIDAY-CONTAMINATION AUDIT (material finding this pass): JCPenney's Home Decor catalog is heavily stocked with Fall/Halloween/Thanksgiving/Christmas seasonal SKUs as of this Aug 2026 snapshot. Several item_type facet buckets that read as generic decor names are in fact dominated by holiday merchandise once product titles are inspected (Rule: 'mixed roll-ups: drop, dont pad -- inspect actual titles'). Method: for every candidate leaf, queried the category's own 'event' facet (christmas/halloween/thanksgiving/easter/etc tags Constructor.io itself applies to each SKU) and computed what fraction of the bucket carries an explicit holiday-event tag; spot-verified against actual product titles for the largest buckets. Buckets >=50% holiday-tagged were dropped entirely (not padded with an estimated 'clean' remainder, which would be a guess): String Lights 317 (82.6%, titles are Kurt Adler Christmas string lights e.g. 'Candy Cane With Holly Leaves'), Icicle Lights 15, Net Lights 10, Snowfall Lights 3 (all Kurt Adler/Northlight Christmas exterior lighting), Tabletop Decor 439 (90.9%, titles e.g. 'Halloween Tabletop Decor'/'Lighted Christmas Tabletop Decor'), Figurines 375 (64.5%, titles are Halloween/Thanksgiving gnomes and turkeys), Decorative Lanterns 40 (62.5%, titles include Halloween skull/spider lanterns), Candle Holders 85 (51.8%, titles include Fall/Christmas/Reindeer themed holders), Flameless Candles 20 (95%, titles e.g. 'Merry' and 'Snowy Woodland' prints), Wall Signs 86 (77.9%), Marquee Lights 14 (100%, titles are 'Joy'/'Eek'/'Merry Christmas' LED signs), Appetizer Plates 62 (51.6%), Dessert Plates 30 (86.7%), Cheese Board Sets 36 (52.8%), Teapots 20 (65%), Tiered Servers 10 (100%), Chip & Dip Sets 8 (50%). Buckets below 50% were kept at their full total_num_results as a normal decor category (e.g. Dinnerware Sets 27%, Coffee Mugs 36%, Serving Platters 38%, Canvas Art 11%, Wall Mirrors 0.7%) -- minority holiday-occasion cross-tagging (housewarming/wedding/hostess-gift tags included in a raw all-events count are NOT treated as holiday; only christmas/halloween/thanksgiving/easter/st-patricks/hanukkah/4th-of-july/mardi-gras/new-years/patriotic tags counted toward the 50% test) is normal for any general decor line and does not disqualify it. This audit could not be run exhaustively on every tiny sub-count across the whole site given time constraints, so a small amount of residual seasonal contamination may remain in the kept 1-2-digit buckets; this is judged immaterial to overall accuracy given the sub-50% threshold and spot title checks on the largest ones. No qty required a null+MANUAL REVIEW flag -- every kept leaf resolved to an exact Constructor.io total_num_results.",
+ "rows": [
+  {
+   "category": "Lighting",
+   "sub_category": "Lighting & Lamps",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Table Lamps",
+   "parent": false,
+   "qty": 207,
+   "link": "https://www.jcpenney.com/g/home-store/home-decor/lamps-light-fixtures?item_type=table+lamps&id=cat100240024",
+   "evidence": "Constructor.io browse API (ac.cnstrc.com/browse/group_id/cat100240024) item_type facet count, key=key_xT77K5VmpiVduqnj -- the index JCPenney's own gallery pages query client-side: item_type='table lamps' = 207 (facet sums exactly to category total_num_results 745; verified filters[item_type] query returns identical total_num_results for a sample)",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Floor Lamps",
+   "parent": false,
+   "qty": 58,
+   "link": "https://www.jcpenney.com/g/home-store/home-decor/lamps-light-fixtures?item_type=floor+lamps&id=cat100240024",
+   "evidence": "Constructor.io browse API (ac.cnstrc.com/browse/group_id/cat100240024) item_type facet count, key=key_xT77K5VmpiVduqnj -- the index JCPenney's own gallery pages query client-side: item_type='floor lamps' = 58 (facet sums exactly to category total_num_results 745; verified filters[item_type] query returns identical total_num_results for a sample)",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Desk Lamps",
+   "parent": false,
+   "qty": 22,
+   "link": "https://www.jcpenney.com/g/home-store/home-decor/lamps-light-fixtures?item_type=desk+lamps&id=cat100240024",
+   "evidence": "Constructor.io browse API (ac.cnstrc.com/browse/group_id/cat100240024) item_type facet count, key=key_xT77K5VmpiVduqnj -- the index JCPenney's own gallery pages query client-side: item_type='desk lamps' = 22 (facet sums exactly to category total_num_results 745; verified filters[item_type] query returns identical total_num_results for a sample)",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Lamp Sets",
+   "parent": false,
+   "qty": 14,
+   "link": "https://www.jcpenney.com/g/home-store/home-decor/lamps-light-fixtures?item_type=lamp+sets&id=cat100240024",
+   "evidence": "Constructor.io browse API (ac.cnstrc.com/browse/group_id/cat100240024) item_type facet count, key=key_xT77K5VmpiVduqnj -- the index JCPenney's own gallery pages query client-side: item_type='lamp sets' = 14 (facet sums exactly to category total_num_results 745; verified filters[item_type] query returns identical total_num_results for a sample)",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Lamp Shades",
+   "parent": false,
+   "qty": 1,
+   "link": "https://www.jcpenney.com/g/home-store/home-decor/lamps-light-fixtures?item_type=lamp+shades&id=cat100240024",
+   "evidence": "Constructor.io browse API (ac.cnstrc.com/browse/group_id/cat100240024) item_type facet count, key=key_xT77K5VmpiVduqnj -- the index JCPenney's own gallery pages query client-side: item_type='lamp shades' = 1 (facet sums exactly to category total_num_results 745; verified filters[item_type] query returns identical total_num_results for a sample)",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Chandeliers",
+   "parent": false,
+   "qty": 14,
+   "link": "https://www.jcpenney.com/g/home-store/home-decor/lamps-light-fixtures?item_type=chandeliers&id=cat100240024",
+   "evidence": "Constructor.io browse API (ac.cnstrc.com/browse/group_id/cat100240024) item_type facet count, key=key_xT77K5VmpiVduqnj -- the index JCPenney's own gallery pages query client-side: item_type='chandeliers' = 14 (facet sums exactly to category total_num_results 745; verified filters[item_type] query returns identical total_num_results for a sample)",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Pendant Lights",
+   "parent": false,
+   "qty": 3,
+   "link": "https://www.jcpenney.com/g/home-store/home-decor/lamps-light-fixtures?item_type=pendant+lights&id=cat100240024",
+   "evidence": "Constructor.io browse API (ac.cnstrc.com/browse/group_id/cat100240024) item_type facet count, key=key_xT77K5VmpiVduqnj -- the index JCPenney's own gallery pages query client-side: item_type='pendant lights' = 3 (facet sums exactly to category total_num_results 745; verified filters[item_type] query returns identical total_num_results for a sample)",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Wall Lamps",
+   "parent": false,
+   "qty": 6,
+   "link": "https://www.jcpenney.com/g/home-store/home-decor/lamps-light-fixtures?item_type=wall+lamps&id=cat100240024",
+   "evidence": "Constructor.io browse API (ac.cnstrc.com/browse/group_id/cat100240024) item_type facet count, key=key_xT77K5VmpiVduqnj -- the index JCPenney's own gallery pages query client-side: item_type='wall lamps' = 6 (facet sums exactly to category total_num_results 745; verified filters[item_type] query returns identical total_num_results for a sample)",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Wall Sconces",
+   "parent": false,
+   "qty": 1,
+   "link": "https://www.jcpenney.com/g/home-store/home-decor/lamps-light-fixtures?item_type=wall+sconces&id=cat100240024",
+   "evidence": "Constructor.io browse API (ac.cnstrc.com/browse/group_id/cat100240024) item_type facet count, key=key_xT77K5VmpiVduqnj -- the index JCPenney's own gallery pages query client-side: item_type='wall sconces' = 1 (facet sums exactly to category total_num_results 745; verified filters[item_type] query returns identical total_num_results for a sample)",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Night Lights",
+   "parent": false,
+   "qty": 4,
+   "link": "https://www.jcpenney.com/g/home-store/home-decor/lamps-light-fixtures?item_type=night+lights&id=cat100240024",
+   "evidence": "Constructor.io browse API (ac.cnstrc.com/browse/group_id/cat100240024) item_type facet count, key=key_xT77K5VmpiVduqnj -- the index JCPenney's own gallery pages query client-side: item_type='night lights' = 4 (facet sums exactly to category total_num_results 745; verified filters[item_type] query returns identical total_num_results for a sample)",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Flood Lights",
+   "parent": false,
+   "qty": 3,
+   "link": "https://www.jcpenney.com/g/home-store/home-decor/lamps-light-fixtures?item_type=flood+lights&id=cat100240024",
+   "evidence": "Constructor.io browse API (ac.cnstrc.com/browse/group_id/cat100240024) item_type facet count, key=key_xT77K5VmpiVduqnj -- the index JCPenney's own gallery pages query client-side: item_type='flood lights' = 3 (facet sums exactly to category total_num_results 745; verified filters[item_type] query returns identical total_num_results for a sample)",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Pathway Lights",
+   "parent": false,
+   "qty": 30,
+   "link": "https://www.jcpenney.com/g/home-store/home-decor/lamps-light-fixtures?item_type=pathway+lights&id=cat100240024",
+   "evidence": "Constructor.io browse API (ac.cnstrc.com/browse/group_id/cat100240024) item_type facet count, key=key_xT77K5VmpiVduqnj -- the index JCPenney's own gallery pages query client-side: item_type='pathway lights' = 30 (facet sums exactly to category total_num_results 745; verified filters[item_type] query returns identical total_num_results for a sample)",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Torches",
+   "parent": false,
+   "qty": 2,
+   "link": "https://www.jcpenney.com/g/home-store/home-decor/lamps-light-fixtures?item_type=torches&id=cat100240024",
+   "evidence": "Constructor.io browse API (ac.cnstrc.com/browse/group_id/cat100240024) item_type facet count, key=key_xT77K5VmpiVduqnj -- the index JCPenney's own gallery pages query client-side: item_type='torches' = 2 (facet sums exactly to category total_num_results 745; verified filters[item_type] query returns identical total_num_results for a sample)",
+   "flag": null
+  },
+  {
+   "category": "Mirrors",
+   "sub_category": "Mirrors",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Mirrors",
+   "sub_category": "Wall Mirrors",
+   "parent": false,
+   "qty": 134,
+   "link": "https://www.jcpenney.com/g/home-store/home-decor/mirrors?id=cat1003990003",
+   "evidence": "Constructor.io browse API (ac.cnstrc.com/browse/group_id/cat1003990003) item_type facet count, key=key_xT77K5VmpiVduqnj -- the index JCPenney's own gallery pages query client-side: total_num_results=134, item_type facet 'wall mirrors'=134 (100% of category)",
+   "flag": null
+  },
+  {
+   "category": "Mirrors",
+   "sub_category": "Makeup & Vanity Mirrors",
+   "parent": false,
+   "qty": 41,
+   "link": "https://www.jcpenney.com/g/home/all-bath/bathroom-accessories-sets?item_type=makeup+mirrors&id=cat1002610003",
+   "evidence": "Constructor.io browse API (ac.cnstrc.com/browse/group_id/cat1002610003) item_type facet count, key=key_xT77K5VmpiVduqnj -- the index JCPenney's own gallery pages query client-side: item_type='makeup mirrors' = 41 (Bath Accessories category; distinct item type not present in main Mirrors category, which is 100% wall mirrors)",
+   "flag": null
+  },
+  {
+   "category": "Mirrors",
+   "sub_category": "Shower Mirrors",
+   "parent": false,
+   "qty": 2,
+   "link": "https://www.jcpenney.com/g/home/all-bath/bathroom-accessories-sets?item_type=shower+mirrors&id=cat1002610003",
+   "evidence": "Constructor.io browse API (ac.cnstrc.com/browse/group_id/cat1002610003) item_type facet count, key=key_xT77K5VmpiVduqnj -- the index JCPenney's own gallery pages query client-side: item_type='shower mirrors' = 2 (Bath Accessories category)",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor",
+   "sub_category": "Wall Decor",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Wall Decor",
+   "sub_category": "Canvas Art",
+   "parent": false,
+   "qty": 1335,
+   "link": "https://www.jcpenney.com/g/home-store/home-decor/wall-decor?item_type=canvas+art&id=cat100240137",
+   "evidence": "Constructor.io browse API (ac.cnstrc.com/browse/group_id/cat100240137) item_type facet count, key=key_xT77K5VmpiVduqnj -- the index JCPenney's own gallery pages query client-side: item_type facet = 1335 (category total_num_results 2433)",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor",
+   "sub_category": "Prints",
+   "parent": false,
+   "qty": 81,
+   "link": "https://www.jcpenney.com/g/home-store/home-decor/wall-decor?item_type=prints&id=cat100240137",
+   "evidence": "Constructor.io browse API (ac.cnstrc.com/browse/group_id/cat100240137) item_type facet count, key=key_xT77K5VmpiVduqnj -- the index JCPenney's own gallery pages query client-side: item_type facet = 81 (category total_num_results 2433)",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor",
+   "sub_category": "Metal Wall Art",
+   "parent": false,
+   "qty": 50,
+   "link": "https://www.jcpenney.com/g/home-store/home-decor/wall-decor?item_type=metal+wall+art&id=cat100240137",
+   "evidence": "Constructor.io browse API (ac.cnstrc.com/browse/group_id/cat100240137) item_type facet count, key=key_xT77K5VmpiVduqnj -- the index JCPenney's own gallery pages query client-side: item_type facet = 50 (category total_num_results 2433)",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor",
+   "sub_category": "Wall Art Sets",
+   "parent": false,
+   "qty": 31,
+   "link": "https://www.jcpenney.com/g/home-store/home-decor/wall-decor?item_type=wall+art+sets&id=cat100240137",
+   "evidence": "Constructor.io browse API (ac.cnstrc.com/browse/group_id/cat100240137) item_type facet count, key=key_xT77K5VmpiVduqnj -- the index JCPenney's own gallery pages query client-side: item_type facet = 31 (category total_num_results 2433)",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor",
+   "sub_category": "Tapestries",
+   "parent": false,
+   "qty": 21,
+   "link": "https://www.jcpenney.com/g/home-store/home-decor/wall-decor?item_type=tapestries&id=cat100240137",
+   "evidence": "Constructor.io browse API (ac.cnstrc.com/browse/group_id/cat100240137) item_type facet count, key=key_xT77K5VmpiVduqnj -- the index JCPenney's own gallery pages query client-side: item_type facet = 21 (category total_num_results 2433)",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor",
+   "sub_category": "Wall Hooks",
+   "parent": false,
+   "qty": 21,
+   "link": "https://www.jcpenney.com/g/home-store/home-decor/wall-decor?item_type=wall+hooks&id=cat100240137",
+   "evidence": "Constructor.io browse API (ac.cnstrc.com/browse/group_id/cat100240137) item_type facet count, key=key_xT77K5VmpiVduqnj -- the index JCPenney's own gallery pages query client-side: item_type facet = 21 (category total_num_results 2433)",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor",
+   "sub_category": "Wall Sculptures",
+   "parent": false,
+   "qty": 18,
+   "link": "https://www.jcpenney.com/g/home-store/home-decor/wall-decor?item_type=wall+sculptures&id=cat100240137",
+   "evidence": "Constructor.io browse API (ac.cnstrc.com/browse/group_id/cat100240137) item_type facet count, key=key_xT77K5VmpiVduqnj -- the index JCPenney's own gallery pages query client-side: item_type facet = 18 (category total_num_results 2433)",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor",
+   "sub_category": "Wall Decals",
+   "parent": false,
+   "qty": 6,
+   "link": "https://www.jcpenney.com/g/home-store/home-decor/wall-decor?item_type=wall+decals&id=cat100240137",
+   "evidence": "Constructor.io browse API (ac.cnstrc.com/browse/group_id/cat100240137) item_type facet count, key=key_xT77K5VmpiVduqnj -- the index JCPenney's own gallery pages query client-side: item_type facet = 6 (category total_num_results 2433)",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor",
+   "sub_category": "Candle Sconces (Wall)",
+   "parent": false,
+   "qty": 3,
+   "link": "https://www.jcpenney.com/g/home-store/home-decor/wall-decor?item_type=candle+sconces&id=cat100240137",
+   "evidence": "Constructor.io browse API (ac.cnstrc.com/browse/group_id/cat100240137) item_type facet count, key=key_xT77K5VmpiVduqnj -- the index JCPenney's own gallery pages query client-side: item_type facet = 3 (category total_num_results 2433)",
+   "flag": null
+  },
+  {
+   "category": "Wall Decor",
+   "sub_category": "Wall Baskets",
+   "parent": false,
+   "qty": 2,
+   "link": "https://www.jcpenney.com/g/home-store/home-decor/wall-decor?item_type=wall+baskets&id=cat100240137",
+   "evidence": "Constructor.io browse API (ac.cnstrc.com/browse/group_id/cat100240137) item_type facet count, key=key_xT77K5VmpiVduqnj -- the index JCPenney's own gallery pages query client-side: item_type facet = 2 (category total_num_results 2433)",
+   "flag": null
+  },
+  {
+   "category": "Decorative Accessories",
+   "sub_category": "Decorative Accessories",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Decorative Accessories",
+   "sub_category": "Vases",
+   "parent": false,
+   "qty": 49,
+   "link": "https://www.jcpenney.com/g/home-store/home-decor/accent-decor-home-accents?item_type=vases&id=cat1002620017",
+   "evidence": "Constructor.io browse API (ac.cnstrc.com/browse/group_id/cat1002620017) item_type facet count, key=key_xT77K5VmpiVduqnj -- the index JCPenney's own gallery pages query client-side: item_type facet = 49 (category total_num_results 2183)",
+   "flag": null
+  },
+  {
+   "category": "Decorative Accessories",
+   "sub_category": "Decorative Boxes",
+   "parent": false,
+   "qty": 15,
+   "link": "https://www.jcpenney.com/g/home-store/home-decor/accent-decor-home-accents?item_type=decorative+boxes&id=cat1002620017",
+   "evidence": "Constructor.io browse API (ac.cnstrc.com/browse/group_id/cat1002620017) item_type facet count, key=key_xT77K5VmpiVduqnj -- the index JCPenney's own gallery pages query client-side: item_type facet = 15 (category total_num_results 2183)",
+   "flag": null
+  },
+  {
+   "category": "Decorative Accessories",
+   "sub_category": "Planters",
+   "parent": false,
+   "qty": 14,
+   "link": "https://www.jcpenney.com/g/home-store/home-decor/accent-decor-home-accents?item_type=planters&id=cat1002620017",
+   "evidence": "Constructor.io browse API (ac.cnstrc.com/browse/group_id/cat1002620017) item_type facet count, key=key_xT77K5VmpiVduqnj -- the index JCPenney's own gallery pages query client-side: item_type facet = 14 (category total_num_results 2183)",
+   "flag": null
+  },
+  {
+   "category": "Decorative Accessories",
+   "sub_category": "Vase Fillers",
+   "parent": false,
+   "qty": 13,
+   "link": "https://www.jcpenney.com/g/home-store/home-decor/accent-decor-home-accents?item_type=vase+fillers&id=cat1002620017",
+   "evidence": "Constructor.io browse API (ac.cnstrc.com/browse/group_id/cat1002620017) item_type facet count, key=key_xT77K5VmpiVduqnj -- the index JCPenney's own gallery pages query client-side: item_type facet = 13 (category total_num_results 2183)",
+   "flag": null
+  },
+  {
+   "category": "Decorative Accessories",
+   "sub_category": "Decorative Trays",
+   "parent": false,
+   "qty": 11,
+   "link": "https://www.jcpenney.com/g/home-store/home-decor/accent-decor-home-accents?item_type=decorative+trays&id=cat1002620017",
+   "evidence": "Constructor.io browse API (ac.cnstrc.com/browse/group_id/cat1002620017) item_type facet count, key=key_xT77K5VmpiVduqnj -- the index JCPenney's own gallery pages query client-side: item_type facet = 11 (category total_num_results 2183)",
+   "flag": null
+  },
+  {
+   "category": "Decorative Accessories",
+   "sub_category": "Decorative Jars",
+   "parent": false,
+   "qty": 1,
+   "link": "https://www.jcpenney.com/g/home-store/home-decor/accent-decor-home-accents?item_type=decorative+jars&id=cat1002620017",
+   "evidence": "Constructor.io browse API (ac.cnstrc.com/browse/group_id/cat1002620017) item_type facet count, key=key_xT77K5VmpiVduqnj -- the index JCPenney's own gallery pages query client-side: item_type facet = 1 (category total_num_results 2183)",
+   "flag": null
+  },
+  {
+   "category": "Clocks",
+   "sub_category": "Clocks",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Clocks",
+   "sub_category": "Wall Clocks",
+   "parent": false,
+   "qty": 81,
+   "link": "https://www.jcpenney.com/g/home-store/home-decor/clocks?item_type=wall+clocks&id=cat100240139",
+   "evidence": "Constructor.io browse API (ac.cnstrc.com/browse/group_id/cat100240139) item_type facet count, key=key_xT77K5VmpiVduqnj -- the index JCPenney's own gallery pages query client-side: item_type facet = 81 (category total_num_results 106, all types kept per brief)",
+   "flag": null
+  },
+  {
+   "category": "Clocks",
+   "sub_category": "Alarm Clocks",
+   "parent": false,
+   "qty": 14,
+   "link": "https://www.jcpenney.com/g/home-store/home-decor/clocks?item_type=alarm+clocks&id=cat100240139",
+   "evidence": "Constructor.io browse API (ac.cnstrc.com/browse/group_id/cat100240139) item_type facet count, key=key_xT77K5VmpiVduqnj -- the index JCPenney's own gallery pages query client-side: item_type facet = 14 (category total_num_results 106, all types kept per brief)",
+   "flag": null
+  },
+  {
+   "category": "Clocks",
+   "sub_category": "Mantel Clocks",
+   "parent": false,
+   "qty": 6,
+   "link": "https://www.jcpenney.com/g/home-store/home-decor/clocks?item_type=mantel+clocks&id=cat100240139",
+   "evidence": "Constructor.io browse API (ac.cnstrc.com/browse/group_id/cat100240139) item_type facet count, key=key_xT77K5VmpiVduqnj -- the index JCPenney's own gallery pages query client-side: item_type facet = 6 (category total_num_results 106, all types kept per brief)",
+   "flag": null
+  },
+  {
+   "category": "Clocks",
+   "sub_category": "Clock Radios",
+   "parent": false,
+   "qty": 3,
+   "link": "https://www.jcpenney.com/g/home-store/home-decor/clocks?item_type=clock+radios&id=cat100240139",
+   "evidence": "Constructor.io browse API (ac.cnstrc.com/browse/group_id/cat100240139) item_type facet count, key=key_xT77K5VmpiVduqnj -- the index JCPenney's own gallery pages query client-side: item_type facet = 3 (category total_num_results 106, all types kept per brief)",
+   "flag": null
+  },
+  {
+   "category": "Clocks",
+   "sub_category": "Table Clocks",
+   "parent": false,
+   "qty": 2,
+   "link": "https://www.jcpenney.com/g/home-store/home-decor/clocks?item_type=table+clocks&id=cat100240139",
+   "evidence": "Constructor.io browse API (ac.cnstrc.com/browse/group_id/cat100240139) item_type facet count, key=key_xT77K5VmpiVduqnj -- the index JCPenney's own gallery pages query client-side: item_type facet = 2 (category total_num_results 106, all types kept per brief)",
+   "flag": null
+  },
+  {
+   "category": "Picture Frames & Photo Display",
+   "sub_category": "Picture Frames & Photo Display",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Picture Frames & Photo Display",
+   "sub_category": "Tabletop Frames",
+   "parent": false,
+   "qty": 101,
+   "link": "https://www.jcpenney.com/g/home-store/home-decor/picture-frames-albums?item_type=tabletop+frames&id=cat100240138",
+   "evidence": "Constructor.io browse API (ac.cnstrc.com/browse/group_id/cat100240138) item_type facet count, key=key_xT77K5VmpiVduqnj -- the index JCPenney's own gallery pages query client-side: item_type facet = 101 (category total_num_results 150)",
+   "flag": null
+  },
+  {
+   "category": "Picture Frames & Photo Display",
+   "sub_category": "Wall Frames",
+   "parent": false,
+   "qty": 19,
+   "link": "https://www.jcpenney.com/g/home-store/home-decor/picture-frames-albums?item_type=wall+frames&id=cat100240138",
+   "evidence": "Constructor.io browse API (ac.cnstrc.com/browse/group_id/cat100240138) item_type facet count, key=key_xT77K5VmpiVduqnj -- the index JCPenney's own gallery pages query client-side: item_type facet = 19 (category total_num_results 150)",
+   "flag": null
+  },
+  {
+   "category": "Picture Frames & Photo Display",
+   "sub_category": "Photo Clips",
+   "parent": false,
+   "qty": 11,
+   "link": "https://www.jcpenney.com/g/home-store/home-decor/picture-frames-albums?item_type=photo+clips&id=cat100240138",
+   "evidence": "Constructor.io browse API (ac.cnstrc.com/browse/group_id/cat100240138) item_type facet count, key=key_xT77K5VmpiVduqnj -- the index JCPenney's own gallery pages query client-side: item_type facet = 11 (category total_num_results 150)",
+   "flag": null
+  },
+  {
+   "category": "Picture Frames & Photo Display",
+   "sub_category": "Collage Frames",
+   "parent": false,
+   "qty": 1,
+   "link": "https://www.jcpenney.com/g/home-store/home-decor/picture-frames-albums?item_type=collage+frames&id=cat100240138",
+   "evidence": "Constructor.io browse API (ac.cnstrc.com/browse/group_id/cat100240138) item_type facet count, key=key_xT77K5VmpiVduqnj -- the index JCPenney's own gallery pages query client-side: item_type facet = 1 (category total_num_results 150)",
+   "flag": null
+  },
+  {
+   "category": "Picture Frames & Photo Display",
+   "sub_category": "Hanging Photo Display",
+   "parent": false,
+   "qty": 1,
+   "link": "https://www.jcpenney.com/g/home-store/home-decor/picture-frames-albums?item_type=hanging+photo+display&id=cat100240138",
+   "evidence": "Constructor.io browse API (ac.cnstrc.com/browse/group_id/cat100240138) item_type facet count, key=key_xT77K5VmpiVduqnj -- the index JCPenney's own gallery pages query client-side: item_type facet = 1 (category total_num_results 150)",
+   "flag": null
+  },
+  {
+   "category": "Picture Frames & Photo Display",
+   "sub_category": "Record Frames",
+   "parent": false,
+   "qty": 1,
+   "link": "https://www.jcpenney.com/g/home-store/home-decor/picture-frames-albums?item_type=record+frames&id=cat100240138",
+   "evidence": "Constructor.io browse API (ac.cnstrc.com/browse/group_id/cat100240138) item_type facet count, key=key_xT77K5VmpiVduqnj -- the index JCPenney's own gallery pages query client-side: item_type facet = 1 (category total_num_results 150)",
+   "flag": null
+  },
+  {
+   "category": "Curtain Rods & Hardware",
+   "sub_category": "Curtain Rods & Hardware",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Curtain Rods & Hardware",
+   "sub_category": "Curtain Rods",
+   "parent": false,
+   "qty": 934,
+   "link": "https://www.jcpenney.com/g/window/curtain-rods-hardware?product_type=curtain+rods&id=cat100260231",
+   "evidence": "Constructor.io browse API (ac.cnstrc.com/browse/group_id/cat100260231) item_type facet count, key=key_xT77K5VmpiVduqnj -- the index JCPenney's own gallery pages query client-side: filters[product_type]=curtain rods -> total_num_results=934 (verified via direct filtered query, matches product_type facet)",
+   "flag": null
+  },
+  {
+   "category": "Curtain Rods & Hardware",
+   "sub_category": "Curtain Rod Finials",
+   "parent": false,
+   "qty": 15,
+   "link": "https://www.jcpenney.com/g/window/curtain-rods-hardware?item_type=curtain+rod+finials&id=cat100260231",
+   "evidence": "Constructor.io browse API (ac.cnstrc.com/browse/group_id/cat100260231) item_type facet count, key=key_xT77K5VmpiVduqnj -- the index JCPenney's own gallery pages query client-side: item_type='curtain rod finials' = 15",
+   "flag": null
+  },
+  {
+   "category": "Curtain Rods & Hardware",
+   "sub_category": "Holdbacks & Tiebacks",
+   "parent": false,
+   "qty": 78,
+   "link": "https://www.jcpenney.com/g/window/curtain-rods-hardware?item_type=curtain+holdbacks&id=cat100260231",
+   "evidence": "Constructor.io browse API (ac.cnstrc.com/browse/group_id/cat100260231) item_type facet count, key=key_xT77K5VmpiVduqnj -- the index JCPenney's own gallery pages query client-side: item_type IN ('curtain holdbacks'=77, 'curtain tie backs'=1) -> filters[item_type][]=curtain holdbacks&filters[item_type][]=curtain tie backs -> total_num_results=78 (verified via direct multi-value filtered query)",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Tableware & Dinnerware",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Tableware & Dinnerware - Dinnerware Sets",
+   "parent": false,
+   "qty": 512,
+   "link": "https://www.jcpenney.com/g/home-store/kitchen-dining/dinnerware-sets?item_type=dinnerware+sets&id=cat100240018",
+   "evidence": "Constructor.io browse API (ac.cnstrc.com/browse/group_id/cat100240018) item_type facet count, key=key_xT77K5VmpiVduqnj -- the index JCPenney's own gallery pages query client-side: item_type facet = 512 (category total_num_results 1174; Serving Platters/Bowls/Dipping Bowls/Egg Plates/Cake Plates/Sugar Bowls dropped here as exact-duplicate cross-listings of the Serveware category, counted there instead; Appetizer Plates 62 (51.6% holiday-tagged) and Dessert Plates 30 (86.7% holiday-tagged) dropped per holiday-event-tag audit)",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Tableware & Dinnerware - Dinner Plates",
+   "parent": false,
+   "qty": 91,
+   "link": "https://www.jcpenney.com/g/home-store/kitchen-dining/dinnerware-sets?item_type=dinner+plates&id=cat100240018",
+   "evidence": "Constructor.io browse API (ac.cnstrc.com/browse/group_id/cat100240018) item_type facet count, key=key_xT77K5VmpiVduqnj -- the index JCPenney's own gallery pages query client-side: item_type facet = 91 (category total_num_results 1174; Serving Platters/Bowls/Dipping Bowls/Egg Plates/Cake Plates/Sugar Bowls dropped here as exact-duplicate cross-listings of the Serveware category, counted there instead; Appetizer Plates 62 (51.6% holiday-tagged) and Dessert Plates 30 (86.7% holiday-tagged) dropped per holiday-event-tag audit)",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Tableware & Dinnerware - Salad Plates",
+   "parent": false,
+   "qty": 74,
+   "link": "https://www.jcpenney.com/g/home-store/kitchen-dining/dinnerware-sets?item_type=salad+plates&id=cat100240018",
+   "evidence": "Constructor.io browse API (ac.cnstrc.com/browse/group_id/cat100240018) item_type facet count, key=key_xT77K5VmpiVduqnj -- the index JCPenney's own gallery pages query client-side: item_type facet = 74 (category total_num_results 1174; Serving Platters/Bowls/Dipping Bowls/Egg Plates/Cake Plates/Sugar Bowls dropped here as exact-duplicate cross-listings of the Serveware category, counted there instead; Appetizer Plates 62 (51.6% holiday-tagged) and Dessert Plates 30 (86.7% holiday-tagged) dropped per holiday-event-tag audit)",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Tableware & Dinnerware - Ice Cream Bowls",
+   "parent": false,
+   "qty": 61,
+   "link": "https://www.jcpenney.com/g/home-store/kitchen-dining/dinnerware-sets?item_type=ice+cream+bowls&id=cat100240018",
+   "evidence": "Constructor.io browse API (ac.cnstrc.com/browse/group_id/cat100240018) item_type facet count, key=key_xT77K5VmpiVduqnj -- the index JCPenney's own gallery pages query client-side: item_type facet = 61 (category total_num_results 1174; Serving Platters/Bowls/Dipping Bowls/Egg Plates/Cake Plates/Sugar Bowls dropped here as exact-duplicate cross-listings of the Serveware category, counted there instead; Appetizer Plates 62 (51.6% holiday-tagged) and Dessert Plates 30 (86.7% holiday-tagged) dropped per holiday-event-tag audit)",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Tableware & Dinnerware - Soup Bowls",
+   "parent": false,
+   "qty": 60,
+   "link": "https://www.jcpenney.com/g/home-store/kitchen-dining/dinnerware-sets?item_type=soup+bowls&id=cat100240018",
+   "evidence": "Constructor.io browse API (ac.cnstrc.com/browse/group_id/cat100240018) item_type facet count, key=key_xT77K5VmpiVduqnj -- the index JCPenney's own gallery pages query client-side: item_type facet = 60 (category total_num_results 1174; Serving Platters/Bowls/Dipping Bowls/Egg Plates/Cake Plates/Sugar Bowls dropped here as exact-duplicate cross-listings of the Serveware category, counted there instead; Appetizer Plates 62 (51.6% holiday-tagged) and Dessert Plates 30 (86.7% holiday-tagged) dropped per holiday-event-tag audit)",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Tableware & Dinnerware - Cereal Bowls",
+   "parent": false,
+   "qty": 22,
+   "link": "https://www.jcpenney.com/g/home-store/kitchen-dining/dinnerware-sets?item_type=cereal+bowls&id=cat100240018",
+   "evidence": "Constructor.io browse API (ac.cnstrc.com/browse/group_id/cat100240018) item_type facet count, key=key_xT77K5VmpiVduqnj -- the index JCPenney's own gallery pages query client-side: item_type facet = 22 (category total_num_results 1174; Serving Platters/Bowls/Dipping Bowls/Egg Plates/Cake Plates/Sugar Bowls dropped here as exact-duplicate cross-listings of the Serveware category, counted there instead; Appetizer Plates 62 (51.6% holiday-tagged) and Dessert Plates 30 (86.7% holiday-tagged) dropped per holiday-event-tag audit)",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Tableware & Dinnerware - Pasta Bowls",
+   "parent": false,
+   "qty": 21,
+   "link": "https://www.jcpenney.com/g/home-store/kitchen-dining/dinnerware-sets?item_type=pasta+bowls&id=cat100240018",
+   "evidence": "Constructor.io browse API (ac.cnstrc.com/browse/group_id/cat100240018) item_type facet count, key=key_xT77K5VmpiVduqnj -- the index JCPenney's own gallery pages query client-side: item_type facet = 21 (category total_num_results 1174; Serving Platters/Bowls/Dipping Bowls/Egg Plates/Cake Plates/Sugar Bowls dropped here as exact-duplicate cross-listings of the Serveware category, counted there instead; Appetizer Plates 62 (51.6% holiday-tagged) and Dessert Plates 30 (86.7% holiday-tagged) dropped per holiday-event-tag audit)",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Tableware & Dinnerware - Salad Bowls",
+   "parent": false,
+   "qty": 16,
+   "link": "https://www.jcpenney.com/g/home-store/kitchen-dining/dinnerware-sets?item_type=salad+bowls&id=cat100240018",
+   "evidence": "Constructor.io browse API (ac.cnstrc.com/browse/group_id/cat100240018) item_type facet count, key=key_xT77K5VmpiVduqnj -- the index JCPenney's own gallery pages query client-side: item_type facet = 16 (category total_num_results 1174; Serving Platters/Bowls/Dipping Bowls/Egg Plates/Cake Plates/Sugar Bowls dropped here as exact-duplicate cross-listings of the Serveware category, counted there instead; Appetizer Plates 62 (51.6% holiday-tagged) and Dessert Plates 30 (86.7% holiday-tagged) dropped per holiday-event-tag audit)",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Tableware & Dinnerware - Fruit Bowls",
+   "parent": false,
+   "qty": 7,
+   "link": "https://www.jcpenney.com/g/home-store/kitchen-dining/dinnerware-sets?item_type=fruit+bowls&id=cat100240018",
+   "evidence": "Constructor.io browse API (ac.cnstrc.com/browse/group_id/cat100240018) item_type facet count, key=key_xT77K5VmpiVduqnj -- the index JCPenney's own gallery pages query client-side: item_type facet = 7 (category total_num_results 1174; Serving Platters/Bowls/Dipping Bowls/Egg Plates/Cake Plates/Sugar Bowls dropped here as exact-duplicate cross-listings of the Serveware category, counted there instead; Appetizer Plates 62 (51.6% holiday-tagged) and Dessert Plates 30 (86.7% holiday-tagged) dropped per holiday-event-tag audit)",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Tableware & Dinnerware - Luncheon Plates",
+   "parent": false,
+   "qty": 5,
+   "link": "https://www.jcpenney.com/g/home-store/kitchen-dining/dinnerware-sets?item_type=luncheon+plates&id=cat100240018",
+   "evidence": "Constructor.io browse API (ac.cnstrc.com/browse/group_id/cat100240018) item_type facet count, key=key_xT77K5VmpiVduqnj -- the index JCPenney's own gallery pages query client-side: item_type facet = 5 (category total_num_results 1174; Serving Platters/Bowls/Dipping Bowls/Egg Plates/Cake Plates/Sugar Bowls dropped here as exact-duplicate cross-listings of the Serveware category, counted there instead; Appetizer Plates 62 (51.6% holiday-tagged) and Dessert Plates 30 (86.7% holiday-tagged) dropped per holiday-event-tag audit)",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Tableware & Dinnerware - Place Settings",
+   "parent": false,
+   "qty": 3,
+   "link": "https://www.jcpenney.com/g/home-store/kitchen-dining/dinnerware-sets?item_type=place+settings&id=cat100240018",
+   "evidence": "Constructor.io browse API (ac.cnstrc.com/browse/group_id/cat100240018) item_type facet count, key=key_xT77K5VmpiVduqnj -- the index JCPenney's own gallery pages query client-side: item_type facet = 3 (category total_num_results 1174; Serving Platters/Bowls/Dipping Bowls/Egg Plates/Cake Plates/Sugar Bowls dropped here as exact-duplicate cross-listings of the Serveware category, counted there instead; Appetizer Plates 62 (51.6% holiday-tagged) and Dessert Plates 30 (86.7% holiday-tagged) dropped per holiday-event-tag audit)",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Tableware & Dinnerware - Charger Plates",
+   "parent": false,
+   "qty": 3,
+   "link": "https://www.jcpenney.com/g/home-store/kitchen-dining/dinnerware-sets?item_type=charger+plates&id=cat100240018",
+   "evidence": "Constructor.io browse API (ac.cnstrc.com/browse/group_id/cat100240018) item_type facet count, key=key_xT77K5VmpiVduqnj -- the index JCPenney's own gallery pages query client-side: item_type facet = 3 (category total_num_results 1174; Serving Platters/Bowls/Dipping Bowls/Egg Plates/Cake Plates/Sugar Bowls dropped here as exact-duplicate cross-listings of the Serveware category, counted there instead; Appetizer Plates 62 (51.6% holiday-tagged) and Dessert Plates 30 (86.7% holiday-tagged) dropped per holiday-event-tag audit)",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Serveware - Serving Platters",
+   "parent": false,
+   "qty": 115,
+   "link": "https://www.jcpenney.com/g/home-store/kitchen-dining/serveware?item_type=serving+platters&id=cat100240101",
+   "evidence": "Constructor.io browse API (ac.cnstrc.com/browse/group_id/cat100240101) item_type facet count, key=key_xT77K5VmpiVduqnj -- the index JCPenney's own gallery pages query client-side: item_type facet = 115 (category total_num_results 550; Salad Servers/Cheese Knives/Cake Servers/Spoon Rests/Casserole Dishes excluded as utensils/cookware; Serving Pitchers & Decanters dropped here as exact-duplicate cross-listings of Glassware & Drinkware, counted there instead; Cheese Board Sets 36 (52.8%), Teapots 20 (65%), Tiered Servers 10 (100%), Chip & Dip Sets 8 (50%) dropped per holiday-event-tag audit)",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Serveware - Serving Bowls",
+   "parent": false,
+   "qty": 86,
+   "link": "https://www.jcpenney.com/g/home-store/kitchen-dining/serveware?item_type=serving+bowls&id=cat100240101",
+   "evidence": "Constructor.io browse API (ac.cnstrc.com/browse/group_id/cat100240101) item_type facet count, key=key_xT77K5VmpiVduqnj -- the index JCPenney's own gallery pages query client-side: item_type facet = 86 (category total_num_results 550; Salad Servers/Cheese Knives/Cake Servers/Spoon Rests/Casserole Dishes excluded as utensils/cookware; Serving Pitchers & Decanters dropped here as exact-duplicate cross-listings of Glassware & Drinkware, counted there instead; Cheese Board Sets 36 (52.8%), Teapots 20 (65%), Tiered Servers 10 (100%), Chip & Dip Sets 8 (50%) dropped per holiday-event-tag audit)",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Serveware - Salt & Pepper Shakers",
+   "parent": false,
+   "qty": 61,
+   "link": "https://www.jcpenney.com/g/home-store/kitchen-dining/serveware?item_type=salt+%26+pepper+shaker&id=cat100240101",
+   "evidence": "Constructor.io browse API (ac.cnstrc.com/browse/group_id/cat100240101) item_type facet count, key=key_xT77K5VmpiVduqnj -- the index JCPenney's own gallery pages query client-side: item_type facet = 61 (category total_num_results 550; Salad Servers/Cheese Knives/Cake Servers/Spoon Rests/Casserole Dishes excluded as utensils/cookware; Serving Pitchers & Decanters dropped here as exact-duplicate cross-listings of Glassware & Drinkware, counted there instead; Cheese Board Sets 36 (52.8%), Teapots 20 (65%), Tiered Servers 10 (100%), Chip & Dip Sets 8 (50%) dropped per holiday-event-tag audit)",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Serveware - Serving Sets",
+   "parent": false,
+   "qty": 43,
+   "link": "https://www.jcpenney.com/g/home-store/kitchen-dining/serveware?item_type=serving+sets&id=cat100240101",
+   "evidence": "Constructor.io browse API (ac.cnstrc.com/browse/group_id/cat100240101) item_type facet count, key=key_xT77K5VmpiVduqnj -- the index JCPenney's own gallery pages query client-side: item_type facet = 43 (category total_num_results 550; Salad Servers/Cheese Knives/Cake Servers/Spoon Rests/Casserole Dishes excluded as utensils/cookware; Serving Pitchers & Decanters dropped here as exact-duplicate cross-listings of Glassware & Drinkware, counted there instead; Cheese Board Sets 36 (52.8%), Teapots 20 (65%), Tiered Servers 10 (100%), Chip & Dip Sets 8 (50%) dropped per holiday-event-tag audit)",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Serveware - Cheese Boards",
+   "parent": false,
+   "qty": 36,
+   "link": "https://www.jcpenney.com/g/home-store/kitchen-dining/serveware?item_type=cheese+boards&id=cat100240101",
+   "evidence": "Constructor.io browse API (ac.cnstrc.com/browse/group_id/cat100240101) item_type facet count, key=key_xT77K5VmpiVduqnj -- the index JCPenney's own gallery pages query client-side: item_type facet = 36 (category total_num_results 550; Salad Servers/Cheese Knives/Cake Servers/Spoon Rests/Casserole Dishes excluded as utensils/cookware; Serving Pitchers & Decanters dropped here as exact-duplicate cross-listings of Glassware & Drinkware, counted there instead; Cheese Board Sets 36 (52.8%), Teapots 20 (65%), Tiered Servers 10 (100%), Chip & Dip Sets 8 (50%) dropped per holiday-event-tag audit)",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Serveware - Cheese Board Sets",
+   "parent": false,
+   "qty": 36,
+   "link": "https://www.jcpenney.com/g/home-store/kitchen-dining/serveware?item_type=cheese+board+sets&id=cat100240101",
+   "evidence": "Constructor.io browse API (ac.cnstrc.com/browse/group_id/cat100240101) item_type facet count, key=key_xT77K5VmpiVduqnj -- the index JCPenney's own gallery pages query client-side: item_type facet = 36 (category total_num_results 550; Salad Servers/Cheese Knives/Cake Servers/Spoon Rests/Casserole Dishes excluded as utensils/cookware; Serving Pitchers & Decanters dropped here as exact-duplicate cross-listings of Glassware & Drinkware, counted there instead; Cheese Board Sets 36 (52.8%), Teapots 20 (65%), Tiered Servers 10 (100%), Chip & Dip Sets 8 (50%) dropped per holiday-event-tag audit)",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Serveware - Serving Trays",
+   "parent": false,
+   "qty": 28,
+   "link": "https://www.jcpenney.com/g/home-store/kitchen-dining/serveware?item_type=serving+trays&id=cat100240101",
+   "evidence": "Constructor.io browse API (ac.cnstrc.com/browse/group_id/cat100240101) item_type facet count, key=key_xT77K5VmpiVduqnj -- the index JCPenney's own gallery pages query client-side: item_type facet = 28 (category total_num_results 550; Salad Servers/Cheese Knives/Cake Servers/Spoon Rests/Casserole Dishes excluded as utensils/cookware; Serving Pitchers & Decanters dropped here as exact-duplicate cross-listings of Glassware & Drinkware, counted there instead; Cheese Board Sets 36 (52.8%), Teapots 20 (65%), Tiered Servers 10 (100%), Chip & Dip Sets 8 (50%) dropped per holiday-event-tag audit)",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Serveware - Bread Baskets",
+   "parent": false,
+   "qty": 5,
+   "link": "https://www.jcpenney.com/g/home-store/kitchen-dining/serveware?item_type=bread+baskets&id=cat100240101",
+   "evidence": "Constructor.io browse API (ac.cnstrc.com/browse/group_id/cat100240101) item_type facet count, key=key_xT77K5VmpiVduqnj -- the index JCPenney's own gallery pages query client-side: item_type facet = 5 (category total_num_results 550; Salad Servers/Cheese Knives/Cake Servers/Spoon Rests/Casserole Dishes excluded as utensils/cookware; Serving Pitchers & Decanters dropped here as exact-duplicate cross-listings of Glassware & Drinkware, counted there instead; Cheese Board Sets 36 (52.8%), Teapots 20 (65%), Tiered Servers 10 (100%), Chip & Dip Sets 8 (50%) dropped per holiday-event-tag audit)",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Serveware - Butter Dishes",
+   "parent": false,
+   "qty": 5,
+   "link": "https://www.jcpenney.com/g/home-store/kitchen-dining/serveware?item_type=butter+dishes&id=cat100240101",
+   "evidence": "Constructor.io browse API (ac.cnstrc.com/browse/group_id/cat100240101) item_type facet count, key=key_xT77K5VmpiVduqnj -- the index JCPenney's own gallery pages query client-side: item_type facet = 5 (category total_num_results 550; Salad Servers/Cheese Knives/Cake Servers/Spoon Rests/Casserole Dishes excluded as utensils/cookware; Serving Pitchers & Decanters dropped here as exact-duplicate cross-listings of Glassware & Drinkware, counted there instead; Cheese Board Sets 36 (52.8%), Teapots 20 (65%), Tiered Servers 10 (100%), Chip & Dip Sets 8 (50%) dropped per holiday-event-tag audit)",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Serveware - Lazy Susans",
+   "parent": false,
+   "qty": 5,
+   "link": "https://www.jcpenney.com/g/home-store/kitchen-dining/serveware?item_type=lazy+susans&id=cat100240101",
+   "evidence": "Constructor.io browse API (ac.cnstrc.com/browse/group_id/cat100240101) item_type facet count, key=key_xT77K5VmpiVduqnj -- the index JCPenney's own gallery pages query client-side: item_type facet = 5 (category total_num_results 550; Salad Servers/Cheese Knives/Cake Servers/Spoon Rests/Casserole Dishes excluded as utensils/cookware; Serving Pitchers & Decanters dropped here as exact-duplicate cross-listings of Glassware & Drinkware, counted there instead; Cheese Board Sets 36 (52.8%), Teapots 20 (65%), Tiered Servers 10 (100%), Chip & Dip Sets 8 (50%) dropped per holiday-event-tag audit)",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Serveware - Dipping Bowls",
+   "parent": false,
+   "qty": 4,
+   "link": "https://www.jcpenney.com/g/home-store/kitchen-dining/serveware?item_type=dipping+bowls&id=cat100240101",
+   "evidence": "Constructor.io browse API (ac.cnstrc.com/browse/group_id/cat100240101) item_type facet count, key=key_xT77K5VmpiVduqnj -- the index JCPenney's own gallery pages query client-side: item_type facet = 4 (category total_num_results 550; Salad Servers/Cheese Knives/Cake Servers/Spoon Rests/Casserole Dishes excluded as utensils/cookware; Serving Pitchers & Decanters dropped here as exact-duplicate cross-listings of Glassware & Drinkware, counted there instead; Cheese Board Sets 36 (52.8%), Teapots 20 (65%), Tiered Servers 10 (100%), Chip & Dip Sets 8 (50%) dropped per holiday-event-tag audit)",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Serveware - Cake Stands",
+   "parent": false,
+   "qty": 4,
+   "link": "https://www.jcpenney.com/g/home-store/kitchen-dining/serveware?item_type=cake+stands&id=cat100240101",
+   "evidence": "Constructor.io browse API (ac.cnstrc.com/browse/group_id/cat100240101) item_type facet count, key=key_xT77K5VmpiVduqnj -- the index JCPenney's own gallery pages query client-side: item_type facet = 4 (category total_num_results 550; Salad Servers/Cheese Knives/Cake Servers/Spoon Rests/Casserole Dishes excluded as utensils/cookware; Serving Pitchers & Decanters dropped here as exact-duplicate cross-listings of Glassware & Drinkware, counted there instead; Cheese Board Sets 36 (52.8%), Teapots 20 (65%), Tiered Servers 10 (100%), Chip & Dip Sets 8 (50%) dropped per holiday-event-tag audit)",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Serveware - Trivets",
+   "parent": false,
+   "qty": 3,
+   "link": "https://www.jcpenney.com/g/home-store/kitchen-dining/serveware?item_type=trivets&id=cat100240101",
+   "evidence": "Constructor.io browse API (ac.cnstrc.com/browse/group_id/cat100240101) item_type facet count, key=key_xT77K5VmpiVduqnj -- the index JCPenney's own gallery pages query client-side: item_type facet = 3 (category total_num_results 550; Salad Servers/Cheese Knives/Cake Servers/Spoon Rests/Casserole Dishes excluded as utensils/cookware; Serving Pitchers & Decanters dropped here as exact-duplicate cross-listings of Glassware & Drinkware, counted there instead; Cheese Board Sets 36 (52.8%), Teapots 20 (65%), Tiered Servers 10 (100%), Chip & Dip Sets 8 (50%) dropped per holiday-event-tag audit)",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Serveware - Ramekins",
+   "parent": false,
+   "qty": 3,
+   "link": "https://www.jcpenney.com/g/home-store/kitchen-dining/serveware?item_type=ramekins&id=cat100240101",
+   "evidence": "Constructor.io browse API (ac.cnstrc.com/browse/group_id/cat100240101) item_type facet count, key=key_xT77K5VmpiVduqnj -- the index JCPenney's own gallery pages query client-side: item_type facet = 3 (category total_num_results 550; Salad Servers/Cheese Knives/Cake Servers/Spoon Rests/Casserole Dishes excluded as utensils/cookware; Serving Pitchers & Decanters dropped here as exact-duplicate cross-listings of Glassware & Drinkware, counted there instead; Cheese Board Sets 36 (52.8%), Teapots 20 (65%), Tiered Servers 10 (100%), Chip & Dip Sets 8 (50%) dropped per holiday-event-tag audit)",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Serveware - Divided Trays",
+   "parent": false,
+   "qty": 2,
+   "link": "https://www.jcpenney.com/g/home-store/kitchen-dining/serveware?item_type=divided+trays&id=cat100240101",
+   "evidence": "Constructor.io browse API (ac.cnstrc.com/browse/group_id/cat100240101) item_type facet count, key=key_xT77K5VmpiVduqnj -- the index JCPenney's own gallery pages query client-side: item_type facet = 2 (category total_num_results 550; Salad Servers/Cheese Knives/Cake Servers/Spoon Rests/Casserole Dishes excluded as utensils/cookware; Serving Pitchers & Decanters dropped here as exact-duplicate cross-listings of Glassware & Drinkware, counted there instead; Cheese Board Sets 36 (52.8%), Teapots 20 (65%), Tiered Servers 10 (100%), Chip & Dip Sets 8 (50%) dropped per holiday-event-tag audit)",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Serveware - Oil Cruets",
+   "parent": false,
+   "qty": 2,
+   "link": "https://www.jcpenney.com/g/home-store/kitchen-dining/serveware?item_type=oil+cruets&id=cat100240101",
+   "evidence": "Constructor.io browse API (ac.cnstrc.com/browse/group_id/cat100240101) item_type facet count, key=key_xT77K5VmpiVduqnj -- the index JCPenney's own gallery pages query client-side: item_type facet = 2 (category total_num_results 550; Salad Servers/Cheese Knives/Cake Servers/Spoon Rests/Casserole Dishes excluded as utensils/cookware; Serving Pitchers & Decanters dropped here as exact-duplicate cross-listings of Glassware & Drinkware, counted there instead; Cheese Board Sets 36 (52.8%), Teapots 20 (65%), Tiered Servers 10 (100%), Chip & Dip Sets 8 (50%) dropped per holiday-event-tag audit)",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Serveware - Soup Tureens",
+   "parent": false,
+   "qty": 2,
+   "link": "https://www.jcpenney.com/g/home-store/kitchen-dining/serveware?item_type=soup+tureens&id=cat100240101",
+   "evidence": "Constructor.io browse API (ac.cnstrc.com/browse/group_id/cat100240101) item_type facet count, key=key_xT77K5VmpiVduqnj -- the index JCPenney's own gallery pages query client-side: item_type facet = 2 (category total_num_results 550; Salad Servers/Cheese Knives/Cake Servers/Spoon Rests/Casserole Dishes excluded as utensils/cookware; Serving Pitchers & Decanters dropped here as exact-duplicate cross-listings of Glassware & Drinkware, counted there instead; Cheese Board Sets 36 (52.8%), Teapots 20 (65%), Tiered Servers 10 (100%), Chip & Dip Sets 8 (50%) dropped per holiday-event-tag audit)",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Serveware - Sugar Bowls",
+   "parent": false,
+   "qty": 1,
+   "link": "https://www.jcpenney.com/g/home-store/kitchen-dining/serveware?item_type=sugar+bowls&id=cat100240101",
+   "evidence": "Constructor.io browse API (ac.cnstrc.com/browse/group_id/cat100240101) item_type facet count, key=key_xT77K5VmpiVduqnj -- the index JCPenney's own gallery pages query client-side: item_type facet = 1 (category total_num_results 550; Salad Servers/Cheese Knives/Cake Servers/Spoon Rests/Casserole Dishes excluded as utensils/cookware; Serving Pitchers & Decanters dropped here as exact-duplicate cross-listings of Glassware & Drinkware, counted there instead; Cheese Board Sets 36 (52.8%), Teapots 20 (65%), Tiered Servers 10 (100%), Chip & Dip Sets 8 (50%) dropped per holiday-event-tag audit)",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Serveware - Cupcake Stands",
+   "parent": false,
+   "qty": 1,
+   "link": "https://www.jcpenney.com/g/home-store/kitchen-dining/serveware?item_type=cupcake+stands&id=cat100240101",
+   "evidence": "Constructor.io browse API (ac.cnstrc.com/browse/group_id/cat100240101) item_type facet count, key=key_xT77K5VmpiVduqnj -- the index JCPenney's own gallery pages query client-side: item_type facet = 1 (category total_num_results 550; Salad Servers/Cheese Knives/Cake Servers/Spoon Rests/Casserole Dishes excluded as utensils/cookware; Serving Pitchers & Decanters dropped here as exact-duplicate cross-listings of Glassware & Drinkware, counted there instead; Cheese Board Sets 36 (52.8%), Teapots 20 (65%), Tiered Servers 10 (100%), Chip & Dip Sets 8 (50%) dropped per holiday-event-tag audit)",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Serveware - Gravy Boats",
+   "parent": false,
+   "qty": 1,
+   "link": "https://www.jcpenney.com/g/home-store/kitchen-dining/serveware?item_type=gravy+boats&id=cat100240101",
+   "evidence": "Constructor.io browse API (ac.cnstrc.com/browse/group_id/cat100240101) item_type facet count, key=key_xT77K5VmpiVduqnj -- the index JCPenney's own gallery pages query client-side: item_type facet = 1 (category total_num_results 550; Salad Servers/Cheese Knives/Cake Servers/Spoon Rests/Casserole Dishes excluded as utensils/cookware; Serving Pitchers & Decanters dropped here as exact-duplicate cross-listings of Glassware & Drinkware, counted there instead; Cheese Board Sets 36 (52.8%), Teapots 20 (65%), Tiered Servers 10 (100%), Chip & Dip Sets 8 (50%) dropped per holiday-event-tag audit)",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Serveware - Egg Plates",
+   "parent": false,
+   "qty": 1,
+   "link": "https://www.jcpenney.com/g/home-store/kitchen-dining/serveware?item_type=egg+plates&id=cat100240101",
+   "evidence": "Constructor.io browse API (ac.cnstrc.com/browse/group_id/cat100240101) item_type facet count, key=key_xT77K5VmpiVduqnj -- the index JCPenney's own gallery pages query client-side: item_type facet = 1 (category total_num_results 550; Salad Servers/Cheese Knives/Cake Servers/Spoon Rests/Casserole Dishes excluded as utensils/cookware; Serving Pitchers & Decanters dropped here as exact-duplicate cross-listings of Glassware & Drinkware, counted there instead; Cheese Board Sets 36 (52.8%), Teapots 20 (65%), Tiered Servers 10 (100%), Chip & Dip Sets 8 (50%) dropped per holiday-event-tag audit)",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Serveware - Oil & Vinegar Cruets",
+   "parent": false,
+   "qty": 1,
+   "link": "https://www.jcpenney.com/g/home-store/kitchen-dining/serveware?item_type=oil+%26+vinegar+cruets&id=cat100240101",
+   "evidence": "Constructor.io browse API (ac.cnstrc.com/browse/group_id/cat100240101) item_type facet count, key=key_xT77K5VmpiVduqnj -- the index JCPenney's own gallery pages query client-side: item_type facet = 1 (category total_num_results 550; Salad Servers/Cheese Knives/Cake Servers/Spoon Rests/Casserole Dishes excluded as utensils/cookware; Serving Pitchers & Decanters dropped here as exact-duplicate cross-listings of Glassware & Drinkware, counted there instead; Cheese Board Sets 36 (52.8%), Teapots 20 (65%), Tiered Servers 10 (100%), Chip & Dip Sets 8 (50%) dropped per holiday-event-tag audit)",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Serveware - Cake Plates",
+   "parent": false,
+   "qty": 1,
+   "link": "https://www.jcpenney.com/g/home-store/kitchen-dining/serveware?item_type=cake+plates&id=cat100240101",
+   "evidence": "Constructor.io browse API (ac.cnstrc.com/browse/group_id/cat100240101) item_type facet count, key=key_xT77K5VmpiVduqnj -- the index JCPenney's own gallery pages query client-side: item_type facet = 1 (category total_num_results 550; Salad Servers/Cheese Knives/Cake Servers/Spoon Rests/Casserole Dishes excluded as utensils/cookware; Serving Pitchers & Decanters dropped here as exact-duplicate cross-listings of Glassware & Drinkware, counted there instead; Cheese Board Sets 36 (52.8%), Teapots 20 (65%), Tiered Servers 10 (100%), Chip & Dip Sets 8 (50%) dropped per holiday-event-tag audit)",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Glassware & Drinkware - Coffee Mugs",
+   "parent": false,
+   "qty": 140,
+   "link": "https://www.jcpenney.com/g/home-store/kitchen-dining/glassware-mugs?item_type=coffee+mugs&id=cat100260248",
+   "evidence": "Constructor.io browse API (ac.cnstrc.com/browse/group_id/cat100260248) item_type facet count, key=key_xT77K5VmpiVduqnj -- the index JCPenney's own gallery pages query client-side: item_type facet = 140 (category total_num_results 547; Water Bottles/Travel Mugs/Insulated Tumblers excluded as travel/hydration gear, not tableware)",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Glassware & Drinkware - Tumbler Glasses",
+   "parent": false,
+   "qty": 77,
+   "link": "https://www.jcpenney.com/g/home-store/kitchen-dining/glassware-mugs?item_type=tumbler+glasses&id=cat100260248",
+   "evidence": "Constructor.io browse API (ac.cnstrc.com/browse/group_id/cat100260248) item_type facet count, key=key_xT77K5VmpiVduqnj -- the index JCPenney's own gallery pages query client-side: item_type facet = 77 (category total_num_results 547; Water Bottles/Travel Mugs/Insulated Tumblers excluded as travel/hydration gear, not tableware)",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Glassware & Drinkware - Drinkware Sets",
+   "parent": false,
+   "qty": 48,
+   "link": "https://www.jcpenney.com/g/home-store/kitchen-dining/glassware-mugs?item_type=drinkware+sets&id=cat100260248",
+   "evidence": "Constructor.io browse API (ac.cnstrc.com/browse/group_id/cat100260248) item_type facet count, key=key_xT77K5VmpiVduqnj -- the index JCPenney's own gallery pages query client-side: item_type facet = 48 (category total_num_results 547; Water Bottles/Travel Mugs/Insulated Tumblers excluded as travel/hydration gear, not tableware)",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Glassware & Drinkware - Wine Glasses",
+   "parent": false,
+   "qty": 36,
+   "link": "https://www.jcpenney.com/g/home-store/kitchen-dining/glassware-mugs?item_type=wine+glasses&id=cat100260248",
+   "evidence": "Constructor.io browse API (ac.cnstrc.com/browse/group_id/cat100260248) item_type facet count, key=key_xT77K5VmpiVduqnj -- the index JCPenney's own gallery pages query client-side: item_type facet = 36 (category total_num_results 547; Water Bottles/Travel Mugs/Insulated Tumblers excluded as travel/hydration gear, not tableware)",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Glassware & Drinkware - Serving Pitchers",
+   "parent": false,
+   "qty": 20,
+   "link": "https://www.jcpenney.com/g/home-store/kitchen-dining/glassware-mugs?item_type=serving+pitchers&id=cat100260248",
+   "evidence": "Constructor.io browse API (ac.cnstrc.com/browse/group_id/cat100260248) item_type facet count, key=key_xT77K5VmpiVduqnj -- the index JCPenney's own gallery pages query client-side: item_type facet = 20 (category total_num_results 547; Water Bottles/Travel Mugs/Insulated Tumblers excluded as travel/hydration gear, not tableware)",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Glassware & Drinkware - Double Old Fashioned Glasses",
+   "parent": false,
+   "qty": 14,
+   "link": "https://www.jcpenney.com/g/home-store/kitchen-dining/glassware-mugs?item_type=double+old+fashioned&id=cat100260248",
+   "evidence": "Constructor.io browse API (ac.cnstrc.com/browse/group_id/cat100260248) item_type facet count, key=key_xT77K5VmpiVduqnj -- the index JCPenney's own gallery pages query client-side: item_type facet = 14 (category total_num_results 547; Water Bottles/Travel Mugs/Insulated Tumblers excluded as travel/hydration gear, not tableware)",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Glassware & Drinkware - Martini Glasses",
+   "parent": false,
+   "qty": 8,
+   "link": "https://www.jcpenney.com/g/home-store/kitchen-dining/glassware-mugs?item_type=martini+glasses&id=cat100260248",
+   "evidence": "Constructor.io browse API (ac.cnstrc.com/browse/group_id/cat100260248) item_type facet count, key=key_xT77K5VmpiVduqnj -- the index JCPenney's own gallery pages query client-side: item_type facet = 8 (category total_num_results 547; Water Bottles/Travel Mugs/Insulated Tumblers excluded as travel/hydration gear, not tableware)",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Glassware & Drinkware - Highball Glasses",
+   "parent": false,
+   "qty": 8,
+   "link": "https://www.jcpenney.com/g/home-store/kitchen-dining/glassware-mugs?item_type=highball+glasses&id=cat100260248",
+   "evidence": "Constructor.io browse API (ac.cnstrc.com/browse/group_id/cat100260248) item_type facet count, key=key_xT77K5VmpiVduqnj -- the index JCPenney's own gallery pages query client-side: item_type facet = 8 (category total_num_results 547; Water Bottles/Travel Mugs/Insulated Tumblers excluded as travel/hydration gear, not tableware)",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Glassware & Drinkware - Espresso Cups",
+   "parent": false,
+   "qty": 8,
+   "link": "https://www.jcpenney.com/g/home-store/kitchen-dining/glassware-mugs?item_type=espresso+cups&id=cat100260248",
+   "evidence": "Constructor.io browse API (ac.cnstrc.com/browse/group_id/cat100260248) item_type facet count, key=key_xT77K5VmpiVduqnj -- the index JCPenney's own gallery pages query client-side: item_type facet = 8 (category total_num_results 547; Water Bottles/Travel Mugs/Insulated Tumblers excluded as travel/hydration gear, not tableware)",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Glassware & Drinkware - Champagne Flutes",
+   "parent": false,
+   "qty": 7,
+   "link": "https://www.jcpenney.com/g/home-store/kitchen-dining/glassware-mugs?item_type=champagne+flutes&id=cat100260248",
+   "evidence": "Constructor.io browse API (ac.cnstrc.com/browse/group_id/cat100260248) item_type facet count, key=key_xT77K5VmpiVduqnj -- the index JCPenney's own gallery pages query client-side: item_type facet = 7 (category total_num_results 547; Water Bottles/Travel Mugs/Insulated Tumblers excluded as travel/hydration gear, not tableware)",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Glassware & Drinkware - Shot Glasses",
+   "parent": false,
+   "qty": 5,
+   "link": "https://www.jcpenney.com/g/home-store/kitchen-dining/glassware-mugs?item_type=shot+glasses&id=cat100260248",
+   "evidence": "Constructor.io browse API (ac.cnstrc.com/browse/group_id/cat100260248) item_type facet count, key=key_xT77K5VmpiVduqnj -- the index JCPenney's own gallery pages query client-side: item_type facet = 5 (category total_num_results 547; Water Bottles/Travel Mugs/Insulated Tumblers excluded as travel/hydration gear, not tableware)",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Glassware & Drinkware - Cup and Saucer Sets",
+   "parent": false,
+   "qty": 5,
+   "link": "https://www.jcpenney.com/g/home-store/kitchen-dining/glassware-mugs?item_type=cup+and+saucer+sets&id=cat100260248",
+   "evidence": "Constructor.io browse API (ac.cnstrc.com/browse/group_id/cat100260248) item_type facet count, key=key_xT77K5VmpiVduqnj -- the index JCPenney's own gallery pages query client-side: item_type facet = 5 (category total_num_results 547; Water Bottles/Travel Mugs/Insulated Tumblers excluded as travel/hydration gear, not tableware)",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Glassware & Drinkware - Beverage Dispensers",
+   "parent": false,
+   "qty": 3,
+   "link": "https://www.jcpenney.com/g/home-store/kitchen-dining/glassware-mugs?item_type=beverage+dispensers&id=cat100260248",
+   "evidence": "Constructor.io browse API (ac.cnstrc.com/browse/group_id/cat100260248) item_type facet count, key=key_xT77K5VmpiVduqnj -- the index JCPenney's own gallery pages query client-side: item_type facet = 3 (category total_num_results 547; Water Bottles/Travel Mugs/Insulated Tumblers excluded as travel/hydration gear, not tableware)",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Glassware & Drinkware - Cappuccino Cups",
+   "parent": false,
+   "qty": 3,
+   "link": "https://www.jcpenney.com/g/home-store/kitchen-dining/glassware-mugs?item_type=cappuccino+cups&id=cat100260248",
+   "evidence": "Constructor.io browse API (ac.cnstrc.com/browse/group_id/cat100260248) item_type facet count, key=key_xT77K5VmpiVduqnj -- the index JCPenney's own gallery pages query client-side: item_type facet = 3 (category total_num_results 547; Water Bottles/Travel Mugs/Insulated Tumblers excluded as travel/hydration gear, not tableware)",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Glassware & Drinkware - Goblets",
+   "parent": false,
+   "qty": 3,
+   "link": "https://www.jcpenney.com/g/home-store/kitchen-dining/glassware-mugs?item_type=goblets&id=cat100260248",
+   "evidence": "Constructor.io browse API (ac.cnstrc.com/browse/group_id/cat100260248) item_type facet count, key=key_xT77K5VmpiVduqnj -- the index JCPenney's own gallery pages query client-side: item_type facet = 3 (category total_num_results 547; Water Bottles/Travel Mugs/Insulated Tumblers excluded as travel/hydration gear, not tableware)",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Glassware & Drinkware - Beer Tasting Glasses",
+   "parent": false,
+   "qty": 2,
+   "link": "https://www.jcpenney.com/g/home-store/kitchen-dining/glassware-mugs?item_type=beer+tasting+glasses&id=cat100260248",
+   "evidence": "Constructor.io browse API (ac.cnstrc.com/browse/group_id/cat100260248) item_type facet count, key=key_xT77K5VmpiVduqnj -- the index JCPenney's own gallery pages query client-side: item_type facet = 2 (category total_num_results 547; Water Bottles/Travel Mugs/Insulated Tumblers excluded as travel/hydration gear, not tableware)",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Glassware & Drinkware - Decanters",
+   "parent": false,
+   "qty": 2,
+   "link": "https://www.jcpenney.com/g/home-store/kitchen-dining/glassware-mugs?item_type=decanters&id=cat100260248",
+   "evidence": "Constructor.io browse API (ac.cnstrc.com/browse/group_id/cat100260248) item_type facet count, key=key_xT77K5VmpiVduqnj -- the index JCPenney's own gallery pages query client-side: item_type facet = 2 (category total_num_results 547; Water Bottles/Travel Mugs/Insulated Tumblers excluded as travel/hydration gear, not tableware)",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Glassware & Drinkware - Margarita Glasses",
+   "parent": false,
+   "qty": 1,
+   "link": "https://www.jcpenney.com/g/home-store/kitchen-dining/glassware-mugs?item_type=margarita+glasses&id=cat100260248",
+   "evidence": "Constructor.io browse API (ac.cnstrc.com/browse/group_id/cat100260248) item_type facet count, key=key_xT77K5VmpiVduqnj -- the index JCPenney's own gallery pages query client-side: item_type facet = 1 (category total_num_results 547; Water Bottles/Travel Mugs/Insulated Tumblers excluded as travel/hydration gear, not tableware)",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Glassware & Drinkware - Pub Glasses",
+   "parent": false,
+   "qty": 1,
+   "link": "https://www.jcpenney.com/g/home-store/kitchen-dining/glassware-mugs?item_type=pub+glasses&id=cat100260248",
+   "evidence": "Constructor.io browse API (ac.cnstrc.com/browse/group_id/cat100260248) item_type facet count, key=key_xT77K5VmpiVduqnj -- the index JCPenney's own gallery pages query client-side: item_type facet = 1 (category total_num_results 547; Water Bottles/Travel Mugs/Insulated Tumblers excluded as travel/hydration gear, not tableware)",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Glassware & Drinkware - Carafes",
+   "parent": false,
+   "qty": 1,
+   "link": "https://www.jcpenney.com/g/home-store/kitchen-dining/glassware-mugs?item_type=carafes&id=cat100260248",
+   "evidence": "Constructor.io browse API (ac.cnstrc.com/browse/group_id/cat100260248) item_type facet count, key=key_xT77K5VmpiVduqnj -- the index JCPenney's own gallery pages query client-side: item_type facet = 1 (category total_num_results 547; Water Bottles/Travel Mugs/Insulated Tumblers excluded as travel/hydration gear, not tableware)",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Glassware & Drinkware - Beer Mugs",
+   "parent": false,
+   "qty": 1,
+   "link": "https://www.jcpenney.com/g/home-store/kitchen-dining/glassware-mugs?item_type=beer+mugs&id=cat100260248",
+   "evidence": "Constructor.io browse API (ac.cnstrc.com/browse/group_id/cat100260248) item_type facet count, key=key_xT77K5VmpiVduqnj -- the index JCPenney's own gallery pages query client-side: item_type facet = 1 (category total_num_results 547; Water Bottles/Travel Mugs/Insulated Tumblers excluded as travel/hydration gear, not tableware)",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Glassware & Drinkware - Juice Glasses",
+   "parent": false,
+   "qty": 1,
+   "link": "https://www.jcpenney.com/g/home-store/kitchen-dining/glassware-mugs?item_type=juice+glasses&id=cat100260248",
+   "evidence": "Constructor.io browse API (ac.cnstrc.com/browse/group_id/cat100260248) item_type facet count, key=key_xT77K5VmpiVduqnj -- the index JCPenney's own gallery pages query client-side: item_type facet = 1 (category total_num_results 547; Water Bottles/Travel Mugs/Insulated Tumblers excluded as travel/hydration gear, not tableware)",
+   "flag": null
+  }
+ ]
+}

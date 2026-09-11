@@ -1,0 +1,16 @@
+{
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "Direct HTTP fetch of homepage/robots.txt/sitemap.xml worked (no WAF, no Claude-specific robots disallow). Discovered /bestsellers via sitemap.xml (not in main mega-menu). Confirmed via Magento GraphQL categoryList (mage.barkerandstonehouse.co.uk/index.php/graphql): id 837, name 'Bestsellers', url_path 'bestsellers', product_count 95, children: []  -> single flat listing, no genuine sub-structure. Opened the page: rendered via the same Angular <category-view> component used by ordinary category pages (breadcrumb 'Bestsellers', H1 'Bestselling Designs'), with a real product grid, filters, and a sort option literally labelled 'Bestseller' (field ga_unique_purchases desc) plus 'New Arrivals' as another sort option -- confirms this is the site's own bestseller-ranked merchandising concept, not an editorial page. Searchspring (siteId zzw53h) powers the grid; SSR HTML has no embedded product/pagination JSON (products load client-side), so used Playwright to capture the live search.json response and the rendered page text. Searchspring API totalResults=91, but the rendered page footer/heading literally reads '90 Products'. This +1 offset (Searchspring counts one phantom result that never actually appears in the results array) is the exact site-wide pattern documented in the prior Home-Decor pass for this same domain (16/16 categories then); this session independently re-confirmed it 7/7 times across Bestsellers, New In, New In>Accessories, Clearance, Clearance>Accessories, Clearance>Sofas, Clearance>Dining, and Clearance>Further Reduced -- every case where a rendered 'N Products' string could be captured matched Searchspring totalResults-1 exactly. Used qty=90 (the rendered, corrected count) accordingly. Checked for other bestseller-type pages: main mega-menu, footer, sitemap.xml (grepped for best-seller/bestseller/top-seller/popular/trending/customer-favourite/loved/favourite/editor/picks) -- no other candidate found; the only other 'trending' hit was an unrelated editorial blog post (/yourhouse/trending-gold-furniture-and-decor), correctly excluded as non-PLP content per the brief. No local-language variant needed (UK/English-only site). Working files prefixed w85_ in scratchpad root and scratchpad/w85_pwenv/.",
+  "rows": [
+    {
+      "category": "Bestsellers",
+      "sub_category": "Bestsellers",
+      "qty": 90,
+      "link": "https://www.barkerandstonehouse.co.uk/bestsellers",
+      "is_group": false,
+      "evidence": "Rendered page text '90 Products' (Playwright-rendered body text on /bestsellers); Searchspring search.json totalResults=91 with the site's documented +1 phantom-result offset subtracted (verified 7/7 against rendered counts this session)",
+      "flag": null
+    }
+  ]
+}

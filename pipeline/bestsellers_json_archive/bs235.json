@@ -1,0 +1,43 @@
+{
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "Site: Shopify storefront myborosil.com (www redirects 301 to non-www canonical). Tier-1 direct HTTP fetch worked throughout, no WAF/block encountered; no Playwright/Claude-in-Chrome needed. Checked: collections.json (393 total published collections, 2 pages), homepage header mega-menu, homepage 'shop by category' chip carousel (126 /collections/ links), footer (no collection links), and the site's own predictive-search endpoint (/search/suggest.json) for queries 'bestsellers','best sellers','trending','new' etc. VALID BESTSELLERS-TYPE LISTINGS FOUND: (1) /collections/bestsellers 'Best Sellers' -- the only one of these actually linked from the homepage chip grid (alt text 'Best Sellers'); confirmed real PLP via products.json. (2) /collections/larah-bestseller 'Larah Bestseller' -- for the Larah-by-Borosil sub-brand sold on the same storefront; discoverable via site search only (not in nav). (3) /collections/trending 'Trending' and (4) /collections/trending-larah 'Trending Larah' -- 'Trending Products' is an explicit target term in this brief; both discoverable via site search only (not in nav). EXCLUDED: /collections/zall 'All Best Selling' (3004 of ~3061 site-wide products, i.e. ~98% of the entire catalogue) -- not linked anywhere in header/footer/homepage chips and does NOT appear in site search results for any bestseller-related query; handle prefix 'z' and near-total-catalogue size strongly indicate this is a backend/theme utility collection (e.g. feeding a 'sort by best-selling' widget elsewhere) rather than a customer-facing Bestsellers merchandising page, so it fails criterion 2 (genuinely represents the concept) and was dropped rather than recorded. IMPORTANT CROSS-CHECK FINDING (applies to rows below, not a reason to drop them): products.json dedup-by-id shows bestsellers(2248) is a strict subset of trending(2442), and new-arrival (see na235.json, 2257) is also a strict subset of trending -- i.e. Bestsellers/New-Arrivals/Trending on the main brand nest inside each other almost completely (Bestsellers=73%, Trending=80% of the ~3061-product catalogue). On the Larah sub-brand, larah-bestseller and larah-new-arrivals (see na235.json) are BYTE-IDENTICAL product sets (1122/1122, full intersection), and trending-larah (910) is a strict subset of that same 1122-product set. This pattern (near-total catalogue coverage, strict nesting/identity across different 'concepts') is strong circumstantial evidence these may be broad automated collections rather than genuinely hand-curated bestseller/new-arrival/trending selections -- flagged per-row below for reviewer judgement rather than silently excluded or silently trusted, since each one individually does pass the open-and-confirm test (real PLP, correctly titled, reachable via nav or site search, distinct exact product count).",
+  "rows": [
+    {
+      "category": "Bestsellers",
+      "sub_category": "Best Sellers",
+      "qty": 2248,
+      "link": "https://myborosil.com/collections/bestsellers",
+      "is_group": false,
+      "evidence": "products.json?limit=250, paginated to an empty page: pages 1-8 full (2000) + page 9 = 248 => 2248 unique product ids. Collection titled 'Best Sellers'; linked from homepage shop-by-category chip carousel (alt=\"Best Sellers\", href=\"/collections/bestsellers\").",
+      "flag": "MANUAL REVIEW: qty = 2248 of site's ~3061 total published products (~73% of the whole catalogue per sitemap_products_*.xml) and is a strict subset of the 'Trending' collection (2442) -- unusually broad for a curated Bestsellers listing; could not confirm this reflects genuine best-seller curation vs. a broad automated collection rule."
+    },
+    {
+      "category": "Bestsellers",
+      "sub_category": "Larah Bestseller",
+      "qty": 1122,
+      "link": "https://myborosil.com/collections/larah-bestseller",
+      "is_group": false,
+      "evidence": "products.json?limit=250, paginated to an empty page: pages 1-4 full (1000) + page 5 = 122 => 1122 unique product ids. Collection titled 'Larah Bestseller' (Larah by Borosil sub-brand, same storefront); surfaced by /search/suggest.json for query 'bestsellers'.",
+      "flag": "MANUAL REVIEW: product set is BYTE-IDENTICAL (1122/1122 match) to the 'Larah New Arrivals' collection (see na235.json) -- same products under two different merchandising labels, so this may represent 'all Larah products' rather than a genuinely curated bestseller subset."
+    },
+    {
+      "category": "Bestsellers",
+      "sub_category": "Trending",
+      "qty": 2442,
+      "link": "https://myborosil.com/collections/trending",
+      "is_group": false,
+      "evidence": "products.json?limit=250, paginated to an empty page: pages 1-9 full (2250) + page 10 = 192 => 2442 unique product ids. Collection titled 'Trending' ('Trending Products' is a listed target term for this brief); surfaced by /search/suggest.json for query 'trending'.",
+      "flag": "MANUAL REVIEW: qty = 2442 of ~3061 total products (~80% of the whole catalogue) and is a strict superset of both 'Best Sellers' and New Arrivals' New Arrival' collection -- unusually broad for a Trending listing; not linked in main nav, only found via site search."
+    },
+    {
+      "category": "Bestsellers",
+      "sub_category": "Trending Larah",
+      "qty": 910,
+      "link": "https://myborosil.com/collections/trending-larah",
+      "is_group": false,
+      "evidence": "products.json?limit=250, paginated to an empty page: 910 unique product ids total. Collection titled 'Trending Larah'; surfaced by /search/suggest.json for query 'trending'.",
+      "flag": "MANUAL REVIEW: product set is a strict subset of 'Larah Bestseller'/'Larah New Arrivals' (910 of that 1122) -- same nesting pattern seen on the main brand; genuineness of curation vs. broad auto-collection could not be confirmed."
+    }
+  ]
+}

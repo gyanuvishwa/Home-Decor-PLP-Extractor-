@@ -1,0 +1,70 @@
+{
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "Site is a Shopify store (thedecorkart.com), no WAF, direct HTTP fetch worked throughout (tier 1 only, no Playwright/Claude-in-Chrome needed). robots.txt has a full Disallow:/ for ClaudeBot/Google-Extended/GPTBot etc. but that only gates the Claude-in-Chrome last-resort tier per project policy; plain HTTP requests (as used here, matching the prior Home-Decor pass's own access method for this company) are unaffected. Checked: homepage main nav, mega-menu, announcement bar, 'At a Glance' homepage tabs (New Arrivals/Bestsellers/Trending Now/Luxury Picks), full collections.json listing (639 collections across 3 pages, keyword-scanned for bestseller/popular/trending/favourite terms), the site's own search-app JSON config (references a 'best-sellers' collection as its no-results fallback), and the /collections/bestsellers and /collections/best-sellers hub pages themselves for genuine sub-collection sliders. All qty values are exact counts from exhaustive /collections/<handle>/products.json pagination (limit=250) deduped by product id -- collections.json's products_count field is confirmed inflated for every collection checked here (e.g. bestsellers claims 50 vs 47 real, kitchen-bestsellers-1 claims 86 vs 1 real) and was not used, consistent with this site's known pattern from the prior Home-Decor extraction pass. Genuine site-declared structure: /collections/bestsellers is the primary Bestsellers PLP and itself exposes 4 real per-category children via an on-page 'shop by category' collection-list slider (Decor/Kitchen/Lighting/Wall Decor Bestsellers) -- kept as group+leaves. Trending Now (/collections/trending-now-1) is presented site-wide as a sibling top-level concept to Bestsellers (separate homepage tab, separate promo card, separate announcement-bar slide) and qualifies under the brief's 'Trending Products' target term; it has no further sub-structure of its own. A second, older Bestsellers-labeled collection (/collections/best-sellers, page H1 'The Decor Kart Bestsellers') exists and is a genuinely different product set (only 4/23 products overlap with the primary bestsellers collection) -- kept as a separate row per the multiple-PLPs rule, flagged because it is not reachable via any live navigation path, only via the search app's empty-results fallback config. Excluded as orphaned/undeclared (present in collections.json but not linked from any nav, mega-menu, or hub-page slider found): 'Best Selling Products Decor + Kitchen' (best-selling-products-decor-kitchen), 'Trending Products' (trending-products, and also a same-named but non-linking mega-menu product-showcase widget with no href of its own), 'Trending this week' (trending-this-week).",
+  "rows": [
+    {
+      "category": "Bestsellers",
+      "sub_category": "Bestsellers",
+      "qty": 47,
+      "link": "https://www.thedecorkart.com/collections/bestsellers",
+      "is_group": true,
+      "evidence": "Exhaustive dedup via /collections/bestsellers/products.json?limit=250 paged => 47 unique product ids (collections.json products_count field = 50, confirmed inflated, not used). Nav-linked from homepage announcement bar ('Shop Bestsellers'), header mega-menu promo card, and 'At a Glance' homepage tab.",
+      "flag": null
+    },
+    {
+      "category": "Decor Bestsellers",
+      "sub_category": "Decor Bestsellers",
+      "qty": 4,
+      "link": "https://www.thedecorkart.com/collections/decor-bestsellers",
+      "is_group": false,
+      "evidence": "Exhaustive dedup via products.json paged => 4 unique product ids (collections.json products_count = 85, inflated). Declared as a genuine child of Bestsellers via the 'shop by category' collection-card slider on the /collections/bestsellers page itself.",
+      "flag": null
+    },
+    {
+      "category": "Kitchen Bestsellers",
+      "sub_category": "Kitchen Bestsellers",
+      "qty": 1,
+      "link": "https://www.thedecorkart.com/collections/kitchen-bestsellers-1",
+      "is_group": false,
+      "evidence": "Exhaustive dedup via products.json paged => 1 unique product id (collections.json products_count = 86, inflated). Cross-checked against the rendered page's own product-grid section (DOM id scoped to product 7512779358380) which also shows exactly 1 real listing item -- higher-looking product-card counts elsewhere on that page belong to the site-wide header mega-menu widgets embedded on every page, not this collection.",
+      "flag": null
+    },
+    {
+      "category": "Lighting Bestsellers",
+      "sub_category": "Lighting Bestsellers",
+      "qty": 2,
+      "link": "https://www.thedecorkart.com/collections/lighting-bestsellers",
+      "is_group": false,
+      "evidence": "Exhaustive dedup via products.json paged => 2 unique product ids (collections.json products_count = 31, inflated).",
+      "flag": null
+    },
+    {
+      "category": "Wall Decor Bestsellers",
+      "sub_category": "Wall Decor Bestsellers",
+      "qty": 2,
+      "link": "https://www.thedecorkart.com/collections/wall-decor-bestsellers",
+      "is_group": false,
+      "evidence": "Exhaustive dedup via products.json paged => 2 unique product ids (collections.json products_count = 45, inflated).",
+      "flag": null
+    },
+    {
+      "category": "Bestsellers",
+      "sub_category": "Trending Now",
+      "qty": 50,
+      "link": "https://www.thedecorkart.com/collections/trending-now-1",
+      "is_group": false,
+      "evidence": "Exhaustive dedup via products.json paged => 50 unique product ids, matching collections.json products_count = 50 exactly. Page is promoted site-wide as a top-level concept: homepage announcement bar ('What's Trending'), header mega-menu promo card, and 'At a Glance' homepage tab labeled 'Trending Now'.",
+      "flag": null
+    },
+    {
+      "category": "Bestsellers",
+      "sub_category": "The Decor Kart's Bestsellers",
+      "qty": 23,
+      "link": "https://www.thedecorkart.com/collections/best-sellers",
+      "is_group": false,
+      "evidence": "Exhaustive dedup via products.json paged => 23 unique product ids (collections.json products_count = 194, inflated). Page H1 reads 'The Decor Kart Bestsellers' with a real product grid. Only 4 of its 23 products overlap with the primary /collections/bestsellers listing (47 items), confirming a genuinely different product set rather than an alias.",
+      "flag": "MANUAL REVIEW: secondary Bestsellers-labeled collection not linked from any main nav, mega-menu, or homepage promo found on this site -- it was discovered only via the site's own search-app JSON config, whose empty-search-results fallback widget explicitly queries collection_handles_shopify = \"best-sellers\" with header text 'Here are some of our bestselling products'. It is a real, live, product-listing page (not a dead link), so it is recorded, but confirm whether the project wants this secondary/legacy Bestsellers listing counted alongside the primary one."
+    }
+  ]
+}

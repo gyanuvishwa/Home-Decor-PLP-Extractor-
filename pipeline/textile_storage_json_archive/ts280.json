@@ -1,0 +1,104 @@
+{
+  "sr": 280,
+  "company": "The Conran Shop",
+  "brand_site": "conranshop.co.uk",
+  "country": "UK",
+  "site_url": "https://www.conranshop.co.uk/",
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "ACCESS: Tier (a) direct HTTP fetch only (curl_cffi impersonate=chrome), no Playwright/Chrome needed - conranshop.co.uk redirects to the live storefront theconranshop.com (Shopify), whose theme server-renders the full mega-menu, collection h1/breadcrumb, and Shopify facet HTML (Product Type filter checkboxes with per-value counts) in the initial HTML response. robots.txt (theconranshop.com/robots.txt) has no anthropic-ai/ClaudeBot/Claude-Web/Claude-User/Claude-SearchBot rule and no blanket Disallow: / - only specific paths (cart, checkout, /search, sort/filter-combo query strings) are disallowed; none of the URLs fetched match a disallowed pattern. TREE METHOD: union of the 'shop' mega-menu (Furniture / Sofas / Lighting / Kitchen & Dining / Textiles (labelled 'rugs, cushions & throws') / Home Accessories / Gifts / Collections / Outlet) read from the homepage HTML, the collections sitemap (theconranshop.com/sitemap_collections_1.xml, ~130 collection handles), and each candidate collection page's own Shopify 'Product Type' facet block (which enumerates every sub-type + exact count within that collection, verified against ProductResultsCount span on the base and filtered URLs). QTY METHOD: exact integer read from the '<span id=\"ProductResultsCount\">N</span>' element rendered on each listing page (base collection URL, or collection URL + a single filter.p.m.custom.product_type= query param for facet-only sub-types with no dedicated collection page) - never estimated. EXCLUDED: /collections/storage-furniture (nav label 'Storage', 46 items) - its own Product Type facet breaks down entirely into Bedside Tables(6), Chest of Drawers(9), Coat Hooks(3), Coat Stands(15), Consoles(6), Sideboards(7); all six are classic furniture case-goods and this collection sits as a sibling of Chairs/Tables/Bedroom Furniture/Desks/Outdoor Furniture directly under the 'Furniture' mega-menu item, so per storage.md Sec21/27 (website explicitly places it inside a Furniture menu -> prefer Furniture) it was classified Furniture, not Storage, despite the 'Storage' label. Kitchen Linen page copy mentions 'Aprons' but the live Product Type facet only lists Napkins(24)/Placemats(1) - no Apron product_type currently populated, so no Apron row was created (would be fabrication). Napkins(24) and Placemats(1) are reachable identically via both /collections/kitchen-linen and /collections/kitchen-dining filters (verified same counts) - kept once under Kitchen Linen (more specific parent). Storage Containers & Jars(17) is reachable identically via both /collections/home-accessories and /collections/kitchen-dining filters (verified same count 17) - kept once under Home Accessories. No dedicated Bedding/Curtains/Blankets/Throws/Storage Boxes/Storage Baskets/Organizer collections or product_type facet values exist anywhere on the site (checked textiles, home-accessories, kitchen-dining, living-room, bedroom, kitchen, outdoor room pages' facets) - Conran Shop is primarily a furniture/lighting/tableware retailer with only a small rugs+cushions textile range and a handful of storage-jar/desk-organizer accessory SKUs. Cushion Covers(64)+Cushion Pads(5) are sold together on one dedicated page /collections/cushion-covers-pads (69) per the site's own hierarchy, not split further since no separate dedicated pages exist for each. No blocks encountered.",
+  "textile_rows": [
+    {
+      "category": "Textile",
+      "sub_category": "Rugs, Cushions & Throws",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Rugs",
+      "qty": 30,
+      "link": "https://theconranshop.com/collections/rugs",
+      "is_group": false,
+      "evidence": "ProductResultsCount span = 30 on /collections/rugs (h1 'Rugs'); matches Product Type facet 'Rugs (30)' shown on parent /collections/textiles page",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Cushion Covers & Pads",
+      "qty": 69,
+      "link": "https://theconranshop.com/collections/cushion-covers-pads",
+      "is_group": false,
+      "evidence": "ProductResultsCount span = 69 on /collections/cushion-covers-pads; equals sum of parent Textiles page's own Product Type facet Cushion Covers(64)+Cushion Pads(5)",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Kitchen Linen",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Napkins",
+      "qty": 24,
+      "link": "https://theconranshop.com/collections/napkins",
+      "is_group": false,
+      "evidence": "ProductResultsCount span = 24 on dedicated /collections/napkins page; matches Kitchen Linen page's own Product Type facet 'Napkins (24)'",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Placemats",
+      "qty": 1,
+      "link": "https://theconranshop.com/collections/kitchen-linen?filter.p.m.custom.product_type=Placemats",
+      "is_group": false,
+      "evidence": "Kitchen Linen page's Product Type facet shows 'Placemats (1)'; filtered listing URL fetched directly, ProductResultsCount span = 1",
+      "flag": "No dedicated Placemats collection page exists; used the site's own verified single-facet filtered listing URL",
+      "confidence": "MEDIUM"
+    }
+  ],
+  "storage_rows": [
+    {
+      "category": "Storage",
+      "sub_category": "Storage Containers & Jars",
+      "qty": 17,
+      "link": "https://theconranshop.com/collections/home-accessories?filter.p.m.custom.product_type=Storage+Containers+%26+Jars",
+      "is_group": false,
+      "evidence": "Home Accessories page Product Type facet 'Storage Containers & Jars (17)'; filtered URL fetched directly, ProductResultsCount span = 17. Product titles confirm genuine storage function (e.g. 'Home Lab Wide Storage Jar', 'Home Lab Glass Storage Containers Set')",
+      "flag": "No dedicated collection page; used site's own verified product_type filter URL. Identical 17-item set also reachable via /collections/kitchen-dining with the same filter - kept once here to avoid duplication",
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Storage Jars & Containers",
+      "qty": 1,
+      "link": "https://theconranshop.com/collections/home-accessories?filter.p.m.custom.product_type=Storage+Jars+%26+Containers",
+      "is_group": false,
+      "evidence": "Home Accessories page Product Type facet 'Storage Jars & Containers (1)'; filtered URL fetched directly, ProductResultsCount span = 1 ('Uthai Canister Green Uthai Marble')",
+      "flag": "Distinct product_type facet value from 'Storage Containers & Jars' on the site (different label, different single product); no dedicated collection page exists",
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Desk Organizers",
+      "qty": 6,
+      "link": "https://theconranshop.com/collections/home-accessories?filter.p.m.custom.product_type=Desk+Organizers",
+      "is_group": false,
+      "evidence": "Home Accessories page Product Type facet 'Desk Organizers (6)'; filtered URL fetched directly, ProductResultsCount span = 6 (Confetti Cork Catchall/Trio Pot, Oddments Bits and Bobs Pot x4)",
+      "flag": "No dedicated collection page; used site's own verified product_type filter URL",
+      "confidence": "MEDIUM"
+    }
+  ]
+}

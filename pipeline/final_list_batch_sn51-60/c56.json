@@ -1,0 +1,120 @@
+{
+  "sr": 56,
+  "company": "The Citizenry",
+  "brand_site": "the-citizenry.com",
+  "country": "USA",
+  "site_url": "https://www.the-citizenry.com/",
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "ACCESS: direct fetch worked throughout (HTTP 200, no WAF). Shopify store. NAV: the mega-menu is a Vue component (#vue-desktop-nav) with no server-rendered links, so /?section_id=navigation and the raw HTML were both empty. Recovered the full nav tree from the site's headless CMS: layout.theme.js calls a Builder.io content API with model:\"nav\"; public apiKey ffd771d56cde49a3932ba2dc845afab8 extracted from the bundle, then GET https://cdn.builder.io/api/v3/content/nav?apiKey=... returned the complete primaryNav JSON (the second 32-hex key in the bundle, 9f068a3b..., 401s). COUNT VERIFICATION: two independent methods agreed on all 16 collections tested, with zero divergence. (1) The collection page embeds an analytics blob 'collection_handle\":\"<handle>\",\"total_products\":<n>'. (2) Exhaustive enumeration of /collections/<handle>/products.json?limit=250&page=N to an empty page, counting UNIQUE product ids. Because method 2 is a true exhaustion check and it reproduced method 1 exactly 16/16, the numbers are treated as exact. No Shopify /collections.json products_count was used anywhere (known-inflated). No tile-href counting was used. LIGHTING: The Citizenry has NO lighting category and no lighting collection anywhere in the nav or the 1,148-entry collections sitemap; a single table lamp (Veda Marble Table Lamp) exists but is merchandised under Accents. So Rule 0.1/0.2 produced no rows here - the absence is real, not a traversal gap. MIRRORS: the site has exactly one mirror node (all-mirrors, 7) covering wall, floor and leaner mirrors together; no room-split mirror nodes exist to recover under Rule 0.3. EXCLUDED AFTER READING PRODUCT TITLES: (a) Baskets (all-baskets, 19) - inspected all 19 titles, 19/19 are storage baskets/bins/cubes ('Totora Storage Basket', 'Mercado Floor Baskets', 'Azad Tall Leather Storage Bins'); primary purpose is storage, not decoration, so dropped under the decision rule despite the woven/rattan material. (b) Bath Accessories (bath-accessories, 16) - a mixed roll-up: 9 items are bathroom hardware/utility (soap dispenser, toothbrush holder, wastebasket, canister, tissue box, soap dishes, accessory set) excluded under Rule 0.4, and the other 7 are simply re-cuts of items already counted in Accents (vases, taper candles, candle holders, tray). Dropped rather than padded. (c) Kitchen Linens / Table Linens, Kitchen Furniture, Bath Furniture, Bath Towels & Mats, Rugs, Bedding, Pillows & Throws, Furniture, Swatches - textiles and furniture. (d) The Floral Shop (faux/dried florals) and all Holiday/Gift/Sale/Archive/New Arrivals/Best Sellers/Ready to Ship/Back in Stock nodes - marketing or excluded types. (e) 'Shop All' nodes are never emitted as leaves: all-wall-art (29) and shop-all-decor (44) were both measured and are curated subsets, not supersets, of their children (children sum to 54 and 128 respectively) - they are emitted as parent grouping rows with null qty. OVERLAPS DOCUMENTED (Rule 0.6): (i) 'Tabletop' (shop-all-tabletop) appears twice in the nav, under both 'Baskets & Decor' and 'Kitchen', at the identical URL - emitted ONCE, under Kitchen & Dining. (ii) 'Mirrors & Wall Art' likewise appears as its own top-level menu and again as a child of 'Baskets & Decor' at the same URL - emitted once. (iii) Framed Art (9) is 8/9 contained inside Wall Hangings (22) - it reads as a framed-vs-unframed re-cut of the same wall hangings, but it is a distinct named node in the site's own nav and carries one unique product, so it is kept and flagged rather than silently dropped. (iv) Drinkware & Bar (7) is fully contained in Tabletop (26); both are genuine sibling nav nodes, kept and flagged. (v) Planters & Vases (14) and Accents (40) overlap on 11 vases but neither contains the other (Planters has 3 unique: Tikal Wood Bud Vase, Loma Floor Vases, Paseo Tabletop Planter) - both kept as distinct product-type nodes. (vi) Tabletop (26) contains 3 textile items (Stonewashed Linen Tablecloth, Sangeet Linen Napkins, Onam Table Runner) out of 26; the node exposes no sub-categories to split, so the site's own exact total is reported with the contamination noted here rather than dropping a 23-in-scope-item category.",
+  "rows": [
+    {
+      "category": "Wall Decor & Mirrors",
+      "sub_category": "Mirrors & Wall Art",
+      "parent": true,
+      "qty": null,
+      "link": null,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Wall Decor & Mirrors",
+      "sub_category": "Mirrors",
+      "parent": false,
+      "qty": 7,
+      "link": "https://www.the-citizenry.com/collections/all-mirrors",
+      "evidence": "embedded collection JSON on the PLP: collection_handle\":\"all-mirrors\",\"total_products\":7 -- confirmed by exhausting /collections/all-mirrors/products.json?limit=250 (7 unique product ids, page 2 empty)",
+      "flag": null
+    },
+    {
+      "category": "Wall Decor & Mirrors",
+      "sub_category": "Wall Hangings",
+      "parent": false,
+      "qty": 22,
+      "link": "https://www.the-citizenry.com/collections/all-decor-wall-hangings",
+      "evidence": "embedded collection JSON on the PLP: collection_handle\":\"all-decor-wall-hangings\",\"total_products\":22 -- confirmed by exhausting /collections/all-decor-wall-hangings/products.json?limit=250 (22 unique product ids)",
+      "flag": null
+    },
+    {
+      "category": "Wall Decor & Mirrors",
+      "sub_category": "Framed Art",
+      "parent": false,
+      "qty": 9,
+      "link": "https://www.the-citizenry.com/collections/framed-art-1",
+      "evidence": "embedded collection JSON on the PLP: collection_handle\":\"framed-art-1\",\"total_products\":9 -- confirmed by exhausting /collections/framed-art-1/products.json?limit=250 (9 unique product ids)",
+      "flag": "OVERLAP: 8 of these 9 products also appear in Wall Hangings (all-decor-wall-hangings, 22); only 'Mihki Wall Hanging - Midnight' is unique. Kept because it is a separate named node in the site's own nav, but it is close to a framed-vs-unframed re-cut of the same population."
+    },
+    {
+      "category": "Wall Decor & Mirrors",
+      "sub_category": "Travel Prints",
+      "parent": false,
+      "qty": 16,
+      "link": "https://www.the-citizenry.com/collections/all-travel-prints",
+      "evidence": "embedded collection JSON on the PLP: collection_handle\":\"all-travel-prints\",\"total_products\":16 -- confirmed by exhausting /collections/all-travel-prints/products.json?limit=250 (16 unique product ids, all product_type 'Art')",
+      "flag": null
+    },
+    {
+      "category": "Home Decor",
+      "sub_category": "Baskets & Decor",
+      "parent": true,
+      "qty": null,
+      "link": null,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Home Decor",
+      "sub_category": "Planters & Vases",
+      "parent": false,
+      "qty": 14,
+      "link": "https://www.the-citizenry.com/collections/all-planters",
+      "evidence": "embedded collection JSON on the PLP: collection_handle\":\"all-planters\",\"total_products\":14 -- confirmed by exhausting /collections/all-planters/products.json?limit=250 (14 unique product ids)",
+      "flag": "OVERLAP: 11 of 14 vases also appear in Accents (all-accents, 40); 3 are unique to this node. Neither category contains the other, so both are kept."
+    },
+    {
+      "category": "Home Decor",
+      "sub_category": "Accents",
+      "parent": false,
+      "qty": 40,
+      "link": "https://www.the-citizenry.com/collections/all-accents",
+      "evidence": "embedded collection JSON on the PLP: collection_handle\":\"all-accents\",\"total_products\":40 -- confirmed by exhausting /collections/all-accents/products.json?limit=250 (40 unique product ids). Titles inspected: vases, sculptures, trays, bookends, candle holders, unscented beeswax/twist taper candles - decorative throughout.",
+      "flag": null
+    },
+    {
+      "category": "Kitchen & Dining",
+      "sub_category": "Kitchen",
+      "parent": true,
+      "qty": null,
+      "link": null,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Kitchen & Dining",
+      "sub_category": "Tabletop",
+      "parent": false,
+      "qty": 26,
+      "link": "https://www.the-citizenry.com/collections/shop-all-tabletop",
+      "evidence": "embedded collection JSON on the PLP: collection_handle\":\"shop-all-tabletop\",\"total_products\":26 -- confirmed by exhausting /collections/shop-all-tabletop/products.json?limit=250 (26 unique product ids)",
+      "flag": "MIXED (minor): 3 of 26 are table linens (Stonewashed Linen Tablecloth, Sangeet Linen Napkins, Onam Table Runner); the remaining 23 are glassware, serveware and tabletop decor. Node exposes no sub-categories to split. Also appears under 'Baskets & Decor' at the same URL - emitted once here."
+    },
+    {
+      "category": "Kitchen & Dining",
+      "sub_category": "Drinkware & Bar",
+      "parent": false,
+      "qty": 7,
+      "link": "https://www.the-citizenry.com/collections/all-tableware-glassware",
+      "evidence": "embedded collection JSON on the PLP: collection_handle\":\"all-tableware-glassware\",\"total_products\":7 -- confirmed by exhausting /collections/all-tableware-glassware/products.json?limit=250 (7 unique product ids, all glassware/mugs)",
+      "flag": "OVERLAP: all 7 also appear inside Tabletop (shop-all-tabletop, 26). Kept as a distinct sibling nav node."
+    },
+    {
+      "category": "Kitchen & Dining",
+      "sub_category": "Entertaining & Serving",
+      "parent": false,
+      "qty": 16,
+      "link": "https://www.the-citizenry.com/collections/plp-redesign-bath-kitchen-tableware-serving-essentials",
+      "evidence": "embedded collection JSON on the PLP: collection_handle\":\"plp-redesign-bath-kitchen-tableware-serving-essentials\",\"total_products\":16 -- confirmed by exhausting that collection's products.json?limit=250 (16 unique product ids: serving boards, bowls, trays, coasters, salad servers)",
+      "flag": null
+    }
+  ]
+}

@@ -1,0 +1,644 @@
+{
+  "sr": 90,
+  "company": "Zara Home UK",
+  "brand_site": "zarahome.com",
+  "country": "UK",
+  "site_url": "https://www.zarahome.com/gb/",
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "ACCESS: robots.txt (tier a) has no anthropic-ai/ClaudeBot/Claude-Web/Claude-User/Claude-SearchBot entries and no blanket 'User-agent: * / Disallow: /', so no tier is blocked by policy; it does list the sitemap index. Tier (a) direct HTTP (curl_cffi, chrome124 impersonation) worked for robots.txt and the GB-locale XML sitemap (8/info/sitemaps/sitemap-home-categories-zh-gb-0.xml.gz, 338 URLs) - Akamai does not challenge these static assets - but every HTML page (home, category) returned an Akamai Bot Manager interstitial JS-challenge shell (bm-verify meta-refresh), unusable for parsing. Tier (b) Playwright headless=True got a hard 'Access Denied' (Akamai fingerprints headless Chromium). Escalated within tier (b) to headless=False (headed) Chromium with --disable-blink-features=AutomationControlled, which passed the Akamai challenge cleanly and loaded the real Angular site; reused across all subsequent page loads in the same tier. Tier (c) Claude-in-Chrome was not needed (and was confirmed disconnected beforehand). This mirrors the sister site Zara Home UAE (SR21) exactly. TREE: built the union of (1) the top mega-menu flyout for every department (Bedroom, Home Decor, Kitchen and Dining, Bathroom, Kids and Baby, Furniture, Laundry Care), (2) each visited category page's own on-page tab-strip sub-navigation, and (3) the GB-locale XML sitemap cross-checked by keyword (bed/cushion/throw/blanket/towel/curtain/napkin/rug/organis/storage/basket/box/etc) to catch nodes not reachable from the nav. Sitemap URLs suffixed '-all-' were confirmed (by visiting) to be either the group's own View-All aggregator (dropped per the Parent Category URL Rule since true sibling subcategory pages exist, e.g. bedroom-fillings-all-n1384, dining-table-linen-tablecloths-n1034 traffic already covered by Napkins/Placemats/Table Runners, home-decor-rugs-living-room-n992 covered by its Vintage/Jute/Doormats/Runner/Kitchen children) or genuinely dead (redirect to /gb/error.html: bed-linen-all-n4129, bedroom-basic-sheets-all-n5514, bedroom-fillings-n954, livingroom-rugs-all-n4121, kids-bedroom-decoration-n1119, dining-furniture-storage-n4742). winter-duvet-n4965 loaded normally (title 'Winter duvets') but rendered 0 product cards and duplicates the already-captured Duvets leaf, so it was omitted rather than recorded as a fabricated/duplicate row. QTY: Zara Home shows no explicit 'N products' counter; the GB store lazy-loads inside an Angular Material sidenav container (not the window), so qty = the count of article.product-item cards after programmatically scrolling that inner container to bottom repeatedly until the raw card count was stable across 3+ consecutive checks. A second-order defect was found and corrected during this run: on any page with its own material/type filter-tab strip (e.g. Basics' COTTON PERCALE/SATEEN COTTON/LINEN tabs, or Kids Bedding's BED LINEN/COT BEDDING/BEDSPREADS AND QUILTS/CUSHIONS AND THROWS tabs), those tab chips render as sibling <article> elements identical in tag to real product cards, inflating the raw count by the tab count (verified directly on bedroom-basic-sheets-percale-n5336 and doormats-n4979, where 6 of 8 raw <article> elements were tab chips, not products). Final qty on every leaf below = raw article count filtered to only cards containing an actual quick-add 'ADD' button + price, which reliably excludes the tab chips (confirmed no false negatives: a product genuinely out of stock/without a live price was not observed in any sampled page). All qtys were reconfirmed via a second full pass after this fix. EXCLUDED and why: home-decor-baskets-n997 and home-decor-jewellery-boxes-n971 (breadcrumbed under HOME DECOR, decorative-basket/jewellery-box boundary per storage.md Sec5/Sec24 - Decorative Home Accessories, out of this task's scope); furniture-storage-n4111 and dining-furniture-storage-n4742 (Furniture nav group / dead link respectively - Furniture.xlsx's domain, already validated, not re-verified here); bathroom-bins-n3827 (waste/trash bins, not storage/organization containers), bathroom-soap-dispensers-n3882, bathroom-toothbrush-tumblers-n3883, bathroom-soap-dishes-n3884, bathroom-trays-n3885 (hygiene/decorative accessories, not storage per storage.md Sec24/Sec26); laundry-care-n1399 (title 'Products for clothing care and laundry care' - mixed ironing/detergent/clothes-care equipment, predominantly non-storage per storage.md Sec11/Sec30, no dedicated storage-only sub-listing); laundry-cleaning-n2485 (cleaning supplies, not storage); bathroom-baskets-all-n4142 (title 'Bathroom Baskets', qty 43 - a narrower see-all than the sum of the already-captured Cosmetic Storage (56) + Laundry Baskets (18) children, i.e. the group's own aggregator tab, dropped per the Parent Category URL Rule); dressing-room-n2463 (its own 'Storage' tab is a same-URL celement filter pointing back to bathroom-baskets-all-n4142, already excluded as a duplicate aggregator; the page itself is otherwise a Hangers+Furniture+Storage cross-link aggregate, not a distinct category); kids-hangers-n1131 (hangers, not covered by storage.md); bathroom-toiletry-wash-bags-n4748 (personal toiletry/wash bag - carrying bag, not home textile/storage per storage.md Sec6 boundary); kids-furniture-n1122 (its 'Storage'/'Desks and chairs' nav labels are celement filters on the Kids Furniture page - Furniture.xlsx's domain); picnic-collection-n1812 (mixed general-merchandise themed Collection - plates/cutlery/blankets/baskets combined under one qty, not a clean single-type category, and a Collection per the View-All/Collections exclusion rule). Also excluded as not applicable to either ruleset: Vases, Photo Frames, Decorative Candles, Candle Holders, Door Knobs and Hooks (Decorative Home Accessories); Mirrors, Lamps and Lighting (Lighting/other tasks); Kitchen & Dining tableware/glassware/cutlery/cookware/serving trays (Kitchen and Dining task, not Storage per storage.md Sec13/Sec26 unless explicitly a storage/organization product, which these are not); all Furniture-nav items (sofas, chairs, tables, wardrobes, bed frames, headboards, sideboards, cabinets, shelving units - Furniture.xlsx's already-validated domain); Clothing and Footwear, Toys, Fragrances (out of scope for both rulesets). LOW-confidence rows (review queue): Bathrobes and Slippers (bathroom-bathrobes-n1053, Textile) - mixes textile bathrobes with footwear slippers under one qty; and Storage (baby-organisers-n4758, Storage) - title 'Baby bumpers and organizers' may mix cot bumpers (non-storage) with organizers (storage), no way to isolate a storage-only count. MEDIUM-confidence rows: Duvets, Pillows, Cushion Inserts, Protectors (Textile) and Towel Racks and Hooks (Storage) - see per-row flags.",
+  "textile_rows": [
+    {
+      "category": "Textile",
+      "sub_category": "Bedding",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Basics",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Cotton Percale",
+      "qty": 29,
+      "link": "https://www.zarahome.com/gb/bedroom-basic-sheets-percale-n5336",
+      "is_group": false,
+      "evidence": "Playwright-rendered category page (headed Chromium, --disable-blink-features=AutomationControlled, Akamai-cleared); product cards counted via scroll-to-bottom stabilization on the Angular Material sidenav container (article elements, count stable across 3+ consecutive checks), then filtered to only cards containing an actual quick-add 'ADD' button + price (this excludes the page's own material/type filter-tab chips, which also render as sibling <article> elements with no price/ADD) = 29. Page title: 'COTTON PERCALE | Zara Home United Kingdom'.",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Sateen Cotton",
+      "qty": 73,
+      "link": "https://www.zarahome.com/gb/bedroom-basic-sheets-sateen-n5335",
+      "is_group": false,
+      "evidence": "Playwright-rendered category page (headed Chromium, --disable-blink-features=AutomationControlled, Akamai-cleared); product cards counted via scroll-to-bottom stabilization on the Angular Material sidenav container (article elements, count stable across 3+ consecutive checks), then filtered to only cards containing an actual quick-add 'ADD' button + price (this excludes the page's own material/type filter-tab chips, which also render as sibling <article> elements with no price/ADD) = 73. Page title: 'SATEEN COTTON | Zara Home United Kingdom'.",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Linen",
+      "qty": 36,
+      "link": "https://www.zarahome.com/gb/bedroom-basic-sheets-linen-n5334",
+      "is_group": false,
+      "evidence": "Playwright-rendered category page (headed Chromium, --disable-blink-features=AutomationControlled, Akamai-cleared); product cards counted via scroll-to-bottom stabilization on the Angular Material sidenav container (article elements, count stable across 3+ consecutive checks), then filtered to only cards containing an actual quick-add 'ADD' button + price (this excludes the page's own material/type filter-tab chips, which also render as sibling <article> elements with no price/ADD) = 36. Page title: 'LINEN | Zara Home United Kingdom'.",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Pillowcases",
+      "qty": 79,
+      "link": "https://www.zarahome.com/gb/bedroom-pillowcases-n949",
+      "is_group": false,
+      "evidence": "Playwright-rendered category page (headed Chromium, --disable-blink-features=AutomationControlled, Akamai-cleared); product cards counted via scroll-to-bottom stabilization on the Angular Material sidenav container (article elements, count stable across 3+ consecutive checks), then filtered to only cards containing an actual quick-add 'ADD' button + price (this excludes the page's own material/type filter-tab chips, which also render as sibling <article> elements with no price/ADD) = 79. Page title: 'Pillowcases | Zara Home United Kingdom'.",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Fitted Sheets",
+      "qty": 50,
+      "link": "https://www.zarahome.com/gb/bedroom-fitted-sheets-n948",
+      "is_group": false,
+      "evidence": "Playwright-rendered category page (headed Chromium, --disable-blink-features=AutomationControlled, Akamai-cleared); product cards counted via scroll-to-bottom stabilization on the Angular Material sidenav container (article elements, count stable across 3+ consecutive checks), then filtered to only cards containing an actual quick-add 'ADD' button + price (this excludes the page's own material/type filter-tab chips, which also render as sibling <article> elements with no price/ADD) = 50. Page title: 'Fitted sheets | Zara Home United Kingdom'.",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Flat Sheets",
+      "qty": 46,
+      "link": "https://www.zarahome.com/gb/bedroom-flat-sheets-n947",
+      "is_group": false,
+      "evidence": "Playwright-rendered category page (headed Chromium, --disable-blink-features=AutomationControlled, Akamai-cleared); product cards counted via scroll-to-bottom stabilization on the Angular Material sidenav container (article elements, count stable across 3+ consecutive checks), then filtered to only cards containing an actual quick-add 'ADD' button + price (this excludes the page's own material/type filter-tab chips, which also render as sibling <article> elements with no price/ADD) = 46. Page title: 'Flat Sheets | Zara Home United Kingdom'.",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Valances",
+      "qty": 6,
+      "link": "https://www.zarahome.com/gb/bedroom-valances-n952",
+      "is_group": false,
+      "evidence": "Playwright-rendered category page (headed Chromium, --disable-blink-features=AutomationControlled, Akamai-cleared); product cards counted via scroll-to-bottom stabilization on the Angular Material sidenav container (article elements, count stable across 3+ consecutive checks), then filtered to only cards containing an actual quick-add 'ADD' button + price (this excludes the page's own material/type filter-tab chips, which also render as sibling <article> elements with no price/ADD) = 6. Page title: 'Valances | Zara Home United Kingdom'.",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Bedspreads",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Quilted Bedspreads",
+      "qty": 74,
+      "link": "https://www.zarahome.com/gb/bedroom-quilted-bedspreads-n951",
+      "is_group": false,
+      "evidence": "Playwright-rendered category page (headed Chromium, --disable-blink-features=AutomationControlled, Akamai-cleared); product cards counted via scroll-to-bottom stabilization on the Angular Material sidenav container (article elements, count stable across 3+ consecutive checks), then filtered to only cards containing an actual quick-add 'ADD' button + price (this excludes the page's own material/type filter-tab chips, which also render as sibling <article> elements with no price/ADD) = 74. Page title: 'Quilted bedspreads | Zara Home United Kingdom'.",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Summer Bedspreads",
+      "qty": 42,
+      "link": "https://www.zarahome.com/gb/bedspreads-summer-n4877",
+      "is_group": false,
+      "evidence": "Playwright-rendered category page (headed Chromium, --disable-blink-features=AutomationControlled, Akamai-cleared); product cards counted via scroll-to-bottom stabilization on the Angular Material sidenav container (article elements, count stable across 3+ consecutive checks), then filtered to only cards containing an actual quick-add 'ADD' button + price (this excludes the page's own material/type filter-tab chips, which also render as sibling <article> elements with no price/ADD) = 42. Page title: 'Summer quilts | Zara Home United Kingdom'.",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Duvets",
+      "qty": 7,
+      "link": "https://www.zarahome.com/gb/bedroom-duvets-n956",
+      "is_group": false,
+      "evidence": "Playwright-rendered category page (headed Chromium, --disable-blink-features=AutomationControlled, Akamai-cleared); product cards counted via scroll-to-bottom stabilization on the Angular Material sidenav container (article elements, count stable across 3+ consecutive checks), then filtered to only cards containing an actual quick-add 'ADD' button + price (this excludes the page's own material/type filter-tab chips, which also render as sibling <article> elements with no price/ADD) = 7. Page title: 'Duvets of various materials and bed sizes | Zara Home United Kingdom'.",
+      "flag": "No breadcrumb widget on this page template; classification confirmed via page title/H1 and nav placement under BEDDING > DUVETS AND PILLOWS.",
+      "confidence": "MEDIUM"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Pillows",
+      "qty": 4,
+      "link": "https://www.zarahome.com/gb/bedroom-pillows-n957",
+      "is_group": false,
+      "evidence": "Playwright-rendered category page (headed Chromium, --disable-blink-features=AutomationControlled, Akamai-cleared); product cards counted via scroll-to-bottom stabilization on the Angular Material sidenav container (article elements, count stable across 3+ consecutive checks), then filtered to only cards containing an actual quick-add 'ADD' button + price (this excludes the page's own material/type filter-tab chips, which also render as sibling <article> elements with no price/ADD) = 4. Page title: 'Pillows | Zara Home United Kingdom'.",
+      "flag": "No breadcrumb widget on this page template; classification confirmed via page title/H1 and nav placement under BEDDING > DUVETS AND PILLOWS.",
+      "confidence": "MEDIUM"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Cushion Inserts",
+      "qty": 5,
+      "link": "https://www.zarahome.com/gb/bedroom-cushion-inserts-n958",
+      "is_group": false,
+      "evidence": "Playwright-rendered category page (headed Chromium, --disable-blink-features=AutomationControlled, Akamai-cleared); product cards counted via scroll-to-bottom stabilization on the Angular Material sidenav container (article elements, count stable across 3+ consecutive checks), then filtered to only cards containing an actual quick-add 'ADD' button + price (this excludes the page's own material/type filter-tab chips, which also render as sibling <article> elements with no price/ADD) = 5. Page title: 'Cushion fillings | Zara Home United Kingdom'.",
+      "flag": "No breadcrumb widget on this page template; page title 'Cushion fillings' confirms textile filling product under BEDDING > DUVETS AND PILLOWS.",
+      "confidence": "MEDIUM"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Protectors",
+      "qty": 5,
+      "link": "https://www.zarahome.com/gb/bedroom-protectors-n953",
+      "is_group": false,
+      "evidence": "Playwright-rendered category page (headed Chromium, --disable-blink-features=AutomationControlled, Akamai-cleared); product cards counted via scroll-to-bottom stabilization on the Angular Material sidenav container (article elements, count stable across 3+ consecutive checks), then filtered to only cards containing an actual quick-add 'ADD' button + price (this excludes the page's own material/type filter-tab chips, which also render as sibling <article> elements with no price/ADD) = 5. Page title: 'Mattress and Pillow Protectors | Zara Home United Kingdom'.",
+      "flag": "No breadcrumb widget on this page template; classification confirmed via page title 'Mattress and Pillow Protectors'.",
+      "confidence": "MEDIUM"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Cushions",
+      "qty": 121,
+      "link": "https://www.zarahome.com/gb/bedroom-cushions-n964",
+      "is_group": false,
+      "evidence": "Playwright-rendered category page (headed Chromium, --disable-blink-features=AutomationControlled, Akamai-cleared); product cards counted via scroll-to-bottom stabilization on the Angular Material sidenav container (article elements, count stable across 3+ consecutive checks), then filtered to only cards containing an actual quick-add 'ADD' button + price (this excludes the page's own material/type filter-tab chips, which also render as sibling <article> elements with no price/ADD) = 121. Page title: 'Bedroom Cushions | Zara Home United Kingdom'.",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Blankets and Throws",
+      "qty": 85,
+      "link": "https://www.zarahome.com/gb/bedroom-throws-blankets-n963",
+      "is_group": false,
+      "evidence": "Playwright-rendered category page (headed Chromium, --disable-blink-features=AutomationControlled, Akamai-cleared); product cards counted via scroll-to-bottom stabilization on the Angular Material sidenav container (article elements, count stable across 3+ consecutive checks), then filtered to only cards containing an actual quick-add 'ADD' button + price (this excludes the page's own material/type filter-tab chips, which also render as sibling <article> elements with no price/ADD) = 85. Page title: 'Bed Blankets | Zara Home United Kingdom'.",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Home Decor",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Rugs",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Bedroom Rugs",
+      "qty": 51,
+      "link": "https://www.zarahome.com/gb/bedroom-rugs-n961",
+      "is_group": false,
+      "evidence": "Playwright-rendered category page (headed Chromium, --disable-blink-features=AutomationControlled, Akamai-cleared); product cards counted via scroll-to-bottom stabilization on the Angular Material sidenav container (article elements, count stable across 3+ consecutive checks), then filtered to only cards containing an actual quick-add 'ADD' button + price (this excludes the page's own material/type filter-tab chips, which also render as sibling <article> elements with no price/ADD) = 51. Page title: 'Bedroom rugs | Zara Home United Kingdom'.",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Vintage Rugs",
+      "qty": 24,
+      "link": "https://www.zarahome.com/gb/rugs-vintage-n4975",
+      "is_group": false,
+      "evidence": "Playwright-rendered category page (headed Chromium, --disable-blink-features=AutomationControlled, Akamai-cleared); product cards counted via scroll-to-bottom stabilization on the Angular Material sidenav container (article elements, count stable across 3+ consecutive checks), then filtered to only cards containing an actual quick-add 'ADD' button + price (this excludes the page's own material/type filter-tab chips, which also render as sibling <article> elements with no price/ADD) = 24. Page title: 'Vintage Effect Rugs | Zara Home United Kingdom'.",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Jute Rugs",
+      "qty": 28,
+      "link": "https://www.zarahome.com/gb/rugs-jute-n4978",
+      "is_group": false,
+      "evidence": "Playwright-rendered category page (headed Chromium, --disable-blink-features=AutomationControlled, Akamai-cleared); product cards counted via scroll-to-bottom stabilization on the Angular Material sidenav container (article elements, count stable across 3+ consecutive checks), then filtered to only cards containing an actual quick-add 'ADD' button + price (this excludes the page's own material/type filter-tab chips, which also render as sibling <article> elements with no price/ADD) = 28. Page title: 'Jute Rugs | Zara Home United Kingdom'.",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Doormats",
+      "qty": 2,
+      "link": "https://www.zarahome.com/gb/doormats-n4979",
+      "is_group": false,
+      "evidence": "Playwright-rendered category page (headed Chromium, --disable-blink-features=AutomationControlled, Akamai-cleared); product cards counted via scroll-to-bottom stabilization on the Angular Material sidenav container (article elements, count stable across 3+ consecutive checks), then filtered to only cards containing an actual quick-add 'ADD' button + price (this excludes the page's own material/type filter-tab chips, which also render as sibling <article> elements with no price/ADD) = 2. Page title: 'Doormats | Zara Home United Kingdom'.",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Runner Rugs",
+      "qty": 20,
+      "link": "https://www.zarahome.com/gb/rugs-hallway-runners-n4181",
+      "is_group": false,
+      "evidence": "Playwright-rendered category page (headed Chromium, --disable-blink-features=AutomationControlled, Akamai-cleared); product cards counted via scroll-to-bottom stabilization on the Angular Material sidenav container (article elements, count stable across 3+ consecutive checks), then filtered to only cards containing an actual quick-add 'ADD' button + price (this excludes the page's own material/type filter-tab chips, which also render as sibling <article> elements with no price/ADD) = 20. Page title: 'Hallway Runner Rugs | Zara Home United Kingdom'.",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Kitchen Rugs",
+      "qty": 6,
+      "link": "https://www.zarahome.com/gb/kitchen-rugs-n2799",
+      "is_group": false,
+      "evidence": "Playwright-rendered category page (headed Chromium, --disable-blink-features=AutomationControlled, Akamai-cleared); product cards counted via scroll-to-bottom stabilization on the Angular Material sidenav container (article elements, count stable across 3+ consecutive checks), then filtered to only cards containing an actual quick-add 'ADD' button + price (this excludes the page's own material/type filter-tab chips, which also render as sibling <article> elements with no price/ADD) = 6. Page title: 'Non-Slip Kitchen Rugs | Zara Home United Kingdom'.",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Blankets and Throws",
+      "qty": 37,
+      "link": "https://www.zarahome.com/gb/home-decor-throws-living-room-couch-n995",
+      "is_group": false,
+      "evidence": "Playwright-rendered category page (headed Chromium, --disable-blink-features=AutomationControlled, Akamai-cleared); product cards counted via scroll-to-bottom stabilization on the Angular Material sidenav container (article elements, count stable across 3+ consecutive checks), then filtered to only cards containing an actual quick-add 'ADD' button + price (this excludes the page's own material/type filter-tab chips, which also render as sibling <article> elements with no price/ADD) = 37. Page title: 'Throws for sofas and living rooms | Zara Home United Kingdom'.",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Cushions",
+      "qty": 99,
+      "link": "https://www.zarahome.com/gb/home-decor-cushions-couch-living-room-n994",
+      "is_group": false,
+      "evidence": "Playwright-rendered category page (headed Chromium, --disable-blink-features=AutomationControlled, Akamai-cleared); product cards counted via scroll-to-bottom stabilization on the Angular Material sidenav container (article elements, count stable across 3+ consecutive checks), then filtered to only cards containing an actual quick-add 'ADD' button + price (this excludes the page's own material/type filter-tab chips, which also render as sibling <article> elements with no price/ADD) = 99. Page title: 'Decorative cushions for the sofa and living room | Zara Home United Kingdom'.",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Curtains and Roller Blinds",
+      "qty": 19,
+      "link": "https://www.zarahome.com/gb/home-decor-curtains-blinds-n996",
+      "is_group": false,
+      "evidence": "Playwright-rendered category page (headed Chromium, --disable-blink-features=AutomationControlled, Akamai-cleared); product cards counted via scroll-to-bottom stabilization on the Angular Material sidenav container (article elements, count stable across 3+ consecutive checks), then filtered to only cards containing an actual quick-add 'ADD' button + price (this excludes the page's own material/type filter-tab chips, which also render as sibling <article> elements with no price/ADD) = 19. Page title: 'Curtains and roller blinds for living room | Zara Home United Kingdom'.",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Kitchen and Dining",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Table Linen",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Napkins",
+      "qty": 55,
+      "link": "https://www.zarahome.com/gb/dining-napkins-n1037",
+      "is_group": false,
+      "evidence": "Playwright-rendered category page (headed Chromium, --disable-blink-features=AutomationControlled, Akamai-cleared); product cards counted via scroll-to-bottom stabilization on the Angular Material sidenav container (article elements, count stable across 3+ consecutive checks), then filtered to only cards containing an actual quick-add 'ADD' button + price (this excludes the page's own material/type filter-tab chips, which also render as sibling <article> elements with no price/ADD) = 55. Page title: 'Napkins | Zara Home United Kingdom'.",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Placemats",
+      "qty": 51,
+      "link": "https://www.zarahome.com/gb/dining-placemats-n1038",
+      "is_group": false,
+      "evidence": "Playwright-rendered category page (headed Chromium, --disable-blink-features=AutomationControlled, Akamai-cleared); product cards counted via scroll-to-bottom stabilization on the Angular Material sidenav container (article elements, count stable across 3+ consecutive checks), then filtered to only cards containing an actual quick-add 'ADD' button + price (this excludes the page's own material/type filter-tab chips, which also render as sibling <article> elements with no price/ADD) = 51. Page title: 'Placemats | Zara Home United Kingdom'.",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Table Runners",
+      "qty": 18,
+      "link": "https://www.zarahome.com/gb/dining-table-runners-n1039",
+      "is_group": false,
+      "evidence": "Playwright-rendered category page (headed Chromium, --disable-blink-features=AutomationControlled, Akamai-cleared); product cards counted via scroll-to-bottom stabilization on the Angular Material sidenav container (article elements, count stable across 3+ consecutive checks), then filtered to only cards containing an actual quick-add 'ADD' button + price (this excludes the page's own material/type filter-tab chips, which also render as sibling <article> elements with no price/ADD) = 18. Page title: 'Table runners | Zara Home United Kingdom'.",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Kitchen Textiles",
+      "qty": 59,
+      "link": "https://www.zarahome.com/gb/kitchen-textiles-n1406",
+      "is_group": false,
+      "evidence": "Playwright-rendered category page (headed Chromium, --disable-blink-features=AutomationControlled, Akamai-cleared); product cards counted via scroll-to-bottom stabilization on the Angular Material sidenav container (article elements, count stable across 3+ consecutive checks), then filtered to only cards containing an actual quick-add 'ADD' button + price (this excludes the page's own material/type filter-tab chips, which also render as sibling <article> elements with no price/ADD) = 59. Page title: 'Kitchen textiles and accessories | Zara Home United Kingdom'.",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Bathroom",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Towels",
+      "qty": 120,
+      "link": "https://www.zarahome.com/gb/bathroom-towels-n1051",
+      "is_group": false,
+      "evidence": "Playwright-rendered category page (headed Chromium, --disable-blink-features=AutomationControlled, Akamai-cleared); product cards counted via scroll-to-bottom stabilization on the Angular Material sidenav container (article elements, count stable across 3+ consecutive checks), then filtered to only cards containing an actual quick-add 'ADD' button + price (this excludes the page's own material/type filter-tab chips, which also render as sibling <article> elements with no price/ADD) = 120. Page title: 'Bathroom towels | Zara Home United Kingdom'.",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Everyday Towels",
+      "qty": 35,
+      "link": "https://www.zarahome.com/gb/bathroom-basic-towels-n1817",
+      "is_group": false,
+      "evidence": "Playwright-rendered category page (headed Chromium, --disable-blink-features=AutomationControlled, Akamai-cleared); product cards counted via scroll-to-bottom stabilization on the Angular Material sidenav container (article elements, count stable across 3+ consecutive checks), then filtered to only cards containing an actual quick-add 'ADD' button + price (this excludes the page's own material/type filter-tab chips, which also render as sibling <article> elements with no price/ADD) = 35. Page title: 'Basic Towels | Zara Home United Kingdom'.",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Beach Towels",
+      "qty": 9,
+      "link": "https://www.zarahome.com/gb/bathroom-towels-beach-n1335",
+      "is_group": false,
+      "evidence": "Playwright-rendered category page (headed Chromium, --disable-blink-features=AutomationControlled, Akamai-cleared); product cards counted via scroll-to-bottom stabilization on the Angular Material sidenav container (article elements, count stable across 3+ consecutive checks), then filtered to only cards containing an actual quick-add 'ADD' button + price (this excludes the page's own material/type filter-tab chips, which also render as sibling <article> elements with no price/ADD) = 9. Page title: 'Beach Towels | Zara Home United Kingdom'.",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Bath Mats",
+      "qty": 51,
+      "link": "https://www.zarahome.com/gb/bathroom-bathmats-n1052",
+      "is_group": false,
+      "evidence": "Playwright-rendered category page (headed Chromium, --disable-blink-features=AutomationControlled, Akamai-cleared); product cards counted via scroll-to-bottom stabilization on the Angular Material sidenav container (article elements, count stable across 3+ consecutive checks), then filtered to only cards containing an actual quick-add 'ADD' button + price (this excludes the page's own material/type filter-tab chips, which also render as sibling <article> elements with no price/ADD) = 51. Page title: 'Bathmats for the bathroom | Zara Home United Kingdom'.",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Bathrobes and Slippers",
+      "qty": 47,
+      "link": "https://www.zarahome.com/gb/bathroom-bathrobes-n1053",
+      "is_group": false,
+      "evidence": "Playwright-rendered category page (headed Chromium, --disable-blink-features=AutomationControlled, Akamai-cleared); product cards counted via scroll-to-bottom stabilization on the Angular Material sidenav container (article elements, count stable across 3+ consecutive checks), then filtered to only cards containing an actual quick-add 'ADD' button + price (this excludes the page's own material/type filter-tab chips, which also render as sibling <article> elements with no price/ADD) = 47. Page title: 'Bathrobes and bathroom slippers | Zara Home United Kingdom'.",
+      "flag": "MANUAL REVIEW: page title 'Bathrobes and bathroom slippers' - this single listing mixes textile bathrobes with slippers (footwear, non-textile) under one qty; site provides no bathrobes-only listing to isolate a textile-only count.",
+      "confidence": "LOW"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Kids and Baby",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Bedding",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Cot Bedding",
+      "qty": 79,
+      "link": "https://www.zarahome.com/gb/baby-bed-linen-n3948",
+      "is_group": false,
+      "evidence": "Playwright-rendered category page (headed Chromium, --disable-blink-features=AutomationControlled, Akamai-cleared); product cards counted via scroll-to-bottom stabilization on the Angular Material sidenav container (article elements, count stable across 3+ consecutive checks), then filtered to only cards containing an actual quick-add 'ADD' button + price (this excludes the page's own material/type filter-tab chips, which also render as sibling <article> elements with no price/ADD) = 79. Page title: 'Cots and Rest Beds | Zara Home United Kingdom'.",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Bedspreads and Quilts",
+      "qty": 23,
+      "link": "https://www.zarahome.com/gb/kids-bedspreads-n2500",
+      "is_group": false,
+      "evidence": "Playwright-rendered category page (headed Chromium, --disable-blink-features=AutomationControlled, Akamai-cleared); product cards counted via scroll-to-bottom stabilization on the Angular Material sidenav container (article elements, count stable across 3+ consecutive checks), then filtered to only cards containing an actual quick-add 'ADD' button + price (this excludes the page's own material/type filter-tab chips, which also render as sibling <article> elements with no price/ADD) = 23. Page title: 'Kids' bedspreads | Zara Home United Kingdom'.",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Cushions and Throws",
+      "qty": 52,
+      "link": "https://www.zarahome.com/gb/kids-blankets-cushions-n1115",
+      "is_group": false,
+      "evidence": "Playwright-rendered category page (headed Chromium, --disable-blink-features=AutomationControlled, Akamai-cleared); product cards counted via scroll-to-bottom stabilization on the Angular Material sidenav container (article elements, count stable across 3+ consecutive checks), then filtered to only cards containing an actual quick-add 'ADD' button + price (this excludes the page's own material/type filter-tab chips, which also render as sibling <article> elements with no price/ADD) = 52. Page title: 'Kids' blankets and cushions | Zara Home United Kingdom'.",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Duvet Covers",
+      "qty": 21,
+      "link": "https://www.zarahome.com/gb/kids-duvet-covers-n1098",
+      "is_group": false,
+      "evidence": "Playwright-rendered category page (headed Chromium, --disable-blink-features=AutomationControlled, Akamai-cleared); product cards counted via scroll-to-bottom stabilization on the Angular Material sidenav container (article elements, count stable across 3+ consecutive checks), then filtered to only cards containing an actual quick-add 'ADD' button + price (this excludes the page's own material/type filter-tab chips, which also render as sibling <article> elements with no price/ADD) = 21. Page title: 'Kids' duvet covers | Zara Home United Kingdom'.",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Pillowcases",
+      "qty": 3,
+      "link": "https://www.zarahome.com/gb/kids-pillowcases-n1101",
+      "is_group": false,
+      "evidence": "Playwright-rendered category page (headed Chromium, --disable-blink-features=AutomationControlled, Akamai-cleared); product cards counted via scroll-to-bottom stabilization on the Angular Material sidenav container (article elements, count stable across 3+ consecutive checks), then filtered to only cards containing an actual quick-add 'ADD' button + price (this excludes the page's own material/type filter-tab chips, which also render as sibling <article> elements with no price/ADD) = 3. Page title: 'Kids' pillowcases | Zara Home United Kingdom'.",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Decoration",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Rugs",
+      "qty": 22,
+      "link": "https://www.zarahome.com/gb/kids-rugs-n1124",
+      "is_group": false,
+      "evidence": "Playwright-rendered category page (headed Chromium, --disable-blink-features=AutomationControlled, Akamai-cleared); product cards counted via scroll-to-bottom stabilization on the Angular Material sidenav container (article elements, count stable across 3+ consecutive checks), then filtered to only cards containing an actual quick-add 'ADD' button + price (this excludes the page's own material/type filter-tab chips, which also render as sibling <article> elements with no price/ADD) = 22. Page title: 'Children's Rugs | Zara Home United Kingdom'.",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Curtains",
+      "qty": 4,
+      "link": "https://www.zarahome.com/gb/kids-curtains-n1118",
+      "is_group": false,
+      "evidence": "Playwright-rendered category page (headed Chromium, --disable-blink-features=AutomationControlled, Akamai-cleared); product cards counted via scroll-to-bottom stabilization on the Angular Material sidenav container (article elements, count stable across 3+ consecutive checks), then filtered to only cards containing an actual quick-add 'ADD' button + price (this excludes the page's own material/type filter-tab chips, which also render as sibling <article> elements with no price/ADD) = 4. Page title: 'Children's Curtains | Zara Home United Kingdom'.",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Bathroom",
+      "qty": 66,
+      "link": "https://www.zarahome.com/gb/kids-bathroom-towels-n1140",
+      "is_group": false,
+      "evidence": "Playwright-rendered category page (headed Chromium, --disable-blink-features=AutomationControlled, Akamai-cleared); product cards counted via scroll-to-bottom stabilization on the Angular Material sidenav container (article elements, count stable across 3+ consecutive checks), then filtered to only cards containing an actual quick-add 'ADD' button + price (this excludes the page's own material/type filter-tab chips, which also render as sibling <article> elements with no price/ADD) = 66. Page title: 'Kids' bath towels | Zara Home United Kingdom'.",
+      "flag": null,
+      "confidence": "HIGH"
+    }
+  ],
+  "storage_rows": [
+    {
+      "category": "Storage",
+      "sub_category": "Bathroom",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Storage",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Cosmetic Storage",
+      "qty": 56,
+      "link": "https://www.zarahome.com/gb/bathroom-boxes-n3886",
+      "is_group": false,
+      "evidence": "Playwright-rendered category page (headed Chromium, --disable-blink-features=AutomationControlled, Akamai-cleared); product cards counted via scroll-to-bottom stabilization on the Angular Material sidenav container (article elements, count stable across 3+ consecutive checks), then filtered to only cards containing an actual quick-add 'ADD' button + price (this excludes the page's own material/type filter-tab chips, which also render as sibling <article> elements with no price/ADD) = 56. Page title: 'Cosmetic Storage | Zara Home United Kingdom'.",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Laundry Baskets",
+      "qty": 18,
+      "link": "https://www.zarahome.com/gb/bathroom-baskets-laundry-n3891",
+      "is_group": false,
+      "evidence": "Playwright-rendered category page (headed Chromium, --disable-blink-features=AutomationControlled, Akamai-cleared); product cards counted via scroll-to-bottom stabilization on the Angular Material sidenav container (article elements, count stable across 3+ consecutive checks), then filtered to only cards containing an actual quick-add 'ADD' button + price (this excludes the page's own material/type filter-tab chips, which also render as sibling <article> elements with no price/ADD) = 18. Page title: 'Laundry Baskets | Zara Home United Kingdom'.",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Towel Racks and Hooks",
+      "qty": 17,
+      "link": "https://www.zarahome.com/gb/bathroom-towel-racks-n4615",
+      "is_group": false,
+      "evidence": "Playwright-rendered category page (headed Chromium, --disable-blink-features=AutomationControlled, Akamai-cleared); product cards counted via scroll-to-bottom stabilization on the Angular Material sidenav container (article elements, count stable across 3+ consecutive checks), then filtered to only cards containing an actual quick-add 'ADD' button + price (this excludes the page's own material/type filter-tab chips, which also render as sibling <article> elements with no price/ADD) = 17. Page title: 'Towel Racks and Hooks | Zara Home United Kingdom'.",
+      "flag": "Category combines towel storage racks (Storage) with wall hooks (hardware) under one qty; site provides no racks-only listing.",
+      "confidence": "MEDIUM"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Kitchen and Dining",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Storage",
+      "qty": 55,
+      "link": "https://www.zarahome.com/gb/kitchen-storage-n3835",
+      "is_group": false,
+      "evidence": "Playwright-rendered category page (headed Chromium, --disable-blink-features=AutomationControlled, Akamai-cleared); product cards counted via scroll-to-bottom stabilization on the Angular Material sidenav container (article elements, count stable across 3+ consecutive checks), then filtered to only cards containing an actual quick-add 'ADD' button + price (this excludes the page's own material/type filter-tab chips, which also render as sibling <article> elements with no price/ADD) = 55. Page title: 'Kitchen Organisation | Zara Home United Kingdom'.",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Kids and Baby",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Baskets and Storage",
+      "qty": 24,
+      "link": "https://www.zarahome.com/gb/kids-storage-n3831",
+      "is_group": false,
+      "evidence": "Playwright-rendered category page (headed Chromium, --disable-blink-features=AutomationControlled, Akamai-cleared); product cards counted via scroll-to-bottom stabilization on the Angular Material sidenav container (article elements, count stable across 3+ consecutive checks), then filtered to only cards containing an actual quick-add 'ADD' button + price (this excludes the page's own material/type filter-tab chips, which also render as sibling <article> elements with no price/ADD) = 24. Page title: 'Children's Storage and Organisers | Zara Home United Kingdom'.",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Baby",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Storage",
+      "qty": 13,
+      "link": "https://www.zarahome.com/gb/baby-organisers-n4758",
+      "is_group": false,
+      "evidence": "Playwright-rendered category page (headed Chromium, --disable-blink-features=AutomationControlled, Akamai-cleared); product cards counted via scroll-to-bottom stabilization on the Angular Material sidenav container (article elements, count stable across 3+ consecutive checks), then filtered to only cards containing an actual quick-add 'ADD' button + price (this excludes the page's own material/type filter-tab chips, which also render as sibling <article> elements with no price/ADD) = 13. Page title: 'Baby bumpers and organizers | Zara Home United Kingdom'.",
+      "flag": "MANUAL REVIEW: page title 'Baby bumpers and organizers' - listing may mix cot bumpers (non-storage, safety/decorative) with organizers (storage); site provides no organizers-only listing to isolate a storage-only count.",
+      "confidence": "LOW"
+    }
+  ]
+}

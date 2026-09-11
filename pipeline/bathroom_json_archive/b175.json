@@ -1,0 +1,84 @@
+{
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ACCESS: robots.txt https://www.beaconlighting.com.au/robots.txt fetched FIRST via probe.fetch (HTTP 200, safari18_0_ios), 3,977 bytes. TWO user-agent groups only: '*' and 'bingbot'. NO Claude / ClaudeBot / anthropic-ai / Claude-Web group and no literal 'Claude' string anywhere in the file (regex-checked, and I confirmed every hit would have to be an actual User-agent: line per the Galeries Lafayette precedent). NO Crawl-delay. The * group disallows /blog/tag|archive|author|category/, /lib/, /*.php$, /report/, /var/, /customer/, /*SID=, /index.php/, /app/, /wishlist/, /sendfriend/, /review/, /checkout/, several /media/wysiwyg PDFs, /locator/, /banner/ajax/, /storeavailability/ajax/, and a long list of FACET/SORT parameters: item_colours, manufacturer, item_style, item_room_types, globe_type, globe_colour_temperature, colour_temperature, blade_type, fan_blade_size, light_location, item_light_location, item_lamp_types, item_outdoor_lighting_type, top_web_category, downlight_type, fan_with_light, product_list_order, price, fan_location, globe_effiency, colour_group, style, order, dir, limit, colour, plus /catalogsearch/result/*page= and *p=. I requested NONE of those. The only query parameter I used anywhere on this host was '?p=2' on three category pages, purely to verify page-2 counts: 'p=' is NOT in the disallow list (the /*p= rule is scoped to /catalogsearch/result/, an internal-search path I never touched) and it is not a facet or sort parameter. Every recorded link is a clean canonical URL with no parameter. ROBOTS IS PER-HOST - the PLP's data source is SearchSpring, so I checked https://nhbtv0.a.searchspring.io/robots.txt separately: HTTP 200, a single group 'User-agent: wotbox / Disallow: /', which does not name or bind us; api.searchspring.net checked too, identical. snapui.searchspring.io returns 403 on robots.txt and I did NOT fetch anything from it (it only serves the JS bundle). No bot wall anywhere on this site: every page returned 200 first time. No campaign parameters, no reader, no browser automation. TREE: taken from the site's OWN navigation and category index, three ways. (1) The declared sitemap https://www.beaconlighting.com.au/sitemap.xml (the single Sitemap: line in robots.txt), 7,176 non-media <loc> entries, of which 874 are depth-2+ category paths - the complete server-side category namespace including orphans. (2) Each PLP embeds its own SearchSpring category context - <script id=\"searchspring-context\"> category = { id, name, path } - which gives the AUTHORITATIVE parentage as the site itself stores it (the BATCH_BRIEF s5 rule: parentage from the page's own data, never from URL shape). This mattered: /lighting/bathroom-lighting/mirrors-vanity looks from its slug like a mirrors node but its context says name 'Bathroom Wall & Vanity Lights', path 'Beacon Lighting>LIGHTING>Bathroom Lighting>Bathroom Wall & Vanity Lights', and its H1 is 'Wall & Vanity Lights' - a lighting node. (3) The SearchSpring index's own ss_categories facet, which enumerates ALL 419 live category names with product counts in one call - a complete taxonomy listing that no mega-menu truncation can hide. Beacon's Bathroom structure: LIGHTING > Bathroom Lighting (id 194) > [Bathroom Mirrors with Lights (id 1747) | Bathroom Wall & Vanity Lights (id 788) | Heaters & Exhaust (id 806) | IP Rated Bathroom Lights (id 3603) | MFL Artisan Mix 'N' Match (id 1723) | Chameleon - Create Your Own (id 2913)], plus a parallel SHOP BY ROOM > Bathroom (id 374) > [Bathroom Mirrors (4185) | Bathroom Vanity Lights (4188) | Bathroom Heaters and Exhaust Fans (4191) | Bathroom Accent Lighting (4194)] re-cut, plus FANS > Exhaust Fans > 3 in 1 Bathroom Heaters (1301) and Bathroom Exhaust Fans, plus a HOME department [Decorative, Candles & Accessories, Cleaning, Homewares Brands]. FINDING (the dispatch-briefed check, and the Pooky precedent held): Beacon Lighting IS a lighting specialist, and it DOES have a real Bathroom node. /lighting/bathroom-lighting/mirror has H1 'Bathroom Mirrors with Lights' and holds 32 products that are MIRRORS, not lights - Contour LED Backlit Mirrors (arch/rectangle/oval/round), Contour LED Colour-Shifting Mirrors, 16 Contour Mirror Frames (black/brushed chrome/aged brass/bronze in 4 shapes), Aura Mirrored Cabinets with LED Backlight (round/arch/race-track), Aura Mirrors with Integrated LED Colour-Shifting Backlight and ANTI-FOG technology, Reflextion LED Swing Arm Vanity Mirrors, and a Haus & Co Round Mirror. Rule 10 names every one of these types explicitly (LED, Illuminated, Backlit, Anti-Fog, Cabinet Mirrors, Mirrored Cabinets, Vanity, Round/Oval/Rectangular/Arched) and rule 11 is decisive: primary type = mirror -> BATHROOM, including integrated-LED mirrors; primary type = lighting -> Lighting. This is the same call the run made on Pooky. QTY SOURCE AND PROOF: the PLP grid is client-rendered by SearchSpring (Beacon_Searchspring Magento module; snapui.searchspring.io/nhbtv0/bundle.js), so the HTML carries no rendered total. I did NOT use the page's totalRecords value - I caught it as a count trap: totalRecords is 237 on EVERY page I fetched, including Bathroom Lighting, Bathroom Mirrors with Lights, Wall & Vanity Lights, Heaters & Exhaust, Homewares Decorative and Pendant Lighting. A figure identical across nodes of visibly different size is not a count (BATCH_BRIEF s3); it is a store/record constant. Instead I used the storefront's OWN SearchSpring search API (nhbtv0.a.searchspring.io/api/search/search.json, the exact endpoint the PLP renders from) filtered by bgfilter.ss_categories, and then PROVED equivalence against the site's own rendered output on three nodes of DIFFERING SIZE using the server-side <noscript id=\"ss-plp-noscript\"> product list that Beacon renders into every PLP for crawlers: Bathroom Mirrors with Lights page 1 = 20 items, ?p=2 = 12 items, total 32 = API totalResults 32; Bathroom Mirrors (room cut) 20 + 9 = 29 = API 29; Homewares Decorative 20 + 4 = 24 = API 24. I also confirmed page 2 genuinely DIFFERS from page 1 in every case (different product names - the IKEA trap in BATCH_BRIEF s3 where a site re-serves page 1), and that the API returns the full result set in one call at resultsPerPage=100 with totalPages 1 for these nodes. Counts discriminate sharply per node: 198 / 116 / 62 / 55 / 50 / 41 / 32 / 29 / 27 / 24 / 21 / 5. VERIFICATION: H1 read on every page opened and matched the node requested (Bathroom Lighting -> 'Bathroom Lighting', /mirror -> 'Bathroom Mirrors with Lights', /mirrors-vanity -> 'Wall & Vanity Lights', /heaters-exhaust -> 'Heaters & Exhaust', /lighting-room/bathroom -> 'Shop By Bathroom', /lighting-room/bathroom/bathroom-mirrors -> 'Bathroom Mirrors'), and rel=canonical on each is self-referential so there is no canonical-alias dedup blind spot. RULE 24: /lighting/bathroom-lighting/mirror has NO child categories in the sitemap or in the SearchSpring taxonomy, so it is a true leaf and correctly carries its own URL and qty. Its parent Bathroom Lighting is not recorded (it has children, and it is a Lighting node). PRODUCT-LEVEL SWEEP (decisive, and it changed the outcome): I enumerated Beacon's ENTIRE live catalogue through the same API - 3,897 products, 3,897 unique URLs fetched, matching the API's own totalResults exactly - and keyword-scanned every product name. soap 0, toilet 0, shower 0, basin 0, faucet 0, 'tap ' 0, bathtub 0, bidet 0, sanitary 0, robe 0, tumbler 0, toothbrush 0, shelf 0. 'towel' returns 3, and they are REAL: three heated towel rails, which rules 15/17 would place in Bathroom - see review[] for the full disposition and why no row can be raised for them. 'cabinet' returns 6: 3 Aura Mirrored Cabinets (already inside the recorded 32) and 3 under-cabinet LED light kits (lighting). 'hook' returns 5: pendant hooks and a ceiling-fan T-hook (lighting hardware, not bathroom robe hooks). 'mirror' returns 35 against the recorded 32 - I checked all 3 extras and correctly excluded them: 'LEDlux Mecca LED Wireless Makeup Mirror LIGHT' (a table/desk lamp - rule 11's other limb: primary type lighting -> Lighting), and 'Lexicon Diamond Shade in Mirrored Smoke Glass' / 'Lexicon Short Shade in Mirrored Smoke Glass' (pendant-light shades in a mirrored FINISH - exactly the Georg Jensen / Iittala false-positive pattern BATCH_BRIEF s6 warns about, rejected on primary product type). DEDUP: already_extracted() run on every candidate leaf and every review node. ZERO hits on any bathroom node - /lighting/bathroom-lighting/mirror, /lighting-room/bathroom/bathroom-mirrors, /mirrors-vanity, /ip-rated-bathroom-lights, /heaters-exhaust and /lighting-room/bathroom are all absent from the index. Beacon has 52 prior records in the index, all Final.xlsx (Home Decor pass) lighting nodes plus /homewares/decorative and /homewares/candles-accessories - none is a bathroom node, and none is the mirror node, so this is a genuine new find and not a re-extraction. No hreflang alternates and no second country host were found, so BATCH_BRIEF s4 blind spots (b)/(c) do not apply. EXCLUDED AND WHY: all Bathroom Lighting siblings -> Lighting (rule 19), banked in review[] with qty+URL; Heaters & Exhaust and the 3-in-1 heater / exhaust fan nodes -> heating and ventilation appliances, not in rule 3's list (rule 2); MFL Artisan Mix 'N' Match and Chameleon - Create Your Own -> mix-and-match light CONFIGURATOR nodes inside Bathroom Lighting, lighting components, rule 19; /clearance/clearance-bathroom-lighting (5) and /beacon-sale/bathroom-sale -> clearance and sale pages, rule 25, never recorded; /trade-essentials/bathroom (id 2727) and /trade-essentials/bathroom/bathroom-exhaust-fans -> a trade-channel re-cut of the same exhaust-fan assortment, rule 28 duplicate plus rule 2; /bathroom-lighting-buying-guide and the /blog/post/... bathroom articles -> editorial content, not listings (rule 27); HOME > Decorative (24) and HOME > Candles & Accessories (19) -> Decor, and both already in Final.xlsx; HOME > Cleaning (11) -> I opened and enumerated it rather than assuming, and it is Haus & Co cleaning chemistry for light fittings (crystal cleaner, glass cleaner, metal/brass/copper care kits, stainless protector, ceiling-fan cleaner, miracle sponge, hand sanitiser) - light-fitting maintenance, not the bathroom 'Cleaning Accessories' of rule 3. CONCLUSION: a lighting specialist with exactly one genuine Bathroom leaf, 32 illuminated and framed bathroom mirrors and mirrored cabinets, plus 3 heated towel rails that have no category of their own and are flagged in review[].",
+ "rows": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Mirrors with Lights",
+   "qty": 32,
+   "link": "https://www.beaconlighting.com.au/lighting/bathroom-lighting/mirror",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  }
+ ],
+ "review": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Shop By Room > Bathroom > Bathroom Mirrors",
+   "qty": 29,
+   "issue": "DUPLICATE / NOT RECORDED (rule 28 + BATCH_BRIEF s5 'shop-by-room re-cuts are duplicates, not extra rows'). Beacon runs a parallel SHOP BY ROOM taxonomy (SearchSpring path 'Beacon Lighting>SHOP BY ROOM>Bathroom>Bathroom Mirrors', category id 4185) alongside its primary LIGHTING taxonomy. I did not assume - I enumerated both product sets in full and compared uids: all 29 products here are a STRICT SUBSET of the 32 in the recorded node (0 outside). The 3 extra products in the recorded node are 'Haus & Co Round Mirror in Black', 'Reflextion LED Swing Arm Vanity Mirror in Black' and 'Reflextion LED Swing Arm Vanity Mirror in White'. Recording both would double-count 29 mirrors, so only the primary-taxonomy node is in rows[]. DEDUP: already_extracted() = no hit on either URL.",
+   "link": "https://www.beaconlighting.com.au/lighting-room/bathroom/bathroom-mirrors"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Lighting > Bathroom Wall & Vanity Lights",
+   "qty": 198,
+   "issue": "ROUTED TO LIGHTING: rule 19/11 - primary product type is lighting. The URL slug says 'mirrors-vanity' but the page's own H1 is 'Wall & Vanity Lights' and its SearchSpring category name is 'Bathroom Wall & Vanity Lights' - I checked rather than trusting the slug, exactly because rules 10/11 make 'mirror' a word that must never cause a wrong call in either direction. Products are LED wall sconces and vanity wall brackets (Vector, Kings, MFL Obi). Not duplicated into Bathroom (rule 19 explicitly forbids it).",
+   "link": "https://www.beaconlighting.com.au/lighting/bathroom-lighting/mirrors-vanity"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Lighting > IP Rated Bathroom Lights",
+   "qty": 116,
+   "issue": "ROUTED TO LIGHTING: rule 19 - IP-rated ceiling, wall and downlights for wet areas. Primary product type is lighting.",
+   "link": "https://www.beaconlighting.com.au/lighting/bathroom-lighting/ip-rated-bathroom-lights"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shop By Room > Bathroom > Bathroom Vanity Lights",
+   "qty": 41,
+   "issue": "ROUTED TO LIGHTING (rule 19) AND a shop-by-room re-cut of the Bathroom Wall & Vanity Lights node above (rule 28). Recorded here for completeness only.",
+   "link": "https://www.beaconlighting.com.au/lighting-room/bathroom/bathroom-vanity-lights"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shop By Room > Bathroom > Bathroom Accent Lighting",
+   "qty": 55,
+   "issue": "ROUTED TO LIGHTING: rule 19 - strip and step accent lighting for bathrooms. Primary product type is lighting. Also a shop-by-room re-cut.",
+   "link": "https://www.beaconlighting.com.au/lighting-room/bathroom/bathroom-accent-lighting-strip-step"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Lighting > Heaters & Exhaust  [contains 3 heated towel rails]",
+   "qty": 50,
+   "issue": "NOT RECORDED - primary product type of the node is heating and ventilation appliance (3-in-1 bathroom heaters, exhaust fans, IXL/Panasonic units), which is not in rule 3's Bathroom inclusion list; rule 2 puts primary product type above the room name. BUT FLAGGED, because a full product-name sweep of Beacon's entire 3,897-product catalogue found exactly 3 items that WOULD be Bathroom under rules 15/17 (towel rails are hardware, and rule 22 says metal never excludes): 'Ladder 5 Bar Heated Towel Rail in Black' (/ladder-5-bar-heated-towel-rail-in-black), 'Silhouette Vertical Heated Towel Rail in Chrome' (/silhouette-vertical-heated-towel-rail-in-chrome) and 'Silhouette Vertical Heated Towel Rail in Black' (/silhouette-vertical-heated-towel-rail-in-black). I read their category_hierarchy from the site's own product index: all three sit in LIGHTING>Bathroom Lighting>Heaters & Exhaust and SHOP BY ROOM>Bathroom>Bathroom Heaters and Exhaust Fans. Beacon has NO towel-rail category node, so there is no deepest valid listing URL to record for them (rule 24 forbids inventing one and rule 27 forbids recording their product-detail URLs). 3 of 50 cannot flip the node's classification, so the node stays out and the 3 products are raised here.",
+   "link": "https://www.beaconlighting.com.au/lighting/bathroom-lighting/heaters-exhaust"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shop By Room > Bathroom > Bathroom Heaters and Exhaust Fans",
+   "qty": 62,
+   "issue": "NOT RECORDED - heating/ventilation appliances (rule 2, primary product type), and a shop-by-room re-cut of Heaters & Exhaust above (rule 28). It is the room-cut that also carries the 3 heated towel rails described in the entry above.",
+   "link": "https://www.beaconlighting.com.au/lighting-room/bathroom/bathroom-heaters-and-exhaust"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Fans > Exhaust Fans > 3 in 1 Bathroom Heaters",
+   "qty": 21,
+   "issue": "NOT RECORDED - the node lives in Beacon's FANS department (SearchSpring path 'Beacon Lighting>FANS>Exhaust Fans>3 in 1 Bathroom Heaters', id 1301, H1 '3 in 1 Bathroom Heaters'). Combination heater/exhaust-fan/light units: primary product type is an appliance, not a Bathroom fitting (rule 2). Listed so the 'Bathroom' in its name is visibly accounted for and not silently skipped.",
+   "link": "https://www.beaconlighting.com.au/fans/exhaust-fans/bathroom-heaters"
+  }
+ ],
+ "_reconstructed_from": "Bathroom.xlsx delivered 2026-09-01 (checkpoint), not original worker JSON"
+}

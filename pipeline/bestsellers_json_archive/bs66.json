@@ -1,0 +1,16 @@
+{
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "Tier 1 (curl) only returns an SPA shell (site is a Laravel+Vue app, not Shopify despite the /collections/ URL shape; /collections/X/products.json etc all just return the same 9532-byte shell too -- Shopify JSON endpoints do not exist here). Used Playwright (Tier 2) to render. Homepage has a dedicated 'Best Sellers' merchandising module ('Shop All' -> /collections/bestsellers) with individual PDPs carrying a 'BEST SELLER' badge overlay; opened /collections/bestsellers directly and confirmed it is a genuine PLP: title 'Best Selling Custom Furniture & Decor | The Inside', on-page heading 'Best for a Reason', description 'Shop our best-selling custom furniture and decor, from accent chairs and sofas to throw pillows and ottomans.' Single flat listing (a 'Sort By' control only, no sub-category tabs/filters exposing children), so recorded as one row, not a grouping. The page's own GraphQL call (merchandiserBySlug, slug=bestsellers) returned an availableProducts array of 87 items with 87 unique product ids -- matches the 87 unique /products/ links counted in the fully-scrolled rendered DOM. Checked main nav, mega menus, footer, and /categories (full category index) for any child Bestsellers structure (e.g. 'Furniture Bestsellers') -- none exists; a homepage widget links to /collections/bestselling-curtains but that is an isolated one-off marketing collection (like /collections/red-furniture, /collections/the-bedroom-edit also seen on the homepage), not a nav-exposed child of Bestsellers, so not added as a sub-row. Site's own search (?q=) returns the identical 'FOUND 75,321 ITEMS' result for every query including nonsense terms, so it was not relied on as evidence either way (matches known false-absence pattern for this kind of search widget). robots.txt has no Claude-specific disallow (User-agent: * / Disallow: is empty).",
+  "rows": [
+    {
+      "category": "Bestsellers",
+      "sub_category": "Bestsellers",
+      "qty": 87,
+      "link": "https://www.theinside.com/collections/bestsellers",
+      "is_group": false,
+      "evidence": "GraphQL merchandiserBySlug(slug=\"bestsellers\").availableProducts array = 87 items, 87 unique product ids (captured via intercepted XHR response on page load); independently matches 87 unique /products/ links in the fully-scrolled rendered DOM",
+      "flag": null
+    }
+  ]
+}

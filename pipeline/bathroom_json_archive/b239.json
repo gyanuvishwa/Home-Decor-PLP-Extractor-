@@ -1,0 +1,62 @@
+{
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "ACCESS: plain curl with a Chrome124 UA got HTTP 200 on every URL needed (www.potterybarn.in 301s -> potterybarn.in via Cloudflare; no bot-block hit). robots.txt (https://potterybarn.in/robots.txt) has one generic 'User-agent: *' group disallowing /dashboard/, /order/, /profile/*, /cart/, /thankyou/, /order-tracking/, /products/?*, /brands/?*, /collections* (plural, promo listing routes) and a Sitemap directive; it names no anthropic-ai/ClaudeBot/Claude-Web section. Every URL fetched here is a singular /collection/<slug> page, which is never matched by the disallow list, so nothing was blocked. PLATFORM: response headers carry a CSP allowing frame-ancestors *.fynd.com and the HTML confirms this store runs on India's Fynd/Jio commerce SaaS (Reliance-operated storefront), completely different from Pottery Barn US's Akamai+Constructor.io stack seen in b3.json -- confirms this had to be verified independently, not assumed identical, per the task note. TREE: sitemap.xml's category_l1/l2/l3 sitemaps only contain placeholder test-slugs (dept=fashion, l1_category=test-l1) so were useless; the real taxonomy is a full JSON nav tree server-rendered inline on every page (search for '\"display\":\"Bath\"'). That JSON was read directly: Bath has exactly two children -- 'Bath Linens' (Bath Towels & Mats / Hand Towels / Robes & Slippers, all textile -> ROUTED TO TEXTILE per rule 15/20, not recorded here) and 'Bathroom Accessories' (one child: 'Countertop Accessories'). No Bathroom Furniture/Fixtures/Storage/Mirrors/Showers/Taps/Toilets/Vanities/Sinks/Tubs section exists anywhere in the site's ~213-node nav (checked every display label plus targeted greps for vanit/mirror/shower/toilet/faucet/tap/tub/sink/basin) -- this India storefront curates only a soft-goods + decor assortment of the Pottery Barn US catalog, no sanitaryware/fixtures range at all. The only other 'mirror' nodes on the site sit under the unrelated top-level 'Mirrors & Art' section (Wall Mirrors, Floor Mirrors) which is generic home-decor, not bathroom-hierarchy -> not Bathroom per rule 11/29 (hierarchy decides), logged to review for completeness. QTY: Fynd's SSR embeds the listing pagination state inline as item_total (has_next:false confirms it is the true total, not a page size) -- verified 'Bathroom Accessories' page and 'Countertop Accessories' page both return item_total:7 (identical set), confirming Bathroom Accessories has zero products of its own beyond its one subcategory, so per rule 24 the parent is recorded only as a grouping row and 'Countertop Accessories' (qty 7) as the leaf. Spot-checked product names on that page (e.g. 'Black Handcrafted Marble Bathroom Accessories') confirming genuine bathroom items. DEDUP: checked cross_category_url_index.json for both URLs -- no hit, no prior extraction. EXCLUSIONS logged to review[]: 3 Bath Linens subcats (textile, not bathroom) and 2 generic Mirrors & Art subcats (decor mirrors, not bathroom hierarchy).",
+  "rows": [
+    {
+      "category": "Bathroom",
+      "sub_category": "Bathroom Accessories",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": "Site nav parent node 'Bathroom Accessories' under 'Bath'; its own listing page (https://potterybarn.in/collection/bath-bathroom-accessories) returns item_total:7, identical to its sole child 'Countertop Accessories', proving it carries no products of its own -> grouping row only, deepest leaf recorded separately per rule 24.",
+      "flag": null
+    },
+    {
+      "category": "Bathroom",
+      "sub_category": "Countertop Accessories",
+      "qty": 7,
+      "link": "https://potterybarn.in/collection/bath-bathroom-accessories-countertop-accessories",
+      "is_group": false,
+      "evidence": "Site nav leaf under Bath > Bathroom Accessories. SSR pagination state item_total:7, has_next:false (exhaustive). Sample product name 'Black Handcrafted Marble Bathroom Accessories' confirms genuine bathroom countertop items.",
+      "flag": null
+    }
+  ],
+  "review": [
+    {
+      "category": "Bathroom",
+      "sub_category": "Bath Towels & Mats",
+      "qty": 5,
+      "issue": "ROUTED TO TEXTILE - Bath Linens subcategory, textile bath towel/mat product per rule 15/20, not Bathroom hardware.",
+      "link": "https://potterybarn.in/collection/bath-bath-linens-bath-towels--mats"
+    },
+    {
+      "category": "Bathroom",
+      "sub_category": "Hand Towels",
+      "qty": 6,
+      "issue": "ROUTED TO TEXTILE - Bath Linens subcategory, textile towel per rule 15/20, not Bathroom hardware.",
+      "link": "https://potterybarn.in/collection/bath-bath-linens-hand-towels"
+    },
+    {
+      "category": "Bathroom",
+      "sub_category": "Robes & Slippers",
+      "qty": 2,
+      "issue": "ROUTED TO TEXTILE - Bath Linens subcategory, robes/slippers are textile per rule 20, not Bathroom.",
+      "link": "https://potterybarn.in/collection/bath-bath-linens-robes--slippers"
+    },
+    {
+      "category": "Bathroom",
+      "sub_category": "Wall Mirrors",
+      "qty": 11,
+      "issue": "NOT BATHROOM - lives under the unrelated top-level 'Mirrors & Art' nav section (generic decor mirrors), not under Bath hierarchy; primary type/hierarchy is home decor per rule 11/29.",
+      "link": "https://potterybarn.in/collection/mirrors--art-mirrors-wall-mirrors"
+    },
+    {
+      "category": "Bathroom",
+      "sub_category": "Floor Mirrors",
+      "qty": 5,
+      "issue": "NOT BATHROOM - lives under the unrelated top-level 'Mirrors & Art' nav section (generic decor mirrors), not under Bath hierarchy; primary type/hierarchy is home decor per rule 11/29.",
+      "link": "https://potterybarn.in/collection/mirrors--art-mirrors-floor-mirrors"
+    }
+  ]
+}

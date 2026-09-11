@@ -1,0 +1,138 @@
+{
+  "sr": 159,
+  "company": "Merci Paris",
+  "brand_site": "merci-merci.com",
+  "country": "France",
+  "site_url": "https://www.merci-merci.com/",
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "ACCESS: Claude-in-Chrome connector only, one dedicated tab. https://www.merci-merci.com/ 302s to the canonical apex host https://merci-merci.com (link rel=canonical confirms), so all links use the apex origin. No Cloudflare challenge, no 403, no rate-limit at any point (the prior Home-Decor pass needed curl_cffi to get past a managed challenge; a real Chrome session never saw one). robots.txt read in-page: no ClaudeBot / anthropic-ai / Claude-Web / Claude-User / Claude-SearchBot group at all. Platform: Shopify. TREE SOURCE: the mega-menu parsed out of the page DOM (nav.SidebarMenu__Nav--primary, 242 links across 11 top branches), UNION'd with the full collection sitemap (/sitemap.xml -> 2 collection sitemaps, 3824 collection handles, keyword-filtered to 107 furniture-ish handles) AND the /collections/meubles department page's own link block (which carries no sub-category tile strip at all - only a self-link). The three sources agree; the sitemap surfaced no furniture node the mega-menu lacks. Only the 'Meubles' branch is furniture. Branch-by-branch: Le Lit = bed linen (checked /collections/lit, 160 products, titles are housses de couette / draps / taies - no beds or bed frames anywhere on the site), Le Bain = bath textiles + bathroom accessories (no vanity units), La Table = tableware, Mode Femme/Homme = fashion, Beaute = cosmetics, Enfants = books/toys/kids linen/plush (no kids furniture node), Deco & lifestyle = wall art/vases/mirrors/candles/clocks + textiles + hardware + lighting + lifestyle. Wonder Merci and New In dropped per NEVER-EXTRACT. QTY METHOD: the collection pages publish NO rendered count text anywhere (verified on /collections/chaises - zero 'produits'/'articles'/'resultats' strings in body innerText), so Rule 1 is unobtainable here. Every qty is therefore a two-source agreement: (a) exhaustive unique product-ID count from same-origin fetch of /collections/<handle>/products.json?limit=250 paginated to exhaustion (all returned <250 on page 1, which proves exhaustion), and (b) the number of .ProductItem tiles in the SSR HTML of the collection page itself. The two agree exactly on all 10 leaves, and every leaf was confirmed HTTP 200 with an h1 matching the node asked for (trap 2). SET ARITHMETIC (done locally on the ID sets, not by more browsing): /collections/meubles = 133 products; the 9 distinct leaf handles cover 108 unique IDs; the 26 products in meubles not covered by any leaf were title-scanned and are 100% out of scope - 22 sofa covers (Housse de canape / Housse canape convertible), 3 armchair cushions (Coussin Fauteuil Roly Poly), 1 floor lamp (Gervasoni Lampadaire Pajama). So nothing furniture-shaped is orphaned. Likewise /collections/assises (45) = the 4 seating leaves (40) + 3 chair cushions + 2 Bout de canape already counted under the Bouts de canape leaf; /collections/mobilier (90) is NOT a sofa-only node - it mixes sofas with chairs/stools/tables already covered by the Assises and Tables leaves, so it is treated as an aggregate, not a leaf. EXCLUDED and why: /collections/housses-de-canape (22) and /collections/coussins-fauteuil (3) = furniture covers and cushions, excluded per section 1; /collections/mobilier, /collections/assises, /collections/tables, /collections/meubles = 'Voir tout' aggregates; Meubles > Nos marques (meubles-bed-philosophy, meubles-frama, meuble-serax, meubles-vaarnii, canapes-gervasoni, fauteuils-driade) = brand/designer listing pages; canape-2-places / canape-beige / canape-bleu / housse-de-canape-3-places etc = colour and size filter pages; /collections/tables-commerciales (28) is a mixed editorial gift assortment (books, quilts, plates, matchboxes) despite the name, not tables; expo-cartoon-meubles-objets and thematique-* = editorial/exhibition pages. TABLES OVERLAP (flagged): the mega-menu's Tables bloc lists 'Tables' (/collections/table-1, h1 'Table', 20 products) and 'Tables basses' (/collections/table-basse, h1 'Tables basses', 6 products) as two SIBLING links under the bloc heading, plus a 'Voir tout' pointing at /collections/tables - and /collections/tables turned out to be byte-identical in membership to /collections/table-1 (0 IDs either way). table-basse is a strict subset of table-1 (all 6 present). Both sibling nodes are emitted because the site's own IA makes them siblings, not parent/child, and the 14 non-coffee tables (dining tables, gueridons, bistro tables, side tables) have no other node; both rows carry a MANUAL REVIEW flag naming the overlap so the merge can collapse them if preferred. Merci sells no beds, mattresses, desks, sideboards, bookcases, TV units or outdoor furniture - the entire furniture offer is the 133-product Meubles department.",
+  "rows": [
+    {
+      "category": "Furniture",
+      "sub_category": "Furnishings",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Straight Sofas",
+      "qty": 37,
+      "link": "https://merci-merci.com/collections/canapes-merci",
+      "is_group": false,
+      "evidence": "37 .ProductItem tiles in SSR HTML of /collections/canapes-merci (HTTP 200, h1 'Les canapes droits'); identical to 37 unique product IDs from exhaustive /collections/canapes-merci/products.json?limit=250 (single page, <250 returned = exhausted). No rendered count text exists on this site.",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Sofa Beds",
+      "qty": 8,
+      "link": "https://merci-merci.com/collections/canapes-convertible",
+      "is_group": false,
+      "evidence": "8 .ProductItem tiles in SSR HTML of /collections/canapes-convertible (HTTP 200, h1 'Canapes convertibles'); identical to 8 unique product IDs from exhaustive /collections/canapes-convertible/products.json?limit=250 (single page = exhausted).",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Sofa Side Tables",
+      "qty": 2,
+      "link": "https://merci-merci.com/collections/bouts-de-canape",
+      "is_group": false,
+      "evidence": "2 .ProductItem tiles in SSR HTML of /collections/bouts-de-canape (HTTP 200, h1 'Bouts de canape'); identical to 2 unique product IDs from exhaustive /collections/bouts-de-canape/products.json?limit=250 (single page = exhausted).",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Storage",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Wardrobes",
+      "qty": 1,
+      "link": "https://merci-merci.com/collections/armoire",
+      "is_group": false,
+      "evidence": "1 .ProductItem tile in SSR HTML of /collections/armoire (HTTP 200, h1 'Armoire'); identical to 1 unique product ID from /collections/armoire/products.json?limit=250 (single page = exhausted).",
+      "flag": "MANUAL REVIEW: genuinely tiny node - Armoires is the only child of the mega-menu's Rangement (Storage) bloc and holds exactly 1 product; verified twice (grid tile count and products.json), not a read error."
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Seating",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Benches",
+      "qty": 2,
+      "link": "https://merci-merci.com/collections/banc",
+      "is_group": false,
+      "evidence": "2 .ProductItem tiles in SSR HTML of /collections/banc (HTTP 200, h1 'Banc'); identical to 2 unique product IDs from exhaustive /collections/banc/products.json?limit=250 (single page = exhausted).",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Armchairs",
+      "qty": 17,
+      "link": "https://merci-merci.com/collections/fauteuils",
+      "is_group": false,
+      "evidence": "17 .ProductItem tiles in SSR HTML of /collections/fauteuils (HTTP 200, h1 'Fauteuils'); identical to 17 unique product IDs from exhaustive /collections/fauteuils/products.json?limit=250 (single page = exhausted).",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Chairs",
+      "qty": 13,
+      "link": "https://merci-merci.com/collections/chaises",
+      "is_group": false,
+      "evidence": "13 .ProductItem tiles rendered on the live /collections/chaises page in my tab (HTTP 200, h1 'Chaises'); identical to 13 unique product IDs from exhaustive /collections/chaises/products.json?limit=250 (single page = exhausted).",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Stools",
+      "qty": 8,
+      "link": "https://merci-merci.com/collections/tabourets",
+      "is_group": false,
+      "evidence": "8 .ProductItem tiles in SSR HTML of /collections/tabourets (HTTP 200, h1 'Tabourets'); identical to 8 unique product IDs from exhaustive /collections/tabourets/products.json?limit=250 (single page = exhausted).",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Tables",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Tables",
+      "qty": 20,
+      "link": "https://merci-merci.com/collections/table-1",
+      "is_group": false,
+      "evidence": "20 .ProductItem tiles in SSR HTML of /collections/table-1 (HTTP 200, h1 'Table'); identical to 20 unique product IDs from exhaustive /collections/table-1/products.json?limit=250 (single page = exhausted).",
+      "flag": "MANUAL REVIEW: overlapping siblings - the mega-menu's Tables bloc lists 'Tables' (this node, 20: dining tables, gueridons, bistro and side tables PLUS the 6 coffee tables) and 'Tables basses' (6) as sibling links; ID-set diff proves table-basse is a strict subset of this node, and /collections/tables (the bloc's 'Voir tout') is identical to this node. Emitted alongside Coffee Tables so the 14 non-coffee tables are not lost; collapse at merge if double counting matters."
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Coffee Tables",
+      "qty": 6,
+      "link": "https://merci-merci.com/collections/table-basse",
+      "is_group": false,
+      "evidence": "6 .ProductItem tiles in SSR HTML of /collections/table-basse (HTTP 200, h1 'Tables basses'); identical to 6 unique product IDs from exhaustive /collections/table-basse/products.json?limit=250 (single page = exhausted).",
+      "flag": "MANUAL REVIEW: all 6 of these IDs are also inside the sibling 'Tables' node (/collections/table-1, 20)."
+    }
+  ]
+}

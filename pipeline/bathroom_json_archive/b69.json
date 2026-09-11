@@ -1,0 +1,212 @@
+{
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ACCESS: robots.txt WAS retrievable this session (https://www.macys.com/robots.txt, HTTP 200, 2,261 bytes, curl_cffi via lib/probe.py) - unlike the Furniture pass, which recorded it as permanently 403. It contains a NAMED Claude group: 'User-agent: ClaudeBot' followed by 'Crawl-delay: 5' and NO Disallow line. A named group with no Disallow is not an exclusion, so this is not a robots HARD STOP; the most-specific-group rule means the generic 'User-agent: *' disallow list does not bind ClaudeBot, but I honoured the Crawl-delay by raising probe.MIN_GAP to 6.0s per host for the whole company and I additionally stayed off every path the '*' group disallows (/search*, /shop/all/*, */Sortby/*, *Productsperpage, /shop/*,*,*,*,*?* facet URLs) because those are View-All/search/facet URLs I am barred from recording anyway. All category pages fetched 200 first try on rotating curl_cffi profiles (edge101, safari17_2_ios, chrome124); no proxy, no r.jina.ai needed. Every fetched page is cached to disk so no URL was requested twice.\n\nTREE: Macy's mega-menu is server-rendered into the Home landing page (/shop/home?id=22672 -> normalises to the Home department id=173142) as <a data-text=... href=...> nodes, and every category page additionally carries its own left-rail child list. I walked top-down recursively, treating as a child only a link whose path is exactly the current path plus ONE additional all-lowercase slug segment - Macy's facet URLs are distinguishable because their added segment is Capitalised (/Brand/, /Price/, /Pageindex/), so this cleanly separates real categories from facets. Bath entry point: Home > Bedding and Bath (/shop/home/bed-bath?id=7495, 11,067) whose only two children are Bedding (20919) and Bath (60241). Bath (2,364) has exactly 5 children: Bath Accessories (22094), Bath Robes (51483), Bathroom Rugs & Bath Mats (8240), Shower Accessories (8237) and Towels (16853). Shower Accessories has 5 children and Towels has 8; Bath Accessories, Bath Robes and Bathroom Rugs & Bath Mats have none (their pages carry no deeper /bed-bath/bath/... category link at all, only facets), so they are true leaves. Depth 4 was probed and does not exist. 19 nodes in the Bath subtree in total. The Bath parent URL is NOT recorded (rule 24) because valid children exist; Shower Accessories and Towels are likewise emitted as grouping rows only.\n\nMIRRORS: Macy's has no bathroom-fixtures department (it is a department store - no toilets, basins, baths, taps, enclosures or bathroom vanity units anywhere in the catalogue), but it does carry bathroom mirrors, filed under Home Decor > Mirrors (/shop/home/home-decor/mirrors?id=190359, h1 'Wall Mirrors', 991) with 5 children. Per rules 2, 10 and 11 (PRIMARY PRODUCT TYPE outranks WEBSITE HIERARCHY, and 'Vanity'/'Bathroom' must never cause exclusion) I inspected the rendered tiles of each. Vanity Mirrors (341877, 335) and Magnifying & Makeup Mirror (341858, 26) are dominated by bathroom mirrors - rendered product titles include '32x24 Inch Bathroom Mirror with LED Lights Dimmable Makeup Vanity Mirror', 'LED Bathroom Vanity Mirror with Lights, Anti-Fog Dimmable Wall Mounted', '23.6x31.5 In Led Backlit Light Bathroom Wall Mounted Vanity Mirror 3X Magnifier', 'Keonjinn Vanity Wall Mirror Bathroom Mirror', 'Apmir ... Bathroom Vanity Mirror' - so both are recorded as Bathroom. Their three siblings (Wall Mirrors 502, Round Mirrors 88, Large Mirrors 94) are the general decorative-mirror range and are routed to Decor in `review`, not silently dropped.\n\nQTY: exact and double-sourced on every recorded node. Primary source is the server-rendered Nuxt payload in <script type=\"application/json\" data-nuxt-data=\"nuxt-app\">, which is devalue-flattened (values are integer pointers into one big array), so a literal regex on the HTML returns nothing - I wrote a slot resolver (scratchpad/macys_lib.py) and read pageDataStore -> productCount. Second, independent source in the SAME document: the server-rendered Tealium block, utag_data['total_results'] = 'N'. The two agreed EXACTLY on all 24 nodes read (Bath 2364/2364, Bath Accessories 1265/1265, Shower Accessories 282/282, Shower Caddies 33/33, Shower Curtain Hooks & Rings 49/49, Shower Curtain Rods 12/12, Shower Curtain Liners 6/6, Shower Curtains 214/214, Towels 583/583, Vanity Mirrors 335/335, Magnifying & Makeup 26/26, Wall Mirrors 502/502, ...).\n\nVERIFICATION: (a) equivalence to the rendered grid - on every node whose total is below the 60-per-page grid size I counted the DISTINCT product-detail IDs actually rendered in the HTML and it equalled the reported total exactly: Shower Curtain Rods 12 tiles = 12, Shower Curtain Liners 6 = 6, Shower Caddies & Organizers 33 = 33, Shower Curtain Hooks & Rings 49 = 49, Magnifying & Makeup Mirror 26 = 26. On Bath Accessories (1,265) the page renders a full 60-tile slot, consistent. (b) discrimination - the numbers differ node by node across three orders of magnitude (6, 10, 12, 26, 33, 49, 52, 80, 94, 182, 214, 275, 335, 366, 409, 502, 583, 1265, 2364), so this is not a site-wide constant. (c) identity - each page's <title>/h1 matches the node requested (e.g. id=22094 -> 'Bathroom Accessories', id=338273 -> 'Shower Curtain Rods', id=341877 -> 'Vanity Mirrors'). (d) internal consistency - Bath 2364 vs the sum of its five children 1265+94+182+282+583 = 2406, i.e. children overlap slightly rather than being derived from the parent, confirming no number was inferred from another.\n\nCONTENT CHECK on the one large recorded leaf: Bath Accessories (1,265) rendered tiles are genuinely bathroom accessories and hardware - simplehuman slim bathroom trash can, simplehuman toilet plunger & brush set with magnetic caddy, Michael Aram soap dispenser and tissue box holder, Avanti / Cassadecor / J Queen resin & ceramic bath accessory sets, Joseph Joseph toilet paper roll holder with concealed storage, wall-mounted bathroom medicine cabinet with towel bar, bathroom floor storage cabinet, Artifacts rattan soap pump dispenser, decorative tumblers, heated towel warmer. This is rules 13/14/17/18 material, so it is a Bathroom leaf.\n\nDEDUP: dedup.already_extracted() was called on all 24 candidate URLs (the full 19-node Bath subtree plus the 5 Home Decor mirror nodes). ZERO hits - Macy's rows in Furniture.xlsx are all under /shop/home/furniture-mattress/ and none of them is a bath or mirror listing. The nearest thing, Furniture > Bedroom > Vanities (2,536), is bedroom dressing-table vanities and is recorded in `review` for transparency; it stays in Furniture per dispatch_note Option 1.\n\nEXCLUDED / NOT FOUND: no toilets, basins, sinks, bidets, baths, showers, enclosures, taps/faucets or bathroom vanity units exist in the Macy's catalogue - the mega-menu and the recursive left-rail crawl of the whole Home department were scanned for organiz|storage|vanit|mirror|medicine|hardware|towel|toilet|shower|faucet|sink|bath and the only hits outside Bath and Mirrors were Kitchen > Food Storage and two sale/off-to-college marketing mirrors of the Bed & Bath tree (/shop/sale/by-category/home/bed-bath, /shop/off-to-college/...), which are promotional pages and are barred by rule 25. No View All / Shop All / search / Pageindex / facet URL was recorded.",
+ "rows": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Accessories",
+   "qty": 1265,
+   "link": "https://www.macys.com/shop/home/bed-bath/bath/accessories?id=22094",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower Accessories",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower Caddies & Organizers",
+   "qty": 33,
+   "link": "https://www.macys.com/shop/home/bed-bath/bath/shower-accessories/shower-caddies?id=338274",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower Curtain Hooks & Rings",
+   "qty": 49,
+   "link": "https://www.macys.com/shop/home/bed-bath/bath/shower-accessories/shower-curtain-hooks?id=338278",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower Curtain Rods",
+   "qty": 12,
+   "link": "https://www.macys.com/shop/home/bed-bath/bath/shower-accessories/shower-curtain-rods?id=338273",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Mirrors",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Vanity Mirrors",
+   "qty": 335,
+   "link": "https://www.macys.com/shop/home/home-decor/mirrors/vanity-mirrors?id=341877",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Magnifying & Makeup Mirrors",
+   "qty": 26,
+   "link": "https://www.macys.com/shop/home/home-decor/mirrors/magnifying-makeup-mirror?id=341858",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  }
+ ],
+ "review": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath > Shower Accessories > Shower Curtains",
+   "qty": 214,
+   "issue": "ROUTED TO TEXTILE: shower curtains (rule 20). Deepest node under Bath > Shower Accessories.",
+   "link": "https://www.macys.com/shop/home/bed-bath/bath/shower-accessories/shower-curtains?id=58936"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath > Shower Accessories > Shower Curtain Liners",
+   "qty": 6,
+   "issue": "ROUTED TO TEXTILE: shower curtain liners, treated with shower curtains (rule 20) for consistency with SR 1. LOW CONFIDENCE / material caveat - all 6 rendered tiles are PEVA or vinyl plastic liners (Kenney medium-weight PEVA, Clara Clark 5g soap-scum-resistant, SlickBlue 2-pack PEVA with magnets, SPA-251 waffle curtain with detachable liner), so a reviewer applying the rule-16 non-textile carve-out could move this node to Bathroom.",
+   "link": "https://www.macys.com/shop/home/bed-bath/bath/shower-accessories/shower-curtain-liners?id=338277"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath > Bathroom Rugs & Bath Mats",
+   "qty": 182,
+   "issue": "ROUTED TO TEXTILE: textile bath rugs and bath mats (rules 15/16/20), not rubber/anti-slip bathroom accessory mats.",
+   "link": "https://www.macys.com/shop/home/bed-bath/bath/rugs-mats?id=8240"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath > Bath Robes",
+   "qty": 94,
+   "issue": "ROUTED TO TEXTILE: bathrobes (rule 20).",
+   "link": "https://www.macys.com/shop/home/bed-bath/bath/bath-robes?id=51483"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath > Towels > Bath Towels",
+   "qty": 275,
+   "issue": "ROUTED TO TEXTILE: bath towels (rules 15/20).",
+   "link": "https://www.macys.com/shop/home/bed-bath/bath/towels/bath-towels?id=385176"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath > Towels > Bath Towel Sets",
+   "qty": 409,
+   "issue": "ROUTED TO TEXTILE: bath towel sets (rules 15/20).",
+   "link": "https://www.macys.com/shop/home/bed-bath/bath/towels/bath-towel-sets?id=338271"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath > Towels > Bath Sheets",
+   "qty": 80,
+   "issue": "ROUTED TO TEXTILE: bath sheets (rules 15/20).",
+   "link": "https://www.macys.com/shop/home/bed-bath/bath/towels/bath-sheets?id=338280"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath > Towels > Hand Towels",
+   "qty": 366,
+   "issue": "ROUTED TO TEXTILE: hand towels (rules 15/20).",
+   "link": "https://www.macys.com/shop/home/bed-bath/bath/towels/hand?id=338295"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath > Towels > Washcloths",
+   "qty": 192,
+   "issue": "ROUTED TO TEXTILE: washcloths (rules 15/20).",
+   "link": "https://www.macys.com/shop/home/bed-bath/bath/towels/washcloths?id=338281"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath > Towels > Turkish Cotton Towels",
+   "qty": 6,
+   "issue": "ROUTED TO TEXTILE: Turkish cotton bath towels (rules 15/20).",
+   "link": "https://www.macys.com/shop/home/bed-bath/bath/towels/turkish?id=338276"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath > Towels > Kids Bath Towels",
+   "qty": 10,
+   "issue": "ROUTED TO TEXTILE: kids bath towels (rules 15/20).",
+   "link": "https://www.macys.com/shop/home/bed-bath/bath/towels/kids?id=341275"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath > Towels > Beach Towels",
+   "qty": 52,
+   "issue": "ROUTED TO TEXTILE: beach towels (rules 15/20); also not a bathroom product at all.",
+   "link": "https://www.macys.com/shop/home/bed-bath/bath/towels/beach?id=51717"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Home Decor > Mirrors > Wall Mirrors",
+   "qty": 502,
+   "issue": "ROUTED TO DECOR: decorative wall mirrors (rule 21 - Bathroom Wall Art / decorative mirror is Wall Decor). Inspected and rejected for Bathroom; the sibling Vanity and Magnifying/Makeup nodes WERE taken because their rendered product titles are overwhelmingly LED/anti-fog bathroom vanity mirrors.",
+   "link": "https://www.macys.com/shop/home/home-decor/mirrors/wall-mirrors?id=341865"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Home Decor > Mirrors > Round Mirrors",
+   "qty": 88,
+   "issue": "ROUTED TO DECOR: decorative round wall mirrors, shape facet of the general decor mirror range.",
+   "link": "https://www.macys.com/shop/home/home-decor/mirrors/round-mirrors?id=341923"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Home Decor > Mirrors > Large Mirrors",
+   "qty": 94,
+   "issue": "ROUTED TO DECOR: decorative large/full-length wall mirrors, size facet of the general decor mirror range.",
+   "link": "https://www.macys.com/shop/home/home-decor/mirrors/large-mirrors?id=341893"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Furniture & Mattresses > Bedroom > Vanities",
+   "qty": 2536,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Vanities' - and in any case it is bedroom dressing-table vanities, not bathroom vanity units. Not re-extracted (dispatch_note Option 1).",
+   "link": "https://www.macys.com/shop/home/furniture-mattress/bedroom/vanities?id=223850"
+  }
+ ],
+ "_reconstructed_from": "Bathroom.xlsx delivered 2026-09-01 (checkpoint), not original worker JSON"
+}

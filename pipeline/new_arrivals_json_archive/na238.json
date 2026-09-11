@@ -1,0 +1,25 @@
+{
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "Scope: Home vertical only (nykaafashion.com/home/c/8528). Access tiers as in bs238.json: tier1 HTTP works for homepage/sitemap only (403 on listing pages), tier2 Playwright/CDP blocked at connection level on every URL tried (net::ERR_HTTP2_PROTOCOL_ERROR, 2 launch configs), escalated to Claude-in-Chrome (tier3) for page verification. Found the mega-menu's 'What's New' tab (parent_id 2, id 101), which for the Home department's own children_data exposes a 'Just In' node (id 40000) with two genuinely distinct time-windowed listings, both scoped via filter_data:category_filter=8528 (Home): 'Last 30 Days' at /last-30-days/c/4879 and 'Just In' (the page's own on-page H1/breadcrumb label; the URL slug is /recently-added/c/4878) at /recently-added/c/4878. Opened both directly via Claude-in-Chrome with the Home filter applied: (1) last-30-days shows H1 'Last 30 Days', breadcrumb Home, Category facet shows 1 selected, exact count '11,483 items'; (2) recently-added shows H1/breadcrumb 'Home > Just In', Category facet shows 1 selected, exact count '3,509 items'. These are confirmed as two genuinely different listings, not aliases - very different counts (11,483 vs 3,509) and the narrower 'Just In' set is a subset-by-recency of the broader 'Last 30 Days' window, both legitimate site-exposed new-arrivals concepts (time-window based rather than sub-category based), so both kept as separate sibling rows (neither is a parent of the other - is_group=false on both). The 'What's New' tab's other Home child, 'Top Brands', is a brand-showcase grid (links to individual designer/brand category pages), not itself a New-Arrivals product listing, so it was not included. Also checked: category sitemap (5573 URLs) grepped for new-arrival/new_arrival - only 3 hits, all designer/brand pages literally named 'New Arrivals' as a brand (e.g. /designers/new-arrivals/c/18142), not a merchandising New Arrivals PLP, and not Home-scoped - excluded. Site's own catalogsearch is Disallow'd in robots.txt and was not used. No 'New Collection'/'New Season' style ambiguous pages were found for Home - the two rows below are genuine, unambiguous PLPs with real product grids, filters, sort, and facet-backed exact counts.",
+  "rows": [
+    {
+      "category": "New Arrivals",
+      "sub_category": "Last 30 Days",
+      "qty": 11483,
+      "link": "https://www.nykaafashion.com/last-30-days/c/4879?f=category_filter%3D8528",
+      "is_group": false,
+      "evidence": "Page H1 'Last 30 Days', breadcrumb 'Home', header reads '11,483 items', Category facet shows 1 filter applied (Home)",
+      "flag": null
+    },
+    {
+      "category": "New Arrivals",
+      "sub_category": "Just In",
+      "qty": 3509,
+      "link": "https://www.nykaafashion.com/recently-added/c/4878?f=category_filter%3D8528",
+      "is_group": false,
+      "evidence": "Page breadcrumb 'Home > Just In', header reads '3,509 items', Category facet shows 1 filter applied (Home)",
+      "flag": null
+    }
+  ]
+}

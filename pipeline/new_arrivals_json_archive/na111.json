@@ -1,0 +1,79 @@
+{
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "Direct HTTP fetch throughout (Tier 1), no WAF. Two distinct 'nieuw binnen' URLs exist: /pages/nieuw-binnen is an EDITORIAL HUB page (<title>Ontdek de nieuwste producten bij fonQ</title>) with no product-overview widget / no nbResults -- it only contains navigation tiles linking to the 6 department pages plus a small 'Iets voor jou?' recommendation carousel; excluded as a landing/marketing page per the brief's Collection-page test. Its product-listing counterpart /collections/nieuw-binnen DOES have a real product grid and nbResults widget and was used instead as the parent row. Discovery method: main nav mega-menu (all department headers carry a 'Nieuwe collectie'/'Nieuw in X' link), the site's XML sitemap index, and a site /sitemap human-readable page (2419 links, cross-checked) which additionally surfaced two department children (Baby & Kids, Huishouden) not present in the homepage mega-menu HTML actually fetched, plus confirmed no Bathroom 'new' page exists (nieuw-in-badkamer -> 404). IMPORTANT DATA-QUALITY FINDING, applies broadly: cross-referenced every 'new' listing's own nbResults against its full parent department's own nbResults (fetched independently) and found systematic inconsistency -- 2 of 7 non-zero children (Garden & Balcony, Sleep) report a count IDENTICAL to their full department total, and 3 more (Kitchen & Dining, Lighting, Home Accessories) report a count that EXCEEDS their full department total. A 'new' subset cannot legitimately be equal to or larger than its own parent department if it is genuinely time-bounded -- this indicates fonQ's 'Nieuw'/'Nieuw in' collections do not reliably filter to recently-added items on this site (possibly a default sort=newest applied without an actual recency cutoff, or a broader underlying index scope than the stated department). Each affected row is flagged individually with the specific comparison. Only Furniture and Household children showed a plausible bounded-subset ratio (75% and 21% of their department respectively) and were left unflagged. Also found and EXCLUDED as brand/product-line campaign pages (not general site New Arrivals structure): brabantia-nieuw, hay-nieuw, hk-living-nieuw, nieuw-van-dutchbone, nieuw-van-zuiver, by-fonq-nieuw, k-amsterdam-nieuwe-collectie, k-amsterdam-ss26-nieuwe-collectie, dekbedovertrekken-nieuwe-collectie, hay-nieuwe-tuincollectie, merken/lekue/nieuw -- all are single-brand or single-product-line 'new' pages, not the site's general New Arrivals merchandising concept. Dropped as zero-product: nieuw-in-baby-kids (0 artikelen).",
+  "rows": [
+    {
+      "category": "New Arrivals",
+      "sub_category": "New Arrivals",
+      "qty": null,
+      "link": "https://www.fonq.nl/collections/nieuw-binnen",
+      "is_group": true,
+      "evidence": "Parent/umbrella new-in listing, nav-labeled 'Nieuw binnen'. SSR header reports nbResults=81975 artikelen. Represented as a non-counted grouping row per the hierarchy convention -- department children below are the measured leaves.",
+      "flag": "MANUAL REVIEW: AMBIGUOUS NEW COLLECTION - 81975 exceeds the sum of ALL top-level department totals combined (approx. 69585 = koken-tafelen 10934 + meubels 15437 + woonaccessoires 7913 + verlichting 5044 + tuin-balkon 7091 + slapen 3403 + huishouden 6947 + badkamer 12658 + baby-kids 158, each fetched independently), i.e. this listing appears to represent close to fonQ's ENTIRE catalog rather than a genuinely bounded new-arrivals subset. Recorded per the site's own 'Nieuw binnen' nav label; flagging validity of the underlying concept for reviewer judgment."
+    },
+    {
+      "category": "New Arrivals",
+      "sub_category": "Kitchen & Dining New Arrivals",
+      "qty": 14129,
+      "link": "https://www.fonq.nl/collections/nieuw-bij-koken-tafelen",
+      "is_group": false,
+      "evidence": "SSR header: nbResults=14129 artikelen; paginator last page=236 (~60/page, internally consistent: 235*60=14100+29=14129).",
+      "flag": "MANUAL REVIEW: AMBIGUOUS NEW COLLECTION - qty (14129) EXCEEDS the full Kitchen & Dining department total of 10934 (checked /collections/koken-tafelen independently). A 'new' subset cannot legitimately be larger than its own department, so this listing likely draws from a broader scope than genuinely-new Kitchen & Dining items."
+    },
+    {
+      "category": "New Arrivals",
+      "sub_category": "Furniture New Arrivals",
+      "qty": 11595,
+      "link": "https://www.fonq.nl/collections/nieuw-bij-meubels",
+      "is_group": false,
+      "evidence": "SSR header: nbResults=11595 artikelen; paginator last page=194 (~60/page, consistent). Full Furniture dept total is 15437 (checked /collections/meubels), so 11595 is a plausible 75% subset.",
+      "flag": null
+    },
+    {
+      "category": "New Arrivals",
+      "sub_category": "Garden & Balcony New Arrivals",
+      "qty": 7091,
+      "link": "https://www.fonq.nl/collections/nieuw-bij-tuin",
+      "is_group": false,
+      "evidence": "SSR header: nbResults=7091 artikelen; paginator last page=119 (~60/page, consistent).",
+      "flag": "MANUAL REVIEW: AMBIGUOUS NEW COLLECTION - qty (7091) is EXACTLY EQUAL to the full Garden & Balcony department total (also 7091, checked /collections/tuin-balkon independently). This strongly suggests it is the same underlying listing as the full department rather than a genuinely filtered new-items subset."
+    },
+    {
+      "category": "New Arrivals",
+      "sub_category": "Lighting New Arrivals",
+      "qty": 5441,
+      "link": "https://www.fonq.nl/collections/nieuw-bij-verlichting",
+      "is_group": false,
+      "evidence": "SSR header: nbResults=5441 artikelen; paginator last page=91 (~60/page, consistent).",
+      "flag": "MANUAL REVIEW: AMBIGUOUS NEW COLLECTION - qty (5441) exceeds the full Lighting department total of 5044 (checked /collections/verlichting independently)."
+    },
+    {
+      "category": "New Arrivals",
+      "sub_category": "Sleep New Arrivals",
+      "qty": 3403,
+      "link": "https://www.fonq.nl/collections/nieuw-slapen",
+      "is_group": false,
+      "evidence": "SSR header: nbResults=3403 artikelen; paginator last page=57 (~60/page, consistent).",
+      "flag": "MANUAL REVIEW: AMBIGUOUS NEW COLLECTION - qty (3403) is EXACTLY EQUAL to the full Sleep department total (also 3403, checked /collections/slapen independently). Likely the same underlying listing as the full department, not a bounded new-items subset."
+    },
+    {
+      "category": "New Arrivals",
+      "sub_category": "Home Accessories New Arrivals",
+      "qty": 14242,
+      "link": "https://www.fonq.nl/collections/nieuwe-woonaccessoires",
+      "is_group": false,
+      "evidence": "SSR header: nbResults=14242 artikelen; paginator last page=238 (~60/page, consistent).",
+      "flag": "MANUAL REVIEW: AMBIGUOUS NEW COLLECTION - qty (14242) is nearly double the full Home Accessories department total of 7913 (checked /collections/woonaccessoires independently)."
+    },
+    {
+      "category": "New Arrivals",
+      "sub_category": "Household New Arrivals",
+      "qty": 1485,
+      "link": "https://www.fonq.nl/collections/nieuw-in-huishouden",
+      "is_group": false,
+      "evidence": "SSR header: nbResults=1485 artikelen. Full Household dept total is 6947 (checked /collections/huishouden), so 1485 is a plausible 21% subset.",
+      "flag": null
+    }
+  ]
+}

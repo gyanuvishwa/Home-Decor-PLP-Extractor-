@@ -1,0 +1,696 @@
+{
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ROBOTS (www.ikea.com): fetched FIRST, before any other request on the host - HTTP 200, 4,054 bytes - and read by group boundary, not by grep. Four groups: AdsBot-Google and AdsBot-Google-Mobile (Allow-only), 'User-agent: AmazonProductDiscoverybot / Disallow: /', and 'User-agent: *'. NO Claude agent is named anywhere - a case-insensitive search for claude, anthropic, Claude-Web, ClaudeBot, Content-Signal and Crawl-delay returns NOTHING - so there is no hard stop and no crawl-delay to honour beyond probe.py's own 2 s per-host gap. We fall under '*'. The '*' disallows that bear on this work are */search/?q=*, */search/products/?q=*, /compare*, *?filter=*, *filters=*, *?sorting=*, *&sorting=*, *?storeId=*, *catalogId=*, *productId=*, *productid=*, *partNumber=*, *?priceFilter*, *min_price=*, *max_price=*, /iows/, */navigation/, */fragments/*, /*-fragment.html, */rl/, */browse-history/, */recommendations/*, /m3/*, and the cart/order/checkout/profile/favourites paths. I stayed clear of every one of them: no facet URL, no /f/ filter page, no sort, no storeId, no /iows/ API, no fragment endpoint. DISCLOSURE, because it is a query string and the FR sibling used none: for the SERIES-AXIS CONTAINMENT PROOF ONLY I requested a small number of '?page=N' URLs on nine generic category paths. '?page=' is NOT in any disallow rule in the '*' group (the query-string disallows are filter, filters, sorting, storeId, catalogId, productId, partNumber, priceFilter, min_price, max_price, krypto, compare, printView, preferedui, tblang, range_chapter, range_subcategory - none of which is 'page'), so it was permitted. It also turned out to be USELESS and no recorded figure came from it: IKEA IGNORES ?page and re-serves the identical first 24 cards every time - 12 successive requests to bathroom-shelving-units-20804 returned the same 24 data-ref-ids and the same '60' total. I record that here as a count trap AVOIDED: 12 pages x 24 cards would have suggested 288 for a 60-product node. Every URL written into rows[] and review[] is a bare https://www.ikea.com/ae/en/cat/<slug>/ path with NO query string at all. ONE HOST ONLY: www.ikea.com. No API host, no CDN host, no proxy, no r.jina.ai, no browser automation, no campaign parameters - so no second robots file was owed. ACCESS: plain HTTP 200 on every request through probe.fetch(); no bot wall, no interstitial, no 403, no rate limiting. 91 category pages were fetched and cached under work/164/pages/. TREE SOURCE - IKEA's OWN in-page navigation, not guessed URL patterns and not a mega-menu. Entry point: https://www.ikea.com/ae/en/cat/bathroom-ba001/ (H1 'Bathroom products'; the same ba001 department id as SR 107 IKEA DE and SR 140 IKEA FR), which server-renders 18 in-page nav cards. Children at every level came from each page's own a.hnf-inpage-nav__card set. LEAF RULE, taken from the SR 140 sibling and re-verified here: IKEA's in-page nav is context-sensitive - on a node that HAS children the FIRST card is a link back to that node's PARENT and the rest are its real children; on a node with NO children the cards are that node's SIBLING set, which necessarily includes the node itself. So the test is 'does this node's own URL appear among its cards' - yes = leaf, no = the cards after the first are its children. I record that my FIRST walk was WRONG and was discarded: I treated ALL cards as children, which swallowed the parent link and escaped the bathroom department entirely into Textiles & rugs, Lighting, Bedding, Rugs, Cushions, Kitchen textiles and LED bulbs. Dropping cards[0] as the parent link fixed it; the corrected recursion ran to a fixed point at 91 nodes with ZERO unexpanded children left. QTY: every quantity here is the LISTING PAGE'S OWN RENDERED EXACT TOTAL, read from server-rendered HTML. No API, no estimate, no aggregation, no parent's number reused for a child. IKEA AE renders the figure twice in two independent places on every PLP: (1) the visible <p class=\"plp-filter-information__total-count\">N</p> and (2) a machine-readable data-category attribute on the product-list div, e.g. {\"id\":\"20723\",\"canonical\":\"https://www.ikea.com/ae/en/cat/bathroom-sinks-20723/\",\"totalCount\":20}. VERIFICATION. (a) The two rendered figures were compared on ALL 90 nodes in the walk that have a grid: 90/90 agree exactly, ZERO mismatches. The single node with neither figure is the department page ba001 itself, i.e. precisely the one non-PLP - independent structural proof that it is a grouping node (rule 38). (b) INDEPENDENT CARD ENUMERATION, not a restatement of the same number: I extracted per-card data-ref-id product ids from every page. For EVERY node whose total is at or below IKEA's 24-per-page grid the unique id count equals the stated total exactly - among the recorded leaves 3/3, 5/5, 6/6, 6/6, 7/7, 8/8, 9/9, 10/10, 14/14, 17/17, 17/17, 20/20 - and every node whose total exceeds 24 renders exactly 24 unique ids (33, 43, 28, 24 nodes). Zero violations across all 90 grids. (c) The data-category 'canonical' field and the <link rel=canonical> on every recorded leaf equal the URL written into rows[], so there is no canonical-alias dedup blind spot on any row. (d) DISCRIMINATION: 41 distinct totals across the 91 nodes, running 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 14, 15, 16, 17, 19, 20, 21, 22, 23, 24, 27, 28, 32, 33, 34, 36, 43, 58, 60, 62, 72, 86, 87, 103, 113, 115, 123, 146, 184, 315 - no site-wide constant and no round-number cap. (e) H1 was read on every page and matches the node requested. (f) Product names and descriptions were read on EVERY recorded leaf to confirm the content matches the label - Bathroom sinks = 'VINDELALVEN Countertop wash-basin w water trap, white' / 'ORRSJON Wash-basin with water trap, 82x49 cm' / 'RUTSJON Wash-basin with water trap'; Bathroom taps = 'HAMNSKAR Wash-basin mixer tap, brass-colour' / 'SALJEN Wash-basin mixer tap, black' / 'BERGVATTNET Wash-basin mixer tap'; Shower enclosures & screens = 'OPPEJEN Shower screen, glass, 84x199 cm' / 'FOTINGEN Shower tray, 90x90 cm' / 'OPPEJEN Bathtub door, glass'; Shower sets & rails = 'BROGRUND Shower set with thermostatic mixer' / 'BROGRUND Riser rail with handshower kit'; Shower heads = 'VOXNAN 5-spray handshower' / 'KOLSJON Shower hose'; Shower mixers = 'VALLAMOSSE Thermostatic shower mixer, 150 mm'; Toilet brushes = 'BOLMEN Toilet brush/holder' / 'STORAVAN Toilet brush'; Soap dispensers & soap dishes = 'EKOLN Soap dispenser' / 'TVALSJON 3-piece bathroom set'; Toothbrush holders = 'EKOLN Toothbrush holder' / 'DRAGAN Toothbrush holder, bamboo'; Bathroom bins = 'BROFJARDEN Waste bin, chrome effect, 4 l'; Non-drill bathroom accessories = 'TISKEN Hook with suction cup' / 'SKOGHALL Hook, self-adhesive'; Bathroom shelves & towel rails = 'SKOGHALL Towel rail, self-adhesive, chrome-plated' / 'BROFJARDEN Wall shelf with towel rail'; Bathroom storage baskets & make-up organisers = 'DRAGAN 4-piece bathroom set, bamboo' / 'SKOGSVIKEN Tray'; Bathroom countertops = 'TOLKEN Countertop, 142x49 cm' / 'ALSKEN Countertop, bamboo'; Vanity mirrors = 'NISSEDAL Mirror, 65x65 cm' / 'LETTAN Mirror, 60x95 cm'; Makeup & magnifying mirrors = 'TRENSUM Mirror, stainless steel' / 'EKFANN Mirror with integrated lighting'. DEDUP - OPTION 1, run on ALL 91 walked URLs, plus every rel=canonical target. TEN HITS, every one of them in review[] and never in rows[]: Vanity units 20720 (Furniture.xlsx, 'Vanity Units', 103), Vanity units without basin 54989 ('Vanity Units without Basin', 16), Under sink cabinets 20721 ('Under Sink Cabinets', 4), Bathroom tall cabinets & shelving units 20804 ('Bathroom Tall Cabinets & Shelving Units', 60), Bathroom wall cabinets 20808 ('Bathroom Wall Cabinets', 14), Mirror cabinets 20500 ('Mirror Cabinets', 12), Bathroom stools & benches 20859 ('Bathroom Stools & Benches', 12), Bathroom trolleys 20858 ('Bathroom Trolleys', 6), Laundry storage 48925 ('Laundry Storage', 24), and Mirrors with lights 49138 (Final.xlsx Home Decor pass, 'Mirrors with lights', 7). ZERO hits on any of the 17 recorded leaves. That is exactly the shape the two IKEA siblings produced - SR 107 IKEA DE 18 leaves / 10 hits, SR 140 IKEA FR 17 leaves / 10 hits - and it is OPTION 1 working as intended: the Furniture pass took the bathroom FURNITURE and left the fixtures, taps, showers, enclosures, mirrors, accessories and bathroom storage untouched, and those are what this file records. DEDUP BLIND SPOTS (b) and (c) - the brief's specific warning about IKEA locale forms, checked and CLEARED rather than assumed. The brief warns that Final.xlsx recorded IKEA DE under /de/en/ while Furniture.xlsx used /de/de/, so the index cannot see some nodes. I inspected the index directly: it holds 899 ikea.com keys in exactly seven locale forms - ae/en 180, jp/ja 172, fr/fr 163, de/de 116, gb/en 112, in/en 110, de/en 46. For the UAE storefront there is ONE form only, /ae/en/, which is precisely the form I walked, so the DE-style split does not exist here and every one of my 91 lookups was against the same locale the prior workbooks used. I also checked the two ways a UAE site could still hide an alternate: (i) the Arabic locale - the index contains ZERO /ae/ar/ keys, so nothing could be hiding behind an Arabic slug; and (ii) a separate country HOST - the index contains ZERO keys on ikea.ae, and IKEA AE PLPs emit NO hreflang alternate links at all (I checked: zero <link rel=alternate hreflang> on the category pages), only a self-referential rel=canonical. So there is no cross-host alternate to miss. The ten hits above are therefore the complete dedup picture, not an artefact of URL form. ONE NODE WORTH FLAGGING: category id 20498 is 'Vanity mirrors' here and IS recorded as a Bathroom row (17); the same id on the French storefront is named 'Miroirs a poser' and was already taken by the Home Decor pass as 'Table Mirrors', so SR 140 had to send it to review. On /ae/en/ that URL is NOT in the index (the index holds ae/en mirrors-20489, wall-mirrors-24858, round-mirrors-24860, large-mirrors-24859, decorative-mirrors-24861, standing-mirrors-49139 and mirrors-with-lights-49138, but not 20498), its products are bathroom-hierarchy mirrors under Bathroom > Bathroom mirrors (NISSEDAL, LETTAN, LINDBYN wall mirrors), and rule 10 forbids excluding a node because it is called 'Vanity'. So it is recorded, and the divergence from the FR sibling is deliberate and stated. THE TWO-AXIS PROBLEM AND HOW IT WAS RESOLVED - the main judgement in this file, handled exactly as SR 140 handled it. IKEA UAE exposes the same bathroom catalogue twice: a generic PRODUCT axis and a SERIES axis under 'Bathroom systems' (315) that re-slices the identical products by furniture series (HAVBACK 113, ANGSJON 184, TANNFORSEN 115, HEMNES 34, ENHET 146, NYSJON 21, VIDVESSEL 17). I recorded the GENERIC axis only. Not assumed - MEASURED by per-card data-ref-id extraction: all five 'Wash-basins for <SERIES>' nodes are EXACT subsets of the generic Bathroom sinks node (20, fully enumerated) - 12/12, 12/12, 12/12, 10/10, 3/3 inside, ZERO ids outside - and four of the five series 'vanity units without basin' nodes are exact 2/2 subsets of the generic Vanity units without basin (16). Where a series id fell outside a fully-enumerable generic node I opened the product rather than hand-waving: every residual is a FAXALVEN/ENHET/HEMNES mirror cabinet or high cabinet with mirror door, a NYSJON wash-basin/laundry/high cabinet, an ENHET sink cabinet, or an ENHET frame part (rail, hook, swivel shelf, hanging shelf insert, laundry bag) - i.e. all of them belong to Mirror cabinets, Bathroom wall cabinets, Bathroom tall cabinets & shelving units, Vanity units or Laundry storage, and ALL FIVE of those are ALREADY EXTRACTED in Furniture.xlsx. The series axis therefore contains nothing that is both new and in Bathroom scope. All 38 series-axis nodes (1 roll-up + 7 series + 30 series children) are in review[] with that proof, never in rows[]; recording them would have double-counted 315 products. HONEST LIMIT, stated rather than hidden: because ?page is ignored, generic nodes above 24 products (Vanity units 103, Bathroom tall cabinets 60, Bathroom shelves & towel rails 43, Bathroom storage baskets 33, Shower & bathtub accessories 28, Knobs & handles 58) could only be id-enumerated to their first 24 cards, so the containment claim for those is supported by product identity and by the Furniture.xlsx dedup rather than by exhaustive id equality. OVERLAPPING SIBLINGS - NEVER SUMMED, and the overlaps were measured. Bathroom mirrors: the union of its four children's id sets is EXACTLY 32, which equals the parent's own rendered total of 32 - an independent confirmation that the parent is a roll-up - while the children's totals sum to 42, because siblings share products (Vanity mirrors and Makeup & magnifying mirrors share 3 ids; Vanity mirrors and Mirrors with lights share 2; Mirror cabinets and Mirrors with lights share 3; Makeup & magnifying and Mirrors with lights share 2 - the EKFANN illuminated mirrors and the LINDBYN/KARMSUND pieces). Bathroom accessories: six children totalling 105 against a parent of 87, with a MEASURED 14-id overlap between Shower & bathtub accessories and Non-drill bathroom accessories (the shared TISKEN suction and SKOGHALL/OBONAS self-adhesive baskets, hooks and shelves). Showers: five children whose first-page id union is 55 against a parent of 72 that also contains the 14 textile shower curtains. Each figure recorded is the storefront's own number for its own node; they are recorded separately per rule 28 and MUST NOT be added together. TWO NODES ARE REACHABLE BY TWO NAV PATHS and each is recorded exactly once (rule 28): Shower & bathtub accessories 10658 (under both Bathroom accessories and Showers - recorded once, under Bathroom accessories, its first nav path) and Mirrors with lights 49138 (under both Bathroom mirrors and Bathroom lighting - one review entry). Bathroom taps 20724 and Bathroom countertops 30565 are likewise cross-linked into six of the seven series pages and are each recorded once on the generic axis. ROUTED OUT, all in review[] with counts and URLs so nothing is silently skipped: Bath textiles tl003 (86) and its 9 towel / bath-mat / shower-curtain / bathrobe leaves to TEXTILE (rules 15, 16, 20) - while the matching HARDWARE stays in Bathroom as 'Bathroom shelves & towel rails' (43: SKOGHALL towel rails, BROFJARDEN wall shelf with towel rail, hooks), which is precisely the split rule 15 asks for; Bathroom lighting 10736 (23) and its 3 lighting leaves to LIGHTING (rule 19), while Mirrors with lights - which IKEA cross-links into that lighting branch - is NOT a lighting routing but a dedup exclusion, since its primary product type is a mirror (rule 11); Bathroom laundry ba003 (62) and its 5 laundry leaves to STORAGE / appliances, exactly as SR 140 routed Buanderie; and Knobs & handles 16298 (58), furniture knobs and handles cross-linked from the series pages, routed out on primary product type exactly as SR 107 routed Moebelgriffe. NO EMPTY NODES: every one of the 91 walked nodes returned a non-zero total (minimum 1, Washing machines & tumble dryers), so there is no EMPTY NODE entry to make. NO VIEW ALL / COLLECTIONS / SEARCH / FACET / PDP URL is recorded anywhere; the 'Products' index card at the head of every in-page nav (the parent link) is never recorded. RESULT: 4 grouping rows + 17 leaf rows; 71 review entries.",
+ "rows": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathroom storage baskets & make-up organisers",
+   "qty": 33,
+   "link": "https://www.ikea.com/ae/en/cat/bathroom-boxes-baskets-16233/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathroom shelves & towel rails",
+   "qty": 43,
+   "link": "https://www.ikea.com/ae/en/cat/bathroom-shelves-20615/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathroom mirrors",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathroom mirrors > Vanity mirrors",
+   "qty": 17,
+   "link": "https://www.ikea.com/ae/en/cat/vanity-mirrors-20498/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathroom mirrors > Makeup & magnifying mirrors",
+   "qty": 6,
+   "link": "https://www.ikea.com/ae/en/cat/makeup-magnifying-mirrors-20499/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathroom accessories",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathroom accessories > Bathroom bins",
+   "qty": 9,
+   "link": "https://www.ikea.com/ae/en/cat/bathroom-bins-48940/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathroom accessories > Shower & bathtub accessories",
+   "qty": 28,
+   "link": "https://www.ikea.com/ae/en/cat/shower-caddies-10658/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathroom accessories > Soap dispensers & soap dishes",
+   "qty": 17,
+   "link": "https://www.ikea.com/ae/en/cat/soap-dispensers-soap-dishes-10656/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathroom accessories > Toilet brushes",
+   "qty": 24,
+   "link": "https://www.ikea.com/ae/en/cat/toilet-brushes-48944/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathroom accessories > Toothbrush holders",
+   "qty": 5,
+   "link": "https://www.ikea.com/ae/en/cat/toothbrush-holders-48943/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathroom accessories > Non-drill bathroom accessories",
+   "qty": 22,
+   "link": "https://www.ikea.com/ae/en/cat/non-drill-bathroom-accessories-700699/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathroom countertops",
+   "qty": 3,
+   "link": "https://www.ikea.com/ae/en/cat/bathroom-countertops-30565/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathroom sinks",
+   "qty": 20,
+   "link": "https://www.ikea.com/ae/en/cat/bathroom-sinks-20723/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bathroom taps",
+   "qty": 14,
+   "link": "https://www.ikea.com/ae/en/cat/bathroom-taps-20724/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Showers",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Showers > Shower sets & rails",
+   "qty": 10,
+   "link": "https://www.ikea.com/ae/en/cat/shower-sets-rails-40693/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Showers > Shower heads",
+   "qty": 7,
+   "link": "https://www.ikea.com/ae/en/cat/shower-heads-40692/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Showers > Shower mixers",
+   "qty": 6,
+   "link": "https://www.ikea.com/ae/en/cat/shower-mixers-40691/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Showers > Shower enclosures & screens",
+   "qty": 8,
+   "link": "https://www.ikea.com/ae/en/cat/shower-enclosures-screens-47358/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  }
+ ],
+ "review": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom products (department)",
+   "qty": null,
+   "issue": "EXCLUDED AS PARENT URL (rule 24) and structurally a grouping node: it is the ONLY node of the 91 walked that renders NEITHER a plp-filter-information__total-count string NOR a data-category totalCount, i.e. the only one with no product grid of its own. Recorded in rows[] as the top grouping row with blank qty and blank link (rule 38).",
+   "link": "https://www.ikea.com/ae/en/cat/bathroom-ba001/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom tall cabinets & shelving units",
+   "qty": 60,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Bathroom Tall Cabinets & Shelving Units' - OPTION 1: IKEA UAE's bath vanities, bathroom cabinets, mirror cabinets and bath storage furniture STAY in Furniture.xlsx and are not re-imported into Bathroom, even though rules 9/10/12 would otherwise class them as Bathroom. Verified by dedup.already_extracted() on the exact URL, which is also this page's own rel=canonical and its data-category 'canonical' field.",
+   "link": "https://www.ikea.com/ae/en/cat/bathroom-shelving-units-20804/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom wall cabinets",
+   "qty": 14,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Bathroom Wall Cabinets' - OPTION 1: IKEA UAE's bath vanities, bathroom cabinets, mirror cabinets and bath storage furniture STAY in Furniture.xlsx and are not re-imported into Bathroom, even though rules 9/10/12 would otherwise class them as Bathroom. Verified by dedup.already_extracted() on the exact URL, which is also this page's own rel=canonical and its data-category 'canonical' field.",
+   "link": "https://www.ikea.com/ae/en/cat/bathroom-wall-cabinets-20808/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom stools & benches",
+   "qty": 12,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Bathroom Stools & Benches' - OPTION 1: IKEA UAE's bath vanities, bathroom cabinets, mirror cabinets and bath storage furniture STAY in Furniture.xlsx and are not re-imported into Bathroom, even though rules 9/10/12 would otherwise class them as Bathroom. Verified by dedup.already_extracted() on the exact URL, which is also this page's own rel=canonical and its data-category 'canonical' field.",
+   "link": "https://www.ikea.com/ae/en/cat/bathroom-stools-benches-20859/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom trolleys",
+   "qty": 6,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Bathroom Trolleys' - OPTION 1: IKEA UAE's bath vanities, bathroom cabinets, mirror cabinets and bath storage furniture STAY in Furniture.xlsx and are not re-imported into Bathroom, even though rules 9/10/12 would otherwise class them as Bathroom. Verified by dedup.already_extracted() on the exact URL, which is also this page's own rel=canonical and its data-category 'canonical' field.",
+   "link": "https://www.ikea.com/ae/en/cat/bathroom-trolleys-20858/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Vanity units",
+   "qty": 103,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Vanity Units' - OPTION 1: IKEA UAE's bath vanities, bathroom cabinets, mirror cabinets and bath storage furniture STAY in Furniture.xlsx and are not re-imported into Bathroom, even though rules 9/10/12 would otherwise class them as Bathroom. Verified by dedup.already_extracted() on the exact URL, which is also this page's own rel=canonical and its data-category 'canonical' field.",
+   "link": "https://www.ikea.com/ae/en/cat/vanity-units-20720/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Vanity units without basin",
+   "qty": 16,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Vanity Units without Basin' - OPTION 1: IKEA UAE's bath vanities, bathroom cabinets, mirror cabinets and bath storage furniture STAY in Furniture.xlsx and are not re-imported into Bathroom, even though rules 9/10/12 would otherwise class them as Bathroom. Verified by dedup.already_extracted() on the exact URL, which is also this page's own rel=canonical and its data-category 'canonical' field.",
+   "link": "https://www.ikea.com/ae/en/cat/vanity-units-without-basin-54989/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Under sink cabinets",
+   "qty": 4,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Under Sink Cabinets' - OPTION 1: IKEA UAE's bath vanities, bathroom cabinets, mirror cabinets and bath storage furniture STAY in Furniture.xlsx and are not re-imported into Bathroom, even though rules 9/10/12 would otherwise class them as Bathroom. Verified by dedup.already_extracted() on the exact URL, which is also this page's own rel=canonical and its data-category 'canonical' field.",
+   "link": "https://www.ikea.com/ae/en/cat/under-sink-cabinets-20721/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Mirror cabinets",
+   "qty": 12,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Mirror Cabinets' - OPTION 1: IKEA UAE's bath vanities, bathroom cabinets, mirror cabinets and bath storage furniture STAY in Furniture.xlsx and are not re-imported into Bathroom, even though rules 9/10/12 would otherwise class them as Bathroom. Verified by dedup.already_extracted() on the exact URL, which is also this page's own rel=canonical and its data-category 'canonical' field.",
+   "link": "https://www.ikea.com/ae/en/cat/mirror-cabinets-20500/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Laundry storage",
+   "qty": 24,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Laundry Storage' - OPTION 1: IKEA UAE's bath vanities, bathroom cabinets, mirror cabinets and bath storage furniture STAY in Furniture.xlsx and are not re-imported into Bathroom, even though rules 9/10/12 would otherwise class them as Bathroom. Verified by dedup.already_extracted() on the exact URL, which is also this page's own rel=canonical and its data-category 'canonical' field.",
+   "link": "https://www.ikea.com/ae/en/cat/laundry-cabinets-shelving-48925/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom mirrors > Mirrors with lights",
+   "qty": 7,
+   "issue": "ALREADY EXTRACTED IN Final.xlsx (Home Decor pass) as 'Mirrors with lights'. Reached by TWO nav paths on this storefront (Bathroom > Bathroom mirrors, and Bathroom > Bathroom lighting) - one node, one entry (rule 28). NOTE the divergence from SR 107 IKEA DE, which recorded the illuminated-mirror node as a Bathroom row: on the UAE storefront this exact URL is already in the Home Decor workbook, so under OPTION 1 it stays there. Its primary product type IS a mirror (FAXÄLVEN 'Mirror with built-in lighting'), so it is NOT a Lighting routing - it is purely a dedup exclusion.",
+   "link": "https://www.ikea.com/ae/en/cat/mirrors-with-lights-49138/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom vanities (parent)",
+   "qty": 123,
+   "issue": "PARENT NOT RECORDED (rule 24) and nothing recordable beneath it: ALL THREE of its children - Vanity units (103), Vanity units without basin (16), Under sink cabinets (4) - are ALREADY EXTRACTED in Furniture.xlsx. The whole branch is therefore out of Bathroom scope under OPTION 1 and no grouping row was created for it.",
+   "link": "https://www.ikea.com/ae/en/cat/bathroom-vanities-20719/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom systems",
+   "qty": 315,
+   "issue": "DUPLICATE SERIES AXIS - NOT RECORDED. IKEA UAE exposes the same bathroom catalogue on two axes: a generic PRODUCT axis (Bathroom vanities / sinks / taps / mirrors / accessories / showers) and a SERIES axis under 'Bathroom systems' (315) that re-slices the identical products by furniture series (HAVBACK, ANGSJON, TANNFORSEN, HEMNES, ENHET, NYSJON, VIDVESSEL). I recorded the GENERIC axis only, following the proven SR 140 IKEA FR treatment. Containment was MEASURED by extracting per-card data-ref-id product ids from both sides, not assumed: all five 'Wash-basins for <SERIES>' nodes are EXACT subsets of the generic Bathroom sinks node (20, fully enumerated) - HAVBACK 12/12 inside, ANGSJON 12/12, TANNFORSEN 12/12, HEMNES 10/10, VIDVESSEL 3/3, ZERO ids outside; four of the five series 'vanity units without basin' nodes are exact subsets of the generic Vanity units without basin (16) - 2/2 each. The residual ids that fall outside a fully-enumerable generic node were resolved individually by opening each product: they are FAXALVEN/ENHET/HEMNES mirror cabinets and high cabinets with mirror doors, NYSJON wash-basin/laundry/high cabinets, an ENHET sink cabinet, and ENHET frame parts (rails, hooks, swivel shelf, hanging shelf insert, laundry bag) - i.e. every one of them belongs to Mirror cabinets, Bathroom wall cabinets, Bathroom tall cabinets & shelving units, Vanity units or Laundry storage, ALL FIVE of which are ALREADY EXTRACTED in Furniture.xlsx. So the series axis carries nothing that is both new and in Bathroom scope. Recording it would have double-counted 315 products.",
+   "link": "https://www.ikea.com/ae/en/cat/bathroom-systems-700450/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom systems > HAVBACK bathroom",
+   "qty": 113,
+   "issue": "DUPLICATE SERIES AXIS - NOT RECORDED (see the 'Bathroom systems' entry for the containment proof). Series-scoped re-slice of the same assortment already exposed on the generic product axis; recording it alongside the generic nodes would double-count.",
+   "link": "https://www.ikea.com/ae/en/cat/havbaeck-bathroom-700451/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom systems > HAVBACK bathroom > HAVBACK mirror & mirror cabinets",
+   "qty": 5,
+   "issue": "DUPLICATE SERIES AXIS - NOT RECORDED. Series-scoped slice of an assortment already exposed on the generic product axis (or, for the cabinet/vanity slices, of assortment already held by Furniture.xlsx). Containment proof in the 'Bathroom systems' entry.",
+   "link": "https://www.ikea.com/ae/en/cat/havbaeck-mirror-mirror-cabinets-700462/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom systems > HAVBACK bathroom > HAVBACK cabinets & legs",
+   "qty": 4,
+   "issue": "DUPLICATE SERIES AXIS - NOT RECORDED. Series-scoped slice of an assortment already exposed on the generic product axis (or, for the cabinet/vanity slices, of assortment already held by Furniture.xlsx). Containment proof in the 'Bathroom systems' entry.",
+   "link": "https://www.ikea.com/ae/en/cat/havbaeck-storage-700463/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom systems > HAVBACK bathroom > HAVBACK vanity units without basin",
+   "qty": 2,
+   "issue": "DUPLICATE SERIES AXIS - NOT RECORDED. Series-scoped slice of an assortment already exposed on the generic product axis (or, for the cabinet/vanity slices, of assortment already held by Furniture.xlsx). Containment proof in the 'Bathroom systems' entry.",
+   "link": "https://www.ikea.com/ae/en/cat/havbaeck-vanity-units-without-basin-700464/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom systems > HAVBACK bathroom > HAVBACK vanity units with basin",
+   "qty": 15,
+   "issue": "DUPLICATE SERIES AXIS - NOT RECORDED. Series-scoped slice of an assortment already exposed on the generic product axis (or, for the cabinet/vanity slices, of assortment already held by Furniture.xlsx). Containment proof in the 'Bathroom systems' entry.",
+   "link": "https://www.ikea.com/ae/en/cat/havbaeck-vanity-units-with-basin-700465/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom systems > HAVBACK bathroom > Wash-basins for HAVBACK",
+   "qty": 12,
+   "issue": "DUPLICATE SERIES AXIS - NOT RECORDED. Series-scoped slice of an assortment already exposed on the generic product axis (or, for the cabinet/vanity slices, of assortment already held by Furniture.xlsx). Containment proof in the 'Bathroom systems' entry.",
+   "link": "https://www.ikea.com/ae/en/cat/wash-basins-for-havbaeck-700466/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom systems > ANGSJON bathroom",
+   "qty": 184,
+   "issue": "DUPLICATE SERIES AXIS - NOT RECORDED (see the 'Bathroom systems' entry for the containment proof). Series-scoped re-slice of the same assortment already exposed on the generic product axis; recording it alongside the generic nodes would double-count.",
+   "link": "https://www.ikea.com/ae/en/cat/aengsjoen-bathroom-700453/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom systems > ANGSJON bathroom > ANGSJON mirror & mirror cabinets",
+   "qty": 5,
+   "issue": "DUPLICATE SERIES AXIS - NOT RECORDED. Series-scoped slice of an assortment already exposed on the generic product axis (or, for the cabinet/vanity slices, of assortment already held by Furniture.xlsx). Containment proof in the 'Bathroom systems' entry.",
+   "link": "https://www.ikea.com/ae/en/cat/aengsjoen-mirror-mirror-cabinets-700467/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom systems > ANGSJON bathroom > ANGSJON cabinets & legs",
+   "qty": 4,
+   "issue": "DUPLICATE SERIES AXIS - NOT RECORDED. Series-scoped slice of an assortment already exposed on the generic product axis (or, for the cabinet/vanity slices, of assortment already held by Furniture.xlsx). Containment proof in the 'Bathroom systems' entry.",
+   "link": "https://www.ikea.com/ae/en/cat/aengsjoen-storage-700468/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom systems > ANGSJON bathroom > ANGSJON vanity units without basin",
+   "qty": 2,
+   "issue": "DUPLICATE SERIES AXIS - NOT RECORDED. Series-scoped slice of an assortment already exposed on the generic product axis (or, for the cabinet/vanity slices, of assortment already held by Furniture.xlsx). Containment proof in the 'Bathroom systems' entry.",
+   "link": "https://www.ikea.com/ae/en/cat/aengsjoen-vanity-units-without-basin-700469/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom systems > ANGSJON bathroom > ANGSJON vanity units with basin",
+   "qty": 86,
+   "issue": "DUPLICATE SERIES AXIS - NOT RECORDED. Series-scoped slice of an assortment already exposed on the generic product axis (or, for the cabinet/vanity slices, of assortment already held by Furniture.xlsx). Containment proof in the 'Bathroom systems' entry.",
+   "link": "https://www.ikea.com/ae/en/cat/aengsjoen-vanity-units-with-basin-700470/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom systems > ANGSJON bathroom > Wash-basins for ANGSJON",
+   "qty": 12,
+   "issue": "DUPLICATE SERIES AXIS - NOT RECORDED. Series-scoped slice of an assortment already exposed on the generic product axis (or, for the cabinet/vanity slices, of assortment already held by Furniture.xlsx). Containment proof in the 'Bathroom systems' entry.",
+   "link": "https://www.ikea.com/ae/en/cat/wash-basins-for-aengsjoen-700471/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom systems > TANNFORSEN bathroom",
+   "qty": 115,
+   "issue": "DUPLICATE SERIES AXIS - NOT RECORDED (see the 'Bathroom systems' entry for the containment proof). Series-scoped re-slice of the same assortment already exposed on the generic product axis; recording it alongside the generic nodes would double-count.",
+   "link": "https://www.ikea.com/ae/en/cat/taennforsen-bathroom-700456/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom systems > TANNFORSEN bathroom > Wash-basins for TANNFORSEN",
+   "qty": 12,
+   "issue": "DUPLICATE SERIES AXIS - NOT RECORDED. Series-scoped slice of an assortment already exposed on the generic product axis (or, for the cabinet/vanity slices, of assortment already held by Furniture.xlsx). Containment proof in the 'Bathroom systems' entry.",
+   "link": "https://www.ikea.com/ae/en/cat/wash-basins-for-taennforsen-700472/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom systems > TANNFORSEN bathroom > TANNFORSEN mirror & mirror cabinets",
+   "qty": 6,
+   "issue": "DUPLICATE SERIES AXIS - NOT RECORDED. Series-scoped slice of an assortment already exposed on the generic product axis (or, for the cabinet/vanity slices, of assortment already held by Furniture.xlsx). Containment proof in the 'Bathroom systems' entry.",
+   "link": "https://www.ikea.com/ae/en/cat/taennforsen-mirror-mirror-cabinets-700473/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom systems > TANNFORSEN bathroom > TANNFORSEN cabinets & legs",
+   "qty": 4,
+   "issue": "DUPLICATE SERIES AXIS - NOT RECORDED. Series-scoped slice of an assortment already exposed on the generic product axis (or, for the cabinet/vanity slices, of assortment already held by Furniture.xlsx). Containment proof in the 'Bathroom systems' entry.",
+   "link": "https://www.ikea.com/ae/en/cat/taennforsen-storage-700474/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom systems > TANNFORSEN bathroom > TANNFORSEN vanity units without basin",
+   "qty": 2,
+   "issue": "DUPLICATE SERIES AXIS - NOT RECORDED. Series-scoped slice of an assortment already exposed on the generic product axis (or, for the cabinet/vanity slices, of assortment already held by Furniture.xlsx). Containment proof in the 'Bathroom systems' entry.",
+   "link": "https://www.ikea.com/ae/en/cat/taennforsen-vanity-units-without-basin-700475/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom systems > TANNFORSEN bathroom > TANNFORSEN vanity units with basin",
+   "qty": 16,
+   "issue": "DUPLICATE SERIES AXIS - NOT RECORDED. Series-scoped slice of an assortment already exposed on the generic product axis (or, for the cabinet/vanity slices, of assortment already held by Furniture.xlsx). Containment proof in the 'Bathroom systems' entry.",
+   "link": "https://www.ikea.com/ae/en/cat/taennforsen-vanity-units-with-basin-700476/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom systems > HEMNES bathroom",
+   "qty": 34,
+   "issue": "DUPLICATE SERIES AXIS - NOT RECORDED (see the 'Bathroom systems' entry for the containment proof). Series-scoped re-slice of the same assortment already exposed on the generic product axis; recording it alongside the generic nodes would double-count.",
+   "link": "https://www.ikea.com/ae/en/cat/hemnes-bathroom-700457/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom systems > HEMNES bathroom > Wash-basins for HEMNES",
+   "qty": 10,
+   "issue": "DUPLICATE SERIES AXIS - NOT RECORDED. Series-scoped slice of an assortment already exposed on the generic product axis (or, for the cabinet/vanity slices, of assortment already held by Furniture.xlsx). Containment proof in the 'Bathroom systems' entry.",
+   "link": "https://www.ikea.com/ae/en/cat/wash-basins-for-hemnes-700477/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom systems > HEMNES bathroom > HEMNES mirror & mirror cabinets",
+   "qty": 3,
+   "issue": "DUPLICATE SERIES AXIS - NOT RECORDED. Series-scoped slice of an assortment already exposed on the generic product axis (or, for the cabinet/vanity slices, of assortment already held by Furniture.xlsx). Containment proof in the 'Bathroom systems' entry.",
+   "link": "https://www.ikea.com/ae/en/cat/hemnes-mirror-mirror-cabinets-700478/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom systems > HEMNES bathroom > HEMNES storage",
+   "qty": 1,
+   "issue": "DUPLICATE SERIES AXIS - NOT RECORDED. Series-scoped slice of an assortment already exposed on the generic product axis (or, for the cabinet/vanity slices, of assortment already held by Furniture.xlsx). Containment proof in the 'Bathroom systems' entry.",
+   "link": "https://www.ikea.com/ae/en/cat/hemnes-storage-700479/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom systems > HEMNES bathroom > HEMNES vanity units without basin",
+   "qty": 2,
+   "issue": "DUPLICATE SERIES AXIS - NOT RECORDED. Series-scoped slice of an assortment already exposed on the generic product axis (or, for the cabinet/vanity slices, of assortment already held by Furniture.xlsx). Containment proof in the 'Bathroom systems' entry.",
+   "link": "https://www.ikea.com/ae/en/cat/hemnes-vanity-units-without-basin-700480/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom systems > HEMNES bathroom > HEMNES vanity units with basin",
+   "qty": 4,
+   "issue": "DUPLICATE SERIES AXIS - NOT RECORDED. Series-scoped slice of an assortment already exposed on the generic product axis (or, for the cabinet/vanity slices, of assortment already held by Furniture.xlsx). Containment proof in the 'Bathroom systems' entry.",
+   "link": "https://www.ikea.com/ae/en/cat/hemnes-vanity-units-with-basin-700481/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom systems > ENHET bathroom",
+   "qty": 146,
+   "issue": "DUPLICATE SERIES AXIS - NOT RECORDED (see the 'Bathroom systems' entry for the containment proof). Series-scoped re-slice of the same assortment already exposed on the generic product axis; recording it alongside the generic nodes would double-count.",
+   "link": "https://www.ikea.com/ae/en/cat/enhet-bathroom-700458/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom systems > ENHET bathroom > ENHET mirror & mirror cabinets",
+   "qty": 5,
+   "issue": "DUPLICATE SERIES AXIS - NOT RECORDED. Series-scoped slice of an assortment already exposed on the generic product axis (or, for the cabinet/vanity slices, of assortment already held by Furniture.xlsx). Containment proof in the 'Bathroom systems' entry.",
+   "link": "https://www.ikea.com/ae/en/cat/enhet-mirror-mirror-cabinets-700484/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom systems > ENHET bathroom > ENHET bathroom accessories & lighting",
+   "qty": 10,
+   "issue": "DUPLICATE SERIES AXIS - NOT RECORDED. Series-scoped slice of an assortment already exposed on the generic product axis (or, for the cabinet/vanity slices, of assortment already held by Furniture.xlsx). Containment proof in the 'Bathroom systems' entry.",
+   "link": "https://www.ikea.com/ae/en/cat/enhet-bathroom-accessories-700485/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom systems > ENHET bathroom > ENHET bathroom cabinets & shelves",
+   "qty": 23,
+   "issue": "DUPLICATE SERIES AXIS - NOT RECORDED. Series-scoped slice of an assortment already exposed on the generic product axis (or, for the cabinet/vanity slices, of assortment already held by Furniture.xlsx). Containment proof in the 'Bathroom systems' entry.",
+   "link": "https://www.ikea.com/ae/en/cat/enhet-bathroom-cabinets-700486/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom systems > ENHET bathroom > ENHET laundry combinations",
+   "qty": 12,
+   "issue": "DUPLICATE SERIES AXIS - NOT RECORDED. Series-scoped slice of an assortment already exposed on the generic product axis (or, for the cabinet/vanity slices, of assortment already held by Furniture.xlsx). Containment proof in the 'Bathroom systems' entry.",
+   "link": "https://www.ikea.com/ae/en/cat/enhet-laundry-combinations-700490/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom systems > ENHET bathroom > ENHET bathroom storage combinations",
+   "qty": 27,
+   "issue": "DUPLICATE SERIES AXIS - NOT RECORDED. Series-scoped slice of an assortment already exposed on the generic product axis (or, for the cabinet/vanity slices, of assortment already held by Furniture.xlsx). Containment proof in the 'Bathroom systems' entry.",
+   "link": "https://www.ikea.com/ae/en/cat/enhet-bathroom-combinations-700491/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom systems > ENHET bathroom > ENHET vanity units without basin",
+   "qty": 4,
+   "issue": "DUPLICATE SERIES AXIS - NOT RECORDED. Series-scoped slice of an assortment already exposed on the generic product axis (or, for the cabinet/vanity slices, of assortment already held by Furniture.xlsx). Containment proof in the 'Bathroom systems' entry.",
+   "link": "https://www.ikea.com/ae/en/cat/enhet-vanity-units-without-basin-700492/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom systems > ENHET bathroom > ENHET vanity units with basin",
+   "qty": 4,
+   "issue": "DUPLICATE SERIES AXIS - NOT RECORDED. Series-scoped slice of an assortment already exposed on the generic product axis (or, for the cabinet/vanity slices, of assortment already held by Furniture.xlsx). Containment proof in the 'Bathroom systems' entry.",
+   "link": "https://www.ikea.com/ae/en/cat/enhet-vanity-units-with-basin-700493/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom systems > NYSJON bathroom",
+   "qty": 21,
+   "issue": "DUPLICATE SERIES AXIS - NOT RECORDED (see the 'Bathroom systems' entry for the containment proof). Series-scoped re-slice of the same assortment already exposed on the generic product axis; recording it alongside the generic nodes would double-count.",
+   "link": "https://www.ikea.com/ae/en/cat/nysjoen-bathroom-700459/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom systems > NYSJON bathroom > NYSJON storage & mirrors",
+   "qty": 6,
+   "issue": "DUPLICATE SERIES AXIS - NOT RECORDED. Series-scoped slice of an assortment already exposed on the generic product axis (or, for the cabinet/vanity slices, of assortment already held by Furniture.xlsx). Containment proof in the 'Bathroom systems' entry.",
+   "link": "https://www.ikea.com/ae/en/cat/nysjoen-storage-mirrors-700494/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom systems > NYSJON bathroom > NYSJON vanity units with basin",
+   "qty": 1,
+   "issue": "DUPLICATE SERIES AXIS - NOT RECORDED. Series-scoped slice of an assortment already exposed on the generic product axis (or, for the cabinet/vanity slices, of assortment already held by Furniture.xlsx). Containment proof in the 'Bathroom systems' entry.",
+   "link": "https://www.ikea.com/ae/en/cat/nysjoen-vanity-units-with-basin-700495/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom systems > VIDVESSEL bathroom",
+   "qty": 17,
+   "issue": "DUPLICATE SERIES AXIS - NOT RECORDED (see the 'Bathroom systems' entry for the containment proof). Series-scoped re-slice of the same assortment already exposed on the generic product axis; recording it alongside the generic nodes would double-count.",
+   "link": "https://www.ikea.com/ae/en/cat/vidvessel-bathroom-700868/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom systems > VIDVESSEL bathroom > Wash-basins for VIDVESSEL",
+   "qty": 3,
+   "issue": "DUPLICATE SERIES AXIS - NOT RECORDED. Series-scoped slice of an assortment already exposed on the generic product axis (or, for the cabinet/vanity slices, of assortment already held by Furniture.xlsx). Containment proof in the 'Bathroom systems' entry.",
+   "link": "https://www.ikea.com/ae/en/cat/wash-basins-for-vidvessel-700874/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom systems > (shared child) Knobs & handles",
+   "qty": 58,
+   "issue": "ROUTED OUT ON PRIMARY PRODUCT TYPE: furniture knobs and handles, cross-linked into six of the seven series pages. Not a bathroom product type under rules 3/4/13/17 - identical treatment to SR 107 IKEA DE (Moebelgriffe) and SR 140 IKEA FR (Boutons et poignees).",
+   "link": "https://www.ikea.com/ae/en/cat/knobs-handles-16298/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom laundry (parent)",
+   "qty": 62,
+   "issue": "ROUTED TO STORAGE / APPLIANCES: laundry is a distinct function from bathing/washing under rule 2 (primary product type and function beat room name). Same treatment as SR 140 IKEA FR (Buanderie et accessoires). Parent also excluded under rule 24. Children listed separately below.",
+   "link": "https://www.ikea.com/ae/en/cat/bathroom-laundry-ba003/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom laundry > Laundry accessories",
+   "qty": 7,
+   "issue": "ROUTED TO STORAGE / APPLIANCES: primary product type is laundry equipment, not a bathroom fixture, fitting or accessory (rule 2 priority order).",
+   "link": "https://www.ikea.com/ae/en/cat/laundry-accessories-55004/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom laundry > Laundry baskets",
+   "qty": 20,
+   "issue": "ROUTED TO STORAGE / APPLIANCES: primary product type is laundry equipment, not a bathroom fixture, fitting or accessory (rule 2 priority order).",
+   "link": "https://www.ikea.com/ae/en/cat/laundry-baskets-20601/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom laundry > Drying racks",
+   "qty": 19,
+   "issue": "ROUTED TO STORAGE / APPLIANCES: primary product type is laundry equipment, not a bathroom fixture, fitting or accessory (rule 2 priority order).",
+   "link": "https://www.ikea.com/ae/en/cat/drying-racks-20602/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom laundry > Washing machines & tumble dryers",
+   "qty": 1,
+   "issue": "ROUTED TO STORAGE / APPLIANCES: primary product type is laundry equipment, not a bathroom fixture, fitting or accessory (rule 2 priority order).",
+   "link": "https://www.ikea.com/ae/en/cat/washing-machines-tumble-dryers-20826/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom laundry > Ironing boards",
+   "qty": 4,
+   "issue": "ROUTED TO STORAGE / APPLIANCES: primary product type is laundry equipment, not a bathroom fixture, fitting or accessory (rule 2 priority order).",
+   "link": "https://www.ikea.com/ae/en/cat/ironing-boards-20608/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath textiles (parent)",
+   "qty": 86,
+   "issue": "ROUTED TO TEXTILE (rules 15 and 20): bath towels, bath sheets, face cloths, textile bath mats, shower curtains and bathrobes are Textile, not Bathroom. Parent also excluded under rule 24. Children listed separately below.",
+   "link": "https://www.ikea.com/ae/en/cat/bath-textiles-tl003/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath textiles > Towels",
+   "qty": 36,
+   "issue": "ROUTED TO TEXTILE (rules 15/16/20): textile product type. The matching HARDWARE - towel rails, hooks and rail shelves - is recorded in rows[] as 'Bathroom shelves & towel rails' (43), which is the split rule 15 asks for. Note 'Shower curtains' is reachable by two nav paths (Bath textiles and Showers) and appears once (rule 28).",
+   "link": "https://www.ikea.com/ae/en/cat/towels-20520/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath textiles > Bath towels",
+   "qty": 7,
+   "issue": "ROUTED TO TEXTILE (rules 15/16/20): textile product type. The matching HARDWARE - towel rails, hooks and rail shelves - is recorded in rows[] as 'Bathroom shelves & towel rails' (43), which is the split rule 15 asks for. Note 'Shower curtains' is reachable by two nav paths (Bath textiles and Showers) and appears once (rule 28).",
+   "link": "https://www.ikea.com/ae/en/cat/bath-towels-20523/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath textiles > Hand towels",
+   "qty": 7,
+   "issue": "ROUTED TO TEXTILE (rules 15/16/20): textile product type. The matching HARDWARE - towel rails, hooks and rail shelves - is recorded in rows[] as 'Bathroom shelves & towel rails' (43), which is the split rule 15 asks for. Note 'Shower curtains' is reachable by two nav paths (Bath textiles and Showers) and appears once (rule 28).",
+   "link": "https://www.ikea.com/ae/en/cat/hand-towels-20525/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath textiles > Bath sheets & beach towels",
+   "qty": 8,
+   "issue": "ROUTED TO TEXTILE (rules 15/16/20): textile product type. The matching HARDWARE - towel rails, hooks and rail shelves - is recorded in rows[] as 'Bathroom shelves & towel rails' (43), which is the split rule 15 asks for. Note 'Shower curtains' is reachable by two nav paths (Bath textiles and Showers) and appears once (rule 28).",
+   "link": "https://www.ikea.com/ae/en/cat/bath-sheets-beach-towels-20524/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath textiles > Face cloths",
+   "qty": 6,
+   "issue": "ROUTED TO TEXTILE (rules 15/16/20): textile product type. The matching HARDWARE - towel rails, hooks and rail shelves - is recorded in rows[] as 'Bathroom shelves & towel rails' (43), which is the split rule 15 asks for. Note 'Shower curtains' is reachable by two nav paths (Bath textiles and Showers) and appears once (rule 28).",
+   "link": "https://www.ikea.com/ae/en/cat/face-cloths-20521/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath textiles > Baby & children's towels & washcloths",
+   "qty": 9,
+   "issue": "ROUTED TO TEXTILE (rules 15/16/20): textile product type. The matching HARDWARE - towel rails, hooks and rail shelves - is recorded in rows[] as 'Bathroom shelves & towel rails' (43), which is the split rule 15 asks for. Note 'Shower curtains' is reachable by two nav paths (Bath textiles and Showers) and appears once (rule 28).",
+   "link": "https://www.ikea.com/ae/en/cat/baby-towels-washcloths-18700/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath textiles > Bath mats",
+   "qty": 21,
+   "issue": "ROUTED TO TEXTILE (rules 15/16/20): textile product type. The matching HARDWARE - towel rails, hooks and rail shelves - is recorded in rows[] as 'Bathroom shelves & towel rails' (43), which is the split rule 15 asks for. Note 'Shower curtains' is reachable by two nav paths (Bath textiles and Showers) and appears once (rule 28).",
+   "link": "https://www.ikea.com/ae/en/cat/bath-mats-20519/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath textiles > Shower curtains",
+   "qty": 14,
+   "issue": "ROUTED TO TEXTILE (rules 15/16/20): textile product type. The matching HARDWARE - towel rails, hooks and rail shelves - is recorded in rows[] as 'Bathroom shelves & towel rails' (43), which is the split rule 15 asks for. Note 'Shower curtains' is reachable by two nav paths (Bath textiles and Showers) and appears once (rule 28).",
+   "link": "https://www.ikea.com/ae/en/cat/shower-curtains-18908/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath textiles > Bathrobes, slippers & spa accessories",
+   "qty": 15,
+   "issue": "ROUTED TO TEXTILE (rules 15/16/20): textile product type. The matching HARDWARE - towel rails, hooks and rail shelves - is recorded in rows[] as 'Bathroom shelves & towel rails' (43), which is the split rule 15 asks for. Note 'Shower curtains' is reachable by two nav paths (Bath textiles and Showers) and appears once (rule 28).",
+   "link": "https://www.ikea.com/ae/en/cat/spa-accessories-700339/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom lighting (parent)",
+   "qty": 23,
+   "issue": "ROUTED TO LIGHTING (rule 19): parent of three lighting leaves plus the already-extracted Mirrors with lights. Parent also excluded under rule 24.",
+   "link": "https://www.ikea.com/ae/en/cat/bathroom-lighting-10736/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom lighting > Bathroom cabinet lighting",
+   "qty": 7,
+   "issue": "ROUTED TO LIGHTING: primary product type is lighting (rule 11/19). Not duplicated into Bathroom.",
+   "link": "https://www.ikea.com/ae/en/cat/bathroom-cabinet-lighting-55010/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom lighting > Bathroom ceiling lights",
+   "qty": 4,
+   "issue": "ROUTED TO LIGHTING: primary product type is lighting (rule 11/19). Not duplicated into Bathroom.",
+   "link": "https://www.ikea.com/ae/en/cat/bathroom-ceiling-lights-700215/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom lighting > Bathroom wall lights",
+   "qty": 8,
+   "issue": "ROUTED TO LIGHTING: primary product type is lighting (rule 11/19). Not duplicated into Bathroom.",
+   "link": "https://www.ikea.com/ae/en/cat/bathroom-wall-lights-700214/"
+  }
+ ],
+ "_reconstructed_from": "Bathroom.xlsx delivered 2026-09-01 (checkpoint), not original worker JSON"
+}

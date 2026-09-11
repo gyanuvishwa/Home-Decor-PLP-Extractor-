@@ -1,0 +1,39 @@
+{
+  "sr": 225,
+  "company": "H&M Home India",
+  "brand_site": "www2.hm.com",
+  "country": "India",
+  "site_url": "https://www2.hm.com/en_in/home.html",
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "Reached entirely via Claude-in-Chrome, own tab, en_in locale. robots.txt (https://www2.hm.com/robots.txt) names ClaudeBot/Claude-Web/anthropic-ai but ends 'Allow: /' - explicit permission, not a block. STEP 1 - mega-menu: extracted window.__NEXT_DATA__.props.pageProps.headerData.menuItems on the Home homepage. The 'Home' department's canonical product-type tree ('Shop by Product', 18 top-level nodes) contains NO 'Furniture' node anywhere - not at top level, not under Cooking & Dining, Bedding, Decorations, Bath & Shower, Interior textiles, Storage, or Room Fragrance (all children enumerated and inspected by name). 'Shop by Room' (Living Room, Bedroom Decor, Bathroom, Kitchen, Kids Room, Nursery, Balcony & Outdoor) has zero own children in the menu JSON - confirmed these are filtered views over the same product set with no unique nav breakdown, matching the prior Home-Decor pass's finding for this same site/locale, so they were not used as a separate taxonomy source. Only furniture-adjacent nav node found was Kids & Baby > 'Furniture & Lighting' (a mixed roll-up, kept - see row 3). STEP 2 - sitemap cross-check (mandatory per project rule 7b.1, since the mega-menu is known to under-report the tree): fetched robots.txt's declared https://www2.hm.com/en_in.sitemap.xml (sitemap index), then all 18 en_in.pages.subdepartment.N.xml files (0-17, ~2043 URLs total) via same-origin fetch() from the loaded page and regex-scanned every <loc> for furniture keywords. This surfaced a real 'Furniture' department (URL slug plural 'furnitures', matching the known H&M slug trap: singular 'furniture' 404s/misses) at /home/shop-by-product/furnitures.html with two leaf children: furnitures/chairs.html and furnitures/tables.html. This department is NOT reachable from the live mega-menu at all (absent from headerData.menuItems entirely) - it only exists in the sitemap, i.e. an indexed-but-unlinked department, most likely because every node in it is currently out of stock (see below). No other /furnitures/ URLs exist anywhere in the 18 sitemap files (no sofas, beds, storage, wardrobes, desks as separate leaves) and the furnitures.html parent page itself has an empty departmentPills array (no in-page sub-navigation), so Chairs and Tables are the complete and only children. COUNTS: for all 3 furniture rows, __NEXT_DATA__.props.pageProps.plpProps.productListingSectionProps.productListingData.totalHits = 0, pagination.totalPages = 0, hits: [] and rawProductList: [] - a clean, structurally valid empty-PLP payload (not an error state), and each page's own h1/breadcrumb/title correctly match the requested node (furnitures.html breadcrumb ends 'Furniture', tables.html breadcrumb ends 'Furniture > Tables', chairs.html title 'Chairs & Seating') confirming no bad-slug-redirects-to-parent trap. No client-side XHR re-fetch fired on any of the 3 pages (network requests monitored via read_network_requests after a fresh navigation) because there was nothing further to fetch - SSR already carried the final 0-hit result. Per project rule 7b.4, live categories with 0 products are emitted as normal leaf rows with qty 0 rather than omitted; all 3 furniture-typed nodes on this locale currently show 0 in-stock products, i.e. the entire India furniture assortment is out of stock/not yet live at time of extraction - this is stated here rather than assumed to be a misread. The H&M Home UK/IT sibling-precedent PLP totalHits field (validated exact on qty=37 and qty=21 test cases in the notes/225.md prior pass) is the same field used here, just returning 0. Attempted the api.hm.com/search-services/v1 Elevate endpoint referenced as a reusable finding for H&M Home; it 422'd requiring an internal categoryId not exposed on this page, so the SSR-embedded PLP JSON (already exact per the UK/IT precedent) was used instead - equally authoritative and did not require guessing an internal id. EXCLUDED: Kids & Baby's other 10 siblings (Toys, Bedding Sets, Rugs, Storage, Room Decor, Towels, Blankets, Cushions, Tableware, View all) - none furniture. Interior textiles, Decorations, Cooking & Dining, Bedding, Bath & Shower, Room Fragrance children fully enumerated - all textiles/decor/tableware/bedding/bath/fragrance, no furniture-typed items. 'Shop by Room' branches carry no separate breakdown (see above). Mattresses: not present on this locale at all (Bedding has Duvet Covers/Pillowcases/Sheets/Bed Skirts/Blankets only, no mattress node) so the mattress-exclusion rule did not need to be applied.",
+  "rows": [
+    {
+      "category": "Furniture",
+      "sub_category": "Chairs & Seating",
+      "qty": 0,
+      "link": "https://www2.hm.com/en_in/home/shop-by-product/furnitures/chairs.html",
+      "is_group": false,
+      "evidence": "__NEXT_DATA__:props.pageProps.plpProps.productListingSectionProps.productListingData.totalHits=0 (pagination.totalPages=0, hits=[]); page h1 'Chairs & Seating', breadcrumb Home > Furniture > (Chairs), matches requested node - live node currently out of stock, not a bad-slug redirect",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Tables",
+      "qty": 0,
+      "link": "https://www2.hm.com/en_in/home/shop-by-product/furnitures/tables.html",
+      "is_group": false,
+      "evidence": "__NEXT_DATA__:props.pageProps.plpProps.productListingSectionProps.productListingData.totalHits=0 (pagination.totalPages=0, hits=[]); page h1 'Tables', breadcrumb Home > Furniture > Tables, matches requested node - live node currently out of stock, not a bad-slug redirect",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Kids' Furniture & Lighting",
+      "qty": 0,
+      "link": "https://www2.hm.com/en_in/home/shop-by-product/kids-baby/furniture-lighting.html",
+      "is_group": false,
+      "evidence": "__NEXT_DATA__:props.pageProps.plpProps.productListingSectionProps.productListingData.totalHits=0 (pagination.totalPages=0, hits=[]); page h1 'Kids' Furniture & Lighting', breadcrumb Home > Kids & Baby > Furniture & Lighting, matches requested node",
+      "flag": "MANUAL REVIEW: mixed furniture+lighting roll-up - this is the site's own single node for kids' furniture, no separate furniture-only leaf exists under Kids & Baby. Page description explicitly lists furniture items (wooden table and chairs sets, rattan stools, side tables, chests of drawers, dressing tables) alongside lighting items (rice paper lamps, pendant lights, bedside lamps). Currently 0 live products so a title-scan split by product type could not be performed; kept as furniture per the site's own department classification (site files it as a Kids & Baby sub-node whose H1 leads with 'Furniture', and the FURNITURE_BRIEF.md kids/nursery-furniture inclusion rule applies) but flagged since it is not purely furniture-typed."
+    }
+  ]
+}

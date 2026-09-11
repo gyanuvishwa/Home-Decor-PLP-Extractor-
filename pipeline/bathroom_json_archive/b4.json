@@ -1,0 +1,187 @@
+{
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ACCESS: pbteen.com is Akamai-fronted; curl_cffi impersonation reached it on every request this session (winning profiles safari15_5, safari17_0, safari17_2_ios; desktop chrome/edge profiles intermittently 403 or time out, so a random-profile retry loop was used). r.jina.ai, the route used in the prior Home-Decor pass, is dead for this workstation. robots.txt was fetched FIRST: EasouSpider is disallowed entirely, Pinterestbot gets crawl-delay 0.2, and the 'User-agent: *' group names no anthropic-ai / ClaudeBot / Claude-Web agent; it disallows only /account/, /checkout/, /shoppingcart/, /services/, */minipip, */quicklook, /*N=, */order-shipment-tracking, */registry/list.json, */undefined and '/shop/*+*+*' facet URLs. Every URL emitted is a plain /shop/<supercat>/<node>/ path, so nothing here is disallowed and no Crawl-delay applies to '*'. probe.py's 2s/host pacing was used. TREE: taken from PB Teen's OWN mega-menu payload, https://www.pbteen.com/api/catalog/v1/category/categorytree/shop/data.json (786 KB), in which type='header' nodes are grouping rows, type='subcat' nodes are leaves and secret=true marks nodes hidden from the rendered navigation. That mapping was verified against the live pages: the flyout HTML actually served on https://www.pbteen.com/shop/bath/ and https://www.pbteen.com/shop/dorm/ was scraped and matches the non-secret nodes exactly. Cross-checked against the shop sitemap https://www.pbteen.com/netstorage/sitemaps/shop-sitemap-1.xml.gz (612 URLs - every emitted link is present verbatim) and against constructor.io's group tree (group_id=bath returns 16 child groups, group_id=dorm carries the Bath & Laundry leaves; every recorded leaf has children=[] and parents=['all','bath'] or ['all','dorm'], so the taxonomy is two levels deep). WHAT THE BATH DEPARTMENT ACTUALLY CONTAINS: PB Teen's Bath supercat has five displayed headers - Towels & Linens, Bathroom Organization, Bathroom Decor, Robes & Pajamas, Beach Towels - plus In-Stock, Best Selling and a 'Dorm Bath & Laundry' pointer. Only Bathroom Organization yields Bathroom leaves under the category rules: Bathroom Storage & Accessories, Shower Caddies and Bathroom Mirrors. The site sells NO sanitaryware, baths, taps, toilets, showers or enclosures - it is a teen/dorm brand - so those parts of the Bathroom taxonomy are legitimately absent, not missed. The second real source of Bathroom leaves is the Dorm supercat's 'Bath & Laundry' header, whose Shower Caddies and Bath Storage & Accessories nodes are separate URLs from the Bath supercat's and are recorded separately per rule 28 (their assortments overlap heavily - 34 vs 35 items - but no quantity is ever combined; each row carries only its own page's total). The header nodes themselves are navigation-only: /shop/bath/bathroom-accessories/ (Towels & Linens), /shop/bath/bathroom-decor-category/, /shop/bath/robes-pajamas-category/ and /shop/dorm/bath-and-laundry/ all return total_num_results=0 in the site's own product engine, and /shop/bath/bathroom-organization/ returns 1, so all are emitted as grouping rows with blank qty and blank link (rule 24). QTY: PB Teen's PLP is client-rendered - the served HTML carries the H1 and breadcrumb but no product total - so every number is response.total_num_results from the storefront's OWN product API, https://ac.cnstrc.com/browse/group_id/<slug>?key=key_QdCsKhJzRGmFMX0N, the key read live out of the PLP's __INITIAL_STATE__ (constructor variant 'treatmentSearchEngineConstructor', enabled=true), alongside productCountDisplay={displayText:'Items', isEnabled:true, viewAllProductsJumpLink.enabled={desktop:true,mobile:true}} - the 'View N Items' jump-link variant PB Teen renders. VERIFICATION - three independent checks. (1) SOURCE CHAIN, read out of the live WSI storefront bundle dist/shop.cd506c32.js, which declares POTTERY_BRANDS=['PB','PK','PT'] and so serves pbteen: it assigns 'v.response.numFound = e.response.total_num_results' from this exact browse call, defines productCount() as '(state.shop.cat.response.numFound) || 0' and builds the rendered count message from productCount + productCountDisplayConfig.displayText. total_num_results IS the number PB Teen prints, not a proxy. (2) ENUMERATION TO EXHAUSTION on all five recorded leaves, paged out at 100 results/page with unique product ids counted: bathroom-storage 57/57, shower-caddies 35/35, bathroom-mirrors 46/46, dorm shower caddies 34/34, dorm bath storage & accessories 40/40 - exact matches to total_num_results in every case. (3) IDENTITY + CONTENT: each leaf URL was fetched and its server-rendered H1 / __INITIAL_STATE__ categoryNames confirmed, and each leaf's first page of products was read to confirm the assortment matches the label - Bathroom Mirrors really is mirrors (Forget-Me-Knot Bow Mirror, Gold Double-Wide Arch Mirror, AERIN Bamboo Wall Mirror, Audrey Storage Mirror), Shower Caddies really is shower caddies. Counts discriminate per category (34 to 57) and no filter/store/zip pre_filter_expression was attached. EXCLUDED: 'All Bath Linens', 'All Bathroom Organization', 'All Bath Linens, Beach & Organization', 'All Bath & Laundry' and 'Shop All Bath' as View-All (rule 25); 'All In-Stock Bath & Beach' as an availability filter; 'Bath Best Sellers', 'Bath & Beach Sale', 'Pajamas & Robes Sale', 'New Arrivals' and 'Sorority Shop' as promotional; and the cross-brand linkcats to potterybarnkids.com and potterybarn.com, which are other companies' sites. ROUTED OUT (recorded in review with qty and URL, not in rows): Bath Towels & Wraps, Shower Curtains & Bath Mats, Bath Mats, Beach Towels, Robes & Pajamas and the Dorm equivalents -> Textile; the two 'Laundry' nodes -> Storage; 'Bathroom Decor' and Decor > 'Bathroom & Laundry' held back as mixed/overlapping aggregates; the two beauty/vanity-mirror nodes held back as LOW-confidence per rule 29; Dorm Storage > 'Bath and Jewelry Storage' and the legacy /shop/dorm-bath/ tree held back as duplicates. PB Teen has no Bathroom Lighting node - its Lighting supercat and Dorm > Lighting carry no bathroom/vanity sub-node - so nothing was routed to Lighting. KEPT DELIBERATELY: Bathroom Mirrors as Bathroom rather than Wall Decor, because the primary product type is a mirror and the node sits inside Bath > Bathroom Organization (rules 10/11/21); Bathroom Storage & Accessories as Bathroom storage/organizers under rule 12 even though some of its items are beauty carts, because PB Teen's own Bath hierarchy owns the node; the Dorm shower-caddy and bath-accessory nodes because caddies are explicitly Bathroom under rules 6/13. PB Teen's 'vanity' furniture (Furniture > Vanities, Study > Vanity Desks / Vanity Chairs, Decor > Vanities & Storage Furniture) was inspected and DEPRECATED from Bathroom per rule 29: those are bedroom makeup-vanity desks and stools, not bathroom vanity units, and they were already captured by the Furniture pass. BREADCRUMB EVIDENCE (final check): every recorded leaf URL was re-fetched and its __INITIAL_STATE__ analytics.pageCategory.categoryNames read back - /shop/bath/bathroom-storage/ -> [\"Teen Bathroom Decor & Accessories\",\"Bathroom Organization\",\"Bathroom Storage + Accessories\"]; /shop/bath/shower-caddies/ -> [...,\"Bathroom Organization\",\"Shower Caddies\"]; /shop/bath/bathroom-mirrors/ -> [...,\"Bathroom Organization\",\"Bathroom Mirrors\"]; /shop/dorm/bath-bats-and-shower-curtains/ -> [\"Dorm\",\"Dorm Bath & Laundry\",\"Shower Caddies\"]; /shop/dorm/shower-caddies-bath-accessories/ -> [\"Dorm\",\"Dorm Bath & Laundry\",\"Bath Storage & Accessories\"]. This confirms both the node identity and the three-level path used for the grouping rows (the Bath supercat renders as 'Teen Bathroom Decor & Accessories', with 'Bathroom Organization' as the intermediate group).",
+ "rows": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Organization",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Storage & Accessories",
+   "qty": 57,
+   "link": "https://www.pbteen.com/shop/bath/bathroom-storage/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower Caddies",
+   "qty": 35,
+   "link": "https://www.pbteen.com/shop/bath/shower-caddies/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Mirrors",
+   "qty": 46,
+   "link": "https://www.pbteen.com/shop/bath/bathroom-mirrors/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Dorm > Bath & Laundry",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower Caddies (Dorm)",
+   "qty": 34,
+   "link": "https://www.pbteen.com/shop/dorm/bath-bats-and-shower-curtains/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Storage & Accessories (Dorm)",
+   "qty": 40,
+   "link": "https://www.pbteen.com/shop/dorm/shower-caddies-bath-accessories/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  }
+ ],
+ "review": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Decor (Bath > Bathroom Decor)",
+   "qty": 108,
+   "issue": "REVIEW - MIXED / OVERLAPPING NODE, not recorded to avoid duplication and mis-classification: the assortment sampled from PB Teen's own product engine is predominantly textile bath mats and shower curtains (Classic Loop Organic Bath Mat, Football Bath Mat, AERIN Scallop Bath Mat, LoveShackFancy Oversized Bow Shower Curtain) mixed with items already recorded under Bathroom Storage & Accessories (Glam Wall Storage Cabinet, Glam Three-Tier Caddy, LoveShackFancy Gold Bow Trash Can) and with hampers. Its textile half belongs to Textile (rules 16/20) and its non-textile half is already inside recorded leaves, so it is flagged with its exact qty and URL rather than double counted (rules 26/29).",
+   "link": "https://www.pbteen.com/shop/bath/bathroom-decor/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Towels & Wraps (Bath > Towels & Linens)",
+   "qty": 55,
+   "issue": "ROUTED TO TEXTILE: bath towels and wraps (rules 15/20).",
+   "link": "https://www.pbteen.com/shop/bath/teen-boys-girls-bath-towels/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower Curtains & Bath Mats (Bath > Towels & Linens)",
+   "qty": 14,
+   "issue": "ROUTED TO TEXTILE: shower curtains and textile bath mats (rules 16/20).",
+   "link": "https://www.pbteen.com/shop/bath/shower-curtains/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Mats (Bath > Towels & Linens)",
+   "qty": 3,
+   "issue": "ROUTED TO TEXTILE: textile bath mats (rule 16). Present in the nav payload and the shop sitemap; the desktop flyout folds it into 'Shower Curtains & Bath Mats'.",
+   "link": "https://www.pbteen.com/shop/bath/bath-mats/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Beach Towels (Bath)",
+   "qty": 25,
+   "issue": "ROUTED TO TEXTILE: beach towels (rules 15/20).",
+   "link": "https://www.pbteen.com/shop/bath/beach-towels/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Robes & Pajamas (Bath)",
+   "qty": 39,
+   "issue": "ROUTED TO TEXTILE: robes and pyjamas (rule 20).",
+   "link": "https://www.pbteen.com/shop/bath/robes-pjs/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Laundry (Bath > Bathroom Organization)",
+   "qty": 55,
+   "issue": "ROUTED TO STORAGE: primary product type is laundry bags, pop-up hampers, laundry backpacks and lidded hampers - laundry storage, not a bathroom fixture/accessory type - even though PB Teen surfaces it inside Bath > Bathroom Organization (rules 2/12/31).",
+   "link": "https://www.pbteen.com/shop/bath/laundry-bags-all/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Towels (Dorm > Bath & Laundry)",
+   "qty": 40,
+   "issue": "ROUTED TO TEXTILE: bath towels (rules 15/20).",
+   "link": "https://www.pbteen.com/shop/dorm/bath-towels/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Robes & Bath Wraps (Dorm > Bath & Laundry)",
+   "qty": 18,
+   "issue": "ROUTED TO TEXTILE: robes and bath wraps (rule 20).",
+   "link": "https://www.pbteen.com/shop/dorm/robes-and-pajamas/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Laundry (Dorm > Bath & Laundry)",
+   "qty": 44,
+   "issue": "ROUTED TO STORAGE: laundry bags/hampers/backpacks (rules 2/12/31).",
+   "link": "https://www.pbteen.com/shop/dorm/laundry/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom & Laundry (Decor supercat)",
+   "qty": 103,
+   "issue": "REVIEW - OVERLAPPING AGGREGATE: a Decor-supercat node blending hampers and laundry bags with shower caddies, trash cans and bath shelving that are already recorded under Bath > Bathroom Organization and Dorm > Bath & Laundry. Not recorded, to avoid duplicating the same products under a third URL (rules 26/28).",
+   "link": "https://www.pbteen.com/shop/accessories/bathroom-and-laundry/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Mirrors (Jewelry & Beauty supercat)",
+   "qty": 73,
+   "issue": "REVIEW - LOW CONFIDENCE (rule 29): light-up/LED beauty and vanity mirrors, which rule 10 would keep in Bathroom, but PB Teen files them under Jewelry & Beauty next to Marquee Makeup Vanity desks, i.e. bedroom get-ready furniture, and the site has a separate Bath > Bathroom Mirrors node which IS recorded. Flagged, not guessed.",
+   "link": "https://www.pbteen.com/shop/get-ready/beauty-mirrors/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Beauty & Vanity Mirrors (Decor > Mirrors)",
+   "qty": 45,
+   "issue": "REVIEW - LOW CONFIDENCE (rule 29): same ambiguity as above; the node sits under Decor > Mirrors alongside Wall Mirrors and Floor & Over-the-Door Mirrors (Wall Decor), and its assortment is makeup/vanity-desk mirrors rather than bathroom mirrors.",
+   "link": "https://www.pbteen.com/shop/accessories/decor-beauty-vanity-mirrors/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath and Jewelry Storage (Dorm Storage supercat)",
+   "qty": 6,
+   "issue": "REVIEW - OVERLAP: six products (shower caddies, trash cans, a standing bath towel hanger, cotton case) all already inside the recorded Dorm > Bath Storage & Accessories leaf; not recorded twice.",
+   "link": "https://www.pbteen.com/shop/dorm-storage/dorm-storage-bath/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Shower Caddies & Bath Accessories (legacy /shop/dorm-bath/ tree)",
+   "qty": 6,
+   "issue": "REVIEW - LEGACY DUPLICATE TREE: pbteen.com carries a second, older 'dorm-bath' supercat (/shop/dorm-bath/) in the category-tree payload and the sitemap, but it does not appear in the live Dorm flyout that was scraped from /shop/dorm/; the live tree is Dorm > Bath & Laundry, which is what was recorded. Listed here so the node is not silently skipped.",
+   "link": "https://www.pbteen.com/shop/dorm-bath/dorm-caddies-accessories/"
+  }
+ ],
+ "_reconstructed_from": "Bathroom.xlsx delivered 2026-09-01 (checkpoint), not original worker JSON"
+}

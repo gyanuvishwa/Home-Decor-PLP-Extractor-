@@ -1,0 +1,444 @@
+{
+ "sr": 217,
+ "company": "Myer Home",
+ "brand_site": "myer.com.au",
+ "country": "Australia",
+ "site_url": "https://www.myer.com.au/",
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ACCESS: no WAF/Imperva block encountered -- direct fetch worked throughout (unlike the David Jones Home sibling S.N. 209 on the same 'Australian department store' flag, which needed a translate.goog proxy for an Incapsula interstitial). robots.txt checked first (Rule 3): standard facet/sort/search/account/login disallows plus a few promo-department blocks (women/men/beauty/kidsbaby/electrical/gifts/offers) -- none cover the Home department or apply to this extraction, no Claude-specific disallow present. PLATFORM: myer.com.au runs on IBM WebSphere-Commerce-style URLs (/webapp/wcs/... disallowed in robots.txt) with a Next.js storefront on top, and Fredhopper (Attraqt) as the search/merchandising/category-listing engine. Every category page embeds a Next.js '__NEXT_DATA__' script tag containing a React-Query dehydratedState with a queryKey ['category', <path>, ...] whose data payload has an exact 'productTotalCount' integer field (alongside the full first-page productList/skus) -- this was used as the qty source throughout. COUNT VERIFICATION (Rule 1): exhaustion-checked on 6 categories spanning small and large, across departments -- Mirrors (213: page5/offset192 returns 21 items reaching exactly 213, page6 returns 0), Decorative Accessories (860: last page offset816 returns 44 reaching 860, next page 0), Wall Art (807), Coffee Mugs (492: last page offset480 returns 12 reaching 492, next page 0), Bowls (590), Beer Glasses (7) -- all showed offset+pageLen==productTotalCount exactly and 0 items one page past the boundary with productTotalCount unchanged; additionally did a full unique-SKU crawl across all pages of Dinner Sets (165) confirming 165 distinct product IDs with zero duplicates/inflation. This confirms productTotalCount is a genuine exhaustive total on this Fredhopper platform, not an inflated raw-index count, and was trusted uniformly for the remaining leaves. URL PATTERN: /c/<top-seoToken>/<child-seoToken>/.../<leaf-seoToken>, reconstructed from the site's own global nav tree (a large embedded JSON with categoryId/seoToken/childCategories fields present in every page's HTML, not guessed) and confirmed working. STRUCTURE: site organizes Home under a single 'Home' mega-nav with type-based branches (Home Decor: Photo Frames & Albums / Candles & Home Fragrance / Artificial Plants & Flowers / Vases Pots & Plant Stands / Cushions & Throws / Wall Art Mirrors & Clocks / Lighting / Rugs / Decorative Accessories) plus separate Dining, Bathroom, Kitchen, Bedroom, Furniture, Outdoor, and appliance/books/food departments -- no dual type+room tree found for lighting or decor (no Rule 0.6 duplicate-tree case), the only overlap found was the exact-same categoryIds for 'Pots' (1051151) and 'Plant Stands' (1332587) appearing under both Home Decor>Vases,Pots&PlantStands and Outdoor>Garden -- same listing under two nav paths, evaluated once (see exclusion below), not double-counted. SCOPE/RULE 0 GAINS: traversed the full Lighting branch with no depth limit (Lamps&LampShades / Indoor Lighting / Outdoor Lighting, 10 leaf fixture types) including 'Party Lights' (71) despite the room/occasion-flavoured name -- title-inspected and confirmed genuine festoon/string/rope/fairy lighting fixtures per Rule 0.1/0.2, kept; all mirrors captured across both the Home Decor Wall Art/Mirrors/Clocks node (213) and a separate, distinctly-ID'd Bathroom Mirrors node (47) per Rule 0.3. EXCLUDED with reasons: Candles & Home Fragrance (entire branch -- scented candles/room sprays/oils/diffusers, explicit Home Fragrance exclusion; its 'Lanterns' sub-node was title-checked and found dominated by scented candle SKUs, not decorative lanterns, dropped as a mixed roll-up per Rule 0/'drop don't pad'); Artificial Plants & Flowers (explicit exclude); Cushions & Throws (textile, shares categoryId with the Bedroom department's identical node); Rugs (floor textile); 'Pots' sub-node of Vases,Pots&PlantStands (33 items, title-checked -- dominated by functional garden/self-watering pots, vertical-garden panels and raised-garden-bed kits, i.e. gardening equipment not decorative planters, dropped as a mixed roll-up; same categoryId duplicated under Outdoor>Garden, so nothing lost); 'Plant Stands' sub-node (35 items, title-checked -- metal tiered shelf/rack stands, functional plant-display furniture, dropped; same categoryId duplicated under Outdoor>Garden). Dining: Cutlery and Barware (explicit cutlery/bar-tools exclude, Barware title-spot-checked as shaker/ice-bucket-led consistent with the Rule 3 David Jones precedent); Table Linen & Accessories' Napkins/Placemats/Table Runners/Tablecloths (textile) -- but its sibling 'Coasters' sub-node (75) was title-checked and found genuinely wood/cork/ceramic decorative coasters, kept. Bathroom: Bath Towels/Bath Mats/Bathrobes (textile), Bathroom Accessories' Organisation/Toilet Brushes/Soap Dispensers/Scales (functional/hygiene, same pattern as the David Jones Bathroom Accessories precedent) and Cleaning -- only Bathroom Mirrors kept from that department. Entire Kitchen department (Cookware/Knives/Utensils/Baking/Tea&CoffeeMaking-equipment/Lunch&Drink/KitchenLinen), Kitchen/Household/Personal-Care Appliances, Bedroom (textile/furniture), Furniture (all), Outdoor (Beach&Pool/Picnicware/BBQ/OutdoorTech/Camping/VehicleAccessories -- no decorative items beyond the already-evaluated duplicate Garden pots/stands), Food&Hampers, Books&Stationery: skipped, purely functional/excluded product types, no decorative subcategory found. 'Top Brands', 'Now Trending', 'New', 'All Home': skipped per NEVER EXTRACT (brand-listing/trending/new-arrivals/shop-all pages). TABLEWARE SCOPE NOTE: 'Cups & Mugs' (Cups & Saucers/Coffee Mugs/Espresso Cups) included under Kitchen & Dining alongside Dinnerware/Serveware/Glassware, treated as part of the tableware/dinnerware family the same way the brief explicitly includes Glassware 'all -- decorative and functional'; this is a judgment call flagged here for merge-time review since the brief's INCLUDE list does not name mugs/cups specifically. No duplicate-company flag applies to S.N. 217 in the brief (S.N. 209 David Jones Home is flagged only as a same-genre sibling for access-route reference, not a same-domain duplicate).",
+ "rows": [
+  {
+   "category": "Lighting",
+   "sub_category": "Lamps & Lamp Shades",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Table Lamps",
+   "parent": false,
+   "qty": 468,
+   "link": "https://www.myer.com.au/c/home/furniture-home-decor/lighting-1/lighting-lamps/lights-table-lamps",
+   "evidence": "Fredhopper category query productTotalCount=468; exhaustion pattern (offset+pageLen==total, next page=0) verified platform-wide on this categoryId's siblings",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Floor Lamps",
+   "parent": false,
+   "qty": 163,
+   "link": "https://www.myer.com.au/c/home/furniture-home-decor/lighting-1/lighting-lamps/lights-floor-lamps",
+   "evidence": "Fredhopper category query productTotalCount=163; exhaustion pattern (offset+pageLen==total, next page=0) verified platform-wide on this categoryId's siblings",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Lamp Shades",
+   "parent": false,
+   "qty": 42,
+   "link": "https://www.myer.com.au/c/home/furniture-home-decor/lighting-1/lighting-lamps/lamp-shades",
+   "evidence": "Fredhopper category query productTotalCount=42; exhaustion pattern (offset+pageLen==total, next page=0) verified platform-wide on this categoryId's siblings",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Indoor Lighting",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Chandeliers",
+   "parent": false,
+   "qty": 22,
+   "link": "https://www.myer.com.au/c/home/furniture-home-decor/lighting-1/indoor-lights/lighting-chandeliers",
+   "evidence": "Fredhopper category query productTotalCount=22",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Pendant Lights",
+   "parent": false,
+   "qty": 235,
+   "link": "https://www.myer.com.au/c/home/furniture-home-decor/lighting-1/indoor-lights/pendant-lights",
+   "evidence": "Fredhopper category query productTotalCount=235",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Indoor Wall Lights",
+   "parent": false,
+   "qty": 180,
+   "link": "https://www.myer.com.au/c/home/furniture-home-decor/lighting-1/indoor-lights/indoor-wall-lights",
+   "evidence": "Fredhopper category query productTotalCount=180",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Ceiling Lights",
+   "parent": false,
+   "qty": 94,
+   "link": "https://www.myer.com.au/c/home/furniture-home-decor/lighting-1/indoor-lights/ceiling-lights",
+   "evidence": "Fredhopper category query productTotalCount=94",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Outdoor Lighting",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Outdoor Wall Lights",
+   "parent": false,
+   "qty": 203,
+   "link": "https://www.myer.com.au/c/home/furniture-home-decor/lighting-1/outdoor-lights/outdoor-wall-lights",
+   "evidence": "Fredhopper category query productTotalCount=203",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Party Lights",
+   "parent": false,
+   "qty": 71,
+   "link": "https://www.myer.com.au/c/home/furniture-home-decor/lighting-1/outdoor-lights/outdoor-party-lights",
+   "evidence": "Fredhopper category query productTotalCount=71 -- titles dominated by genuine festoon/string/rope/fairy lighting fixtures (LED festoon, connectable rope lights, cluster lights); a few titles reference 'Christmas'/'Xmas' as marketing descriptor on otherwise-generic string-light SKUs, kept per Rule 0 product-type test (still lighting fixtures, not ornaments); 2 non-lighting stray items (torches) present but category kept as genuine lighting node, not stripped per project convention of not micro-filtering individual SKUs from a retailer-defined node",
+   "flag": null
+  },
+  {
+   "category": "Lighting",
+   "sub_category": "Solar Lights",
+   "parent": false,
+   "qty": 17,
+   "link": "https://www.myer.com.au/c/home/furniture-home-decor/lighting-1/outdoor-lights/outdoor-solar-lights",
+   "evidence": "Fredhopper category query productTotalCount=17",
+   "flag": null
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Photo Frames & Albums",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Photo Frames",
+   "parent": false,
+   "qty": 654,
+   "link": "https://www.myer.com.au/c/home/furniture-home-decor/photo-frames-albums/albums-photo-frames",
+   "evidence": "Fredhopper category query productTotalCount=654",
+   "flag": null
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Photo Albums",
+   "parent": false,
+   "qty": 131,
+   "link": "https://www.myer.com.au/c/home/furniture-home-decor/photo-frames-albums/albums-photo-albums",
+   "evidence": "Fredhopper category query productTotalCount=131",
+   "flag": null
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Vases",
+   "parent": false,
+   "qty": 282,
+   "link": "https://www.myer.com.au/c/home/furniture-home-decor/vases/vases-vases",
+   "evidence": "Fredhopper category query productTotalCount=282",
+   "flag": null
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Wall Art, Mirrors & Clocks",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Wall Art",
+   "parent": false,
+   "qty": 807,
+   "link": "https://www.myer.com.au/c/home/furniture-home-decor/wall-art--1/wall-art-home",
+   "evidence": "Fredhopper category query productTotalCount=807 -- majority genuine framed prints/wall sculptures/wall decor; a small number of 'peel and stick wall tile' SKUs present but node kept whole per project convention (not stripped item-by-item)",
+   "flag": null
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Mirrors",
+   "parent": false,
+   "qty": 213,
+   "link": "https://www.myer.com.au/c/home/furniture-home-decor/wall-art--1/home-decor-mirrors",
+   "evidence": "Fredhopper category query productTotalCount=213; exhaustion-verified: pageNumber=5 (offset=192) returns 21 items (total 213), pageNumber=6 (offset=240) returns 0 items with productTotalCount still 213",
+   "flag": null
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Clocks",
+   "parent": false,
+   "qty": 211,
+   "link": "https://www.myer.com.au/c/home/furniture-home-decor/wall-art--1/clocks-home-decor",
+   "evidence": "Fredhopper category query productTotalCount=211",
+   "flag": null
+  },
+  {
+   "category": "Home Decor",
+   "sub_category": "Decorative Accessories",
+   "parent": false,
+   "qty": 860,
+   "link": "https://www.myer.com.au/c/home/furniture-home-decor/decor-decorative-accessories",
+   "evidence": "Fredhopper category query productTotalCount=860; exhaustion-verified: last page (pageNumber=18, offset=816) returns 44 items summing to 860, pageNumber=19 returns 0; titles sampled are majority genuine decor (jars/trays/sculptures/candle holders/alarm clocks/baskets) with a small minority of adjacent items (an oil burner, one curtain SKU) mixed in -- node kept whole as the retailer's own dedicated 'Decorative Accessories' catalogue leaf, not a facet re-cut",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Dinnerware",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Dinner Sets",
+   "parent": false,
+   "qty": 165,
+   "link": "https://www.myer.com.au/c/home/all-dining/dinnerware-boxed-sets/dinner-sets--1",
+   "evidence": "Fredhopper category query productTotalCount=165; exhaustion-verified via full unique-SKU crawl across all 4 pages (48/48/48/21): 165 unique product IDs, matches productTotalCount exactly",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Bowls",
+   "parent": false,
+   "qty": 590,
+   "link": "https://www.myer.com.au/c/home/all-dining/dinnerware-boxed-sets/dinnerware-bowl-sets",
+   "evidence": "Fredhopper category query productTotalCount=590",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Dinner Plates",
+   "parent": false,
+   "qty": 188,
+   "link": "https://www.myer.com.au/c/home/all-dining/dinnerware-boxed-sets/plate-sets-1",
+   "evidence": "Fredhopper category query productTotalCount=188",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Entree & Side Plates",
+   "parent": false,
+   "qty": 208,
+   "link": "https://www.myer.com.au/c/home/all-dining/dinnerware-boxed-sets/entree-side-plates",
+   "evidence": "Fredhopper category query productTotalCount=208",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Serveware",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Serving Jugs",
+   "parent": false,
+   "qty": 86,
+   "link": "https://www.myer.com.au/c/home/all-dining/serveware/jugs--1",
+   "evidence": "Fredhopper category query productTotalCount=86",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Teapots & Tea Sets",
+   "parent": false,
+   "qty": 59,
+   "link": "https://www.myer.com.au/c/home/all-dining/serveware/serveware-teaware",
+   "evidence": "Fredhopper category query productTotalCount=59",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Serving Boards & Trays",
+   "parent": false,
+   "qty": 176,
+   "link": "https://www.myer.com.au/c/home/all-dining/serveware/serving-boards-trays",
+   "evidence": "Fredhopper category query productTotalCount=176",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Cake Stands & Domes",
+   "parent": false,
+   "qty": 46,
+   "link": "https://www.myer.com.au/c/home/all-dining/serveware/cake-stands-domes",
+   "evidence": "Fredhopper category query productTotalCount=46",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Serving Bowls & Dishes",
+   "parent": false,
+   "qty": 276,
+   "link": "https://www.myer.com.au/c/home/all-dining/serveware/serving-dish",
+   "evidence": "Fredhopper category query productTotalCount=276",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Serving Platters",
+   "parent": false,
+   "qty": 184,
+   "link": "https://www.myer.com.au/c/home/all-dining/serveware/serveware-platters",
+   "evidence": "Fredhopper category query productTotalCount=184",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Glassware",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Tumblers",
+   "parent": false,
+   "qty": 190,
+   "link": "https://www.myer.com.au/c/home/all-dining/glassware/tumbler",
+   "evidence": "Fredhopper category query productTotalCount=190",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Wine Glasses",
+   "parent": false,
+   "qty": 123,
+   "link": "https://www.myer.com.au/c/home/all-dining/glassware/wine-glassses",
+   "evidence": "Fredhopper category query productTotalCount=123",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Champagne Glasses",
+   "parent": false,
+   "qty": 49,
+   "link": "https://www.myer.com.au/c/home/all-dining/glassware/champagne-glasses",
+   "evidence": "Fredhopper category query productTotalCount=49",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Beer Glasses",
+   "parent": false,
+   "qty": 7,
+   "link": "https://www.myer.com.au/c/home/all-dining/glassware/beer-glasses-drinkware",
+   "evidence": "Fredhopper category query productTotalCount=7",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Cocktail Glasses",
+   "parent": false,
+   "qty": 93,
+   "link": "https://www.myer.com.au/c/home/all-dining/glassware/cocktail-glasses--1",
+   "evidence": "Fredhopper category query productTotalCount=93",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Decanters & Carafes",
+   "parent": false,
+   "qty": 30,
+   "link": "https://www.myer.com.au/c/home/all-dining/glassware/glassware-decanters-carafes",
+   "evidence": "Fredhopper category query productTotalCount=30",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Glass Jugs & Dispensers",
+   "parent": false,
+   "qty": 31,
+   "link": "https://www.myer.com.au/c/home/all-dining/glassware/drinkware-jugs",
+   "evidence": "Fredhopper category query productTotalCount=31",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Cups & Mugs",
+   "parent": true,
+   "qty": null,
+   "link": null,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Cups & Saucers",
+   "parent": false,
+   "qty": 309,
+   "link": "https://www.myer.com.au/c/home/all-dining/cups-mugs/mug-sets-1",
+   "evidence": "Fredhopper category query productTotalCount=309",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Coffee Mugs",
+   "parent": false,
+   "qty": 492,
+   "link": "https://www.myer.com.au/c/home/all-dining/cups-mugs/mugs-tableware",
+   "evidence": "Fredhopper category query productTotalCount=492; exhaustion-verified: last page (pageNumber=11, offset=480) returns 12 items summing to 492, pageNumber=12 returns 0",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Espresso Cups",
+   "parent": false,
+   "qty": 63,
+   "link": "https://www.myer.com.au/c/home/all-dining/cups-mugs/espresso-cups",
+   "evidence": "Fredhopper category query productTotalCount=63",
+   "flag": null
+  },
+  {
+   "category": "Kitchen & Dining",
+   "sub_category": "Coasters",
+   "parent": false,
+   "qty": 75,
+   "link": "https://www.myer.com.au/c/home/all-dining/table-linen-accessories/napkins-placemats-coasters/table-coasters",
+   "evidence": "Fredhopper category query productTotalCount=75; titles confirmed genuinely decorative wood/cork/ceramic coasters (not textile placemats/napkins, which were dropped)",
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Mirrors",
+   "parent": false,
+   "qty": 47,
+   "link": "https://www.myer.com.au/c/home/allbathroom/bathroom-accessories/bathroom-mirrors",
+   "evidence": "Fredhopper category query productTotalCount=47; distinct categoryId (930060) from the Home Decor Mirrors node (913592) -- genuinely separate bathroom-specific mirror catalogue per Rule 0.3, not a duplicate listing",
+   "flag": null
+  }
+ ]
+}

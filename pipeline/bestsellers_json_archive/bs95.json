@@ -1,0 +1,16 @@
+{
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "Access: prior notes confirmed curl_cffi (chrome124 impersonation) reaches amara.com with no WAF resistance; direct plain HTTP fetch of robots.txt timed out, so all fetches used curl_cffi impersonation per the prior pass. Discovery: no 'Bestsellers' link exists in the main desktop or mobile nav (New In, Shop By Room, Furniture & Outdoor, Home Accessories, Luxury Gifts, Designers, Outlet only). robots.txt contains 'Disallow: /*bestsellers*' under its Search/Products block, which was the clue that a bestsellers URL exists but is deliberately deindexed from search engines (not a Claude-specific disallow, so HTTP fetch tier proceeded per brief Sec 1). Probed candidate URL shapes: /bestsellers (404), /best-sellers (404), /special/bestsellers (404), /bestseller (404), /most-popular (404), /top-sellers (404), /popular (404); /shop/bestsellers returned 200. Sitemaps (sitemap-category-department.xml, sitemap-category-brand.xml index, sitemap-extras.xml, sitemap-store-pages.xml) were also checked -- no bestseller/popular/trending entries found in the department sitemap (extras and store-pages sitemaps are empty <urlset></urlset>). Validated /shop/bestsellers against Sec 3: h1/lblCategoryHeader = 'Bestsellers', title = 'Bestsellers | Luxury Homeware & Designer Home Decor | AMARA', breadcrumb path Shop > Other > Bestsellers (categoryBreadcrumbs JSON, 'Other' is a hidden parent bucket used for pages excluded from primary nav), productlistcontainer data-category='AMAR_SHOPBESTSELLER' -- same live category-container platform pattern (data-category=AMAR_SHOPxxx) verified as server-rendered in the prior Home-Decor pass for this company, not a marketing/editorial page. Real product tiles render on the page (confirmed via repeated product-tile markup, matching the platform's known desktop+mobile dual-render pattern). Count verified via the server-rendered '<span class=totalProducts>16</span>' marker (appears identically twice, once per responsive render block) with data-defaultpagelength=60, so all 16 products are on the single rendered page -- no pagination needed to reach the true total. No sub-structure ('In This Section' filter block) present on this page, so it is emitted as a single undifferentiated row.",
+  "rows": [
+    {
+      "category": "Bestsellers",
+      "sub_category": "Bestsellers",
+      "qty": 16,
+      "link": "https://www.amara.com/shop/bestsellers",
+      "is_group": false,
+      "evidence": "<span id=prdsFound class=pppt><span class='totalProducts'>16</span> <span class='productsCountText'>products</span></span>; data-category=AMAR_SHOPBESTSELLER",
+      "flag": null
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "Checked: main header mega-menu (site-nav dropdowns + mobile slide-nav), homepage hero/footer banners, full /collections.json sweep (270 collections, all pages), sitemap_collections_1.xml (confirms indexed/live pages), robots.txt (clean, no Claude-specific disallow, standard Shopify crawl rules, accessed via direct HTTP requests, no WAF issues encountered this pass). Target-term matches found: 'Best Selling' (handle best-selling, 13 products) and 'TRENDING DECOR' (handle trending-back-in-stock, 21 products) -- neither is currently linked from the main nav or homepage, but both are live, publicly reachable, sitemapped collection pages with real product grids. See flag on row 2 for why Trending Decor is ambiguous. Excluded after inspection: 'Popular Dinnerware' (handle popular-dinnerware, the site's own products_count field claimed 9 products, but exhaustive /products.json enumeration and the rendered page both show 0 products -- dropped per the zero-product rule). 'Deal of The Day' (deal-of-the-day, 5 products) -- a generic time-bound promo with no popularity/bestseller wording in title or copy, excluded. Also reviewed and excluded as non-matching: Art Bash, CRED Offer tiers, Diwali Offer tiers, Summer Sale family, Valentine's Day Sale family, Freedom Sale, Rakhi Special, Friday Deals/Sales family, Shop Under X price tiers, Gift For Her/Him, Cred Reward tiers -- all generic seasonal/promotional/price-tier/gifting collections carrying no Bestsellers/Top Sellers/Popular/Trending/Customer Favorites wording. No 'Top Sellers', 'Customer Favorites', or 'Most Popular' named page exists anywhere on the site. Per the prior Home-Decor pass's confirmed finding for this exact site, the Shopify 'products_count' field is consistently inflated vs the exhaustive /products.json id enumeration (e.g. best-selling: field said 32, enumeration=13; trending-back-in-stock: field said 22, enumeration=21); every qty below is the enumerated value, independently confirmed against the rendered page's own '<N> products' header text.",
+  "rows": [
+    {
+      "category": "Bestsellers",
+      "sub_category": "Best Selling",
+      "qty": 13,
+      "link": "https://theartment.com/collections/best-selling",
+      "is_group": false,
+      "evidence": "Page H1 'Best Selling' and on-page text '13 products'; exhaustive /collections/best-selling/products.json enumeration = 13 unique product ids (site's products_count field reported 32, inflated, not used)",
+      "flag": null
+    },
+    {
+      "category": "Bestsellers",
+      "sub_category": "Trending Decor",
+      "qty": 21,
+      "link": "https://theartment.com/collections/trending-back-in-stock",
+      "is_group": false,
+      "evidence": "Page H1 'TRENDING DECOR' and on-page text '21 products'; exhaustive /products.json enumeration = 21 unique product ids (site's products_count field reported 22, inflated by 1, not used)",
+      "flag": "MANUAL REVIEW: AMBIGUOUS BESTSELLER SIGNAL - page H1 literally reads 'TRENDING DECOR' (matches the brief's 'Trending Products' target term) but the URL handle is 'trending-back-in-stock' and all 21 listed products carry created_at dates from 2019-2022, suggesting this may be a restock-notification page rather than a genuine popularity/bestseller merchandising concept. Recorded per ambiguous-candidate guidance rather than silently excluded."
+    }
+  ]
+}

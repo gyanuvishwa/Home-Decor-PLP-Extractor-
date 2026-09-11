@@ -1,0 +1,70 @@
+{
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ACCESS: no block, and the site OPTS IN. robots.txt (https://www.thewhitecompany.com/robots.txt, HTTP 200, 1155 bytes) carries an explicit '# Explicitly allow AI crawlers' block containing 'User-agent: Anthropic-AI' / 'Allow: /' alongside GPTBot, ChatGPT-User, Google-Extended and GeminiBot; the only Disallow: / groups are CazoodleBot, MJ12bot, dotbot/1.0 and Gigabot. The generic '*' group disallows /uk/bag, /uk/checkout, /uk/my-account, /quickView, '*?q=', '*.pdf$' and '/*?page=' (with Allow exceptions only for ?page=1..19). I HONOURED THAT: the prior Furniture pass on this company read counts from '<category>/results?q=%3Arelevance&page=0', which matches BOTH 'Disallow: *?q=' and 'Disallow: /*?page=', so I did not use it. I used the same endpoint with NO query string at all - '<category-url>/results' - which is not matched by any Disallow, and confirmed it returns the identical payload shape (pagination + results). Direct curl_cffi (probe.fetch) reached every URL at HTTP 200; no WAF, no proxy. TREE: uk/sitemap_Category.xml (365 loc entries) cross-checked against WebFetch's RENDERED read of the department and leaf pages, which gives the site's own display names and the live sub-nav. The Bathroom department is https://www.thewhitecompany.com/uk/Home/c/bathroom (rendered H1 'Bathroom', breadcrumb Home > Bathroom, universal_variable.page.category = 'Bathroom'). Its live children are exactly five: Towels, Bath Mats, Bathroom Accessories & Storage, Wash Bags, and Robes & Dressing Gowns (the last is a cross-link into Clothing > Nightwear). The rendered breadcrumb on the recorded leaf is 'The White Company > Home > Bathroom > Bathroom Accessories & Storage' and its rendered H1 is 'Bathroom Accessories & Storage' - so sub_category here is the site's own display name, not the URL slug 'bathroom-accessories'. QTY: SAP Hybris. Every category exposes its own listing JSON at <category-url>/results, and pagination.totalNumberOfResults is the number the rendered grid header prints. VERIFICATION - three live rendered reads this session, at three different magnitudes, all exact: Bathroom department rendered 'Showing 48 of 98' vs API 98; Bathroom Accessories & Storage rendered 'Showing 40 of 40' vs API 40; Bath Mats rendered 'Showing 16 of 16' vs API 16. Counts discriminate (8, 10, 16, 22, 27, 40, 98, and 0 for the empty cabinets node) - not a site-wide constant. STRUCTURAL CHECK: the department total of 98 is fully accounted for - the four in-department children hold 82 distinct product codes (22+16+40+8 with no overlap) and the remaining 16 are the Robes cross-listed from Clothing > Nightwear (9 of them appear on page 0 of the department feed, all named '... Robe'). I did NOT use the SSR universal_variable.listing.initialItems blob, which the prior Home-Decor pass used and which counts non-product content tiles. LEAF CONTENT: enumerated all 40 items of Bathroom Accessories & Storage - Morston and Larton marble/ceramic soap dishes, soap dispensers, toothbrush holders, bottle holders/arches, trays and vanity trays, tissue box covers, glass storage jars, a wooden bath tidy, a marble vanity mirror, seagrass/rattan laundry and storage baskets, plus two organic-cotton hair wraps/headbands and one bath & body gift box. Overwhelmingly rule 13/17/18 bathroom accessories, soap accessories, toothbrush holders and bathroom storage; the node is kept whole at the site's own depth because TWC publishes no finer split (rule 24 - it has no children). WHY THIS IS THE ONLY BATHROOM ROW: TWC's Bathroom presence is large (98 items) but heavily textile-weighted - towels 22, bath mats 16 and robes 27 are all Textile under rules 15/16/20, wash bags are travel/cosmetic bags, and the one bathroom-furniture node the site publishes (Home > Furniture > Bathroom Cabinets & Units) is currently EMPTY (API total 0). So Bathroom Accessories & Storage is the entire Bathroom remainder. DEDUP: already_extracted() run on all 11 candidate URLs (the department, its five children, bathroom-cabinets-and-units, Home Accessories mirrors, laundry-and-storage, the Seasonal General Store bathroom node and robes) - ZERO hits. The White Company's 5 Furniture.xlsx rows are beds, side-tables, chairs-benches-and-stools, sofas-and-armchairs and childrens-bedroom-furniture; none collides. EXCLUDED: /Home/Bathroom/c/new-in-bathroom (17) as a New In facet, /Sale/c/bathroom-sale and /Offers/c/bathroom-offers as sale/promo, /uk/c/towels-cs and /uk/c/robe-cs as collection/content-shop pages, /Home-Collections/c/chiltern-mirrors-collection as a Collections page - all rule 25. /Seasonal/General-Store/Bathroom/c/'Bathroom Accessories' was opened and returns API total 0 (dead seasonal re-cut), so it was not recorded. /Home/Home-Accessories/c/laundry-and-storage (7) inspected and left out - general household laundry/storage under Home Accessories, not presented under Bathroom. /Beauty-and-Spa/Bath-and-Body-/* (shower gel, bath foam and oils, hand wash and soap, body lotion) are toiletries/consumables, not bathroom products (rule 2). BATHROOM LIGHTING: none - Home Accessories > Lighting has only ceiling-lights and table-lamps, no bathroom or vanity light node, so nothing was routed to Lighting.",
+ "rows": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Accessories & Storage",
+   "qty": 40,
+   "link": "https://www.thewhitecompany.com/uk/Home/Bathroom/c/bathroom-accessories",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  }
+ ],
+ "review": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Towels",
+   "qty": 22,
+   "issue": "ROUTED TO TEXTILE: bath towels, hand towels, bath sheets and guest towels (rules 15, 20).",
+   "link": "https://www.thewhitecompany.com/uk/Home/Bathroom/c/towels"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Bath Mats",
+   "qty": 16,
+   "issue": "ROUTED TO TEXTILE: enumerated all 16 - every item is a woven cotton textile bath mat (Rib Hydrocotton, Luxury Egyptian Cotton, Ile de Re, TWC Signature). No rubber/anti-slip bathroom-accessory mat present (rules 16, 20).",
+   "link": "https://www.thewhitecompany.com/uk/Home/Bathroom/c/bath-mats"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Robes & Dressing Gowns",
+   "qty": 27,
+   "issue": "ROUTED TO TEXTILE: bathrobes and dressing gowns (rule 20). Cross-listed into the Bathroom department nav (9 of the 98 Bathroom-department items are robes) but the node itself lives at Clothing > Nightwear.",
+   "link": "https://www.thewhitecompany.com/uk/Clothing/Nightwear/c/robes-and-dressing-gowns"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom > Wash Bags",
+   "qty": 8,
+   "issue": "AMBIGUOUS / LOW CONFIDENCE - not recorded (rule 29). Sits under TWC's own Bathroom nav, but the enumerated 8 items are travel/cosmetic bags - Organic Cotton Spot Print Washbag, Double Cotton Gingham Wash Bag, four Saffiano leather fold-out make-up cases, a leather travel jewellery case and an inflight clear cosmetic case. Primary product type is a travel/cosmetic bag, not a bathroom fitting, fixture, accessory or storage unit, so room placement alone does not make it Bathroom (rule 2).",
+   "link": "https://www.thewhitecompany.com/uk/Home/Bathroom/c/wash-bags"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Home > Furniture > Bathroom Cabinets & Units",
+   "qty": 0,
+   "issue": "EMPTY CATEGORY - no row emitted. The node exists in uk/sitemap_Category.xml and would be Bathroom under rule 9, but its own listing API returns pagination.totalNumberOfResults 0 and zero results, i.e. TWC currently stocks nothing in it. No fabricated count (rule 26/35).",
+   "link": "https://www.thewhitecompany.com/uk/Home/Furniture/c/bathroom-cabinets-and-units"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Home > Home Accessories > Mirrors",
+   "qty": 10,
+   "issue": "NOT BATHROOM - recorded for traceability. Enumerated all 10: nine are Chiltern Fine Metal decorative wall/floor/full-length mirrors (general Decor), and the single bathroom-typed item, the Larton Double Sided Marble Vanity Mirror, is ALREADY inside the Bathroom Accessories & Storage leaf that IS recorded. Taking this node would be a Decor mirror listing plus a duplicate (rules 2, 11, 28).",
+   "link": "https://www.thewhitecompany.com/uk/Home/Home-Accessories/c/mirrors"
+  }
+ ],
+ "_reconstructed_from": "Bathroom.xlsx delivered 2026-09-01 (checkpoint), not original worker JSON"
+}

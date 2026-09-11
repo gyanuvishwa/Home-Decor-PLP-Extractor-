@@ -1,0 +1,163 @@
+{
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ACCESS: direct curl_cffi impersonation, HTTP 200 on every URL (firefox133 / safari15_5 / safari18_0_ios / chrome120 / edge101), no WAF resistance - the same route the Furniture and Home-Decor passes used. ROBOTS: https://www.amara.com/robots.txt fetched FIRST. One 'User-agent: *' group only; there is NO ClaudeBot / anthropic-ai / Claude-Web / Google-Extended group and no Disallow covering /shop/ or the sitemaps. The disallows that do exist and that I respected: /api/*, /api*, /desktopmodules/*, /searchresults?*, /searchnoresults?*, *OrderBy*, *dppp, /*?category, /*&mcp|mppp|sizecode|BrandFilter|DescriptionFilter, /store/, /*.aspx$, /productdetail/*, and the country sub-paths /us/ /eu/ /gb/ /au/ etc. I used ONLY bare /shop/<slug> URLs, the allowed ?dcp=<n> pagination parameter, and the public sitemaps - no API host, no dppp/OrderBy/filter query string, no search URL, no product-detail URL, no country sub-path. TREE: taken from two independent sources that agree. (a) https://www.amara.com/sitemap.xml -> sitemap-category-department.xml, 204 category URLs = the full site taxonomy; its bathroom slice is exactly /shop/bathroom, /shop/bathroom-accessories, /shop/bathroom-bins, /shop/bathroom-shop-all, /shop/bathroom-storage, /shop/toilet-accessories, /shop/toilet-brush-holders, /shop/toothbrush-holders, /shop/soap-dishes-dispensers, /shop/shower-caddies, /shop/laundry-baskets, /shop/bath-shower-mats, /shop/bath-towels, /shop/towels-mats, /shop/dressing-gowns-bathrobes. (b) the server-rendered 'In This Section' child-category block (ul#filterlist > li.child-categories-in-filters) on each category page, walked recursively from /shop/bathroom. The department page carries dataLayer categoryId 'AMAR_SHOPBATHROOM', CategoryLevel0 'Bathroom Accessories', categoryBreadCrumb 'Shop>Bathroom Accessories' and canonical https://www.amara.com/shop/bathroom. Resulting tree: Bathroom (164) -> Bathrobes & Dressing Gowns (37, textile) | Bathroom Accessories (3) -> Bathroom Bins (1), Soap Dishes & Dispensers (1), Toothbrush Holders (1) | Bathroom Shop All (164, rule 25) | Bathroom Storage (1) -> Bathroom Baskets & Caddies (1), Laundry Baskets (1) | Toilet Accessories (1) -> Toilet Brush Holders (1) | Toiletries (dead) | Towel Rails & Racks (dead) | Towels & Mats (120, textile) -> Bath & Shower Mats (22), Luxury Bathroom Towels (98). QTY - THE PLP IS SERVER-RENDERED, NOT CLIENT-RENDERED. This was challenged in review and re-verified from the raw bytes. Amara runs a legacy .NET (Frasers group) storefront that ships the complete product grid in the initial HTML: <div ... data-noproductstext=\"No Products Found\"><ul id=\"navlist\" class=\"s-productscontainer2 plp-products-container\"><li li-productid=\"78951311\" li-name=\"Unknown Ombre Waste Bin\" li-brand=\"Mike and Ally\" li-activitygroup=\"Bathroom\" li-activity=\"Bathroom\" li-category=\"Accessories\" li-subcategory=\"Bins\" ...>. The tile attribute is li-productid, NOT data-product-id / .product-tile / an /product/ href - a reviewer looking for those names will conclude the page is empty when it is not. The total is likewise server-rendered, twice per page, as <span id=\"prdsFound\"><span class='totalProducts'>N</span> <span class='productsCountText'>product|products</span></span>; note the SINGLE quotes on the class attribute, which silently defeat a double-quote regex. The count regex used here is anchored on class=['\"]totalProducts['\"] and can never match the inline-JS string `sizes: [1, 1], // Increases width to 1/2/3/4/5 products width` that was suspected as the source of the 1s - that string contains no such span, and the rendered text next to the 1 is the singular 'product', which the template only emits when the true total is 1. QTY - INDEPENDENT PROOF BY EXHAUSTION (this is the load-bearing evidence, not the header regex). The whole Bathroom department was enumerated to exhaustion over its allowed ?dcp= pagination: /shop/bathroom (60 tiles), ?dcp=2 (60), ?dcp=3 (44) = 164 unique li-productid values, exactly equal to the rendered total 164, with the page-3 short page proving the list terminates. Tallying those 164 tiles by their own li-category/li-subcategory attributes gives: Towels 98, Bathrobes 32, Bathmats 22, Beach Towels 6, Toilet Brushes / Holders 1, Laundry Baskets 1, Soap Dispensers 1, Bins 1, Toothbrush Holders 1, Storage Baskets 1. Those six 1s are the six recorded leaves, derived WITHOUT touching any leaf page, and they match the six leaf pages' own headers one-for-one (Bins=/shop/bathroom-bins, Soap Dispensers=/shop/soap-dishes-dispensers, Toothbrush Holders=/shop/toothbrush-holders, Storage Baskets=/shop/shower-caddies 'Bathroom Baskets & Caddies', Laundry Baskets=/shop/laundry-baskets, Toilet Brushes / Holders=/shop/toilet-brush-holders). The textile tallies corroborate too: Towels 98 = /shop/bath-towels 98, Bathmats 22 = /shop/bath-shower-mats 22, 98+22 = /shop/towels-mats 120. Every recorded leaf was additionally exhausted on its own page (page size 60, each holds 1, so the rendered tile count IS the exhaustive count): 1=1 on all six. No parent total was reused for a child and nothing was summed. ON THE UNIFORM-COUNT FLAG (validate.py 'all 6 leaf counts identical'): this is a TRUE reading of the data and a FALSE alarm about the method. Amara's non-textile bathroom range really is six categories holding one product each. It is not a site-wide constant - the same extraction on the same pages returns 164, 120, 98, 37, 22, 3 and 2 elsewhere in this very company, and the six 1s were reproduced from a completely different code path (the parent's exhaustive tile enumeration) as well as from each leaf's own header. The arithmetic closes exactly: 164 department products = 98 towels + 32 bathrobes + 22 bath mats + 6 beach towels + 6 single-product accessory/storage/toilet leaves. If Bathroom Accessories (3) were mistakenly recorded as a leaf instead of a grouping row the flag would disappear, but that would violate rule 24, so the flag is accepted rather than engineered away. VERIFICATION: counts discriminate across the company (164 / 120 / 98 / 37 / 22 / 3 / 2 / 1); the H1 and the dataLayer categoryBreadCrumb of every fetched page matched the node requested (e.g. /shop/toilet-brush-holders -> h1 'Toilet Brush Holders', breadcrumb 'Shop>Bathroom>Toilet Accessories>Toilet Brush Holders'); a second full read of all nine bathroom URLs minutes later returned identical totals, identical unique product ids and identical product names, so no intra-session drift. Product identities were checked rather than assumed: Bathroom Bins = 'Unknown Ombre Waste Bin' (Mike and Ally), Soap Dishes & Dispensers = 'Hammam Soap Dispenser', Toothbrush Holders = 'Hammam Toothbrush Holder', Bathroom Baskets & Caddies = 'Safi Rattan Basket', Laundry Baskets = 'DecorWalther CT DA30 Shower Shelf', Toilet Brush Holders = 'DecorWalther Stone SBG Toilet Brush' - all genuine bathroom hardware/accessories, so the 'Laundry Baskets' node is bathroom despite its name and is kept under rule 12 (site hierarchy decides: breadcrumb 'Shop>Bathroom>Bathroom Storage>Laundry Baskets'). SIZE: this is a genuinely small non-textile bathroom range, not a truncated read. The Bathroom department is 164 products of which 158 are textile/clothing (98 towels + 32 bathrobes + 22 bath mats + 6 beach towels); the residual 6 are exactly what the six recorded leaves expose. Amara's whole catalogue is ~931 products (sitemap-product-1.xml), consistent with the Furniture pass which found only 15 furniture products here. HIERARCHY: /shop/bathroom (164) is a parent with extractable children so it is a grouping row and its URL is NOT recorded (rule 24); likewise Bathroom Accessories, Bathroom Storage and Toilet Accessories are grouping rows. Two internal inconsistencies in the site's own faceting are noted for honesty rather than smoothed over: Bathroom Storage reports 1 while its two children report 1+1=2 (the DecorWalther Shower Shelf sits in the Laundry Baskets child but not in the parent's own facet count), and Bathrobes & Dressing Gowns reports 37 while only 32 of its products carry the Bathroom activity group (the other 5 sit in Clothing/Nightwear). The child figures are the ones recorded and nothing was aggregated. EXCLUDED: /shop/bathroom-shop-all (Shop All, rule 25 - identical 164-product listing to the parent); /special/new/bathroom (New In promo, rule 25); /shop/toiletries and /shop/towel-racks (dead, SearchNoResults); bathrobes, towels and bath mats -> Textile; /shop/mirrors and /shop/wall-mirrors -> Wall Decor (filed under Home Accessories, no bathroom mirror node exists on this site); /shop/beach-towels sits under Outdoors, not Bathroom. Amara sells no sanitaryware, baths, showers, enclosures, taps or bathroom furniture - confirmed against all 204 category URLs in the department sitemap. DEDUP: lib/dedup.already_extracted() run on all 17 bathroom-area URLs considered (every recorded leaf, every grouping parent, every routed-out node and both mirror nodes) - ZERO hits; none appear in Furniture.xlsx or Final.xlsx, so no leaf was lost to prior extraction. ===== RECOVERY WORKER RE-VERIFICATION (independent, second pass) ===== The file was quarantined on the report that /shop/bathroom-bins is CLIENT-RENDERED (zero product tiles: no data-product-id, no .product-tile, no /product/ hrefs) and that the six 1s came from the inline JS string `sizes: [1, 1], // Increases width to 1/2/3/4/5 products width`. I re-fetched the pages from scratch with a fresh session and rotating curl_cffi fingerprints and the report does not hold: the PLP is SERVER-RENDERED and the prior worker's numbers are RIGHT. Evidence, all from raw response bytes (files kept in work/rec70_95/): (1) PAGE WEIGHT DISCRIMINATES. /shop/bathroom-bins = 190,908 bytes, /shop/bath-towels = 516,888 bytes, /shop/bathroom = 556,603 bytes. An empty client-rendered shell cannot vary 3x with the size of the category; the grid is in the initial HTML. (2) TILES ARE PRESENT, UNDER A NON-STANDARD ATTRIBUTE. The tile is <li li-productid=\"78951311\" li-name=\"Unknown Ombre Waste Bin\" li-brand=\"Mike and Ally\" li-category=\"Accessories\" li-subcategory=\"Bins\" ...> inside <ul id=\"navlist\" class=\"s-productscontainer2 plp-products-container\">. There is deliberately NO data-product-id, NO .product-tile and NO /product/ href on this legacy .NET (Frasers) storefront - which is exactly why the tile-shape probe returned zero and mis-diagnosed the page as empty. Unique li-productid counts: bathroom-bins 1, bath-towels 60 (page 1 of 98). (3) THE HEADER IS SERVER-RENDERED AND IS NOT THE JS `sizes` ARRAY. Verbatim from /shop/bathroom-bins: <span id=\"prdsFound\" class=\"pppt\" data-singular=\"product\" data-plural=\"products\"><span class='totalProducts'>1</span> <span class='productsCountText'>product</span></span>, emitted twice. From /shop/bath-towels the identical element reads 98 with the plural 'products'. The template only emits the singular 'product' when the true total is 1. The `sizes: [1, 1]` string contains no such span and cannot match a regex anchored on class=['\"]totalProducts['\"]. (4) EQUIVALENCE PROVEN ON NODES OF CLEARLY DIFFERENT SIZE, NOT ASSUMED. Rendered header vs exhaustive unique-li-productid enumeration, same fetch: bathroom-bins 1=1, soap-dishes-dispensers 1=1, toothbrush-holders 1=1, shower-caddies 1=1, laundry-baskets 1=1, toilet-brush-holders 1=1, bathroom-storage 1=1, toilet-accessories 1=1, bathroom-accessories 3=3, bath-shower-mats 22=22, dressing-gowns-bathrobes 37=37. Eleven nodes, four distinct sizes (1/3/22/37), header equals exhaustive tile count every time with zero exceptions. For the three nodes above the 60 page size the header is confirmed by paginating instead (below). (5) THE SIX 1s WERE REPRODUCED FROM A SECOND, COMPLETELY INDEPENDENT CODE PATH. I exhausted the department over its robots-permitted ?dcp= pagination without touching any leaf page: /shop/bathroom 60 tiles, ?dcp=2 60, ?dcp=3 44 (short page proves termination) = 164 unique product ids, exactly the rendered 164. Tallying those 164 tiles by their own li-category/li-subcategory attributes: Towels 98, Bathrobes 32, Bathmats 22, Beach Towels 6, Toilet Brushes / Holders 1, Laundry Baskets 1, Soap Dispensers 1, Bins 1, Toothbrush Holders 1, Storage Baskets 1. Sum 164, closing exactly. The six 1s fall out of the parent's product inventory itself and map one-for-one onto the six recorded leaf pages. (6) TREE RE-DERIVED INDEPENDENTLY AND UNCHANGED. sitemap-category-department.xml re-fetched: 204 category URLs, bathroom slice identical to the prior worker's list. The server-rendered ul#filterlist child block re-walked: /shop/bathroom -> Bathrobes & Dressing Gowns, Bathroom Accessories, Bathroom Shop All, Bathroom Storage, Toilet Accessories, Toiletries, Towel Rails & Racks, Towels & Mats; /shop/bathroom-accessories -> Bathroom Bins, Soap Dishes & Dispensers, Toothbrush Holders; /shop/bathroom-storage -> Bathroom Baskets & Caddies, Laundry Baskets; /shop/toilet-accessories -> Toilet Brush Holders. Every H1 and dataLayer categoryBreadCrumb matched the node requested (e.g. /shop/shower-caddies -> h1 'Bathroom Baskets & Caddies', breadcrumb 'Shop>Bathroom>Bathroom Storage>Bathroom Baskets & Caddies'). Storefront currency GBP, consistent with the UK manifest entry. (7) COUNTS DO DISCRIMINATE ON THIS SITE. The same extractor on the same template returned 164, 120, 98, 37, 22, 3, 2 and 1 across this company, so 1 is not a parse constant. CONCLUSION: the quantities were NOT wrong and nothing was re-derived downward or upward - qty=1 on all six leaves is the site's own true data. Amara's bathroom department is 164 products of which 158 are textile or clothing (98 towels + 32 bathrobes + 22 bath mats + 6 beach towels); the residual 6 non-textile products sit one apiece in six subcategories. The validate.py '4+ identical leaf counts' guard therefore fires on a TRUE reading of a genuinely tiny non-textile range. It is a false alarm about the method, and it cannot be cleared without either deleting valid Bathroom leaves or promoting the Bathroom Accessories / Bathroom Storage / Toilet Accessories grouping rows into leaves, which rule 24 forbids. Flagging it for a human decision is the correct outcome; no number has been altered to silence it. DEDUP RE-RUN: lib/dedup.already_extracted() re-run this pass on all six recorded leaves plus every grouping parent and routed-out node - ZERO hits.",
+ "rows": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Accessories",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Bins",
+   "qty": 1,
+   "link": "https://www.amara.com/shop/bathroom-bins",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Soap Dishes & Dispensers",
+   "qty": 1,
+   "link": "https://www.amara.com/shop/soap-dishes-dispensers",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Toothbrush Holders",
+   "qty": 1,
+   "link": "https://www.amara.com/shop/toothbrush-holders",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Storage",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Baskets & Caddies",
+   "qty": 1,
+   "link": "https://www.amara.com/shop/shower-caddies",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Laundry Baskets",
+   "qty": 1,
+   "link": "https://www.amara.com/shop/laundry-baskets",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Toilet Accessories",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Toilet Brush Holders",
+   "qty": 1,
+   "link": "https://www.amara.com/shop/toilet-brush-holders",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  }
+ ],
+ "review": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathrobes & Dressing Gowns",
+   "qty": 37,
+   "issue": "ROUTED TO TEXTILE: bathrobes / dressing gowns (rule 20). Real child of Shop>Bathroom, breadcrumb 'Shop>Bathroom>Bathrobes & Dressing Gowns', 37 products.",
+   "link": "https://www.amara.com/shop/dressing-gowns-bathrobes"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath & Shower Mats",
+   "qty": 22,
+   "issue": "ROUTED TO TEXTILE: textile bath mats (rules 15/16/20). Breadcrumb 'Shop>Bathroom>Towels & Mats>Bath & Shower Mats'.",
+   "link": "https://www.amara.com/shop/bath-shower-mats"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Towels (Luxury Bathroom Towels)",
+   "qty": 98,
+   "issue": "ROUTED TO TEXTILE: bath towels (rules 15/20). Breadcrumb 'Shop>Bathroom>Towels & Mats>Luxury Bathroom Towels'.",
+   "link": "https://www.amara.com/shop/bath-towels"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Towels & Mats",
+   "qty": 120,
+   "issue": "ROUTED TO TEXTILE: parent of the two textile leaves above (22+98=120). Recorded for completeness only; its children carry the detail and no parent URL is being taken as a leaf.",
+   "link": "https://www.amara.com/shop/towels-mats"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Shop All",
+   "qty": 164,
+   "issue": "EXCLUDED (rule 25): 'Shop All' node. It is byte-for-byte the same listing as the department parent /shop/bathroom (both report 164) and holds no products of its own.",
+   "link": "https://www.amara.com/shop/bathroom-shop-all"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "New In > Bathroom",
+   "qty": 2,
+   "issue": "EXCLUDED (rule 25): seasonal 'New In' promotional page, breadcrumb 'Shop>New In>Bathroom', not a catalogue subcategory.",
+   "link": "https://www.amara.com/special/new/bathroom"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Toiletries",
+   "qty": 0,
+   "issue": "DEAD NODE: still linked from the Bathroom page's own 'In This Section' block but resolves to the SearchNoResults page (h1 'Sorry - we could not find any search results', no product grid, no totalProducts) and is absent from sitemap-category-department.xml. Nothing to record.",
+   "link": "https://www.amara.com/shop/toiletries"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Towel Rails & Racks",
+   "qty": 0,
+   "issue": "DEAD NODE: would be a valid Bathroom hardware leaf (rules 15/17) but resolves to the SearchNoResults page (h1 'Sorry - we could not find any search results') and is absent from sitemap-category-department.xml. Recorded here so the omission is explicit, not silent.",
+   "link": "https://www.amara.com/shop/towel-racks"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Mirrors / Wall Mirrors",
+   "qty": 1,
+   "issue": "NOT BATHROOM (rules 2/10/29): Amara files Mirrors under Home Accessories ('Shop>Home Accessories>Designer Mirrors' -> 'Luxury Wall Mirrors'), never under Bathroom, and there is no bathroom/vanity/LED/cabinet mirror node anywhere in the 204-URL category sitemap. Single product, general decorative wall mirror. Belongs to Wall Decor.",
+   "link": "https://www.amara.com/shop/wall-mirrors"
+  }
+ ],
+ "_reconstructed_from": "Bathroom.xlsx delivered 2026-09-01 (checkpoint), not original worker JSON"
+}

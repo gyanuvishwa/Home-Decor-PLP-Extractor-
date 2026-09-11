@@ -1,0 +1,54 @@
+{
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ACCESS: clean, no bot wall. probe.fetch() returned HTTP 200 on every request across rotating fingerprints (safari17_2_ios, safari18_0, safari18_0_ios, chrome131, edge101); no 403, no 429, no challenge, no reader prefix or alternate profile set needed. Single host throughout (www.fleux.com serves pages, sitemaps and the products.json endpoints), so no second robots.txt was owed. ROBOTS: https://www.fleux.com/robots.txt fetched FIRST (HTTP 200, safari17_2_ios) before any other request and read in full. It is the current Shopify storefront robots file with an agent-facing preamble ('Shopify storefront. Public product, collection, page, blog, policy, cart, and localized HTML is crawlable.') and exactly TWO user-agent groups: 'User-agent: *' and 'User-agent: adsbot-google'. There is NO group naming ClaudeBot, anthropic-ai, Claude-Web or Claude-User anywhere in the file, so no Claude opt-out exists; the applicable '*' group opens with 'Allow: /'. No Crawl-delay is declared (probe.py's 2 s per-host gap was kept anyway). The '*' group's Disallows that matter here are 'Disallow: /collections/*sort_by*', 'Disallow: /collections/*+*' (and its %2B/%2b encodings), 'Disallow: /collections/*filter*&*filter*', 'Disallow: /cart.js', 'Disallow: /recommendations/products', 'Disallow: /services', 'Disallow: /sf_*', plus checkout/account/order paths. Nothing disallowed was requested: no sort_by, no '+' tag URL, no multi-filter facet URL, no /cart.js, no /recommendations/products, no internal search. The plain ?page=N pagination and /collections/<handle>/products.json used for counting are NOT disallowed by any group (the file's own preamble declares collection HTML crawlable, and products.json is the storefront's public collection endpoint the PLP is built from). The preamble's checkout warning was honoured trivially - nothing transactional was touched. TREE: the site is Shopify (Impulse-derived theme). The rendered mega-menu was extracted from the homepage HTML: 174 distinct labelled menu links over 8 departments - Decoration (Vases, Bougies/bougeoirs/allumettes, Sculptures & figurines, Box Surprise, Pots & jardinieres, Accessoires design, Miroirs, Affiches & Tableaux, Horloges, Art mural, Vide-poches, Petits rangements, Paniers & boites, Porte-manteaux & pateres, Coussins, Tapis, Linge de lit), Table et cuisine, Mobilier, Luminaire, Lifestyle (incl. Soins, Parfums, Accessoires beaute), Kids, Green and Idees cadeaux. THE MEGA-MENU CONTAINS NO BATHROOM ENTRY - the string 'salle de bain' appears zero times in the homepage HTML. The bathroom branch was recovered from the site's OWN category sitemap: https://www.fleux.com/sitemap.xml -> https://www.fleux.com/sitemap_collections_1.xml?from=281059819579&to=700205039950 (HTTP 200, 663 collection URLs), regex-scanned for bain|bath|douche|salle|vasque|lavabo|wc|toilette|robinet|baignoire|miroir|savon|serviette|hygiene|sanitaire|brosse. That surfaced exactly six candidates: /collections/salle-de-bain, /collections/linge-de-bain, /collections/linge-accessoires-de-bain, /collections/linge-de-bain-enfants, /collections/miroirs, /collections/miroirs-grande-taille. Every one was fetched and adjudicated; five are in review[] with reasons. /collections/salle-de-bain is a real published category, not an editorial cut: HTTP 200, H1 'Salle de bain', and its own schema.org BreadcrumbList is exactly [Accueil, Salle de bain] - i.e. a TOP-LEVEL node with no parent and (theme snippet get-subcollections.liquid emitting nothing) no sub-collections, so it is a leaf and its own URL is recorded (rule 24). Its 5 products are 4 Ferm Living 'Pond' mirrors (product_type 'Miroir', incl. a table/vanity mirror) and 1 Seletti 'Kit Porte-savon & Savon Crane' (product_type 'Porte-savon' = SOAP DISH) - mirrors under rule 10 and a soap accessory under rule 13, both squarely Bathroom, and the site's own hierarchy names the node 'Salle de bain', which is decisive under rule 2. QTY: 5, and the site renders no 'N produits' string anywhere, so the count was established two independent ways and they agree exactly. (a) The rendered PLP: the theme emits a GA4-style 'collectionData' JSON block listing every tile it renders, and the grid emits one class=\"ProductItem\" per tile - both give 5 for Salle de bain. (b) The storefront's own collection endpoint /collections/salle-de-bain/products.json?limit=250, enumerated to exhaustion, returns 5 unique handles. EQUIVALENCE PROVEN ON FOUR COLLECTIONS OF DIFFERING SIZE, rendered-tiles vs products.json: Salle de bain 5 = 5, Linge & Accessoires de bain 17 = 17, Linge de bain 20 = 20, and Miroirs, which is the only one large enough to paginate, 32 tiles on page 1 + 12 tiles on ?page=2 + 0 on ?page=3 = 44 = 44 from products.json. So the page size is 32 and none of the recorded/reviewed single-page figures is a page-size artifact. Counts discriminate (0, 5, 17, 20, 22, 44 across the six candidate nodes, and 2 / 36 / 238 on the control nodes below) rather than being a site-wide constant. No number was estimated, no parent number reused, nothing summed. DEDUP: dedup.already_extracted() was run on all six bathroom-vocabulary candidates plus the six near-miss controls; NONE is in the 12,194-URL index. Fleux appears in the index only via 10 Furniture.xlsx nodes (tables-a-manger, tables-basses-d-appoint, canapes, fauteuils-repose-pieds, chaises, poufs-bancs, bibliotheques, buffets-armoires-commodes, bureaux-secretaires, etageres), so the Home Decor pass never covered this company and /collections/salle-de-bain is genuinely new. EXCLUDED AND WHY (each fetched and inspected via products.json, not assumed): /collections/entretien = 2 products (a scourer-sponge set and a Lind DNA Clean & Care spray) - general household cleaning, not bathroom cleaning accessories in any bathroom hierarchy; /collections/accessoires-design = 36 products, all product_type Objet decoratif / Eventail / Barometre / Accessoire electrique - desk and decorative objects, no bathroom item; /collections/bien-etre = 238 products dominated by Vernis (81 nail polishes), generic Accessoire (109), Parfum (27) and hot-water bottles - beauty/wellbeing, not bathroom fixtures or accessories; Lifestyle > Soins / Parfums / Accessoires beaute - cosmetics and personal care, not rule-13 bathroom accessories; Decoration > Porte-manteaux & pateres (coat hooks - hallway hardware, not bathroom robe hooks: the node sits under Decoration next to Coussins and Tapis and contains no bathroom-merchandised item), Paniers & boites, Petits rangements and Vide-poches - general storage and catch-alls, explicitly not to be re-extracted under rules 30-33; Luminaire (all four lamp nodes) - primary type lighting, and no bathroom-lighting sub-node exists (rule 19). Also checked and rejected as an entry point: the /en/ English locale, which mirrors the same collection handles under /en/collections/ and would only duplicate the same nodes (rule 28). VERDICT: BATHROOM FOUND - one genuine leaf, Salle de bain (5).",
+ "rows": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Salle de bain",
+   "qty": 5,
+   "link": "https://www.fleux.com/collections/salle-de-bain",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  }
+ ],
+ "review": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Linge & Accessoires de bain",
+   "qty": 17,
+   "issue": "ROUTED TO TEXTILE: bath linen (rules 15, 20). 16 of the 17 products are Shopify product_type 'Serviette' (bath towels - Ferm Living Ekko, Wild Weave, Tulip Quilt), one is 'Tapis' (a quilted textile bath mat, rule 16 - textile, not a rubber anti-slip accessory) and one is a Liewood 'Cape de bain' hooded baby towel. The only non-textile item, a 'Lampe de bain Disco Fever' bath light, is a single product and does not make the node a bathroom node. No hardware, no towel rail, no soap accessory.",
+   "link": "https://www.fleux.com/collections/linge-accessoires-de-bain"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Linge de bain",
+   "qty": 20,
+   "issue": "ROUTED TO TEXTILE: bath linen (rules 15, 20). All 20 products are product_type 'Serviette' (14 bath towels) or 'Tapis' (6 textile bath mats - Bisous, Get Naked, Amour Terracotta, C'est la vie, Tulip Quilt, Soleil - woven/quilted cotton, so Textile under rule 16, not the rubber/anti-slip bathroom-accessory exception). This node overlaps 'Linge & Accessoires de bain' heavily (15 of its 20 handles are shared) but is a separate published collection with its own H1; both are routed out so neither enters rows[] and no quantity is aggregated.",
+   "link": "https://www.fleux.com/collections/linge-de-bain"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Linge de bain enfants",
+   "qty": 0,
+   "issue": "EMPTY NODE - published collection, HTTP 200, but /collections/linge-de-bain-enfants/products.json?limit=250 returns zero products and the page renders no grid. Not recorded as a zero-qty row (brief s8). Would in any case have been ROUTED TO TEXTILE as children's bath linen.",
+   "link": "https://www.fleux.com/collections/linge-de-bain-enfants"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Decoration > Miroirs",
+   "qty": 44,
+   "issue": "ROUTED TO DECOR: this is the Decoration department's decorative wall-mirror node (mega-menu path Decoration > Miroirs, H1 'Miroirs'), not a bathroom mirror node. All 44 products are product_type 'Miroir' and are decorative/wall pieces (Chubby, Strap, Pond, Miroir vieilli); none is described, filtered or merchandised as bathroom, vanity, LED, backlit, demister, magnifying or cabinet. Rule 10 was applied deliberately: the four Ferm Living Pond mirrors that ARE merchandised as bathroom appear separately in the site's own 'Salle de bain' collection, which IS recorded in rows[]. Recording Miroirs in Bathroom as well would misclassify 40 wall-decor mirrors and double-count the 4 Pond ones. Checked with dedup.already_extracted(): not in the exclusion index (only Fleux's 10 furniture nodes are).",
+   "link": "https://www.fleux.com/collections/miroirs"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Miroirs grande taille",
+   "qty": 22,
+   "issue": "NOT RECORDED - size-based roll-up/overlap collection, every one of its 22 products is also in Decoration > Miroirs (44). It is a merchandising cut ('large-size mirrors'), not a hierarchy node, it appears in no menu, and it is decorative wall mirrors, not bathroom mirrors. Recording it would double-count against Miroirs (rule 28 / brief s9).",
+   "link": "https://www.fleux.com/collections/miroirs-grande-taille"
+  }
+ ],
+ "_reconstructed_from": "Bathroom.xlsx delivered 2026-09-01 (checkpoint), not original worker JSON"
+}

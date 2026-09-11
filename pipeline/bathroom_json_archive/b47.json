@@ -1,0 +1,158 @@
+{
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ACCESS: plain HTTPS with a desktop-Chrome UA via urllib, exactly as the Furniture pass recorded; no WAF, no proxy. NOTE FOR FUTURE WORKERS: probe.fetch()/curl_cffi FAILS on this host with 'curl: (61) Unrecognized content encoding type' because Dunelm negotiates an encoding libcurl will not decode - urllib with 'Accept-Encoding: gzip' works on every URL. robots.txt was fetched FIRST: one 'User-agent: *' group naming NO anthropic-ai / ClaudeBot / Claude-Web agent and declaring no Crawl-delay; it Disallows /facet/, /*search?*, /*f_attributes*, /checkout, /basket, /my-account/ and the two multi-parameter pagination forms '/category/*?page=*&*' and '/category/*?*&page=*'. Nothing Disallowed was fetched - the exhaustion walk used the bare single-parameter form '?page=N', which is not covered by either pagination rule. A 2s per-host gap was applied throughout. TREE: two independent sources reconciled. (1) https://www.dunelm.com/sitemap.xml -> /sitemap/category-sitemap.xml, 660 category URLs; grepping for bath|shower|toilet|basin|tap|sanitar|wc|vanity|mirror|towel yields exactly 22 bathroom-shaped category paths, and those 22 are the complete set of real category pages. (2) The site's own mega-menu JSON at reduxState.editorialContent.content.nav inside <script id=\"ssr-state-data\"> - 15 top-level menus, one of which is 'Bath' -> /category/home-and-furniture/bathroom, with the column headers Bathroom Accessories, Bathroom Furniture, Bathroom Decor, Shop By Price and Self Care Health & Wellbeing. The mega-menu's 'Bathroom Cabinets', 'Under Sink Units', 'Bathroom Shelving' and 'Bathroom Caddies' entries are NOT category pages - they are ?furniture-type= facet URLs on bathroom-furniture-and-storage (e.g. ...?furniture-type=corner-bathroom-cabinets&furniture-type=freestanding-cabinets&furniture-type=wall-cabinets), so per rules 25/27 they were not recorded and the real child category page was used instead. QTY: Dunelm A/B-serves two PLP templates on the same URL. OLD template: reduxState.searchProduct.results[0].res.nbHits inside <script id=\"ssr-state-data\">, alongside a rendered '<span>N results</span>' header. NEW template: \"totalProducts\":N (with \"totalPages\") inside <script id=\"shell-ssr-data\">. EQUIVALENCE PROVED on Soap Dispensers & Dishes, which was served on BOTH templates during this session and returned nbHits 69 + rendered header '69 results' on the old template and totalProducts 69 on the new - the same number from two different backends and from the page's own visible header. VERIFICATION: (a) DRIFT CHECK - every node was fetched at least twice, minutes apart; 20 of 21 reproduced identically. Soap Dispensers & Dishes returned 69,68,69,69,69 across five reads (plus the old-template rendered header '69 results'), i.e. one transient out-of-stock blip; 69 is recorded as the value five of six reads and the rendered header agree on. (b) EXHAUSTION - Bathroom Furniture and Storage paginated to 60+60+5 = 125 UNIQUE productIds, exactly its reported 125 over totalPages 3; Toilet Brushes and Holders paginated to 60+38 = 98 UNIQUE productIds, exactly its reported 98. No count was inferred from ceil(total/pageSize). (c) H1 CHECK - every page's <h1> matched the node requested, so no URL silently served a parent listing; this also caught the towels-and-bathmats alias, which serves h1 'Towels'. (d) DISCRIMINATION - 29,32,32,43,45,46,69,80,98,125; no site-wide constant. (e) No count came from raw tile or href counting, so sponsored/PLA tiles cannot inflate anything. EXCLUDED - shop-all roll-ups (rule 25): All Bathroom (1,454), All Bathroom Accessories (740). EXCLUDED - parent URLs with valid children (rule 24): Bathroom (1,620 - the department page, whose assortment is heavily room-tagged and includes house plants, loungewear and toiletries), Bathroom Accessories (914), Bathroom Furniture (130). Bathroom Furniture is kept as a grouping row because it has exactly one real child category page, Bathroom Furniture and Storage (125); the 130-vs-125 gap is 5 products that carry the parent category only. EXCLUDED - facet/price re-cuts: 'Bathroom Accessories under GBP 15', 'Towels And Bathmats under GBP 20', 'Bathroom Furniture under GBP 50', 'Bathroom Decor under GBP 15', 'Cotton Towels' (?material=cotton), 'Bathroom Paint' (?room=bathroom on the DIY paint listing), 'Toiletries' (?room=bathroom&type=toiletries), 'Bathroom Blinds' via ?room=bathroom, and the new-in ?highlights=new-in cuts. EXCLUDED - duplicate: /bathroom/towels-and-bathmats, an alias serving the identical Towels node. BATHROOM DECOR JUDGEMENT: /bathroom-accessories/bathroom-decor (32) was enumerated in full. The dominant product types are bathroom trays (13), hooks (5), a tiered caddy, a basket tray, a pot and a bowl - all explicitly named in rule 13/17 as Bathroom (Bathroom Hooks/Trays/Caddies, Bathroom Baskets/Containers) - so it is recorded in Bathroom on primary product type, not on the word 'Decor'. FLAG: a minority of the node is genuinely other-category (3 word plaques/signs -> Wall Decor under rule 21, 4 novelty rubber ducks, 1 starfish ornament, 1 trinket dish, and 2 stray made-to-measure roller blinds), but Dunelm publishes no finer category page, so the node is recorded whole with this caveat rather than split. CONFIRMED ABSENT: Dunelm sells NO bathroom sanitaryware or plumbing. Across all 660 sitemap category URLs and the whole mega-menu there is no Baths/Bathtubs, Basins/Sinks, Toilets/WCs, Bidets, Shower Enclosures/Screens/Doors, Shower Systems/Heads, or Bathroom Taps/Faucets/Mixers node - the only 'tap' hits in the sitemap are /diy-and-decorating/adhesives-and-tapes. A 'Showers' value (29) and a 'Vanity Unit' value (16) do appear in the department's product-attribute Type facet, but they are attribute values on products inside the recorded categories, not categories, and no listing page exists for them; recording them would be inventing a URL. STORAGE BOUNDARY: the general Storage department (/home-and-furniture/storage/*: all-storage, storage-boxes, storage-boxes-and-baskets, shelves, wall-and-door-hooks, cube-storage, ottomans etc.) was inspected and deliberately NOT re-extracted (rules 30-33); the Storage mega-menu's 'Shop by Room > Bathroom Storage' entry points at the same bathroom-furniture-and-storage node already recorded, so it is one record, not two (rule 28). || CROSS-FILE DEDUP: 1 leaf record(s) removed as already extracted in a prior category workbook. See Review sheet. POST-DEDUP AMENDMENT: the 'Bathroom Furniture' grouping row was removed after the run's cross-file dedup gate moved its only child, Bathroom Furniture and Storage (125), into `review` - the identical URL is already recorded in the validated Furniture.xlsx as 'Bathroom Furniture and Storage', so it must not be re-extracted into Bathroom (master guide s13). Leaving a grouping row with no remaining children would have violated rule 38's group/leaf structure, so the group was dropped rather than left dangling. The node itself was still fully verified this session (h1 'Bathroom Furniture and Storage', totalProducts 125 on two reads, exhausted to exactly 125 unique productIds over 3 pages) and that evidence is preserved in its review entry.",
+ "rows": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Accessories",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Soap Dispensers & Dishes",
+   "qty": 69,
+   "link": "https://www.dunelm.com/category/home-and-furniture/bathroom/bathroom-accessories/soap-dishes",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Toothbrush Holders",
+   "qty": 46,
+   "link": "https://www.dunelm.com/category/home-and-furniture/bathroom/bathroom-accessories/toothbrush-holders",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Toilet Brushes and Holders",
+   "qty": 98,
+   "link": "https://www.dunelm.com/category/home-and-furniture/bathroom/bathroom-accessories/toilet-brushes-and-holders",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom & Shower Organisers (Hooks & Organisers)",
+   "qty": 80,
+   "link": "https://www.dunelm.com/category/home-and-furniture/bathroom/bathroom-accessories/hooks-and-organisers",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Towel Rails",
+   "qty": 43,
+   "link": "https://www.dunelm.com/category/home-and-furniture/bathroom/bathroom-accessories/towel-rails",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Bins",
+   "qty": 32,
+   "link": "https://www.dunelm.com/category/home-and-furniture/bathroom/bathroom-accessories/bathroom-bins",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Decor",
+   "qty": 32,
+   "link": "https://www.dunelm.com/category/home-and-furniture/bathroom/bathroom-accessories/bathroom-decor",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Mirrors",
+   "qty": 45,
+   "link": "https://www.dunelm.com/category/home-and-furniture/bathroom/bathroom-mirrors",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Toilet Seats",
+   "qty": 29,
+   "link": "https://www.dunelm.com/category/home-and-furniture/bathroom/toilet-seats",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  }
+ ],
+ "review": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath > Towels",
+   "qty": 174,
+   "issue": "ROUTED TO TEXTILE: bath/hand/face towels and towel bales (rule 15/20). Dunelm's own Type facet on the node is Towels/Beach Towels/Kids Towels. The hardware counterpart (Towel Rails, 43) was kept in Bathroom per rule 15. NOTE: /category/home-and-furniture/bathroom/towels-and-bathmats is an ALIAS of this same node - it serves h1 'Towels' and the identical totalProducts 174 on two independent reads - so it is not a separate record.",
+   "link": "https://www.dunelm.com/category/home-and-furniture/bathroom/towels"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath > Bath Mats",
+   "qty": 89,
+   "issue": "ROUTED TO TEXTILE: textile bath mats (rule 16/20). The node's own Pile Type facet (Shaggy Pile / Tufted Pile) confirms these are soft furnishings; Dunelm publishes no separate rubber/anti-slip bathroom-accessory mat category that would qualify under rule 16's second limb.",
+   "link": "https://www.dunelm.com/category/home-and-furniture/bathroom/bath-mats"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath > Shower Curtains",
+   "qty": 57,
+   "issue": "ROUTED TO TEXTILE: shower curtains are textiles (rule 20) despite sitting inside the Bath department.",
+   "link": "https://www.dunelm.com/category/home-and-furniture/bathroom/shower-curtains"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Lighting > Bathroom Lights",
+   "qty": 117,
+   "issue": "ROUTED TO LIGHTING: primary product type is lighting (rule 19/11). Dunelm files the node under the Lighting department (hierarchicalCategories_lvl1 = lighting), not under Bath; the mega-menu cross-links it as 'Bathroom Lights & Pulls'. Its Bulb Type / Cap Type / Maximum Wattage / Dimmable facets confirm luminaires. Not duplicated into Bathroom.",
+   "link": "https://www.dunelm.com/category/lighting/bathroom-lights"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Blinds > Bathroom Blinds",
+   "qty": 25,
+   "issue": "ROUTED TO TEXTILE / WINDOW DRESSING: cross-linked into the Bath mega-menu but the node lives under Curtains & Blinds > Blinds and the products are made-to-measure roller and venetian blinds. Primary product type is a window blind, not a bathroom fitting (rule 2).",
+   "link": "https://www.dunelm.com/category/home-and-furniture/curtains-and-blinds/blinds/bathroom-blinds"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath > Bathroom Scales",
+   "qty": 6,
+   "issue": "ROUTED TO ELECTRICALS / PERSONAL CARE: all 6 products enumerated (Brabantia ReNew Digital Bathroom Scale, Brabantia Digital Bathroom Scale, Gymcline Body Analysis Scales, Salter Black Eco Power Bathroom Scale, Salter Grey Glass Electronic Bathroom Scale, Salter Black Add and Weigh Scale) are battery/electronic body-weighing appliances. Primary product type is a measuring appliance, and scales appear nowhere in the Bathroom inclusion lists of rules 3-18; 'Bathroom' here is a room qualifier, which rule 2 ranks last. Recorded here so the node is not silently skipped.",
+   "link": "https://www.dunelm.com/category/home-and-furniture/bathroom/bathroom-scales"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Furniture and Storage",
+   "qty": 125,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Bathroom Furniture and Storage' - excluded from Bathroom per cross-category dedup (master guide s13)",
+   "link": "https://www.dunelm.com/category/home-and-furniture/furniture/bathroom-furniture/bathroom-furniture-and-storage"
+  }
+ ],
+ "_reconstructed_from": "Bathroom.xlsx delivered 2026-09-01 (checkpoint), not original worker JSON"
+}

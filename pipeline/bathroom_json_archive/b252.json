@@ -1,0 +1,36 @@
+{
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "Access: direct HTTP (curl, no JS needed) - full success, no block encountered. robots.txt has no Claude-specific disallow (only Nutch and adsbot-google named, generic Allow: / for everything else). Site is a Shopify store (whisperinghomes.com, India) whose actual catalog is home decor + indoor/outdoor lighting (vases, dried flowers, cushions, chandeliers, wall/pendant/floor lights, ceramics, brass decorative items) - it has NO genuine bathroom fixtures/hardware/storage/mirror category tree. Tree source: homepage mega-menu hrefs + full sitemap_collections_1.xml (checked via /sitemap.xml -> sitemap_collections_1.xml, all handles scanned for bath/toilet/shower/vanity/basin/faucet/tap/mirror/soap/towel/tray/dispenser/tissue/storage/cabinet/shelf/hook/rail/caddy/basket). Only 4 candidate collections surfaced: /collections/bathroom, /collections/vanity, /collections/tissue-paper-holder, /collections/decorative-trays. Verified each via Shopify's public /products.json endpoint (qty = item count returned, product_type + tags inspected for primary type per rule 2/29): (1) /collections/bathroom = 11 products, ALL product_type Wall Lights (sconces), tags include 'Bathroom'/'Bathroom Lights' as a room-placement tag, not a fixture type -> primary type is LIGHTING per bathroom.md rule 19 (Bathroom Wall Light -> Lighting, do not duplicate into Bathroom); excluded, routed to Lighting/Wall Decor scope, not this run. (2) /collections/vanity = ~32 products, ALL product_type Wall Lights tagged 'Vanity'+'Bathroom Lights' (vanity/wall lighting fixtures, not vanity cabinets/units) -> LIGHTING, excluded per rule 19/11. (3) /collections/tissue-paper-holder = 6 products, product_type 'Brass Decorative Items', tags are gifting/occasion tags (Anniversary, Diwali, Housewarming, Living Room) with no bathroom association -> general home decor/giftware, not a bathroom accessory -> Decorative Home Accessories scope, excluded. (4) /collections/decorative-trays = ~20 products, product_type 'Decorative Objects'/'Brass Decorative Items', tags show Dining Room/Living Room/gifting only, no bathroom context -> Decorative Home Accessories scope, excluded. No basins, sinks, toilets, bidets, baths, showers, shower enclosures, taps/faucets, bathroom cabinets/vanity units, bathroom storage, bathroom mirrors, soap dispensers/dishes, toothbrush holders, toilet accessories, towel rails/hooks, or robe hooks found anywhere in the nav or sitemap. Cross-category dedup checked for all 4 candidate URLs against cross_category_url_index.json - all returned null (not previously extracted elsewhere), consistent with none being genuine Bathroom leaves. Confirmed absence: Status = NO_CATEGORY equivalent, rows left empty, all candidates logged to review with routing reason.",
+  "rows": [],
+  "review": [
+    {
+      "category": "Bathroom",
+      "sub_category": "Bathroom (room-tag collection)",
+      "qty": 11,
+      "issue": "ALREADY ROUTED TO LIGHTING - all 11 products are product_type Wall Lights (sconces); 'Bathroom'/'Bathroom Lights' are room-placement tags, not a fixture category. Primary type = lighting per bathroom.md rule 19/11, excluded from Bathroom.",
+      "link": "https://www.whisperinghomes.com/collections/bathroom"
+    },
+    {
+      "category": "Bathroom",
+      "sub_category": "Vanity (room-tag collection)",
+      "qty": 32,
+      "issue": "ALREADY ROUTED TO LIGHTING - all products are product_type Wall Lights tagged Vanity+Bathroom Lights (vanity/wall light fixtures), not vanity cabinets or units. Excluded per rule 19/11.",
+      "link": "https://www.whisperinghomes.com/collections/vanity"
+    },
+    {
+      "category": "Bathroom",
+      "sub_category": "Tissue Paper Holder",
+      "qty": 6,
+      "issue": "ALREADY ROUTED TO DECORATIVE HOME ACCESSORIES - product_type Brass Decorative Items, tags are gifting/occasion (Anniversary, Diwali, Housewarming, Living Room) with no bathroom context; not presented as a bathroom accessory.",
+      "link": "https://www.whisperinghomes.com/collections/tissue-paper-holder"
+    },
+    {
+      "category": "Bathroom",
+      "sub_category": "Decorative Trays",
+      "qty": 20,
+      "issue": "ALREADY ROUTED TO DECORATIVE HOME ACCESSORIES - product_type Decorative Objects/Brass Decorative Items, tags show Dining Room/Living Room/gifting only, no bathroom hierarchy or context.",
+      "link": "https://www.whisperinghomes.com/collections/decorative-trays"
+    }
+  ]
+}

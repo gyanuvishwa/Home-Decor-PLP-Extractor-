@@ -1,0 +1,25 @@
+{
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "ACCESS: curl_cffi impersonate=chrome131 to www.ballarddesigns.com worked directly (per prior notes/34.md, Akamai 403s plain requests/r.jina.ai but not curl_cffi chrome131). No robots.txt Claude-specific disallow found; Claude-in-Chrome not needed. NAV DISCOVERY: fetched robots.txt-listed SiteMap_CAT_001..004_v2.xml (465 category URLs, the same authoritative source the prior Furniture pass validated by exhaustive product-ID enumeration) and filtered for best/top-seller/popular/trending/favorite terms; also grepped the full sitemap for every /featured/* URL (49 of them) to check for a Bestsellers hub with department children - only one exists: /featured/best-sellers/. Site's rendered homepage HTML is a client JS shell with no nav markup reachable over plain HTTP, so the sitemap (already proven exhaustive) was the discovery mechanism, matching the prior pass's method. For each candidate, fetched <url>?templateInfo=true to read the site's own pageHeader/pageTitle/categorySubType and categoryId, then queried the same-origin proxy /UnbxdAPI?categoryId=<id>&returnRespAsJSON=true&isAPI=true&requesttype=ajax&rows=1&unbxdStart=0 with header CBI-AJAX:1 for numberOfProducts - this is the exact request the storefront makes for its own grid header, not an inferred/vendor total. FOUND: (1) /featured/best-sellers/ - categoryId 184953, pageHeader/pageTitle literally 'Best Sellers', categorySubType ProductGridView (real listing), qty=49. (2) /furniture/upholstery/bestselling-instock/ - categoryId 212955, pageHeader 'Best Selling In-Stock', a genuine narrower bestseller-type listing scoped to Furniture>Upholstery in-stock items, qty=8. EXCLUDED after inspection: /furniture/home-office/collections/tuscan/popular/ (categoryId 83465, pageHeader 'Popular Tuscan Furniture Combinations', qty=7) - opened the Unbxd grid and read product titles: all 7 items are pre-configured multi-piece furniture bundle SKUs ('Tuscan 3-Piece Bookcase with Cabinet', 'Tuscan 3-Piece Media Group', 'Tuscan Return Office Group - Large', etc.) for one specific furniture collection's home-office line. This is a curated bundle/combinations cross-sell page for a single collection, not a sitewide or departmental bestseller/popularity merchandising concept - the word 'Popular' here describes common furniture pairings, not top-selling products. Judged out of scope per brief section 3 criterion 2 (not a genuine bestseller/popularity concept) rather than 'collections that merely mention bestselling products' - closest analog is an arbitrary curated combo page. No flag added since this is a confident exclusion, not a genuine toss-up. Also checked and confirmed absent: no per-department Bestsellers children exist under /featured/best-sellers/ (only the single hub found in the sitemap); no separate best-seller badge-only PDPs were treated as PLPs. Did not need Claude-in-Chrome or Playwright - tier 1 HTTP sufficed for all pages including exact counts.",
+  "rows": [
+    {
+      "category": "Bestsellers",
+      "sub_category": "Bestsellers",
+      "qty": 49,
+      "link": "https://www.ballarddesigns.com/featured/best-sellers/",
+      "is_group": false,
+      "evidence": "UnbxdAPI categoryId=184953 (site pageHeader/pageTitle 'Best Sellers', categorySubType ProductGridView) numberOfProducts:\"49\"",
+      "flag": null
+    },
+    {
+      "category": "Furniture Bestsellers",
+      "sub_category": "Best Selling In-Stock",
+      "qty": 8,
+      "link": "https://www.ballarddesigns.com/furniture/upholstery/bestselling-instock/",
+      "is_group": false,
+      "evidence": "UnbxdAPI categoryId=212955 (site pageHeader/pageTitle 'Best Selling In-Stock', categorySubType ProductGridView) numberOfProducts:\"8\"",
+      "flag": null
+    }
+  ]
+}

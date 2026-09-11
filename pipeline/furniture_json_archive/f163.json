@@ -1,0 +1,552 @@
+{
+ "sr": 163,
+ "company": "PAN Emirates UAE",
+ "brand_site": "panemirates.com",
+ "country": "UAE",
+ "site_url": "https://www.panemirates.com/",
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ACCESS: panemirates.com is a marketing redirect to www.panhomestores.com/uae_en/ (Al Seer Group's Pan Home UAE storefront, ScandiPWA on Magento 2, store_code uae_en) - confirmed as the correct live site. Reached ONLY through the Claude-in-Chrome connector in my own tab; no HTTP-layer tooling was used at any point. The origin sits behind a Cloudflare Managed Challenge: the first hit of any URL renders a 'Just a moment...' interstitial which then SELF-CLEARS in real Chrome, so ordinary tab navigation works. BLOCK ENCOUNTERED: the same-origin POST /graphql started returning HTTP 403 after about four successful queries. Per the hard block rule I stopped that route immediately - no retries, no backoff, no waiting - and finished the company through plain page navigation plus DOM reads instead. ROBOTS.TXT: could not be read - the challenge never clears for that non-HTML path. The prior Home-Decor pass recorded 'User-agent: * / Disallow: /', a blanket disallow with NO Claude-specific rule (no ClaudeBot / anthropic-ai / Claude-Web / Claude-User / Claude-SearchBot directive), i.e. an ordinary WAF-protected site rather than a named must-decline case. QTY SOURCE: the site's own RENDERED listing header ('N items') and, for children, the parent listing page's own CATEGORIES layered-nav facet. I verified that the facet equals the child's own rendered header on two independent nodes at two different depths - Sofas facet 884 == sofas page header 884, and Beds facet 245 == beds page header 245 - so facet counts are used as exact per-node totals. MAGENTO product_count IS INFLATED HERE, CONFIRMED, AND WAS NOT USED: categoryList.product_count reported 21694 for Furniture where the rendered header reads 5955 (3.6x), and 1717 for Bedroom where the header reads 1250. Every qty in this file comes from the rendered header or facet, never from product_count. TREE SOURCES (three, cross-checked per trap 1): (a) GraphQL categoryList before it was blocked, which gave the 8 Furniture children; (b) the desktop mega-menu, forced fully open by dispatching mouseenter on every department so all panels rendered, yielding 73 furniture paths; (c) each department page's own CATEGORIES facet. Menu and facet agree exactly on every level-3 node in all 7 departments, and both agree with GraphQL at level 2. The XML sitemap is not usable - the SPA swallows /sitemap.xml and renders an empty 'Menu' route. FACET CAVEAT HANDLED: the CATEGORIES facet can list cross-cut categories that are not path children. 'Kids Accessories (759)' under Kids & Teens and 'Modular (168)' / 'Modulars (155)' under Bedroom / Sofas are such cross-cuts, and I did not treat them as children of those departments. Modular is instead emitted from its own top-level branch modular-furniture, whose three children sum exactly to its header (178+157+88=423). EXCLUDED, with reasons: Mattresses (248, plus Bonnel Spring / Foam / Memory Foam / Pocketed Spring) - bedding, not furniture; Outdoor > Garden Accessories (739) - planters, garden decor and accessories, matching what the prior Home-Decor pass found in that branch; Outdoor > Barbeque and Camping (53); Outdoor > Kids Outdoor Playsets (7) - play equipment; Outdoor > Gazebo and Pergola (13) - garden structures rather than furniture; Living Room > Storage and Organisation (29) - the brief assigns standalone storage and organisers to a future Storage task; Consoles & Mirrors > Mirrors (7) - Wall Decor's job; Kids & Teens > Kids Accessories (759) - cross-cut accessories branch. NOT ROWS (rule 3 landing pages, no listing and no count): /uae_en/department-household and /uae_en/furniture-office are CMS pages whose only links are the main nav - the real office listings are the four furniture/home-office children, which are emitted. 'Online Exclusive upto 80% Off', 'Shop All', 'Package', 'Flat 70/80/90% Off', 'Best Price' and the discount-range entries were dropped as promotional or navigation facets. LIMITATION AFFECTING CLASSIFICATION ONLY, NOT COUNTS: product tiles never hydrate - every card stays a 'ProductCard-VisibilityPlaceholder' with no text, no product anchors and no JSON-LD, because the product-list GraphQL call is exactly the route that is 403'd. I therefore could not run the usual title scan to classify borderline nodes on product evidence, and fell back to the node name plus the site's own placement inside its Furniture department. The nodes where that leaves real doubt carry a MANUAL REVIEW flag; their qty values are still exact site-reported numbers. ALSO UNRESOLVED: furniture/bedroom/bedroom-add-ons returned the SPA's empty 'Menu' route rather than a listing when opened directly (category resolution was degrading by then). Its count of 57 still comes from the parent Bedroom page's own facet, and I did not retry, per the hard block rule. DEPTH DECISIONS: Beds is kept as a leaf because its six children are pure size cuts (King / Queen / Single / Super King / Twin / Day Beds), and Wardrobes likewise (6-Door and Sliding are configuration facets). Dining Chairs and Living Chair each have a single child covering only part of the node (Bench, Accent Chair), so the parent is kept to avoid losing the rest. Consoles & Mirrors is the one case where the child is the right leaf: Consoles (47) is emitted and the 7 mirrors are excluded, leaving 18 console-and-mirror set items on the parent with no dedicated URL. LEAF URLS come from the site's own mega-menu anchors rather than constructed slugs, so trap 2 (a bogus slug silently serving the parent's number) does not apply here; the counts are independently anchored to the parent's facet rather than to whatever a leaf page might render.",
+ "rows": [
+  {
+   "category": "Furniture",
+   "sub_category": "Bedroom",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Beds",
+   "qty": 245,
+   "link": "https://www.panhomestores.com/uae_en/furniture/bedroom/beds",
+   "is_group": false,
+   "evidence": "rendered listing header on furniture/bedroom/beds read '245 items'",
+   "flag": "MANUAL REVIEW: node has 6 children that are pure SIZE cuts (King 139 / Queen 45 / Single 37 / Super King 16 / Twin 6 / Day Beds 4); treated as filter re-cuts per rule 3, so Beds is kept as the leaf. Day Beds (4) is a real product type if a deeper split is wanted."
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Wardrobes",
+   "qty": 127,
+   "link": "https://www.panhomestores.com/uae_en/furniture/bedroom/wardrobes",
+   "is_group": false,
+   "evidence": "CATEGORIES layered-nav facet on the parent listing page 'furniture/bedroom' read 'Wardrobes (127)'; facet == child's own rendered header, validated twice (Sofas 884==884, Beds 245==245)",
+   "flag": "MANUAL REVIEW: has 2 children (6-Door Wardrobes, Sliding Wardrobes) that are configuration facets rather than product types; kept parent as leaf."
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dressers",
+   "qty": 94,
+   "link": "https://www.panhomestores.com/uae_en/furniture/bedroom/dressers",
+   "is_group": false,
+   "evidence": "CATEGORIES layered-nav facet on the parent listing page 'furniture/bedroom' read 'Dressers (94)'; facet == child's own rendered header, validated twice (Sofas 884==884, Beds 245==245)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Night Stands",
+   "qty": 93,
+   "link": "https://www.panhomestores.com/uae_en/furniture/bedroom/night-stands",
+   "is_group": false,
+   "evidence": "CATEGORIES layered-nav facet on the parent listing page 'furniture/bedroom' read 'Night Stands (93)'; facet == child's own rendered header, validated twice (Sofas 884==884, Beds 245==245)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bedroom Sets",
+   "qty": 80,
+   "link": "https://www.panhomestores.com/uae_en/furniture/bedroom/bedroom-sets",
+   "is_group": false,
+   "evidence": "CATEGORIES layered-nav facet on the parent listing page 'furniture/bedroom' read 'Bedroom Sets (80)'; facet == child's own rendered header, validated twice (Sofas 884==884, Beds 245==245)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Chest of Drawers",
+   "qty": 77,
+   "link": "https://www.panhomestores.com/uae_en/furniture/bedroom/chest-of-drawers",
+   "is_group": false,
+   "evidence": "CATEGORIES layered-nav facet on the parent listing page 'furniture/bedroom' read 'Chest Of Drawers (77)'; facet == child's own rendered header, validated twice (Sofas 884==884, Beds 245==245)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bedroom Add-Ons",
+   "qty": 57,
+   "link": "https://www.panhomestores.com/uae_en/furniture/bedroom/bedroom-add-ons",
+   "is_group": false,
+   "evidence": "CATEGORIES layered-nav facet on the parent listing page 'furniture/bedroom' read 'Bedroom Add-Ons (57)'; facet == child's own rendered header, validated twice (Sofas 884==884, Beds 245==245)",
+   "flag": "MANUAL REVIEW: ambiguous contents - 'Add-Ons' in a bedroom furniture department is typically headboards and bed benches (furniture) mixed with bed bases and mattress protectors (bedding, out of scope). Product tiles could not be inspected (see notes) and this leaf's own page would not resolve, so the classification rests on the site filing it under Furniture > Bedroom."
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sofas",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Single Seater Sofas",
+   "qty": 170,
+   "link": "https://www.panhomestores.com/uae_en/furniture/sofas/single-seaters",
+   "is_group": false,
+   "evidence": "CATEGORIES layered-nav facet on the parent listing page 'furniture/sofas' read 'Single Seater Sofas (170)'; facet == child's own rendered header, validated twice (Sofas 884==884, Beds 245==245)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Living Chair",
+   "qty": 133,
+   "link": "https://www.panhomestores.com/uae_en/furniture/sofas/living-chair",
+   "is_group": false,
+   "evidence": "CATEGORIES layered-nav facet on the parent listing page 'furniture/sofas' read 'Living Chair (133)'; facet == child's own rendered header, validated twice (Sofas 884==884, Beds 245==245)",
+   "flag": "MANUAL REVIEW: has one child 'Accent Chair' covering only part of the node; kept the parent as the leaf so the remaining living chairs are not lost."
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Corner Sofa Sets",
+   "qty": 111,
+   "link": "https://www.panhomestores.com/uae_en/furniture/sofas/corner-sofa-sets",
+   "is_group": false,
+   "evidence": "CATEGORIES layered-nav facet on the parent listing page 'furniture/sofas' read 'Corner Sofa Sets (111)'; facet == child's own rendered header, validated twice (Sofas 884==884, Beds 245==245)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Ottomans and Stools",
+   "qty": 107,
+   "link": "https://www.panhomestores.com/uae_en/furniture/sofas/ottomans-stools",
+   "is_group": false,
+   "evidence": "CATEGORIES layered-nav facet on the parent listing page 'furniture/sofas' read 'Ottomans and Stools (107)'; facet == child's own rendered header, validated twice (Sofas 884==884, Beds 245==245)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "3 Seater Sofas",
+   "qty": 78,
+   "link": "https://www.panhomestores.com/uae_en/furniture/sofas/3-seaters",
+   "is_group": false,
+   "evidence": "CATEGORIES layered-nav facet on the parent listing page 'furniture/sofas' read '3 Seater Sofas (78)'; facet == child's own rendered header, validated twice (Sofas 884==884, Beds 245==245)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "2 Seater Sofas",
+   "qty": 56,
+   "link": "https://www.panhomestores.com/uae_en/furniture/sofas/2-seaters",
+   "is_group": false,
+   "evidence": "CATEGORIES layered-nav facet on the parent listing page 'furniture/sofas' read '2 Seater Sofas (56)'; facet == child's own rendered header, validated twice (Sofas 884==884, Beds 245==245)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "4 Seater Sofas",
+   "qty": 54,
+   "link": "https://www.panhomestores.com/uae_en/furniture/sofas/4-seaters",
+   "is_group": false,
+   "evidence": "CATEGORIES layered-nav facet on the parent listing page 'furniture/sofas' read '4 Seater Sofas (54)'; facet == child's own rendered header, validated twice (Sofas 884==884, Beds 245==245)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sofa Sets",
+   "qty": 48,
+   "link": "https://www.panhomestores.com/uae_en/furniture/sofas/sofa-sets",
+   "is_group": false,
+   "evidence": "CATEGORIES layered-nav facet on the parent listing page 'furniture/sofas' read 'Sofa Sets (48)'; facet == child's own rendered header, validated twice (Sofas 884==884, Beds 245==245)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Recliners",
+   "qty": 27,
+   "link": "https://www.panhomestores.com/uae_en/furniture/sofas/recliners",
+   "is_group": false,
+   "evidence": "CATEGORIES layered-nav facet on the parent listing page 'furniture/sofas' read 'Recliners (27)'; facet == child's own rendered header, validated twice (Sofas 884==884, Beds 245==245)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Sofa Beds",
+   "qty": 23,
+   "link": "https://www.panhomestores.com/uae_en/furniture/sofas/sofa-beds",
+   "is_group": false,
+   "evidence": "CATEGORIES layered-nav facet on the parent listing page 'furniture/sofas' read 'Sofa Beds (23)'; facet == child's own rendered header, validated twice (Sofas 884==884, Beds 245==245)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Living Room",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Coffee Tables",
+   "qty": 312,
+   "link": "https://www.panhomestores.com/uae_en/furniture/living-room/coffee-tables",
+   "is_group": false,
+   "evidence": "CATEGORIES layered-nav facet on the parent listing page 'furniture/living-room' read 'Coffee Tables (312)'; facet == child's own rendered header, validated twice (Sofas 884==884, Beds 245==245)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "End Tables",
+   "qty": 292,
+   "link": "https://www.panhomestores.com/uae_en/furniture/living-room/end-table",
+   "is_group": false,
+   "evidence": "CATEGORIES layered-nav facet on the parent listing page 'furniture/living-room' read 'End Table (292)'; facet == child's own rendered header, validated twice (Sofas 884==884, Beds 245==245)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "TV and Entertainment Units",
+   "qty": 90,
+   "link": "https://www.panhomestores.com/uae_en/furniture/living-room/t-v-entertainment-units",
+   "is_group": false,
+   "evidence": "CATEGORIES layered-nav facet on the parent listing page 'furniture/living-room' read 'T.V and Entertainment Units (90)'; facet == child's own rendered header, validated twice (Sofas 884==884, Beds 245==245)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Shoe Racks",
+   "qty": 74,
+   "link": "https://www.panhomestores.com/uae_en/furniture/living-room/shoe-racks",
+   "is_group": false,
+   "evidence": "CATEGORIES layered-nav facet on the parent listing page 'furniture/living-room' read 'Shoe Racks (74)'; facet == child's own rendered header, validated twice (Sofas 884==884, Beds 245==245)",
+   "flag": "MANUAL REVIEW: ambiguous shelving/storage - shoe CABINETS are furniture per the brief, but 'racks' may include small standalone organisers; the site files it under Furniture > Living Room. Tiles not inspectable."
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Consoles",
+   "qty": 47,
+   "link": "https://www.panhomestores.com/uae_en/furniture/living-room/consoles-mirrors/consoles",
+   "is_group": false,
+   "evidence": "rendered CATEGORIES facet on furniture/living-room/consoles-mirrors read 'Consoles (47)' against that page's own rendered header of '72 items'",
+   "flag": "MANUAL REVIEW: the parent 'Consoles & Mirrors' (72) splits as Consoles 47 + 18 console-and-mirror SET items sitting directly on the parent with no dedicated URL + Mirrors 7 (excluded, Wall Decor's job). The 18 set items are furniture but have no separate listing URL, so they are not emitted."
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Accent Tables",
+   "qty": 45,
+   "link": "https://www.panhomestores.com/uae_en/furniture/living-room/accent-tables",
+   "is_group": false,
+   "evidence": "CATEGORIES layered-nav facet on the parent listing page 'furniture/living-room' read 'Accent Tables (45)'; facet == child's own rendered header, validated twice (Sofas 884==884, Beds 245==245)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Nesting Tables",
+   "qty": 5,
+   "link": "https://www.panhomestores.com/uae_en/furniture/living-room/nesting-tables",
+   "is_group": false,
+   "evidence": "CATEGORIES layered-nav facet on the parent listing page 'furniture/living-room' read 'Nesting Tables (5)'; facet == child's own rendered header, validated twice (Sofas 884==884, Beds 245==245)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Screens and Partitions",
+   "qty": 5,
+   "link": "https://www.panhomestores.com/uae_en/furniture/living-room/screen-partition",
+   "is_group": false,
+   "evidence": "CATEGORIES layered-nav facet on the parent listing page 'furniture/living-room' read 'Screen and Partition (5)'; facet == child's own rendered header, validated twice (Sofas 884==884, Beds 245==245)",
+   "flag": "MANUAL REVIEW: room dividers / screens are freestanding furniture-adjacent pieces; included because the site files them under Furniture > Living Room."
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dining Room",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dining Tables",
+   "qty": 251,
+   "link": "https://www.panhomestores.com/uae_en/furniture/dining-room/dining-tables",
+   "is_group": false,
+   "evidence": "CATEGORIES layered-nav facet on the parent listing page 'furniture/dining-room' read 'Dining Tables (251)'; facet == child's own rendered header, validated twice (Sofas 884==884, Beds 245==245)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dining Chairs",
+   "qty": 171,
+   "link": "https://www.panhomestores.com/uae_en/furniture/dining-room/dining-chairs",
+   "is_group": false,
+   "evidence": "CATEGORIES layered-nav facet on the parent listing page 'furniture/dining-room' read 'Dining Chairs (171)'; facet == child's own rendered header, validated twice (Sofas 884==884, Beds 245==245)",
+   "flag": "MANUAL REVIEW: has one child 'Bench' covering only part of the node; kept the parent as the leaf so the chairs are not lost."
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dining Sets",
+   "qty": 107,
+   "link": "https://www.panhomestores.com/uae_en/furniture/dining-room/dining-sets",
+   "is_group": false,
+   "evidence": "CATEGORIES layered-nav facet on the parent listing page 'furniture/dining-room' read 'Dining Sets (107)'; facet == child's own rendered header, validated twice (Sofas 884==884, Beds 245==245)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Dining Serve and Storage",
+   "qty": 73,
+   "link": "https://www.panhomestores.com/uae_en/furniture/dining-room/dining-serve-storage",
+   "is_group": false,
+   "evidence": "CATEGORIES layered-nav facet on the parent listing page 'furniture/dining-room' read 'Dining Serve and Storage (73)'; facet == child's own rendered header, validated twice (Sofas 884==884, Beds 245==245)",
+   "flag": "MANUAL REVIEW: ambiguous - in a dining FURNITURE department this is normally sideboards, buffets and crockery units (furniture), but the word 'Serve' may pull in serveware (out of scope). Tiles not inspectable."
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bar Furniture",
+   "qty": 39,
+   "link": "https://www.panhomestores.com/uae_en/furniture/dining-room/bar-furniture",
+   "is_group": false,
+   "evidence": "CATEGORIES layered-nav facet on the parent listing page 'furniture/dining-room' read 'Bar Furniture (39)'; facet == child's own rendered header, validated twice (Sofas 884==884, Beds 245==245)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Home Office",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Office Tables",
+   "qty": 129,
+   "link": "https://www.panhomestores.com/uae_en/furniture/home-office/office-tables",
+   "is_group": false,
+   "evidence": "CATEGORIES layered-nav facet on the parent listing page 'furniture/home-office' read 'Office Tables (129)'; facet == child's own rendered header, validated twice (Sofas 884==884, Beds 245==245)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Office Chairs",
+   "qty": 108,
+   "link": "https://www.panhomestores.com/uae_en/furniture/home-office/office-chairs",
+   "is_group": false,
+   "evidence": "CATEGORIES layered-nav facet on the parent listing page 'furniture/home-office' read 'Office Chairs (108)'; facet == child's own rendered header, validated twice (Sofas 884==884, Beds 245==245)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Office Storage",
+   "qty": 65,
+   "link": "https://www.panhomestores.com/uae_en/furniture/home-office/office-storage",
+   "is_group": false,
+   "evidence": "CATEGORIES layered-nav facet on the parent listing page 'furniture/home-office' read 'Office Storage (65)'; facet == child's own rendered header, validated twice (Sofas 884==884, Beds 245==245)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Office Seating",
+   "qty": 24,
+   "link": "https://www.panhomestores.com/uae_en/furniture/home-office/office-seating",
+   "is_group": false,
+   "evidence": "CATEGORIES layered-nav facet on the parent listing page 'furniture/home-office' read 'Office Seating (24)'; facet == child's own rendered header, validated twice (Sofas 884==884, Beds 245==245)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Kids and Teens",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Kids Beds",
+   "qty": 140,
+   "link": "https://www.panhomestores.com/uae_en/furniture/kids-teens/kids-beds",
+   "is_group": false,
+   "evidence": "CATEGORIES layered-nav facet on the parent listing page 'furniture/kids-teens' read 'Kids Beds (140)'; facet == child's own rendered header, validated twice (Sofas 884==884, Beds 245==245)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Kids Wardrobes",
+   "qty": 40,
+   "link": "https://www.panhomestores.com/uae_en/furniture/kids-teens/wardrobes",
+   "is_group": false,
+   "evidence": "CATEGORIES layered-nav facet on the parent listing page 'furniture/kids-teens' read 'Wardrobes (40)'; facet == child's own rendered header, validated twice (Sofas 884==884, Beds 245==245)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Kids Study",
+   "qty": 34,
+   "link": "https://www.panhomestores.com/uae_en/furniture/kids-teens/kids-study",
+   "is_group": false,
+   "evidence": "CATEGORIES layered-nav facet on the parent listing page 'furniture/kids-teens' read 'Kids Study (34)'; facet == child's own rendered header, validated twice (Sofas 884==884, Beds 245==245)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Kids Night Stands and Bedside Tables",
+   "qty": 31,
+   "link": "https://www.panhomestores.com/uae_en/furniture/kids-teens/night-stand",
+   "is_group": false,
+   "evidence": "CATEGORIES layered-nav facet on the parent listing page 'furniture/kids-teens' read 'Night Stand and Bedside Tables (31)'; facet == child's own rendered header, validated twice (Sofas 884==884, Beds 245==245)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Bunk Beds",
+   "qty": 13,
+   "link": "https://www.panhomestores.com/uae_en/furniture/kids-teens/bunk-beds",
+   "is_group": false,
+   "evidence": "CATEGORIES layered-nav facet on the parent listing page 'furniture/kids-teens' read 'Bunk Beds (13)'; facet == child's own rendered header, validated twice (Sofas 884==884, Beds 245==245)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Kids Dressers",
+   "qty": 12,
+   "link": "https://www.panhomestores.com/uae_en/furniture/kids-teens/dressers",
+   "is_group": false,
+   "evidence": "CATEGORIES layered-nav facet on the parent listing page 'furniture/kids-teens' read 'Dressers (12)'; facet == child's own rendered header, validated twice (Sofas 884==884, Beds 245==245)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Cots and Cribs",
+   "qty": 1,
+   "link": "https://www.panhomestores.com/uae_en/furniture/kids-teens/cot-crib",
+   "is_group": false,
+   "evidence": "CATEGORIES layered-nav facet on the parent listing page 'furniture/kids-teens' read 'Cot and Crib (1)'; facet == child's own rendered header, validated twice (Sofas 884==884, Beds 245==245)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Kids Seating",
+   "qty": 1,
+   "link": "https://www.panhomestores.com/uae_en/furniture/kids-teens/seating",
+   "is_group": false,
+   "evidence": "CATEGORIES layered-nav facet on the parent listing page 'furniture/kids-teens' read 'Seating (1)'; facet == child's own rendered header, validated twice (Sofas 884==884, Beds 245==245)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Kids Chest of Drawers",
+   "qty": 1,
+   "link": "https://www.panhomestores.com/uae_en/furniture/kids-teens/chest-of-drawers",
+   "is_group": false,
+   "evidence": "CATEGORIES layered-nav facet on the parent listing page 'furniture/kids-teens' read 'Chest Of Drawers (1)'; facet == child's own rendered header, validated twice (Sofas 884==884, Beds 245==245)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Outdoor",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Outdoor Sofas",
+   "qty": 95,
+   "link": "https://www.panhomestores.com/uae_en/furniture/outdoor/outdoor-sofas",
+   "is_group": false,
+   "evidence": "CATEGORIES layered-nav facet on the parent listing page 'furniture/outdoor' read 'Outdoor Sofas (95)'; facet == child's own rendered header, validated twice (Sofas 884==884, Beds 245==245)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Balcony Furniture",
+   "qty": 68,
+   "link": "https://www.panhomestores.com/uae_en/furniture/outdoor/balcony-furniture",
+   "is_group": false,
+   "evidence": "CATEGORIES layered-nav facet on the parent listing page 'furniture/outdoor' read 'Balcony Furniture (68)'; facet == child's own rendered header, validated twice (Sofas 884==884, Beds 245==245)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Outdoor Dining and Benches",
+   "qty": 35,
+   "link": "https://www.panhomestores.com/uae_en/furniture/outdoor/dining-bench",
+   "is_group": false,
+   "evidence": "CATEGORIES layered-nav facet on the parent listing page 'furniture/outdoor' read 'Dining and Bench (35)'; facet == child's own rendered header, validated twice (Sofas 884==884, Beds 245==245)",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Swings",
+   "qty": 11,
+   "link": "https://www.panhomestores.com/uae_en/furniture/outdoor/swings",
+   "is_group": false,
+   "evidence": "CATEGORIES layered-nav facet on the parent listing page 'furniture/outdoor' read 'Swings (11)'; facet == child's own rendered header, validated twice (Sofas 884==884, Beds 245==245)",
+   "flag": "MANUAL REVIEW: garden swing seats read as outdoor seating furniture, but the node may also carry hanging/porch swing hardware. Tiles not inspectable."
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Umbrellas and Loungers",
+   "qty": 4,
+   "link": "https://www.panhomestores.com/uae_en/furniture/outdoor/umbrella-lounger",
+   "is_group": false,
+   "evidence": "CATEGORIES layered-nav facet on the parent listing page 'furniture/outdoor' read 'Umbrella and Lounger (4)'; facet == child's own rendered header, validated twice (Sofas 884==884, Beds 245==245)",
+   "flag": "MANUAL REVIEW: mixed node - sun loungers are furniture, parasols/umbrellas are not, and the site does not split them."
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Outdoor Storage",
+   "qty": 2,
+   "link": "https://www.panhomestores.com/uae_en/furniture/outdoor/outdoor-storage",
+   "is_group": false,
+   "evidence": "CATEGORIES layered-nav facet on the parent listing page 'furniture/outdoor' read 'Outdoor Storage (2)'; facet == child's own rendered header, validated twice (Sofas 884==884, Beds 245==245)",
+   "flag": "MANUAL REVIEW: ambiguous - outdoor storage cabinets would be furniture, deck boxes/bins would be standalone storage (out of scope). Only 2 items. Tiles not inspectable."
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Modular Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Modular Beds",
+   "qty": 178,
+   "link": "https://www.panhomestores.com/uae_en/modular-furniture/modular-beds",
+   "is_group": false,
+   "evidence": "CATEGORIES facet on the modular-furniture listing read 'Modular Beds (178)'; that page's own rendered header read '423 items' and its three children sum exactly to 423",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Modular Sofas",
+   "qty": 157,
+   "link": "https://www.panhomestores.com/uae_en/modular-furniture/modular-sofa",
+   "is_group": false,
+   "evidence": "CATEGORIES facet on the modular-furniture listing read 'Modular Sofa (157)'; children sum exactly to the page header of 423",
+   "flag": null
+  },
+  {
+   "category": "Furniture",
+   "sub_category": "Modular Dining and Living",
+   "qty": 88,
+   "link": "https://www.panhomestores.com/uae_en/modular-furniture/modular-dining-and-living",
+   "is_group": false,
+   "evidence": "CATEGORIES facet on the modular-furniture listing read 'Modular Dining and Living (88)'; children sum exactly to the page header of 423",
+   "flag": null
+  }
+ ]
+}

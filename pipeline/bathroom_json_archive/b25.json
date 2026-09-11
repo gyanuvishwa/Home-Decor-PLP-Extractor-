@@ -1,0 +1,107 @@
+{
+ "status": "ok",
+ "failure_reason": null,
+ "notes": "ACCESS: Salesforce Commerce Cloud (Demandware) storefront, reached by DIRECT curl_cffi fetch via probe.fetch - no proxy, no WAF workaround, same route the prior Furniture/Home-Decor passes on this SR used. robots.txt names NO Anthropic/Claude/ClaudeBot agent; it only disallows /search*, /cart*, /account*, /checkout*, *?store* and several Demandware controllers (Search-UpdateGrid, Search-ShowAjax, Cart-, ReportingEvent-, Review-Write, MessagingApp-DisplayChat, __Analytics-Start) plus /gtag/. I used none of those; every URL below is a plain /c/... category path. No Crawl-delay is declared; probe.py's 2s per-host gap was left in force.\n\nTREE: taken from three independent sources that agree exactly. (1) sitemap_8-category.xml (840 category URLs) - grepping /bath/ returns the complete Bath department. (2) The homepage mega-menu, which is fully server-rendered and exposes Bath -> 8 real children plus Shop All / New / Best Sellers / Sale promo links. (3) Each PLP's own left-rail Category refinement block (div#refinement-category), which on this site lists the department's real child set. All three give the same Bath department: Bathroom Towels & Linens (4 children), Bathroom Rugs & Mats, Bathroom Accessories, Bathroom Storage & Furniture (2 children), Bathroom Light Fixtures, Bath Robes, Bathroom Candles & Fragrance, Bath & Body (4 children). No deeper level exists below any of these - the only sub-links are Shop All pages and sort/refinement facets.\n\nQTY: every qty is the PLP's own server-rendered \"N Items\" header. VERIFICATION: I independently counted .product-tile elements inside div#product-search-results > div.product-grid (excluding recommendation carousels, which also carry product markup and would over-count) and the tile count equalled the header on every page whose total is under the 60-per-page render cap: Bathroom Accessories 33=33, Bathroom Storage Cabinets & Shelves 8=8, Bathroom Storage & Furniture 32=32, Bathroom Rugs & Mats 33=33, Bath Towel Collections 16=16, Bath Towels 31=31, Bathroom Hand Towels 37=37, Shower Curtains & Rings 7=7, Bath Robes 37=37, Bathroom Light Fixtures 26=26. Counts discriminate properly (7 to 306), none is a round display cap, and every page's H1 and breadcrumb were read and matched the node requested - which is exactly how the four mislabelled Bath nav items below were caught. Each recorded leaf was fetched twice and returned an identical header.\n\nHIERARCHY DECISION - Bathroom Storage & Furniture: this node's own PLP shows 32 Items, but it has a genuine child (Bathroom Storage Cabinets & Shelves, 8) so rule 24 forbids recording the parent URL; it is emitted as a grouping row with blank qty and blank link. Its other nav child, \"Bathroom Baskets\", is only a label - the page it serves canonicalises to /c/decor-and-pillows/baskets/ with a Home Decor breadcrumb and an H1 of \"Baskets\" (51 general seagrass/rattan baskets), so it is not a bathroom-owned listing and went to review rather than rows. Note the parent's 32 tiles are themselves mostly seagrass baskets, hampers and storage towers, i.e. the same Decor-owned assortment surfaced under a Bath label, which corroborates that decision. No quantity was ever aggregated: 8 was not derived from 32, and 32 was not recorded.\n\nDUPLICATE HANDLING: https://www.worldmarket.com/c/furniture/storage-furniture/bathroom-storage-and-furniture/ is reachable from the Furniture department but canonicalises to https://www.worldmarket.com/c/bath/bathroom-storage%C2%A0and-furniture/ and renders the same 32-item listing with breadcrumb Home > Bath > Bathroom Storage & Furniture. One node, one record (rule 28). Note the live Bath URL contains a literal non-breaking space encoded as %C2%A0 - that is the site's own path, not a typo, and it is required for the URL to resolve.\n\nEXCLUDED, WITH REASON: Shop All Bath, Shop All Bath Towels & Linens, Shop All Bathroom Storage & Furniture, Shop All Bath & Body (rule 25 View All/Shop All); New Bath, Bath Best Sellers, Bath Sale, /c/sale/bath/, /c/free-shipping/bath-free-shipping/, /c/holidays/... bath-and-body gift pages, /c/sale/clearance/clearance-bath-and-body/ (promotional/seasonal listings, rule 25); /c/bath/bath-mats-and-rugs/ and /c/rugs/bath-mats-and-rugs/ (alternate paths onto the same textile bath-rug assortment); Bath & Body and its children Beauty & Skincare Products, Soaps & Lotions (+Soaps, +Lotions), Spa Products, Men's Grooming, Duo Collection - these are consumable personal-care toiletries (body soap, lotion, skincare), not bathroom furniture, fixtures, hardware or accessories, so they fall outside every home-furnishing category, not just Bathroom; rule 13's \"soap accessories\" covers dispensers and dishes, which are already captured inside Bathroom Accessories.\n\nMIRRORS: checked explicitly (rule 10 - must not be skipped). World Market has no bathroom or vanity mirror node. Every mirror URL in the category sitemap sits under /c/wall-decor-and-mirrors/mirrors/ (plus its Sale/Clearance mirrors), a general decorative wall-mirror department with no bathroom or vanity child and no bathroom breadcrumb, so it is Wall Decor, not Bathroom. FIXTURES: also checked - grepping the full 840-URL category sitemap for shower, toilet, sink, faucet, tap, vanity, basin, bathtub returns nothing except the shower-curtains textile node. World Market sells no sanitaryware, baths, showers, enclosures or taps. || CROSS-FILE DEDUP: 1 leaf record(s) removed as already extracted in a prior category workbook. See Review sheet.",
+ "rows": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Accessories",
+   "qty": 33,
+   "link": "https://www.worldmarket.com/c/bath/bathroom-accessories/",
+   "is_group": false,
+   "evidence": null,
+   "flag": null
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Storage & Furniture",
+   "qty": null,
+   "link": null,
+   "is_group": true,
+   "evidence": null,
+   "flag": null
+  }
+ ],
+ "review": [
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Towels & Linens > Bath Towel Collections",
+   "qty": 16,
+   "issue": "ROUTED TO TEXTILE: bath towel sets, primary product type is textile (rules 15, 20)",
+   "link": "https://www.worldmarket.com/c/bath/bathroom-towels-and-linens/bath-towel-collections/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Towels & Linens > Bath Towels",
+   "qty": 31,
+   "issue": "ROUTED TO TEXTILE: bath towels, primary product type is textile (rules 15, 20)",
+   "link": "https://www.worldmarket.com/c/bath/bathroom-towels-and-linens/bath-towels/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Towels & Linens > Bathroom Hand Towels",
+   "qty": 37,
+   "issue": "ROUTED TO TEXTILE: hand towels, primary product type is textile (rules 15, 20)",
+   "link": "https://www.worldmarket.com/c/bath/bathroom-towels-and-linens/bathroom-hand-towels/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Towels & Linens > Shower Curtains & Rings",
+   "qty": 7,
+   "issue": "ROUTED TO TEXTILE: all 7 tiles are fabric shower curtains (waffle-weave cotton, block-print, tufted floral); no curtain rings are actually merchandised here. Rule 20 sends shower curtains to Textile",
+   "link": "https://www.worldmarket.com/c/bath/bathroom-towels-and-linens/shower-curtains-and-rings/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Rugs & Mats",
+   "qty": 33,
+   "issue": "ROUTED TO TEXTILE: 31 of 33 tiles are tufted/flatwoven/memory-foam textile bath mats and rugs (rules 15, 16). Only 2 tiles are non-textile (Acacia Wood Scalloped Bath Mat, Teak Wood Bath Mat); the node is not split on the site so the whole node goes to Textile rather than splitting a count",
+   "link": "https://www.worldmarket.com/c/bath/bathroom-rugs-and-mats/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bath Robes",
+   "qty": 37,
+   "issue": "ROUTED TO TEXTILE: the Bath nav item /c/bath/bath-robes/ serves a page whose H1 is \"Women's Pajamas & Robes\" and whose canonical/breadcrumb is Apparel, not Bath. Robes are textile (rule 20)",
+   "link": "https://www.worldmarket.com/c/bath/bath-robes/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Light Fixtures",
+   "qty": 26,
+   "issue": "ROUTED TO LIGHTING: the Bath nav item serves a page with H1 \"Wall Sconces\", canonical https://www.worldmarket.com/c/lighting/wall-sconces-and-accent-lighting/wall-sconces/ and breadcrumb Home > Lighting > Wall Sconces & Accent Lighting > Wall Sconces. Primary product type is lighting (rules 11, 19)",
+   "link": "https://www.worldmarket.com/c/bath/bathroom-light-fixtures/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Candles & Fragrance",
+   "qty": 306,
+   "issue": "ROUTED TO DECOR: the Bath nav item serves a page with H1 \"Candles & Candle Holders\" (306 Items header, generic candle assortment, not bathroom-specific). Rule 21 sends bathroom candles to Decorative Home Accessories",
+   "link": "https://www.worldmarket.com/c/bath/bathroom-candles-and-fragrance/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Storage & Furniture > Bathroom Baskets",
+   "qty": 51,
+   "issue": "ROUTED TO DECOR/STORAGE: nav label says Bathroom Baskets but the page serves H1 \"Baskets\", canonical https://www.worldmarket.com/c/decor-and-pillows/baskets/ and breadcrumb Home > Home Decor & Pillows > Baskets - a general 51-item decor basket assortment, not a bathroom-owned node. Recording it as Bathroom would import a Decor category (rules 29, 30-33)",
+   "link": "https://www.worldmarket.com/c/bath/bathroom-storage%C2%A0and-furniture/bathroom-baskets/"
+  },
+  {
+   "category": "Bathroom",
+   "sub_category": "Bathroom Storage Cabinets & Shelves",
+   "qty": 8,
+   "issue": "ALREADY EXTRACTED IN Furniture.xlsx as 'Bathroom Storage Cabinets & Shelves' - excluded from Bathroom per cross-category dedup (master guide s13)",
+   "link": "https://www.worldmarket.com/c/bath/bathroom-storage%C2%A0and-furniture/bathroom-storage-cabinets-and-shelves/"
+  }
+ ],
+ "_reconstructed_from": "Bathroom.xlsx delivered 2026-09-01 (checkpoint), not original worker JSON"
+}

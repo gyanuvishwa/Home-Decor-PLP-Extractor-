@@ -1,0 +1,124 @@
+{
+  "sr": 198,
+  "company": "Sur La Table",
+  "brand_site": "surlatable.com",
+  "country": "USA",
+  "site_url": "https://www.surlatable.com/",
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "ACCESS: HTTP-first tier (a) worked end to end - no Playwright/Chrome needed. robots.txt (https://www.surlatable.com/robots.txt) is User-agent:* with disallows only on cart/search/checkout/filter-query paths (pmin/pmax/prefn*/srule etc.) and no anthropic-ai/ClaudeBot/Claude-Web entry, so plain HTTP fetch was fully permitted. Used curl with a desktop Chrome UA + curl -L to follow redirects; every category page returned HTTP 200 and the site is SSR (product count and h1 are present in the raw HTML, not hydration-only), so no browser tier was required. TREE METHOD: built the tree from the union of sitemap_0.xml (from sitemap_index.xml) and each category page's own subcategory link list (site uses Chakra/SFCC-style markup with a JSON blob containing {\"url\":...} nav entries). Sur La Table's mega-menu top-level categories are Bakeware, Cookware, Coffee & Tea, Dining & Bar, Food, Kitchen Decor, Kitchen Tools, Knives, Outdoor, Small Appliances - all overwhelmingly Kitchen & Dining scope (cookware/bakeware/dinnerware/glassware/flatware/appliances/knives), out of scope for this Textile+Storage pass per the task boundary. Confirmed /products/dining-bar/linens/* 301-redirects to /products/kitchen-decor/linens/* (canonical - same 7 subcategory URLs and counts either way, recorded once). Also confirmed /baskets-decor/ and /linens-1/ are dead (410 Gone); /fall-linens/, /holiday-linens/, /sur-la-table-linens/, /modern-decor-table-linens/, /made-in-usa/linens/, /sale/clearance/linens/, /registry/registry-must-haves/kitchen-storage/ are seasonal/brand/registry/sale collection landing pages (redirect into or duplicate the real category, or are promotional cross-listings), excluded per the View All/Collections rule - not real nav category nodes. QTY METHOD: every qty is the exact 'N Items' string rendered in a <span data-testid=\"category-product-count\"> element in the raw server-rendered HTML of the category's own listing page (verified the h1 text matches the requested node on every page fetched, so no parent/sibling-count leakage). No pagination math or estimation was used anywhere. EXCLUDED (checked and rejected, with reason): Paper Napkins (46 items, /products/kitchen-decor/linens/paper-napkins/) - paper is not a textile material per textile.md section 16, so it was read but dropped, not recorded as a flagged row. Utensil Holders (14, countertop-organization/utensil-holders/) and Knife Blocks & Storage (19, knives/knife-accessories/knife-blocks-storage/) - both are single-purpose kitchen/cutlery tool holders (utensil crocks, knife blocks, knife rolls), not general home storage/organization per storage.md's Kitchen & Dining boundary (section 13/26) - treated as Kitchen & Dining scope, excluded. Dish Racks & Sink Accessories (25) and Cleaning (79, home-essentials) - dish-drying racks, sink caddies, sponges/brushes/cleaning cloths; primary purpose is dishwashing/cleaning, not storage, and not on any storage.md include list - excluded. Trash & Recycling (21, home-essentials) - trash cans/bins/compost bin/trash bags; waste disposal, not organization/storage of possessions, not on storage.md's include list - excluded. Totes & Gift Bags (16, home-essentials) - market totes, picnic baskets/backpacks, wine totes; storage.md section 6 explicitly excludes fashion/lifestyle/personal-carrying bags - excluded. Kitchen Islands & Carts (12, home-essentials) - dominantly butcher-block island/prep tables (Furniture scope, out of this project's task); the 2 Yamazaki rolling storage carts inside this mixed category could not be isolated to their own URL/qty without fabricating a subset count, so the whole node was excluded rather than guessed. Pot Racks (cookware/specialty/pot-racks/) - cookware-specific hanging rack, Kitchen & Dining scope, excluded. Home Decor/Ornaments/Fragrance Collection/candles/soaps (kitchen-decor/decor/*, kitchen-decor/fragrance-collection/*) and countertop items (Butter Dishes & Gravy Boats, Spoonrests & Trivets, Cookbooks & Cookbook Holders) - Decorative Home Accessories / Kitchen & Dining scope per both rule files' boundary sections, excluded. Pets (home-essentials/pets/) - pet products, excluded per textile.md 18 / storage.md 31. No Textile or Storage node was found blocked or inaccessible; status is ok because the full tree was read and every node was independently classified (no partial/unread branch remains).",
+  "textile_rows": [
+    {
+      "category": "Textile",
+      "sub_category": "Linens",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Aprons",
+      "qty": 59,
+      "link": "https://www.surlatable.com/products/kitchen-decor/linens/aprons/",
+      "is_group": false,
+      "evidence": "Rendered category-product-count span text '59 Items' on the Aprons listing page; h1 confirmed 'Aprons'",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Kitchen Towels & Dishcloths",
+      "qty": 69,
+      "link": "https://www.surlatable.com/products/kitchen-decor/linens/kitchen-towels-dishcloths/",
+      "is_group": false,
+      "evidence": "Rendered category-product-count span text '69 Items' on the Kitchen Towels & Dishcloths listing page; h1 confirmed",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Napkins & Napkin Rings",
+      "qty": 131,
+      "link": "https://www.surlatable.com/products/kitchen-decor/linens/napkins-napkin-rings/",
+      "is_group": false,
+      "evidence": "Rendered category-product-count span text '131 Items' on the Napkins & Napkin Rings listing page; h1 confirmed",
+      "flag": "Combined site category mixes cloth napkins (textile) with metal/wood napkin rings (hardware, non-textile per the curtain-hardware precedent in textile.md section 5); could not be split into separate URLs, so the node was kept but marked MEDIUM rather than HIGH",
+      "confidence": "MEDIUM"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Oven Mitts & Pot Holders",
+      "qty": 45,
+      "link": "https://www.surlatable.com/products/kitchen-decor/linens/oven-mitts-pot-holders/",
+      "is_group": false,
+      "evidence": "Rendered category-product-count span text '45 Items' on the Oven Mitts & Pot Holders listing page; h1 confirmed",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Placemats",
+      "qty": 60,
+      "link": "https://www.surlatable.com/products/kitchen-decor/linens/placemats/",
+      "is_group": false,
+      "evidence": "Rendered category-product-count span text '60 Items' on the Placemats listing page; h1 confirmed",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Tablecloths & Runners",
+      "qty": 100,
+      "link": "https://www.surlatable.com/products/kitchen-decor/linens/tablecloths-runners/",
+      "is_group": false,
+      "evidence": "Rendered category-product-count span text '100 Items' on the Tablecloths & Runners listing page; h1 confirmed",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Floor Mats & Rugs",
+      "qty": 46,
+      "link": "https://www.surlatable.com/products/kitchen-decor/home-essentials/floor-mats-rugs/",
+      "is_group": false,
+      "evidence": "Rendered category-product-count span text '46 Items' on the Floor Mats & Rugs listing page; h1 confirmed",
+      "flag": "Category mixes woven-vinyl Chilewich floor mats/rugs (textile floor covering per textile.md section 6) with WellnessMats polyurethane anti-fatigue standing mats (functional/industrial, borderline non-textile); single combined listing page could not be split - kept as one node, MEDIUM confidence",
+      "confidence": "MEDIUM"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Outdoor Linens",
+      "qty": 46,
+      "link": "https://www.surlatable.com/products/outdoor/outdoor-dining-entertaining/outdoor-linens/",
+      "is_group": false,
+      "evidence": "Rendered category-product-count span text '46 Items' on the Outdoor Linens listing page; h1 confirmed. Sampled product names confirm kitchen towels, napkins, oven mitts, tablecloths, table runners, placemats, aprons, picnic blanket",
+      "flag": null,
+      "confidence": "HIGH"
+    }
+  ],
+  "storage_rows": [
+    {
+      "category": "Storage",
+      "sub_category": "Organization & Storage",
+      "qty": 167,
+      "link": "https://www.surlatable.com/products/kitchen-decor/countertop-organization/organization-storage/",
+      "is_group": false,
+      "evidence": "Rendered category-product-count span text '167 Items' on the Organization & Storage listing page; h1 confirmed. Sampled product names confirm bread boxes, glass/plastic storage containers and canisters, cookware organizers, produce keepers, silverware/flatware trays, utensil crocks, knife storage trays",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Food Storage",
+      "qty": 71,
+      "link": "https://www.surlatable.com/products/food/cooking-pantry/food-storage/",
+      "is_group": false,
+      "evidence": "Rendered category-product-count span text '71 Items' on the Food Storage listing page; h1 confirmed. Sampled product names confirm bread boxes, storage bowls, food huggers, vacuum sealer bags - genuine food-storage products per storage.md section 13",
+      "flag": null,
+      "confidence": "HIGH"
+    }
+  ]
+}

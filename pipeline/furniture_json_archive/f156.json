@@ -1,0 +1,201 @@
+{
+  "sr": 156,
+  "company": "&Tradition",
+  "brand_site": "andtradition.com",
+  "country": "Denmark",
+  "site_url": "https://andtradition.com/",
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "ACCESS: Chrome connector only, own tab. www.andtradition.com/robots.txt = 'User-agent: * / Disallow: / Allow: /' - no Claude-specific rule, and no bot wall, 403 or challenge was hit at any point. Site is a Nuxt/Vue SPA on www.andtradition.com fronting a headless WordPress backend at wp.andtradition.com/wp-json (custom 'trouble' REST namespace, open, no auth); all API reads were same-page fetch() from the loaded www.andtradition.com document via javascript_tool. TREE: taken from the site's own product taxonomy (GET /wp-json/trouble/taxonomy, 175 terms) - this is the exact tree the frontend's '?type=<slug>' filter resolves against. Cross-checked against the rendered mega-menu, which exposes only 7 top-level chips (New Collection, Furniture, Lighting, Objects, Outdoor, Classics, EU Ecolabel) and no deeper nodes, so the taxonomy is the superset. Under Products(29): Furniture(265) > Seating(39)/Tables(42)/Storage(1589) with 16 leaves total, plus a sibling top-level Outdoor(1593) > Outdoor Seating/Outdoor Tables/Outdoor Objects. No XML sitemap route to category pages exists (categories are query-string filters on one SPA route); www.andtradition.com/sitemap.xml intermittently returns 'Nuxt Internal Server Error' and in any case only lists product detail pages. QTY METHOD: the rendered listing header is UNOBTAINABLE on this site - /products and every /products?type=<slug> render '0 Products' with an empty grid (state.sections is empty and the page never even issues a /trouble/list request; confirmed by network capture on a fresh load of ?type=sofas). The taxonomy API's own 'count' field is 0 for every term (unpopulated) and was never used. Every qty is therefore Rule-4 method 3: an exhaustive unique-product-ID count over the full catalogue (GET /trouble/list -> 410 post_type=product, which exactly matches the 410 URLs in wp-sitemap-posts-product-1.xml), counting distinct product IDs whose 'tags' array contains the exact leaf term_id. The endpoint was read twice in this session and all 19 term counts were identical - no drift. Products legitimately appear under two leaves where the site tags them twice (e.g. Wire Stool VP11 in both Bar & Counter Stools and Poufs/Stools/Benches); these are not deduped across leaves, matching the site's own assignment. Parent terms are separately tagged and are NOT the sum of their children (Seating 124 vs 163 across children), so no parent number was used anywhere. COVERAGE CHECK: 264 distinct products carry any of Furniture(265)/Seating/Tables/Storage/Outdoor(1593); 256 are covered by the 18 leaf rows. The 8 uncovered are: Fly SC9 (tagged Seating only - real furniture, reachable from no leaf), Allwood AV35 Trolley (tagged Furniture only, belongs in Trolleys), Capture Coat Stand SC77 (furniture, filed by the site under Objects > Hooks/Hangers/Coat Stands), plus 5 correctly out of scope: RFH Terrace Chair Cushion RD4, Collect Hurricane SC83, Solid SC105 (an outdoor lamp, also tagged Lighting), Capture Hanger SC76 and Capture Hook SC74 (wall hooks). So exactly 3 furniture products are unreachable from any category node; reported here rather than dropped silently, and too few to justify inventing a node. EXCLUDED: Lighting(30) and all 5 of its leaves; Objects(41) and its 10 leaves (rugs, cushions, mirrors, throws, vases, hooks/hangers/coat stands, candleholders, tableware, scents, care kits); Outdoor Objects(1596, 13 items = 12 outdoor seat pads/cushions + 1 glass lantern). Also excluded as non-categories per the brief: Classics(1755, 61 products - a re-edition marketing collection whose members are all already tagged into real product-type leaves), New Collection, EU Ecolabel, Product Family(44), Materials(87), Collections(1447) and the Designers taxonomy - this brand leans heavily on designer names (Verner Panton, Jaime Hayon, Space Copenhagen etc.) and none of those pages were treated as categories. MODULAR SOFA CHECK (SR 148 lesson): &Tradition's modular systems Develius EV1 & EV2, Develius Mellow and Isole NN1A-NN1G are each a SINGLE catalogue entry driven by a separate Configurator, not a set of individually listed modules - there is no hidden pool of module SKUs behind a system page, so nothing was lost that way. TOP BUCKET: 'Outdoor Furniture' used for the two outdoor leaves because the site files them under its own top-level Outdoor department, a sibling of Furniture rather than a child of it.",
+  "rows": [
+    {
+      "category": "Furniture",
+      "sub_category": "Seating",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Lounge Chairs",
+      "qty": 29,
+      "link": "https://www.andtradition.com/products?type=lounge-chairs",
+      "is_group": false,
+      "evidence": "exhaustive unique product-ID count over the site's own catalogue endpoint wp.andtradition.com/wp-json/trouble/list (410 products, matches wp-sitemap-posts-product-1.xml = 410): 29 unique product IDs carry taxonomy term_id 40 (lounge-chairs), the same term the site's own ?type=lounge-chairs filter resolves to. Rendered header unobtainable - the /products listing renders '0 Products' with an empty grid for every filter incl. unfiltered. Two independent reads agreed.",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Dining Chairs",
+      "qty": 38,
+      "link": "https://www.andtradition.com/products?type=dining-chairs",
+      "is_group": false,
+      "evidence": "exhaustive unique product-ID count over the site's own catalogue endpoint wp.andtradition.com/wp-json/trouble/list (410 products, matches wp-sitemap-posts-product-1.xml = 410): 38 unique product IDs carry taxonomy term_id 45 (dining-chairs), the same term the site's own ?type=dining-chairs filter resolves to. Rendered header unobtainable - the /products listing renders '0 Products' with an empty grid for every filter incl. unfiltered. Two independent reads agreed.",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Sofas",
+      "qty": 26,
+      "link": "https://www.andtradition.com/products?type=sofas",
+      "is_group": false,
+      "evidence": "exhaustive unique product-ID count over the site's own catalogue endpoint wp.andtradition.com/wp-json/trouble/list (410 products, matches wp-sitemap-posts-product-1.xml = 410): 26 unique product IDs carry taxonomy term_id 171 (sofas), the same term the site's own ?type=sofas filter resolves to. Rendered header unobtainable - the /products listing renders '0 Products' with an empty grid for every filter incl. unfiltered. Two independent reads agreed.",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Conference Chairs",
+      "qty": 19,
+      "link": "https://www.andtradition.com/products?type=conference-chairs",
+      "is_group": false,
+      "evidence": "exhaustive unique product-ID count over the site's own catalogue endpoint wp.andtradition.com/wp-json/trouble/list (410 products, matches wp-sitemap-posts-product-1.xml = 410): 19 unique product IDs carry taxonomy term_id 185 (conference-chairs), the same term the site's own ?type=conference-chairs filter resolves to. Rendered header unobtainable - the /products listing renders '0 Products' with an empty grid for every filter incl. unfiltered. Two independent reads agreed.",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Bar & Counter Stools & Chairs",
+      "qty": 34,
+      "link": "https://www.andtradition.com/products?type=bar-counter-stool-chair",
+      "is_group": false,
+      "evidence": "exhaustive unique product-ID count over the site's own catalogue endpoint wp.andtradition.com/wp-json/trouble/list (410 products, matches wp-sitemap-posts-product-1.xml = 410): 34 unique product IDs carry taxonomy term_id 1483 (bar-counter-stool-chair), the same term the site's own ?type=bar-counter-stool-chair filter resolves to. Rendered header unobtainable - the /products listing renders '0 Products' with an empty grid for every filter incl. unfiltered. Two independent reads agreed.",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Poufs, Stools and Benches",
+      "qty": 17,
+      "link": "https://www.andtradition.com/products?type=pouf-stool-bench",
+      "is_group": false,
+      "evidence": "exhaustive unique product-ID count over the site's own catalogue endpoint wp.andtradition.com/wp-json/trouble/list (410 products, matches wp-sitemap-posts-product-1.xml = 410): 17 unique product IDs carry taxonomy term_id 1590 (pouf-stool-bench), the same term the site's own ?type=pouf-stool-bench filter resolves to. Rendered header unobtainable - the /products listing renders '0 Products' with an empty grid for every filter incl. unfiltered. Two independent reads agreed.",
+      "flag": "MANUAL REVIEW: the site's own count of 17 includes 5 accessory SKUs it files in this node (Ita Seat pad OS5, Ita Seat pad OS6, Wire Stool Seat Pad VP11, Wire Stool Seat Pad VP15, Wire Stool Marble Top VP11); 12 are actual poufs/stools/benches."
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Tables",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Coffee Tables",
+      "qty": 19,
+      "link": "https://www.andtradition.com/products?type=coffee-tables",
+      "is_group": false,
+      "evidence": "exhaustive unique product-ID count over the site's own catalogue endpoint wp.andtradition.com/wp-json/trouble/list (410 products, matches wp-sitemap-posts-product-1.xml = 410): 19 unique product IDs carry taxonomy term_id 158 (coffee-tables), the same term the site's own ?type=coffee-tables filter resolves to. Rendered header unobtainable - the /products listing renders '0 Products' with an empty grid for every filter incl. unfiltered. Two independent reads agreed.",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Bar & Counter Tables",
+      "qty": 14,
+      "link": "https://www.andtradition.com/products?type=bar-counter-tables",
+      "is_group": false,
+      "evidence": "exhaustive unique product-ID count over the site's own catalogue endpoint wp.andtradition.com/wp-json/trouble/list (410 products, matches wp-sitemap-posts-product-1.xml = 410): 14 unique product IDs carry taxonomy term_id 160 (bar-counter-tables), the same term the site's own ?type=bar-counter-tables filter resolves to. Rendered header unobtainable - the /products listing renders '0 Products' with an empty grid for every filter incl. unfiltered. Two independent reads agreed.",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Conference Tables",
+      "qty": 2,
+      "link": "https://www.andtradition.com/products?type=conference-table",
+      "is_group": false,
+      "evidence": "exhaustive unique product-ID count over the site's own catalogue endpoint wp.andtradition.com/wp-json/trouble/list (410 products, matches wp-sitemap-posts-product-1.xml = 410): 2 unique product IDs carry taxonomy term_id 161 (conference-table), the same term the site's own ?type=conference-table filter resolves to. Rendered header unobtainable - the /products listing renders '0 Products' with an empty grid for every filter incl. unfiltered. Two independent reads agreed.",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Dining Tables",
+      "qty": 22,
+      "link": "https://www.andtradition.com/products?type=dining-tables",
+      "is_group": false,
+      "evidence": "exhaustive unique product-ID count over the site's own catalogue endpoint wp.andtradition.com/wp-json/trouble/list (410 products, matches wp-sitemap-posts-product-1.xml = 410): 22 unique product IDs carry taxonomy term_id 231 (dining-tables), the same term the site's own ?type=dining-tables filter resolves to. Rendered header unobtainable - the /products listing renders '0 Products' with an empty grid for every filter incl. unfiltered. Two independent reads agreed.",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Desks",
+      "qty": 4,
+      "link": "https://www.andtradition.com/products?type=desks-furniture",
+      "is_group": false,
+      "evidence": "exhaustive unique product-ID count over the site's own catalogue endpoint wp.andtradition.com/wp-json/trouble/list (410 products, matches wp-sitemap-posts-product-1.xml = 410): 4 unique product IDs carry taxonomy term_id 1588 (desks-furniture), the same term the site's own ?type=desks-furniture filter resolves to. Rendered header unobtainable - the /products listing renders '0 Products' with an empty grid for every filter incl. unfiltered. Two independent reads agreed.",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Side Tables",
+      "qty": 8,
+      "link": "https://www.andtradition.com/products?type=side-tables",
+      "is_group": false,
+      "evidence": "exhaustive unique product-ID count over the site's own catalogue endpoint wp.andtradition.com/wp-json/trouble/list (410 products, matches wp-sitemap-posts-product-1.xml = 410): 8 unique product IDs carry taxonomy term_id 1591 (side-tables), the same term the site's own ?type=side-tables filter resolves to. Rendered header unobtainable - the /products listing renders '0 Products' with an empty grid for every filter incl. unfiltered. Two independent reads agreed.",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Cafe Tables",
+      "qty": 2,
+      "link": "https://www.andtradition.com/products?type=cafe-tables",
+      "is_group": false,
+      "evidence": "exhaustive unique product-ID count over the site's own catalogue endpoint wp.andtradition.com/wp-json/trouble/list (410 products, matches wp-sitemap-posts-product-1.xml = 410): 2 unique product IDs carry taxonomy term_id 1612 (cafe-tables), the same term the site's own ?type=cafe-tables filter resolves to. Rendered header unobtainable - the /products listing renders '0 Products' with an empty grid for every filter incl. unfiltered. Two independent reads agreed.",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Storage",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": "MANUAL REVIEW: 5 products carry the parent Storage term (1589) but none of its three child terms, so they fall outside every leaf row: Alima NDS3 and Develius EV3 (real storage furniture), Capture Coat Stand SC77 (furniture, but the site files it under Objects > Hooks, Hangers & Coat Stands), Capture Hanger SC76 and Capture Hook SC74 (wall hooks, not furniture)."
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Trolleys",
+      "qty": 3,
+      "link": "https://www.andtradition.com/products?type=trolley",
+      "is_group": false,
+      "evidence": "exhaustive unique product-ID count over the site's own catalogue endpoint wp.andtradition.com/wp-json/trouble/list (410 products, matches wp-sitemap-posts-product-1.xml = 410): 3 unique product IDs carry taxonomy term_id 1482 (trolley), the same term the site's own ?type=trolley filter resolves to. Rendered header unobtainable - the /products listing renders '0 Products' with an empty grid for every filter incl. unfiltered. Two independent reads agreed.",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Cabinets",
+      "qty": 2,
+      "link": "https://www.andtradition.com/products?type=cabinets",
+      "is_group": false,
+      "evidence": "exhaustive unique product-ID count over the site's own catalogue endpoint wp.andtradition.com/wp-json/trouble/list (410 products, matches wp-sitemap-posts-product-1.xml = 410): 2 unique product IDs carry taxonomy term_id 1592 (cabinets), the same term the site's own ?type=cabinets filter resolves to. Rendered header unobtainable - the /products listing renders '0 Products' with an empty grid for every filter incl. unfiltered. Two independent reads agreed.",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Shelving",
+      "qty": 16,
+      "link": "https://www.andtradition.com/products?type=shelving",
+      "is_group": false,
+      "evidence": "exhaustive unique product-ID count over the site's own catalogue endpoint wp.andtradition.com/wp-json/trouble/list (410 products, matches wp-sitemap-posts-product-1.xml = 410): 16 unique product IDs carry taxonomy term_id 1918 (shelving), the same term the site's own ?type=shelving filter resolves to. Rendered header unobtainable - the /products listing renders '0 Products' with an empty grid for every filter incl. unfiltered. Two independent reads agreed.",
+      "flag": "MANUAL REVIEW: freestanding furniture shelving/bookcase systems (Alima, Rombe, Guild, Archivo), not wall shelves - included per the shelving line. 2 of the 16 are component SKUs the site lists as products (Rombe shelf IF1-IF6, Rombe cabinet shelf IF3 & IF6)."
+    },
+    {
+      "category": "Outdoor Furniture",
+      "sub_category": "Outdoor Seating",
+      "qty": 29,
+      "link": "https://www.andtradition.com/products?type=outdoor-seating",
+      "is_group": false,
+      "evidence": "exhaustive unique product-ID count over the site's own catalogue endpoint wp.andtradition.com/wp-json/trouble/list (410 products, matches wp-sitemap-posts-product-1.xml = 410): 29 unique product IDs carry taxonomy term_id 1594 (outdoor-seating), the same term the site's own ?type=outdoor-seating filter resolves to. Rendered header unobtainable - the /products listing renders '0 Products' with an empty grid for every filter incl. unfiltered. Two independent reads agreed.",
+      "flag": null
+    },
+    {
+      "category": "Outdoor Furniture",
+      "sub_category": "Outdoor Tables",
+      "qty": 13,
+      "link": "https://www.andtradition.com/products?type=outdoor-tables",
+      "is_group": false,
+      "evidence": "exhaustive unique product-ID count over the site's own catalogue endpoint wp.andtradition.com/wp-json/trouble/list (410 products, matches wp-sitemap-posts-product-1.xml = 410): 13 unique product IDs carry taxonomy term_id 1595 (outdoor-tables), the same term the site's own ?type=outdoor-tables filter resolves to. Rendered header unobtainable - the /products listing renders '0 Products' with an empty grid for every filter incl. unfiltered. Two independent reads agreed.",
+      "flag": null
+    }
+  ]
+}

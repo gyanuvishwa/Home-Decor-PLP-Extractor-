@@ -1,0 +1,52 @@
+{
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "Shopify store (whisperinghomes.com). Access: curl (direct HTTP, no Cloudflare/WAF challenge on collection pages) worked initially but hit a sustained 429 rate-limit after ~17 rapid requests during nav discovery; escalated to Playwright/CDP (tier 2) which succeeded (status 200) and was used for all rendered-page product-count verification; curl recovered later and was used for zero-count/products.json spot-checks. No Claude-specific robots.txt disallow. Discovery: header mega-menu (mobile drawer HTML in the homepage source) exposes a full 'Bestsellers' tab with a parent listing (/collections/bestsellers) plus 4 genuine site-defined sub-collections (Indoor Lights, Outdoor Lights, Home Decor, Dried Florals). Also checked sitemap_collections_1.xml for any additional best-sellers-* handles not in the nav - none found beyond the 4 already discovered (sitemap confirms exactly best-sellers-home-decor, best-sellers-dried-florals, best-sellers-indoor-lights, best-sellers-outdoor-lights). No other bestseller/top-seller/popular/trending/customer-favorite terminology found elsewhere in nav, footer, or sitemap. QTY METHOD: the site's collection pages default to an in-stock-only view (confirmed via an in-page developer comment referencing 'filter.v.availability=1' and 'in-stock-only count'); the rendered #ProductCount/#wh-grid-count span (e.g. '114 products') is the number actually shown to a visitor on that PLP and was used as qty. The raw /collections/<handle>/products.json feed returns a larger figure for some collections (all-time collection membership incl. out-of-stock items) - per this project's established pattern (storefront count/membership APIs can overstate vs. the rendered available count), the rendered figure was trusted, not the raw feed. Note the 4 child counts (44+19+23+28=114) sum exactly to the parent's own rendered count, confirming the parent 'Bestsellers' page is a clean aggregate of the 4 children with no additional hidden members and no double-counting concern.",
+  "rows": [
+    {
+      "category": "Bestsellers",
+      "sub_category": "Bestsellers",
+      "qty": 114,
+      "link": "https://www.whisperinghomes.com/collections/bestsellers",
+      "is_group": true,
+      "evidence": "#ProductCount span on /collections/bestsellers: '114 products' (rendered via Playwright)",
+      "flag": null
+    },
+    {
+      "category": "Indoor Lights Bestsellers",
+      "sub_category": "Indoor Lights Bestsellers",
+      "qty": 44,
+      "link": "https://www.whisperinghomes.com/collections/best-sellers-indoor-lights",
+      "is_group": false,
+      "evidence": "#ProductCount span: '44 products' (rendered via Playwright)",
+      "flag": null
+    },
+    {
+      "category": "Outdoor Lights Bestsellers",
+      "sub_category": "Outdoor Lights Bestsellers",
+      "qty": 19,
+      "link": "https://www.whisperinghomes.com/collections/best-sellers-outdoor-lights",
+      "is_group": false,
+      "evidence": "#ProductCount span: '19 products' (rendered via Playwright)",
+      "flag": null
+    },
+    {
+      "category": "Home Decor Bestsellers",
+      "sub_category": "Home Decor Bestsellers",
+      "qty": 23,
+      "link": "https://www.whisperinghomes.com/collections/best-sellers-home-decor",
+      "is_group": false,
+      "evidence": "#ProductCount span: '23 products' (rendered via Playwright)",
+      "flag": null
+    },
+    {
+      "category": "Dried Florals Bestsellers",
+      "sub_category": "Dried Florals Bestsellers",
+      "qty": 28,
+      "link": "https://www.whisperinghomes.com/collections/best-sellers-dried-florals",
+      "is_group": false,
+      "evidence": "#ProductCount span: '28 products' (rendered via Playwright; a direct curl fetch of this collection returned a transient HTTP 500 during the rate-limit episode, resolved via Playwright)",
+      "flag": null
+    }
+  ]
+}

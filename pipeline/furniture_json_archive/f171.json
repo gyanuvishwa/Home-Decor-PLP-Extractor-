@@ -1,0 +1,66 @@
+{
+  "sr": 171,
+  "company": "Aura Living UAE",
+  "brand_site": "auraliving.com",
+  "country": "UAE",
+  "site_url": "https://www.auraliving.com/",
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "ACCESS: Claude-in-Chrome connector only, own tab, UAE locale https://www.auraliving.com/ae. robots.txt (fetched same-origin in the tab) is 'User-agent: * / Allow: *' with disallows only for Yandex/Semrush/Ahrefs/MJ12/BLEX/dotbot/Barkrowler/Optimizer/MauiBot/ScreamingFrog - no Claude/anthropic-ai/ClaudeBot restriction. No block, challenge or rate-limit encountered at any point. TREE SOURCES (union of three, per trap 1): (a) the header mega-menu parsed out of the SSR Nuxt payload window.__NUXT__.data['published/en/aura/ae/templates'].content.header[0].navigationItems - Furniture > {All Furniture, Sofas and Armchairs, Living Room, Dining Room, Bedroom, Game Room}; (b) the site's own CMS category index in place of a sitemap - www.auraliving.com/sitemap.xml is a dead stub listing only six leem.com locale roots, so I enumerated all 222 published /ae/c/ stories via the Storyblok links API the site itself uses (token taken from window.__NUXT__.config.public.cms.accessToken) and resolved each story's ProductGrid.query relation to see which commerce category path or collection id it drives; (c) each category page's own in-page CATEGORY filter drawer. COUNTS: the rendered listing header is the h1 with the total appended ('Bedroom41'). I read that header in the tab for all five leaves plus the parent, and independently corroborated every one against the site's own commerce API (POST https://api.auraliving.com/aura/catalog/products with {page,count,category:'/category-1/...',region:'ae',language:'en',order:'OrderByScoreDESC',filters:[],calculateTotalPrice:false}) called same-origin from the loaded page. The two agree exactly on all six: 170/58/25/34/41/12, and the five children sum to the parent 170. I also pulled all 170 furniture products (8 API pages, 170 unique productIds, zero duplicates) and their 3-level 'categories' arrays; the per-node tallies reproduce the header numbers exactly, so this is a full-enumeration cross-check, not just a header read. DEPTH / WHY THE LEAVES STOP AT LEVEL 2: the catalogue taxonomy is 3 levels (e.g. Furniture > Bedroom > Dressers and Chests) but level 3 has NO addressable URL - it exists only as a client-side facet inside the 'SHOW FILTERS' drawer. I verified this by opening the drawer on /ae/c/bedroom (it prints 'Dressers and Chests 23 / Beds and Mattresses 11 / Bedside Tables 4 / Benches and Stools 3', matching my API tallies) and clicking a facet: the URL does not change at all - no path segment, not even a query string. So the deepest valid listing URLs are the five level-2 pages, which is what I recorded. For reference the level-3 splits are: Sofas and Armchairs = Sofas and Sectionals 38 + Armchairs 20; Living Room = Side Tables 13 + Coffee and Console Tables 10 + Ottomans 1 + Cabinets 1; Dining Room = Dining Chairs 24 + Dining Tables 9 + Storage 1; Bedroom = Dressers and Chests 23 + Beds and Mattresses 11 + Bedside Tables 4 + Benches and Stools 3; Game Room has no level 3. TRAP 2 (bad slug): checked - /ae/c/bedroom-nonexistent-zzz returns the real error page ('Sorry, we can't find what you are looking for.', title 'Error | Aura'), it does NOT silently serve a parent listing. Every leaf URL I recorded was loaded and its rel=canonical confirmed to be the node I asked for. Note the API layer DOES behave this way though: a malformed category value ('category-1/Furniture' without the leading slash, or an unknown key) silently returns a site-wide fallback of 807 or 633 instead of erroring, so every API total I used was sanity-checked against the rendered header and against the 807/633 fallback values. TRAP 3 (slug not label): the 'Game Room' node is linked in the mega-menu as /ae/c/collections/game-room but its own canonical is /ae/c/game-room (category /category-1/Furniture/category-2/Game-Room, 12 items); I recorded the canonical. Separately there is a merchandising collection 'gaming' (collection id 406, 14 items) which is a different object - not recorded. DEAD LEGACY CATEGORY PAGES EXCLUDED: the Storyblok index contains ~25 furniture-named /ae/c/ pages inherited from the shared Leem platform that point at a completely different taxonomy root (/category-1/Chairs, /category-1/Tables, /category-1/Sofas-and-Seating, /category-1/Storage, /category-1/Beds-and-Mattresses, /category-1/Accessories) - e.g. 2-seater, 3-seater, 4-seater, sectional-sofas, occasional-chairs, dining-arm-chairs, dining-side-chairs, stools, benches, coffee-tables, side-tables, console-tables, dining-tables, bedside-tables-aura, dressing-tables, occasional-tables, double-size-beds, king-size-beds, mattresses, bedroom-storage, dining-storage, living-room-storage, kitchen-storage, all-in-chairs, all-in-tables, all-in-storage, all-sofas-and-seating, all-in-beds-and-mattresses. I queried the API for those roots and paths: every one returns total 0, and none of Aura's 633 catalogue products carries those categories. They are orphaned CMS pages from the sister brand's taxonomy, not live Aura categories, so they are not rows. MADE TO ORDER - DELIBERATELY NOT ROWED, FLAGGING FOR THE ORCHESTRATOR: the catalogue has a second furniture department, category-1 'Made to Order', with 144 products (Sofas and Sectionals 120, Armchairs 16, Ottomans 8) - genuine upholstery furniture. It has a top-level nav entry, but /ae/c/collections/Made-To-Order is an editorial landing page with no product grid, no h1 count and no listing; its only children are three named product-line collections (Dahlia 47, Kiera 24, Rania 72 - ids 444/445/446, 143 of the 144). Both a landing page and product collections are explicitly barred by the brief, and the department has no category listing page of its own, so per 'a node with no listing page is not a row at all' I emitted nothing for it. If the merge wants those 144 items represented, the numbers above are verified and a decision is needed on which URL to use. ABSENCE ELSEWHERE: I tabulated all 633 UAE catalogue products by their full category path. The only category-1 values in the whole catalogue are Furniture (170), Made to Order (144), Decor, Tableware and Bed and Bath. Decor/Tableware/Bed and Bath contain no furniture-typed node whatsoever (candles, vases, mirrors, rugs, cushions, dinnerware, serveware, drinkware, cutlery, table linen, bed linen, bath linen, bathroom accessories) and there is no outdoor/garden/office/kids furniture anywhere on the site. EXCLUDED per brief: all-furniture (roll-up parent, kept as the grouping row only), New In / Sale / Clearance / All-* roll-ups, and every /c/collections/* merchandising page.",
+  "rows": [
+    {
+      "category": "Furniture",
+      "sub_category": "Furniture",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Sofas and Armchairs",
+      "qty": 58,
+      "link": "https://www.auraliving.com/ae/c/sofas-and-armchairs",
+      "is_group": false,
+      "evidence": "rendered listing header h1 'Sofas and Armchairs58' on the loaded page (canonical https://www.auraliving.com/ae/c/sofas-and-armchairs); corroborated by same-origin POST api.auraliving.com/aura/catalog/products category=/category-1/Furniture/category-2/Sofas-and-Armchairs -> pagination.total=58, and by enumerating the 170 Furniture products (Sofas and Sectionals 38 + Armchairs 20 = 58)",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Living Room",
+      "qty": 25,
+      "link": "https://www.auraliving.com/ae/c/living-room",
+      "is_group": false,
+      "evidence": "rendered listing header h1 'Living Room25' (canonical https://www.auraliving.com/ae/c/living-room); corroborated by pagination.total=25 for category=/category-1/Furniture/category-2/Living-Room and by product enumeration (Side Tables 13 + Coffee and Console Tables 10 + Ottomans 1 + Cabinets 1 = 25)",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Dining Room",
+      "qty": 34,
+      "link": "https://www.auraliving.com/ae/c/dining-room",
+      "is_group": false,
+      "evidence": "rendered listing header h1 'Dining Room34' (canonical https://www.auraliving.com/ae/c/dining-room); corroborated by pagination.total=34 for category=/category-1/Furniture/category-2/Dining-Room and by product enumeration (Dining Chairs 24 + Dining Tables 9 + Storage 1 = 34)",
+      "flag": null
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Bedroom",
+      "qty": 41,
+      "link": "https://www.auraliving.com/ae/c/bedroom",
+      "is_group": false,
+      "evidence": "rendered listing header h1 'Bedroom41' (canonical https://www.auraliving.com/ae/c/bedroom); corroborated by pagination.total=41 for category=/category-1/Furniture/category-2/Bedroom and by product enumeration (Dressers and Chests 23 + Beds and Mattresses 11 + Bedside Tables 4 + Benches and Stools 3 = 41), which also matches the counts printed in the page's own CATEGORY filter drawer",
+      "flag": "MANUAL REVIEW: the site's own count of 41 includes 4 mattresses (Uni Orthopax Tight Top King Mattress, Uni Jumbo Mattress, Uni Orthopax Pillow Top King Mattress, Pillow Top Mattress) inside its undivided 'Beds and Mattresses' sub-facet of 11 (the other 7 are beds/bed frames). There is no separate beds-only listing URL. Furniture-only count would be 37."
+    },
+    {
+      "category": "Furniture",
+      "sub_category": "Game Room",
+      "qty": 12,
+      "link": "https://www.auraliving.com/ae/c/game-room",
+      "is_group": false,
+      "evidence": "rendered listing header h1 'Game Room12' (canonical https://www.auraliving.com/ae/c/game-room, title 'Game Room | Aura'); corroborated by pagination.total=12 for category=/category-1/Furniture/category-2/Game-Room and by product enumeration (12 of the 170 Furniture products carry categories ['Furniture','Game Room'])",
+      "flag": "MANUAL REVIEW: mixed node. The site files it under Furniture and 9 of the 12 are furniture (carrom/backgammon/card gaming tables, Dina Gaming Table Armchair x2, Boden Dina Floor Seat); 3 are board-game sets, not furniture (Urk Backgammon Set, Urk Domino Set, Urk Card Set). Site's own count 12 recorded per the exact-qty rule; furniture-only count would be 9."
+    }
+  ]
+}

@@ -1,0 +1,504 @@
+{
+  "sr": 228,
+  "company": "Urban Ladder",
+  "brand_site": "urbanladder.com",
+  "country": "India",
+  "site_url": "https://www.urbanladder.com/",
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "ACCESS: robots.txt (User-agent: * with specific path disallows, no blanket Disallow: / and no anthropic-ai/ClaudeBot naming) permitted tier (a)/(b). Tier (a) plain HTTP fetch of homepage + sitemap.xml + sitemap/category_l1/l2/l3.sitemap.xml (requests) got the full l1/l2/l3 category slug inventory but the product-listing pages are client-rendered (React SPA on a 'proddist' platform, no __NEXT_DATA__/embedded JSON), so quantities were not visible via tier (a) alone. Escalated to tier (b): launched headless Playwright (chromium), rendered representative listing pages, and captured the page's own XHR calls to the site's public search API (https://www.urbanladder.com/ext/search/application/api/v1.0/products?f=<facet-filter>&page_id=0&page_size=N). This is the same JSON the rendered page itself uses to build its DOM (not a third-party API), so it counts as tier (b) DOM/network-response reading, not an invented endpoint. TREE METHOD: built the tree from the union of the l1_category/l2_category facet families returned by that API (l1_category=storage-furniture -> l2_category={living-storage,dining-storage,bedroom-storage,kids-storage} -> category={leaf slugs}) plus l1=lighting--decor (which nests the 'Furnishing' nav tab's l2 groups: home-linen, carpets-rugs, bathroom-accessories, kitchen-dining-accessories, home-decor, wall-art-decor, lamps-lighting) plus l1=dining-room and l1=bedroom-mattresses for a few directly-tagged leaves (chair-pads; pillows1, mattress-protectors, kids-bedsheets). Confirmed the site's real working leaf-category URL scheme is /products/?category=<slug>&department=urban-ladder-furniture (NOT the /products/?l3_categories=<slug>&department=... URLs listed in sitemap/category_l3.sitemap.xml, which silently fall through to the site-wide total, e.g. l3_categories=chair-pads rendered '36098 Products' with unrelated sofa/lamp items instead of filtering - a confirmed instance of the 'bad slug silently serves the wrong number' trap; category_l3.sitemap.xml URLs were therefore discarded as unreliable and not used for any row). Verified the working ?category= URL against 4 spot-check renders (category=chair-pads -> '3 Products'/chip 'Chair Pads'; category=table-mat -> '29 Products' of table covers/placemats/runners; category=bookshelves -> '428 Products'; category=room-divider -> '174 Products') and every value matched the API facet count exactly, and item_total for each parent facet call equals the exact sum of its children's counts (e.g. storage-furniture item_total=2707 = sum of its 18 leaf categories). QTY METHOD: qty = the 'count' field on the matching value inside the 'category' (or l2_category) facet of the search API response for that parent scope - this is the site's own exact per-category product count, the same number the rendered page displays as '<qty> Products'. EXCLUDED: Wall Mirrors (126, sits inside the Home Linen l2 bucket but is a mirror/decor product, not textile); Dinnerware (414, Kitchen & Dining Accessories bucket - tableware, not textile/storage); Home Decor l2 (Showpieces/Artificial Plants/Planters/Vases/Table Photoframes/Artificial Flowers - decorative accessories, neither textile nor storage); Wall Art & Decor l2 (Wall Accent/Wall Clocks/Wall Art/Wall Photoframes - Wall Decor boundary, no distinct textile-wall-hanging subcategory exposed); all pure-furniture l1 departments (Sofas & Recliners, Living [Coffee/Side/Console Tables, Accent/Lounge Chairs, Ottomans, Benches, Bar Stools], Outdoor Furniture, Study, remaining Dining Room leaves [dining sets/chairs/tables/benches], remaining Bedroom & Mattresses leaves [beds, mattresses, bunk beds, cribs, kids study tables/chairs]) - all Furniture per the furniture boundary in both rule files. Institutional-business/B2B l1 branch and Deals/Services/Value-Added-Service branches skipped as non-category promo/B2B scope, not product taxonomy. STORAGE BOUNDARY JUDGEMENT CALL: Urban Ladder's own top nav has a dedicated 'Storage Furniture' department, structurally distinct and separate from its Living/Bedroom/Dining/Study furniture departments - i.e. the site itself explicitly buckets these 18 leaves as Storage rather than plain Furniture (storage.md Sec21/27: 'if explicitly placed inside a Storage/Organization category, prefer Storage'). All 18 leaves under that department were therefore included in storage_rows, with confidence graded per how clearly the item's own primary function is storage/organization: HIGH for Bookshelves, TV Units, Wall Shelves, Shoe Racks, Kitchen Cabinets & Racks, Crockery Units, Wardrobes, Chest of Drawers, Kids Bookshelves, Kids Wardrobes, Kids Chest of Drawers; MEDIUM for Bedside Tables, Dressing Tables & Mirrors, Bar Cabinets, Coat Rack, Kids Bedside Tables (storage is a secondary function alongside another primary use); LOW + MANUAL REVIEW flag for Prayer Units and Room Divider (devotional-furniture / room-partition primary purpose, storage secondary at best, placed in the review queue per storage.md Sec42 rather than silently guessed either way). Kitchen Linen (qty 1) is LOW confidence: the single item ranked under that category name is a 'Holiday Bunting' decoration, not a conventional kitchen textile, so it is flagged for manual review rather than dropped or upgraded.",
+  "textile_rows": [
+    {
+      "category": "Textile",
+      "sub_category": "Furnishing",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Home Linen",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Bedsheets",
+      "qty": 249,
+      "link": "https://www.urbanladder.com/products/?category=bedsheets&department=urban-ladder-furniture",
+      "is_group": false,
+      "evidence": "search API facet l2_category=home-linen -> category facet value 'bedsheets' count=249; rendered category page header shows '249 Products'",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Window Curtains",
+      "qty": 159,
+      "link": "https://www.urbanladder.com/products/?category=window-curtains&department=urban-ladder-furniture",
+      "is_group": false,
+      "evidence": "search API facet l2_category=home-linen -> category facet value 'window-curtains' count=159",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Door Curtains",
+      "qty": 308,
+      "link": "https://www.urbanladder.com/products/?category=door-curtains&department=urban-ladder-furniture",
+      "is_group": false,
+      "evidence": "search API facet l2_category=home-linen -> category facet value 'door-curtains' count=308",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Cushion Covers",
+      "qty": 529,
+      "link": "https://www.urbanladder.com/products/?category=cushion-covers&department=urban-ladder-furniture",
+      "is_group": false,
+      "evidence": "search API facet l2_category=home-linen -> category facet value 'cushion-covers' count=529",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Sofa Covers",
+      "qty": 125,
+      "link": "https://www.urbanladder.com/products/?category=sofa-covers&department=urban-ladder-furniture",
+      "is_group": false,
+      "evidence": "search API facet l2_category=home-linen -> category facet value 'sofa-covers' count=125 (furniture cover, textile per rule)",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Quilts & Comforters",
+      "qty": 53,
+      "link": "https://www.urbanladder.com/products/?category=quilts-comforters&department=urban-ladder-furniture",
+      "is_group": false,
+      "evidence": "search API facet l2_category=home-linen -> category facet value 'quilts-comforters' count=53",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Blankets",
+      "qty": 9,
+      "link": "https://www.urbanladder.com/products/?category=blankets&department=urban-ladder-furniture",
+      "is_group": false,
+      "evidence": "search API facet l2_category=home-linen -> category facet value 'blankets' count=9",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Filled Cushions",
+      "qty": 9,
+      "link": "https://www.urbanladder.com/products/?category=filled-cushions&department=urban-ladder-furniture",
+      "is_group": false,
+      "evidence": "search API facet l2_category=home-linen -> category facet value 'filled-cushions' count=9",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Carpets & Rugs",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Carpets",
+      "qty": 1334,
+      "link": "https://www.urbanladder.com/products/?category=carpets&department=urban-ladder-furniture",
+      "is_group": false,
+      "evidence": "search API facet l2_category=carpets-rugs -> category facet value 'carpets' count=1334; l2 item_total=1404 = 1334+70 confirming exhaustiveness",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Dhurries",
+      "qty": 70,
+      "link": "https://www.urbanladder.com/products/?category=dhurries&department=urban-ladder-furniture",
+      "is_group": false,
+      "evidence": "search API facet l2_category=carpets-rugs -> category facet value 'dhurries' count=70",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Bathroom Accessories",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Towels",
+      "qty": 8,
+      "link": "https://www.urbanladder.com/products/?category=towels&department=urban-ladder-furniture",
+      "is_group": false,
+      "evidence": "search API facet l2_category=bathroom-accessories -> category facet value 'towels' count=8; l2 item_total=15 = 8+7 confirming exhaustiveness",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Bath Mats",
+      "qty": 7,
+      "link": "https://www.urbanladder.com/products/?category=bath-mats&department=urban-ladder-furniture",
+      "is_group": false,
+      "evidence": "search API facet l2_category=bathroom-accessories -> category facet value 'bath-mats' count=7",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Kitchen & Dining Accessories",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "MEDIUM"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Table Mat",
+      "qty": 29,
+      "link": "https://www.urbanladder.com/products/?category=table-mat&department=urban-ladder-furniture",
+      "is_group": false,
+      "evidence": "search API facet l2_category=kitchen-dining-accessories -> category facet value 'table-mat' count=29; spot-checked rendered page confirms contents are table covers/placemats/table runners (fabric table textiles)",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Table Napkin",
+      "qty": 12,
+      "link": "https://www.urbanladder.com/products/?category=table-napkin&department=urban-ladder-furniture",
+      "is_group": false,
+      "evidence": "search API facet l2_category=kitchen-dining-accessories -> category facet value 'table-napkin' count=12",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Kitchen Linen",
+      "qty": 1,
+      "link": "https://www.urbanladder.com/products/?category=kitchen-linens&department=urban-ladder-furniture",
+      "is_group": false,
+      "evidence": "search API facet l2_category=kitchen-dining-accessories -> category facet value 'kitchen-linens' count=1; spot-checked rendered page: sole item is a 'Holiday Bunting' fabric decoration, not a conventional kitchen textile",
+      "flag": "MANUAL REVIEW: only product in this category is a seasonal fabric bunting decoration, not a typical kitchen textile - verify intent before treating as Textile",
+      "confidence": "LOW"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Dining & Kitchen",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Chair Pads",
+      "qty": 3,
+      "link": "https://www.urbanladder.com/products/?category=chair-pads&department=urban-ladder-furniture",
+      "is_group": false,
+      "evidence": "search API facet l1_category=dining-room -> category facet value 'chair-pads' count=3; verified rendered page shows '3 Products' / chip 'Chair Pads' / products are fabric seat cushions",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Bedroom & Mattresses",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Pillows",
+      "qty": 26,
+      "link": "https://www.urbanladder.com/products/?category=pillows1&department=urban-ladder-furniture",
+      "is_group": false,
+      "evidence": "search API facet l1_category=bedroom-mattresses -> category facet value 'pillows1' (display 'Pillows') count=26",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Mattress Protectors",
+      "qty": 5,
+      "link": "https://www.urbanladder.com/products/?category=mattress-protectors&department=urban-ladder-furniture",
+      "is_group": false,
+      "evidence": "search API facet l1_category=bedroom-mattresses -> category facet value 'mattress-protectors' count=5",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Textile",
+      "sub_category": "Kids Bedsheets",
+      "qty": 2,
+      "link": "https://www.urbanladder.com/products/?category=kids-bedsheets&department=urban-ladder-furniture",
+      "is_group": false,
+      "evidence": "search API facet l1_category=bedroom-mattresses -> category facet value 'kids-bedsheets' count=2",
+      "flag": null,
+      "confidence": "HIGH"
+    }
+  ],
+  "storage_rows": [
+    {
+      "category": "Storage",
+      "sub_category": "Storage Furniture",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Living Storage",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Bookshelves",
+      "qty": 428,
+      "link": "https://www.urbanladder.com/products/?category=bookshelves&department=urban-ladder-furniture",
+      "is_group": false,
+      "evidence": "search API facet l1_category=storage-furniture,l2_category=living-storage -> category facet value 'bookshelves' count=428; rendered page confirms '428 Products'",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "TV Units",
+      "qty": 229,
+      "link": "https://www.urbanladder.com/products/?category=tv-units&department=urban-ladder-furniture",
+      "is_group": false,
+      "evidence": "search API facet l2_category=living-storage -> category facet value 'tv-units' count=229",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Wall Shelves",
+      "qty": 223,
+      "link": "https://www.urbanladder.com/products/?category=wall-shelves&department=urban-ladder-furniture",
+      "is_group": false,
+      "evidence": "search API facet l2_category=living-storage -> category facet value 'wall-shelves' count=223",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Shoe Racks",
+      "qty": 215,
+      "link": "https://www.urbanladder.com/products/?category=shoe-racks&department=urban-ladder-furniture",
+      "is_group": false,
+      "evidence": "search API facet l2_category=living-storage -> category facet value 'shoe-racks' count=215",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Prayer Units",
+      "qty": 200,
+      "link": "https://www.urbanladder.com/products/?category=prayer-units&department=urban-ladder-furniture",
+      "is_group": false,
+      "evidence": "search API facet l2_category=living-storage -> category facet value 'prayer-units' count=200",
+      "flag": "MANUAL REVIEW: primary purpose is devotional/pooja furniture, not storage/organization - included only because the site itself groups it under Storage Furniture > Living Storage",
+      "confidence": "LOW"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Room Divider",
+      "qty": 174,
+      "link": "https://www.urbanladder.com/products/?category=room-divider&department=urban-ladder-furniture",
+      "is_group": false,
+      "evidence": "search API facet l2_category=living-storage -> category facet value 'room-divider' count=174; spot-checked rendered page confirms '174 Products'",
+      "flag": "MANUAL REVIEW: primary purpose is space partitioning, not storage/organization - included only because the site itself groups it under Storage Furniture > Living Storage",
+      "confidence": "LOW"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Coat Rack",
+      "qty": 3,
+      "link": "https://www.urbanladder.com/products/?category=coat-rack&department=urban-ladder-furniture",
+      "is_group": false,
+      "evidence": "search API facet l2_category=living-storage -> category facet value 'coat-rack' count=3",
+      "flag": null,
+      "confidence": "MEDIUM"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Dining Storage",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Crockery Units",
+      "qty": 241,
+      "link": "https://www.urbanladder.com/products/?category=crockery-units&department=urban-ladder-furniture",
+      "is_group": false,
+      "evidence": "search API facet l1_category=storage-furniture,l2_category=dining-storage -> category facet value 'crockery-units' count=241",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Kitchen Cabinets & Racks",
+      "qty": 131,
+      "link": "https://www.urbanladder.com/products/?category=kitchen-cabinets-racks&department=urban-ladder-furniture",
+      "is_group": false,
+      "evidence": "search API facet l2_category=dining-storage -> category facet value 'kitchen-cabinets-racks' count=131",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Bar Cabinets",
+      "qty": 76,
+      "link": "https://www.urbanladder.com/products/?category=bar-cabinets&department=urban-ladder-furniture",
+      "is_group": false,
+      "evidence": "search API facet l2_category=dining-storage -> category facet value 'bar-cabinets' count=76",
+      "flag": null,
+      "confidence": "MEDIUM"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Bedroom Storage",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Bedside Tables",
+      "qty": 283,
+      "link": "https://www.urbanladder.com/products/?category=bedside-tables&department=urban-ladder-furniture",
+      "is_group": false,
+      "evidence": "search API facet l1_category=storage-furniture,l2_category=bedroom-storage -> category facet value 'bedside-tables' count=283",
+      "flag": null,
+      "confidence": "MEDIUM"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Wardrobes",
+      "qty": 276,
+      "link": "https://www.urbanladder.com/products/?category=wardrobes&department=urban-ladder-furniture",
+      "is_group": false,
+      "evidence": "search API facet l2_category=bedroom-storage -> category facet value 'wardrobes' count=276",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Chest of Drawers",
+      "qty": 87,
+      "link": "https://www.urbanladder.com/products/?category=chest-of-drawers&department=urban-ladder-furniture",
+      "is_group": false,
+      "evidence": "search API facet l2_category=bedroom-storage -> category facet value 'chest-of-drawers' count=87",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Dressing Tables & Mirrors",
+      "qty": 81,
+      "link": "https://www.urbanladder.com/products/?category=dressing-tables-mirrors&department=urban-ladder-furniture",
+      "is_group": false,
+      "evidence": "search API facet l2_category=bedroom-storage -> category facet value 'dressing-tables-mirrors' count=81",
+      "flag": null,
+      "confidence": "MEDIUM"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Kids Storage",
+      "qty": null,
+      "link": null,
+      "is_group": true,
+      "evidence": null,
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Kids Bookshelves",
+      "qty": 34,
+      "link": "https://www.urbanladder.com/products/?category=kids-bookshelves&department=urban-ladder-furniture",
+      "is_group": false,
+      "evidence": "search API facet l1_category=storage-furniture,l2_category=kids-storage -> category facet value 'kids-bookshelves' count=34",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Kids Wardrobes",
+      "qty": 22,
+      "link": "https://www.urbanladder.com/products/?category=kids-wardrobes&department=urban-ladder-furniture",
+      "is_group": false,
+      "evidence": "search API facet l2_category=kids-storage -> category facet value 'kids-wardrobes' count=22",
+      "flag": null,
+      "confidence": "HIGH"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Kids Bedside Tables",
+      "qty": 2,
+      "link": "https://www.urbanladder.com/products/?category=kids-bedside-tables&department=urban-ladder-furniture",
+      "is_group": false,
+      "evidence": "search API facet l2_category=kids-storage -> category facet value 'kids-bedside-tables' count=2",
+      "flag": null,
+      "confidence": "MEDIUM"
+    },
+    {
+      "category": "Storage",
+      "sub_category": "Kids Chest of Drawers",
+      "qty": 2,
+      "link": "https://www.urbanladder.com/products/?category=kids-chest-of-drawers&department=urban-ladder-furniture",
+      "is_group": false,
+      "evidence": "search API facet l2_category=kids-storage -> category facet value 'kids-chest-of-drawers' count=2",
+      "flag": null,
+      "confidence": "HIGH"
+    }
+  ]
+}

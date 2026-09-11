@@ -1,0 +1,34 @@
+{
+  "status": "ok",
+  "failure_reason": null,
+  "notes": "Direct HTTP fetch only (site fully reachable, robots.txt has no Claude-specific disallow). Site is Shopify + Algolia (InstantSearch). Read the Algolia app_id=AVKHUU7E0V, search_api_key=82a89b3b781da17c3ff1c020ea007984, index_prefix=shopify_ straight out of the collection page's own embedded window.algoliaShopify.config script (same config the storefront JS uses), then queried POST https://AVKHUU7E0V-dsn.algolia.net/1/indexes/*/queries against index shopify_products with facetFilters=[['collections:<handle>']], distinct=1 -- the exact query shape the prior Home-Decor pass (notes/64.md) verified as truncation-free and matching the storefront's own rendered counts. Checked: main nav (desktop/mobile mega menu dump of homepage), the /collections/bestsellers page's own 'Bubbles' sub-filter row, the Rugs category subnav, /collections.json (845 collections total across 4 pages, enumerated in full and keyword-scanned for best/sell/popular/favorite/trend). Found top-level 'Bestsellers' in main nav as a single-link item (no nav submenu). On the Bestsellers page itself, an 8-item filter 'bubble' row appears: Furniture/Rugs/Lighting/Pillows+Throws/Wall Decor+Mirrors/Decor+Tabletop bubbles are all in-page Algolia refinementList facet filters on the SAME /collections/bestsellers listing (URL query params, not separate collections) and were excluded as arbitrary filter pages per the brief. The 'Outdoor' bubble is different: it routes to a genuinely separate Shopify collection /collections/outdoor-bestsellers with its own distinct product count -- kept as a real child. Separately, /collections/bestsellers-rugs ('Bestsellers') is reachable from the Rugs category's own subnav (not from the Bestsellers page) and is also a genuinely distinct collection/count -- kept as a real child. Also found and inspected /collections/sure-to-sell-out (H1 'Sure to Sell Out', qty=253, reachable only via internal link from other collection pages, not main nav) -- this is a scarcity/low-stock-urgency merchandising concept, not a bestseller/popularity ranking, and doesn't match any target term (Bestsellers/Top Sellers/Popular/Customer Favorites/Trending); excluded as a different marketing concept, not recorded as ambiguous since the distinction from 'bestselling' is clear on inspection. Overlap between the 275-item main Bestsellers listing and the two children is expected/not deduplicated per brief.",
+  "rows": [
+    {
+      "category": "Bestsellers",
+      "sub_category": "Bestsellers",
+      "qty": 275,
+      "link": "https://www.luluandgeorgia.com/collections/bestsellers",
+      "is_group": true,
+      "evidence": "Algolia nbHits=275 for index shopify_products, facetFilters=[[\"collections:bestsellers\"]], distinct=1, hitsPerPage=1 -- queried with the app_id/search_api_key read from the page's own window.algoliaShopify.config (the same client the storefront's InstantSearch grid uses)",
+      "flag": null
+    },
+    {
+      "category": "Rugs Bestsellers",
+      "sub_category": "Rugs Bestsellers",
+      "qty": 41,
+      "link": "https://www.luluandgeorgia.com/collections/bestsellers-rugs",
+      "is_group": false,
+      "evidence": "Algolia nbHits=41 for facetFilters=[[\"collections:bestsellers-rugs\"]], distinct=1; page reached via the Rugs category's own subnav 'Bestsellers' link (a distinct Shopify collection, not a facet of /collections/bestsellers)",
+      "flag": null
+    },
+    {
+      "category": "Outdoor Bestsellers",
+      "sub_category": "Outdoor Bestsellers",
+      "qty": 18,
+      "link": "https://www.luluandgeorgia.com/collections/outdoor-bestsellers",
+      "is_group": false,
+      "evidence": "Algolia nbHits=18 for facetFilters=[[\"collections:outdoor-bestsellers\"]], distinct=1; page reached via the 'Outdoor' bubble filter shown on /collections/bestsellers, which (unlike the other bubbles) routes to this separate standalone collection with its own distinct count",
+      "flag": null
+    }
+  ]
+}
